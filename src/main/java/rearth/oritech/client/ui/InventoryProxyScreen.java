@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemSlotWidget;
@@ -72,6 +72,6 @@ public class InventoryProxyScreen extends OritechWidgetScreen<InventoryProxyScre
         menu.addonEntity.setTargetSlot(slot);
         
         // sync to server entity
-        NetworkManager.sendToServer(new InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket(menu.blockPos, slot));
+        PacketDistributor.sendToServer(new InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket(menu.blockPos, slot));
     }
 }

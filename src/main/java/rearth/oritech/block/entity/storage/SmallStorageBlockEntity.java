@@ -13,7 +13,7 @@ import java.util.List;
 public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
     
     public SmallStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SMALL_STORAGE_ENTITY, pos, state);
+        super(BlockEntitiesContent.SMALL_STORAGE_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -41,8 +41,8 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
 
     @Override
     public int getComparatorOutput() {
-        if (energyStorage.amount == 0) return 0;
-        return (int) (1 + ((energyStorage.amount / (float) energyStorage.capacity) * 14));
+        if (energyStorage.energy <= 0) return 0;
+        return (int) (1 + ((energyStorage.energy / (float) energyStorage.capacity) * 14));
     }
     
     @Override

@@ -10,6 +10,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -20,6 +21,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
@@ -302,7 +304,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     private void updateNetwork() {
-        NetworkManager.sendBlockHandle(this, new CatalystSyncPacket(worldPosition, collectedSouls, progress, isHyperEnchanting, maxSouls));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new CatalystSyncPacket(worldPosition, collectedSouls, progress, isHyperEnchanting, maxSouls));
     }
     
     @Override

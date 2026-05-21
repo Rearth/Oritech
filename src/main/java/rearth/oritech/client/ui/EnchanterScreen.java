@@ -8,7 +8,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
@@ -146,6 +146,6 @@ public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler
     }
 
     private void sendEnchantmentToServer(Identifier selected) {
-        NetworkManager.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(menu.blockPos, selected));
+        PacketDistributor.sendToServer(new EnchanterBlockEntity.SelectEnchantingPacket(menu.blockPos, selected));
     }
 }

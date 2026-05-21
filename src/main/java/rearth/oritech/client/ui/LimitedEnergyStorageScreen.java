@@ -2,7 +2,7 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SliderWidget;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
@@ -43,7 +43,7 @@ public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnerg
     }
     
     private void onSliderDragged(SliderWidget slider, int value) {
-        NetworkManager.sendToServer(new ExpandableEnergyStorageBlockEntity.StorageLimitPacket(menu.blockPos, value));
+        PacketDistributor.sendToServer(new ExpandableEnergyStorageBlockEntity.StorageLimitPacket(menu.blockPos, value));
     }
     
     // basically generates multiples of 2 and 5 that can be selected from

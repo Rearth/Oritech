@@ -3,10 +3,12 @@ package rearth.oritech.block.entity.pipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.time.StopWatch;
@@ -184,7 +186,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             pathLength += nextPathPos.distManhattan(pathPos);
         }
         var packet = new RenderStackData(worldPosition, new ItemStack(moved, movedCount), codedPath, level.getGameTime(), pathLength);
-        NetworkManager.sendBlockHandle(this, packet);
+        PacketDistributor.sendToPlayersTrackingChunk((net.minecraft.server.level.ServerLevel) level, ChunkPos.containing(worldPosition), packet);
         
         if (wasEmpty) {
             var arrivalTime = level.getGameTime() + (int) calculatePathLength(path.getB());

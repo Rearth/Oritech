@@ -8,8 +8,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.attachment.AttachmentApi;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -122,7 +122,7 @@ public class ClientZiplineHandler {
             return;
         }
         
-        NetworkManager.sendToServer(new ServerZiplineHandler.ZiplinePlayerUsePacket());
+        PacketDistributor.sendToServer(new ServerZiplineHandler.ZiplinePlayerUsePacket());
         
         // Shift -> Drop
         if (player.input.shiftKeyDown) {

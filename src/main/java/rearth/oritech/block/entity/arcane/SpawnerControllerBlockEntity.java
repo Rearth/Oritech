@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -15,6 +16,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
@@ -148,7 +150,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         networkDirty = false;
         
         if (!mobNbt.isEmpty())
-            NetworkManager.sendBlockHandle(this, new SpawnerSyncPacket(worldPosition, mobNbt, hasCage, collectedSouls, maxSouls));
+            PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new SpawnerSyncPacket(worldPosition, mobNbt, hasCage, collectedSouls, maxSouls));
     }
     
     public static void receiveUpdatePacket(SpawnerSyncPacket message, IPayloadContext context) {

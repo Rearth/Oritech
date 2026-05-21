@@ -6,12 +6,16 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import rearth.oritech.Oritech;
 
 // important: when implementing this class and the block has a GUI, make sure to call `this.sendUpdate(SyncType.GUI_OPEN);` in the `writeClientSideData()` method.
@@ -53,7 +57,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     }
     
     public abstract void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
-    public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {};
+    public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {}
     
     public int getSparseUpdateInterval() {return 100;}
     
@@ -77,18 +81,18 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     public void preNetworkUpdate(SyncType type) {}
     
     public void sendUpdate(SyncType type) {
-        if (level == null) {
-              Oritech.LOGGER.warn("unable to send update: Level is null.");
+        if (level == null || !(level instanceof ServerLevel serverLevel)) {
+            Oritech.LOGGER.warn("unable to send update for {} at {}.", getType(), worldPosition);
             return;
         }
         
         preNetworkUpdate(type);
         
-        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-        
-        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
+
+        PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
     
     public void sendUpdate(SyncType type, ServerPlayer player) {
@@ -99,11 +103,11 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         
         preNetworkUpdate(type);
         
-        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
+        var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-        
-        NetworkManager.sendPlayerHandle(new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()), player);
+
+        PacketDistributor.sendToPlayer(player, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
     
     @Override

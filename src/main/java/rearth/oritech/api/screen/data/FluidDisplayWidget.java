@@ -12,11 +12,11 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.StackContext;
@@ -77,7 +77,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
                             mouseY
                         );
                     }
-                    NetworkManager.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
+                    PacketDistributor.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
                     return true;
                 }
             }

@@ -9,10 +9,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oracle.Oracle;
 import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -97,7 +97,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         if (menu.screenData.inputOptionsEnabled() && inputSlots > 1) {
             cycleInputButton = ButtonWidget.panel(1, 0, 58, 14,
                 Component.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(LabelWidget.DARK_TEXT),
-                btn -> NetworkManager.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos)))
+                btn -> PacketDistributor.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos)))
                 .withTextColor(LabelWidget.DARK_TEXT);
             cycleInputButton.withSurfacePadding(Insets.of(2, 1, 3, 1));
             content.add(cycleInputButton);

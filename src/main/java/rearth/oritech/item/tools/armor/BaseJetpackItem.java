@@ -12,9 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
@@ -86,7 +86,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var fluid = BuiltInRegistries.FLUID.getKey(fluidStack.getFluid());
         
         // this will currently only for instances of this class
-        NetworkManager.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
+        PacketDistributor.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
         
         var playerForward = player.getForward();
         var playerRight = playerForward.normalize().yRot(-90);

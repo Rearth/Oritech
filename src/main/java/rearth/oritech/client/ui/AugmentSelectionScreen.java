@@ -8,10 +8,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.util.ColorHelper;
@@ -253,7 +253,7 @@ public class AugmentSelectionScreen extends Screen {
     }
     
     private void toggleAugment(Identifier id) {
-        NetworkManager.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
+        PacketDistributor.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
     
     @Override

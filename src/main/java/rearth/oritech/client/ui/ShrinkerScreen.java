@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
@@ -66,6 +66,6 @@ public class ShrinkerScreen extends UpgradableOritechScreen<UpgradableOritechScr
     }
     
     private void onShrinkPressed() {
-        NetworkManager.sendToServer(new ShrinkerBlockEntity.ShrinkerPlayerUsePacket(this.menu.blockPos));
+        PacketDistributor.sendToServer(new ShrinkerBlockEntity.ShrinkerPlayerUsePacket(this.menu.blockPos));
     }
 }

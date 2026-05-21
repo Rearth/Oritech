@@ -13,8 +13,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -326,11 +326,11 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             return;
         }
         
-        NetworkManager.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.menu.blockPos, id, operation.ordinal()));
+        PacketDistributor.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.menu.blockPos, id, operation.ordinal()));
     }
     
     private void onLoadAugmentsClick() {
-        NetworkManager.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
+        PacketDistributor.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
         
         int loadedAugmentsCount = 0;
         for (var entry : PlayerAugments.allAugments.entrySet()) {
@@ -349,7 +349,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     
     private void onOpenInvClicked() {
         this.onClose();
-        NetworkManager.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.menu.blockPos));
+        PacketDistributor.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.menu.blockPos));
     }
     
     private void showAugmentDialog(Identifier id, PlayerAugments.AugmentApplicatorOperation operation) {

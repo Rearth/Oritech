@@ -6,7 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.widgets.ItemSlotWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
@@ -106,7 +106,7 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
     }
     
     private void sendUpdateToServer() {
-        NetworkManager.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(menu.blockPos, menu.blockEntity.getFilterSettings()));
+        PacketDistributor.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(menu.blockPos, menu.blockEntity.getFilterSettings()));
     }
     
     private void toggleWhitelist() {

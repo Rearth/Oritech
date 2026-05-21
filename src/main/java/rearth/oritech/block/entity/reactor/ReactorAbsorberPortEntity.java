@@ -18,8 +18,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.InOutInventoryStorage;
@@ -110,10 +112,11 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     }
     
     public void updateNetwork() {
+        if (!(level instanceof ServerLevel serverLevel)) return;
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess());
         var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf, level);
         if (fieldCount == 0) return;
-        NetworkManager.sendBlockHandle(this, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), SyncType.GUI_TICK, usedBuf.array()));
+        PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), SyncType.GUI_TICK, usedBuf.array()));
     }
     
     @Override

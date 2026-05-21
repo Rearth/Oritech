@@ -2,7 +2,7 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import rearth.oritech.api.networking.NetworkManager;
+import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.api.screen.widgets.BoxWidget;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
@@ -81,7 +81,7 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
             var tankIndex = refinery.selectedOutput;
             var newIndex = (tankIndex + 1) % 3;
             widget.setLabel(Component.translatable("label.oritech.tainted_refinery.output_slot", newIndex + 1));
-            NetworkManager.sendToServer(new TaintedRefineryBlockEntity.RefineryTankSelectorPacket(menu.blockPos, newIndex));
+            PacketDistributor.sendToServer(new TaintedRefineryBlockEntity.RefineryTankSelectorPacket(menu.blockPos, newIndex));
         }).withTextColor(LabelWidget.BRIGHT_TEXT).withTooltip(Component.translatable("tooltip.oritech.tainted_refinery.output_slot"));
         
         addComponent(cycleSlotButton);

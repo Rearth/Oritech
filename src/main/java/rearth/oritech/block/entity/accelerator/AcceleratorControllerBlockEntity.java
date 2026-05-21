@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Portal;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
@@ -152,13 +154,13 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public void onParticleExited(Vec3 from, Vec3 to, BlockPos lastGate, Vec3 exitDirection, ParticleEvent reason) {
         
         var eventPosition = BlockPos.containing(particle.position);
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new LastEventPacket(worldPosition, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.lastParticle = particle;
         this.particle = null;
         
         var renderedTrail = List.of(from, to);
-        NetworkManager.sendBlockHandle(this, new ParticleRenderTrail(worldPosition, renderedTrail));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new ParticleRenderTrail(worldPosition, renderedTrail));
         
         this.setChanged();
     }
@@ -174,8 +176,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var success = tryCraftResult(relativeSpeed, activeItemParticle, secondControllerEntity.activeItemParticle);
         }
         
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(secondControllerEntity.getBlockPos(), ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new LastEventPacket(worldPosition, ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(secondControllerEntity.getBlockPos()), new LastEventPacket(secondControllerEntity.getBlockPos(), ParticleEvent.COLLIDED, relativeSpeed, BlockPos.containing(collision), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
         this.removeParticleDueToCollision();
         secondControllerEntity.removeParticleDueToCollision();
@@ -338,8 +340,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             resultList.add(position);
         }
         
-        NetworkManager.sendBlockHandle(this, new ParticleRenderTrail(worldPosition, resultList));
-        NetworkManager.sendBlockHandle(this, new LastEventPacket(worldPosition, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new ParticleRenderTrail(worldPosition, resultList));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new LastEventPacket(worldPosition, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
         
     }
     

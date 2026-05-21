@@ -57,7 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements ItemProvider, FluidProvider, EnergyProvider, MachineAddonController,
+public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements ItemProvider, EnergyProvider, MachineAddonController,
                                                                                                    ScreenProvider, MenuProvider {
     
     @SyncField(SyncType.GUI_OPEN)

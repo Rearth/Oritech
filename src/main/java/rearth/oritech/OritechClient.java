@@ -3,8 +3,8 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
@@ -60,7 +60,7 @@ public final class OritechClient {
         // send mining laser use events to server
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
-                NetworkManager.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
+                PacketDistributor.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
             } else {
                 laserActive = false;
             }

@@ -10,6 +10,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
@@ -59,7 +60,13 @@ public class ParticleContent {
     
     private static void sendParticle(Level level, Payload payload) {
         if (level instanceof ServerLevel sl) {
-            NetworkManager.sendNearby(sl, payload.pos, 64, payload);
+            double radius = 64;
+            double radiusSq = radius * radius;
+            for (var player : sl.players()) {
+                if (player.distanceToSqr(payload.pos.x, payload.pos.y, payload.pos.z) <= radiusSq) {
+                    PacketDistributor.sendToPlayer(player, payload);
+                }
+            }
         } else if (level.isClientSide()) {
             handleOnClient(payload, level, null);
         }
