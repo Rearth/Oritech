@@ -424,8 +424,8 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
-        buf.writeBlockPos(worldPosition);
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
     }
     
     @Override

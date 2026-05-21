@@ -97,9 +97,9 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(worldPosition);
     }
     
     @Override

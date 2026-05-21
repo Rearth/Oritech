@@ -4,6 +4,7 @@ import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -627,9 +628,9 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
         sendUpdate(SyncType.GUI_OPEN);
-        buf.writeBlockPos(worldPosition);
     }
     
     @Override

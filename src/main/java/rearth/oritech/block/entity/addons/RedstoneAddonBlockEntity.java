@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Inventory;
@@ -110,9 +111,9 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
         sendDataToClient();
-        buf.writeBlockPos(worldPosition);
+        buffer.writeBlockPos(getBlockPos());
     }
     
     @Nullable

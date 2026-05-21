@@ -125,8 +125,8 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
-        buf.writeBlockPos(worldPosition);
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
     }
     
     @Override

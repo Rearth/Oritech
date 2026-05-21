@@ -3,9 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -13,13 +11,18 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.StackContext;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,23 +40,25 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     @NotNull
     public final Inventory playerInventory;
     @NotNull
-    public final Container inventory;
+    public final StacksResourceHandler<ItemStack, ItemResource> inventory;
     @NotNull
     public final BlockPos blockPos;
     @NotNull
     public final ScreenProvider screenData;
     
     private final List<DisplayDataSource> dataDisplays = new ArrayList<>();
-    public final List<FluidApi.SingleSlotStorage> fluidStorages;
+    public final List<ResourceHandler<FluidResource>> fluidStorages;
     
     public BlockState machineBlock;
     public BlockEntity blockEntity;
     public List<Integer> armorSlots;
     
+    // client constructor
     public OritechScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
     
+    // server constructor (and forwarded client constructor)
     public OritechScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
         
@@ -63,9 +68,6 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = blockEntity;
         this.inventory = screenData.getDisplayedInventory();
-        
-        if (this.inventory != null)
-            this.inventory.startOpen(playerInventory.player);
         
         addEnergyDisplay();
         addProgressDisplay();

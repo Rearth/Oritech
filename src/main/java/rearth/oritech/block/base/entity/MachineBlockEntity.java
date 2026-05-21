@@ -367,8 +367,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
-        MenuProvider.super.writeClientSideData(menu, buffer);
     }
     
     protected Direction getFacing() {

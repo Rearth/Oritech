@@ -3,13 +3,11 @@ package rearth.oritech.block.base.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +38,6 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
-import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.blocks.storage.SmallStorageBlock;
@@ -292,8 +289,8 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
-        MenuProvider.super.writeClientSideData(menu, buffer);
     }
     
     @Override

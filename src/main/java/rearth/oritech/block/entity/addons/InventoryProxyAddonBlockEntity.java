@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Inventory;
@@ -83,9 +84,9 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
         var data = new InventoryProxyScreenHandler.InvProxyData(worldPosition, getControllerPos(), targetSlot);
-        InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC.encode(buf, data);
+        InventoryProxyScreenHandler.InvProxyData.PACKET_CODEC.encode(buffer, data);
     }
     
     @Override

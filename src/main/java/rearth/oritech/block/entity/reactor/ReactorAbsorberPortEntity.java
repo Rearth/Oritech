@@ -120,8 +120,8 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     }
     
     @Override
-    public void saveExtraData(FriendlyByteBuf buf) {
-        buf.writeBlockPos(worldPosition);
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        buffer.writeBlockPos(getBlockPos());
     }
     
     @Override
