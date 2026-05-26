@@ -2,15 +2,15 @@ package rearth.oritech.block.entity.generators;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -50,21 +50,21 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     private boolean isFolded;
     
     public BigSolarPanelEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIG_SOLAR_ENTITY, pos, state);
+        super(BlockEntitiesContent.BIG_SOLAR_ENTITY.get(), pos, state);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        addMultiblockToNbt(nbt);
-        nbt.putBoolean("folded", isFolded);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        serializeMultiblock(output);
+        output.putBoolean("folded", isFolded);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadMultiblockNbtData(nbt);
-        isFolded = nbt.getBoolean("folded");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeMultiblock(input);
+        isFolded = input.getBooleanOr("folded", false);
     }
     
     @Override

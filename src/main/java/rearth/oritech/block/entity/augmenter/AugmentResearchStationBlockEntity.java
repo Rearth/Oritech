@@ -2,13 +2,13 @@ package rearth.oritech.block.entity.augmenter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -24,19 +24,19 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     private float coreQuality = 1f;
     
     public AugmentResearchStationBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY, pos, state);
+        super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY.get(), pos, state);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        addMultiblockToNbt(nbt);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        serializeMultiblock(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadMultiblockNbtData(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeMultiblock(input);
     }
     
     @Override

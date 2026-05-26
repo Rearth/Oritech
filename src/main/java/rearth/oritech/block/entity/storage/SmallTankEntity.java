@@ -2,13 +2,10 @@ package rearth.oritech.block.entity.storage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -17,56 +14,78 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.blocks.storage.SmallFluidTank;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.util.*;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.ComparatorOutputProvider;
+import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
 
-public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, ItemApi.BlockProvider, ComparatorOutputProvider,
-                                                                       ScreenProvider, ExtendedMenuProvider {
+public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvider, ItemProvider, ComparatorOutputProvider,
+                                                                       ScreenProvider, MenuProvider {
     
     private int lastComparatorOutput = 0;
     public final boolean isCreative;
     
-    private BlockLookupCache<FluidApi.FluidStorage> cachedOutputTarget;
+    private BlockCapabilityCache<ResourceHandler<FluidResource>, Direction> cachedOutputTarget;
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(3, this::setChanged, new ContainerSlotAssignment(0, 2, 2, 1));
     
     @SyncField({SyncType.TICK, SyncType.INITIAL})
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * 1000, this::setChanged);
     
     public SmallTankEntity(BlockPos pos, BlockState state, boolean isCreative) {
-        super(isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY, pos, state);
+        super((isCreative ? BlockEntitiesContent.CREATIVE_TANK_ENTITY : BlockEntitiesContent.SMALL_TANK_ENTITY).get(), pos, state);
         this.isCreative = isCreative;
     }
     
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        fluidStorage.writeNbt(nbt, "");
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        fluidStorage.serialize(output);
+        inventory.serialize(output);
     }
     
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        fluidStorage.readNbt(nbt, "");
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+    public void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        fluidStorage.deserialize(input);
+        inventory.deserialize(input);
         setChanged();
+    }
+
+    public boolean hasStoredFluidForDrops() {
+        return fluidStorage.getAmount() > 0;
+    }
+
+    public FluidStack getStoredFluidForDrops() {
+        return fluidStorage.getContent();
     }
     
     @Override
@@ -76,9 +95,9 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         // in creative, set tank fill level
         if (isCreative) {
             if (fluidStorage.getFluid() != Fluids.EMPTY) {
-                fluidStorage.setAmount(fluidStorage.getCapacity() - FluidStackHooks.bucketAmount() * 8);  //leave space to insert a bit
+                fluidStorage.set(0, FluidResource.of(fluidStorage.getContent()), (int) (fluidStorage.getCapacity() - 1000 * 8));  //leave space to insert a bit
             } else {
-                fluidStorage.setAmount(0);
+                fluidStorage.set(0, FluidResource.of(fluidStorage.getContent()), 0);
             }
         }
         
@@ -96,15 +115,17 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         
         if (cachedOutputTarget == null) {
-            cachedOutputTarget = FluidApi.BLOCK.createCache(level, worldPosition.below(), Direction.UP);
+            if (!(level instanceof ServerLevel serverLevel)) return;
+            cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, serverLevel, worldPosition.below(), Direction.UP);
         }
         
-        var tankCandidate = cachedOutputTarget.find();
-        
-        if (!(tankCandidate instanceof SimpleFluidStorage belowTank)) return;
-        var ownTank = this.fluidStorage;
-        
-        SimpleFluidStorage.transfer(ownTank, belowTank, ownTank.getCapacity(), false);
+        var tankCandidate = cachedOutputTarget.getCapability();
+        if (tankCandidate == null) return;
+
+        try (var transaction = Transaction.openRoot()) {
+            var moved = ResourceHandlerUtil.moveFirst(fluidStorage, tankCandidate, resource -> true, (int) fluidStorage.getCapacity(), transaction);
+            if (moved != null && !moved.isEmpty()) transaction.commit();
+        }
     }
     
     private void updateComparators(Level level, BlockPos pos, BlockState state) {
@@ -123,21 +144,24 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setItem(0, updated));
-        var candidate = FluidApi.ITEM.find(stackRef);
-        if (candidate == null || !candidate.supportsInsertion()) return;
-        
-        var moved = FluidApi.transferFirst(fluidStorage, candidate, FluidStackHooks.bucketAmount() * 64, false);
-        
-        if (moved == 0) {
+        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
+        if (candidate == null) return;
+
+        try (var transaction = Transaction.openRoot()) {
+            var moved = ResourceHandlerUtil.moveFirst(fluidStorage, candidate, resource -> true, 1000 * 64, transaction);
+            if (!moved.isEmpty()) {
+                transaction.commit();
+                return;
+            }
+
             // move stack to out slot
             var outStack = inventory.getItem(2);
             if (outStack.isEmpty()) {
-                inventory.setItem(2, stackRef.getValue());
-                inventory.setItem(0, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
+                inventory.getStacks().set(2, inStack);
+                inventory.getStacks().set(0, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(inStack.getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
                 outStack.grow(1);
-                inventory.setItem(0, ItemStack.EMPTY);
+                inventory.getStacks().set(0, ItemStack.EMPTY);
             }
         }
     }
@@ -149,21 +173,24 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
         
         if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
         
-        var stackRef = new StackContext(inStack, updated -> inventory.setItem(1, updated));
-        var candidate = FluidApi.ITEM.find(stackRef);
-        if (candidate == null || !candidate.supportsExtraction()) return;
-        
-        var moved = FluidApi.transferFirst(candidate, fluidStorage, FluidStackHooks.bucketAmount() * 64, false);
-        
-        if (moved == 0) {
+        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 1));
+        if (candidate == null) return;
+
+        try (var transaction = Transaction.openRoot()) {
+            var moved = ResourceHandlerUtil.moveFirst(candidate, fluidStorage, resource -> true, 1000 * 64, transaction);
+            if (!moved.isEmpty()) {
+                transaction.commit();
+                return;
+            }
+
             // move stack
             var outStack = inventory.getItem(2);
             if (outStack.isEmpty()) {
-                inventory.setItem(2, stackRef.getValue());
-                inventory.setItem(1, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(stackRef.getValue().getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
+                inventory.getStacks().set(2, inStack);
+                inventory.getStacks().set(1, ItemStack.EMPTY);
+            } else if (outStack.getItem().equals(inStack.getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
                 outStack.grow(1);
-                inventory.setItem(1, ItemStack.EMPTY);
+                inventory.getStacks().set(1, ItemStack.EMPTY);
             }
         }
     }
@@ -203,7 +230,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
@@ -233,17 +260,17 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.TANK_SCREEN;
+        return ModScreens.TANK_SCREEN.get();
     }
     
     public boolean isGlowingFluid() {
-        return fluidStorage.getAmount() > 0 && FluidStackHooks.getLuminosity(fluidStorage.getFluid(), null, null) > 0;
+        return fluidStorage.getAmount() > 0 && fluidStorage.getContent().getFluid().defaultFluidState().createLegacyBlock().getLightEmission() > 0;
     }
     
     @Override
@@ -270,7 +297,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public FluidApi.SingleSlotStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

@@ -1,22 +1,22 @@
 package rearth.oritech.block.entity.decorative;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ColorableMachine;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 
 public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity, ColorableMachine {
 
@@ -30,7 +30,7 @@ public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity
     private long lastSoundEventAt = 0;
 
     public HangarDoorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.HANGAR_DOOR_ENTITY, pos, state);
+        super(BlockEntitiesContent.HANGAR_DOOR_ENTITY.get(), pos, state);
     }
 
     public boolean shouldPlaySoundAgain() {
@@ -41,8 +41,8 @@ public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity
 
     private AnimationController<HangarDoorBlockEntity> getAnimationController() {
         return new AnimationController<>(this, state -> {
-            if (state.getController().getCurrentAnimation() == null) {
-                state.getController().setAnimation(MachineBlockEntity.IDLE);
+            if (state.controller().getCurrentAnimation() == null) {
+                state.controller().setAnimation(MachineBlockEntity.IDLE);
             }
 
             return getBlockState().getValue(HangarDoorBlock.OPENED) ? state.setAndContinue(OPEN) : state.setAndContinue(CLOSE);
@@ -50,23 +50,17 @@ public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(tag, registryLookup);
-        addColorToNbt(tag);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        serializeColor(output);
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(tag, registryLookup);
-        loadColorFromNbt(tag);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeColor(input);
     }
 
-    @Override
-    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
-        var tag = super.getUpdateTag(registryLookup);
-        addColorToNbt(tag);
-        return tag;
-    }
 
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {

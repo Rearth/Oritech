@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,6 +25,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -173,24 +174,26 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        addMultiblockToNbt(nbt);
-        writeAddonToNbt(nbt);
-        addColorToNbt(nbt);
-        nbt.putLong("energy_stored", energyStorage.amount);
-        nbt.putBoolean("redstone", wasRedstoneActive);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        serializeMultiblock(output);
+        if (currentCandidate != null) output.store("shrunk_addon", ShrunkAddonData.CODEC, currentCandidate);
+        serializeColor(output);
+        output.putLong("energy_stored", energyStorage.amount);
+        output.putBoolean("redstone", wasRedstoneActive);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        loadMultiblockNbtData(nbt);
-        loadAddonNbtData(nbt);
-        loadColorFromNbt(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        deserializeMultiblock(input);
+        currentCandidate = input.read("shrunk_addon", ShrunkAddonData.CODEC).orElse(null);
+        deserializeColor(input);
         
-        energyStorage.amount = nbt.getLong("energy_stored");
-        wasRedstoneActive = nbt.getBoolean("redstone");
+        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        wasRedstoneActive = input.getBooleanOr("redstone", false);
         
         updateEnergyContainer();
     }

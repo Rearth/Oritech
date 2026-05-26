@@ -1,16 +1,16 @@
 package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -35,7 +35,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     private boolean hasByproductAddon;
     
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, pos, state, OritechConfig.processingMachines.fragmentForgeData.energyPerTick.get());
+        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY.get(), pos, state, OritechConfig.processingMachines.fragmentForgeData.energyPerTick.get());
     }
     
     @Override
@@ -87,15 +87,15 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putBoolean("byproductAddon", hasByproductAddon);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putBoolean("byproductAddon", hasByproductAddon);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        hasByproductAddon = nbt.getBoolean("byproductAddon");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        hasByproductAddon = input.getBooleanOr("byproductAddon", false);
     }
     
     @Override
@@ -141,7 +141,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.GRINDER_SCREEN;
+        return ModScreens.GRINDER_SCREEN.get();
     }
     
     @Override

@@ -2,26 +2,27 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.util.InventoryInputMode;
@@ -32,10 +33,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInteractionBlockEntity
-  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ExtendedMenuProvider, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
+  implements ItemProvider, EnergyProvider, MenuProvider, ScreenProvider, MachineAddonController, RedstoneAddonBlockEntity.RedstoneControllable {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::setChanged);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, 0, this::setChanged, false);
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(getInventorySize(), this::setChanged);
     
@@ -58,14 +59,14 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     @Override
     protected boolean canProgress() {
         return !disabledViaRedstone &&
-                 energyStorage.amount >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
-                 energyStorage.amount >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+                 energyStorage.energy >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
+                 energyStorage.energy >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
     }
     
     @Override
     protected void doProgress(boolean moving) {
         var usedCost = moving ? getMoveEnergyUsage() : getOperationEnergyUsage();
-        energyStorage.amount -= (long) (usedCost * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
+        energyStorage.energy -= (long) (usedCost * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
     }
     
     @Override
@@ -73,32 +74,31 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        energyStorage.amount = nbt.getLong("energy_stored");
-        disabledViaRedstone = nbt.getBoolean("oritech.redstone");
-        
-        loadAddonNbtData(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        energyStorage.deserialize(input);
+        disabledViaRedstone = input.getBooleanOr("oritech.redstone", false);
+        deserializeAddonData(input);
         updateEnergyContainer();
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putLong("energy_stored", energyStorage.amount);
-        nbt.putBoolean("oritech.redstone", disabledViaRedstone);
-        writeAddonToNbt(nbt);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        energyStorage.serialize(output);
+        output.putBoolean("oritech.redstone", disabledViaRedstone);
+        serializeAddonData(output);
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
     
@@ -172,7 +172,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public SimpleInventoryStorage getDisplayedInventory() {
         return inventory;
     }
     
@@ -182,7 +182,7 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForAddon() {
+    public SimpleInventoryStorage getInventoryForAddon() {
         return inventory;
     }
     
@@ -237,14 +237,14 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
     
     @Override
     public int getComparatorEnergyAmount() {
-        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+        return (int) ((energyStorage.energy / (float) energyStorage.capacity) * 15);
     }
     
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.heldStacks.size() <= slot) return 0;
+        if (inventory.getStacks().size() <= slot) return 0;
         
-        var stack = inventory.getItem(slot);
+        var stack = inventory.getStacks().get(slot);
         if (stack.isEmpty()) return 0;
         
         return (int) ((stack.getCount() / (float) stack.getMaxStackSize()) * 15);

@@ -3,9 +3,7 @@ package rearth.oritech.block.entity.reactor;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -21,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.item.ItemApi;
@@ -65,23 +65,23 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         
-        nbt.putInt("available", availableFuel);
-        nbt.putInt("capacity", currentFuelOriginalCapacity);
+        output.putInt("available", availableFuel);
+        output.putInt("capacity", currentFuelOriginalCapacity);
         
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
+        inventory.serialize(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         
-        availableFuel = nbt.getInt("available");
-        currentFuelOriginalCapacity = nbt.getInt("capacity");
+        availableFuel = input.getIntOr("available", 0);
+        currentFuelOriginalCapacity = input.getIntOr("capacity", 0);
         
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+        inventory.deserialize(input);
     }
     
     // consumes remaining internal fuel when disabled, but will not consume new input items

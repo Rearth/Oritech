@@ -1,13 +1,12 @@
 package rearth.oritech.block.entity.addons;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.OritechPlatform;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MachineAddonProvider;
@@ -28,7 +27,7 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     private BlockPos controllerPos = BlockPos.ZERO;
     
     public AddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ADDON_ENTITY, pos, state);
+        super(BlockEntitiesContent.ADDON_ENTITY.get(), pos, state);
     }
     
     public AddonBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -38,7 +37,7 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     @Override
     public void setControllerPos(BlockPos pos) {
         if (!controllerPos.equals(pos) && level instanceof ServerLevel serverLevel)
-            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, pos);
+            serverLevel.invalidateCapabilities(pos);
         controllerPos = pos;
     }
     
@@ -48,16 +47,15 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("controller_x", controllerPos.getX());
-        nbt.putInt("controller_y", controllerPos.getY());
-        nbt.putInt("controller_z", controllerPos.getZ());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("controller", BlockPos.CODEC, controllerPos);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        controllerPos = input.read("controller", BlockPos.CODEC)
+                          .orElse(new BlockPos(input.getIntOr("controller_x", 0), input.getIntOr("controller_y", 0), input.getIntOr("controller_z", 0)));
     }
 }

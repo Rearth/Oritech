@@ -2,10 +2,8 @@ package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +12,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.api.energy.EnergyApi;
@@ -172,21 +172,21 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        addMultiblockToNbt(nbt);
-        addColorToNbt(nbt);
-        nbt.putLong("energy_stored", energyStorage.amount);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        serializeMultiblock(output);
+        serializeColor(output);
+        output.putLong("energy_stored", energyStorage.amount);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        loadMultiblockNbtData(nbt);
-        loadColorFromNbt(nbt);
-        energyStorage.amount = nbt.getLong("energy_stored");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        deserializeMultiblock(input);
+        deserializeColor(input);
+        energyStorage.amount = input.getLongOr("energy_stored", 0);
     }
     
     @Override

@@ -1,8 +1,6 @@
 package rearth.oritech.block.entity.addons;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -14,6 +12,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +33,12 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     public int currentOutput;
     
     public RedstoneAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REDSTONE_ADDON_ENTITY, pos, state);
+        super(BlockEntitiesContent.REDSTONE_ADDON_ENTITY.get(), pos, state);
     }
     
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, RedstoneAddonBlockEntity blockEntity) {
-        if (level.isClientSide || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
+        if (level.isClientSide() || !isConnected() || activeMode == RedstoneMode.INPUT_CONTROL) return;
         
         var lastOutput = currentOutput;
         
@@ -57,17 +57,17 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("slot", monitoredSlot);
-        nbt.putInt("mode", activeMode.ordinal());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("slot", monitoredSlot);
+        output.putInt("mode", activeMode.ordinal());
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        monitoredSlot = nbt.getInt("slot");
-        activeMode = RedstoneMode.values()[nbt.getInt("mode")];
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        monitoredSlot = input.getIntOr("slot", 0);
+        activeMode = RedstoneMode.values()[Math.clamp(input.getIntOr("mode", RedstoneMode.INPUT_CONTROL.ordinal()), 0, RedstoneMode.values().length - 1)];
     }
     
     public void sendDataToClient() {

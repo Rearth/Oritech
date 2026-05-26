@@ -1,7 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.world.item.ItemStack;
-import rearth.oritech.api.fluid.FluidApi;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 
 public interface ComparatorOutputProvider {
 
@@ -9,7 +9,7 @@ public interface ComparatorOutputProvider {
 		return (int) ((stack.getCount() / (float) stack.getMaxStackSize()) * 15);
 	}
 
-	static int getFluidStorageComparatorOutput(FluidApi.SingleSlotStorage storage) {
+	static int getFluidStorageComparatorOutput(SimpleFluidStorage storage) {
 		return (int) ((storage.getStack().getAmount() / (float) storage.getCapacity()) * 15);
 	}
 

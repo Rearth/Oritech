@@ -10,10 +10,11 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import rearth.oritech.api.energy.EnergyApi;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.util.StackContext;
 
 public class LaserArmEntityBehavior {
     static private LaserArmEntityBehavior transferPowerBehavior;
@@ -46,11 +47,14 @@ public class LaserArmEntityBehavior {
                 if (!(entity instanceof Player player))
                     return false;
                 
-                var stackRef = new StackContext(player.getItemBySlot(EquipmentSlot.CHEST), updated -> player.getInventory().armor.set(EquipmentSlot.CHEST.getIndex(), updated));
-                var candidate = EnergyApi.ITEM.find(stackRef);
+                var stack = player.getItemBySlot(EquipmentSlot.CHEST);
+                var candidate = stack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forStack(stack));
                 if (candidate != null) {
-                    var amount = candidate.insert(laserEntity.energyRequiredToFire(), false);
-                    if (amount > 0) candidate.update();
+                    int amount;
+                    try (var transaction = Transaction.openRoot()) {
+                        amount = candidate.insert(laserEntity.energyRequiredToFire(), transaction);
+                        if (amount > 0) transaction.commit();
+                    }
                     return amount > 0;
                 }
                 

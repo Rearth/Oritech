@@ -2,10 +2,8 @@ package rearth.oritech.block.entity.arcane;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -13,8 +11,8 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -26,14 +24,21 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.CatalystScreenHandler;
@@ -44,18 +49,18 @@ import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
 public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
-  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider, ComparatorOutputProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, ExtendedMenuProvider {
+  implements ItemProvider, EnergyProvider, ScreenProvider, ComparatorOutputProvider, GeoBlockEntity, BlockEntityTicker<EnchantmentCatalystBlockEntity>, MenuProvider {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation STABILIZED = RawAnimation.begin().thenLoop("stabilized");
@@ -78,16 +83,16 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(2, this::setChanged) {
         @Override
-        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
-            if (slot == 0 && !addedStack.isEmpty() && !addedStack.getItem().equals(Items.ENCHANTED_BOOK)) return 0; // only allow enchanter books in slot 0
-            return super.insertToSlot(addedStack, slot, simulate);
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            if (index == 0 && !resource.is(Items.ENCHANTED_BOOK)) return 0; // only allow enchanter books in slot 0
+            return super.insert(index, resource, amount, transaction);
         }
     };
     
-    public final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(10_000, 0, 50_000);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(10_000, 50_000, 0, 0, this::setChanged, false);
     
     public EnchantmentCatalystBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -145,9 +150,9 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
             DeathListener.resetEvents();
             updateAnimation();
             
-            var level = calculateComparatorLevel();
-            if (level != lastComparatorOutput) {
-                lastComparatorOutput = level;
+            var comparatorLevel = calculateComparatorLevel();
+            if (comparatorLevel != lastComparatorOutput) {
+                lastComparatorOutput = comparatorLevel;
                 level.updateNeighbourForOutputSignal(pos, state.getBlock());
             }
             
@@ -166,19 +171,19 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putInt("souls", collectedSouls);
-        nbt.putInt("maxSouls", maxSouls);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        output.putInt("souls", collectedSouls);
+        output.putInt("maxSouls", maxSouls);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        collectedSouls = nbt.getInt("souls");
-        maxSouls = nbt.getInt("maxSouls");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        collectedSouls = input.getIntOr("souls", 0);
+        maxSouls = input.getIntOr("maxSouls", 0);
     }
     
     public void doExplosion() {
@@ -216,7 +221,7 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         collectedSouls -= getEnchantmentCost(enchantment.value(), toolLevel + 1, isHyperEnchanting);
         
         if (isHyperEnchanting)
-            inventory.setItem(0, ItemStack.EMPTY);
+                inventory.getStacks().set(0, ItemStack.EMPTY);
         
     }
     
@@ -331,12 +336,12 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
     
@@ -403,13 +408,13 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.CATALYST_SCREEN;
+        return ModScreens.CATALYST_SCREEN.get();
     }
     
     @Override

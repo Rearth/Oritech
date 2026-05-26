@@ -1,8 +1,6 @@
 package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.core.*;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -17,6 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -164,61 +164,36 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.getHeldStacks(), false, registryLookup);
-        addMultiblockToNbt(nbt);
-        writeAddonToNbt(nbt);
-        addColorToNbt(nbt);
-        fluidStorage.writeNbt(nbt, "");
-        nbt.putBoolean("has_fluid_addon", hasFluidAddon);
-        nbt.putBoolean("disabled_via_redstone", disabledViaRedstone);
-        nbt.putLong("energy_stored", energyStorage.amount);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        serializeMultiblock(output);
+        serializeAddonData(output);
+        serializeColor(output);
+        fluidStorage.serialize(output);
+        output.putBoolean("has_fluid_addon", hasFluidAddon);
+        output.putBoolean("disabled_via_redstone", disabledViaRedstone);
+        output.putLong("energy_stored", energyStorage.amount);
         
         if (targetPosition != null) {
-            nbt.putLong("target_position", targetPosition.asLong());
-        }
-        
-        var cardCompound = new CompoundTag();
-        ContainerHelper.saveAllItems(cardCompound, cardInventory.getItems(), false, registryLookup);
-        nbt.put("cards", cardCompound);
-        
-        if (incomingPacket != null) {
-            var compound = new CompoundTag();
-            NonNullList<ItemStack> list = NonNullList.createWithCapacity(incomingPacket.transferredStacks.size());
-            list.addAll(incomingPacket.transferredStacks);
-            ContainerHelper.saveAllItems(compound, list, false, registryLookup);
-            nbt.put("incoming", compound);
-            FluidStack.CODEC.encodeStart(NbtOps.INSTANCE, incomingPacket.movedFluid).result().ifPresent(tag -> nbt.put("fluidmoving", tag));
-            nbt.putLong("incomingTime", incomingPacket.arrivesAt);
-        } else {
-            nbt.remove("incoming");
+            output.store("target_position", BlockPos.CODEC, targetPosition);
         }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.getHeldStacks(), registryLookup);
-        loadMultiblockNbtData(nbt);
-        loadAddonNbtData(nbt);
-        loadColorFromNbt(nbt);
-        fluidStorage.readNbt(nbt, "");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        deserializeMultiblock(input);
+        deserializeAddonData(input);
+        deserializeColor(input);
+        fluidStorage.deserialize(input);
         
-        hasFluidAddon = nbt.getBoolean("has_fluid_addon");
-        disabledViaRedstone = nbt.getBoolean("disabled_via_redstone");
-        energyStorage.amount = nbt.getLong("energy_stored");
-        targetPosition = BlockPos.of(nbt.getLong("target_position"));
-        
-        ContainerHelper.loadAllItems(nbt.getCompound("cards"), cardInventory.getItems(), registryLookup);
-        
-        if (nbt.contains("incoming")) {
-            NonNullList<ItemStack> list = NonNullList.withSize(15, ItemStack.EMPTY);
-            ContainerHelper.loadAllItems(nbt.getCompound("incoming"), list, registryLookup);
-            var fluid = FluidStack.CODEC.parse(NbtOps.INSTANCE, nbt.get("fluidmoving")).result().orElse(FluidStack.empty());
-            var arrivalTime = nbt.getLong("incomingTime");
-            incomingPacket = new DroneTransferData(list, fluid, arrivalTime);
-        }
+        hasFluidAddon = input.getBooleanOr("has_fluid_addon", false);
+        disabledViaRedstone = input.getBooleanOr("disabled_via_redstone", false);
+        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        targetPosition = input.read("target_position", BlockPos.CODEC).orElse(null);
+        incomingPacket = null;
     }
     
     @Override

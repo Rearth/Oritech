@@ -3,15 +3,14 @@ package rearth.oritech.block.entity.accelerator;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,14 +26,20 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
@@ -51,7 +56,7 @@ import java.util.List;
 
 // networking: last event could be automated. Inject event can just be called on server, and let vanilla handle sounds. Trail should be sent normally,
 // so maybe everything could just be moved to manually sent packets
-public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemApi.BlockProvider, ExtendedMenuProvider, ScreenProvider {
+public class AcceleratorControllerBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorControllerBlockEntity>, ItemProvider, MenuProvider, ScreenProvider {
     
     private AcceleratorParticleLogic.ActiveParticle particle;
     private AcceleratorParticleLogic.ActiveParticle lastParticle;
@@ -66,7 +71,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     public LastEventPacket lastEvent = new LastEventPacket(worldPosition, ParticleEvent.IDLE, 0, worldPosition, 1, ItemStack.EMPTY);
     
     public AcceleratorControllerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -85,43 +90,15 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        
-        if (particle != null && activeItemParticle != null && activeItemParticle != ItemStack.EMPTY) {
-            var data = new CompoundTag();
-            data.putFloat("speed", particle.velocity);
-            data.putFloat("posX", (float) particle.position.x);
-            data.putFloat("posY", (float) particle.position.y);
-            data.putFloat("posZ", (float) particle.position.z);
-            data.putLong("lastGate", particle.lastGate.asLong());
-            data.putLong("nextGate", particle.nextGate.asLong());
-            data.put("item", activeItemParticle.save(registryLookup));
-            nbt.put("particle", data);
-        } else {
-            nbt.remove("particle");
-        }
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        
-        if (nbt.contains("particle")) {
-            var data = nbt.getCompound("particle");
-            var speed = data.getFloat("speed");
-            var posX = data.getFloat("posX");
-            var posY = data.getFloat("posY");
-            var posZ = data.getFloat("posZ");
-            var lastGate = BlockPos.of(data.getLong("lastGate"));
-            var nextGate = BlockPos.of(data.getLong("nextGate"));
-            var item = ItemStack.parse(registryLookup, data.get("item"));
-            
-            item.ifPresent(stack -> activeItemParticle = stack);
-            particle = new AcceleratorParticleLogic.ActiveParticle(new Vec3(posX, posY, posZ), speed, lastGate, nextGate);
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
     }
     
     private void initParticleLogic() {
@@ -135,7 +112,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var directionRight = Geometry.getRight(facing);
         
         var candidateBlock = level.getBlockState(new BlockPos(posBehind));
-        if (candidateBlock.getBlock().equals(BlockContent.ACCELERATOR_RING)) {
+        if (candidateBlock.getBlock().equals(BlockContent.ACCELERATOR_RING.get())) {
             var startPosition = (BlockPos) posBehind;
             var nextGate = particleLogic.findNextGate(startPosition, directionRight, 1);
             particle = new AcceleratorParticleLogic.ActiveParticle(startPosition.getCenter(), 1, nextGate, startPosition);
@@ -199,7 +176,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var caughtParticles = 0;
         
         for (int i = 0; i < shotCount; i++) {
-            var r = level.random;
+                var r = level.getRandom();
             var offset = collisionPosition.add(r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange);
             var direction = offset.subtract(collisionPosition).normalize();
             
@@ -242,10 +219,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         if (speed < requiredSpeed) return false;
         
         var result = recipe.getResults();
-        if (inventory.heldStacks.get(1).getItem().equals(result.get(0).getItem())) {
-            inventory.heldStacks.get(1).grow(1);
+            if (inventory.getStacks().get(1).getItem().equals(result.get(0).getItem())) {
+                inventory.getStacks().get(1).grow(1);
         } else {
-            inventory.setItem(1, result.get(0).copy());
+                inventory.getStacks().set(1, result.get(0).copy());
         }
         
         return true;
@@ -257,7 +234,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         for (var candidate : BlockPos.withinManhattan(pos, 8, 4, 8)) {
             
             var dist = candidate.getCenter().distanceTo(pos.getCenter());
-            if (level.random.nextFloat() < dist / 8) continue;
+            if (level.getRandom().nextFloat() < dist / 8) continue;
             
             var candidateState = level.getBlockState(candidate);
             if (candidateState.isAir() || candidateState.canBeReplaced() || candidateState.getBlock().defaultDestroyTime() < 0)
@@ -267,10 +244,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
                 level.setBlockAndUpdate(candidate, Blocks.END_STONE.defaultBlockState());
             
             // generate chorus flowers
-            if (level.random.nextFloat() > 0.8) {
+            if (level.getRandom().nextFloat() > 0.8) {
                 var stateAbove = level.getBlockState(candidate.above());
                 if (stateAbove.isAir() || stateAbove.canBeReplaced()) {
-                    for (int i = 1; i < level.random.nextIntBetweenInclusive(3, 6); i++) {
+                        for (int i = 1; i < level.getRandom().nextIntBetweenInclusive(3, 6); i++) {
                         stateAbove = level.getBlockState(candidate.above(i));
                         if (stateAbove.isAir() || stateAbove.canBeReplaced())
                             level.setBlockAndUpdate(candidate.above(i), Blocks.CHORUS_PLANT.defaultBlockState());
@@ -293,7 +270,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         for (var candidate : BlockPos.withinManhattan(pos, 12, 4, 12)) {
             
             var dist = candidate.getCenter().distanceTo(pos.getCenter());
-            if (level.random.nextFloat() < dist / 12) continue;
+            if (level.getRandom().nextFloat() < dist / 12) continue;
             
             var candidateState = level.getBlockState(candidate);
             if (candidateState.isAir() || candidateState.canBeReplaced() || candidateState.getBlock().defaultDestroyTime() < 0)
@@ -302,7 +279,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             level.setBlockAndUpdate(candidate, Blocks.NETHERRACK.defaultBlockState());
             
             // generate fires
-            if (level.random.nextFloat() > 0.8) {
+            if (level.getRandom().nextFloat() > 0.8) {
                 var stateAbove = level.getBlockState(candidate.above());
                 if (stateAbove.isAir() || stateAbove.canBeReplaced()) {
                     level.setBlockAndUpdate(candidate.above(), Blocks.FIRE.defaultBlockState());
@@ -392,7 +369,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         level.explode(null, center.x, center.y, center.z, 10, false, Level.ExplosionInteraction.BLOCK);
         
         level.removeBlock(checkPos, false);
-        level.setBlockAndUpdate(checkPos, BlockContent.BLACK_HOLE_BLOCK.defaultBlockState());
+        level.setBlockAndUpdate(checkPos, BlockContent.BLACK_HOLE_BLOCK.get().defaultBlockState());
     }
     
     public void handleParticleMotorInteraction(BlockPos motorBlock) {
@@ -400,22 +377,25 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var entity = level.getBlockEntity(motorBlock);
         if (!(entity instanceof AcceleratorMotorBlockEntity motorEntity)) return;
         
-        var storage = motorEntity.getEnergyStorage(null);
-        var availableEnergy = storage.getAmount();
+        var storage = motorEntity.getEnergyLookup(null);
+        var availableEnergy = storage.getAmountAsLong();
         
         var speed = particle.velocity;
         var cost = speed * OritechConfig.accelerationRFCost.get();
         if (availableEnergy < cost) return;
         
-        storage.extract((long) cost, false);
-        storage.update();
+        try (var transaction = Transaction.openRoot()) {
+            var extracted = storage.extract((int) cost, transaction);
+            if (extracted <= 0) return;
+            transaction.commit();
+        }
         
         particle.velocity += 1;
         
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
@@ -462,13 +442,13 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.ACCELERATOR_SCREEN;
+        return ModScreens.ACCELERATOR_SCREEN.get();
     }
     
     @Override
@@ -502,7 +482,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             }
             
             var pitch = Math.pow(acceleratorBlock.lastEvent.lastEventSpeed, 0.1);
-            level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING, SoundSource.BLOCKS, 2f, (float) pitch, true);
+                level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING.value(), SoundSource.BLOCKS, 2f, (float) pitch, true);
             
         }
     }

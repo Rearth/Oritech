@@ -2,37 +2,39 @@ package rearth.oritech.block.entity.accelerator;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
 
-public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyApi.BlockProvider {
+public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyProvider {
     
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), this::setChanged);
+    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), 0, this::setChanged, false);
     
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putLong("energy", energyStorage.getAmount());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putLong("energy", energyStorage.getAmountAsLong());
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        energyStorage.setAmount(nbt.getLong("energy"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        energyStorage.set(input.getLongOr("energy", 0));
     }
 }

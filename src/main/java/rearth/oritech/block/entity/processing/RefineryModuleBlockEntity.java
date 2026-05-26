@@ -2,12 +2,12 @@ package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.fluid.FluidApi;
@@ -55,21 +55,21 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
     
     
     public RefineryModuleBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_MODULE_ENTITY, pos, state);
+        super(BlockEntitiesContent.REFINERY_MODULE_ENTITY.get(), pos, state);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        addMultiblockToNbt(nbt);
-        addColorToNbt(nbt);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        serializeMultiblock(output);
+        serializeColor(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadMultiblockNbtData(nbt);
-        loadColorFromNbt(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeMultiblock(input);
+        deserializeColor(input);
     }
     
     @Override

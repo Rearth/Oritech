@@ -3,21 +3,47 @@ package rearth.oritech.block.entity.addons;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyApi.BlockProvider {
-    private final DelegatingEnergyStorage delegatedStorage = new DelegatingEnergyStorage(this::getMainStorage, this::isConnected);
+public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements EnergyProvider {
+    private final EnergyHandler delegatedStorage = new EnergyHandler() {
+        @Override
+        public int insert(int amount, TransactionContext transaction) {
+            var storage = getMainStorage();
+            return storage == null ? 0 : storage.insert(amount, transaction);
+        }
+
+        @Override
+        public int extract(int amount, TransactionContext transaction) {
+            var storage = getMainStorage();
+            return storage == null ? 0 : storage.extract(amount, transaction);
+        }
+
+        @Override
+        public long getAmountAsLong() {
+            var storage = getMainStorage();
+            return storage == null ? 0 : storage.getAmountAsLong();
+        }
+
+        @Override
+        public long getCapacityAsLong() {
+            var storage = getMainStorage();
+            return storage == null ? 0 : storage.getCapacityAsLong();
+        }
+    };
     
     private MachineAddonController cachedController;
     
     public EnergyAcceptorAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON_ENTITY, pos, state);
+        super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON_ENTITY.get(), pos, state);
     }
     
     private boolean isConnected() {
@@ -25,7 +51,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
         return isUsed && getCachedController() != null;
     }
     
-    private EnergyApi.EnergyStorage getMainStorage() {
+    private EnergyHandler getMainStorage() {
         
         var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
@@ -44,7 +70,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return delegatedStorage;
     }
 }

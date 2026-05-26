@@ -42,7 +42,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     public Set<RenderStackData> activeStacks = new HashSet<>();
     
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ITEM_PIPE_ENTITY, pos, state);
+        super(BlockEntitiesContent.ITEM_PIPE_ENTITY.get(), pos, state);
         this.renderItems = state.getBlock().equals(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
         
     }
@@ -51,7 +51,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (level.isClientSide || !block.isExtractable(state))
+        if (level.isClientSide() || !block.isExtractable(state))
             return;
         
         // boosted pipe works every tick, otherwise only every N tick

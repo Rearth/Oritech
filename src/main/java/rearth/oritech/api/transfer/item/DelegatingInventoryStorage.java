@@ -1,21 +1,20 @@
 package rearth.oritech.api.transfer.item;
 
-import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
-import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
-public class DelegatingInventoryStorage implements ResourceHandler<ItemResource> {
+public class DelegatingInventoryStorage extends ItemStacksResourceHandler {
     
     protected final Supplier<ItemStacksResourceHandler> backingStorage;
     protected final BooleanSupplier validPredicate;
     
     public DelegatingInventoryStorage(Supplier<ItemStacksResourceHandler> backingStorage, @Nullable BooleanSupplier validPredicate) {
+        super(0);
         this.backingStorage = backingStorage;
         this.validPredicate = validPredicate == null ? () -> true : validPredicate;
     }
@@ -29,81 +28,44 @@ public class DelegatingInventoryStorage implements ResourceHandler<ItemResource>
     }
     
     @Override
-    public void update() {
-        if (canUseBackend())
-            backingStorage.get().update();
-    }
-    
-    @Override
-    public boolean supportsInsertion() {
-        if (canUseBackend())
-            return backingStorage.get().supportsInsertion();
-        
-        return false;
-    }
-    
-    @Override
-    public int insert(ItemStack inserted, boolean simulate) {
-        if (canUseBackend())
-            return backingStorage.get().insert(inserted, simulate);
+    public int size() {
+        if (canUseBackend()) return backingStorage.get().size();
         return 0;
     }
-    
+
     @Override
-    public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
-        if (canUseBackend())
-            return backingStorage.get().insertToSlot(inserted, slot, simulate);
+    public ItemResource getResource(int index) {
+        if (canUseBackend()) return backingStorage.get().getResource(index);
+        return ItemResource.EMPTY;
+    }
+
+    @Override
+    public int getAmountAsInt(int index) {
+        if (canUseBackend()) return backingStorage.get().getAmountAsInt(index);
         return 0;
     }
-    
+
     @Override
-    public boolean supportsExtraction() {
-        if (canUseBackend())
-            return backingStorage.get().supportsExtraction();
-        
-        return false;
-    }
-    
-    @Override
-    public int extract(ItemStack extracted, boolean simulate) {
-        if (canUseBackend())
-            return backingStorage.get().extract(extracted, simulate);
+    public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        if (canUseBackend()) return backingStorage.get().insert(index, resource, amount, transaction);
         return 0;
     }
-    
+
     @Override
-    public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
-        if (canUseBackend())
-            return backingStorage.get().extractFromSlot(extracted, slot, simulate);
-        
+    public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+        if (canUseBackend()) return backingStorage.get().insert(resource, amount, transaction);
         return 0;
     }
-    
+
     @Override
-    public void setStackInSlot(int slot, ItemStack stack) {
-        if (canUseBackend())
-            backingStorage.get().setStackInSlot(slot, stack);
-    }
-    
-    @Override
-    public ItemStack getStackInSlot(int slot) {
-        if (canUseBackend())
-            return backingStorage.get().getStackInSlot(slot);
-        
-        return ItemStack.EMPTY;
-    }
-    
-    @Override
-    public int getSlotCount() {
-        if (canUseBackend())
-            return backingStorage.get().getSlotCount();
+    public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+        if (canUseBackend()) return backingStorage.get().extract(index, resource, amount, transaction);
         return 0;
     }
-    
+
     @Override
-    public int getSlotLimit(int slot) {
-        if (canUseBackend())
-            return backingStorage.get().getSlotLimit(slot);
+    public int extract(ItemResource resource, int amount, TransactionContext transaction) {
+        if (canUseBackend()) return backingStorage.get().extract(resource, amount, transaction);
         return 0;
     }
 }

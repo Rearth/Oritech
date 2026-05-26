@@ -8,8 +8,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
@@ -32,10 +33,10 @@ public class LaserArmBlockBehavior {
             return false;
         
         // has an energy storage, try to transfer power to it
-        var storageCandidate = EnergyApi.BLOCK.find(level, blockPos, blockState, blockEntity, null);
+        var storageCandidate = level.getCapability(Capabilities.Energy.BLOCK, blockPos, blockState, blockEntity, null);
         // if the storage is not exposed (e.g. catalyst / deep drill / atomic forge), get it directly
-        if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider provider)
-            storageCandidate = provider.getEnergyStorage(null);
+        if (storageCandidate == null && blockEntity instanceof EnergyProvider provider)
+            storageCandidate = provider.getEnergyLookup(null);
         if (storageCandidate != null)
             return transferPowerBehavior.fireAtBlock(level, laserEntity, block, blockPos, blockState, blockEntity);
         
@@ -67,46 +68,37 @@ public class LaserArmBlockBehavior {
         transferPowerBehavior = new LaserArmBlockBehavior() {
             @Override
             public boolean fireAtBlock(Level level, LaserArmBlockEntity laserEntity, Block block, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-                var storageCandidate = EnergyApi.BLOCK.find(level, blockPos, blockState, blockEntity, null);
+                var storageCandidate = level.getCapability(Capabilities.Energy.BLOCK, blockPos, blockState, blockEntity, null);
                 
-                if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider energyProvider)
-                    storageCandidate = energyProvider.getEnergyStorage(null);
+                if (storageCandidate == null && blockEntity instanceof EnergyProvider energyProvider)
+                    storageCandidate = energyProvider.getEnergyLookup(null);
                 
                 if (blockEntity instanceof UnstableContainerBlockEntity unstableContainerBlockEntity)
                     storageCandidate = unstableContainerBlockEntity.laserInputStorage;
                 
-                var insertAmount = storageCandidate.getCapacity() - storageCandidate.getAmount();
-                if (insertAmount <= 0 || storageCandidate.getCapacity() <= 1)
+                var insertAmount = storageCandidate.getCapacityAsLong() - storageCandidate.getAmountAsLong();
+                if (insertAmount <= 0 || storageCandidate.getCapacityAsLong() <= 1)
                     return false;
                 
-                var transferCapacity = Math.min(insertAmount, laserEntity.energyRequiredToFire());
-                
-                if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
-                    var inserted = dynamicStorage.insertIgnoringLimit(transferCapacity, true);
+                var transferCapacity = (int) Math.min(Integer.MAX_VALUE, Math.min(insertAmount, laserEntity.energyRequiredToFire()));
+
+                try (var transaction = Transaction.openRoot()) {
+                    var inserted = storageCandidate.insert(transferCapacity, transaction);
                     if (inserted > 0 && inserted <= transferCapacity) {
-                        dynamicStorage.insertIgnoringLimit(transferCapacity, false);
-                        dynamicStorage.update();
-                        
+                        transaction.commit();
+
                         if (blockEntity instanceof AtomicForgeBlockEntity atomicForgeBlock)
                             atomicForgeBlock.lastWorkedAt = level.getGameTime();
-                        
+
                         return true;
                     }
-                    return false;
-                } else {
-                    var inserted = storageCandidate.insert(transferCapacity, true);
-                    if (inserted > 0 && inserted <= transferCapacity) {
-                        storageCandidate.insert(transferCapacity, false);
-                        storageCandidate.update();
-                        return true;
-                    }
-                    return false;
                 }
+                return false;
             }
         };
-        LaserArmBlock.registerBlockBehavior(BlockContent.ATOMIC_FORGE_BLOCK, transferPowerBehavior);
-        LaserArmBlock.registerBlockBehavior(BlockContent.DEEP_DRILL_BLOCK, transferPowerBehavior);
-        LaserArmBlock.registerBlockBehavior(BlockContent.ENCHANTMENT_CATALYST_BLOCK, transferPowerBehavior);
+        LaserArmBlock.registerBlockBehavior(BlockContent.ATOMIC_FORGE_BLOCK.get(), transferPowerBehavior);
+        LaserArmBlock.registerBlockBehavior(BlockContent.DEEP_DRILL_BLOCK.get(), transferPowerBehavior);
+        LaserArmBlock.registerBlockBehavior(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get(), transferPowerBehavior);
         
         energizeBuddingBehavior = new LaserArmBlockBehavior() {
             @Override
@@ -117,7 +109,7 @@ public class LaserArmBlockBehavior {
                 }
                 if (blockState.isAir() || !blockState.getFluidState().isEmpty()) return false;
                 
-                blockState.randomTick((ServerLevel) level, blockPos, level.random);
+                blockState.randomTick((ServerLevel) level, blockPos, level.getRandom());
                 ParticleContent.Accelerating(level, Vec3.atLowerCornerOf(blockPos));
                 
                 return true;

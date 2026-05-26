@@ -2,13 +2,13 @@ package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -40,7 +40,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     private boolean setPipe;
     
     public PipeBoosterBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PIPE_BOOSTER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.PIPE_BOOSTER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -82,15 +82,15 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putLong("energy_stored", energyStorage.amount);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putLong("energy_stored", energyStorage.amount);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        energyStorage.amount = nbt.getLong("energy_stored");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        energyStorage.amount = input.getLongOr("energy_stored", 0);
     }
     
     @Override

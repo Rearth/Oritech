@@ -28,13 +28,13 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
         
         // todo
         
-        var blockEntity = context.getParamOrNull(LootContextParams.BLOCK_ENTITY);
+        var blockEntity = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         
-        if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.fluidStorage.getAmount() > 0) {
-            stack.set(FluidApi.ITEM.getFluidComponent(), tankEntity.fluidStorage.getStack());
+        if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.hasStoredFluidForDrops()) {
+            stack.set(ComponentContent.STORED_FLUID.get(), tankEntity.getStoredFluidForDrops());
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
-        } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.amount > 0) {
-            stack.set(EnergyApi.ITEM.getEnergyComponent(), storageEntity.energyStorage.amount);
+        } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.energy > 0) {
+            stack.set(ComponentContent.ENERGY.get(), storageEntity.energyStorage.energy);
         } else if (blockEntity instanceof CombiAddonEntity combiAddon && combiAddon.storedData != null) {
             stack.set(ComponentContent.ADDON_DATA.get(), combiAddon.storedData);
         }

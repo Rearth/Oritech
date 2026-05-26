@@ -1,12 +1,9 @@
 package rearth.oritech.block.entity.addons;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.Oritech;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -17,30 +14,22 @@ public class CombiAddonEntity extends AddonBlockEntity {
     public ShrinkerBlockEntity.ShrunkAddonData storedData;
     
     public CombiAddonEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.COMBI_ADDON_ENTITY, pos, state);
+        super(BlockEntitiesContent.COMBI_ADDON_ENTITY.get(), pos, state);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         
         if (this.storedData != null) {
-            ShrinkerBlockEntity.ShrunkAddonData.CODEC.encodeStart(registryLookup.createSerializationContext(NbtOps.INSTANCE), this.storedData)
-              .resultOrPartial(error -> Oritech.LOGGER.error("Failed to encode stored_data: {}", error))
-              .ifPresent(tag -> nbt.put("data", tag));
+            output.store("data", ShrinkerBlockEntity.ShrunkAddonData.CODEC, this.storedData);
         }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        
-        if (nbt.contains("data", Tag.TAG_COMPOUND)) {
-            var dataTag = nbt.get("data");
-            this.storedData = ShrinkerBlockEntity.ShrunkAddonData.CODEC.parse(registryLookup.createSerializationContext(NbtOps.INSTANCE), dataTag)
-                                .resultOrPartial(error -> Oritech.LOGGER.error("Failed to decode stored_data: {}", error))
-                                .orElse(null);
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.storedData = input.read("data", ShrinkerBlockEntity.ShrunkAddonData.CODEC).orElse(null);
         
     }
     

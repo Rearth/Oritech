@@ -2,10 +2,8 @@ package rearth.oritech.block.entity.reactor;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -20,6 +18,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.api.energy.EnergyApi;
@@ -260,22 +260,22 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         
-        nbt.putLong("energy_stored", energyStorage.getAmount());
-        nbt.putBoolean("was_active", active);
-        nbt.putBoolean("redstone_disabled", disabledViaRedstone);
+        output.putLong("energy_stored", energyStorage.getAmount());
+        output.putBoolean("was_active", active);
+        output.putBoolean("redstone_disabled", disabledViaRedstone);
         
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         
-        energyStorage.setAmount(nbt.getLong("energy_stored"));
-        doAutoInit = nbt.getBoolean("was_active");
-        disabledViaRedstone = nbt.getBoolean("redstone_disabled");
+        energyStorage.setAmount(input.getLongOr("energy_stored", 0));
+        doAutoInit = input.getBooleanOr("was_active", false);
+        disabledViaRedstone = input.getBooleanOr("redstone_disabled", false);
     }
     
     private void playMeltdownAnimation(BlockPos port) {

@@ -2,13 +2,8 @@ package rearth.oritech.block.entity.augmenter;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.StringTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,6 +21,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
@@ -107,41 +104,35 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     
     // persist researched augments, inventory, energy
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putLong("rf", energyStorage.getAmount());
-        addMultiblockToNbt(nbt);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        output.putLong("rf", energyStorage.getAmount());
+        serializeMultiblock(output);
         
-        
-        var list = new ListTag();
+        var list = output.childrenList("researched");
         for (var augment : researchedAugments) {
-            list.add(StringTag.valueOf(augment.getPath()));
+            list.addChild().store("id", Identifier.CODEC, augment);
         }
         
         // also put in pending researches to avoid having to separately store them
         for (var station : availableStations.values()) {
             if (station == null) continue;
             if (station.working) {
-                list.add(StringTag.valueOf(station.selectedResearch.getPath()));
+                list.addChild().store("id", Identifier.CODEC, station.selectedResearch);
             }
         }
-        
-        nbt.put("researched", list);
-        
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        energyStorage.setAmount(nbt.getLong("rf"));
-        loadMultiblockNbtData(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        energyStorage.setAmount(input.getLongOr("rf", 0));
+        deserializeMultiblock(input);
         
-        var parsedList = nbt.getList("researched", Tag.TAG_STRING);
-        for (var element : parsedList) {
-            var id = Oritech.id(element.getAsString());
-            researchedAugments.add(id);
+        for (var element : input.childrenListOrEmpty("researched")) {
+            element.read("id", Identifier.CODEC).ifPresent(researchedAugments::add);
         }
         
     }

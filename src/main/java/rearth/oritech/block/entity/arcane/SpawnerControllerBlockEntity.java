@@ -1,7 +1,6 @@
 package rearth.oritech.block.entity.arcane;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -20,6 +19,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -76,25 +77,25 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("souls", collectedSouls);
-        nbt.putInt("maxSouls", maxSouls);
-        nbt.putBoolean("cage", hasCage);
-        nbt.putBoolean("redstone", redstonePowered);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("souls", collectedSouls);
+        output.putInt("maxSouls", maxSouls);
+        output.putBoolean("cage", hasCage);
+        output.putBoolean("redstone", redstonePowered);
         if (mobNbt != null) {
-            nbt.put("mobNbt", mobNbt);
+            output.store("mobNbt", CompoundTag.CODEC, mobNbt);
         }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        hasCage = nbt.getBoolean("cage");
-        maxSouls = nbt.getInt("maxSouls");
-        collectedSouls = nbt.getInt("souls");
-        redstonePowered = nbt.getBoolean("redstone");
-        mobNbt = sanitizeMobNbt(nbt.getCompound("mobNbt"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        hasCage = input.getBooleanOr("cage", false);
+        maxSouls = input.getIntOr("maxSouls", 0);
+        collectedSouls = input.getIntOr("souls", 0);
+        redstonePowered = input.getBooleanOr("redstone", false);
+        mobNbt = sanitizeMobNbt(input.read("mobNbt", CompoundTag.CODEC).orElse(new CompoundTag()));
         lastComparatorOutput = getComparatorOutput();
     }
     

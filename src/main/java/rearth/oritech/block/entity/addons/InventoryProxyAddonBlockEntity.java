@@ -2,22 +2,25 @@ package rearth.oritech.block.entity.addons;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
+import rearth.oritech.api.transfer.item.DelegatingInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.InventoryProxyScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -25,7 +28,7 @@ import rearth.oritech.util.MachineAddonController;
 
 import java.util.Objects;
 
-public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
+public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements ItemProvider, MenuProvider {
     
     private MachineAddonController cachedController;
     private int targetSlot = 0;
@@ -33,40 +36,41 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     private final DelegatingInventoryStorage inventory = new DelegatingInventoryStorage(this::getTargetItemStorage, this::isConnected) {
         
         @Override
-        public int insert(ItemStack inserted, boolean simulate) {
-            return insertToSlot(inserted, targetSlot, simulate);
+        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+            return insert(targetSlot, resource, amount, transaction);
         }
         
         @Override
-        public int extract(ItemStack extracted, boolean simulate) {
-            return extractFromSlot(extracted, targetSlot, simulate);
+        public int extract(ItemResource resource, int amount, TransactionContext transaction) {
+            return extract(targetSlot, resource, amount, transaction);
         }
-        
+
         @Override
-        public int insertToSlot(ItemStack inserted, int slot, boolean simulate) {
-            if (slot != targetSlot) return 0;
-            return super.insertToSlot(inserted, slot, simulate);
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            if (index != targetSlot) return 0;
+            return super.insert(index, resource, amount, transaction);
         }
-        
+
         @Override
-        public int extractFromSlot(ItemStack extracted, int slot, boolean simulate) {
-            if (slot != targetSlot) return 0;
-            return super.extractFromSlot(extracted, slot, simulate);
+        public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            if (index != targetSlot) return 0;
+            return super.extract(index, resource, amount, transaction);
         }
     };
     
     public InventoryProxyAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.INVENTORY_PROXY_ADDON_ENTITY, pos, state);
+        super(BlockEntitiesContent.INVENTORY_PROXY_ADDON_ENTITY.get(), pos, state);
     }
     
-    private ItemApi.InventoryStorage getTargetItemStorage() {
+    private ItemStacksResourceHandler getTargetItemStorage() {
         
         var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         if (!isUsed) return null;
         
         var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof ItemApi.BlockProvider itemProvider)) return null;
-        return itemProvider.getInventoryStorage(null);
+        if (controllerEntity.getInventoryForAddon() instanceof ItemStacksResourceHandler storage) return storage;
+        if (controllerEntity instanceof ItemProvider itemProvider && itemProvider.getItemLookup(null) instanceof ItemStacksResourceHandler storage) return storage;
+        return null;
     }
     
     private boolean isConnected() {
@@ -105,19 +109,19 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("target_slot", targetSlot);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("target_slot", targetSlot);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        targetSlot = nbt.getInt("target_slot");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        targetSlot = input.getIntOr("target_slot", 0);
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     

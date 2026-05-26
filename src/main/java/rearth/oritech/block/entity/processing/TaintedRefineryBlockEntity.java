@@ -4,8 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +18,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
@@ -240,21 +240,21 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ownStorage.writeNbt(nbt, "main");
-        nbt.putInt("output", selectedOutput);
-        EnvironmentFactor.toNbt(nbt, "arcane_factor", arcaneFactor);
-        EnvironmentFactor.toNbt(nbt, "sculk_factor", sculkFactor);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ownStorage.serialize(output);
+        output.putInt("output", selectedOutput);
+        output.store("arcane_factor", EnvironmentFactor.CODEC, arcaneFactor);
+        output.store("sculk_factor", EnvironmentFactor.CODEC, sculkFactor);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ownStorage.readNbt(nbt, "main");
-        selectedOutput = nbt.getInt("output");
-        arcaneFactor = EnvironmentFactor.fromNbt(nbt, "arcane_factor");
-        sculkFactor = EnvironmentFactor.fromNbt(nbt, "sculk_factor");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ownStorage.deserialize(input);
+        selectedOutput = input.getIntOr("output", 0);
+        arcaneFactor = input.read("arcane_factor", EnvironmentFactor.CODEC).orElse(EnvironmentFactor.DEFAULT);
+        sculkFactor = input.read("sculk_factor", EnvironmentFactor.CODEC).orElse(EnvironmentFactor.DEFAULT);
     }
     
     @Override
@@ -547,22 +547,6 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         ).apply(instance, EnvironmentFactor::new));
         
         public static final EnvironmentFactor DEFAULT = new EnvironmentFactor(0, 0, List.of());
-        
-        public static void toNbt(CompoundTag nbt, String key, EnvironmentFactor factor) {
-            CODEC.encodeStart(NbtOps.INSTANCE, factor)
-              .resultOrPartial(error -> Oritech.LOGGER.error("Failed to encode {}: {}", key, error))
-              .ifPresent(tag -> nbt.put(key, tag));
-        }
-        
-        public static EnvironmentFactor fromNbt(CompoundTag nbt, String key) {
-            if (!nbt.contains(key)) {
-                return DEFAULT;
-            }
-            
-            return CODEC.parse(NbtOps.INSTANCE, nbt.get(key))
-                     .resultOrPartial(error -> Oritech.LOGGER.error("Failed to decode {}: {}", key, error))
-                     .orElse(DEFAULT);
-        }
         
         @Override
         public String toString() {

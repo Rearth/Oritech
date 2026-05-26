@@ -2,14 +2,14 @@ package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -64,25 +64,30 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        fluidStorage.writeNbt(nbt, "");
-        nbt.putBoolean("initialized", initialized);
-        nbt.putLong("energy", energyStorage.getAmount());
-        addColorToNbt(nbt);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        fluidStorage.serialize(output);
+        output.putBoolean("initialized", initialized);
+        output.putLong("energy", energyStorage.getAmount());
+        serializeColor(output);
         
-        if (pendingLiquidPositions != null)
-            nbt.putLongArray("pendingTargets", pendingLiquidPositions.stream().mapToLong(BlockPos::asLong).toArray());
+        if (pendingLiquidPositions != null) {
+            var pending = output.childrenList("pendingTargets");
+            pendingLiquidPositions.forEach(pos -> pending.addChild().store("pos", BlockPos.CODEC, pos));
+        }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        loadColorFromNbt(nbt);
-        initialized = nbt.getBoolean("initialized");
-        fluidStorage.readNbt(nbt, "");
-        energyStorage.setAmount(nbt.getLong("energy"));
-        pendingLiquidPositions = Arrays.stream(nbt.getLongArray("pendingTargets")).mapToObj(BlockPos::of).collect(Collectors.toCollection(ArrayDeque::new));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeColor(input);
+        initialized = input.getBooleanOr("initialized", false);
+        fluidStorage.deserialize(input);
+        energyStorage.setAmount(input.getLongOr("energy", 0));
+        pendingLiquidPositions = input.childrenListOrEmpty("pendingTargets").stream()
+                                   .map(posData -> posData.read("pos", BlockPos.CODEC))
+                                   .flatMap(Optional::stream)
+                                   .collect(Collectors.toCollection(ArrayDeque::new));
     }
     
     @Override

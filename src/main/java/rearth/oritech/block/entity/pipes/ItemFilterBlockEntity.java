@@ -2,12 +2,8 @@ package rearth.oritech.block.entity.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -21,6 +17,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -46,40 +44,35 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putBoolean("whitelist", filterSettings.useWhitelist);
-        nbt.putBoolean("useNbt", filterSettings.useNbt);
-        nbt.putBoolean("useComponents", filterSettings.useComponents);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        output.putBoolean("whitelist", filterSettings.useWhitelist);
+        output.putBoolean("useNbt", filterSettings.useNbt);
+        output.putBoolean("useComponents", filterSettings.useComponents);
         
-        var filterItems = filterSettings.items.values();
-        var itemsNbtList = new ListTag();
-        
-        for (var item : filterItems) {
-            var data = item.save(registryLookup);
-            itemsNbtList.add(data);
-        }
-        
-        nbt.put("filterItems", itemsNbtList);
+        var filterItems = output.childrenList("filterItems");
+        filterSettings.items.forEach((slot, stack) -> {
+            var entry = filterItems.addChild();
+            entry.putInt("slot", slot);
+            entry.store("stack", ItemStack.OPTIONAL_CODEC, stack);
+        });
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
         
-        var whiteList = nbt.getBoolean("whitelist");
-        var useNbt = nbt.getBoolean("useNbt");
-        var useComponents = nbt.getBoolean("useComponents");
+        var whiteList = input.getBooleanOr("whitelist", true);
+        var useNbt = input.getBooleanOr("useNbt", false);
+        var useComponents = input.getBooleanOr("useComponents", false);
         
-        var list = nbt.getList("filterItems", Tag.TAG_COMPOUND);
         var itemsList = new HashMap<Integer, ItemStack>();
-        for (int i = 0; i < list.size(); i++) {
-            var data = list.get(i);
-            var stack = ItemStack.parse(registryLookup, data).orElse(ItemStack.EMPTY);
-            
-            itemsList.put(i, stack);
+        for (var entry : input.childrenListOrEmpty("filterItems")) {
+            var slot = entry.getIntOr("slot", itemsList.size());
+            var stack = entry.read("stack", ItemStack.OPTIONAL_CODEC).orElse(ItemStack.EMPTY);
+            itemsList.put(slot, stack);
         }
         
         var data = new FilterData(useNbt, whiteList, useComponents, itemsList);
@@ -88,7 +81,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     public ItemFilterBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ITEM_FILTER_ENTITY, pos, state);
+        super(BlockEntitiesContent.ITEM_FILTER_ENTITY.get(), pos, state);
     }
     
     @Override

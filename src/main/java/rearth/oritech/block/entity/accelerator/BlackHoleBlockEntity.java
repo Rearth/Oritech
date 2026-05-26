@@ -37,7 +37,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
     private final Map<BlockPos, ParticleCollectorBlockEntity> cachedCollectors = new HashMap<>();
     
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BLACK_HOLE_ENTITY, pos, state);
+        super(BlockEntitiesContent.BLACK_HOLE_ENTITY.get(), pos, state);
     }
     
     @Override

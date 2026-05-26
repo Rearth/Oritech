@@ -2,10 +2,10 @@ package rearth.oritech.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
@@ -31,21 +31,20 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     private final Map<Direction, DelegatingInventoryStorage> delegatedItem = new HashMap<>(6);
     
     public MachineCoreEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.MACHINE_CORE_ENTITY, pos, state);
+        super(BlockEntitiesContent.MACHINE_CORE_ENTITY.get(), pos, state);
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("controller_x", controllerPos.getX());
-        nbt.putInt("controller_y", controllerPos.getY());
-        nbt.putInt("controller_z", controllerPos.getZ());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.store("controller", BlockPos.CODEC, controllerPos);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        controllerPos = input.read("controller", BlockPos.CODEC)
+                          .orElse(new BlockPos(input.getIntOr("controller_x", 0), input.getIntOr("controller_y", 0), input.getIntOr("controller_z", 0)));
     }
     
     public BlockPos getControllerPos() {

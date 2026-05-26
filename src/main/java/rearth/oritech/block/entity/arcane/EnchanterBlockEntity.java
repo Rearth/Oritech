@@ -3,15 +3,14 @@ package rearth.oritech.block.entity.arcane;
 import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -21,17 +20,23 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
@@ -41,20 +46,20 @@ import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.ScreenProvider;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.animation.PlayState;
-import software.bernie.geckolib.animation.RawAnimation;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 public class EnchanterBlockEntity extends NetworkedBlockEntity
-  implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, ScreenProvider, ExtendedMenuProvider {
+  implements ItemProvider, EnergyProvider, GeoBlockEntity, ScreenProvider, MenuProvider {
     
     public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
     public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
@@ -65,7 +70,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, 0, this::setChanged, false);
     
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
     
@@ -87,7 +92,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     private String activeAnimation = "idle";
     
     public EnchanterBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.ENCHANTER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -100,7 +105,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         
         // return early if there is no work to do
         statistics = EnchanterStatistics.EMPTY;
-        var content = inventory.heldStacks.get(0);
+        var content = inventory.getStacks().get(0);
         if (content.isEmpty()
               || !inventory.getItem(1).isEmpty()
               || !content.getItem().isEnchantable(content)
@@ -120,12 +125,12 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         
         if (canProgress(existingLevel + 1) && level.getGameTime() % 5 == 0) {
             this.setChanged();
-            energyStorage.amount -= (long) getDisplayedEnergyUsage();
+            energyStorage.energy -= (long) getDisplayedEnergyUsage();
             progress++;
             activeAnimation = "working";
             
             var center = pos.getCenter();
-            var r = level.random;
+            var r = level.getRandom();
             var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
             ParticleContent.WeedKiller(level, center, offset);
             
@@ -155,31 +160,28 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putLong("energy", energyStorage.amount);
-        nbt.putString("selected", selectedEnchantment.toString());
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        output.putLong("energy", energyStorage.energy);
+        output.store("selected", Identifier.CODEC, selectedEnchantment);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        energyStorage.amount = nbt.getLong("energy");
-        
-        if (nbt.contains("selected")) {
-            selectedEnchantment = Identifier.parse(nbt.getString("selected"));
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        energyStorage.energy = input.getLongOr("energy", 0);
+        selectedEnchantment = input.read("selected", Identifier.CODEC).orElse(NONE_SELECTED);
     }
     
     private void finishEnchanting() {
-        var content = inventory.heldStacks.get(0);
+        var content = inventory.getStacks().get(0);
         var existingLevel = content.getEnchantments().getLevel(getSelectedEnchantment());
         content.enchant(getSelectedEnchantment(), existingLevel + 1);
         
-        inventory.heldStacks.set(0, ItemStack.EMPTY);
-        inventory.heldStacks.set(1, content);
+        inventory.getStacks().set(0, ItemStack.EMPTY);
+        inventory.getStacks().set(1, content);
         statistics = new EnchanterStatistics(0, cachedCatalysts.size());
     }
     
@@ -189,7 +191,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     
     private boolean canProgress(int targetLevel) {
         
-        if (energyStorage.amount <= getDisplayedEnergyUsage()) {
+        if (energyStorage.energy <= getDisplayedEnergyUsage()) {
             activeAnimation = "unpowered";
             return false;
         }
@@ -279,7 +281,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
     
@@ -319,13 +321,13 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.ENCHANTER_SCREEN;
+        return ModScreens.ENCHANTER_SCREEN.get();
     }
     
     @Override
@@ -334,7 +336,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     

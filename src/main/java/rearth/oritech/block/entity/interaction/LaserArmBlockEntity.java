@@ -3,12 +3,10 @@ package rearth.oritech.block.entity.interaction;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -38,6 +36,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
@@ -555,58 +555,57 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        addMultiblockToNbt(nbt);
-        writeAddonToNbt(nbt);
-        addColorToNbt(nbt);
-        nbt.putLong("energy_stored", energyStorage.amount);
-        nbt.putBoolean("redstone", redstonePowered);
-        nbt.putInt("areaSize", areaSize);
-        nbt.putInt("yieldAddons", yieldAddons);
-        nbt.putInt("hunterAddons", hunterAddons);
-        nbt.putBoolean("cropAddon", hasCropFilterAddon);
-        nbt.putBoolean("silkAddon", hasSilkTouchAddon);
-        nbt.putInt("hunterTargetMode", hunterTargetMode.value);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        serializeMultiblock(output);
+        serializeAddonData(output);
+        serializeColor(output);
+        output.putLong("energy_stored", energyStorage.amount);
+        output.putBoolean("redstone", redstonePowered);
+        output.putInt("areaSize", areaSize);
+        output.putInt("yieldAddons", yieldAddons);
+        output.putInt("hunterAddons", hunterAddons);
+        output.putBoolean("cropAddon", hasCropFilterAddon);
+        output.putBoolean("silkAddon", hasSilkTouchAddon);
+        output.putInt("hunterTargetMode", hunterTargetMode.value);
         
         if (targetDirection != null && currentTarget != null) {
-            nbt.putLong("target_position", currentTarget.asLong());
-            nbt.putLong("target_direction", targetDirection.asLong());
+            output.store("target_position", BlockPos.CODEC, currentTarget);
+            output.store("target_direction", BlockPos.CODEC, targetDirection);
         }
         
         if (pendingArea != null && !pendingArea.isEmpty()) {
-            var positions = pendingArea.stream().mapToLong(BlockPos::asLong).toArray();
-            nbt.putLongArray("pendingPositions", positions);
-        } else {
-            nbt.remove("pendingPositions");
+            var pending = output.childrenList("pendingPositions");
+            pendingArea.forEach(pos -> pending.addChild().store("pos", BlockPos.CODEC, pos));
         }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        loadMultiblockNbtData(nbt);
-        loadAddonNbtData(nbt);
-        loadColorFromNbt(nbt);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        deserializeMultiblock(input);
+        deserializeAddonData(input);
+        deserializeColor(input);
         
         updateEnergyContainer();
         
-        redstonePowered = nbt.getBoolean("redstone");
-        energyStorage.amount = nbt.getLong("energy_stored");
-        targetDirection = BlockPos.of(nbt.getLong("target_direction"));
-        currentTarget = BlockPos.of(nbt.getLong("target_position"));
-        areaSize = nbt.getInt("areaSize");
-        yieldAddons = nbt.getInt("yieldAddons");
-        hunterAddons = nbt.getInt("hunterAddons");
-        hunterTargetMode = HunterTargetMode.fromValue(nbt.getInt("hunterTargetMode"));
-        hasCropFilterAddon = nbt.getBoolean("cropAddon");
-        hasSilkTouchAddon = nbt.getBoolean("silkAddon");
+        redstonePowered = input.getBooleanOr("redstone", false);
+        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        targetDirection = input.read("target_direction", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        currentTarget = input.read("target_position", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        areaSize = input.getIntOr("areaSize", 1);
+        yieldAddons = input.getIntOr("yieldAddons", 0);
+        hunterAddons = input.getIntOr("hunterAddons", 0);
+        hunterTargetMode = HunterTargetMode.fromValue(input.getIntOr("hunterTargetMode", 0));
+        hasCropFilterAddon = input.getBooleanOr("cropAddon", false);
+        hasSilkTouchAddon = input.getBooleanOr("silkAddon", false);
         
-        if (nbt.contains("pendingPositions")) {
-            pendingArea = Arrays.stream(nbt.getLongArray("pendingPositions")).mapToObj(BlockPos::of).collect(Collectors.toCollection(ArrayDeque::new));
-        }
+        pendingArea = input.childrenListOrEmpty("pendingPositions").stream()
+                        .map(posData -> posData.read("pos", BlockPos.CODEC))
+                        .flatMap(Optional::stream)
+                        .collect(Collectors.toCollection(ArrayDeque::new));
     }
     
     //region multiblock

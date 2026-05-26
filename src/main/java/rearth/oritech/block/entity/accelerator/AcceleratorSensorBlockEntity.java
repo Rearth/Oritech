@@ -16,7 +16,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
     private boolean dirty = false;
     
     public AcceleratorSensorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ACCELERATOR_SENSOR_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.ACCELERATOR_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override

@@ -2,16 +2,16 @@ package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.fluid.FluidApi;
@@ -58,15 +58,15 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        fluidStorage.writeNbt(nbt, "");
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        fluidStorage.serialize(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        fluidStorage.readNbt(nbt, "");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        fluidStorage.deserialize(input);
     }
     
     @Override

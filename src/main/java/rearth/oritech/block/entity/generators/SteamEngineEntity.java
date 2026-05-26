@@ -2,11 +2,9 @@ package rearth.oritech.block.entity.generators;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
@@ -15,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.jetbrains.annotations.Nullable;
@@ -71,14 +70,14 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public SteamEngineSyncPacket clientStats;
     
     public SteamEngineEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY, pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
+        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY.get(), pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
         clientStats = new SteamEngineSyncPacket(pos, 1f, 1f, 0, 0, 0);
     }
     
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         
-        if (level.isClientSide || !isAssembled(state)) return;
+        if (level.isClientSide() || !isAssembled(state)) return;
         
         var slaved = inSlaveMode();
         var hasInput = !boilerStorage.getInStack().isEmpty();
@@ -168,11 +167,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             for (int i = 1; i <= MAX_CHAIN_SIZE; i++) {
                 var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), worldPosition));
                 
-                var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY);
+                    var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
                 if (coreCandidate.isPresent() && coreCandidate.get().getCachedController() != null)
                     checkPos = coreCandidate.get().getControllerPos();
                 
-                var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
+                    var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
                 if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) {
                     break;
                 } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {
@@ -213,8 +212,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
     }
     
     private float getSteamProcessingSpeed(FluidApi.SingleSlotStorage usedTank) {
@@ -250,7 +249,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.STEAM_ENGINE_SCREEN;
+        return ModScreens.STEAM_ENGINE_SCREEN.get();
     }
 
     @Override

@@ -2,12 +2,10 @@ package rearth.oritech.block.entity.interaction;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,6 +21,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
@@ -60,7 +60,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     private ServerPlayer destroyerPlayerEntity = null;
     
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -111,21 +111,21 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putBoolean("cropAddon", hasCropFilterAddon);
-        nbt.putBoolean("silkTouchAddon", hasSilkTouchAddon);
-        nbt.putInt("range", range);
-        nbt.putInt("yield", yieldAddons);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putBoolean("cropAddon", hasCropFilterAddon);
+        output.putBoolean("silkTouchAddon", hasSilkTouchAddon);
+        output.putInt("range", range);
+        output.putInt("yield", yieldAddons);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        hasCropFilterAddon = nbt.getBoolean("cropAddon");
-        hasSilkTouchAddon = nbt.getBoolean("silkTouchAddon");
-        range = nbt.getInt("range");
-        yieldAddons = nbt.getInt("yield");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        hasCropFilterAddon = input.getBooleanOr("cropAddon", false);
+        hasSilkTouchAddon = input.getBooleanOr("silkTouchAddon", false);
+        range = input.getIntOr("range", 1);
+        yieldAddons = input.getIntOr("yield", 0);
     }
     
     @Override
@@ -305,7 +305,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_DESTROYER_HEAD.defaultBlockState();
+        return BlockContent.BLOCK_DESTROYER_HEAD.get().defaultBlockState();
     }
     
     @Override
@@ -357,7 +357,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.DESTROYER_SCREEN;
+        return ModScreens.DESTROYER_SCREEN.get();
     }
     
     @Override

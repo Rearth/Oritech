@@ -2,9 +2,7 @@ package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -13,6 +11,8 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.OritechPlatform;
 import rearth.oritech.api.fluid.FluidApi;
@@ -193,18 +193,18 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        nbt.putBoolean("fluidAddon", hasFluidAddon);
-        fluidContainer.writeNbt(nbt, "");
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putBoolean("fluidAddon", hasFluidAddon);
+        fluidContainer.serialize(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         
-        hasFluidAddon = nbt.getBoolean("fluidAddon");
-        fluidContainer.readNbt(nbt, "");
+        hasFluidAddon = input.getBooleanOr("fluidAddon", false);
+        fluidContainer.deserialize(input);
     }
     
     @Override

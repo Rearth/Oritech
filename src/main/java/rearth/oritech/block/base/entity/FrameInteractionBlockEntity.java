@@ -2,15 +2,15 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -251,35 +251,35 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     public abstract void finishBlockWork(BlockPos processed);
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (getBlockState().getValue(FrameInteractionBlock.HAS_FRAME) && areaMin != null) {
             
-            nbt.putLong("areaMin", areaMin.asLong());
-            nbt.putLong("areaMax", areaMax.asLong());
+            output.store("areaMin", BlockPos.CODEC, areaMin);
+            output.store("areaMax", BlockPos.CODEC, areaMax);
             
             if (currentTarget != null)
-                nbt.putLong("currentTarget", currentTarget.asLong());
+                output.store("currentTarget", BlockPos.CODEC, currentTarget);
             
             if (currentDirection != null)
-                nbt.putLong("currentDirection", new BlockPos(currentDirection).asLong());
+                output.store("currentDirection", BlockPos.CODEC, new BlockPos(currentDirection));
             
-            nbt.putInt("progress", (int) currentProgress);
-            nbt.putBoolean("moving", moving);
+            output.putInt("progress", (int) currentProgress);
+            output.putBoolean("moving", moving);
         }
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         if (getBlockState().getValue(FrameInteractionBlock.HAS_FRAME)) {
-            areaMin = BlockPos.of(nbt.getLong("areaMin"));
-            areaMax = BlockPos.of(nbt.getLong("areaMax"));
-            currentTarget = BlockPos.of(nbt.getLong("currentTarget"));
-            currentDirection = BlockPos.of(nbt.getLong("currentDirection"));
+            areaMin = input.read("areaMin", BlockPos.CODEC).orElse(null);
+            areaMax = input.read("areaMax", BlockPos.CODEC).orElse(null);
+            currentTarget = input.read("currentTarget", BlockPos.CODEC).orElse(null);
+            currentDirection = input.read("currentDirection", BlockPos.CODEC).orElse(null);
             lastTarget = currentTarget;
-            currentProgress = nbt.getInt("progress");
-            moving = nbt.getBoolean("moving");
+            currentProgress = input.getIntOr("progress", 0);
+            moving = input.getBooleanOr("moving", false);
         }
     }
     

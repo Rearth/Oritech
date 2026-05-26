@@ -8,7 +8,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -44,9 +44,9 @@ public class TooltipHelper {
     }
     
     public static void addMachineTooltip(List<Component> tooltip, Block block, EntityBlock entityProvider) {
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Boolean.TRUE.equals(Screen.hasShiftDown());
         
-        if (showExtra) {
+        if (Boolean.TRUE.equals(showExtra)) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
             
             var isAtomicForge = entity instanceof AtomicForgeBlockEntity;
@@ -75,8 +75,8 @@ public class TooltipHelper {
             }
             
             
-            if (entity instanceof EnergyApi.BlockProvider energyProvider) {
-                var maxStorage = getEnergyText(energyProvider.getEnergyStorage(null).getCapacity());
+            if (entity instanceof EnergyProvider energyProvider) {
+                var maxStorage = getEnergyText(energyProvider.getEnergyLookup(null).getCapacityAsLong());
                 if (!isAtomicForge)
                     tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
                 

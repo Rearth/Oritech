@@ -4,7 +4,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 
 public abstract class FakeMachinePlayer {
 

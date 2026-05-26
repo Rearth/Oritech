@@ -9,7 +9,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -17,28 +16,36 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.DelegatingEnergyHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.api.networking.UpdatableField;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
@@ -52,8 +59,8 @@ import rearth.oritech.util.ScreenProvider;
 
 import java.util.*;
 
-public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockMachineController, ExtendedMenuProvider,
-                                                                       ScreenProvider, EnergyApi.BlockProvider {
+public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockMachineController, MenuProvider,
+                                                                       ScreenProvider, EnergyProvider {
     
     // stores data per dimension
     public static final HashMap<Identifier, PoleNetworkData> POLE_NETWORK_DATA = new HashMap<>();
@@ -73,24 +80,19 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     protected final PowerPoleEnergyStorage energyStorage = new PowerPoleEnergyStorage();
     
-    private final EnergyApi.EnergyStorage outputStorage = new DelegatingEnergyStorage(energyStorage, null) {
+    private final EnergyHandler outputStorage = new DelegatingEnergyHandler(energyStorage) {
         @Override
-        public boolean supportsInsertion() {
-            return false;
-        }
-        
-        @Override
-        public long insert(long amount, boolean simulate) {
-            return 0L;
+        public int insert(int amount, TransactionContext transaction) {
+            return 0;
         }
     };
 
-    private BlockLookupCache<EnergyApi.EnergyStorage> cachedOutputTarget;
+    private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
     
     private final SimpleInventoryStorage basicInv = new SimpleInventoryStorage(0, this::setChanged);
     
     public PowerPoleEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWER_POLE_ENTITY, pos, state);
+        super(BlockEntitiesContent.POWER_POLE_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -100,14 +102,14 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         energyStorage.tick(level.getGameTime());
         
-        if (level.random.nextFloat() > 0.95f) {
+        if (level.getRandom().nextFloat() > 0.95f) {
             
             var stats = this.energyStorage.getCurrentStatistics(level.getGameTime());
             var moved = stats.insertedLastTickTotal() + stats.extractedLastTickTotal();
             
             if (moved > 10 && level instanceof ServerLevel serverLevel) {
-                var at = worldPosition.getCenter().add(level.random.nextFloat() * 0.4, level.random.nextFloat() * 0.4, level.random.nextFloat() * 0.4);
-                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
+                var at = worldPosition.getCenter().add(level.getRandom().nextFloat() * 0.4, level.getRandom().nextFloat() * 0.4, level.getRandom().nextFloat() * 0.4);
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
             }
         }
         
@@ -120,16 +122,22 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     private void outputEnergy() {
-        if (!isConnected() || energyStorage.getAmount() <= 0) return;
+        if (!isConnected() || energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
 
         if (cachedOutputTarget == null) {
             var target = ExpandableEnergyStorageBlockEntity.getOutputPosition(worldPosition, getFacingForMultiblock().getCounterClockWise());
-            cachedOutputTarget = EnergyApi.BLOCK.createCache(level, target.getB(), target.getA().getOpposite());
+            cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getB(), target.getA().getOpposite());
         }
 
-        var candidate = cachedOutputTarget.find();
-        if (candidate != null && candidate.supportsInsertion()) {
-            EnergyApi.transfer(energyStorage, candidate, Long.MAX_VALUE, false);
+        var candidate = cachedOutputTarget.getCapability();
+        if (candidate != null) {
+            var available = (int) Math.min(Integer.MAX_VALUE, energyStorage.getAmountAsLong());
+            try (var transaction = Transaction.openRoot()) {
+                var inserted = candidate.insert(available, transaction);
+                if (inserted <= 0) return;
+                energyStorage.extract(inserted, transaction);
+                transaction.commit();
+            }
         }
     }
     
@@ -142,8 +150,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             target = MachineCoreBlock.getControllerPos(level, target);
         }
         
-        var pitch = 0.85f + level.random.nextFloat() * 0.3f;
-        level.playSound(null, worldPosition, SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS, 0.7f, pitch);
+        var pitch = 0.85f + level.getRandom().nextFloat() * 0.3f;
+        level.playSound(null, worldPosition, SoundContent.ELECTRIC_SHOCK.value(), SoundSource.PLAYERS, 0.7f, pitch);
         
         var dist = target.distManhattan(worldPosition);
         
@@ -152,7 +160,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             return;
         }
         
-        var targetEntityCandidate = level.getBlockEntity(target, BlockEntitiesContent.POWER_POLE_ENTITY);
+        var targetEntityCandidate = level.getBlockEntity(target, BlockEntitiesContent.POWER_POLE_ENTITY.get());
         if (targetEntityCandidate.isEmpty() || target.equals(worldPosition)) {
             player.sendSystemMessage(Component.translatable("message.oritech.target_designator.pole_position_invalid"));
             return;
@@ -160,7 +168,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         var targetEntity = targetEntityCandidate.get();
         
-        if (this.connections.stream().anyMatch(elem -> elem.pos().equals(targetEntity.worldPosition))) {
+        if (this.connections.stream().anyMatch(elem -> elem.pos().equals(targetEntity.getBlockPos()))) {
             this.removeIncomingConnection(target);
             targetEntity.removeIncomingConnection(worldPosition);
             
@@ -255,7 +263,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     
     public PoleNetworkData getCachedNetData() {
         if (netDataRef == null) {
-            netDataRef = POLE_NETWORK_DATA.computeIfAbsent(level.dimension().location(), data -> new PoleNetworkData());
+            netDataRef = POLE_NETWORK_DATA.computeIfAbsent(level.dimension().identifier(), data -> new PoleNetworkData());
         }
         
         return netDataRef;
@@ -293,37 +301,31 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
-    protected void saveAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
-        super.saveAdditional(tag, registries);
-        addMultiblockToNbt(tag);
-        
-        var connectionList = new ListTag();
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        serializeMultiblock(output);
+
+        var connectionList = output.childrenList("connectionData");
         for (var connection : connections) {
-            var compound = new CompoundTag();
-            compound.putLong("p", connection.pos().asLong());
-            compound.putInt("d", connection.facing.ordinal());
-            connectionList.add(compound);
+            var child = connectionList.addChild();
+            child.store("pos", BlockPos.CODEC, connection.pos());
+            child.putInt("direction", connection.facing.ordinal());
         }
-        tag.put("connectionData", connectionList);
     }
     
     @Override
-    protected void loadAdditional(@NotNull CompoundTag tag, HolderLookup.@NotNull Provider registries) {
-        super.loadAdditional(tag, registries);
-        loadMultiblockNbtData(tag);
-        
-        if (tag.contains("connectionData")) {
-            
-            connections.clear();
-            
-            var nbtList = tag.getList("connectionData", Tag.TAG_COMPOUND);
-            for (var nbtElem : nbtList) {
-                var elem = (CompoundTag) nbtElem;
-                var pos = BlockPos.of(elem.getLong("p"));
-                var dir = Direction.values()[elem.getInt("d")];
-                connections.add(new ConnectionTarget(pos, dir));
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        deserializeMultiblock(input);
+
+        connections.clear();
+        for (var connectionData : input.childrenListOrEmpty("connectionData")) {
+            var pos = connectionData.read("pos", BlockPos.CODEC);
+            var directionIndex = connectionData.getIntOr("direction", -1);
+            if (pos.isPresent() && directionIndex >= 0 && directionIndex < Direction.values().length) {
+                connections.add(new ConnectionTarget(pos.get(), Direction.values()[directionIndex]));
             }
-            
+
         }
     }
     
@@ -344,7 +346,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         
         if (direction != null && direction.equals(getFacingForMultiblock().getCounterClockWise()))
             return outputStorage;
@@ -388,12 +390,12 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
-        return null;
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
+        return basicInv;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -443,59 +445,62 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return basicInv;
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.POWER_POLE_SCREEN;
+        return ModScreens.POWER_POLE_SCREEN.get();
     }
     
-    protected class PowerPoleEnergyStorage extends EnergyApi.EnergyStorage implements UpdatableField<PowerPoleEnergyStorage, Long> {
+    protected class PowerPoleEnergyStorage extends DynamicEnergyStorage {
         
         private long clientShownEnergy;
-        
+
+        public PowerPoleEnergyStorage() {
+            super(0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, PowerPoleEntity.this::setChanged, false);
+        }
         
         private boolean isValid() {
             return level != null && PowerPoleEntity.this.isConnected();
         }
         
         @Override
-        public long insert(long maxAmount, boolean simulate) {
+        public int insert(int maxAmount, TransactionContext transaction) {
             if (!isValid()) return 0;
             
-            var insertAmount = Math.min(maxAmount, getCapacity() - getAmount());
+            var insertAmount = (int) Math.min(maxAmount, getCapacityAsLong() - getAmountAsLong());
             
-            if (insertAmount > 0 && !simulate) {
-                var newAmount = getAmount() + insertAmount;
-                setAmount(newAmount);
-                getNetwork().inserted.add(insertAmount);
+            if (insertAmount > 0) {
+                var newAmount = getAmountAsLong() + insertAmount;
+                set(newAmount);
+                getNetwork().inserted.add((long) insertAmount);
             }
             
             return insertAmount;
         }
         
         @Override
-        public long extract(long maxAmount, boolean simulate) {
+        public int extract(int maxAmount, TransactionContext transaction) {
             if (!isValid()) return 0;
             
-            var extractAmount = Math.min(maxAmount, this.getAmount());
+            var extractAmount = (int) Math.min(maxAmount, this.getAmountAsLong());
             
-            if (extractAmount > 0 && !simulate) {
-                var newAmount = getAmount() - extractAmount;
-                setAmount(newAmount);
-                getNetwork().extracted.add(extractAmount);
+            if (extractAmount > 0) {
+                var newAmount = getAmountAsLong() - extractAmount;
+                set(newAmount);
+                getNetwork().extracted.add((long) extractAmount);
             }
             
             return extractAmount;
         }
         
         @Override
-        public void setAmount(long amount) {
+        public void set(long amount) {
             if (!isValid()) return;
             
-            if (amount > getCapacity() || amount < 0) {
+            if (amount > getCapacityAsLong() || amount < 0) {
                 Oritech.LOGGER.error("tried setting invalid amount for pole network: " + amount);
                 return;
             }
@@ -511,7 +516,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
         
         @Override
-        public long getAmount() {
+        public long getAmountAsLong() {
             if (level.isClientSide()) return clientShownEnergy;
             
             if (!isValid()) return 0;
@@ -526,11 +531,10 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
         
         @Override
-        public long getCapacity() {
+        public long getCapacityAsLong() {
             return OritechConfig.poleConfig.energyCapacity.get();
         }
-        
-        @Override
+
         public void update() {
             if (!isValid()) return;
             PowerPoleEntity.this.setChanged(false);
@@ -568,7 +572,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         
         @Override
         public Long getDeltaData() {
-            return getAmount();
+            return getAmountAsLong();
         }
         
         @Override
@@ -579,21 +583,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         @Override
         public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
             return ByteBufCodecs.VAR_LONG;
-        }
-        
-        @Override
-        public StreamCodec<? extends ByteBuf, PowerPoleEnergyStorage> getFullCodec() {
-            return null;
-        }
-        
-        @Override
-        public boolean useDeltaOnly(SyncType type) {
-            return true;
-        }
-        
-        @Override
-        public void handleFullUpdate(PowerPoleEnergyStorage updatedData) {
-        
         }
         
         @Override
@@ -656,19 +645,19 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             
             if (!nbt.contains("networks")) return data;
             
-            var networksList = nbt.getList("networks", Tag.TAG_COMPOUND);
+            var networksList = nbt.getList("networks").orElse(new ListTag());
             
             for (var networkTag : networksList) {
                 
                 var tag = (CompoundTag) networkTag;
                 
-                var energy = tag.getLong("energy");
+                var energy = tag.getLong("energy").orElse(0L);
                 var poles = new HashMap<BlockPos, Set<BlockPos>>();
-                var poleDataList = tag.getList("poles", Tag.TAG_COMPOUND);
+                var poleDataList = tag.getList("poles").orElse(new ListTag());
                 for (var poleDataTag : poleDataList) {
                     var poleData = (CompoundTag) poleDataTag;
-                    var polePos = BlockPos.of(poleData.getLong("pos"));
-                    var poleConnections = new HashSet<>(Arrays.stream(poleData.getLongArray("cons")).mapToObj(BlockPos::of).toList());
+                    var polePos = BlockPos.of(poleData.getLong("pos").orElse(0L));
+                    var poleConnections = new HashSet<>(Arrays.stream(poleData.getLongArray("cons").orElse(new long[0])).mapToObj(BlockPos::of).toList());
                     poles.put(polePos, poleConnections);
                 }
                 

@@ -2,15 +2,11 @@ package rearth.oritech.block.entity.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -18,42 +14,52 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.InOutInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.util.StackContext;
 
 import java.util.List;
 
-public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi.BlockProvider, EnergyApi.BlockProvider, ItemApi.BlockProvider,
-                                                                 ScreenProvider, ExtendedMenuProvider {
+public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidProvider, EnergyProvider, ItemProvider,
+                                                                 ScreenProvider, MenuProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.charger.energyCapacity.get(), OritechConfig.charger.maxEnergyInsertion.get(), OritechConfig.charger.maxEnergyExtraction.get(), this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.charger.energyCapacity.get(), OritechConfig.charger.maxEnergyInsertion.get(), OritechConfig.charger.maxEnergyExtraction.get(), 0, this::setChanged, false);
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(16 * 1000, this::setChanged);
     
     // 0 = bucket/item to be charged/filled, 1 = empty bucket/charged/fill item
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
     
     
     public ChargerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.CHARGER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -64,7 +70,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
         if (inventory.getItem(0).isEmpty() || inventory.getItem(0).getCount() > 1) return;
         
         var isFull = true;
-        var startEnergy = energyStorage.amount;
+        var startEnergy = energyStorage.energy;
         var startFluid = fluidStorage.getAmount();
         
         // try charge item
@@ -77,42 +83,46 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
         if (isFull) {
             var outSlot = inventory.getItem(1);
             if (outSlot.isEmpty()) {
-                inventory.setItem(1, inventory.getItem(0));
-                inventory.setItem(0, ItemStack.EMPTY);
+                inventory.getStacks().set(1, inventory.getItem(0));
+                inventory.getStacks().set(0, ItemStack.EMPTY);
             }
         }
         
-        if (fluidStorage.getAmount() != startFluid || energyStorage.amount != startEnergy) {
+        if (fluidStorage.getAmount() != startFluid || energyStorage.energy != startEnergy) {
             if (level instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
         }
         
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        fluidStorage.writeNbt(nbt, "");
-        ContainerHelper.saveAllItems(nbt, inventory.heldStacks, false, registryLookup);
-        nbt.putLong("energy_stored", energyStorage.amount);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        fluidStorage.serialize(output);
+        inventory.serialize(output);
+        output.putLong("energy_stored", energyStorage.energy);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        fluidStorage.readNbt(nbt, "");
-        ContainerHelper.loadAllItems(nbt, inventory.heldStacks, registryLookup);
-        energyStorage.amount = nbt.getLong("energy_stored");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        fluidStorage.deserialize(input);
+        inventory.deserialize(input);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
     }
     
     // return true if nothing is left to charge/fill
     private boolean chargeItems() {
-        var heldStack = inventory.heldStacks.get(0);
-        
-        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
-        var slotEnergyContainer = EnergyApi.ITEM.find(stackRef);
+        var heldStack = inventory.getStacks().get(0);
+        var slotEnergyContainer = heldStack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
         if (slotEnergyContainer != null) {
-            EnergyApi.transfer(energyStorage, slotEnergyContainer, Long.MAX_VALUE, false);
-            return slotEnergyContainer.getAmount() >= slotEnergyContainer.getCapacity();
+            try (var transaction = Transaction.openRoot()) {
+                var moved = slotEnergyContainer.insert((int) Math.min(Integer.MAX_VALUE, energyStorage.energy), transaction);
+                if (moved > 0) {
+                    energyStorage.internalExtract(moved, transaction);
+                    transaction.commit();
+                }
+            }
+            return slotEnergyContainer.getAmountAsLong() >= slotEnergyContainer.getCapacityAsLong();
         } else {
             return true;
         }
@@ -121,13 +131,14 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     // return true if nothing is left to fill
     private boolean fillItems() {
         
-        var heldStack = inventory.heldStacks.get(0);
-        
-        var stackRef = new StackContext(heldStack, updated -> inventory.heldStacks.set(0, updated));
-        var slotFluidContainer = FluidApi.ITEM.find(stackRef);
+        var heldStack = inventory.getStacks().get(0);
+        var slotFluidContainer = heldStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
         if (slotFluidContainer != null) {
-            var moved = FluidApi.transferFirst(fluidStorage, slotFluidContainer, (long) (FluidStackHooks.bucketAmount() * 0.1f), false);
-            return fluidStorage.getAmount() > 0 && moved == 0;
+            try (var transaction = Transaction.openRoot()) {
+                var moved = ResourceHandlerUtil.moveFirst(fluidStorage, slotFluidContainer, resource -> true, 100, transaction);
+                if (moved != null && !moved.isEmpty()) transaction.commit();
+                return fluidStorage.getAmount() > 0 && (moved == null || moved.isEmpty());
+            }
         } else {
             return true;
         }
@@ -153,16 +164,16 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.CHARGER_SCREEN;
+        return ModScreens.CHARGER_SCREEN.get();
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
@@ -187,7 +198,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
     
@@ -207,7 +218,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidApi
     }
     
     @Override
-    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         return fluidStorage;
     }
 }

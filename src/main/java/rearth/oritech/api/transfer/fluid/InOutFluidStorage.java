@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -124,12 +126,16 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     
     }
     
-    public int getCapacity() {
-        return capacity;
-    }
-    
     @Override
     public void handleDeltaUpdate(List<FluidStack> updatedData) {
         this.setStacks(NonNullList.copyOf(updatedData));
+    }
+
+    public void serialize(ValueOutput output) {
+        output.store("fluids", FluidStack.OPTIONAL_CODEC.listOf(), stacks);
+    }
+
+    public void deserialize(ValueInput input) {
+        input.read("fluids", FluidStack.OPTIONAL_CODEC.listOf()).ifPresent(this::handleDeltaUpdate);
     }
 }

@@ -28,13 +28,13 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private List<CachedTarget<FluidApi.FluidStorage>> filteredFluidTargetsCached;
     
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FLUID_PIPE_ENTITY, pos, state);
+        super(BlockEntitiesContent.FLUID_PIPE_ENTITY.get(), pos, state);
     }
     
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
-        if (level.isClientSide || !block.isExtractable(state)) return;
+        if (level.isClientSide() || !block.isExtractable(state)) return;
         
         var boosted = isBoostAvailable();
         

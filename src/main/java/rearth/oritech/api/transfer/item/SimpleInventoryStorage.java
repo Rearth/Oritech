@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
@@ -72,5 +74,14 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
     
     public NonNullList<ItemStack> getStacks() {
         return stacks;
+    }
+
+
+    public void serialize(ValueOutput output) {
+        output.store("items", ItemStack.OPTIONAL_CODEC.listOf(), stacks);
+    }
+
+    public void deserialize(ValueInput input) {
+        input.read("items", ItemStack.OPTIONAL_CODEC.listOf()).ifPresent(this::handleDeltaUpdate);
     }
 }

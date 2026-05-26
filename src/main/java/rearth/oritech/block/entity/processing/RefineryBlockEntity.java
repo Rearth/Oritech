@@ -2,10 +2,8 @@ package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
@@ -17,6 +15,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -71,19 +71,15 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.saveAdditional(nbt, registryLookup);
-        ownStorage.writeNbt(nbt, "main");
-        nodeA.writeNbt(nbt, "a");
-        nodeB.writeNbt(nbt, "b");
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ownStorage.serialize(output);
     }
     
     @Override
-    protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-        super.loadAdditional(nbt, registryLookup);
-        ownStorage.readNbt(nbt, "main");
-        nodeA.readNbt(nbt, "a");
-        nodeB.readNbt(nbt, "b");
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        ownStorage.deserialize(input);
     }
     
     private void refreshModules() {
