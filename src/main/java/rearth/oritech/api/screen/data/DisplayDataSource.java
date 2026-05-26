@@ -2,8 +2,10 @@ package rearth.oritech.api.screen.data;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.fluid.FluidApi;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
@@ -45,11 +47,11 @@ public abstract class DisplayDataSource {
     public static class FluidDataSource extends DisplayDataSource {
         
         private final Supplier<FluidStack> fluidSupplier;
-        private final FluidApi.SingleSlotStorage storage;
+        private final SimpleFluidStorage storage;
         private int tankIndex;
         
-        private FluidDataSource(FluidApi.SingleSlotStorage storage, long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
-            super(capacity, () -> fluidSupplier.get().getAmount(), tooltipSupplier, config);
+        private FluidDataSource(SimpleFluidStorage storage, long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
+            super(capacity, () -> (long) fluidSupplier.get().amount(), tooltipSupplier, config);
             this.storage = storage;
             this.fluidSupplier = fluidSupplier;
         }
@@ -58,7 +60,7 @@ public abstract class DisplayDataSource {
             return fluidSupplier;
         }
         
-        public FluidApi.SingleSlotStorage getStorage() {
+        public SimpleFluidStorage getStorage() {
             return storage;
         }
         
@@ -71,20 +73,20 @@ public abstract class DisplayDataSource {
         }
     }
     
-    public static FluidDataSource CreateFluid(FluidApi.SingleSlotStorage storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
+    public static FluidDataSource CreateFluid(SimpleFluidStorage storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
         
         return new FluidDataSource(
           storage,
           storage.getCapacity(),
-          storage::getStack,
-          () -> getFluidTooltip(storage.getStack()),
+          storage::getContent,
+          () -> getFluidTooltip(storage.getContent()),
           config);
     }
     
     public static Component getFluidTooltip(FluidStack stack) {
         
-        return stack.getAmount() > 0
-                            ? Component.translatable("tooltip.oritech.tank_content", stack.getAmount() * 1000 / FluidStackHooks.bucketAmount(), FluidStackHooks.getName(stack).getString())
+        return stack.amount() > 0
+                            ? Component.translatable("tooltip.oritech.tank_content", stack.amount() * 1000L / FluidType.BUCKET_VOLUME, stack.getHoverName().getString())
                             : Component.translatable("tooltip.oritech.tank_empty");
     }
     
@@ -95,12 +97,12 @@ public abstract class DisplayDataSource {
         }
     }
     
-    public static EnergyDataSource CreateEnergy(EnergyApi.EnergyStorage storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
+    public static EnergyDataSource CreateEnergy(EnergyHandler storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
         
         return new EnergyDataSource(
-          storage.getCapacity(),
-          storage::getAmount,
-          () -> getEnergyTooltip(storage.getAmount(), storage.getCapacity(), (long) provider.getDisplayedEnergyUsage(), (long) provider.getDisplayedEnergyTransfer(), provider.showEnergyUsage(), provider.showEnergyTransfer()),
+          storage.getCapacityAsLong(),
+          storage::getAmountAsLong,
+          () -> getEnergyTooltip(storage.getAmountAsLong(), storage.getCapacityAsLong(), (long) provider.getDisplayedEnergyUsage(), (long) provider.getDisplayedEnergyTransfer(), provider.showEnergyUsage(), provider.showEnergyTransfer()),
           config);
     }
     

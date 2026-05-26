@@ -2,7 +2,8 @@ package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -271,7 +272,7 @@ public class SliderWidget extends UIComponent {
     }
 
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         var font = Minecraft.getInstance().font;
         var cx = contentX();
         var cy = contentY();
@@ -294,7 +295,7 @@ public class SliderWidget extends UIComponent {
         }
     }
 
-    private void renderHorizontalBar(GuiGraphics graphics, int x, int y, int width, int height, boolean highlighted) {
+    private void renderHorizontalBar(GuiGraphicsExtractor graphics, int x, int y, int width, int height, boolean highlighted) {
         if (width <= 1 || height <= 1) {
             return;
         }
@@ -331,7 +332,7 @@ public class SliderWidget extends UIComponent {
             active ? (highlighted ? KNOB_HOVER_COLOR : KNOB_COLOR) : KNOB_DISABLED_COLOR);
     }
 
-    private void renderVerticalBar(GuiGraphics graphics, int x, int y, int width, int height, boolean highlighted) {
+    private void renderVerticalBar(GuiGraphicsExtractor graphics, int x, int y, int width, int height, boolean highlighted) {
         if (width <= 1 || height <= 1) {
             return;
         }
@@ -369,7 +370,7 @@ public class SliderWidget extends UIComponent {
             active ? (highlighted ? KNOB_HOVER_COLOR : KNOB_COLOR) : KNOB_DISABLED_COLOR);
     }
 
-    private void drawHorizontalMarker(GuiGraphics graphics, int x, int y, int width, int height, float progress) {
+    private void drawHorizontalMarker(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float progress) {
         if (width <= 0 || height <= 0) {
             return;
         }
@@ -378,7 +379,7 @@ public class SliderWidget extends UIComponent {
         graphics.fill(markerX, y, markerX + 1, y + height, ProgressBarWidget.BAR_MARKER);
     }
 
-    private void drawVerticalMarker(GuiGraphics graphics, int x, int y, int width, int height, float progress) {
+    private void drawVerticalMarker(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float progress) {
         if (width <= 0 || height <= 0) {
             return;
         }
@@ -391,17 +392,17 @@ public class SliderWidget extends UIComponent {
         return valueFormatter.apply(value);
     }
 
-    private void renderHeader(GuiGraphics graphics, Font font, int x, int y, int width, Component valueLabel) {
+    private void renderHeader(GuiGraphicsExtractor graphics, Font font, int x, int y, int width, Component valueLabel) {
         var color = active ? textColor : DISABLED_TEXT_COLOR;
         
         if (valueLabelPosition == ValueLabelPosition.BEGIN && valueLabel != null) {
-            graphics.drawString(font, valueLabel, x, y, color, textShadow);
+            graphics.text(font, valueLabel, x, y, color, textShadow);
         }
         
         if (valueLabelPosition == ValueLabelPosition.END && valueLabel != null) {
             var valueX = orientation == Orientation.HORIZONTAL ? x + Math.max(0, width - font.width(valueLabel)) : x - font.width(valueLabel) / 2 + width / 2;
             var valueY = orientation == Orientation.VERTICAL ? y + height + TITLE_BAR_GAP : y;
-            graphics.drawString(font, valueLabel, valueX, valueY, color, textShadow);
+            graphics.text(font, valueLabel, valueX, valueY, color, textShadow);
         }
 
         if (title != null) {
@@ -409,7 +410,7 @@ public class SliderWidget extends UIComponent {
             if (valueLabelPosition == ValueLabelPosition.BEGIN && valueLabel != null) {
                 titleX += font.width(valueLabel) + TITLE_VALUE_GAP;
             }
-            graphics.drawString(font, title, titleX, y, color, textShadow);
+            graphics.text(font, title, titleX, y, color, textShadow);
         }
     }
 

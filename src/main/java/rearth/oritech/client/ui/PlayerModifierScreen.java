@@ -1,11 +1,9 @@
 package rearth.oritech.client.ui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -541,33 +539,12 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         };
     }
     
-    private static void drawLine(GuiGraphics graphics, int fromX, int fromY, int toX, int toY, int color, float zIndex) {
-        if (fromX == toX && fromY == toY) return;
-        
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        var pose = graphics.pose();
-        pose.pushPose();
-        
-        var matrix = pose.last().pose();
-        double dx = toX - fromX;
-        double dy = toY - fromY;
-        double length = Math.sqrt(dx * dx + dy * dy);
-        if (length == 0) {
-            pose.popPose();
-            return;
-        }
-        
-        float normalX = (float) (-dy / length);
-        float normalY = (float) (dx / length);
-        
-        var buffer = graphics.bufferSource().getBuffer(RenderType.gui());
-        buffer.addVertex(matrix, fromX - normalX, fromY - normalY, zIndex).setColor(color);
-        buffer.addVertex(matrix, fromX + normalX, fromY + normalY, zIndex).setColor(color);
-        buffer.addVertex(matrix, toX + normalX, toY + normalY, zIndex).setColor(color);
-        buffer.addVertex(matrix, toX - normalX, toY - normalY, zIndex).setColor(color);
-        graphics.flush();
-        
-        pose.popPose();
+    // Stubbed: the immediate-mode vertex API used to draw arbitrary 2D lines was removed
+    // in 26.1. Diagonal lines between dependency nodes will not render until a custom
+    // GuiRenderState submission is built. Axis-aligned segments could fall back to fill()
+    // but most dependency edges in this tree are diagonal.
+    private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color, float zIndex) {
+        // no-op
     }
     
     @Override
@@ -594,7 +571,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         @Override
-        protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             for (var dependency : dependencyLines) {
                 drawLine(graphics, dependency.fromX(), dependency.fromY(), dependency.toX(), dependency.toY(), LINE_COLOR, 0f);
             }
@@ -635,7 +612,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         @Override
-        protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             boolean hovered = isMouseOver(mouseX, mouseY);
             if (hovered) {
                 graphics.fill(x - 1, y - 1, x + width + 1, y + height + 1, HIGHLIGHT_COLOR);
@@ -648,10 +625,10 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
                 default -> Oritech.id("textures/gui/augment/background_open.png");
             };
             
-            graphics.blit(backgroundTexture, x, y, 0, 0, width, height, 16, 16);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, x, y, 0f, 0f, width, height, 16, 16);
             
             int iconOffset = (width - ICON_SIZE) / 2;
-            graphics.blit(iconTexture, x + iconOffset, y + iconOffset, 0, 0, ICON_SIZE, ICON_SIZE, 24, 24);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, iconTexture, x + iconOffset, y + iconOffset, 0f, 0f, ICON_SIZE, ICON_SIZE, 24, 24);
             
             if (blocked) {
                 graphics.fill(x + 2, y + 2, x + width - 2, y + height - 2, BLOCKER_COLOR);

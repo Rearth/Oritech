@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 
@@ -20,7 +21,7 @@ public class SurfaceWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         // Surface rendered by UIComponent.render()
     }
 }

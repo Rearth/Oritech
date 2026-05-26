@@ -8,19 +8,27 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.screen.data.DisplayDataSource;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.util.ScreenProvider;
 
@@ -82,8 +90,8 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     }
     
     public void addFluidDisplay() {
-        if (blockEntity instanceof FluidApi.BlockProvider blockProvider) {
-            var storage = blockProvider.getFluidStorage(null);
+        if (blockEntity instanceof FluidProvider blockProvider) {
+            var storage = blockProvider.getFluidLookup(null);
             if (storage instanceof SimpleFluidStorage singleSlotStorage) {
                 var source = DisplayDataSource.CreateFluid(singleSlotStorage, screenData.getFluidConfiguration(), screenData);
                 dataDisplays.add(source);
@@ -92,8 +100,8 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     }
 
     protected void addEnergyDisplay() {
-        if (screenData.showEnergy() && blockEntity instanceof EnergyApi.BlockProvider energyProvider) {
-            var storage = energyProvider.getEnergyStorage(null);
+        if (screenData.showEnergy() && blockEntity instanceof EnergyProvider energyProvider) {
+            var storage = energyProvider.getEnergyLookup(null);
             dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
         }
     }
@@ -281,33 +289,23 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         var carriedStack = player.containerMenu.getCarried();
         if (carriedStack.isEmpty()) return;
         
-        var usedStack = carriedStack;
-        if (carriedStack.getCount() > 1) {
-            usedStack = carriedStack.copyWithCount(1);
-        }
-        
-        var stackRef = new StackContext(usedStack, updated -> {
-            if (carriedStack.getCount() > 1) {
-                carriedStack.shrink(1);
-                if (!player.getInventory().add(updated)) {
-                    player.drop(updated, true);
-                }
-            } else {
-                player.containerMenu.setCarried(updated);
-            }
-        });
-        
-        var itemFluidStorage = FluidApi.ITEM.find(stackRef);
+        // Resolve a fluid handler for the player's cursor stack. Single-item access (oneByOne)
+        // matches the previous behavior of acting on one stack at a time.
+        var cursorAccess = ItemAccess.forPlayerCursor(player, player.containerMenu).oneByOne();
+        var itemFluidStorage = cursorAccess.getCapability(Capabilities.Fluid.ITEM);
         if (itemFluidStorage == null) return;
         
         var tankStorage = handler.fluidStorages.get(packet.tankIndex());
         
-        if (packet.extract()) {
-            // Right click: tank → item
-            FluidApi.transferFirst(tankStorage, itemFluidStorage, Long.MAX_VALUE, false);
-        } else {
-            // Left click: item → tank
-            FluidApi.transferFirst(itemFluidStorage, tankStorage, Long.MAX_VALUE, false);
+        try (var transaction = Transaction.openRoot()) {
+            if (packet.extract()) {
+                // Right click: tank → item
+                ResourceHandlerUtil.moveFirst(tankStorage, itemFluidStorage, r -> true, Integer.MAX_VALUE, transaction);
+            } else {
+                // Left click: item → tank
+                ResourceHandlerUtil.moveFirst(itemFluidStorage, tankStorage, r -> true, Integer.MAX_VALUE, transaction);
+            }
+            transaction.commit();
         }
     }
     

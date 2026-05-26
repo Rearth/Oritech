@@ -1,9 +1,11 @@
 package rearth.oritech.client.ui;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
@@ -71,12 +73,16 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     }
     
     @Override
-    protected void renderBg(GuiGraphics graphics, float partialTick, int mouseX, int mouseY) {
+    public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         var sorted = new ArrayList<>(components);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
         
         int relX = mouseX - leftPos;
         int relY = mouseY - topPos;
+        
+        var pose = graphics.pose();
+        pose.pushMatrix();
+        pose.translate(leftPos, topPos);
         
         var backgroundDrawn = false;
         var lastZ = Integer.MIN_VALUE;
@@ -84,44 +90,49 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         for (var component : sorted) {
             if (!component.isVisible() || component instanceof OverlayWidget) continue;
             if (!backgroundDrawn && backgroundTexture != null && lastZ < 0 && component.getZIndex() >= 0) {
-                graphics.blit(backgroundTexture, leftPos, topPos, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+                graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
                 backgroundDrawn = true;
             }
-            graphics.pose().pushPose();
-            graphics.pose().translate(leftPos, topPos, 0);
             component.render(graphics, relX, relY, partialTick);
-            graphics.pose().popPose();
             lastZ = component.getZIndex();
         }
         
         if (!backgroundDrawn && backgroundTexture != null) {
-            graphics.blit(backgroundTexture, leftPos, topPos, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, backgroundTexture, 0, 0, 0, 0, imageWidth, imageHeight, imageWidth, imageHeight);
         }
+        
+        pose.popMatrix();
+        
+        // Standard ACS rendering (slots, labels) on top of our widgets
+        super.extractContents(graphics, mouseX, mouseY, partialTick);
+        
+        // Overlay widgets on a fresh stratum so they sit above slots and floating items
+        graphics.nextStratum();
+        renderOverlays(graphics, mouseX, mouseY, partialTick);
     }
     
-    protected void renderOverlays(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
+    protected void renderOverlays(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         int relX = mouseX - leftPos;
         int relY = mouseY - topPos;
         
         for (var component : components) {
             if (component instanceof OverlayWidget && component.isVisible()) {
-                graphics.pose().pushPose();
-                graphics.pose().translate(leftPos, topPos, 400);
+                var pose = graphics.pose();
+                pose.pushMatrix();
+                pose.translate(leftPos, topPos);
                 component.render(graphics, relX, relY, partialTick);
-                graphics.pose().popPose();
+                pose.popMatrix();
             }
         }
     }
     
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
     }
     
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        super.render(graphics, mouseX, mouseY, partialTick);
-        renderOverlays(graphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(graphics, mouseX, mouseY);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
         renderComponentTooltips(graphics, mouseX, mouseY);
     }
     
@@ -138,7 +149,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         return false;
     }
     
-    private void renderComponentTooltips(GuiGraphics graphics, int mouseX, int mouseY) {
+    private void renderComponentTooltips(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         int relX = mouseX - leftPos;
         int relY = mouseY - topPos;
         
@@ -147,10 +158,8 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             if (c instanceof OverlayWidget overlay && c.isVisible()) {
                 var hovered = overlay.getTopmostHovered(relX, relY);
                 if (hovered != null) {
-                    graphics.pose().pushPose();
-                    graphics.pose().translate(0, 0, 220);   // item stack are 150, item stack tooltips are 200
-                    graphics.renderComponentTooltip(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
-                    graphics.pose().popPose();
+                    graphics.nextStratum();
+                    graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
                 }
                 return;
             }
@@ -161,7 +170,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             if (c instanceof ScrollWidget scrollWidget && c.isVisible() && c.isMouseOver(mouseX, mouseY)) {
                 var hovered = scrollWidget.getTopmostHovered(relX, relY);
                 if (hovered != null)
-                    graphics.renderComponentTooltip(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
+                    graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
                 return;
             }
         }
@@ -175,13 +184,14 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         }
         
         if (topHovered != null && !topHovered.getTooltip().isEmpty() && !topHovered.getTooltip().stream().allMatch(elem -> elem.getString().isBlank()))
-            graphics.renderComponentTooltip(Minecraft.getInstance().font, topHovered.getTooltip(), mouseX, mouseY);
+            graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, topHovered.getTooltip(), mouseX, mouseY);
     }
     
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int relX = (int) mouseX - leftPos;
-        int relY = (int) mouseY - topPos;
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        int relX = (int) event.x() - leftPos;
+        int relY = (int) event.y() - topPos;
+        int button = event.button();
         interactionTarget = null;
         
         var sorted = new ArrayList<>(components);
@@ -194,13 +204,14 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             }
         }
         
-        return super.mouseClicked(mouseX, mouseY, button);
+        return super.mouseClicked(event, doubleClick);
     }
     
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        int relX = (int) mouseX - leftPos;
-        int relY = (int) mouseY - topPos;
+    public boolean mouseDragged(MouseButtonEvent event, double dragX, double dragY) {
+        int relX = (int) event.x() - leftPos;
+        int relY = (int) event.y() - topPos;
+        int button = event.button();
         
         if (interactionTarget != null && interactionTarget.isVisible() && interactionTarget.handleDrag(relX, relY, dragX, dragY, button)) {
             return true;
@@ -216,13 +227,14 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             }
         }
         
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+        return super.mouseDragged(event, dragX, dragY);
     }
     
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        int relX = (int) mouseX - leftPos;
-        int relY = (int) mouseY - topPos;
+    public boolean mouseReleased(MouseButtonEvent event) {
+        int relX = (int) event.x() - leftPos;
+        int relY = (int) event.y() - topPos;
+        int button = event.button();
         
         for (var c : components) {
             if (c.isVisible()) c.handleMouseRelease(relX, relY, button);
@@ -230,7 +242,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         
         interactionTarget = null;
         
-        return super.mouseReleased(mouseX, mouseY, button);
+        return super.mouseReleased(event);
     }
     
     @Override

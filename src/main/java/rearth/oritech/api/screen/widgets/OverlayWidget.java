@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
 
@@ -80,7 +81,7 @@ public class OverlayWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         // Translucent background
         graphics.fill(x, y, x + width, y + height, bgColor);
         

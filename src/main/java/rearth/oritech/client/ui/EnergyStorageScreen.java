@@ -4,7 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage.EnergyStatistics;
+import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage.EnergyStatistics;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.LabelWidget;

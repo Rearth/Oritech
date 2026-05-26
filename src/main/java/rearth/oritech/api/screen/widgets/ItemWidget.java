@@ -1,7 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -42,7 +43,7 @@ public class ItemWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (stack == null || stack.isEmpty()) return;
         
         int cx = contentX();
@@ -53,17 +54,17 @@ public class ItemWidget extends UIComponent {
         int targetSize = Math.min(cw, ch);
         if (targetSize != 16 && targetSize > 0) {
             float scale = targetSize / 16f;
-            graphics.pose().pushPose();
-            graphics.pose().translate(cx, cy, 0);
+            graphics.pose().pushMatrix();
+            graphics.pose().translate(cx, cy);
             graphics.pose().scale(scale, scale, 1f);
-            graphics.renderItem(stack, 0, 0);
+            graphics.item(stack, 0, 0);
             if (showOverlay)
-                graphics.renderItemDecorations(Minecraft.getInstance().font, stack, 0, 0);
-            graphics.pose().popPose();
+                graphics.itemDecorations(Minecraft.getInstance().font, stack, 0, 0);
+            graphics.pose().popMatrix();
         } else {
-            graphics.renderItem(stack, cx, cy);
+            graphics.item(stack, cx, cy);
             if (showOverlay)
-                graphics.renderItemDecorations(Minecraft.getInstance().font, stack, cx, cy);
+                graphics.itemDecorations(Minecraft.getInstance().font, stack, cx, cy);
         }
     }
     

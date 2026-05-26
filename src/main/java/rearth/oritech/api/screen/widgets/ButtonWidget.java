@@ -1,7 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -87,7 +88,7 @@ public class ButtonWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         hovered = isMouseOver(mouseX, mouseY);
         if (pressed && !hovered) pressed = false;
         
@@ -106,6 +107,6 @@ public class ButtonWidget extends UIComponent {
         var font = Minecraft.getInstance().font;
         int textY = y + (height - 8) / 2 + ((hovered && active) ? 1 : 0);
         int textX = x + (width - font.width(label)) / 2;
-        graphics.drawString(font, label, textX, textY, active ? textColor : DISABLED_COLOR, textShadow);
+        graphics.text(font, label, textX, textY, active ? textColor : DISABLED_COLOR, textShadow);
     }
 }

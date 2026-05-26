@@ -1,22 +1,15 @@
 package rearth.oritech.client.ui;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -299,7 +292,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         }
 
         @Override
-        protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             hoveredEntry = findHoveredEntry(mouseX, mouseY);
 
             for (var entry : blockEntries) {
@@ -380,7 +373,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             return null;
         }
 
-        private void renderTooltipPanel(GuiGraphics graphics, int blockX, int blockY, List<Component> tooltip) {
+        private void renderTooltipPanel(GuiGraphicsExtractor graphics, int blockX, int blockY, List<Component> tooltip) {
             if (tooltip.isEmpty()) return;
 
             var font = Minecraft.getInstance().font;
@@ -394,8 +387,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int tooltipX = Math.max(4, Math.min(width - panelWidth - 4, blockX - 24));
             int tooltipY = Math.max(4, blockY - panelHeight - 6);
             
-            graphics.pose().pushPose();
-            graphics.pose().translate(0, 0, 3000);
+            graphics.nextStratum();
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xCC101418);
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + 1, 0xFF9DB4C7);
             graphics.fill(tooltipX, tooltipY + panelHeight - 1, tooltipX + panelWidth, tooltipY + panelHeight, 0xFF9DB4C7);
@@ -403,48 +395,19 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             graphics.fill(tooltipX + panelWidth - 1, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xFF9DB4C7);
 
             for (int index = 0; index < tooltip.size(); index++) {
-                graphics.drawString(font, tooltip.get(index), tooltipX + 5, tooltipY + 4 + index * font.lineHeight, 0xFFF2F6FA, false);
+                graphics.text(font, tooltip.get(index), tooltipX + 5, tooltipY + 4 + index * font.lineHeight, 0xFFF2F6FA, false);
             }
-            graphics.pose().popPose();
         }
 
-        private void renderBlock(GuiGraphics graphics, int drawX, int drawY, int size, float zIndex,
+        // Stubbed: 3D block rendering in a 2D UI no longer has a one-liner equivalent in 26.1.
+        // The previous Minecraft.getInstance().getBlockRenderer().renderSingleBlock(...) call
+        // and LightTexture.FULL_BRIGHT are gone; the new pipeline uses ModelBlockRenderer +
+        // SubmitNodeStorage and requires a dedicated PIP renderer to draw a block into a GUI.
+        // Leaving as a no-op until a proper grid PIP renderer is built.
+        private void renderBlock(GuiGraphicsExtractor graphics, int drawX, int drawY, int size, float zIndex,
                                  @Nullable BlockState overrideState, @Nullable BlockEntity overrideEntity,
                                  BlockPos worldPos, float delta) {
-            var client = Minecraft.getInstance();
-            var usedState = overrideState != null ? overrideState : menu.level.getBlockState(worldPos);
-            var usedEntity = overrideEntity;
-
-            graphics.pose().pushPose();
-            graphics.pose().translate(x + drawX + size / 2f, y + drawY + size / 2f, zIndex * 25 + 1000);
-            graphics.pose().scale(40 * size / 64f, -40 * size / 64f, 40);
-            graphics.pose().mulPose(Axis.XP.rotationDegrees(30));
-            graphics.pose().mulPose(Axis.YP.rotationDegrees(225));
-            graphics.pose().translate(-0.5f, -0.5f, -0.5f);
-
-            RenderSystem.runAsFancy(() -> {
-                var vertexConsumers = client.renderBuffers().bufferSource();
-                if (usedState.getRenderShape() != RenderShape.ENTITYBLOCK_ANIMATED) {
-                    client.getBlockRenderer().renderSingleBlock(
-                        usedState, graphics.pose(), vertexConsumers,
-                        LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
-                    );
-                }
-
-                if (usedEntity != null) {
-                    var renderer = client.getBlockEntityRenderDispatcher().getRenderer(usedEntity);
-                    if (renderer != null) {
-                        renderer.render(usedEntity, delta, graphics.pose(), vertexConsumers,
-                            LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-                    }
-                }
-
-                RenderSystem.setShaderLights(new Vector3f(-1.5f, -0.5f, 0), new Vector3f(0, -1, 0));
-                vertexConsumers.endBatch();
-                Lighting.setupFor3DItems();
-            });
-
-            graphics.pose().popPose();
+            // no-op
         }
     }
 

@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.ColorHelper;
 
@@ -22,7 +23,7 @@ public enum OritechSurface {
     
     @FunctionalInterface
     public interface SurfaceRenderer {
-        void render(GuiGraphics graphics, int x, int y, int width, int height);
+        void render(GuiGraphicsExtractor graphics, int x, int y, int width, int height);
     }
     
     private final SurfaceRenderer renderer;
@@ -31,7 +32,7 @@ public enum OritechSurface {
         this.renderer = renderer;
     }
     
-    public void render(GuiGraphics graphics, int x, int y, int width, int height) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
         if (renderer != null) {
             renderer.render(graphics, x, y, width, height);
         }
@@ -46,7 +47,7 @@ public enum OritechSurface {
         return r::render;
     }
     
-    private static void renderInset(GuiGraphics graphics, int x, int y, int w, int h) {
+    private static void renderInset(GuiGraphicsExtractor graphics, int x, int y, int w, int h) {
         int shadow = ColorHelper.argb(0f, 0f, 0f, 0.4f);
         int highlight = ColorHelper.argb(1f, 1f, 1f, 0.15f);
         int fill = ColorHelper.argb(0.22f, 0.22f, 0.24f);

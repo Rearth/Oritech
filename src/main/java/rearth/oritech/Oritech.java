@@ -34,6 +34,7 @@ import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.*;
@@ -88,6 +89,7 @@ public final class Oritech {
         EntitiesContent.ENTITY_TYPES.register(modEventBus);
         ComponentContent.COMPONENTS.register(modEventBus);
         FeatureContent.FEATURES.register(modEventBus);
+        ModScreens.MENUS.register(modEventBus);
         
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);

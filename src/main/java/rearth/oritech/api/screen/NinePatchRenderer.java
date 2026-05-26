@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 
 /**
@@ -24,7 +25,7 @@ public record NinePatchRenderer(Identifier texture, int texWidth, int texHeight,
         this(texture, 16, 16, 4, 4);
     }
     
-    public void render(GuiGraphics graphics, int x, int y, int width, int height) {
+    public void render(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
         int cw = cornerWidth;
         int ch = cornerHeight;
         int centerW = texWidth - cw * 2;
@@ -33,24 +34,24 @@ public record NinePatchRenderer(Identifier texture, int texWidth, int texHeight,
         int stretchH = height - ch * 2;
         
         // Top-left corner
-        graphics.blit(texture, x, y, cw, ch, 0, 0, cw, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, cw, ch, cw, ch, texWidth, texHeight);
         // Top-right corner
-        graphics.blit(texture, x + width - cw, y, cw, ch, texWidth - cw, 0, cw, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + width - cw, y, texWidth - cw, 0, cw, ch, cw, ch, texWidth, texHeight);
         // Bottom-left corner
-        graphics.blit(texture, x, y + height - ch, cw, ch, 0, texHeight - ch, cw, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y + height - ch, 0, texHeight - ch, cw, ch, cw, ch, texWidth, texHeight);
         // Bottom-right corner
-        graphics.blit(texture, x + width - cw, y + height - ch, cw, ch, texWidth - cw, texHeight - ch, cw, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + width - cw, y + height - ch, texWidth - cw, texHeight - ch, cw, ch, cw, ch, texWidth, texHeight);
         
         // Top edge (stretched)
-        graphics.blit(texture, x + cw, y, stretchW, ch, cw, 0, centerW, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + cw, y, cw, 0, stretchW, ch, centerW, ch, texWidth, texHeight);
         // Bottom edge (stretched)
-        graphics.blit(texture, x + cw, y + height - ch, stretchW, ch, cw, texHeight - ch, centerW, ch, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + cw, y + height - ch, cw, texHeight - ch, stretchW, ch, centerW, ch, texWidth, texHeight);
         // Left edge (stretched)
-        graphics.blit(texture, x, y + ch, cw, stretchH, 0, ch, cw, centerH, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y + ch, 0, ch, cw, stretchH, cw, centerH, texWidth, texHeight);
         // Right edge (stretched)
-        graphics.blit(texture, x + width - cw, y + ch, cw, stretchH, texWidth - cw, ch, cw, centerH, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + width - cw, y + ch, texWidth - cw, ch, cw, stretchH, cw, centerH, texWidth, texHeight);
         
         // Center (stretched)
-        graphics.blit(texture, x + cw, y + ch, stretchW, stretchH, cw, ch, centerW, centerH, texWidth, texHeight);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x + cw, y + ch, cw, ch, stretchW, stretchH, centerW, centerH, texWidth, texHeight);
     }
 }

@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ItemWidget;

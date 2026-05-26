@@ -1,7 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
@@ -71,19 +72,18 @@ public class ToggleWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         boolean hovered = isMouseOver(mouseX, mouseY);
         
         Identifier texture;
         if (value) texture = hovered ? TOGGLE_ON_HOVER : TOGGLE_ON;
         else texture = hovered ? TOGGLE_OFF_HOVER : TOGGLE_OFF;
         
-        graphics.blit(texture, x, y, TOGGLE_WIDTH, TOGGLE_HEIGHT,
-            0, 0, TOGGLE_WIDTH, TOGGLE_HEIGHT, TOGGLE_WIDTH, TOGGLE_HEIGHT);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, TOGGLE_WIDTH, TOGGLE_HEIGHT, TOGGLE_WIDTH, TOGGLE_HEIGHT, TOGGLE_WIDTH, TOGGLE_HEIGHT);
         
         var font = Minecraft.getInstance().font;
         int textX = x + TOGGLE_WIDTH + LABEL_GAP;
         int textY = y + (height - 8) / 2;
-        graphics.drawString(font, label, textX, textY, active ? textColor : DISABLED_TEXT_COLOR, textShadow);
+        graphics.text(font, label, textX, textY, active ? textColor : DISABLED_TEXT_COLOR, textShadow);
     }
 }

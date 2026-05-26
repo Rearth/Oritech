@@ -2,7 +2,8 @@ package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
@@ -73,7 +74,7 @@ public class LabelWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         Font font = Minecraft.getInstance().font;
         int cx = contentX();
         int cy = contentY();
@@ -88,7 +89,7 @@ public class LabelWidget extends UIComponent {
                     case CENTER -> cx + (cw - font.width(line)) / 2;
                     case RIGHT -> cx + cw - font.width(line);
                 };
-                graphics.drawString(font, line, textX, cy + i * font.lineHeight, color, shadow);
+                graphics.text(font, line, textX, cy + i * font.lineHeight, color, shadow);
             }
         } else {
             int textX = switch (alignment) {
@@ -96,7 +97,7 @@ public class LabelWidget extends UIComponent {
                 case CENTER -> cx + (cw - font.width(text)) / 2;
                 case RIGHT -> cx + cw - font.width(text);
             };
-            graphics.drawString(font, text, textX, cy, color, shadow);
+            graphics.text(font, text, textX, cy, color, shadow);
         }
     }
 }

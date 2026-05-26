@@ -1,19 +1,12 @@
 package rearth.oritech.api.screen.widgets;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -21,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Renders multiple blocks in a 3D isometric preview with shared auto-rotation.
- * Each block is placed at a Vec3i offset from the center.
+ * Renders multiple blocks in a 3D isometric preview with shared auto-rotation,
+ * submitting a {@link BlockPreviewRenderState} to the GUI render pipeline.
  */
 public class BlockPreviewWidget extends UIComponent {
     private static final float X_ROTATION = 30f;
@@ -84,7 +77,6 @@ public class BlockPreviewWidget extends UIComponent {
                 maxZ = Math.max(maxZ, offset.getZ() + 0.5f);
             }
         }
-        
 
         centerX = (minX + maxX) * 0.5f;
         centerY = (minY + maxY) * 0.5f;
@@ -106,7 +98,6 @@ public class BlockPreviewWidget extends UIComponent {
                 float[] yValues = {blockMinY, blockMaxY};
                 float[] zValues = {blockMinZ, blockMaxZ};
 
-                // Fit against the full Y rotation by checking the furthest block corners from the origin.
                 for (float x : xValues) {
                     for (float y : yValues) {
                         for (float z : zValues) {
@@ -134,56 +125,32 @@ public class BlockPreviewWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (blocks.isEmpty()) return;
         
-        var client = Minecraft.getInstance();
         int cx = contentX();
         int cy = contentY();
-        float cw = contentWidth();
-        float ch = contentHeight();
+        int cw = contentWidth();
+        int ch = contentHeight();
         float scale = getScale(cw, ch);
         if (scale <= 0f) return;
         
+        var entries = new ArrayList<BlockPreviewRenderState.Entry>(blocks.size());
         for (var entry : blocks) {
-            graphics.pose().pushPose();
-            
-            graphics.pose().translate(cx + cw / 2f, cy + ch / 2f, 400);
-            graphics.pose().scale(scale, -scale, scale);
-            graphics.pose().mulPose(Axis.XP.rotationDegrees(X_ROTATION));
-            graphics.pose().mulPose(Axis.YP.rotationDegrees(225 + rotation));
-            
-            graphics.pose().translate(
-                -0.5f + entry.offset.getX() - centerX,
-                -0.5f + entry.offset.getY() - centerY,
-                -0.5f + entry.offset.getZ() - centerZ
-            );
-            
-            RenderSystem.runAsFancy(() -> {
-                var bufferSource = client.renderBuffers().bufferSource();
-                
-                if (entry.state.getRenderShape() != RenderShape.ENTITYBLOCK_ANIMATED) {
-                    client.getBlockRenderer().renderSingleBlock(
-                        entry.state, graphics.pose(), bufferSource,
-                        LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
-                    );
-                }
-                
-                if (entry.entity != null) {
-                    var entityRenderer = client.getBlockEntityRenderDispatcher().getRenderer(entry.entity);
-                    if (entityRenderer != null) {
-                        entityRenderer.render(entry.entity, delta, graphics.pose(), bufferSource,
-                            LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-                    }
-                }
-                
-                RenderSystem.setShaderLights(new Vector3f(-1.5f, -0.5f, 0), new Vector3f(0, -1, 0));
-                bufferSource.endBatch();
-                Lighting.setupFor3DItems();
-            });
-            
-            graphics.pose().popPose();
+            entries.add(new BlockPreviewRenderState.Entry(entry.state(), entry.entity(), entry.offset()));
         }
+        
+        var renderState = new BlockPreviewRenderState(
+            entries,
+            X_ROTATION,
+            225f + rotation,
+            centerX, centerY, centerZ,
+            delta,
+            cx, cy, cx + cw, cy + ch,
+            scale,
+            null
+        );
+        graphics.submitPictureInPictureRenderState(renderState);
         
         rotation += rotationSpeed;
     }
@@ -212,7 +179,7 @@ public class BlockPreviewWidget extends UIComponent {
                 positions.add(Geometry.rotatePosition(relativeOffset, facing).offset(entry.offset()));
             }
         }
-
+    
         return positions;
     }
 }

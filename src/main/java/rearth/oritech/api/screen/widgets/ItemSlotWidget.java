@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.UIComponent;
@@ -19,7 +20,7 @@ public class ItemSlotWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        graphics.blit(ITEM_SLOT_TEXTURE, x, y, 18, 18, 0, 0, 18, 18, 18, 18);
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, ITEM_SLOT_TEXTURE, x, y, 0, 0, 18, 18, 18, 18, 18, 18);
     }
 }

@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.data;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 
@@ -21,13 +22,13 @@ public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         int cx = contentX();
         int cy = contentY();
         int cw = contentWidth();
         int ch = contentHeight();
 
-        graphics.blit(EMPTY_ARROW, cx, cy, cw, ch, 0, 0, REGION_WIDTH, REGION_HEIGHT, REGION_WIDTH, REGION_HEIGHT);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, EMPTY_ARROW, cx, cy, 0, 0, cw, ch, REGION_WIDTH, REGION_HEIGHT, REGION_WIDTH, REGION_HEIGHT);
 
         float fillRatio = getFillRatio();
         int filledWidth = (int) (cw * fillRatio);
@@ -36,6 +37,6 @@ public class ProgressDisplayWidget extends AbstractDataDisplayWidget {
         }
 
         int srcWidth = (int) (REGION_WIDTH * fillRatio);
-        graphics.blit(FULL_ARROW, cx, cy, filledWidth, ch, 0, 0, srcWidth, REGION_HEIGHT, REGION_WIDTH, REGION_HEIGHT);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, FULL_ARROW, cx, cy, 0, 0, filledWidth, ch, srcWidth, REGION_HEIGHT, REGION_WIDTH, REGION_HEIGHT);
     }
 }

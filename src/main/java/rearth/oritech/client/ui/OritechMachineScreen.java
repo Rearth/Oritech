@@ -10,8 +10,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.PacketDistributor;
-import rearth.oracle.Oracle;
-import rearth.oracle.OracleClient;
+// TODO: re-enable once Oracle Index is available for 26.1
+// import rearth.oracle.Oracle;
+// import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -64,7 +65,8 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         if (menu.armorSlots != null)
             buildEquipmentPanel();
 
-        buildOracleButton();
+        // TODO: re-enable once Oracle Index is available for 26.1
+        // buildOracleButton();
         addExtraComponents();
     }
 
@@ -245,46 +247,47 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         };
     }
 
-    private void buildOracleButton() {
-        if (!OritechClientConfig.enableHelpButton.get()) return;
-
-        var hasOracleLib = Platform.isModLoaded("oracle_index");
-        Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
-        if (hasOracleLib && linkTarget.isEmpty()) return;
-
-        var button = ButtonWidget.darkPanel(-10, imageHeight - 13, 14, 14,
-            Component.literal("?"),
-            btn -> onOracleButtonClick(hasOracleLib, linkTarget))
-            .withTextColor(ColorHelper.argb(0.9f, 0.9f, 0.9f))
-            .withSurfacePadding(new Insets(2, 1, 3, 1));
-
-        button.withTooltip(hasOracleLib
-            ? Component.translatable("tooltip.oritech.oracle_available")
-            : Component.translatable("tooltip.oritech.oracle_missing"));
-        addComponent(button);
-    }
-
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
-        if (!enabled || target.isEmpty()) {
-            Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
-            return;
-        }
-        OracleClient.openScreen("oritech", target.get(), this);
-    }
-
-    private Optional<Identifier> getHelpBookLink() {
-        if (menu.screenData.getWikiLink().isPresent())
-            return Optional.of(Identifier.fromNamespaceAndPath(Oracle.MOD_ID, "books/oritech/" + menu.screenData.getWikiLink().get() + ".mdx"));
-
-        var blockItem = menu.machineBlock.getBlock().asItem();
-        var itemId = BuiltInRegistries.ITEM.getKey(blockItem);
-
-        if (OracleClient.ITEM_LINKS.containsKey(itemId))
-            return Optional.of(OracleClient.ITEM_LINKS.get(itemId).linkTarget());
-
-        return Optional.empty();
-    }
+    // TODO: re-enable once Oracle Index is available for 26.1
+    // private void buildOracleButton() {
+    //     if (!OritechClientConfig.enableHelpButton.get()) return;
+    //
+    //     var hasOracleLib = Platform.isModLoaded("oracle_index");
+    //     Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
+    //     if (hasOracleLib && linkTarget.isEmpty()) return;
+    //
+    //     var button = ButtonWidget.darkPanel(-10, imageHeight - 13, 14, 14,
+    //         Component.literal("?"),
+    //         btn -> onOracleButtonClick(hasOracleLib, linkTarget))
+    //         .withTextColor(ColorHelper.argb(0.9f, 0.9f, 0.9f))
+    //         .withSurfacePadding(new Insets(2, 1, 3, 1));
+    //
+    //     button.withTooltip(hasOracleLib
+    //         ? Component.translatable("tooltip.oritech.oracle_available")
+    //         : Component.translatable("tooltip.oritech.oracle_missing"));
+    //     addComponent(button);
+    // }
+    //
+    // @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    // private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
+    //     if (!enabled || target.isEmpty()) {
+    //         Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
+    //         return;
+    //     }
+    //     OracleClient.openScreen("oritech", target.get(), this);
+    // }
+    //
+    // private Optional<Identifier> getHelpBookLink() {
+    //     if (menu.screenData.getWikiLink().isPresent())
+    //         return Optional.of(Identifier.fromNamespaceAndPath(Oracle.MOD_ID, "books/oritech/" + menu.screenData.getWikiLink().get() + ".mdx"));
+    //
+    //     var blockItem = menu.machineBlock.getBlock().asItem();
+    //     var itemId = BuiltInRegistries.ITEM.getKey(blockItem);
+    //
+    //     if (OracleClient.ITEM_LINKS.containsKey(itemId))
+    //         return Optional.of(OracleClient.ITEM_LINKS.get(itemId).linkTarget());
+    //
+    //     return Optional.empty();
+    // }
 
     @Override
     protected void containerTick() {

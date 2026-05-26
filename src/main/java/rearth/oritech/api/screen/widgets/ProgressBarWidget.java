@@ -1,7 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import rearth.oritech.api.screen.UIComponent;
@@ -91,7 +92,7 @@ public class ProgressBarWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         var font = Minecraft.getInstance().font;
         var cx = contentX();
         var cy = contentY();
@@ -104,13 +105,13 @@ public class ProgressBarWidget extends UIComponent {
         var titleY = cy + Math.max(0, (titleRowHeight - font.lineHeight) / 2);
         
         if (title != null) {
-            graphics.drawString(font, title, cx, titleY, textColor, textShadow);
+            graphics.text(font, title, cx, titleY, textColor, textShadow);
         }
         
         renderBar(graphics, cx, barY, cw, barHeight);
     }
     
-    private void renderBar(GuiGraphics graphics, int x, int y, int width, int height) {
+    private void renderBar(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
         if (width <= 1 || height <= 1) {
             return;
         }
@@ -148,7 +149,7 @@ public class ProgressBarWidget extends UIComponent {
         drawMarker(graphics, innerX, innerY + 1, innerWidth, innerHeight - 2, 0.75f);
     }
     
-    private void drawMarker(GuiGraphics graphics, int x, int y, int width, int height, float progress) {
+    private void drawMarker(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float progress) {
         if (width <= 0 || height <= 0) {
             return;
         }

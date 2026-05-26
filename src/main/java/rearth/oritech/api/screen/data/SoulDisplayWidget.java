@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.data;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 
@@ -15,13 +16,13 @@ public class SoulDisplayWidget extends AbstractDataDisplayWidget {
     }
 
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         int cx = contentX();
         int cy = contentY();
         int cw = contentWidth();
         int ch = contentHeight();
 
-        graphics.blit(GUI_COMPONENTS, cx, cy, cw, ch, 24, 0, REGION_WIDTH, REGION_HEIGHT, 98, 96);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, cy, 24, 0, cw, ch, REGION_WIDTH, REGION_HEIGHT, 98, 96);
 
         float fillRatio = getFillRatio();
         int filledHeight = (int) (ch * fillRatio);
@@ -33,6 +34,6 @@ public class SoulDisplayWidget extends AbstractDataDisplayWidget {
         int srcY = REGION_HEIGHT - (int) (REGION_HEIGHT * fillRatio);
         int srcHeight = REGION_HEIGHT - srcY;
 
-        graphics.blit(GUI_COMPONENTS, cx, drawY, cw, filledHeight, 0, srcY, REGION_WIDTH, srcHeight, 98, 96);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, drawY, 0, srcY, cw, filledHeight, REGION_WIDTH, srcHeight, 98, 96);
     }
 }

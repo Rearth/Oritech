@@ -1,6 +1,6 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -149,12 +149,12 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
         }
         
         @Override
-        protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             var stack = getDisplayedStack(index);
             if (stack.isEmpty()) return;
             
-            graphics.renderItem(stack, x + 1, y + 1);
-            graphics.renderItemDecorations(net.minecraft.client.Minecraft.getInstance().font, stack, x + 1, y + 1);
+            graphics.item(stack, x + 1, y + 1);
+            graphics.itemDecorations(net.minecraft.client.Minecraft.getInstance().font, stack, x + 1, y + 1);
         }
         
         @Override

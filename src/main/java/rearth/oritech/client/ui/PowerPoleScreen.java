@@ -1,12 +1,10 @@
 package rearth.oritech.client.ui;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.LeverBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.api.energy.containers.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.screen.widgets.BlockWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
@@ -27,14 +25,10 @@ public class PowerPoleScreen extends EnergyStorageScreen<UpgradableOritechScreen
         var isConnected = connectionCount > 0;
         var containedTooltipText = Component.translatable("tooltip.oritech.power_pole_connection_" + (isConnected ? "enabled" : "disabled"));
 
-        var connectedIcon = new BlockWidget(24, 3, 50, BlockContent.TECH_LEVER.defaultBlockState().setValue(LeverBlock.POWERED, isConnected)) {
-            @Override
-            public void appleRotation(PoseStack pose) {
-                pose.mulPose(Axis.XP.rotationDegrees(-30));
-                pose.mulPose(Axis.YP.rotationDegrees(180));
-                pose.mulPose(Axis.ZP.rotationDegrees(45));
-            }
-        };
+        // Note: previously this anonymous BlockWidget subclass overrode appleRotation(PoseStack)
+        // to apply a custom -30°/180°/45° XYZ rotation. That hook no longer exists because the
+        // BlockWidget itself was rewritten around a PIP renderer (currently stubbed) for 26.1.
+        var connectedIcon = new BlockWidget(24, 3, 50, BlockContent.TECH_LEVER.defaultBlockState().setValue(LeverBlock.POWERED, isConnected));
         connectedIcon.withTooltip(containedTooltipText);
 
         var connectedLabel = new LabelWidget(7, 53, 84, 18,

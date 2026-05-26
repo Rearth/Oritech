@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.api.screen.UIComponent;
 
@@ -68,7 +69,7 @@ public class TextureWidget extends UIComponent {
     }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         int cx = contentX();
         int cy = contentY();
         int cw = contentWidth();
@@ -89,9 +90,9 @@ public class TextureWidget extends UIComponent {
             int srcW = (int) (clipW * scaleX);
             int srcH = (int) (clipH * scaleY);
             
-            graphics.blit(texture, drawX, drawY, drawW, drawH, srcU, srcV, srcW, srcH, textureWidth, textureHeight);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, texture, drawX, drawY, srcU, srcV, drawW, drawH, srcW, srcH, textureWidth, textureHeight);
         } else {
-            graphics.blit(texture, cx, cy, cw, ch, u, v, regionWidth, regionHeight, textureWidth, textureHeight);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, texture, cx, cy, u, v, cw, ch, regionWidth, regionHeight, textureWidth, textureHeight);
         }
     }
 }

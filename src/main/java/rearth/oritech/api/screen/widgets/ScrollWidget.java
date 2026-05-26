@@ -1,9 +1,8 @@
 package rearth.oritech.api.screen.widgets;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4f;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
@@ -140,7 +139,7 @@ public class ScrollWidget extends UIComponent {
     public float getScrollY() { return scrollY; }
     
     @Override
-    protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         
         renderedX = Mth.lerp(0.12f, renderedX, scrollX);
         renderedY = Mth.lerp(0.12f, renderedY, scrollY);
@@ -151,18 +150,18 @@ public class ScrollWidget extends UIComponent {
         int cw = width - innerMargin * 2;
         int ch = height - innerMargin * 2;
         
-        // enableScissor uses GUI coords, not transformed coords — offset by pose translation
-        Matrix4f matrix = graphics.pose().last().pose();
-        int offsetX = (int) matrix.m30();
-        int offsetY = (int) matrix.m31();
+        // enableScissor uses GUI coords, not transformed coords — offset by current 2D pose translation
+        var pose = graphics.pose();
+        int offsetX = (int) pose.m20();
+        int offsetY = (int) pose.m21();
         graphics.enableScissor(cx + offsetX, cy + offsetY, cx + cw + offsetX, cy + ch + offsetY);
         
         var sorted = new ArrayList<>(children);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
         
         // Translate so children at (0,0) render at the content origin
-        graphics.pose().pushPose();
-        graphics.pose().translate(cx - renderedX, cy - renderedY, 0);
+        pose.pushMatrix();
+        pose.translate(cx - renderedX, cy - renderedY);
         
         // Mouse coords relative to content origin + scroll offset
         float childMouseX = mouseX - cx + renderedX;
@@ -173,7 +172,7 @@ public class ScrollWidget extends UIComponent {
                 child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
         }
         
-        graphics.pose().popPose();
+        pose.popMatrix();
         graphics.disableScissor();
         
         // Scrollbar indicator
@@ -182,7 +181,7 @@ public class ScrollWidget extends UIComponent {
         }
     }
     
-    private void renderScrollbar(GuiGraphics graphics, int barX, int barY, int barW, int trackH, float scroll, int totalContent, int viewportH) {
+    private void renderScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH, float scroll, int totalContent, int viewportH) {
         float thumbRatio = (float) viewportH / totalContent;
         int thumbH = Math.max(8, (int) (trackH * thumbRatio));
         float scrollRatio = scroll / (totalContent - viewportH);

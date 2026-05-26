@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ public abstract class UIComponent {
      * Renders this component: surface background first, then content.
      * Padding expands the surface outward from the content bounds.
      */
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (!visible) return;
         
         if (!surface.isNone()) {
@@ -51,7 +52,7 @@ public abstract class UIComponent {
      * Use {@link #contentX()}, {@link #contentY()}, {@link #contentWidth()}, {@link #contentHeight()}
      * for the available content region.
      */
-    protected abstract void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta);
+    protected abstract void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta);
     
     /**
      * Called every screen tick (~20 times/second) for animations or data updates.
