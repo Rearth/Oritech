@@ -70,12 +70,12 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     }
     
     public boolean canUseBoost() {
-        return energyStorage.amount >= BOOST_ENERGY_COST;
+        return energyStorage.energy >= BOOST_ENERGY_COST;
     }
     
     public void useBoost() {
         if (!canUseBoost()) return;
-        energyStorage.amount -= BOOST_ENERGY_COST;
+        energyStorage.energy -= BOOST_ENERGY_COST;
         this.setChanged();
         
         triggerAnim("machine", "work");
@@ -84,13 +84,13 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
     }
     
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
     }
     
     @Override

@@ -173,7 +173,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         fluidStorage.serialize(output);
         output.putBoolean("has_fluid_addon", hasFluidAddon);
         output.putBoolean("disabled_via_redstone", disabledViaRedstone);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
         
         if (targetPosition != null) {
             output.store("target_position", BlockPos.CODEC, targetPosition);
@@ -191,7 +191,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         
         hasFluidAddon = input.getBooleanOr("has_fluid_addon", false);
         disabledViaRedstone = input.getBooleanOr("disabled_via_redstone", false);
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
         targetPosition = input.read("target_position", BlockPos.CODEC).orElse(null);
         incomingPacket = null;
     }
@@ -263,7 +263,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         inventory.clearContent();
         fluidStorage.setStack(FluidStack.empty());
         lastSentAt = level.getGameTime();
-        energyStorage.amount -= calculateEnergyUsage();
+        energyStorage.energy -= calculateEnergyUsage();
         
         triggerNetworkSendAnimation();
         targetPort.setChanged();
@@ -300,7 +300,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     private boolean canSend() {
         
-        if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.amount < calculateEnergyUsage() || incomingPacket != null)
+        if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.energy < calculateEnergyUsage() || incomingPacket != null)
             return false;
         var targetEntity = level.getBlockEntity(targetPosition);
         if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getHeldStacks(), fluidStorage.getStack()))
@@ -547,7 +547,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public int getComparatorEnergyAmount() {
-        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+        return (int) ((energyStorage.energy / (float) energyStorage.capacity) * 15);
     }
     
     @Override

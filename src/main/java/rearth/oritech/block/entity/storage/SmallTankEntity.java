@@ -20,7 +20,6 @@ import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
-import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -95,7 +94,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
         // in creative, set tank fill level
         if (isCreative) {
             if (fluidStorage.getFluid() != Fluids.EMPTY) {
-                fluidStorage.set(0, FluidResource.of(fluidStorage.getContent()), (int) (fluidStorage.getCapacity() - 1000 * 8));  //leave space to insert a bit
+                fluidStorage.set(0, FluidResource.of(fluidStorage.getContent()), fluidStorage.getCapacity() - 1000 * 8);  //leave space to insert a bit
             } else {
                 fluidStorage.set(0, FluidResource.of(fluidStorage.getContent()), 0);
             }
@@ -112,19 +111,26 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
     
     private void outputToBelow() {
         if (isCreative) return;
-        
-        
+
         if (cachedOutputTarget == null) {
             if (!(level instanceof ServerLevel serverLevel)) return;
             cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, serverLevel, worldPosition.below(), Direction.UP);
         }
-        
+
         var tankCandidate = cachedOutputTarget.getCapability();
         if (tankCandidate == null) return;
 
+        var resource = fluidStorage.getResource(0);
+        if (resource.isEmpty()) return;
+
         try (var transaction = Transaction.openRoot()) {
-            var moved = ResourceHandlerUtil.moveFirst(fluidStorage, tankCandidate, resource -> true, (int) fluidStorage.getCapacity(), transaction);
-            if (moved != null && !moved.isEmpty()) transaction.commit();
+            var inserted = tankCandidate.insert(resource, fluidStorage.getAmount(), transaction);
+            if (inserted <= 0) return;
+
+            var extracted = fluidStorage.extract(0, resource, inserted, transaction);
+            if (extracted == inserted) {
+                transaction.commit();
+            }
         }
     }
     
@@ -139,58 +145,86 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
     
     // from block entity to item
     private void processInput() {
-        var inStack = inventory.getItem(0);
         var canFill = this.fluidStorage.getAmount() > 0;
-        
-        if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
-        
-        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
+
+        if (!canFill) return;
+
+        var inputStorage = inventory.getInputContainer();
+        var inResource = inputStorage.getResource(0);
+        if (inResource.isEmpty()) return;
+
+        var inStack = inResource.toStack();
+        if (inStack.getCount() > 1) return;
+
+        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inputStorage, 0));
         if (candidate == null) return;
 
-        try (var transaction = Transaction.openRoot()) {
-            var moved = ResourceHandlerUtil.moveFirst(fluidStorage, candidate, resource -> true, 1000 * 64, transaction);
-            if (!moved.isEmpty()) {
-                transaction.commit();
-                return;
-            }
+        var resource = fluidStorage.getResource(0);
+        if (resource.isEmpty()) return;
 
-            // move stack to out slot
-            var outStack = inventory.getItem(2);
-            if (outStack.isEmpty()) {
-                inventory.getStacks().set(2, inStack);
-                inventory.getStacks().set(0, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(inStack.getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
-                outStack.grow(1);
-                inventory.getStacks().set(0, ItemStack.EMPTY);
+        try (var transaction = Transaction.openRoot()) {
+            var inserted = candidate.insert(resource, fluidStorage.getAmount(), transaction);
+            if (inserted > 0) {
+                var extracted = fluidStorage.extract(0, resource, inserted, transaction);
+                if (extracted == inserted) {
+                    transaction.commit();
+                    return;
+                }
             }
         }
+
+        moveInputToOutput(0);
     }
-    
+
     // from item to fluid storage
     private void processOutput() {
-        var inStack = inventory.getItem(1);
         var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
-        
-        if (!canFill || inStack.isEmpty() || inStack.getCount() > 1) return;
-        
-        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 1));
+
+        if (!canFill) return;
+
+        var inputStorage = inventory.getInputContainer();
+        var inResource = inputStorage.getResource(1);
+        if (inResource.isEmpty()) return;
+
+        var inStack = inResource.toStack();
+        if (inStack.getCount() > 1) return;
+
+        var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inputStorage, 1));
         if (candidate == null) return;
 
-        try (var transaction = Transaction.openRoot()) {
-            var moved = ResourceHandlerUtil.moveFirst(candidate, fluidStorage, resource -> true, 1000 * 64, transaction);
-            if (!moved.isEmpty()) {
-                transaction.commit();
-                return;
-            }
+        var resource = candidate.getResource(0);
+        if (resource.isEmpty()) {
+            moveInputToOutput(1);
+            return;
+        }
 
-            // move stack
-            var outStack = inventory.getItem(2);
-            if (outStack.isEmpty()) {
-                inventory.getStacks().set(2, inStack);
-                inventory.getStacks().set(1, ItemStack.EMPTY);
-            } else if (outStack.getItem().equals(inStack.getItem()) && outStack.getCount() < outStack.getMaxStackSize()) {
-                outStack.grow(1);
-                inventory.getStacks().set(1, ItemStack.EMPTY);
+        try (var transaction = Transaction.openRoot()) {
+            var maxTaken = Math.min(candidate.getAmountAsLong(0), fluidStorage.getCapacity() - fluidStorage.getAmount());
+            var taken = candidate.extract(0, resource, (int) maxTaken, transaction);
+            if (taken > 0) {
+                var inserted = fluidStorage.insert(resource, taken, transaction);
+                if (inserted == taken) {
+                    transaction.commit();
+                    return;
+                }
+            }
+        }
+
+        moveInputToOutput(1);
+    }
+
+    private void moveInputToOutput(int inputSlot) {
+        var inputStorage = inventory.getInputContainer();
+        var inResource = inputStorage.getResource(inputSlot);
+        if (inResource.isEmpty()) return;
+
+        try (var transaction = Transaction.openRoot()) {
+            var inserted = inventory.getOutputContainer().insert(inResource, 1, transaction);
+            if (inserted != 1) return;
+
+            var extracted = inputStorage.extract(inputSlot, inResource, 1, transaction);
+            if (extracted == 1) {
+                transaction.commit();
             }
         }
     }

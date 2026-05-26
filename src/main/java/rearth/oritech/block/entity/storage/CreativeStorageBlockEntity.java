@@ -14,7 +14,7 @@ import java.util.List;
 public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
 
     public CreativeStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CREATIVE_STORAGE_ENTITY, pos, state);
+        super(BlockEntitiesContent.CREATIVE_STORAGE_ENTITY.get(), pos, state);
     }
 
     @Override
@@ -39,8 +39,8 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
 
     @Override
     public int getComparatorOutput() {
-        if (energyStorage.amount == 0) return 0;
-        return (int) (1 + ((energyStorage.amount / (float) energyStorage.capacity) * 14));
+        if (energyStorage.energy == 0) return 0;
+        return (int) (1 + ((energyStorage.energy / (float) energyStorage.capacity) * 14));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
 
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        energyStorage.amount = (long) (Integer.MAX_VALUE * 0.9f);
+        energyStorage.energy = (long) (Integer.MAX_VALUE * 0.9f);
         super.serverTick(level, pos, state, blockEntity);
     }
 }

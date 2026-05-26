@@ -2,6 +2,7 @@ package rearth.oritech.api.transfer.fluid;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -22,6 +23,18 @@ public class SimpleFluidStorage extends FluidStacksResourceHandler implements Up
     
     public FluidStack getContent() {
         return this.stacks.get(0);
+    }
+    
+    public int getAmount() {
+        return getContent().amount();
+    }
+    
+    public Fluid getFluid() {
+        return getContent().getFluid();
+    }
+    
+    public int getCapacity() {
+        return capacity;
     }
     
     @Override

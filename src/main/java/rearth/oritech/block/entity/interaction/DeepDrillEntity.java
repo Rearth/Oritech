@@ -105,9 +105,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         
         var energyPerStep = getRfPerStep();
         
-        if (energyStorage.amount >= energyPerStep) {
+        if (energyStorage.energy >= energyPerStep) {
             progress++;
-            energyStorage.amount -= energyPerStep;
+            energyStorage.energy -= energyPerStep;
             lastWorkTime = level.getGameTime();
             setChanged();
             
@@ -117,9 +117,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         
         // try increasing faster if too much energy is provided
         for (int i = 0; i < OritechConfig.deepDrillConfig.stepsPerOre.get(); i++) {
-            if (energyStorage.amount >= energyPerStep) {
+            if (energyStorage.energy >= energyPerStep) {
                 progress++;
-                energyStorage.amount -= energyPerStep;
+                energyStorage.energy -= energyPerStep;
             } else {
                 break;
             }
@@ -177,7 +177,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         inventory.serialize(output);
         serializeMultiblock(output);
         serializeColor(output);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
     }
     
     @Override
@@ -186,7 +186,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         inventory.deserialize(input);
         deserializeMultiblock(input);
         deserializeColor(input);
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
     }
     
     @Override

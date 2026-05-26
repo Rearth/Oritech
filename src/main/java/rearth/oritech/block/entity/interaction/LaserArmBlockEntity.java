@@ -178,7 +178,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         LaserArmBlockBehavior behavior = LaserArmBlock.getBehaviorForBlock(targetBlock);
         boolean fired = false;
         if (behavior.fireAtBlock(level, this, targetBlock, targetBlockPos, targetBlockState, targetBlockEntity)) {
-            energyStorage.amount -= energyRequiredToFire();
+            energyStorage.energy -= energyRequiredToFire();
             lastFiredAt = level.getGameTime();
         } else {
             findNextBlockBreakTarget();
@@ -191,7 +191,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             
             var behavior = LaserArmBlock.getBehaviorForEntity(currentLivingTarget.getType());
             if (behavior.fireAtEntity(level, this, currentLivingTarget)) {
-                energyStorage.amount -= energyRequiredToFire();
+                energyStorage.energy -= energyRequiredToFire();
                 this.targetDirection = currentLivingTarget.blockPosition();
                 lastFiredAt = level.getGameTime();
             } else {
@@ -561,7 +561,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         serializeMultiblock(output);
         serializeAddonData(output);
         serializeColor(output);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
         output.putBoolean("redstone", redstonePowered);
         output.putInt("areaSize", areaSize);
         output.putInt("yieldAddons", yieldAddons);
@@ -592,7 +592,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         updateEnergyContainer();
         
         redstonePowered = input.getBooleanOr("redstone", false);
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
         targetDirection = input.read("target_direction", BlockPos.CODEC).orElse(BlockPos.ZERO);
         currentTarget = input.read("target_position", BlockPos.CODEC).orElse(BlockPos.ZERO);
         areaSize = input.getIntOr("areaSize", 1);
@@ -938,7 +938,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     @Override
     public int getComparatorEnergyAmount() {
-        return (int) ((energyStorage.amount / (float) energyStorage.capacity) * 15);
+        return (int) ((energyStorage.energy / (float) energyStorage.capacity) * 15);
     }
     
     @Override

@@ -77,7 +77,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (energyStorage.amount >= LOG_COST) {
+        if (energyStorage.energy >= LOG_COST) {
             if (pendingBlocks.isEmpty() && level.getGameTime() % 20 == 0) {
                 findTarget();
             }
@@ -88,7 +88,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
 
                 var energyCost = isLog ? LOG_COST : LEAF_COST;
-                if (energyCost > energyStorage.amount) break;
+                if (energyCost > energyStorage.energy) break;
                 
                 var actionResult = breakTreeBlock(candidateState, candidate);
                 if (actionResult == InteractionResult.FAIL) break;
@@ -96,7 +96,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 if (actionResult == InteractionResult.PASS) continue;
                 lastWorkedAt = level.getGameTime();
 
-                energyStorage.amount -= energyCost;
+                energyStorage.energy -= energyCost;
                 setChanged();
                 
                 if (isLog) break; // only harvest 1 log, but multiple leaves
@@ -217,7 +217,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         inventory.serialize(output);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
         serializeColor(output);
     }
     
@@ -225,7 +225,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         inventory.deserialize(input);
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
         deserializeColor(input);
     }
     

@@ -180,7 +180,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         serializeMultiblock(output);
         if (currentCandidate != null) output.store("shrunk_addon", ShrunkAddonData.CODEC, currentCandidate);
         serializeColor(output);
-        output.putLong("energy_stored", energyStorage.amount);
+        output.putLong("energy_stored", energyStorage.energy);
         output.putBoolean("redstone", wasRedstoneActive);
     }
     
@@ -192,7 +192,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         currentCandidate = input.read("shrunk_addon", ShrunkAddonData.CODEC).orElse(null);
         deserializeColor(input);
         
-        energyStorage.amount = input.getLongOr("energy_stored", 0);
+        energyStorage.energy = input.getLongOr("energy_stored", 0);
         wasRedstoneActive = input.getBooleanOr("redstone", false);
         
         updateEnergyContainer();

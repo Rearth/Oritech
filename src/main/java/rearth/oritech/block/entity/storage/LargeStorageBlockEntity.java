@@ -13,7 +13,7 @@ import java.util.List;
 public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity implements RedstoneAddonBlockEntity.RedstoneControllable {
     
     public LargeStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LARGE_STORAGE_ENTITY, pos, state);
+        super(BlockEntitiesContent.LARGE_STORAGE_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -56,18 +56,18 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     
     @Override
     public int getComparatorEnergyAmount() {
-        if (energyStorage.amount == 0) return 0;
-        return (int) (1 + ((energyStorage.amount / (float) energyStorage.capacity) * 14));
+        if (energyStorage.energy == 0) return 0;
+        return (int) (1 + ((energyStorage.energy / (float) energyStorage.capacity) * 14));
     }
     
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.heldStacks.size() <= slot) return 0;
+        if (inventory.getStacks().size() <= slot) return 0;
         
-        var stack = inventory.getItem(slot);
+        var stack = inventory.getResource(slot);
         if (stack.isEmpty()) return 0;
         
-        return (int) (1 + (stack.getCount() / (float) stack.getMaxStackSize()) * 15);
+        return (int) (1 + (inventory.getAmountAsInt(slot) / (float) stack.getMaxStackSize()) * 15);
     }
     
     @Override

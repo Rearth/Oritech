@@ -26,14 +26,15 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ComparatorOutputProvider;
-import rearth.oritech.util.StackContext;
 
 import java.util.List;
 
@@ -85,43 +86,63 @@ public class SmallFluidTank extends Block implements EntityBlock {
     
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
             var usedStack = stack;
             if (stack.getCount() > 1) {
                 usedStack = stack.copyWithCount(1);
             }
-            var stackRef = new StackContext(usedStack, updated -> {
-                if (stack.getCount() > 1) {
-                    stack.shrink(1);
-                    if (!player.getInventory().add(updated)) {
-                        player.drop(updated, true);
-                    }
-                } else {
-                    player.setItemInHand(hand, updated);
-                }
-            });
-            
-            var candidate = FluidApi.ITEM.find(stackRef);
+
+            var candidate = usedStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forStack(usedStack));
             if (candidate != null) {
-                
                 if (!level.isClientSide()) {
-                    if (candidate.getContent().getFirst().isEmpty()) { // from tank to item
-                        var moved = FluidApi.transferFirst(tankEntity.fluidStorage, candidate, tankEntity.fluidStorage.getCapacity(), false);
-                        Oritech.LOGGER.debug("moved to item {} {}", moved, stackRef.getValue());
-                    } else {    // from item to tank
-                        var moved = FluidApi.transferFirst(candidate, tankEntity.fluidStorage, tankEntity.fluidStorage.getCapacity(), false);
-                        Oritech.LOGGER.debug("moved from item {} {}", moved, stackRef.getValue());
+                    int moved = 0;
+
+                    try (var transaction = Transaction.openRoot()) {
+                        var itemResource = candidate.getResource(0);
+                        if (itemResource.isEmpty()) { // from tank to item
+                            var tankResource = tankEntity.fluidStorage.getResource(0);
+                            if (!tankResource.isEmpty()) {
+                                var inserted = candidate.insert(tankResource, tankEntity.fluidStorage.getAmount(), transaction);
+                                if (inserted > 0) {
+                                    var extracted = tankEntity.fluidStorage.extract(0, tankResource, inserted, transaction);
+                                    if (extracted == inserted) {
+                                        transaction.commit();
+                                        moved = inserted;
+                                    }
+                                }
+                            }
+                        } else {    // from item to tank
+                            var maxTaken = Math.min(candidate.getAmountAsLong(0), tankEntity.fluidStorage.getCapacity() - tankEntity.fluidStorage.getAmount());
+                            var taken = candidate.extract(0, itemResource, (int) maxTaken, transaction);
+                            if (taken > 0) {
+                                var inserted = tankEntity.fluidStorage.insert(itemResource, taken, transaction);
+                                if (inserted == taken) {
+                                    transaction.commit();
+                                    moved = taken;
+                                }
+                            }
+                        }
+                    }
+
+                    if (moved > 0) {
+                        if (stack.getCount() > 1) {
+                            stack.shrink(1);
+                            if (!player.getInventory().add(usedStack)) {
+                                player.drop(usedStack, true);
+                            }
+                        } else {
+                            player.setItemInHand(hand, usedStack);
+                        }
+
+                        level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f);
                     }
                 }
-                
-                level.playLocalSound(pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f, true);
-                
+
                 return ItemInteractionResult.sidedSuccess(true);
             }
         }
-        
+
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
     
