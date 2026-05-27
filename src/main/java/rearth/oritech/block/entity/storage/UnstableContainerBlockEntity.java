@@ -150,6 +150,7 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         // top and bottom
         var positions = List.of(new Vec3i(0, -3, 0), new Vec3i(0, 2, 0));
         
+        // todo caching?
         for (var outputPos : positions) {
             var worldPos = worldPosition.offset(outputPos);
             var candidate = level.getCapability(Capabilities.Energy.BLOCK, worldPos, null);

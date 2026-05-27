@@ -6,6 +6,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -114,19 +116,21 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
             directions.addFirst(facing);
         }
         
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        
         
         for (var direction : directions) {
-            var checkPos = pos.offset(direction.getNormal());
+            var checkPos = pos.offset(direction.getUnitVec3i());
             var checkEntity = level.getBlockEntity(checkPos);
             if (checkEntity instanceof MachineAddonController machineEntity) {
-                AddonBlockEntity.pendingInits.add(machineEntity);
+                serverLevel.getServer().execute(machineEntity::initAddons);
                 break;
             } else if (checkEntity instanceof ItemEnergyFrameInteractionBlockEntity machineEntity) {
-                AddonBlockEntity.pendingInits.add(machineEntity);
+                serverLevel.getServer().execute(machineEntity::initAddons);
                 break;
             } else if (checkEntity instanceof MachineCoreEntity machineEntity) {
                 if (machineEntity.isEnabled() && machineEntity.getCachedController() instanceof MachineAddonController addonController) {
-                    AddonBlockEntity.pendingInits.add(addonController);
+                    serverLevel.getServer().execute(addonController::initAddons);
                 }
                 break;
             } else if (checkEntity instanceof AddonBlockEntity addonEntity) {
@@ -135,7 +139,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                 if (!addonConnected) continue;
                 var controllerPos = addonEntity.getControllerPos();
                 if (level.getBlockEntity(controllerPos) instanceof MachineAddonController controllerEntity) {
-                    AddonBlockEntity.pendingInits.add(controllerEntity);
+                    serverLevel.getServer().execute(controllerEntity::initAddons);
                     break;
                 }
             }

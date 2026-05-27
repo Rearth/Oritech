@@ -1,7 +1,9 @@
 package rearth.oritech.block.entity.accelerator;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -9,7 +11,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -29,26 +30,30 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.transfer.item.InOutInventoryStorage;
 import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.AcceleratorScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.SoundContent;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -80,7 +85,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         initParticleLogic();
         
         // try insert item as particle
-        if (particle == null && !inventory.getItem(0).isEmpty() && inventory.getItem(1).isEmpty()) {
+        if (particle == null && !inventory.getResource(0).isEmpty() && inventory.getResource(1).isEmpty()) {
             injectParticle();
         }
         
@@ -102,7 +107,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     private void initParticleLogic() {
-        if (particleLogic == null) particleLogic = new AcceleratorParticleLogic(worldPosition, (ServerLevel) level, this);
+        if (particleLogic == null)
+            particleLogic = new AcceleratorParticleLogic(worldPosition, (ServerLevel) level, this);
     }
     
     public void injectParticle() {
@@ -116,10 +122,11 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             var startPosition = (BlockPos) posBehind;
             var nextGate = particleLogic.findNextGate(startPosition, directionRight, 1);
             particle = new AcceleratorParticleLogic.ActiveParticle(startPosition.getCenter(), 1, nextGate, startPosition);
-            activeItemParticle = inventory.getItem(0).split(1);
+            activeItemParticle = inventory.getStacks().getFirst().split(1);
             
             var soundPos = worldPosition.getCenter();
             level.playSound(null, soundPos.x, soundPos.y, soundPos.z, SoundEvents.BAMBOO_WOOD_TRAPDOOR_OPEN, SoundSource.BLOCKS);
+            this.setChanged();
         }
     }
     
@@ -162,7 +169,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var particleCount = Math.pow(relativeSpeed, 0.5) / 2f + 1;
         createCollisionParticles((int) relativeSpeed, collision, (int) particleCount);
         
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
         this.setChanged();
     }
     
@@ -176,7 +184,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         var caughtParticles = 0;
         
         for (int i = 0; i < shotCount; i++) {
-                var r = level.getRandom();
+            var r = level.getRandom();
             var offset = collisionPosition.add(r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange, r.nextFloat() * rayRange * 2 - rayRange);
             var direction = offset.subtract(collisionPosition).normalize();
             
@@ -195,37 +203,37 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             
             // System.out.println("caught: " + caughtParticles + " of " + shotCount);
         }
-    
+        
     }
     
     private boolean tryCraftResult(float speed, ItemStack inputA, ItemStack inputB) {
         
-        if (inputA == null || inputA.isEmpty() || inputB == null || inputB.isEmpty()) return false;
+        if (inputA == null || inputA.isEmpty() || inputB == null || inputB.isEmpty() || !(level instanceof ServerLevel serverLevel))
+            return false;
         
-        var inputInv = new SimpleCraftingInventory(inputA, inputB);
-        var candidate = level.getRecipeManager().getRecipeFor(RecipeContent.PARTICLE_COLLISION, inputInv, level);
+        var inputInv = new OritechRecipeInput(List.of(inputA, inputB), FluidStack.EMPTY);
+        var candidate = serverLevel.recipeAccess().getRecipeFor(RecipeContent.PARTICLE_COLLISION.get(), inputInv, level);
         
-        if (candidate.isEmpty()) {
-            // try again in different order
-            inputInv = new SimpleCraftingInventory(inputB, inputA);
-            candidate = level.getRecipeManager().getRecipeFor(RecipeContent.PARTICLE_COLLISION, inputInv, level);
-        }
-        
+        // we only need to check once, as the recipe matches does fuzzy matching now (e.g. order doesnt matter)
         if (candidate.isEmpty()) return false;
         
         var recipe = candidate.get().value();
         
-        var requiredSpeed = recipe.getTime();
+        var requiredSpeed = recipe.time();
         if (speed < requiredSpeed) return false;
         
-        var result = recipe.getResults();
-            if (inventory.getStacks().get(1).getItem().equals(result.get(0).getItem())) {
-                inventory.getStacks().get(1).grow(1);
-        } else {
-                inventory.getStacks().set(1, result.get(0).copy());
+        var result = recipe.itemResults();
+        
+        try (var transaction = Transaction.openRoot()) {
+            var resultingStack = result.getFirst().create();
+            var inserted = inventory.getOutputContainer().insert(ItemResource.of(resultingStack), resultingStack.count(), transaction);
+            if (inserted == resultingStack.count()) {
+                transaction.commit();
+                return true;
+            }
         }
         
-        return true;
+        return false;
     }
     
     private void spawnEndPortal(BlockPos pos) {
@@ -247,7 +255,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             if (level.getRandom().nextFloat() > 0.8) {
                 var stateAbove = level.getBlockState(candidate.above());
                 if (stateAbove.isAir() || stateAbove.canBeReplaced()) {
-                        for (int i = 1; i < level.getRandom().nextIntBetweenInclusive(3, 6); i++) {
+                    for (int i = 1; i < level.getRandom().nextIntBetweenInclusive(3, 6); i++) {
                         stateAbove = level.getBlockState(candidate.above(i));
                         if (stateAbove.isAir() || stateAbove.canBeReplaced())
                             level.setBlockAndUpdate(candidate.above(i), Blocks.CHORUS_PLANT.defaultBlockState());
@@ -335,7 +343,8 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         mob.hurt(level.damageSources().magic(), remainingMomentum);
         var position = mob.getBoundingBox().getCenter();
         position = new Vec3(position.x, particle.position.y, position.z);
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
         
         return inflictedDamage;
     }
@@ -363,7 +372,10 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     }
     
     private void createBlackHole(BlockPos checkPos) {
-        if (level instanceof ServerLevel sl) { var c = checkPos.getCenter(); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0); }
+        if (level instanceof ServerLevel sl) {
+            var c = checkPos.getCenter();
+            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0);
+        }
         
         var center = checkPos.getCenter();
         level.explode(null, center.x, center.y, center.z, 10, false, Level.ExplosionInteraction.BLOCK);
@@ -482,7 +494,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
             }
             
             var pitch = Math.pow(acceleratorBlock.lastEvent.lastEventSpeed, 0.1);
-                level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING.value(), SoundSource.BLOCKS, 2f, (float) pitch, true);
+            level.playLocalSound(soundPos.x, soundPos.y, soundPos.z, SoundContent.PARTICLE_MOVING.value(), SoundSource.BLOCKS, 2f, (float) pitch, true);
             
         }
     }
@@ -503,9 +515,9 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
     
     public record LastEventPacket(BlockPos position,
                                   ParticleEvent lastEvent,
-// for no gate found events, we can calculate the acceptable dist based on speed
+                                  // for no gate found events, we can calculate the acceptable dist based on speed
                                   float lastEventSpeed,
-// this is particle speed usually, and collision speed for collisions
+                                  // this is particle speed usually, and collision speed for collisions
                                   BlockPos lastEventPosition,  // where it collided/exited
                                   float minBendDist,   // acceptable dist can be calculated from dist
                                   ItemStack activeParticle

@@ -1,10 +1,11 @@
 package rearth.oritech.block.entity.addons;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -14,17 +15,17 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.client.ui.RedstoneAddonScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
-public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockEntityTicker<RedstoneAddonBlockEntity>, ExtendedMenuProvider, ComparatorOutputProvider {
+public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockEntityTicker<RedstoneAddonBlockEntity>, MenuProvider, ComparatorOutputProvider {
     
     private RedstoneControllable cachedController;
     public RedstoneMode activeMode = RedstoneMode.INPUT_CONTROL;
@@ -71,11 +72,11 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     public void sendDataToClient() {
-        PacketDistributor.sendToPlayersTrackingChunk((net.minecraft.server.level.ServerLevel) level, ChunkPos.containing(worldPosition), new RedstoneAddonClientUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new RedstoneAddonClientUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
     }
     
     public void sendDataToServer() {
-        PacketDistributor.sendToServer(new RedstoneAddonServerUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
+        ClientPacketDistributor.sendToServer(new RedstoneAddonServerUpdate(worldPosition, getControllerPos(), monitoredSlot, activeMode.ordinal(), currentOutput));
     }
     
     private boolean isConnected() {

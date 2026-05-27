@@ -35,6 +35,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     
     private final DelegatingInventoryStorage inventory = new DelegatingInventoryStorage(this::getTargetItemStorage, this::isConnected) {
         
+        // forward non-indexed variants to indexed variants to skip the loop (performance optimization only)
         @Override
         public int insert(ItemResource resource, int amount, TransactionContext transaction) {
             return insert(targetSlot, resource, amount, transaction);

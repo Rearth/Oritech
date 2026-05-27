@@ -41,8 +41,12 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     }
     
     public void onParticleCollided(int amount) {
-        energyStorage.energy = Math.min(energyStorage.capacity, energyStorage.energy + amount);
-        energyStorage.update();
+        
+        try (var transaction = Transaction.openRoot()) {
+            energyStorage.internalInsert(amount, transaction);
+            transaction.commit();
+        }
+        
         triggerAnimation();
     }
     
@@ -50,10 +54,10 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     public void tick(Level level, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
         
-        
         if (energyStorage.energy <= 0) return;
         
         // output energy to back
+        // todo caching?
         var target = getOutputPosition(pos, getBlockState().getValue(DirectionalBlock.FACING).getOpposite());
         var candidate = level.getCapability(Capabilities.Energy.BLOCK, target.getB(), target.getA());
         if (candidate != null) {
@@ -70,13 +74,13 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.putLong("energy", energyStorage.getAmountAsLong());
+        energyStorage.serialize(output);
     }
     
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        energyStorage.set(input.getLongOr("energy", 0));
+        energyStorage.deserialize(input);
     }
     
     public void triggerAnimation() {

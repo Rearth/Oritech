@@ -29,12 +29,12 @@ public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyPr
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.putLong("energy", energyStorage.getAmountAsLong());
+        energyStorage.serialize(output);
     }
     
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        energyStorage.set(input.getLongOr("energy", 0));
+        energyStorage.deserialize(input);
     }
 }
