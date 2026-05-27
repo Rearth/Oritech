@@ -118,10 +118,16 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         
         var targetMultiplier = 1 + Math.pow((double) laserInputStorage.getAmountAsLong() / OritechConfig.laserArmConfig.energyPerTick.get(), 2);
         targetMultiplier = Math.min(targetMultiplier, 5_000);
+        
         laserInputStorage.set(0);
+        
         var targetAmount = BASE_CAPACITY * qualityMultiplier * targetMultiplier;
         var currentAmount = energyStorage.getCapacityAsLong();
-        energyStorage.capacity = (long) Mth.lerp(0.005d, currentAmount, targetAmount);
+        
+        // no change needed
+        if (Math.abs(targetAmount - currentAmount) < 1) return;
+        
+        energyStorage.setCapacity((long) Mth.lerp(0.005d, currentAmount, targetAmount));
         energyStorage.setMaxInsert((long) targetAmount);
         energyStorage.setMaxExtract((long) targetAmount);
         
@@ -134,20 +140,22 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
             energyStorage.energy = energyStorage.capacity;
         }
         
-        if (energyStorage.capacity != BASE_CAPACITY * qualityMultiplier)
-            energyStorage.update();
+        energyStorage.onEnergyChanged(currentAmount);
         
     }
     
     private void outputEnergy() {
         if (!(level instanceof ServerLevel)) return;
+        
+        // top and bottom
         var positions = List.of(new Vec3i(0, -3, 0), new Vec3i(0, 2, 0));
+        
         for (var outputPos : positions) {
             var worldPos = worldPosition.offset(outputPos);
             var candidate = level.getCapability(Capabilities.Energy.BLOCK, worldPos, null);
             if (candidate != null) {
                 try (var transaction = Transaction.openRoot()) {
-                    var inserted = candidate.insert((int) Math.min(Integer.MAX_VALUE, energyStorage.maxExtract), transaction);
+                    var inserted = candidate.insert((int) Math.min(energyStorage.energy, energyStorage.maxExtract), transaction);  // no idea if this math.min is really needed
                     if (inserted > 0) {
                         energyStorage.internalExtract(inserted, transaction);
                         transaction.commit();
@@ -160,12 +168,15 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        
         serializeMultiblock(output);
         serializeColor(output);
+        
+        energyStorage.serialize(output);
+        
         var blockId = BuiltInRegistries.BLOCK.getKey(capturedBlock.getBlock());
         output.store("captured", Identifier.CODEC, blockId);
-        output.putLong("energy_stored", energyStorage.energy);
-        output.putLong("energy_capacity", energyStorage.capacity);
+        
         output.putFloat("quality", qualityMultiplier);
     }
     
@@ -174,8 +185,9 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         super.loadAdditional(input);
         deserializeMultiblock(input);
         deserializeColor(input);
-        energyStorage.energy = input.getLongOr("energy_stored", 0);
-        energyStorage.capacity = input.getLongOr("energy_capacity", BASE_CAPACITY);
+        
+        energyStorage.deserialize(input);
+        
         qualityMultiplier = input.getFloatOr("quality", 1f);
         
         input.read("captured", Identifier.CODEC)

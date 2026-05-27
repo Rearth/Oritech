@@ -203,7 +203,7 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
      * For changes that happen through {@link #insert} or {@link #extract},
      * this function will be called at the end of the transaction.
      */
-    protected void onEnergyChanged(long previousAmount) {
+    public void onEnergyChanged(long previousAmount) {
         onUpdate.run();
     }
     
