@@ -6,14 +6,17 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DelegatingEnergyStorage;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.DelegatingFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
+import rearth.oritech.api.transfer.energy.DelegatingEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.DelegatingFluidStorage;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.item.DelegatingInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MultiblockMachineController;
@@ -22,7 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
+public class MachineCoreEntity extends BlockEntity implements ItemProvider, FluidProvider, EnergyProvider {
     
     private BlockPos controllerPos = BlockPos.ZERO;
     private MultiblockMachineController controllerEntity;
@@ -73,59 +76,6 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
         return controllerEntity;
     }
     
-    @Nullable
-    private EnergyApi.EnergyStorage getMainEnergyStorage(Direction direction) {
-        
-        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
-        if (!isUsed) return null;
-        
-        var controllerEntity = getCachedController();
-        if (controllerEntity == null) return new SimpleEnergyStorage(0, 0, 0);    // this should never happen
-        return controllerEntity.getEnergyStorageForMultiblock(direction);
-    }
-    
-    private FluidApi.FluidStorage getMainFluidStorage(Direction direction) {
-        
-        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
-        if (!isUsed) return null;
-        
-        var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof FluidApi.BlockProvider fluidProvider)) return null;
-        return fluidProvider.getFluidStorage(direction);
-    }
-    
-    private ItemApi.InventoryStorage getMainItemStorage(Direction direction) {
-        
-        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
-        if (!isUsed) return null;
-        
-        var controllerEntity = getCachedController();
-        if (!(controllerEntity instanceof ItemApi.BlockProvider itemProvider)) return null;
-        return itemProvider.getInventoryStorage(direction);
-    }
-    
-    @Nullable
-    private EnergyApi.EnergyStorage getEnergyStorageDelegated(Direction direction) {
-        return delegatedEnergy.computeIfAbsent(direction, dir -> {
-            if (getMainEnergyStorage(dir) == null) return null;
-            return new DelegatingEnergyStorage(() -> getMainEnergyStorage(dir), this::isEnabled);
-        });
-    }
-    
-    private FluidApi.FluidStorage getFluidStorageDelegated(Direction direction) {
-        return delegatedFluid.computeIfAbsent(direction, dir -> {
-            if (getMainFluidStorage(dir) == null) return null;
-            return new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled);
-        });
-    }
-    
-    private ItemApi.InventoryStorage getItemStorageDelegated(Direction direction) {
-        return delegatedItem.computeIfAbsent(direction, dir -> {
-            if (getMainItemStorage(dir) == null) return null;
-            return new DelegatingInventoryStorage(() -> getMainItemStorage(dir), this::isEnabled);
-        });
-    }
-    
     public void resetCaches() {
         delegatedItem.clear();
         delegatedFluid.clear();
@@ -136,18 +86,71 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
         return this.getBlockState().getValue(MachineCoreBlock.USED);
     }
     
+    @Nullable
+    private EnergyHandler getMainEnergyStorage(Direction direction) {
+        
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (controllerEntity == null) return null;
+        return controllerEntity.getEnergyStorageForMultiblock(direction);
+    }
+    
+    private ResourceHandler<FluidResource> getMainFluidStorage(Direction direction) {
+        
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (!(controllerEntity instanceof FluidProvider fluidProvider)) return null;
+        return fluidProvider.getFluidLookup(direction);
+    }
+    
+    private ResourceHandler<ItemResource> getMainItemStorage(Direction direction) {
+        
+        var isUsed = this.getBlockState().getValue(MachineCoreBlock.USED);
+        if (!isUsed) return null;
+        
+        var controllerEntity = getCachedController();
+        if (!(controllerEntity instanceof ItemProvider itemProvider)) return null;
+        return itemProvider.getItemLookup(direction);
+    }
+    
+    @Nullable
+    private EnergyHandler getEnergyStorageDelegated(Direction direction) {
+        return delegatedEnergy.computeIfAbsent(direction, dir -> {
+            if (getMainEnergyStorage(dir) == null) return null;
+            return new DelegatingEnergyStorage(() -> getMainEnergyStorage(dir), this::isEnabled);
+        });
+    }
+    
+    private ResourceHandler<FluidResource> getFluidStorageDelegated(Direction direction) {
+        return delegatedFluid.computeIfAbsent(direction, dir -> {
+            if (getMainFluidStorage(dir) == null) return null;
+            return new DelegatingFluidStorage(() -> getMainFluidStorage(dir), this::isEnabled);
+        });
+    }
+    
+    private ResourceHandler<ItemResource> getItemStorageDelegated(Direction direction) {
+        return delegatedItem.computeIfAbsent(direction, dir -> {
+            if (getMainItemStorage(dir) == null) return null;
+            return new DelegatingInventoryStorage(() -> getMainItemStorage(dir), this::isEnabled);
+        });
+    }
+    
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return getEnergyStorageDelegated(direction);
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
-        return getItemStorageDelegated(direction);
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
+        return getFluidStorageDelegated(direction);
     }
     
     @Override
-    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
-        return getFluidStorageDelegated(direction);
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        return getItemStorageDelegated(direction);
     }
 }
