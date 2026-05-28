@@ -70,7 +70,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     public ColorVariant currentColor = getDefaultColor();
     
     public TreefellerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.TREEFELLER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -308,7 +308,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.TREEFELLER_SCREEN;
+        return ModScreens.TREEFELLER_SCREEN.get();
     }
     
     @Override

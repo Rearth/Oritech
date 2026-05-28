@@ -16,7 +16,6 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -26,7 +25,7 @@ import java.util.List;
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PULVERIZER_ENTITY, pos, state, OritechConfig.processingMachines.pulverizerData.energyPerTick.get());
+        super(BlockEntitiesContent.PULVERIZER_ENTITY.get(), pos, state, OritechConfig.processingMachines.pulverizerData.energyPerTick.get());
     }
     
     @Override
@@ -76,8 +75,8 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.PULVERIZER;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.PULVERIZER.get();
     }
     
     @Override
@@ -100,7 +99,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.PULVERIZER_SCREEN;
+        return ModScreens.PULVERIZER_SCREEN.get();
     }
     
     @Override

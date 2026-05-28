@@ -74,7 +74,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     private boolean doAutoInit = false; // used to auto-init when save is being loaded
     
     public ReactorControllerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_CONTROLLER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_CONTROLLER_BLOCK_ENTITY.get(), pos, state);
     }
     
     // heat is only used for reactor rods and heat pipes

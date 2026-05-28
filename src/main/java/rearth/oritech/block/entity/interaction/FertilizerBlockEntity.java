@@ -200,7 +200,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.DESTROYER_SCREEN;
+        return ModScreens.DESTROYER_SCREEN.get();
     }
     
     @Override

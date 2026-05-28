@@ -126,6 +126,10 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     
     }
     
+    public int getCapacity() {
+        return this.capacity;
+    }
+    
     @Override
     public void handleDeltaUpdate(List<FluidStack> updatedData) {
         this.setStacks(NonNullList.copyOf(updatedData));

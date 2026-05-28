@@ -45,7 +45,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
         public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
             
             var craftingInv = new SimpleCraftingInventory(addedStack);
-            var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR, craftingInv, level);
+            var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR.get(), craftingInv, level);
             if (recipeCandidate.isEmpty()) return 0;
             
             return super.insertToSlot(addedStack, slot, simulate);
@@ -59,7 +59,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     public int currentFuelOriginalCapacity;
     
     public ReactorFuelPortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_FUEL_PORT_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_FUEL_PORT_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -96,7 +96,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
         if (inputStack.isEmpty()) return false;
         
         var craftingInv = new SimpleCraftingInventory(inputStack);
-        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR, craftingInv, level);
+        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.REACTOR.get(), craftingInv, level);
         
         if (recipeCandidate.isEmpty()) return false;
         
@@ -175,7 +175,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.FUEL_PORT_SCREEN;
+        return ModScreens.FUEL_PORT_SCREEN.get();
     }
     
     @Override

@@ -60,7 +60,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     public ColorVariant currentColor = getDefaultColor();
     
     public PumpBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PUMP_BLOCK, pos, state);
+        super(BlockEntitiesContent.PUMP_BLOCK.get(), pos, state);
     }
     
     @Override

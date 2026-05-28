@@ -303,7 +303,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
     public static void receiveVisualItemsPacket(RenderStackData message, IPayloadContext context) {
         var level = context.player().level();
-        var blockEntity = level.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY);
+        var blockEntity = level.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY.get());
         if (blockEntity.isPresent()) {
             var pipeEntity = blockEntity.get();
             // use local time for moved item to avoid rendering issues caused by lag

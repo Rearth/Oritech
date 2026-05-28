@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -25,7 +26,6 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -42,7 +42,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged);
     
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.COOLER_ENTITY, pos, state, OritechConfig.processingMachines.coolerData.energyPerTick.get());
+        super(BlockEntitiesContent.COOLER_ENTITY.get(), pos, state, OritechConfig.processingMachines.coolerData.energyPerTick.get());
     }
     
     @Override
@@ -174,8 +174,8 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.COOLER;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.COOLER.get();
     }
     
     @Override
@@ -191,7 +191,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidA
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.COOLER_SCREEN;
+        return ModScreens.COOLER_SCREEN.get();
     }
     
     @Override

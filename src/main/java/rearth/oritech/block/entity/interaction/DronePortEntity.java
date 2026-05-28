@@ -127,7 +127,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     private String statusMessage = "";
     
     public DronePortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.DRONE_PORT_ENTITY, pos, state);
+        super(BlockEntitiesContent.DRONE_PORT_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -660,7 +660,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.DRONE_SCREEN;
+        return ModScreens.DRONE_SCREEN.get();
     }
     
     @Override

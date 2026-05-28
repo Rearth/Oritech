@@ -38,7 +38,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     private ServerPlayer placerPlayerEntity = null;
     
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PLACER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.PLACER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -146,7 +146,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.PLACER_SCREEN;
+        return ModScreens.PLACER_SCREEN.get();
     }
     
     @Override

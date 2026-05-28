@@ -14,7 +14,7 @@ public class ReactorEnergyPortEntity extends BlockEntity implements EnergyApi.Bl
     private final SimpleEnergyStorage dummyStorage = new SimpleEnergyStorage(0, 0, 0);
     
     public ReactorEnergyPortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_ENERGY_PORT_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_ENERGY_PORT_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override

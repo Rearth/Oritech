@@ -52,7 +52,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     public int currentFuelOriginalCapacity;
     
     public ReactorAbsorberPortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_ABSORBER_PORT_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_ABSORBER_PORT_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -176,7 +176,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.FUEL_PORT_SCREEN;
+        return ModScreens.FUEL_PORT_SCREEN.get();
     }
     
     @Override

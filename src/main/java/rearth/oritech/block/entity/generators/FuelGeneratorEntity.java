@@ -5,13 +5,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.Geometry;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY, pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -49,13 +50,13 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.FUEL_GENERATOR;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.FUEL_GENERATOR.get();
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.FUEL_GENERATOR_SCREEN;
+        return ModScreens.FUEL_GENERATOR_SCREEN.get();
     }
     
     @Override

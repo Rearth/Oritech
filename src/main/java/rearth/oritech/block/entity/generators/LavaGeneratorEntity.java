@@ -5,13 +5,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 
 import java.util.HashSet;
@@ -20,7 +21,7 @@ import java.util.Set;
 
 public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, pos, state, OritechConfig.generators.lavaGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.lavaGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -43,13 +44,13 @@ public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.LAVA_GENERATOR;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.LAVA_GENERATOR.get();
     }
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.LAVA_GENERATOR_SCREEN;
+        return ModScreens.LAVA_GENERATOR_SCREEN.get();
     }
     
     @Override

@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -34,7 +35,6 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
@@ -58,7 +58,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
     
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
+        super(BlockEntitiesContent.REFINERY_ENTITY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -88,7 +88,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         
         for (int i = 0; i <= 1; i++) {
             var candidatePos = startPos.offset(0, i, 0);
-            var candidate = level.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY);
+            var candidate = level.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY.get());
             if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) break;
             
             moduleCount++;
@@ -229,8 +229,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.REFINERY;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.REFINERY.get();
     }
     
     @Override
@@ -262,7 +262,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.REFINERY_SCREEN;
+        return ModScreens.REFINERY_SCREEN.get();
     }
     
     @Override
@@ -348,7 +348,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         for (var checkPos : BlockPos.withinManhattan(worldPosition, 6, 5, 6)) {
             var checkState = level.getBlockState(checkPos);
             if (checkState.getBlock().equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK)) {
-                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY);
+                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY.get());
                 if (checkEntity.isPresent() && checkEntity.get().collectedSouls > 0) return checkEntity;
             }
         }
@@ -366,7 +366,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // remove tanks (indexed 1 + 2)
         for (int i = 1; i <= moduleCount; i++) {
             var tankCandidatePos = worldPosition.above(1 + i);
-            var tankEntityCandidate = level.getBlockEntity(tankCandidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY);
+            var tankEntityCandidate = level.getBlockEntity(tankCandidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY.get());
             if (tankEntityCandidate.isPresent()) {
                 var tankEntity = tankEntityCandidate.get();
                 for (var coreBlock : tankEntity.getConnectedCores())

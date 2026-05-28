@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -27,7 +28,6 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -44,7 +44,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public boolean hasFluidAddon = false;
     
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CENTRIFUGE_ENTITY, pos, state, OritechConfig.processingMachines.centrifugeData.energyPerTick.get());
+        super(BlockEntitiesContent.CENTRIFUGE_ENTITY.get(), pos, state, OritechConfig.processingMachines.centrifugeData.energyPerTick.get());
     }
     
     @Override
@@ -105,7 +105,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     // this is provided as fallback for fluid centrifuges that may still process normal stuff
     private Optional<RecipeHolder<OritechRecipe>> getNormalRecipe() {
-        return level.getRecipeManager().getRecipeFor(RecipeContent.CENTRIFUGE, getInputInventory(), level);
+        return level.getRecipeManager().getRecipeFor(RecipeContent.CENTRIFUGE.get(), getInputInventory(), level);
     }
     
     public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
@@ -177,7 +177,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (hasFluidAddon != hadAddon && level instanceof ServerLevel serverLevel) {
             
             // reset cache of core above
-            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY);
+            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
             if (coreCandidate.isPresent()) {
                 var core = coreCandidate.get();
                 core.resetCaches();
@@ -208,9 +208,9 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        if (hasFluidAddon) return RecipeContent.CENTRIFUGE_FLUID;
-        return RecipeContent.CENTRIFUGE;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        if (hasFluidAddon) return RecipeContent.CENTRIFUGE_FLUID.get();
+        return RecipeContent.CENTRIFUGE.get();
     }
     
     @Override
@@ -228,7 +228,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.CENTRIFUGE_SCREEN;
+        return ModScreens.CENTRIFUGE_SCREEN.get();
     }
     
     @Override

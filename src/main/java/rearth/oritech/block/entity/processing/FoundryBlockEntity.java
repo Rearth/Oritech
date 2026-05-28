@@ -3,12 +3,13 @@ package rearth.oritech.block.entity.processing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class FoundryBlockEntity extends MultiblockMachineEntity {
     
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FOUNDRY_ENTITY, pos, state, OritechConfig.processingMachines.foundryData.energyPerTick.get());
+        super(BlockEntitiesContent.FOUNDRY_ENTITY.get(), pos, state, OritechConfig.processingMachines.foundryData.energyPerTick.get());
     }
     
     @Override
@@ -31,8 +32,8 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.FOUNDRY;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.FOUNDRY.get();
     }
     
     @Override
@@ -50,7 +51,7 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.FOUNDRY_SCREEN;
+        return ModScreens.FOUNDRY_SCREEN.get();
     }
     
     @Override

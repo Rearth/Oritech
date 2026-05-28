@@ -146,7 +146,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     private Player laserPlayerEntity = null;
     
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LASER_ARM_ENTITY, pos, state);
+        super(BlockEntitiesContent.LASER_ARM_ENTITY.get(), pos, state);
         laserHead = getLaserHeadPosition().getCenter();
     }
     
@@ -264,7 +264,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     public static RecipeHolder<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, Level level) {
         var inputItem = destroyed.getBlock().asItem();
         var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
-        var candidate = level.getRecipeManager().getRecipeFor(RecipeContent.LASER, inputInv, level);
+        var candidate = level.getRecipeManager().getRecipeFor(RecipeContent.LASER.get(), inputInv, level);
         return candidate.orElse(null);
     }
     
@@ -910,7 +910,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.LASER_SCREEN;
+        return ModScreens.LASER_SCREEN.get();
     }
     
     @Override

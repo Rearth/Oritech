@@ -95,7 +95,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     private boolean wasRedstoneActive = false;
     
     public ShrinkerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -414,7 +414,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.SHRINKER_SCREEN;
+        return ModScreens.SHRINKER_SCREEN.get();
     }
     
     @Override
@@ -425,7 +425,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     public static void onPlayerUse(ShrinkerPlayerUsePacket packet, IPayloadContext context) {
         
         var level = context.player().level();
-        var candidate = level.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY);
+        var candidate = level.getBlockEntity(packet.pos(), BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get());
         candidate.ifPresent(ShrinkerBlockEntity::doShrink);
         
     }

@@ -76,7 +76,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
     public ColorVariant currentColor = getDefaultColor();
     
     public DeepDrillEntity(BlockPos pos, BlockState state) {
-        this(BlockEntitiesContent.DEEP_DRILL_ENTITY, pos, state);
+        this(BlockEntitiesContent.DEEP_DRILL_ENTITY.get(), pos, state);
     }
     
     // this second option is here to allow addons to create custom deep drill entities with special logic
@@ -166,7 +166,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         var nodeOreBlockItem = usedOre.asItem();
         var sampleInv = new SimpleCraftingInventory(new ItemStack(nodeOreBlockItem, 1));
         
-        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.DEEP_DRILL, sampleInv, level);
+        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.DEEP_DRILL.get(), sampleInv, level);
         if (recipeCandidate.isEmpty())
             return;
         

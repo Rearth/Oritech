@@ -5,13 +5,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -21,7 +22,7 @@ import java.util.Set;
 
 public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY, pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
     }
     
     @Override
@@ -44,8 +45,8 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.BIO_GENERATOR;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.BIO_GENERATOR.get();
     }
     
     @Override
@@ -61,7 +62,7 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.BIO_GENERATOR_SCREEN;
+        return ModScreens.BIO_GENERATOR_SCREEN.get();
     }
     
     @Override

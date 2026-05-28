@@ -41,12 +41,12 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     private ServerPlayer nukePlayerEntity = null;
     
     public NuclearExplosionEntity(BlockPos pos, BlockState state, int size) {
-        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
         this.size = size;
     }
     
     public NuclearExplosionEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY, pos, state);
+        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
         this.size = 9;
     }
     

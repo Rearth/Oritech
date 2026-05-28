@@ -16,7 +16,7 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.recipes.OritechRecipeType;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
@@ -28,7 +28,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     private final float FURNACE_SPEED_MULTIPLIER = OritechConfig.processingMachines.furnaceData.speedMultiplier.get().floatValue();
     
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY, pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
+        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY.get(), pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
     }
     
     @Override
@@ -42,8 +42,8 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.ASSEMBLER;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.ASSEMBLER.get();
     }   // not used in this special case
     
     @Override
@@ -177,7 +177,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.POWERED_FURNACE_SCREEN;
+        return ModScreens.POWERED_FURNACE_SCREEN.get();
     }
     
     @Override

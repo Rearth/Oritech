@@ -17,6 +17,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -42,7 +43,6 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
@@ -66,7 +66,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public long lastTickRFUsed = 0; // needed mainly for client UI
     
     public TaintedRefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.TAINTED_REFINERY_ENTITY, pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
+        super(BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
     
     @Override
@@ -378,8 +378,8 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
     
     @Override
-    protected OritechRecipeType getOwnRecipeType() {
-        return RecipeContent.REFINERY;
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return RecipeContent.REFINERY.get();
     }
     
     private void spawnWorkParticles() {
@@ -418,7 +418,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.TAINTED_REFINERY_SCREEN;
+        return ModScreens.TAINTED_REFINERY_SCREEN.get();
     }
     
     @Override
@@ -521,7 +521,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public static void handleTankPacket(RefineryTankSelectorPacket payload, IPayloadContext context) {
         var level = context.player().level();
         if (level == null) return;
-        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY_ENTITY);
+        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get());
         if (refineryCandidate.isEmpty()) return;
         
         var refinery = refineryCandidate.get();
