@@ -29,7 +29,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private static final int TRANSFER_AMOUNT = OritechConfig.itemPipeTransferAmount.get();
     private static final int TRANSFER_PERIOD = OritechConfig.itemPipeIntervalDuration.get();
     
-    private List<CachedTarget<ItemApi.InventoryStorage>> filteredTargetItemStorages;
+    private List<CachedTarget<StacksResourceHandler<ItemStack, ItemResource>>> filteredTargetItemStorages;
     
     // item path cache (invalidated on network update)
     private final HashMap<BlockPos, Tuple<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
@@ -71,7 +71,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
         var stackToMove = ItemStack.EMPTY;
-        ItemApi.InventoryStorage moveFromInventory = null;
+        StacksResourceHandler<ItemStack, ItemResource> moveFromInventory = null;
         BlockPos takenFrom = null;
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
         
@@ -85,7 +85,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 blockedUntil.remove(sourcePos);
             
             var offset = pos.subtract(sourcePos);
-            var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
+            var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
             var inventory = ItemApi.BLOCK.find(level, sourcePos, direction);
             if (inventory == null || !inventory.supportsExtraction()) continue;
@@ -298,7 +298,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     
     private static Direction getDirectionFromOffset(BlockPos self, BlockPos target) {
         var offset = target.subtract(self);
-        return Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
+        return Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
     }
     
     public static void receiveVisualItemsPacket(RenderStackData message, IPayloadContext context) {

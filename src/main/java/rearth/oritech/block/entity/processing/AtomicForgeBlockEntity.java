@@ -9,7 +9,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
-import rearth.oritech.api.energy.EnergyApi;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -133,7 +133,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     

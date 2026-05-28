@@ -364,7 +364,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
                 if (block instanceof ReactorEnergyPortBlock) {
                     var facing = state.getValue(BlockStateProperties.FACING);
                     var blockInFront = pos.offset(Geometry.getForward(facing));
-                    energyPorts.add(new Tuple<>(blockInFront, Direction.fromDelta(Geometry.getBackward(facing).getX(), Geometry.getBackward(facing).getY(), Geometry.getBackward(facing).getZ())));
+                    energyPorts.add(new Tuple<>(blockInFront, Direction.getApproximateNearest(Geometry.getBackward(facing).getX(), Geometry.getBackward(facing).getY(), Geometry.getBackward(facing).getZ())));
                 } else if (block instanceof ReactorRedstonePortBlock) {
                     redstonePorts.add(pos.immutable());
                 }
@@ -569,7 +569,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

@@ -35,7 +35,7 @@ import java.util.Map;
 public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, ExtendedMenuProvider {
     
     public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::setChanged);
-    private BlockLookupCache<ItemApi.InventoryStorage> cachedTargetInventory;
+    private BlockLookupCache<StacksResourceHandler<ItemStack, ItemResource>> cachedTargetInventory;
     
     @SyncField(SyncType.GUI_OPEN)
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
@@ -82,7 +82,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
     

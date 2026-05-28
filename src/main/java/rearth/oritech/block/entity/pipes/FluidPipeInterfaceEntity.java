@@ -53,7 +53,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         
         for (var sourcePos : sources) {
             var offset = pos.subtract(sourcePos);
-            var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
+            var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
             if (!block.isSideExtractable(state, direction.getOpposite())) continue;
             
             var sourceBlock = level.getBlockState(sourcePos);

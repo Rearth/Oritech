@@ -190,7 +190,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
 }

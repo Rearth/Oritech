@@ -640,12 +640,12 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -659,7 +659,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     
     // energyprovider
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -686,7 +686,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForAddon() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon() {
         return inventory;
     }
     
@@ -778,7 +778,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
     

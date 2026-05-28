@@ -12,11 +12,15 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.PassiveGeneratorBlockEntity;
 import rearth.oritech.config.OritechConfig;
@@ -69,14 +73,14 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     public int getProductionRate() {
         var baseRate = OritechConfig.generators.solarGeneratorData.energyPerTick.get();
         var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
-        isFolded = level.isNight() && skyLightLevel < 12;
+        isFolded = level.isBrightOutside() && skyLightLevel < 12;
         return (int) (coreQuality * baseRate);
     }
     
     @Override
     public boolean isProducing() {
         var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
-        return !level.isNight() && skyLightLevel >= 12 && isActive(getBlockState());
+        return !level.isBrightOutside() && skyLightLevel >= 12 && isActive(getBlockState());
     }
     
     public void sendInfoMessageToPlayer(Player player) {
@@ -118,12 +122,12 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     
@@ -163,13 +167,13 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     private AnimationController<BigSolarPanelEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
+        return new AnimationController<>("machine", state -> {
             
             if (!isActive(getBlockState()))
                 return state.setAndContinue(MachineBlockEntity.PACKAGED);
             
             if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
+                if (state.controller().hasAnimationFinished()) {
                     return state.setAndContinue(MachineBlockEntity.IDLE);
                 } else {
                     return state.setAndContinue(MachineBlockEntity.SETUP);
@@ -205,7 +209,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     }
     
     public long getAdjustedTimeOfDay() {
-        return (level.getDayTime() + getTimeOffset()) % 24000;
+        return (level.getDefaultClockTime() + getTimeOffset()) % 24000;
     }
     
     public int getTimeOffset() {

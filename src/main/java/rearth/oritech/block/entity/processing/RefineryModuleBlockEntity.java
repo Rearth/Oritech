@@ -135,12 +135,12 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     

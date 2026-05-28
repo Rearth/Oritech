@@ -38,7 +38,7 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
         var worldPosB = (BlockPos) Geometry.offsetToWorldPosition(facing, posB, pos);
         var offset = worldPosA.subtract(coreWorldPosA);
         
-        var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ());
+        var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
         
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         

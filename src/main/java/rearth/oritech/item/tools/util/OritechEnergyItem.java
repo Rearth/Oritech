@@ -63,7 +63,7 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
     }
     
     @Override
-    default EnergyApi.EnergyStorage getEnergyStorage(ItemStack stack) {
+    default DynamicEnergyStorage getEnergyStorage(ItemStack stack) {
         return new SimpleEnergyItemStorage(getEnergyMaxInput(stack), getEnergyMaxOutput(stack), getEnergyCapacity(stack), stack);
     }
 }

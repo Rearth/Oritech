@@ -189,7 +189,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements ExtendedMenuPr
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
 }

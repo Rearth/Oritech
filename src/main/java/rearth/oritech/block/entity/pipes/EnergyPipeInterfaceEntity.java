@@ -24,7 +24,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     private final SimpleEnergyStorage energyStorage;
     private final boolean isSuperConductor;
     
-    private List<ExtractablePipeInterfaceEntity.CachedTarget<EnergyApi.EnergyStorage>> cachedTargets = new ArrayList<>();
+    private List<ExtractablePipeInterfaceEntity.CachedTarget<DynamicEnergyStorage>> cachedTargets = new ArrayList<>();
     private int cacheHash;
     
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
@@ -53,7 +53,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

@@ -258,12 +258,12 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
     

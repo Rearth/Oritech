@@ -12,23 +12,24 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 // progress is abused to sync active speed.
-public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidApi.BlockProvider {
+public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
     
     private static final int MAX_SPEED = 10;
     private static final int MAX_CHAIN_SIZE = 20;
@@ -80,7 +81,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         if (level.isClientSide() || !isAssembled(state)) return;
         
         var slaved = inSlaveMode();
-        var hasInput = !boilerStorage.getInStack().isEmpty();
+        var hasInput = boilerStorage.getInputContainer().getAmountAsInt(0) > 0;
         if (level.getGameTime() % 80 == 0 && !slaved && hasInput)
             setupMaster();
         
@@ -99,46 +100,47 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var waterTank = boilerStorage.getOutputContainer();
         
         // optional config stops (energy full / water full)
-        if (energyStorage.getAmount() >= energyStorage.getCapacity() && OritechConfig.generators.steamEngineData.stopOnEnergyFull.get())
+        if (energyStorage.getAmountAsLong() >= energyStorage.getCapacityAsLong() && OritechConfig.generators.steamEngineData.stopOnEnergyFull.get())
             return;
-        if (waterTank.getStack().getAmount() >= waterTank.getCapacity() && OritechConfig.generators.steamEngineData.stopOnWaterFull.get())
+        if (waterTank.getAmountAsInt(0) >= boilerStorage.getCapacity() && OritechConfig.generators.steamEngineData.stopOnWaterFull.get())
             return;
         
-        // if not recipe is currently set, or it does not match the steam tank, search for a recipe
-        if (currentRecipe == OritechRecipe.EMPTY || !currentRecipe.getFluidInput().matchesFluid(steamTank.getStack())) {
-            var candidate = FluidMultiblockGeneratorBlockEntity.getRecipe(steamTank, level, getOwnRecipeType());
-            candidate.ifPresent(recipe -> currentRecipe = recipe.value());
-            if (candidate.isEmpty()) return;
-            currentRecipe = candidate.get().value();
+        currentRecipe = findActiveRecipe();
+        if (currentRecipe.isEmpty()) {
+            return;
         }
         
-        var speed = getSteamProcessingSpeed(steamTank);
+        var speed = getSteamProcessingSpeed();
         var workerCount = slaves.size() + 1;
         
-        var consumedCount = currentRecipe.getFluidInput().amount() * speed * workerCount * STEAM_AMOUNT_MULTIPLIER;
-        var producedCount = consumedCount * WATER_RATIO;
-        
+        var consumedCount = currentRecipe.fluidInput().amount() * speed * workerCount * STEAM_AMOUNT_MULTIPLIER;
         consumedCount = Math.max(consumedCount, 1);
-        producedCount = Math.max(producedCount, 1);
         
-        // update tanks
-        steamTank.extract(steamTank.getStack().copyWithAmount((long) consumedCount), false);
-        waterTank.insert(FluidStack.create(Fluids.WATER, (long) producedCount), false);
-        
-        // produce energy
-        var energyEfficiency = getSteamEnergyEfficiency(speed);
-        var energyProduced = consumedCount * energyEfficiency * energyPerTick / STEAM_AMOUNT_MULTIPLIER;
-        energyStorage.insertIgnoringLimit((long) energyProduced, false);
+        try (var transaction = Transaction.openRoot()) {
+            // update tanks
+            var steamTaken = steamTank.extract(steamTank.getResource(0), (int) consumedCount, transaction);
+            
+            var producedCount = steamTaken * WATER_RATIO;
+            producedCount = Math.max(producedCount, 1);
+            
+            var waterInserted = waterTank.insert(FluidResource.of(Fluids.WATER), (int) producedCount, transaction);
+            
+            // produce energy
+            var energyEfficiency = getSteamEnergyEfficiency(speed);
+            var energyProduced = steamTaken * energyEfficiency * energyPerTick / STEAM_AMOUNT_MULTIPLIER;
+            var energyInserted = energyStorage.internalInsert((long) energyProduced, transaction);
+            
+            if (steamTaken <= 0) return;
+            
+            transaction.commit();
+            clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+        }
         
         spawnParticles();
         lastWorkedAt = level.getGameTime();
         
         // used for animation speed
-        progress = (int) (speed * 100f);
-        
-        // order/data: speed, efficiency, rf produced, steam consumed, slave count
-        clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
-        this.setChanged();
+        progress.set((int) (speed * 100));
         
     }
     
@@ -156,7 +158,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         }
         
         // used for animation speed
-        progress = (int) (speed * 100f);
+        progress.set((int) (speed * 100f));
     }
     
     private void setupMaster() {
@@ -172,7 +174,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
                     checkPos = coreCandidate.get().getControllerPos();
                 
                 var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
-                if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) {
+                if (candidate.isEmpty() || !candidate.get().isAssembled(candidate.get().getBlockState())) {
                     break;
                 } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {
                     break;
@@ -192,12 +194,17 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public boolean boilerAcceptsInput(Fluid fluid) {
-        return BuiltInRegistries.FLUID.wrapAsHolder(fluid).is(TagContent.STEAM);
+    protected OritechRecipeInput getRecipeInput() {
+        return new OritechRecipeInput(List.of(), boilerStorage.getInStack());
+    }
+    
+    @Override
+    public boolean boilerAcceptsInput(FluidResource fluid) {
+        return fluid.is(TagContent.STEAM);
     }
     
     private void spawnParticles() {
-        if (level.random.nextFloat() > 0.5) return;
+        if (level.getRandom().nextFloat() > 0.5) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0, -0.5), facing);
@@ -217,15 +224,15 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         super.loadAdditional(input);
     }
     
-    private float getSteamProcessingSpeed(FluidApi.SingleSlotStorage usedTank) {
-        var fillPercentage = usedTank.getStack().getAmount() / (float) usedTank.getCapacity();
+    private float getSteamProcessingSpeed() {
+        var fillPercentage = boilerStorage.getInStack().getAmount() / (float) boilerStorage.getCapacity();
         return fillPercentage * MAX_SPEED;
     }
     
     @Override
     protected float getAnimationSpeed() {
-        if (progress == 0) return 1;
-        return (float) progress / 100f;
+        if (progress.isEmpty()) return 1;
+        return (float) progress.get() / 100f;
     }
     
     @Override
@@ -254,7 +261,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+    public List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
         return List.of(boilerStorage.getOutputContainer(), boilerStorage.getInputContainer());
     }
     
@@ -328,7 +335,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
     
     @Override
-    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         if (inSlaveMode()) return master.boilerStorage;
         return boilerStorage;
     }

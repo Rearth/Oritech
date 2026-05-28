@@ -170,7 +170,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             if (data.machineInterfaces.containsKey(node)) {
                 for (var machinePos : data.machineInterfaces.get(node)) {
                     var offset = machinePos.subtract(node);
-                    var direction = Direction.fromDelta(offset.getX(), offset.getY(), offset.getZ()).getOpposite();
+                    var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ()).getOpposite();
                     res.add(new Tuple<>(machinePos, direction));
                 }
             }

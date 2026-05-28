@@ -214,7 +214,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     
@@ -296,7 +296,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForAddon() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon() {
         return inventory;
     }
     
@@ -373,12 +373,12 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -437,7 +437,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
         return inventory;
     }
     

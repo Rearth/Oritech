@@ -27,7 +27,7 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     private final ResourceHandler<FluidResource> outputContainer;
     
     public InOutFluidStorage(int capacity, Runnable onUpdate, ContainerSlotAssignment slotAssignment) {
-        super(1, capacity);
+        super(2, capacity);
         this.onUpdate = onUpdate;
         this.slotAssignment = slotAssignment;
         
@@ -88,6 +88,14 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     
     public ResourceHandler<FluidResource> getOutputContainer() {
         return outputContainer;
+    }
+    
+    public FluidStack getInStack() {
+        return stacks.get(0);
+    }
+    
+    public FluidStack getOutStack() {
+        return stacks.get(1);
     }
     
     @Override

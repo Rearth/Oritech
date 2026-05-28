@@ -281,7 +281,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidApi.Bl
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
         return energyStorage;
     }
     

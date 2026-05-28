@@ -53,7 +53,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(ItemStack stack) {
+    public DynamicEnergyStorage getEnergyStorage(ItemStack stack) {
         return new SimpleEnergyItemStorage(OritechConfig.smallEnergyStorage.maxEnergyInsertion.get(), OritechConfig.smallEnergyStorage.maxEnergyExtraction.get(), OritechConfig.smallEnergyStorage.energyCapacity.get(), stack);
     }
 }
