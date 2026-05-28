@@ -18,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.util.Geometry;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.renderer.GeoBlockRenderer;
 
 import java.util.HashMap;
 import java.util.Objects;

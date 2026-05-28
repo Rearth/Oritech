@@ -3,7 +3,7 @@ package rearth.oritech.client.renderers;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.PortalEntity;
-import software.bernie.geckolib.model.GeoModel;
+import com.geckolib.model.GeoModel;
 
 public class PortalEntityModel extends GeoModel<PortalEntity> {
     @Override

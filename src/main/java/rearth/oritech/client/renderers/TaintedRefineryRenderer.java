@@ -11,9 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.util.ColorHelper;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.renderer.GeoBlockRenderer;
 
 public class TaintedRefineryRenderer<T extends TaintedRefineryBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     

@@ -4,10 +4,10 @@ import net.minecraft.util.Tuple;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.util.Geometry;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.model.DefaultedBlockGeoModel;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.animation.AnimationState;
+import com.geckolib.cache.object.GeoBone;
+import com.geckolib.model.DefaultedBlockGeoModel;
 
 import java.util.HashMap;
 

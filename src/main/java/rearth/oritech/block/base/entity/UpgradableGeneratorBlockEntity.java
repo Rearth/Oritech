@@ -280,10 +280,6 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
         return 1 - ((float) progress.get() / currentMaxBurnTime);
     }
     
-    public void setCurrentMaxBurnTime(int currentMaxBurnTime) {
-        this.currentMaxBurnTime = currentMaxBurnTime;
-    }
-    
     @Override
     public long getDefaultInsertRate() {
         return 0;

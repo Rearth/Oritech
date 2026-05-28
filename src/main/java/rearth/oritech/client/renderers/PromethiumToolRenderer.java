@@ -2,8 +2,8 @@ package rearth.oritech.client.renderers;
 
 import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
+import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 public class PromethiumToolRenderer extends GeoItemRenderer<PromethiumPickaxeItem> {
     public PromethiumToolRenderer(String modelName) {

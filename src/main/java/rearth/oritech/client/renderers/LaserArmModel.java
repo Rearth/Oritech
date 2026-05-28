@@ -8,9 +8,9 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2f;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.Geometry;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.animation.AnimationState;
-import software.bernie.geckolib.cache.object.GeoBone;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.animation.AnimationState;
+import com.geckolib.cache.object.GeoBone;
 
 import java.util.HashMap;
 

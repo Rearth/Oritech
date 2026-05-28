@@ -2,7 +2,7 @@ package rearth.oritech.client.renderers;
 
 import net.minecraft.resources.Identifier;
 import rearth.oritech.item.tools.PortableLaserItem;
-import software.bernie.geckolib.model.DefaultedItemGeoModel;
+import com.geckolib.model.DefaultedItemGeoModel;
 
 public class PortableLaserModel extends DefaultedItemGeoModel<PortableLaserItem> {
     

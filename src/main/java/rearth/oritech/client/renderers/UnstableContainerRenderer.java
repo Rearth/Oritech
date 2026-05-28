@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.cache.object.BakedGeoModel;
 
 public class UnstableContainerRenderer extends MachineRenderer<UnstableContainerBlockEntity> {
     

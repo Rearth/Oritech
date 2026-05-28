@@ -10,11 +10,11 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
-import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.cache.object.GeoQuad;
-import software.bernie.geckolib.cache.object.GeoVertex;
-import software.bernie.geckolib.cache.texture.AnimatableTexture;
-import software.bernie.geckolib.renderer.specialty.DynamicGeoBlockRenderer;
+import com.geckolib.cache.object.GeoBone;
+import com.geckolib.cache.object.GeoQuad;
+import com.geckolib.cache.object.GeoVertex;
+import com.geckolib.cache.texture.AnimatableTexture;
+import com.geckolib.renderer.specialty.DynamicGeoBlockRenderer;
 
 public class ShrinkerBlockRenderer extends DynamicGeoBlockRenderer<ShrinkerBlockEntity> {
     

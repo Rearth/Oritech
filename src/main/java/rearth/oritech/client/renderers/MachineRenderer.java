@@ -7,12 +7,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.cache.texture.AutoGlowingTexture;
-import software.bernie.geckolib.cache.texture.GeoAbstractTexture;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
-import software.bernie.geckolib.renderer.GeoRenderer;
-import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.cache.texture.AutoGlowingTexture;
+import com.geckolib.cache.texture.GeoAbstractTexture;
+import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.GeoRenderer;
+import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public MachineRenderer(String modelPath) {

@@ -4,8 +4,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.Oritech;
 import rearth.oritech.util.ColorableMachine;
-import software.bernie.geckolib.animatable.GeoAnimatable;
-import software.bernie.geckolib.model.DefaultedBlockGeoModel;
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.model.DefaultedBlockGeoModel;
 
 import java.util.Locale;
 

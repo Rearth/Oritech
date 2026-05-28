@@ -6,7 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
-import software.bernie.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.GeoBlockRenderer;
 
 public class HangarDoorRenderer extends GeoBlockRenderer<HangarDoorBlockEntity> {
     

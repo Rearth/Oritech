@@ -12,10 +12,10 @@ import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.util.PortalEntity;
-import software.bernie.geckolib.cache.object.GeoBone;
-import software.bernie.geckolib.renderer.GeoEntityRenderer;
-import software.bernie.geckolib.renderer.GeoRenderer;
-import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
+import com.geckolib.cache.object.GeoBone;
+import com.geckolib.renderer.GeoEntityRenderer;
+import com.geckolib.renderer.GeoRenderer;
+import com.geckolib.renderer.layer.GeoRenderLayer;
 
 public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {
     public PortalEntityRenderer(EntityRendererProvider.Context renderManager) {

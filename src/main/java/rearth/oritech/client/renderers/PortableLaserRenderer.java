@@ -15,9 +15,9 @@ import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
-import software.bernie.geckolib.cache.object.BakedGeoModel;
-import software.bernie.geckolib.renderer.GeoItemRenderer;
-import software.bernie.geckolib.renderer.layer.AutoGlowingGeoLayer;
+import com.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 import static rearth.oritech.client.renderers.LaserArmRenderer.BEAM_TEXTURE;
 
