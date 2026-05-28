@@ -44,10 +44,10 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity, 
     }
     
     private AnimationController<TechDoorBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
+        return new AnimationController<>("machine", state -> {
             
             // increase animation speed when newly loaded in, to avoid visible animation when initializing
-            if (state.controller().getCurrentAnimation() == null) {
+            if (state.controller().getCurrentRawAnimation() == null) {
                 state.setControllerSpeed(100);
                 delayedTimerReset(state);
             }

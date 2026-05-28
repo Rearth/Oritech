@@ -40,8 +40,8 @@ public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity
     }
     
     private AnimationController<HangarDoorBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
-            if (state.controller().getCurrentAnimation() == null) {
+        return new AnimationController<>("machine", state -> {
+            if (state.controller().getCurrentRawAnimation() == null) {
                 state.controller().setAnimation(MachineBlockEntity.IDLE);
             }
             
