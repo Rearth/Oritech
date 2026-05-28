@@ -75,7 +75,10 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
     public NonNullList<ItemStack> getStacks() {
         return stacks;
     }
-
+    
+    public ItemStack getItem(int index) {
+        return getStacks().get(index);
+    }
 
     public void serialize(ValueOutput output) {
         output.store("items", ItemStack.OPTIONAL_CODEC.listOf(), stacks);

@@ -6,29 +6,27 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
+import net.minecraft.util.ProblemReporter;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
@@ -36,9 +34,9 @@ import java.util.UUID;
 
 public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity implements BlockEntityTicker<SpawnerControllerBlockEntity>, ComparatorOutputProvider {
     private static final String[] STRIPPED_MOB_NBT_KEYS = {
-        "ArmorDropChances", "ArmorItems", "BodyArmorDropChance", "body_armor_drop_chance", "BodyArmorItem", "body_armor_item",
-        "CanPickUpLoot", "ChestedHorse", "DecorItem", "HandDropChances", "HandItems", "Inventory", "Item", "Items",
-        "Leash", "Passengers", "SaddleItem"
+      "ArmorDropChances", "ArmorItems", "BodyArmorDropChance", "body_armor_drop_chance", "BodyArmorItem", "body_armor_item",
+      "CanPickUpLoot", "ChestedHorse", "DecorItem", "HandDropChances", "HandItems", "Inventory", "Item", "Items",
+      "Leash", "Passengers", "SaddleItem"
     };
     
     public int maxSouls = 100_000;
@@ -56,18 +54,18 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     public float lastProgress = 0f;
     
     public SpawnerControllerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
         if (level.isClientSide()) return;
-
+        
         if (networkDirty) {
             updateNetwork();
             DeathListener.resetEvents();
         }
-
+        
         if (mobNbt.isEmpty() || !hasCage || redstonePowered) return;
         
         if (collectedSouls >= maxSouls && level.getGameTime() % 4 == 0) {
@@ -102,16 +100,23 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     private void spawnMob() {
         // try and find a valid position within 10 attempts
         
-        var spawned = EntityType.loadEntityRecursive(mobNbt, level, (entity) -> {
+        var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> {
             var spawnRange = 4;
             var requiredHeight = Math.round(entity.getBbHeight() + 0.5f);
             var targetPosition = findSpawnPosition(spawnRange, requiredHeight);
             
             if (targetPosition == null) return null;
-            entity.moveTo(Vec3.atLowerCornerOf(targetPosition));
+            
+            var center = targetPosition.getCenter();
+            entity.teleportTo(center.x, center.y, center.z);
             entity.setUUID(UUID.randomUUID());
+            
             clearMobEquipment(entity);
-            if (level instanceof ServerLevel sl) { var c = targetPosition.getCenter(); sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0); }
+            
+            if (level instanceof ServerLevel sl) {
+                var c = targetPosition.getCenter();
+                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0);
+            }
             
             return entity;
         });
@@ -126,7 +131,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     
     private BlockPos findSpawnPosition(int spawnRange, int requiredHeight) {
         for (int i = 0; i < 10; i++) {
-            var candidate = worldPosition.offset(level.random.nextIntBetweenInclusive(-spawnRange, spawnRange), 3, level.random.nextIntBetweenInclusive(-spawnRange, spawnRange));
+            var candidate = worldPosition.offset(level.getRandom().nextIntBetweenInclusive(-spawnRange, spawnRange), 3, level.getRandom().nextIntBetweenInclusive(-spawnRange, spawnRange));
             var foundFree = 0;
             for (int j = 0; j < 9; j++) {
                 var state = level.getBlockState(candidate.below(j));
@@ -169,7 +174,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     
     public void loadRendererFromUpdate() {
         
-        var spawned = EntityType.loadEntityRecursive(mobNbt, level, (entity) -> entity);
+        var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> entity);
         if (spawned == null) return;
         
         if (renderedEntity == null || spawned.getType() != renderedEntity.getType()) {
@@ -230,15 +235,16 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         if (entity instanceof Mob mobEntity) {
             
-            if (mobEntity.getType().arch$holder().is(TagContent.SPAWNER_BLACKLIST)) {
-                Oritech.LOGGER.debug("Ignored blacklisted entity for spawner: " + mobEntity.getType().arch$registryName());
+            if (mobEntity.getType().builtInRegistryHolder().is(TagContent.SPAWNER_BLACKLIST)) {
+                Oritech.LOGGER.debug("Ignored blacklisted entity for spawner: " + mobEntity.getType());
                 return;
             }
             
-            var nbt = new CompoundTag();
+            var output = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
             
-            mobEntity.save(nbt);
-            this.mobNbt = sanitizeMobNbt(nbt);
+            mobEntity.save(output);
+            var mobNbt = output.buildResult();
+            this.mobNbt = sanitizeMobNbt(mobNbt);
             
             maxSouls = getSoulCost((int) mobEntity.getMaxHealth());
             
@@ -264,7 +270,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     
     private void reloadCage(@Nullable Player player) {
         
-        var spawned = EntityType.loadEntityRecursive(mobNbt, level, (entity) -> entity);
+        var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> entity);
         if (spawned == null) return;
         
         var cageSize = new Vec3i(Math.round(spawned.getBbWidth() * 2 + 0.5f), Math.round(spawned.getBbHeight() + 0.5f), Math.round(spawned.getBbWidth() * 2 + 0.5f));
@@ -293,7 +299,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         
         this.setChanged();
     }
-
+    
     private CompoundTag sanitizeMobNbt(CompoundTag nbt) {
         var sanitizedNbt = nbt.copy();
         for (var key : STRIPPED_MOB_NBT_KEYS) {
@@ -301,10 +307,10 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         }
         return sanitizedNbt;
     }
-
+    
     private void clearMobEquipment(Entity entity) {
         if (!(entity instanceof Mob mobEntity)) return;
-
+        
         for (var slot : EquipmentSlot.values()) {
             mobEntity.setItemSlot(slot, ItemStack.EMPTY);
         }

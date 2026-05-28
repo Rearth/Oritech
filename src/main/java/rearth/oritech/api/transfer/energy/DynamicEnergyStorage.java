@@ -120,9 +120,9 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
     @Override
     public void deserialize(ValueInput input) {
         this.energy = input.getLongOr("energy", 0L);
-        this.capacity = input.getLongOr("capacity", 0L);
-        this.maxInsert = input.getLongOr("maxInsert", 0L);
-        this.maxExtract = input.getLongOr("maxExtract", 0L);
+        this.capacity = input.getLongOr("capacity", capacity);
+        this.maxInsert = input.getLongOr("maxInsert", maxInsert);
+        this.maxExtract = input.getLongOr("maxExtract", maxExtract);
     }
     
     @Override

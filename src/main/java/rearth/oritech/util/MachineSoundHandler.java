@@ -29,6 +29,10 @@ public class MachineSoundHandler<A extends GeoAnimatable> implements AnimationCo
         this.speedSupplier = speedSupplier;
     }
     
+    public MachineSoundHandler() {
+        this(() -> 1f);
+    }
+    
     @Override
     public void handle(KeyFrameEvent<A, SoundKeyframeData> event) {
         var level = ClientUtil.getLevel();

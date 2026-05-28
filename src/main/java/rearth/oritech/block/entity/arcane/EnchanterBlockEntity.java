@@ -1,15 +1,22 @@
 package rearth.oritech.block.entity.arcane;
 
-import net.minecraft.core.*;
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.util.GeckoLibUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,19 +47,12 @@ import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.EnchanterScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.util.MachineSoundHandler;
-import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.ScreenProvider;
-import com.geckolib.animatable.GeoBlockEntity;
-import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animatable.manager.AnimatableManager;
-import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.object.PlayState;
-import com.geckolib.animation.RawAnimation;
-import com.geckolib.util.GeckoLibUtil;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,18 +105,20 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
         
         // return early if there is no work to do
         statistics = EnchanterStatistics.EMPTY;
-        var content = inventory.getStacks().get(0);
+        
+        var content = inventory.getStacks().getFirst();
+        
         if (content.isEmpty()
-              || !inventory.getItem(1).isEmpty()
-              || !content.getItem().isEnchantable(content)
+              || !inventory.getResource(1).isEmpty()
+              || !content.isEnchantable()
               || selectedEnchantment.equals(NONE_SELECTED)
               || !getSelectedEnchantment().isBound()
-              || !getSelectedEnchantment().value().canEnchant(content)) {
+              || !content.supportsEnchantment(getSelectedEnchantment())) {
             progress = 0;
             return;
         }
         
-        var existingLevel = content.getEnchantments().getLevel(getSelectedEnchantment());
+        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
         var maxLevel = getSelectedEnchantment().value().getMaxLevel();
         
         if (existingLevel >= maxLevel) return;
@@ -155,15 +157,15 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     
     public Holder<Enchantment> getSelectedEnchantment() {
         if (selectedEnchantment.equals(NONE_SELECTED)) return null;
-        var registry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-        return registry.wrapAsHolder(registry.get(selectedEnchantment));
+        var registry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value();
+        return registry.wrapAsHolder(registry.get(selectedEnchantment).orElseThrow().value());
     }
     
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         inventory.serialize(output);
-        output.putLong("energy", energyStorage.energy);
+        energyStorage.serialize(output);
         output.store("selected", Identifier.CODEC, selectedEnchantment);
     }
     
@@ -171,13 +173,13 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         inventory.deserialize(input);
-        energyStorage.energy = input.getLongOr("energy", 0);
+        energyStorage.deserialize(input);
         selectedEnchantment = input.read("selected", Identifier.CODEC).orElse(NONE_SELECTED);
     }
     
     private void finishEnchanting() {
-        var content = inventory.getStacks().get(0);
-        var existingLevel = content.getEnchantments().getLevel(getSelectedEnchantment());
+        var content = inventory.getStacks().getFirst();
+        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
         content.enchant(getSelectedEnchantment(), existingLevel + 1);
         
         inventory.getStacks().set(0, ItemStack.EMPTY);
@@ -224,11 +226,11 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 4, state -> PlayState.CONTINUE)
+        controllers.add(new AnimationController<>("machine", 4, state -> PlayState.CONTINUE)
                           .triggerableAnim("working", WORKING)
                           .triggerableAnim("idle", IDLE)
                           .triggerableAnim("unpowered", UNPOWERED)
-                          .setSoundKeyframeHandler(new MachineSoundHandler<>()));
+                          .setSoundKeyframeHandler(new MachineSoundHandler<>(() -> 1f)));
     }
     
     @Override
