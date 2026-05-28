@@ -116,7 +116,7 @@ public class OritechConfig {
         COMMON.pop();
     }
     
-        // Level generation
+    // Level generation
     static {
         COMMON.push("worldGeneration");
     }

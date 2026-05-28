@@ -32,10 +32,10 @@ public class CatalystScreen extends OritechMachineScreen<CatalystScreenHandler> 
         costLabel = new LabelWidget(56, 58, 40, 10, Component.translatable("message.oritech.catalyst.cost", 0));
         costLabel.withDarkColor();
         costLabel.setVisible(false);
-
+        
         stabilizationLabel = new LabelWidget(101, 39, 60, 10, Component.translatable("title.oritech.catalyst.stable"));
         stabilizationLabel.withDarkColor();
-
+        
         var slotConfig = menu.screenData.getGuiSlots().getFirst();
         addComponent(new TextureWidget(slotConfig.x(), slotConfig.y(), 16, 16, BOOK_SLOT, 16, 16));
         addComponent(costLabel);
@@ -47,7 +47,7 @@ public class CatalystScreen extends OritechMachineScreen<CatalystScreenHandler> 
         var cost = menu.catalyst.getDisplayedCost();
         costLabel.setText(Component.translatable("message.oritech.catalyst.cost", cost).withStyle(ChatFormatting.BLACK));
         costLabel.setVisible(cost > 0);
-
+        
         var result = getStabilizationTitle();
         stabilizationLabel.setText(result.withStyle(ChatFormatting.BLACK));
     }
@@ -64,19 +64,19 @@ public class CatalystScreen extends OritechMachineScreen<CatalystScreenHandler> 
         
         if (soulBonus > 0 && currentSouls >= baseSouls) {
             if (free > 5) {
-                result = Component.translatable("title.oritech.catalyst.stabilized");;
+                result = Component.translatable("title.oritech.catalyst.stabilized");
             } else if (free > 0) {
-                result = Component.translatable("title.oritech.catalyst.semi_stable");;
+                result = Component.translatable("title.oritech.catalyst.semi_stable");
             } else {
-                result = Component.translatable("title.oritech.catalyst.unstable");;
+                result = Component.translatable("title.oritech.catalyst.unstable");
             }
         } else {
             if (free > 5) {
-                result = Component.translatable("title.oritech.catalyst.stable");;
+                result = Component.translatable("title.oritech.catalyst.stable");
             } else if (free > 0) {
-                result = Component.translatable("title.oritech.catalyst.semi_stable");;
+                result = Component.translatable("title.oritech.catalyst.semi_stable");
             } else {
-                result = Component.translatable("title.oritech.catalyst.stable");;
+                result = Component.translatable("title.oritech.catalyst.stable");
             }
         }
         return result;

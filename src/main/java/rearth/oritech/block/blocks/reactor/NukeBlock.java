@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 
 import java.util.List;
 

@@ -31,7 +31,7 @@ public class ScrollWidget extends UIComponent {
     private boolean horizontalScroll = false;
     private boolean dragScrolling = false;
     private int scrollSpeed = 10;
-    private int innerMargin = 4;
+    private final int innerMargin = 4;
     
     public ScrollWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -52,7 +52,7 @@ public class ScrollWidget extends UIComponent {
         this.scrollSpeed = speed;
         return this;
     }
-
+    
     public ScrollWidget withDragScrolling(boolean enabled) {
         this.dragScrolling = enabled;
         return this;
@@ -91,52 +91,57 @@ public class ScrollWidget extends UIComponent {
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
         return handleMouseScroll(mouseX, mouseY, scrollDelta, Screen.hasShiftDown());
     }
-
+    
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
         if (!isMouseOver(mouseX, mouseY)) return false;
-
+        
         double adjX = mouseX - (x + innerMargin) + scrollX;
         double adjY = mouseY - (y + innerMargin) + scrollY;
-
+        
         var sorted = new ArrayList<>(children);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
-
+        
         for (var child : sorted) {
             if (child.isVisible() && child.isMouseOver(adjX, adjY) && child.handleClick(adjX, adjY, button)) {
                 return true;
             }
         }
-
+        
         for (var child : sorted) {
             if (child.isVisible() && child.isMouseOver(adjX, adjY)) {
                 return true;
             }
         }
-
+        
         return true;
     }
-
+    
     @Override
     public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
         if (!dragScrolling || button != 0) return false;
-
+        
         int viewW = width - innerMargin * 2;
         int viewH = height - innerMargin * 2;
-
+        
         if (horizontalScroll) {
             scrollX = Mth.clamp((int) Math.round(scrollX - deltaX), 0, Math.max(0, contentTotalWidth - viewW));
         }
-
+        
         if (verticalScroll) {
             scrollY = Mth.clamp((int) Math.round(scrollY - deltaY), 0, Math.max(0, contentTotalHeight - viewH));
         }
-
+        
         return horizontalScroll || verticalScroll;
     }
     
-    public float getScrollX() { return scrollX; }
-    public float getScrollY() { return scrollY; }
+    public float getScrollX() {
+        return scrollX;
+    }
+    
+    public float getScrollY() {
+        return scrollY;
+    }
     
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {

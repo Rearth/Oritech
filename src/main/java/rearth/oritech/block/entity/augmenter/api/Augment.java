@@ -2,51 +2,16 @@ package rearth.oritech.block.entity.augmenter.api;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
-import rearth.oritech.Oritech;
-import rearth.oritech.api.attachment.Attachment;
-import rearth.oritech.api.attachment.AttachmentApi;
-import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.init.AttachmentContent;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 // all events / methods here are called just on the server (except for refreshClient()). However the augments are also present and loaded
 // on the client with all their data and recipe.
 public abstract class Augment {
-    
-    public static final Attachment<Map<Identifier, AugmentState>> ACTIVE_AUGMENTS_DATA = new Attachment<>() {
-        @Override
-        public Identifier identifier() {
-            return Oritech.id("playeraugments");
-        }
-        
-        @Override
-        public Codec<Map<Identifier, AugmentState>> persistenceCodec() {
-            return Codec.unboundedMap(Identifier.CODEC, AugmentState.CODEC);
-        }
-        
-        @SuppressWarnings("unchecked")
-        @Override
-        public StreamCodec<ByteBuf, Map<Identifier, AugmentState>> networkCodec() {
-            return ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, NetworkManager.getAutoCodec(AugmentState.class));
-        }
-        
-        @Override
-        public Supplier<Map<Identifier, AugmentState>> initializer() {
-            return HashMap::new;
-        }
-    };
-    
-    public static void registerAttachmentTypes() {
-        AttachmentApi.register(ACTIVE_AUGMENTS_DATA);
-        AttachmentApi.register(CustomAugmentsCollection.PORTAL_TARGET_TYPE);
-    }
     
     public final Identifier id;
     public final boolean toggleable;
@@ -57,29 +22,29 @@ public abstract class Augment {
     }
     
     public boolean isInstalled(Player player) {
-        var data = AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA);
+        var data = player.getData(AttachmentContent.ACTIVE_AUGMENTS);
         var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
         return !state.equals(AugmentState.NOT_INSTALLED);
     }
     
     public void installToPlayer(Player player) {
-        var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
+        var data = new HashMap<>(player.getData(AttachmentContent.ACTIVE_AUGMENTS));
         data.put(id, AugmentState.ENABLED);
-        AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
+        player.setData(AttachmentContent.ACTIVE_AUGMENTS, data);
         
         activate(player);
     }
     
     public void removeFromPlayer(Player player) {
-        var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
+        var data = new HashMap<>(player.getData(AttachmentContent.ACTIVE_AUGMENTS));
         data.put(id, AugmentState.NOT_INSTALLED);
-        AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
+        player.setData(AttachmentContent.ACTIVE_AUGMENTS, data);
         
         deactivate(player);
     }
     
     public boolean isEnabled(Player player) {
-        var data = AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA);
+        var data = player.getData(AttachmentContent.ACTIVE_AUGMENTS);
         return isEnabled(data);
     }
     
@@ -89,7 +54,7 @@ public abstract class Augment {
     }
     
     public void toggle(Player player) {
-        var data = new HashMap<>(AttachmentApi.getAttachmentValue(player, ACTIVE_AUGMENTS_DATA));
+        var data = new HashMap<>(player.getData(AttachmentContent.ACTIVE_AUGMENTS));
         var state = data.getOrDefault(id, AugmentState.NOT_INSTALLED);
         if (state.equals(AugmentState.ENABLED)) {
             state = AugmentState.DISABLED;
@@ -99,7 +64,7 @@ public abstract class Augment {
             activate(player);
         }
         data.put(id, state);
-        AttachmentApi.setAttachment(player, ACTIVE_AUGMENTS_DATA, data);
+        player.setData(AttachmentContent.ACTIVE_AUGMENTS, data);
     }
     
     // this is called once when the augment is installed / enabled

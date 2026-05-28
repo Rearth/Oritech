@@ -17,12 +17,14 @@ public class ClientCableFinder {
     private static final int POLE_SEARCH_RADIUS = 196;
     
     /**
-     * @param poleA Origin Pole
-     * @param poleB Target Pole
+     * @param poleA         Origin Pole
+     * @param poleB         Target Pole
      * @param selectedStart The specific Vec3 start point of the cable hit (Left or Right cable)
-     * @param selectedEnd The specific Vec3 end point of the cable hit
+     * @param selectedEnd   The specific Vec3 end point of the cable hit
      */
-    public record CableHit(BlockPos poleA, BlockPos poleB, Vec3 selectedStart, Vec3 selectedEnd, Vec3 parallelStart, Vec3 parallelEnd) {}
+    public record CableHit(BlockPos poleA, BlockPos poleB, Vec3 selectedStart, Vec3 selectedEnd, Vec3 parallelStart,
+                           Vec3 parallelEnd) {
+    }
     
     public static CableHit findLookedAtCable(Player player, float reachDistance) {
         var level = Minecraft.getInstance().level;
@@ -89,12 +91,16 @@ public class ClientCableFinder {
                 
                 if (distDirect < distCross) {
                     // direct Connection
-                    cable1Start = startWorldA; cable1End = targetWorldA;
-                    cable2Start = startWorldB; cable2End = targetWorldB;
+                    cable1Start = startWorldA;
+                    cable1End = targetWorldA;
+                    cable2Start = startWorldB;
+                    cable2End = targetWorldB;
                 } else {
                     // crossed Connection
-                    cable1Start = startWorldA; cable1End = targetWorldB;
-                    cable2Start = startWorldB; cable2End = targetWorldA;
+                    cable1Start = startWorldA;
+                    cable1End = targetWorldB;
+                    cable2Start = startWorldB;
+                    cable2End = targetWorldA;
                 }
                 
                 
@@ -138,11 +144,12 @@ public class ClientCableFinder {
                  p.z >= minZ && p.z <= maxZ;
     }
     
-    private record RayResult(double distSq, Vec3 hitPos) {}
+    private record RayResult(double distSq, Vec3 hitPos) {
+    }
     
     private static RayResult raycastCable(Vec3 p1, Vec3 p2, Vec3 eyePos, Vec3 lookDir, float reach, net.minecraft.level.level.Level level) {
         double cableLength = p1.distanceTo(p2);
-        int segments = Mth.clamp((int)(cableLength), 8, 128);
+        int segments = Mth.clamp((int) (cableLength), 8, 128);
         
         double hitRadius = 1.5;
         double hitRadiusSq = hitRadius * hitRadius;
@@ -161,7 +168,7 @@ public class ClientCableFinder {
             if (DEBUG_DRAW) {
                 // Draw a flame every few ticks or segments to reduce lag,
                 // or just draw points.
-                    level.addParticle(ParticleTypes.FLAME, nextPoint.x, nextPoint.y, nextPoint.z, 0, 0, 0);
+                level.addParticle(ParticleTypes.FLAME, nextPoint.x, nextPoint.y, nextPoint.z, 0, 0, 0);
             }
             
             // Math: Closest point on this segment to the view ray

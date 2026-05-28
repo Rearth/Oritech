@@ -45,7 +45,7 @@ public class AugmentSelectionScreen extends Screen {
         if (player == null) return;
         
         var available = new ArrayList<Augment>();
-        for (var augment : PlayerAugments.allAugments.values()) {
+        for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
             if (augment.isInstalled(player) && augment.toggleable) {
                 available.add(augment);
             }
@@ -108,6 +108,9 @@ public class AugmentSelectionScreen extends Screen {
     }
     
     private void drawBackdrop(GuiGraphicsExtractor graphics, SelectionEntry focused) {
+        var player = minecraft != null ? minecraft.player : null;
+        if (player == null) return;
+        
         int screenSize = Math.min(width, height);
         double innerRadius = 0.175;
         double outerRadius = 0.4;
@@ -116,12 +119,12 @@ public class AugmentSelectionScreen extends Screen {
         
         for (int i = 0; i < augmentEntries.size(); i++) {
             var entry = augmentEntries.get(i);
-            var augmentData = PlayerAugments.allAugments.get(entry.id());
+            var augmentData = PlayerAugments.getAugment(player.registryAccess(), entry.id());
             if (augmentData == null) continue;
             
             boolean active = focused == entry;
             int color = ColorHelper.argb(180 / 255f, 30 / 255f, 30 / 255f, 0.3f);
-            if (augmentData.isEnabled(minecraft.player)) {
+            if (augmentData.isEnabled(player)) {
                 color = ColorHelper.argb(30 / 255f, 180 / 255f, 30 / 255f, 0.3f);
             }
             if (active) {
@@ -155,6 +158,7 @@ public class AugmentSelectionScreen extends Screen {
             int size = Math.round(entry.size() * scale);
             int drawX = entry.centerX() - size / 2;
             int drawY = entry.centerY() - size / 2;
+            if (entry.texture() == null) continue;
             
             if (active) {
                 graphics.fill(drawX - 2, drawY - 2, drawX + size + 2, drawY + size + 2, ColorHelper.argb(0.8f, 0.85f, 0.9f, 0.35f));
@@ -165,6 +169,8 @@ public class AugmentSelectionScreen extends Screen {
     }
     
     private void drawLabels(GuiGraphicsExtractor graphics, SelectionEntry focused) {
+        if (minecraft == null) return;
+        
         var centerLabel = Component.literal("Exit");
         if (focused.id() != null) {
             centerLabel = Component.translatable(PlayerModifierScreen.augmentKey(focused.id()));

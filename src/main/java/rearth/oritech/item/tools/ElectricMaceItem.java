@@ -80,7 +80,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     
     private void createLightningAttack(ServerLevel level, Player attacker, LivingEntity target, ItemStack stack, int damage) {
         
-        var usedEnergy = tryUseEnergy(stack, OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
+        var usedEnergy = tryUseEnergy(stack, (long) OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
         if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
             
             var playerPos = attacker.getEyePosition();

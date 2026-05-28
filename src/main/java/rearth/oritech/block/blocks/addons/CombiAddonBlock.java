@@ -68,13 +68,13 @@ public class CombiAddonBlock extends MachineAddonBlock {
         if (usedSettings.speed() != 1) {
             var displayedNumber = Math.round((1 / usedSettings.speed() - 1) * 100);
             foundTexts.add(Component.translatable("tooltip.oritech.addon_speed_desc").withStyle(ChatFormatting.DARK_GRAY)
-                          .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
+                             .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
         }
         
         if (usedSettings.efficiency() != 1) {
             var displayedNumber = Math.round((1 - usedSettings.efficiency()) * 100);
             foundTexts.add(Component.translatable("tooltip.oritech.addon_efficiency_desc").withStyle(ChatFormatting.DARK_GRAY)
-                          .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
+                             .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
         }
         
         if (usedSettings.energyBonusCapacity() != 0) {
@@ -85,7 +85,7 @@ public class CombiAddonBlock extends MachineAddonBlock {
         
         if (usedSettings.energyBonusTransfer() != 0) {
             foundTexts.add(Component.translatable("tooltip.oritech.addon_transfer_desc").withStyle(ChatFormatting.DARK_GRAY)
-                          .append(TooltipHelper.getFormattedEnergyChangeTooltip(usedSettings.energyBonusTransfer(), " RF/t")));
+                             .append(TooltipHelper.getFormattedEnergyChangeTooltip(usedSettings.energyBonusTransfer(), " RF/t")));
         }
         
         if (usedSettings.maxBurstTicks() != 0) {

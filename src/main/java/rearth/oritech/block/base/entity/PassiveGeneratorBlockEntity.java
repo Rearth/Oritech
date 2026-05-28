@@ -51,14 +51,14 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
     }
     
     private void outputEnergy(Transaction transaction) {
-        if (energyStorage.getAmountAsLong() <= 0 ||  !(level instanceof ServerLevel serverLevel)) return;
-
+        if (energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
+        
         if (cachedOutputTargets.isEmpty()) {
             cachedOutputTargets = getOutputTargets(worldPosition, level).stream()
                                     .map(target -> BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getA(), target.getB()))
                                     .toList();
         }
-
+        
         var available = energyStorage.getAmountAsLong();
         
         for (var target : cachedOutputTargets) {

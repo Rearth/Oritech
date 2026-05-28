@@ -12,42 +12,42 @@ import rearth.oritech.util.ComparatorOutputProvider;
 import java.util.List;
 
 public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
-
+    
     public CreativeStorageBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.CREATIVE_STORAGE_ENTITY.get(), pos, state);
     }
-
+    
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of();
     }
-
+    
     @Override
     public long getDefaultCapacity() {
         return Integer.MAX_VALUE;
     }
-
+    
     @Override
     public long getDefaultInsertRate() {
         return Integer.MAX_VALUE;
     }
-
+    
     @Override
     public long getDefaultExtractionRate() {
         return Integer.MAX_VALUE;
     }
-
+    
     @Override
     public int getComparatorOutput() {
         if (energyStorage.energy == 0) return 0;
         return (int) (1 + ((energyStorage.energy / (float) energyStorage.capacity) * 14));
     }
-
+    
     @Override
     public float getCoreQuality() {
         return 0;
     }
-
+    
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         energyStorage.energy = (long) (Integer.MAX_VALUE * 0.9f);

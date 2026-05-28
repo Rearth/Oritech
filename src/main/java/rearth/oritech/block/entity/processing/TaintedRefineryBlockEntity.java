@@ -2,7 +2,9 @@ package rearth.oritech.block.entity.processing;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -35,15 +37,15 @@ import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.TaintedRefineryScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
 
 import java.util.*;
 
@@ -465,6 +467,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public List<Vec3i> getAddonSlots() {
         return List.of();
     }
+    
     @Override
     public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
         return ownStorage;

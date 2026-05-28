@@ -33,7 +33,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
     private final ScreenProvider.ArrowConfiguration indicatorConfig;
     
     public OritechEMIRecipe(RecipeHolder<OritechRecipe> entry, EmiRecipeCategory category, Class<? extends MachineBlockEntity> screenProviderSource, BlockState machineState) {
-        super(category, entry.id(),  150, 69);
+        super(category, entry.id(), 150, 69);
         
         recipe = entry.value();
         recipe.getInputs().forEach(ingredient -> this.inputs.add(EmiIngredient.of(ingredient)));
@@ -88,7 +88,7 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         }
         
         recipe.getFluidOutputs().forEach(stack -> this.outputs.add(EmiStack.of(stack.getFluid(), stack.getAmount())));
-            
+        
     }
     
     @Override
@@ -99,9 +99,9 @@ public class OritechEMIRecipe extends BasicEmiRecipe {
         
         // central arrow/flame
         if (isGenerator) {
-            widgets.addTexture(EmiTexture.FULL_FLAME, indicatorConfig.x() - offsetX, indicatorConfig.y() -  offsetY);
+            widgets.addTexture(EmiTexture.FULL_FLAME, indicatorConfig.x() - offsetX, indicatorConfig.y() - offsetY);
         } else {
-            widgets.addFillingArrow(indicatorConfig.x() - offsetX, indicatorConfig.y() -  offsetY, recipe.getTime() * 20 / 2);
+            widgets.addFillingArrow(indicatorConfig.x() - offsetX, indicatorConfig.y() - offsetY, recipe.getTime() * 20 / 2);
         }
         
         // inputs

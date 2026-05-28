@@ -156,7 +156,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         }
     }
     
-    protected void onProgressed() {}
+    protected void onProgressed() {
+    }
     
     // performance optimized recipe lookup. Verifies that both item and fluid inputs match the recipe.
     protected OritechRecipe findActiveRecipe() {

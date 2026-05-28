@@ -32,9 +32,9 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.FakeMachinePlayer;
 
 import java.util.List;
@@ -283,10 +283,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             return;
         
         if (range > 1 && quarryTarget != BlockPos.ZERO) {
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
         } else if (hasWorkAvailable(getCurrentTarget())) {
             var bp = getCurrentTarget().below();
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
         }
     }
     

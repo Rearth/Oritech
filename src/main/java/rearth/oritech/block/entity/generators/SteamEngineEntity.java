@@ -24,14 +24,14 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.FluidMultiblockGeneratorBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
 
 import java.util.HashSet;
 import java.util.List;
@@ -167,11 +167,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             for (int i = 1; i <= MAX_CHAIN_SIZE; i++) {
                 var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), worldPosition));
                 
-                    var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
+                var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
                 if (coreCandidate.isPresent() && coreCandidate.get().getCachedController() != null)
                     checkPos = coreCandidate.get().getControllerPos();
                 
-                    var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
+                var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
                 if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) {
                     break;
                 } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {
@@ -203,7 +203,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0, -0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
     
     private float getSteamEnergyEfficiency(float x) {
@@ -251,7 +252,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.STEAM_ENGINE_SCREEN.get();
     }
-
+    
     @Override
     public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
         return List.of(boilerStorage.getOutputContainer(), boilerStorage.getInputContainer());

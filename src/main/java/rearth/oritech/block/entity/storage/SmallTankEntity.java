@@ -78,11 +78,11 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
         inventory.deserialize(input);
         setChanged();
     }
-
+    
     public boolean hasStoredFluidForDrops() {
         return fluidStorage.getAmount() > 0;
     }
-
+    
     public FluidStack getStoredFluidForDrops() {
         return fluidStorage.getContent();
     }
@@ -111,22 +111,22 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
     
     private void outputToBelow() {
         if (isCreative) return;
-
+        
         if (cachedOutputTarget == null) {
             if (!(level instanceof ServerLevel serverLevel)) return;
             cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, serverLevel, worldPosition.below(), Direction.UP);
         }
-
+        
         var tankCandidate = cachedOutputTarget.getCapability();
         if (tankCandidate == null) return;
-
+        
         var resource = fluidStorage.getResource(0);
         if (resource.isEmpty()) return;
-
+        
         try (var transaction = Transaction.openRoot()) {
             var inserted = tankCandidate.insert(resource, fluidStorage.getAmount(), transaction);
             if (inserted <= 0) return;
-
+            
             var extracted = fluidStorage.extract(0, resource, inserted, transaction);
             if (extracted == inserted) {
                 transaction.commit();
@@ -146,22 +146,22 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
     // from block entity to item
     private void processInput() {
         var canFill = this.fluidStorage.getAmount() > 0;
-
+        
         if (!canFill) return;
-
+        
         var inputStorage = inventory.getInputContainer();
         var inResource = inputStorage.getResource(0);
         if (inResource.isEmpty()) return;
-
+        
         var inStack = inResource.toStack();
         if (inStack.getCount() > 1) return;
-
+        
         var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inputStorage, 0));
         if (candidate == null) return;
-
+        
         var resource = fluidStorage.getResource(0);
         if (resource.isEmpty()) return;
-
+        
         try (var transaction = Transaction.openRoot()) {
             var inserted = candidate.insert(resource, fluidStorage.getAmount(), transaction);
             if (inserted > 0) {
@@ -172,32 +172,32 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
                 }
             }
         }
-
+        
         moveInputToOutput(0);
     }
-
+    
     // from item to fluid storage
     private void processOutput() {
         var canFill = this.fluidStorage.getAmount() < this.fluidStorage.getCapacity();
-
+        
         if (!canFill) return;
-
+        
         var inputStorage = inventory.getInputContainer();
         var inResource = inputStorage.getResource(1);
         if (inResource.isEmpty()) return;
-
+        
         var inStack = inResource.toStack();
         if (inStack.getCount() > 1) return;
-
+        
         var candidate = inStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forHandlerIndexStrict(inputStorage, 1));
         if (candidate == null) return;
-
+        
         var resource = candidate.getResource(0);
         if (resource.isEmpty()) {
             moveInputToOutput(1);
             return;
         }
-
+        
         try (var transaction = Transaction.openRoot()) {
             var maxTaken = Math.min(candidate.getAmountAsLong(0), fluidStorage.getCapacity() - fluidStorage.getAmount());
             var taken = candidate.extract(0, resource, (int) maxTaken, transaction);
@@ -209,19 +209,19 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
                 }
             }
         }
-
+        
         moveInputToOutput(1);
     }
-
+    
     private void moveInputToOutput(int inputSlot) {
         var inputStorage = inventory.getInputContainer();
         var inResource = inputStorage.getResource(inputSlot);
         if (inResource.isEmpty()) return;
-
+        
         try (var transaction = Transaction.openRoot()) {
             var inserted = inventory.getOutputContainer().insert(inResource, 1, transaction);
             if (inserted != 1) return;
-
+            
             var extracted = inputStorage.extract(inputSlot, inResource, 1, transaction);
             if (extracted == 1) {
                 transaction.commit();

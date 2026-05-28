@@ -80,7 +80,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
         
         if (!level.isClientSide()) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;
@@ -137,7 +137,8 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
             var checkState = level.getBlockState(checkPos);
             if (checkState.getBlock().equals(BlockContent.REFINERY_BLOCK)) {
                 var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.REFINERY_ENTITY);
-                if (checkEntity.isPresent() && checkState.getBlock() instanceof RefineryBlock refineryBlock) refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, dropConsumer);
+                if (checkEntity.isPresent() && checkState.getBlock() instanceof RefineryBlock refineryBlock)
+                    refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, dropConsumer);
             }
         }
         

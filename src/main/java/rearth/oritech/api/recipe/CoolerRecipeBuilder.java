@@ -4,15 +4,15 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CoolerRecipeBuilder extends OritechRecipeBuilder {
-
+    
     protected CoolerRecipeBuilder() {
         super(RecipeContent.COOLER, "cooler");
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new CoolerRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (results == null || results.isEmpty())

@@ -2,15 +2,12 @@ package rearth.oritech.block.entity.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -117,7 +114,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
             var targetPos = pos.offset(targetDirection.getNormal());
             cachedTargetInventory = ItemApi.BLOCK.createCache(level, targetPos, targetDirection);
         }
-
+        
         var targetInv = cachedTargetInventory.find();
         if (targetInv == null) return;
         
@@ -147,11 +144,12 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         if (blockEntity.isPresent()) {
             blockEntity.get().setFilterSettings(message.data);
         }
-    
+        
     }
     
     // items is a map of position index (in the filter GUI) to filtered item stack
-    public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents, Map<Integer, ItemStack> items) {
+    public record FilterData(boolean useNbt, boolean useWhitelist, boolean useComponents,
+                             Map<Integer, ItemStack> items) {
         
         public static StreamCodec<RegistryFriendlyByteBuf, FilterData> PACKET_CODEC = StreamCodec.composite(
           ByteBufCodecs.BOOL, FilterData::useNbt,

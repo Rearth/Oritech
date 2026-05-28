@@ -17,7 +17,7 @@ class JeiExclusionZoneHandler implements IGuiContainerHandler<OritechWidgetScree
         if (!(containerScreen instanceof OritechWidgetScreen<?> oritechScreen)) return result;
         
         oritechScreen.getExclusionZones().forEach(elem -> result.add(new Rect2i(elem.getX(), elem.getY(), elem.getWidth(), elem.getHeight())));
-
+        
         return result;
     }
 }

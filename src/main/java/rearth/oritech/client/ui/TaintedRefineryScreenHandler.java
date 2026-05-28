@@ -30,14 +30,14 @@ public class TaintedRefineryScreenHandler extends OritechScreenHandler {
         if (!(blockEntity instanceof TaintedRefineryBlockEntity refinery)) {
             throw new IllegalStateException("Opened arcane refinery screen on non-refinery block, this should never happen");
         }
-
+        
         getDataDisplays().add(DisplayDataSource.CreateFluid(
-            refinery.ownStorage.getInputContainer(),
-            this.screenData.getFluidConfiguration(),
-            this.screenData));
+          refinery.ownStorage.getInputContainer(),
+          this.screenData.getFluidConfiguration(),
+          this.screenData));
         getDataDisplays().add(DisplayDataSource.CreateFluid(
-            refinery.ownStorage.getOutputContainer(),
+          refinery.ownStorage.getOutputContainer(),
           new ScreenProvider.BarConfiguration(67, 6 + 22, 18, 52),
-            this.screenData));
+          this.screenData));
     }
 }

@@ -16,5 +16,6 @@ public final class ColorHelper {
     
     public static final int WHITE = 0xFFFFFFFF;
     
-    private ColorHelper() {}
+    private ColorHelper() {
+    }
 }

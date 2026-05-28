@@ -44,12 +44,12 @@ public class CombiAddonEntity extends AddonBlockEntity {
         var base = storedData.data();
         
         return MachineAddonBlock.AddonSettings.getDefaultSettings()
-                     .withAddedCapacity(base.energyBonusCapacity())
-                     .withAddedInsert(base.energyBonusTransfer())
-                     .withSpeedMultiplier(base.speed())
-                     .withEfficiencyMultiplier(base.efficiency())
-                     .withChambers(base.extraChambers())
-                     .withBurstTicks(base.maxBurstTicks());
+                 .withAddedCapacity(base.energyBonusCapacity())
+                 .withAddedInsert(base.energyBonusTransfer())
+                 .withSpeedMultiplier(base.speed())
+                 .withEfficiencyMultiplier(base.efficiency())
+                 .withChambers(base.extraChambers())
+                 .withBurstTicks(base.maxBurstTicks());
         
     }
     

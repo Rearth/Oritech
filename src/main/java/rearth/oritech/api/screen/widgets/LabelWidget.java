@@ -3,7 +3,6 @@ package rearth.oritech.api.screen.widgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
@@ -16,7 +15,7 @@ public class LabelWidget extends UIComponent {
     public static int BRIGHT_TEXT = ColorHelper.argb(0.95f, 0.97f, 0.99f);
     public static int DARK_TEXT = ColorHelper.argb(0.25f, 0.25f, 0.25f);
     
-    public enum Alignment { LEFT, CENTER, RIGHT }
+    public enum Alignment {LEFT, CENTER, RIGHT}
     
     private Component text;
     private int color = BRIGHT_TEXT;
@@ -41,18 +40,24 @@ public class LabelWidget extends UIComponent {
         this(x, y, width, 9, text);
     }
     
-    public Component getText() { return text; }
+    public Component getText() {
+        return text;
+    }
     
-    public void setText(Component text) { this.text = text; }
+    public void setText(Component text) {
+        this.text = text;
+    }
     
     public LabelWidget withColor(int color) {
         this.color = color;
         return this;
     }
+    
     public LabelWidget withBrightColor() {
         this.color = BRIGHT_TEXT;
         return this;
     }
+    
     public LabelWidget withDarkColor() {
         this.color = DARK_TEXT;
         return this;

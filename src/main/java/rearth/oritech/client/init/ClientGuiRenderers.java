@@ -10,9 +10,10 @@ import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 
 @EventBusSubscriber(modid = Oritech.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class ClientGuiRenderers {
-
-    private ClientGuiRenderers() {}
-
+    
+    private ClientGuiRenderers() {
+    }
+    
     @SubscribeEvent
     public static void registerPipRenderers(RegisterPictureInPictureRenderersEvent event) {
         event.register(BlockPreviewRenderState.class, BlockPreviewPipRenderer::new);

@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -29,9 +28,9 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.client.ui.ReactorScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.Geometry;
 
@@ -279,7 +278,10 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     }
     
     private void playMeltdownAnimation(BlockPos port) {
-        if (level instanceof ServerLevel sl) { var c = port.getCenter().add(0, 0.3, 0); sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0); }
+        if (level instanceof ServerLevel sl) {
+            var c = port.getCenter().add(0, 0.3, 0);
+            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0);
+        }
     }
     
     private void playAmbientSound() {
@@ -524,7 +526,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
                 resOutput = Math.min(filledRods, 15);
             } else if (mode == 2 && energyStorage.getAmount() > 0) { // amount of energy stored
                 var fillPercentage = energyStorage.getAmount() / (float) energyStorage.getCapacity();
-                resOutput = (int) (1 + fillPercentage * 14);
+                resOutput = 1 + fillPercentage * 14;
             }
             
             resOutput = Math.min(resOutput, 15);

@@ -5,12 +5,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -32,8 +30,8 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
-import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.List;
@@ -102,13 +100,19 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements ExtendedMe
             availableFuel -= amount;
             
             if (level.getGameTime() % 5 == 0)
-                if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter().add(0, 0.5, 0); sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 1, 1.2, 1.2, 1.2, 0); }
+                if (level instanceof ServerLevel sl) {
+                    var c = worldPosition.getCenter().add(0, 0.5, 0);
+                    sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 1, 1.2, 1.2, 1.2, 0);
+                }
         }
         
     }
     
     private void onFuelConsumed() {
-        if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter().add(0, 0.5, 0); sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 15, 1.2, 1.2, 1.2, 0); }
+        if (level instanceof ServerLevel sl) {
+            var c = worldPosition.getCenter().add(0, 0.5, 0);
+            sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 15, 1.2, 1.2, 1.2, 0);
+        }
     }
     
     public void updateNetwork() {

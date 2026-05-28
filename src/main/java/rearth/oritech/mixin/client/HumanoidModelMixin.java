@@ -15,12 +15,18 @@ import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 @Mixin(HumanoidModel.class)
 public class HumanoidModelMixin<T extends LivingEntity> {
     
-    @Shadow public ModelPart rightArm;
-    @Shadow public ModelPart leftArm;
-    @Shadow public ModelPart rightLeg;
-    @Shadow public ModelPart leftLeg;
-    @Shadow public ModelPart head;
-    @Shadow public ModelPart body;
+    @Shadow
+    public ModelPart rightArm;
+    @Shadow
+    public ModelPart leftArm;
+    @Shadow
+    public ModelPart rightLeg;
+    @Shadow
+    public ModelPart leftLeg;
+    @Shadow
+    public ModelPart head;
+    @Shadow
+    public ModelPart body;
     
     @Inject(method = "setupAnim(Lnet/minecraft/level/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     public void oritech$ziplineAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {

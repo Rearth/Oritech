@@ -26,8 +26,13 @@ public class BlockWidget extends UIComponent {
         this.state = state;
     }
     
-    public BlockState getState() { return state; }
-    public void setState(BlockState state) { this.state = state; }
+    public BlockState getState() {
+        return state;
+    }
+    
+    public void setState(BlockState state) {
+        this.state = state;
+    }
     
     public BlockWidget withRotation(float rotationX, float rotationY) {
         this.rotationX = rotationX;
@@ -56,14 +61,14 @@ public class BlockWidget extends UIComponent {
         
         var entries = List.of(new BlockPreviewRenderState.Entry(state, null, Vec3i.ZERO));
         var renderState = new BlockPreviewRenderState(
-            entries,
-            rotationX,
-            rotationY + currentMouseRotation,
-            0f, 0f, 0f,
-            delta,
-            cx, cy, cx + cw, cy + ch,
-            scale,
-            null
+          entries,
+          rotationX,
+          rotationY + currentMouseRotation,
+          0f, 0f, 0f,
+          delta,
+          cx, cy, cx + cw, cy + ch,
+          scale,
+          null
         );
         graphics.submitPictureInPictureRenderState(renderState);
     }

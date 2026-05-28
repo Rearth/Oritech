@@ -57,11 +57,17 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
     }
     
     public abstract void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
-    public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {}
     
-    public int getSparseUpdateInterval() {return 100;}
+    public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    }
     
-    public int getTickUpdateInterval() {return 4;}
+    public int getSparseUpdateInterval() {
+        return 100;
+    }
+    
+    public int getTickUpdateInterval() {
+        return 4;
+    }
     
     @Override
     public void setChanged() {
@@ -78,7 +84,8 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         networkDirty = true;
     }
     
-    public void preNetworkUpdate(SyncType type) {}
+    public void preNetworkUpdate(SyncType type) {
+    }
     
     public void sendUpdate(SyncType type) {
         if (level == null || !(level instanceof ServerLevel serverLevel)) {
@@ -91,7 +98,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-
+        
         PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
     
@@ -106,7 +113,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-
+        
         PacketDistributor.sendToPlayer(player, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
     

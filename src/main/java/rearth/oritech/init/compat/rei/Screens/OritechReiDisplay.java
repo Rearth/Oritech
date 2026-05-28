@@ -49,12 +49,13 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         
         try {
             var screenProvider = screenProviderSource.getDeclaredConstructor(BlockPos.class, BlockState.class)
-                .newInstance(new BlockPos(0, 0, 0), blockState);
+                                   .newInstance(new BlockPos(0, 0, 0), blockState);
             this.isGenerator = screenProvider instanceof UpgradableGeneratorBlockEntity;
             this.slots = screenProvider.getGuiSlots();
             this.slotOffsets = screenProvider.getSlotAssignments();
             this.indicatorConfig = screenProvider.getIndicatorConfiguration();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
             throw new RuntimeException(e);
         }
     }
@@ -66,9 +67,9 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         this.slots = slots;
         this.slotOffsets = assignments;
         this.indicatorConfig = new ScreenProvider.ArrowConfiguration(
-            Oritech.id("textures/gui/modular/arrow_empty.png"),
-            Oritech.id("textures/gui/modular/arrow_full.png"),
-            80, 35, 29, 16, true);
+          Oritech.id("textures/gui/modular/arrow_empty.png"),
+          Oritech.id("textures/gui/modular/arrow_full.png"),
+          80, 35, 29, 16, true);
     }
     
     @Override
@@ -112,8 +113,8 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
         // cooking time label
         var duration = String.format("%.0f", recipe.getTime() / 20f);
         widgets.add(Widgets.createLabel(
-            new Point(x + (int) (bounds.width * 0.45), y + bounds.height - 12),
-            Component.translatable("rei.title.oritech.cookingtime", duration, recipe.getTime())
+          new Point(x + (int) (bounds.width * 0.45), y + bounds.height - 12),
+          Component.translatable("rei.title.oritech.cookingtime", duration, recipe.getTime())
         ).color(0xFFFFFF).noShadow());
         
         // fluid input
@@ -127,7 +128,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
             
             // tank frame
             widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) ->
-                graphics.blit(OritechMachineScreen.GUI_COMPONENTS, x + 3, y + 4 + 7, 48, 0, 14, 50, 98, 96)));
+                                                       graphics.blit(OritechMachineScreen.GUI_COMPONENTS, x + 3, y + 4 + 7, 48, 0, 14, 50, 98, 96)));
         }
         
         // fluid outputs
@@ -139,12 +140,12 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
                 
                 var tankX = x + tankStartX + tankCount * 20;
                 widgets.add(Widgets.createSlot(new Rectangle(tankX + 1, y + 5 + 7, 12, 48))
-                    .entry(EntryStacks.of(fluidResult.getFluid(), fluidResult.getAmount() / 81)).markOutput());
+                              .entry(EntryStacks.of(fluidResult.getFluid(), fluidResult.getAmount() / 81)).markOutput());
                 
                 // tank frame
                 final int finalTankX = tankX;
                 widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) ->
-                    graphics.blit(OritechMachineScreen.GUI_COMPONENTS, finalTankX, y + 4 + 7, 48, 0, 14, 50, 98, 96)));
+                                                           graphics.blit(OritechMachineScreen.GUI_COMPONENTS, finalTankX, y + 4 + 7, 48, 0, 14, 50, 98, 96)));
                 
                 tankCount++;
             }
@@ -157,7 +158,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     public int getDisplayHeight() {
         return 78;
     }
-    
+
 //    @Override
 //    public int getDisplayWidth(Display display) {
 //        return DisplayCategory.super.getDisplayWidth(display);

@@ -13,12 +13,12 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import java.util.HashSet;
 
 public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity> {
-
+    
     @Override
     public int getViewDistance() {
         return 256;
     }
-
+    
     @Override
     public boolean shouldRenderOffScreen(ItemPipeInterfaceEntity blockEntity) {
         return true;

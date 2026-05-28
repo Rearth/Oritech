@@ -52,7 +52,8 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
     }
     
     @Override
-    public void handleFullUpdate(Void updatedData) { }
+    public void handleFullUpdate(Void updatedData) {
+    }
     
     @Override
     public void handleDeltaUpdate(List<ItemStack> updatedData) {
@@ -79,11 +80,11 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
     public ItemStack getItem(int index) {
         return getStacks().get(index);
     }
-
+    
     public void serialize(ValueOutput output) {
         output.store("items", ItemStack.OPTIONAL_CODEC.listOf(), stacks);
     }
-
+    
     public void deserialize(ValueInput input) {
         input.read("items", ItemStack.OPTIONAL_CODEC.listOf()).ifPresent(this::handleDeltaUpdate);
     }

@@ -63,7 +63,8 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
     
     private static Tuple<Vector3f, Vector3f> getTankCoordinates(int i) {
         return switch (i) {
-            case 0 -> new Tuple<>(new Vector3f(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f));
+            case 0 ->
+              new Tuple<>(new Vector3f(-22 / 16f, 9 / 16f, -5 / 16f), new Vector3f(7 / 16f, 15 / 16f, 10 / 16f));
             case 1 ->
               new Tuple<>(new Vector3f(-21 / 16f, 0 / 16f + 2, -5 / 16f), new Vector3f(26 / 16f, 14 / 16f, 26 / 16f));
             case 2 ->

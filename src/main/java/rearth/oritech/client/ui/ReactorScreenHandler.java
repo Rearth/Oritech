@@ -35,6 +35,7 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
     public ItemStack quickMoveStack(Player player, int slot) {
         return ItemStack.EMPTY;
     }
+    
     public boolean stillValid(Player player) {
         return true;
     }

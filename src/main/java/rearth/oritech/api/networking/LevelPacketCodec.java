@@ -11,12 +11,14 @@ public interface LevelPacketCodec<I, T> extends StreamCodec<I, T> {
         Oritech.LOGGER.warn("Using non-level variant of level packet codec for decode");
         return decode(buf, null);
     }
+    
     default void encode(I buf, T value) {
         Oritech.LOGGER.warn("Using non-level variant of level packet codec for encode");
         encode(buf, value, null);
     }
     
     T decode(I buf, @Nullable Level level);
+    
     void encode(I buf, T value, @Nullable Level level);
     
 }

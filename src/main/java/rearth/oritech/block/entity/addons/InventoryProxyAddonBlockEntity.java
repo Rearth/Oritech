@@ -45,13 +45,13 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         public int extract(ItemResource resource, int amount, TransactionContext transaction) {
             return extract(targetSlot, resource, amount, transaction);
         }
-
+        
         @Override
         public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
             if (index != targetSlot) return 0;
             return super.insert(index, resource, amount, transaction);
         }
-
+        
         @Override
         public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
             if (index != targetSlot) return 0;
@@ -70,7 +70,8 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
         
         var controllerEntity = getCachedController();
         if (controllerEntity.getInventoryForAddon() instanceof ItemStacksResourceHandler storage) return storage;
-        if (controllerEntity instanceof ItemProvider itemProvider && itemProvider.getItemLookup(null) instanceof ItemStacksResourceHandler storage) return storage;
+        if (controllerEntity instanceof ItemProvider itemProvider && itemProvider.getItemLookup(null) instanceof ItemStacksResourceHandler storage)
+            return storage;
         return null;
     }
     

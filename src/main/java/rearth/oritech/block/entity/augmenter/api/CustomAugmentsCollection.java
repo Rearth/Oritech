@@ -1,88 +1,38 @@
 package rearth.oritech.block.entity.augmenter.api;
 
-import com.mojang.serialization.Codec;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.attachment.Attachment;
-import rearth.oritech.api.attachment.AttachmentApi;
 import rearth.oritech.client.other.OreFinderRenderer;
+import rearth.oritech.init.AttachmentContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.PortalEntity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 public class CustomAugmentsCollection {
     
     // for other modders: If you want to use a custom augment from a recipe, you need to add it to this map before level load!
     public static final Map<Identifier, Augment> CUSTOM_AUGMENTS = new HashMap<>();
     
-    public static final Attachment<GlobalPos> PORTAL_TARGET_TYPE = new Attachment<>() {
-        @Override
-        public Identifier identifier() {
-            return Oritech.id("portal_target");
-        }
-        
-        @Override
-        public Codec<GlobalPos> persistenceCodec() {
-            return GlobalPos.CODEC;
-        }
-        
-        @Override
-        public StreamCodec<ByteBuf, GlobalPos> networkCodec() {
-            return GlobalPos.STREAM_CODEC;
-        }
-        
-        @Override
-        public Supplier<GlobalPos> initializer() {
-            return () -> GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO);
-        }
-    };
-    
     public static Augment getById(Identifier id) {
         return CUSTOM_AUGMENTS.get(id);
     }
     
-    public static final Augment flight = new Augment(Oritech.id("augment/flight"), true) {
-        @Override
-        public void activate(Player player) {
-            player.getAbilities().mayfly = true;
-            player.onUpdateAbilities();
-        }
-        
-        @Override
-        public void deactivate(Player player) {
-            player.getAbilities().mayfly = false;
-            player.getAbilities().flying = false;
-            player.onUpdateAbilities();
-        }
-        
-        @Override
-        public void refreshServer(Player player) {
-            player.getAbilities().mayfly = true;
-            player.onUpdateAbilities();
-        }
-        
-        @Override
-        public int refreshInterval() {
-            return 80;
-        }
-    };
+    // todo add fly as normal modifier attribute (see net.neoforged.neoforge.common.NeoForgeMod.CREATIVE_FLIGHT)
     
     public static final Augment feeder = new Augment(Oritech.id("augment/autofeeder"), true) {
         @Override
@@ -99,7 +49,7 @@ public class CustomAugmentsCollection {
             var playerHungerCapacity = 20 - player.getFoodData().getFoodLevel();
             if (playerHungerCapacity < 2) return;
             
-            var foodStackStream = player.getInventory().items.stream()
+            var foodStackStream = player.getInventory().getNonEquipmentItems().stream()
                                     .filter(item -> item.has(DataComponents.FOOD) && !item.is(TagContent.FEEDER_BLACKLIST));
             var selectedFood = foodStackStream
                                  .reduce((a, b) -> Math.abs(a.get(DataComponents.FOOD).nutrition() - playerHungerCapacity) <= Math.abs(b.get(DataComponents.FOOD).nutrition() - playerHungerCapacity) ? a : b);
@@ -198,28 +148,28 @@ public class CustomAugmentsCollection {
             var spawnToPlayer = spawnPos.subtract(player.position()).normalize().scale(0.3);
             spawnPos = spawnPos.subtract(spawnToPlayer);
             
-            var targetPos = AttachmentApi.getAttachmentValue(player, PORTAL_TARGET_TYPE);
-            if (targetPos == null) return;
+            var targetPos = player.getData(AttachmentContent.PORTAL_TARGET);
+            if (targetPos.equals(GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO))) return;
             
-            var portalEntity = EntitiesContent.PORTAL_ENTITY.create((ServerLevel) level, spawner -> {},
+            var spawnedEntity = EntitiesContent.PORTAL_ENTITY.get().create((ServerLevel) level, spawner -> {
+              },
               BlockPos.containing(spawnPos),
-              MobSpawnType.EVENT,
+              EntitySpawnReason.MOB_SUMMONED,
               false,
               false);
             
-            if (portalEntity != null) {
-                portalEntity.setPos(spawnPos);
-                portalEntity.setYRot(-player.getYRot() + 90);
-                level.addFreshEntity(portalEntity);
+            if (spawnedEntity instanceof PortalEntity portalEntity) {
+                spawnedEntity.setPos(spawnPos);
+                spawnedEntity.setYRot(-player.getYRot() + 90);
+                level.addFreshEntity(spawnedEntity);
                 portalEntity.target = targetPos;
                 level.playSound(null, BlockPos.containing(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundSource.BLOCKS, 2, 1.2f);
-                
             }
         }
         
         @Override
         public void activate(Player player) {
-            AttachmentApi.setAttachment(player, PORTAL_TARGET_TYPE, GlobalPos.of(
+            player.setData(AttachmentContent.PORTAL_TARGET, GlobalPos.of(
               player.level().dimension(),
               player.blockPosition()
             ));
@@ -227,7 +177,7 @@ public class CustomAugmentsCollection {
         
         @Override
         public void deactivate(Player player) {
-            AttachmentApi.removeAttachment(player, PORTAL_TARGET_TYPE);
+            player.removeData(AttachmentContent.PORTAL_TARGET);
         }
         
         @Override
@@ -242,7 +192,6 @@ public class CustomAugmentsCollection {
     };
     
     static {
-        CUSTOM_AUGMENTS.put(flight.id, flight);
         CUSTOM_AUGMENTS.put(feeder.id, feeder);
         CUSTOM_AUGMENTS.put(magnet.id, magnet);
         CUSTOM_AUGMENTS.put(oreFinder.id, oreFinder);

@@ -2,19 +2,18 @@ package rearth.oritech.block.entity.interaction;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -41,10 +41,10 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.*;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -100,7 +100,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-    
+        
         var currentRedstone = level.hasNeighborSignal(pos);
         
         if (currentRedstone && !wasRedstoneActive) {
@@ -150,7 +150,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         MachineAddonController.super.gatherAddonStats(addons);
         
         if (addons.isEmpty()) {
-            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);;
+            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);
             return;
         }
         

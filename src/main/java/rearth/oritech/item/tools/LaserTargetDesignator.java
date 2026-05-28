@@ -49,15 +49,15 @@ public class LaserTargetDesignator extends Item {
                 return InteractionResult.SUCCESS;
             } else if (context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
                 var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
-
+                
                 var success = laserEntity.setTargetFromDesignator(target);
                 if (success)
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
         } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
-              && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
-              && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+                     && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
+                     && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
             var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
             
             var success = dronePortEntity.setTargetFromDesignator(target);

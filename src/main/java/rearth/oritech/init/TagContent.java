@@ -3,7 +3,6 @@ package rearth.oritech.init;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -21,20 +20,20 @@ public class TagContent {
     // vanilla variants
     public static final TagKey<Item> CLUMPS = cItemTag("clumps");
     public static final TagKey<Item> DUSTS = cItemTag("dusts");
-
+    
     public static final TagKey<Item> COPPER_CLUMPS = cItemTag("clumps/copper");
     public static final TagKey<Item> COPPER_DUSTS = cItemTag("dusts/copper");
     public static final TagKey<Item> COPPER_NUGGETS = cItemTag("nuggets/copper");
     
     public static final TagKey<Item> IRON_CLUMPS = cItemTag("clumps/iron");
     public static final TagKey<Item> IRON_DUSTS = cItemTag("dusts/iron");
-
+    
     public static final TagKey<Item> GOLD_CLUMPS = cItemTag("clumps/gold");
     public static final TagKey<Item> GOLD_DUSTS = cItemTag("dusts/gold");
     
     public static final TagKey<Item> QUARTZ_DUSTS = cItemTag("dusts/quartz");
     public static final TagKey<Item> COAL_DUSTS = cItemTag("dusts/coal");
-
+    
     // custom ores -----
     // nickel
     public static final TagKey<Block> NICKEL_ORE_BLOCKS = cBlockTag("ores/nickel");
@@ -63,15 +62,15 @@ public class TagContent {
     
     // plutonium
     public static final TagKey<Item> PLUTONIUM_DUSTS = cItemTag("dusts/plutonium");
-
+    
     // alloys
     public static final TagKey<Item> ELECTRUM_INGOTS = cItemTag("ingots/electrum");
     public static final TagKey<Item> ELECTRUM_DUSTS = cItemTag("dusts/electrum");
     public static final TagKey<Item> STEEL_INGOTS = cItemTag("ingots/steel");
-
+    
     // plating
     public static final TagKey<Item> MACHINE_PLATING = oritechItemTag("plating");
-
+    
     // plastic
     public static final TagKey<Item> PLASTIC_PLATES = cItemTag("plates/plastic");
     
@@ -81,19 +80,19 @@ public class TagContent {
     // BIOMASS tag is for the biomass item and other similar items (Mekanism's bio fuel, Tech Reborn's plantball, etc.)
     public static final TagKey<Item> BIOMASS = cItemTag("fuels/bio");
     public static final TagKey<Item> BIOMASS_BLOCK = cItemTag("fuels/block/bio");
-
+    
     // frame support
     public static final TagKey<Block> MACHINE_FRAME_SUPPORT = TagKey.create(Registries.BLOCK, Oritech.id("frame_support"));
-
+    
     // silicon
     public static final TagKey<Item> SILICON = cItemTag("silicon");
-
+    
     // carbon fibre
     public static final TagKey<Item> CARBON_FIBRE = cItemTag("carbon_fibre");
     
     // wrenches
     public static final TagKey<Item> WRENCHES = cItemTag("tools/wrench");
-
+    
     // These items are currently unbreakable, so these only satisfy the required material API shape.
     public static final TagKey<Item> UNBREAKABLE_REPAIRS = oritechItemTag("ignored");
     
@@ -106,7 +105,7 @@ public class TagContent {
     public static final TagKey<Block> LASER_PASSTHROUGH = oritechBlockTag("laser_passthrough");
     public static final TagKey<Block> LASER_ACCELERATED = oritechBlockTag("laser_accelerated");
     public static final TagKey<Block> LASER_FAST_BREAKING = oritechBlockTag("laser_fast_break");
-
+    
     // trees
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");
     public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = oritechBlockTag("mineable/cutter_leaves");
@@ -125,7 +124,7 @@ public class TagContent {
     
     // catalyst blacklist, if you want to be boring
     public static final TagKey<Enchantment> CATALYST_ENCHANTMENT_BLACKLIST = TagKey.create(Registries.ENCHANTMENT, Oritech.id("catalyst_blacklist"));
-
+    
     // dyes
     public static final TagKey<Item> RAW_WHITE_DYE = cItemTag("raw_materials/dyes/white");
     public static final TagKey<Item> RAW_LIGHT_GRAY_DYE = cItemTag("raw_materials/dyes/light_gray");
@@ -151,7 +150,7 @@ public class TagContent {
     // arcane refinery
     public static final TagKey<Block> REFINERY_ARCANE_BLOCKS = oritechBlockTag("refinery/arcane");
     public static final TagKey<Block> REFINERY_SCULK_BLOCKS = oritechBlockTag("refinery/sculk");
-
+    
     // recyclables
     public static final TagKey<Item> RECYCLES_TO_NETHERITE_SCRAP = oritechItemTag("recyclable/netherite_scrap");
     public static final TagKey<Item> RECYCLES_TO_DIAMOND = oritechItemTag("recyclable/diamond");
@@ -169,7 +168,7 @@ public class TagContent {
     public static final TagKey<Item> RECYCLES_TO_RED_SAND = oritechItemTag("recyclable/red_sand");
     public static final TagKey<Item> RECYCLES_TO_STRING = oritechItemTag("recyclable/string");
     public static final TagKey<Item> RECYCLES_TO_BIOMASS = oritechItemTag("recyclable/biomass");
-
+    
     // fuels
     public static final TagKey<Fluid> OIL = cFluidTag("oil");
     public static final TagKey<Fluid> BIOFUEL = cFluidTag("biofuel");
@@ -179,5 +178,5 @@ public class TagContent {
     public static final TagKey<Fluid> TURBOFUEL = cFluidTag("turbofuel");
     
     public static final TagKey<Fluid> STEAM = cFluidTag("steam");
-
+    
 }

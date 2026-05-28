@@ -24,7 +24,7 @@ public class InventoryProxyScreenHandler extends AbstractContainerMenu {
     protected final InventoryProxyAddonBlockEntity addonEntity;
     
     protected int selectedSlot = 0;
-
+    
     @NotNull
     protected final ScreenProvider controllerScreen;
     
@@ -44,7 +44,7 @@ public class InventoryProxyScreenHandler extends AbstractContainerMenu {
     public InventoryProxyScreenHandler(int syncId, Inventory inventory, InvProxyData data) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(data.ownPos())), (ScreenProvider) inventory.player.level().getBlockEntity(data.controllerPos), data.slot);
     }
-
+    
     // on server, also called from client constructor
     public InventoryProxyScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity, @NotNull ScreenProvider controllerScreen, int selectedSlot) {
         super(ModScreens.INVENTORY_PROXY_SCREEN, syncId);
@@ -54,7 +54,7 @@ public class InventoryProxyScreenHandler extends AbstractContainerMenu {
         this.selectedSlot = selectedSlot;
         this.addonEntity = (InventoryProxyAddonBlockEntity) blockEntity;
     }
-
+    
     public @NotNull BlockPos getBlockPos() {
         return blockPos;
     }

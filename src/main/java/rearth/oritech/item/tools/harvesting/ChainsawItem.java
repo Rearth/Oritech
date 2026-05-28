@@ -35,11 +35,11 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
         // this lets ChainsawItem extend AxeItem (for the right-click actions) and still ignore
         // the default tool components set up by AxeItem
         var toolComponent = new Tool(List.of(
-            Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
-            Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
-            Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
-            Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
-            1.0F, 1);
+          Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
+          Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
+          Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
+          Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
+          1.0F, 1);
         this.components = settings.component(DataComponents.TOOL, toolComponent).buildAndValidateComponents();
     }
     
@@ -83,7 +83,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
                 PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(level, elem, stack)).toList());
                 
                 var extraEnergyUsed = treeBlocks.size() * getEnergyUsageMultiplier() / 2;
-                this.tryUseEnergy(stack, (long) extraEnergyUsed, player);
+                this.tryUseEnergy(stack, extraEnergyUsed, player);
             }
         }
         

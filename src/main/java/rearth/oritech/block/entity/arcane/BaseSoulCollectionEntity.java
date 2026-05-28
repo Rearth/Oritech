@@ -36,6 +36,7 @@ public abstract class BaseSoulCollectionEntity extends BlockEntity implements Ga
     }
     
     public abstract boolean canAcceptSoul();
+    
     public abstract void onSoulIncoming(Vec3 emitter);
     
     public class DeathListener implements GameEventListener {
@@ -77,7 +78,7 @@ public abstract class BaseSoulCollectionEntity extends BlockEntity implements Ga
             
             return false;
         }
-
+        
         private boolean isValidEntity(@Nullable Entity entity) {
             // We allow null entities as the Soul Flower triggers a ENTITY_DIE game event with a null entity
             return entity == null || entity instanceof LivingEntity;

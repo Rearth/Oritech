@@ -164,9 +164,9 @@ public class BlockOutlineRenderer {
         if (isMotor)
             facing = facing.getClockWise();
         
-        var shape = Shapes.box(7/16f, 7/16f, 0, 9/16f, 9/16f, 1f);
-        var halfShape = Shapes.box(4/16f, 7/16f, 0.8, 6/16f, 9/16f, 1.3f);
-        var halfShapeLeft = Shapes.box(8/16f, 7/16f, 0.3, 10/16f, 9/16f, 0.8f);
+        var shape = Shapes.box(7 / 16f, 7 / 16f, 0, 9 / 16f, 9 / 16f, 1f);
+        var halfShape = Shapes.box(4 / 16f, 7 / 16f, 0.8, 6 / 16f, 9 / 16f, 1.3f);
+        var halfShapeLeft = Shapes.box(8 / 16f, 7 / 16f, 0.3, 10 / 16f, 9 / 16f, 0.8f);
         
         matrixStack.pushPose();
         

@@ -48,29 +48,29 @@ public class OritechReiTaintedRefineryCreationDisplay implements DisplayCategory
         
         // input: refinery
         widgets.add(Widgets.createSlot(new Point(x + 10, y + 10))
-            .entries(infoDisplay.getInputEntries().get(0)).markInput());
+                      .entries(infoDisplay.getInputEntries().get(0)).markInput());
         
         // input: catalyst
         widgets.add(Widgets.createSlot(new Point(x + 10, y + 35))
-            .entries(infoDisplay.getInputEntries().get(1)).markInput());
+                      .entries(infoDisplay.getInputEntries().get(1)).markInput());
         
         // arrow
         widgets.add(Widgets.createArrow(new Point(x + 50, y + 22)));
         
         // output: tainted refinery
         widgets.add(Widgets.createSlot(new Point(x + 90, y + 22))
-            .entries(infoDisplay.getOutputEntries().get(0)).markOutput());
+                      .entries(infoDisplay.getOutputEntries().get(0)).markOutput());
         
         // hint text
         widgets.add(Widgets.createLabel(
-            new Point(x + 6, y + bounds.height - 24),
-            Component.translatable("emi.title.oritech.tainted_creation_hint")
+          new Point(x + 6, y + bounds.height - 24),
+          Component.translatable("emi.title.oritech.tainted_creation_hint")
         ).leftAligned().color(0xFFFFFF).noShadow());
         
         // hint text
         widgets.add(Widgets.createLabel(
-            new Point(x + 6, y + bounds.height - 12),
-            Component.translatable("emi.title.oritech.tainted_creation_hint2")
+          new Point(x + 6, y + bounds.height - 12),
+          Component.translatable("emi.title.oritech.tainted_creation_hint2")
         ).leftAligned().color(0xFFFFFF).noShadow());
         
         return widgets;

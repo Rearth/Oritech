@@ -21,7 +21,10 @@ import rearth.oritech.Oritech;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
-import rearth.oritech.item.tools.harvesting.*;
+import rearth.oritech.item.tools.harvesting.ChainsawItem;
+import rearth.oritech.item.tools.harvesting.DrillItem;
+import rearth.oritech.item.tools.harvesting.PromethiumAxeItem;
+import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 
 import java.util.EnumMap;
 

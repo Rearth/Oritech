@@ -73,7 +73,7 @@ public class ParticleContent {
     }
     
     // client handler
-
+    
     public static void handleOnClient(Payload payload, IPayloadContext context) {
         context.enqueueWork(() -> handleOnClient(payload, context.player().level(), context.player().registryAccess()));
     }
@@ -96,7 +96,8 @@ public class ParticleContent {
                 var count = Math.min((int) (payload.pos.distanceTo(payload.data1) * 0.6f + 1), 12);
                 spawnLineStaggered(ParticleTypes.SONIC_BOOM, level, payload.pos, payload.data1, count, 20);
             }
-            case CATALYST_CONNECTION -> spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
+            case CATALYST_CONNECTION ->
+              spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
             case BLACK_HOLE_EMISSION -> {
                 var dist = (int) payload.data1.distanceTo(payload.pos);
                 spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.random.nextInt(3), 0.2f);
@@ -146,20 +147,20 @@ public class ParticleContent {
             double t = count > 1 ? (double) i / (count - 1) : 0;
             Vec3 pos = start.add(diff.scale(t));
             level.addParticle(particle,
-                pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
-                pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
-                pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
-                0, 0, 0);
+              pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
+              pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
+              pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
+              0, 0, 0);
         }
     }
     
     private static void spawnEnchantParticles(Level level, Vec3 source, Vec3 dest, float spread) {
         Vec3 diff = dest.subtract(source);
         level.addParticle(ParticleTypes.ENCHANT,
-            source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
-            source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
-            source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
-            diff.x, diff.y, diff.z);
+          source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
+          source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
+          source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
+          diff.x, diff.y, diff.z);
     }
     
     private static void spawnLineStaggered(ParticleOptions particle, Level level, Vec3 start, Vec3 end, float count, long pauseMillis) {
@@ -190,11 +191,11 @@ public class ParticleContent {
             @Override
             public Payload decode(RegistryFriendlyByteBuf buf) {
                 return new Payload(
-                    buf.readInt(),
-                    NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                    NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                    NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                    buf.readInt()
+                  buf.readInt(),
+                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                  buf.readInt()
                 );
             }
             

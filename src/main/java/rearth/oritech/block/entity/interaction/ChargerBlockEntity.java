@@ -46,7 +46,7 @@ import rearth.oritech.util.ScreenProvider;
 import java.util.List;
 
 public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidProvider, EnergyProvider, ItemProvider,
-                                                                 ScreenProvider, MenuProvider {
+                                                                          ScreenProvider, MenuProvider {
     
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.charger.energyCapacity.get(), OritechConfig.charger.maxEnergyInsertion.get(), OritechConfig.charger.maxEnergyExtraction.get(), 0, this::setChanged, false);
@@ -89,7 +89,10 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidPro
         }
         
         if (fluidStorage.getAmount() != startFluid || energyStorage.energy != startEnergy) {
-            if (level instanceof ServerLevel sl) { var c = pos.getCenter().add(0.1, 0.1, 0); sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0); }
+            if (level instanceof ServerLevel sl) {
+                var c = pos.getCenter().add(0.1, 0.1, 0);
+                sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
+            }
         }
         
     }

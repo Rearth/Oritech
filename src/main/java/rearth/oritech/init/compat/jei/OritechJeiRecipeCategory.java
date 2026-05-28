@@ -142,7 +142,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
                 var inputSlot = builder.addInputSlot(10, 6).setBackground(fluidBackground, -2, -2).setFluidRenderer(shownAmount, false, 10, 46);
                 for (var fluidStack : fluidIngredient.getFluidStacks()) {
                     inputSlot = inputSlot.addFluidStack(fluidStack.getFluid(), shownAmount);
-            }
+                }
             }
         }
         
@@ -162,7 +162,7 @@ public class OritechJeiRecipeCategory implements IRecipeCategory<OritechRecipe> 
         var tankStartX = recipe.getFluidOutputs().size() > 1 ? 80 : 120;
         for (var fluidResult : recipe.getFluidOutputs()) {
             if (fluidResult.isEmpty()) continue;
-            builder.addOutputSlot(tankStartX + tankCount *  20, 6).addFluidStack(fluidResult.getFluid(), fluidResult.getAmount()).setBackground(fluidBackground, -2, -2).setFluidRenderer(fluidResult.getAmount(), false, 10, 46);
+            builder.addOutputSlot(tankStartX + tankCount * 20, 6).addFluidStack(fluidResult.getFluid(), fluidResult.getAmount()).setBackground(fluidBackground, -2, -2).setFluidRenderer(fluidResult.getAmount(), false, 10, 46);
             tankCount++;
         }
     }

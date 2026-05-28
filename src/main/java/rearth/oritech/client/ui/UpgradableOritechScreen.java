@@ -16,8 +16,8 @@ import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.processing.FragmentForgeBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.TooltipHelper;
 

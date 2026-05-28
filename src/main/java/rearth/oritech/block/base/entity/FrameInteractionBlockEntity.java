@@ -18,8 +18,8 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 
 import java.util.ArrayDeque;
@@ -67,17 +67,17 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         var backRelative = new Vec3i(getFrameOffset(), 0, 0);
         // Frame machines always anchor to the frame block directly behind the controller.
         var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, worldPosition);
-
+        
         var bounds = findFrameBounds(searchStart);
         if (bounds == null) {
             return false;
         }
-
+        
         // offset values by 1 to define the working area instead of bounds
         var startX = bounds.minX + 1;
         var startZ = bounds.minZ + 1;
         areaMin = new BlockPos(startX, getBlockPos().getY(), startZ);
-
+        
         var endX = bounds.maxX - 1;
         var endZ = bounds.maxZ - 1;
         areaMax = new BlockPos(endX, getBlockPos().getY(), endZ);
@@ -95,41 +95,41 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     protected Direction getFacing() {
         return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
-
+    
     private FrameBounds findFrameBounds(BlockPos searchStart) {
         if (!testForFrame(searchStart)) {
             highlightBlock(searchStart);
             return null;
         }
-
+        
         assert level != null;
-
+        
         var frameBlocks = new HashSet<BlockPos>();
         var openSet = new ArrayDeque<BlockPos>();
         frameBlocks.add(searchStart);
         openSet.add(searchStart);
-
+        
         var minX = searchStart.getX();
         var maxX = searchStart.getX();
         var minZ = searchStart.getZ();
         var maxZ = searchStart.getZ();
         var maxFrameBlocks = MAX_SEARCH_LENGTH * 4;
-
+        
         // Collect the connected frame loop first so validation works no matter which edge or corner we started from.
         while (!openSet.isEmpty()) {
             var currentPos = openSet.removeFirst();
-
+            
             minX = Math.min(minX, currentPos.getX());
             maxX = Math.max(maxX, currentPos.getX());
             minZ = Math.min(minZ, currentPos.getZ());
             maxZ = Math.max(maxZ, currentPos.getZ());
-
+            
             for (var direction : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST}) {
                 var nextPos = currentPos.relative(direction);
                 if (nextPos.getY() != searchStart.getY() || frameBlocks.contains(nextPos) || !testForFrame(nextPos)) {
                     continue;
                 }
-
+                
                 frameBlocks.add(nextPos);
                 openSet.add(nextPos);
                 if (frameBlocks.size() > maxFrameBlocks) {
@@ -138,33 +138,33 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
                 }
             }
         }
-
+        
         var width = maxX - minX + 1;
         var depth = maxZ - minZ + 1;
         if (width < 3 || depth < 3 || width > MAX_SEARCH_LENGTH || depth > MAX_SEARCH_LENGTH) {
             highlightBlock(searchStart);
             return null;
         }
-
+        
         // A valid frame is a solid rectangle border with a completely empty interior.
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 var checkPos = new BlockPos(x, searchStart.getY(), z);
                 var isBoundary = x == minX || x == maxX || z == minZ || z == maxZ;
                 var isFrame = testForFrame(checkPos);
-
+                
                 if (isBoundary && !isFrame) {
                     highlightBlock(checkPos);
                     return null;
                 }
-
+                
                 if (!isBoundary && !level.getBlockState(checkPos).isAir()) {
                     highlightBlock(checkPos);
                     return null;
                 }
             }
         }
-
+        
         Oritech.LOGGER.debug("found valid machine frame from {} to {}", new BlockPos(minX, searchStart.getY(), minZ), new BlockPos(maxX, searchStart.getY(), maxZ));
         return new FrameBounds(minX, maxX, minZ, maxZ);
     }
@@ -404,7 +404,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         if (currentTarget == null || lastTarget == null) return;
         super.sendUpdate(type);
     }
-
+    
     private record FrameBounds(int minX, int maxX, int minZ, int maxZ) {
     }
 }

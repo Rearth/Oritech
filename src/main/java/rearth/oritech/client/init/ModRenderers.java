@@ -14,9 +14,9 @@ import java.util.Map;
 public class ModRenderers {
     
     public static Map<Block, RenderType> RENDER_LAYERS = new HashMap<>();  // this is used in client-specific parts to set render layers
-
+    
     public static void registerRenderers() {
-
+        
         // processing
         BlockEntityRenderers.register(BlockEntitiesContent.PULVERIZER_ENTITY, ctx -> new MachineRenderer<>("models/pulverizer_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, ctx -> new MachineRenderer<>("models/fragment_forge_block"));
@@ -103,10 +103,10 @@ public class ModRenderers {
         RENDER_LAYERS.put(BlockContent.REACTOR_REDSTONE_PORT, RenderType.translucent());
         RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE, RenderType.translucent());
         RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderType.translucent());
-
+        
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
         
         
     }
-
+    
 }

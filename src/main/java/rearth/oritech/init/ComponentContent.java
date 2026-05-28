@@ -8,7 +8,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 
 import java.util.function.Supplier;
@@ -37,5 +36,5 @@ public class ComponentContent {
     public static final Supplier<DataComponentType<ShrinkerBlockEntity.ShrunkAddonData>> ADDON_DATA = COMPONENTS.registerComponentType(
       "addon_data", builder -> builder.persistent(ShrinkerBlockEntity.ShrunkAddonData.CODEC).networkSynchronized(ShrinkerBlockEntity.ShrunkAddonData.STREAM_CODEC)
     );
-
+    
 }

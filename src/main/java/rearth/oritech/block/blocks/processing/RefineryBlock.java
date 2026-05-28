@@ -69,7 +69,8 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         var color = refineryEntity.get().currentColor;
         
         // custom merger to void refinery self drop
-        super.onExplosionHit(state, level, pos, explosion, ((itemStack, blockPos) -> {}));
+        super.onExplosionHit(state, level, pos, explosion, ((itemStack, blockPos) -> {
+        }));
         
         // explode crystal
         crystalCandidate.get().doExplosion();
@@ -97,7 +98,7 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
     // todo maybe this can be cleaned up using server.execute or something similar()?
     public static void updateTaintEvents() {
         for (var elem : DELAYED_TAINT_EVENTS) {
-            elem.run();;
+            elem.run();
         }
         DELAYED_TAINT_EVENTS.clear();
     }

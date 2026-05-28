@@ -10,11 +10,11 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
         super(RecipeContent.FOUNDRY, resourcePath);
         this.time = 80;
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new FoundryRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if ((inputs == null || inputs.size() < 2) || (results == null || results.isEmpty()))

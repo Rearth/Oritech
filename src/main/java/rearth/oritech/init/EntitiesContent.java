@@ -11,13 +11,13 @@ import rearth.oritech.util.PortalEntity;
 import java.util.function.Supplier;
 
 public class EntitiesContent {
-
+    
     public static final DeferredRegister.Entities ENTITY_TYPES = DeferredRegister.createEntities(Oritech.MOD_ID);
     
     public static final Supplier<EntityType<?>> PORTAL_ENTITY = ENTITY_TYPES.register("portal_entity", () -> EntityType.Builder.of(PortalEntity::new, MobCategory.MISC)
-                                                                                                            .sized(1, 2)
+                                                                                                               .sized(1, 2)
                                                                                                                .noSave()
                                                                                                                .noSummon()
-                                                                                                            .build(ResourceKey.create(Registries.ENTITY_TYPE, Oritech.id("portal_entity"))));
-
+                                                                                                               .build(ResourceKey.create(Registries.ENTITY_TYPE, Oritech.id("portal_entity"))));
+    
 }

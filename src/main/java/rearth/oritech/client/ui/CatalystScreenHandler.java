@@ -39,7 +39,7 @@ public class CatalystScreenHandler extends OritechScreenHandler {
               screenData.getEnergyConfiguration()));
         }
     }
-
+    
     // Won't affect player dragging items into slots, but quick-move will only allow enchanted books in the first slot
     @Override
     public int getMachineInvStartSlot(ItemStack stack) {

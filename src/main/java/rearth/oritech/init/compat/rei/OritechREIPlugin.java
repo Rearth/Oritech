@@ -113,16 +113,16 @@ public class OritechREIPlugin implements REIClientPlugin {
         // tainted refinery synthetic displays
         var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));
         registry.add(new TaintedRefineryInfoDisplay(
-            creationCategoryId,
-            List.of(new ItemStack(BlockContent.REFINERY_BLOCK), new ItemStack(BlockContent.ENCHANTMENT_CATALYST_BLOCK)),
-            List.of(new ItemStack(BlockContent.TAINTED_REFINERY_BLOCK))
+          creationCategoryId,
+          List.of(new ItemStack(BlockContent.REFINERY_BLOCK), new ItemStack(BlockContent.ENCHANTMENT_CATALYST_BLOCK)),
+          List.of(new ItemStack(BlockContent.TAINTED_REFINERY_BLOCK))
         ));
         
         var bonusesCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_bonuses"));
         registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_SCULK_BLOCKS, "sculk"));
         registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_ARCANE_BLOCKS, "arcane"));
     }
-
+    
     @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerDraggableStackVisitor(new ReiItemFilterDraggableStackVisitor());
@@ -135,7 +135,7 @@ public class OritechREIPlugin implements REIClientPlugin {
             return zones;
         });
     }
-
+    
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machineIcon, BiFunction<OritechRecipeType, ItemLike, ? extends DisplayCategory<Display>> screenType) {
         var oriCategory = screenType.apply(recipeType, machineIcon);
         registry.add(oriCategory);

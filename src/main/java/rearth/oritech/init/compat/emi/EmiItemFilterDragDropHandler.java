@@ -15,13 +15,13 @@ public class EmiItemFilterDragDropHandler implements EmiDragDropHandler<ItemFilt
             draw.fill(container.x(), container.y(), container.x() + container.width(), container.y() + container.height(), 0x8822BB33);
         }
     }
-
+    
     @Override
     public boolean dropStack(ItemFilterScreen screen, EmiIngredient stack, int x, int y) {
         if (stack.isEmpty()) {
             return false;
         }
-
+        
         for (int i = 0; i < FILTER_SIZE; i++) {
             var container = screen.getItemContainer(i);
             if (container.isInBoundingBox(x, y)) {

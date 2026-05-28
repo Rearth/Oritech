@@ -37,7 +37,8 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
     );
     
     public DynamicEnergyStorage(long capacity, long maxInsert, long maxExtract, long amount) {
-        this(capacity, maxInsert, maxExtract, amount, () -> {}, false);
+        this(capacity, maxInsert, maxExtract, amount, () -> {
+        }, false);
     }
     
     public DynamicEnergyStorage(long capacity, long maxInsert, long maxExtract, long amount, Runnable onUpdate, boolean alwaysFullUpdate) {

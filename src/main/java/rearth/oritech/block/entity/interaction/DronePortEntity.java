@@ -1,11 +1,11 @@
 package rearth.oritech.block.entity.interaction;
 
-import net.minecraft.core.*;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -279,11 +279,7 @@ public class DronePortEntity extends NetworkedBlockEntity
             return false;
         
         // fail if fluid is incoming and would not match
-        if (!fluid.isEmpty() && (!hasFluidAddon || fluidStorage.insert(fluid, true) != fluid.getAmount())) {
-            return false;
-        }
-        
-        return true;
+        return fluid.isEmpty() || (hasFluidAddon && fluidStorage.insert(fluid, true) == fluid.getAmount());
     }
     
     /**

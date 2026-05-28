@@ -17,9 +17,6 @@ public class RecipeContent {
     public static final Supplier<RecipeSerializer<OritechRecipe>> ORITECH_SERIALIZER =
       RECIPE_SERIALIZERS.register("machine_recipe", () -> new RecipeSerializer<>(OritechRecipe.CODEC, OritechRecipe.STREAM_CODEC));
     
-    public static final Supplier<RecipeSerializer<AugmentDataRecipe>> AUGMENT_DATA_SERIALIZER =
-      RECIPE_SERIALIZERS.register("augment_data", () -> new RecipeSerializer<>(AugmentDataRecipe.CODEC, AugmentDataRecipe.STREAM_CODEC));
-    
     public static final Supplier<RecipeType<OritechRecipe>> PULVERIZER = RECIPE_TYPES.register("pulverizer", () -> recipeType("pulverizer"));
     public static final Supplier<RecipeType<OritechRecipe>> GRINDER = RECIPE_TYPES.register("grinder", () -> recipeType("grinder"));
     public static final Supplier<RecipeType<OritechRecipe>> ASSEMBLER = RECIPE_TYPES.register("assembler", () -> recipeType("assembler"));
@@ -37,8 +34,6 @@ public class RecipeContent {
     public static final Supplier<RecipeType<OritechRecipe>> COOLER = RECIPE_TYPES.register("cooler", () -> recipeType("cooler"));
     public static final Supplier<RecipeType<OritechRecipe>> REACTOR = RECIPE_TYPES.register("reactor", () -> recipeType("reactor"));
     public static final Supplier<RecipeType<OritechRecipe>> LASER = RECIPE_TYPES.register("laser", () -> recipeType("laser"));
-    
-    public static final Supplier<RecipeType<AugmentDataRecipe>> AUGMENT_DATA = RECIPE_TYPES.register("augment_data", () -> recipeType("augment_data"));
     
     private static <T extends Recipe<?>> RecipeType<T> recipeType(String path) {
         return new RecipeType<>() {

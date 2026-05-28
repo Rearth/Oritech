@@ -22,7 +22,7 @@ public class DroneScreenHandler extends UpgradableOritechScreenHandler {
     
     public DroneScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
-
+        
         if (!(blockEntity instanceof DronePortEntity dronePortEntity)) {
             cardInventory = null;
             Oritech.LOGGER.error("Opened drone screen on non-drone block, this should never happen");

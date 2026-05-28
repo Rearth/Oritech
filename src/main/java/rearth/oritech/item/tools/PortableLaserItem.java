@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
@@ -37,6 +36,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -47,9 +47,9 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
-import rearth.oritech.init.ComponentContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.MachineSoundHandler;
@@ -169,7 +169,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         
         var startPos = player.getEyePosition().add(endPos.subtract(player.getEyePosition()).scale(0.4f)).add(0, -0.5f, 0).add(rightDir.scale(0.3f));
         ParticleContent.LaserBoom(level, startPos, endPos);
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
         
         return InteractionResultHolder.consume(stack);
     }
@@ -212,7 +213,10 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
         
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
-            if (level instanceof ServerLevel sl) { var loc = finalHit.getLocation(); sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0); }
+            if (level instanceof ServerLevel sl) {
+                var loc = finalHit.getLocation();
+                sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0);
+            }
         }
         
     }
@@ -320,7 +324,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var recipe = blockRecipe.value();
             var farmedCount = 1;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // add stack to player inv, or spawn at block pos

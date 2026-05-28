@@ -8,7 +8,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -50,8 +49,8 @@ import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MultiblockMachineController;
@@ -86,7 +85,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             return 0;
         }
     };
-
+    
     private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
     
     private final SimpleInventoryStorage basicInv = new SimpleInventoryStorage(0, this::setChanged);
@@ -122,13 +121,14 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
     
     private void outputEnergy() {
-        if (!isConnected() || energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
-
+        if (!isConnected() || energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel))
+            return;
+        
         if (cachedOutputTarget == null) {
             var target = ExpandableEnergyStorageBlockEntity.getOutputPosition(worldPosition, getFacingForMultiblock().getCounterClockWise());
             cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getB(), target.getA().getOpposite());
         }
-
+        
         var candidate = cachedOutputTarget.getCapability();
         if (candidate != null) {
             var available = (int) Math.min(Integer.MAX_VALUE, energyStorage.getAmountAsLong());
@@ -272,7 +272,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     public void onRemoved() {
         
         // remove connection from targets
-        for (var target: connections) {
+        for (var target : connections) {
             if (level.getBlockEntity(target.pos) instanceof PowerPoleEntity powerPole) {
                 powerPole.removeIncomingConnection(worldPosition);
             }
@@ -304,7 +304,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         serializeMultiblock(output);
-
+        
         var connectionList = output.childrenList("connectionData");
         for (var connection : connections) {
             var child = connectionList.addChild();
@@ -317,7 +317,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         deserializeMultiblock(input);
-
+        
         connections.clear();
         for (var connectionData : input.childrenListOrEmpty("connectionData")) {
             var pos = connectionData.read("pos", BlockPos.CODEC);
@@ -325,7 +325,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             if (pos.isPresent() && directionIndex >= 0 && directionIndex < Direction.values().length) {
                 connections.add(new ConnectionTarget(pos.get(), Direction.values()[directionIndex]));
             }
-
+            
         }
     }
     
@@ -457,7 +457,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     protected class PowerPoleEnergyStorage extends DynamicEnergyStorage {
         
         private long clientShownEnergy;
-
+        
         public PowerPoleEnergyStorage() {
             super(0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, PowerPoleEntity.this::setChanged, false);
         }
@@ -534,7 +534,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         public long getCapacityAsLong() {
             return OritechConfig.poleConfig.energyCapacity.get();
         }
-
+        
         public void update() {
             if (!isValid()) return;
             PowerPoleEntity.this.setChanged(false);
@@ -591,7 +591,8 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         }
     }
     
-    public record ConnectionTarget(BlockPos pos, Direction facing) {}
+    public record ConnectionTarget(BlockPos pos, Direction facing) {
+    }
     
     // this is kept separate from the block entities (and fully decoupled) so it works well across unloaded areas,
     // even if some poles are in the middle of it

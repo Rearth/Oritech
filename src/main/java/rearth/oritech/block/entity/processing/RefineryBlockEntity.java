@@ -30,14 +30,14 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.RefineryScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
 
 import java.util.Comparator;
 import java.util.List;

@@ -27,7 +27,7 @@ public class DelegatingFluidStorage implements ResourceHandler<FluidResource> {
         if (canUseBackend()) return backingStorage.get().size();
         return 0;
     }
-
+    
     @Override
     public FluidResource getResource(int index) {
         if (canUseBackend()) return backingStorage.get().getResource(index);
@@ -57,19 +57,19 @@ public class DelegatingFluidStorage implements ResourceHandler<FluidResource> {
         if (canUseBackend()) return backingStorage.get().insert(index, resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int insert(FluidResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().insert(resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().extract(index, resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int extract(FluidResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().extract(resource, amount, transaction);

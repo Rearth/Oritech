@@ -38,10 +38,10 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     private static final Vec3 BEAM_START_OFFSET = new Vec3(0, 1.65, 0);
     
     public static final int GLOW_COLOR_START = 0x998AF2DF;
-    public static final int GLOW_COLOR_END   = 0x99135B50;
+    public static final int GLOW_COLOR_END = 0x99135B50;
     
     public static final int CORE_COLOR_START = BeamRenderer.color(200, 220, 255, 100);
-    public static final int CORE_COLOR_END   = BeamRenderer.color(180, 230, 255, 100);
+    public static final int CORE_COLOR_END = BeamRenderer.color(180, 230, 255, 100);
     
     private static final HashMap<Long, Vec3> cachedOffsets = new HashMap<>();
     
@@ -138,19 +138,19 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
     @Override
     protected void rotateBlock(Direction facing, PoseStack poseStack) {
         if (Objects.requireNonNull(facing) == Direction.DOWN) {
-            poseStack.translate(0,  1, 0);
+            poseStack.translate(0, 1, 0);
             poseStack.mulPose(Axis.XP.rotationDegrees(180));
         } else if (facing == Direction.WEST) {
-            poseStack.translate(0.5,  0.5, 0);
+            poseStack.translate(0.5, 0.5, 0);
             poseStack.mulPose(Axis.ZP.rotationDegrees(90));
         } else if (facing == Direction.EAST) {
-            poseStack.translate(-0.5,  0.5, 0);
+            poseStack.translate(-0.5, 0.5, 0);
             poseStack.mulPose(Axis.ZP.rotationDegrees(270));
         } else if (facing == Direction.SOUTH) {
-            poseStack.translate(0,  0.5, -0.5);
+            poseStack.translate(0, 0.5, -0.5);
             poseStack.mulPose(Axis.XP.rotationDegrees(90));
         } else if (facing == Direction.NORTH) {
-            poseStack.translate(0,  0.5, 0.5);
+            poseStack.translate(0, 0.5, 0.5);
             poseStack.mulPose(Axis.XN.rotationDegrees(90));
         }
     }

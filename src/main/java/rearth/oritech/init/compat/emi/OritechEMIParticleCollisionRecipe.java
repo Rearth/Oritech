@@ -29,7 +29,7 @@ public class OritechEMIParticleCollisionRecipe extends BasicEmiRecipe {
     public void addWidgets(WidgetHolder widgets) {
         
         widgets.addTexture(PARTICLE_RECIPE_OVERLAY, 60, 17, 36, 24, 0, 0, 36, 24, 36, 24);
-
+        
         widgets.addSlot(this.inputs.get(0), 42, 20);
         widgets.addSlot(this.inputs.get(1), 96, 20);
         

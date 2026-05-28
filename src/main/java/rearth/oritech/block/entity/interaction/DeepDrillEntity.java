@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -24,11 +23,14 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.*;
+import rearth.oritech.util.ColorableMachine;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.MachineSoundHandler;
+import rearth.oritech.util.MultiblockMachineController;
 import software.bernie.geckolib.animatable.GeoBlockEntity;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
 import software.bernie.geckolib.animation.AnimatableManager;
@@ -87,7 +89,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
         initialized = true;
         targetedOre.clear();
         loadOreBlocks(manual);
-
+        
         return !targetedOre.isEmpty();
     }
     
@@ -112,7 +114,8 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
             setChanged();
             
             var particlePos = getCenter(0);
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // try increasing faster if too much energy is provided
@@ -155,7 +158,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyApi.B
                     } else if (!targetState.isAir()) break;
                 }
             }
-        }  
+        }
     }
     
     private void craftResult(Level level, BlockPos pos) {

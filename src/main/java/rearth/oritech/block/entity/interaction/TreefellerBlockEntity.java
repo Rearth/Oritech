@@ -3,13 +3,11 @@ package rearth.oritech.block.entity.interaction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -86,7 +84,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 var candidate = pendingBlocks.peekLast();
                 var candidateState = level.getBlockState(candidate);
                 var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
-
+                
                 var energyCost = isLog ? LOG_COST : LEAF_COST;
                 if (energyCost > energyStorage.energy) break;
                 
@@ -95,7 +93,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 pendingBlocks.pollLast();
                 if (actionResult == InteractionResult.PASS) continue;
                 lastWorkedAt = level.getGameTime();
-
+                
                 energyStorage.energy -= energyCost;
                 setChanged();
                 
@@ -112,11 +110,13 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     }
     
     private InteractionResult breakTreeBlock(BlockState candidateState, BlockPos candidate) {
-        if (!candidateState.is(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.is(TagContent.CUTTER_LEAVES_MINEABLE)) return InteractionResult.PASS;
+        if (!candidateState.is(TagContent.CUTTER_LOGS_MINEABLE) && !candidateState.is(TagContent.CUTTER_LEAVES_MINEABLE))
+            return InteractionResult.PASS;
         
         var dropped = net.minecraft.level.level.block.Block.getDrops(candidateState, (ServerLevel) level, candidate, null);
-        if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack)))) return InteractionResult.FAIL;
-
+        if (dropped.stream().anyMatch((itemStack) -> !(itemStack.isEmpty() || canInsert(itemStack))))
+            return InteractionResult.FAIL;
+        
         level.addDestroyBlockEffect(candidate, candidateState);
         if (level.getGameTime() % 2 == 0)
             level.playSound(null, candidate, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
@@ -125,12 +125,12 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
         dropped.forEach(stack -> inventory.insert(stack, false));
         return InteractionResult.SUCCESS;
     }
-
+    
     private boolean canInsert(ItemStack stack) {
-        return inventory.heldStacks.stream().anyMatch((itemStack) -> 
-            itemStack.isEmpty() || (ItemStack.isSameItemSameComponents(itemStack, stack) && itemStack.getCount() + stack.getCount() <= itemStack.getMaxStackSize())
+        return inventory.heldStacks.stream().anyMatch((itemStack) ->
+                                                        itemStack.isEmpty() || (ItemStack.isSameItemSameComponents(itemStack, stack) && itemStack.getCount() + stack.getCount() <= itemStack.getMaxStackSize())
         );
-     }
+    }
     
     public void findTarget() {
         

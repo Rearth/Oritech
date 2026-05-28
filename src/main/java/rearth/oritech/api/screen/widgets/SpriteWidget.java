@@ -20,11 +20,21 @@ public class SpriteWidget extends UIComponent {
         this.sprite = sprite;
     }
     
-    public TextureAtlasSprite getSprite() { return sprite; }
-    public void setSprite(TextureAtlasSprite sprite) { this.sprite = sprite; }
+    public TextureAtlasSprite getSprite() {
+        return sprite;
+    }
     
-    public int getColor() { return color; }
-    public void setColor(int argbColor) { this.color = argbColor; }
+    public void setSprite(TextureAtlasSprite sprite) {
+        this.sprite = sprite;
+    }
+    
+    public int getColor() {
+        return color;
+    }
+    
+    public void setColor(int argbColor) {
+        this.color = argbColor;
+    }
     
     public SpriteWidget withColor(int argbColor) {
         this.color = argbColor;

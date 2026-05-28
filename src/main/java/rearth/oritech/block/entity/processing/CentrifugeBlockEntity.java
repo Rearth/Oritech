@@ -23,9 +23,9 @@ import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -71,8 +71,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
             if (fluidContainer.getOutStack().getAmount() + output.getAmount() > fluidContainer.getCapacity())
                 return false; // output too full
             
-            if (!fluidContainer.getOutStack().isEmpty() && !output.isFluidEqual(fluidContainer.getOutStack()))
-                return false;   // output type mismatch
+            return fluidContainer.getOutStack().isEmpty() || output.isFluidEqual(fluidContainer.getOutStack());   // output type mismatch
         }
         
         return true;
@@ -128,7 +127,8 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         
         for (int i = 0; i < chamberCount; i++) {
             var newRecipe = getRecipe();
-            if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe)) break;
+            if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe))
+                break;
             super.finishCrafting(activeRecipe, outputInventory, inputInventory);
             
             if (hasFluidAddon) {

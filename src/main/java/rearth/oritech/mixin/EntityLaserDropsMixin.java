@@ -18,38 +18,39 @@ import rearth.oritech.util.FakePlayerMarker;
 
 @Mixin(Entity.class)
 public abstract class EntityLaserDropsMixin {
-
-
-    @Shadow public abstract boolean isAlive();
-
+    
+    
+    @Shadow
+    public abstract boolean isAlive();
+    
     @Inject(
-            method = "spawnAtLocation(Lnet/minecraft/level/item/ItemStack;F)Lnet/minecraft/level/entity/item/ItemEntity;",
-            at = @At(value = "NEW", args = "class=net/minecraft/level/entity/item/ItemEntity"),
-            cancellable = true
+      method = "spawnAtLocation(Lnet/minecraft/level/item/ItemStack;F)Lnet/minecraft/level/entity/item/ItemEntity;",
+      at = @At(value = "NEW", args = "class=net/minecraft/level/entity/item/ItemEntity"),
+      cancellable = true
     )
     @SuppressWarnings("ConstantValue") // this is mixin
     private void oritech$teleportDropsToLaser(ItemStack stack, float offsetY, CallbackInfoReturnable<ItemEntity> cir) {
         if ((Object) this instanceof LivingEntity thiz && thiz.getLastAttacker() instanceof FakePlayerMarker) {
             Player attacker = (Player) thiz.getLastAttacker();
-
+            
             if (!isAlive()) { // only teleport when we are dead, ie were killed by the laser
                 attacker.addItem(stack);
                 cir.setReturnValue(null);
             }
         }
     }
-
+    
     @Mixin(LivingEntity.class)
     static abstract class LivingEntityMixin extends Entity {
         public LivingEntityMixin(EntityType<?> entityType, Level level) {
             super(entityType, level);
         }
-
+        
         @Inject(method = "dropExperience", at = @At(value = "HEAD"), cancellable = true)
         private void oritech$disableXpForLaser(Entity attacker, CallbackInfo ci) {
             if (attacker instanceof FakePlayerMarker)
                 ci.cancel();
         }
     }
-
+    
 }

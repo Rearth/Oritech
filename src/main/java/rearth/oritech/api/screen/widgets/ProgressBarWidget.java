@@ -2,7 +2,6 @@ package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import rearth.oritech.api.screen.UIComponent;

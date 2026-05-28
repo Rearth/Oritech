@@ -18,8 +18,8 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 

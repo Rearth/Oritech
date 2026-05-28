@@ -23,9 +23,9 @@ import rearth.oritech.api.networking.AdditionalNetworkingProvider;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.FakeMachinePlayer;
 
 import java.lang.reflect.Field;
@@ -66,9 +66,9 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         
         var hitResult = new BlockHitResult(
           new Vec3(
-            (double)targetPosition.getX() + 0.5 + (double)direction.getStepX() * 0.5,
-            (double)targetPosition.getY() + 0.5 + (double)direction.getStepY() * 0.5,
-            (double)targetPosition.getZ() + 0.5 + (double)direction.getStepZ() * 0.5
+            (double) targetPosition.getX() + 0.5 + (double) direction.getStepX() * 0.5,
+            (double) targetPosition.getY() + 0.5 + (double) direction.getStepY() * 0.5,
+            (double) targetPosition.getZ() + 0.5 + (double) direction.getStepZ() * 0.5
           ),
           direction,
           targetPosition,

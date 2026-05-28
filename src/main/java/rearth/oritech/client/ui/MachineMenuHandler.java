@@ -8,6 +8,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
  */
 public interface MachineMenuHandler {
     BlockEntity getBlockEntity();
+    
     int getMachineInvStartSlot(ItemStack stack);
+    
     int getMachineInvEndSlot(ItemStack stack);
 }

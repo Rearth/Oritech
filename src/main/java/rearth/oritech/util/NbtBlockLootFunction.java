@@ -45,7 +45,7 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
     public static Builder<?> builder() {
         return LootItemConditionalFunction.simpleBuilder(NbtBlockLootFunction::new);
     }
-
+    
     @Override
     public MapCodec<NbtBlockLootFunction> codec() {
         return CODEC;

@@ -7,7 +7,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +14,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
@@ -46,10 +44,10 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import rearth.oritech.api.networking.LevelPacketCodec;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.api.networking.LevelPacketCodec;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
@@ -59,9 +57,9 @@ import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -242,7 +240,8 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
             dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
         
         // yes, this will discard items that wont fit anymore
@@ -495,7 +494,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi) {
             areaSize = combi.getQuarryCount();
-            yieldAddons =  combi.getYieldCount();
+            yieldAddons = combi.getYieldCount();
             hasCropFilterAddon = combi.hasCropFilter();
             hasSilkTouchAddon = combi.hasSilk();
         }

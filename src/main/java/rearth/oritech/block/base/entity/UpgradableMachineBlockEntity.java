@@ -179,12 +179,12 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     public boolean isBurstThrottled() {
         return remainingBurstTicks < 0;
     }
-
+    
     private void spawnOverheatSmoke() {
         if (!(level instanceof ServerLevel serverLevel)) {
             return;
         }
-
+        
         var smokePos = worldPosition.getCenter().add(0, 0.35, 0);
         serverLevel.sendParticles(ParticleTypes.SMOKE, smokePos.x, smokePos.y, smokePos.z, 5, 0.15, 0.1, 0.15, 0.01);
     }
@@ -192,7 +192,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     public float getBurstBonus() {
         if (isBurstAvailable()) {
             return 1 / OritechConfig.addonConfig.burstAddonSpeedMultiplier.get().floatValue();
-        } else if(isBurstThrottled()) {
+        } else if (isBurstThrottled()) {
             return OritechConfig.addonConfig.burstAddonThrottleMultiplier.get().floatValue();
         } else {
             return 1f;

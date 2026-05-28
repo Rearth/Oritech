@@ -2,8 +2,6 @@ package rearth.oritech.block.entity.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
-import net.neoforged.neoforge.network.PacketDistributor;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
@@ -11,17 +9,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.apache.commons.lang3.time.StopWatch;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
 import java.util.stream.IntStream;
@@ -67,7 +66,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
             return;
         }
-
+        
         refreshTargetCaches(level, pos, targets);
         
         var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
@@ -111,7 +110,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 for (var cachedTarget : filteredTargetItemStorages) {
                     if (cachedTarget.pos().equals(takenFrom))
                         continue;    // skip when targeting same machine
-
+                    
                     var targetStorage = cachedTarget.lookup().find();
                     if (targetStorage == null || !targetStorage.supportsInsertion()) {
                         continue;
@@ -148,13 +147,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
         
     }
-
+    
     private void refreshTargetCaches(Level level, BlockPos pos, Set<Tuple<BlockPos, Direction>> targets) {
         var netHash = targets.hashCode();
         if (netHash == filteredTargetsNetHash && filteredTargetItemStorages != null) {
             return;
         }
-
+        
         filteredTargetItemStorages = targets.stream()
                                        .filter(target -> {
                                            var targetDir = target.getB();
@@ -168,7 +167,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                        .map(target -> new CachedTarget<>(target.getA(), target.getB(), ItemApi.BLOCK.createCache(level, target.getA(), target.getB())))
                                        .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(pos)))
                                        .toList();
-
+        
         filteredTargetsNetHash = netHash;
         cachedTransferPaths.clear();
     }
@@ -318,7 +317,8 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             level.blockEntityChanged(worldPosition);
     }
     
-    public record RenderStackData(BlockPos self, ItemStack rendered, List<BlockPos> path, Long startedAt, int pathLength) implements CustomPacketPayload {
+    public record RenderStackData(BlockPos self, ItemStack rendered, List<BlockPos> path, Long startedAt,
+                                  int pathLength) implements CustomPacketPayload {
         
         public static final Type<RenderStackData> PIPE_ITEMS_ID = new Type<>(Oritech.id("pipe_items"));
         

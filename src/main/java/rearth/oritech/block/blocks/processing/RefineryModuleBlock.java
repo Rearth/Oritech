@@ -104,7 +104,8 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         
-        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
+        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand))
+            return ItemInteractionResult.sidedSuccess(true);
         
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }

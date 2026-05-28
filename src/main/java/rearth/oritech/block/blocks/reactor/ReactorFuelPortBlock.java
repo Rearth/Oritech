@@ -34,7 +34,7 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
         
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorFuelPortEntity) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;

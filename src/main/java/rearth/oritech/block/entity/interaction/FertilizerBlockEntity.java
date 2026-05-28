@@ -14,9 +14,9 @@ import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
 import rearth.oritech.api.networking.SyncField;
@@ -24,7 +24,10 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.init.*;
+import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
+import rearth.oritech.init.TagContent;
 
 import java.util.List;
 import java.util.Objects;
@@ -118,7 +121,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
         
         if (!hasWorkAvailable(processed)) return;
-
+        
         if (targetState.getBlock() instanceof CropBlock cropBlock) {
             var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
             newAge = Math.min(newAge, cropBlock.getMaxAge());
@@ -131,10 +134,10 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
                 fertilized = true;
             }
         }
-
+        
         var farmlandPosition = processed.below(2);
         var farmlandState = level.getBlockState(farmlandPosition);
-
+        
         if (farmlandState.getBlock() instanceof FarmBlock && farmlandState.getValue(BlockStateProperties.MOISTURE) != 7) {
             level.setBlockAndUpdate(farmlandPosition, farmlandState.setValue(BlockStateProperties.MOISTURE, 7));
         }
@@ -145,7 +148,8 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
                 inventory.setItem(0, inventoryStack);
             }
             super.finishBlockWork(processed);
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
             level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
@@ -167,7 +171,10 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
             fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
-            if (level instanceof ServerLevel sl) { var bp = getCurrentTarget().below(); sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0); }
+            if (level instanceof ServerLevel sl) {
+                var bp = getCurrentTarget().below();
+                sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0);
+            }
         }
     }
     

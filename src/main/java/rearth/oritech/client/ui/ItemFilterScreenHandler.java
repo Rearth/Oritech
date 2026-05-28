@@ -58,10 +58,10 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
         // but player inventory is 0-8 for hotbar, 9-35 for inventory
         var slotStack = player.getInventory().getItem((slot + 9) % 36);
         if (slotStack.isEmpty()) return ItemStack.EMPTY;
-
+        
         var displayStack = new ItemStack(slotStack.getItem(), 1);
         displayStack.applyComponents(slotStack.getComponents());
-
+        
         var data = blockEntity.getFilterSettings();
         for (var item : data.items().values()) {
             // don't add item to filter if it's already in filter
@@ -82,7 +82,7 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
                 filterScreen.updateItemFilters();
             }
         }
-
+        
         return ItemStack.EMPTY;
     }
     

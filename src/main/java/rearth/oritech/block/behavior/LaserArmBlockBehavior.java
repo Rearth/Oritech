@@ -81,15 +81,15 @@ public class LaserArmBlockBehavior {
                     return false;
                 
                 var transferCapacity = (int) Math.min(Integer.MAX_VALUE, Math.min(insertAmount, laserEntity.energyRequiredToFire()));
-
+                
                 try (var transaction = Transaction.openRoot()) {
                     var inserted = storageCandidate.insert(transferCapacity, transaction);
                     if (inserted > 0 && inserted <= transferCapacity) {
                         transaction.commit();
-
+                        
                         if (blockEntity instanceof AtomicForgeBlockEntity atomicForgeBlock)
                             atomicForgeBlock.lastWorkedAt = level.getGameTime();
-
+                        
                         return true;
                     }
                 }

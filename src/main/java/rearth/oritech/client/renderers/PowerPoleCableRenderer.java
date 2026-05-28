@@ -85,6 +85,7 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
     
     /**
      * Renders a cable hanging between two points in local render space.
+     *
      * @param startPos The start position relative to the BlockEntity origin (e.g. 0.5, 0.5, 0.5 is center).
      * @param endPos   The end position relative to the BlockEntity origin.
      */

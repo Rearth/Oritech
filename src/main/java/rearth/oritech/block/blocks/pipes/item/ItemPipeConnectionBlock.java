@@ -35,7 +35,7 @@ import static rearth.oritech.block.blocks.pipes.item.ItemPipeBlock.ITEM_PIPE_DAT
 public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     
     public static BooleanProperty HAS_MOTOR = BooleanProperty.create("has_motor");
-
+    
     public ItemPipeConnectionBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(HAS_MOTOR, false));
@@ -94,7 +94,7 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     public BlockState getNormalBlock() {
         return BlockContent.ITEM_PIPE.defaultBlockState();
     }
-
+    
     @Override
     protected VoxelShape[] createShapes() {
         return THIN_SHAPES;
@@ -114,45 +114,45 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
         return ITEM_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
-
+    
     public static class FramedItemPipeConnectionBlock extends ItemPipeConnectionBlock {
-
+        
         public FramedItemPipeConnectionBlock(Properties settings) {
             super(settings);
         }
-
+        
         @Override
         public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return Shapes.block();
         }
-
+        
         @Override
         public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return state.getShape(level, pos);
         }
-
+        
         @Override
         public BlockState getNormalBlock() {
             return BlockContent.FRAMED_ITEM_PIPE.defaultBlockState();
         }
-
+        
         @Override
         public BlockState getConnectionBlock() {
             return BlockContent.FRAMED_ITEM_PIPE_CONNECTION.defaultBlockState();
         }
     }
-
+    
     public static class TransparentItemPipeConnectionBlock extends ItemPipeConnectionBlock {
-
+        
         public TransparentItemPipeConnectionBlock(Properties settings) {
             super(settings);
         }
-
+        
         @Override
         public BlockState getNormalBlock() {
             return BlockContent.TRANSPARENT_ITEM_PIPE.defaultBlockState();
         }
-
+        
         @Override
         public BlockState getConnectionBlock() {
             return BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.defaultBlockState();

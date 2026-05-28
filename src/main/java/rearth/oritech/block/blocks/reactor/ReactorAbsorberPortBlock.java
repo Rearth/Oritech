@@ -34,7 +34,7 @@ public class ReactorAbsorberPortBlock extends BaseReactorBlock implements Entity
         
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorAbsorberPortEntity) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;

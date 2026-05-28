@@ -29,7 +29,6 @@ import rearth.oritech.api.screen.data.DisplayDataSource;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
-import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.util.ScreenProvider;
 
 import java.util.ArrayList;
@@ -98,21 +97,22 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             }
         }
     }
-
+    
     protected void addEnergyDisplay() {
         if (screenData.showEnergy() && blockEntity instanceof EnergyProvider energyProvider) {
             var storage = energyProvider.getEnergyLookup(null);
             dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
         }
     }
-
+    
     protected void addProgressDisplay() {
         if (screenData.showProgress()) {
             dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
         }
     }
-
-    protected void addAdditionalDisplays() {}
+    
+    protected void addAdditionalDisplays() {
+    }
     
     public Collection<DisplayDataSource> getDataDisplays() {
         return dataDisplays;
@@ -271,9 +271,10 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         super.broadcastChanges();
     }
     
-    public record FluidContainerInteractionPacket(BlockPos position, int tankIndex, boolean extract) implements CustomPacketPayload {
+    public record FluidContainerInteractionPacket(BlockPos position, int tankIndex,
+                                                  boolean extract) implements CustomPacketPayload {
         public static final Type<FluidContainerInteractionPacket> PACKET_ID =
-            new Type<>(Oritech.id("fluid_container_interaction"));
+          new Type<>(Oritech.id("fluid_container_interaction"));
         
         @Override
         public Type<? extends CustomPacketPayload> type() {

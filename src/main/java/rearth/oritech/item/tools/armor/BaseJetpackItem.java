@@ -29,12 +29,18 @@ import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvider {
     
     boolean requireUpward();
+    
     int getRfUsage();
+    
     int getFuelUsage();
+    
     long getFuelCapacity();
+    
     float getSpeed();
     
-    default boolean requireTakeoff() {return true;}
+    default boolean requireTakeoff() {
+        return true;
+    }
     
     default void tickJetpack(ItemStack stack, Entity entity, Level level) {
         
@@ -98,15 +104,15 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
         
         level.addParticle(ParticleTypes.SMOKE,
-            particlePosA.x + (level.random.nextDouble() - 0.5) * 0.2,
-            particlePosA.y + (level.random.nextDouble() - 0.5) * 0.2,
-            particlePosA.z + (level.random.nextDouble() - 0.5) * 0.2,
-            direction.x, direction.y, direction.z);
+          particlePosA.x + (level.random.nextDouble() - 0.5) * 0.2,
+          particlePosA.y + (level.random.nextDouble() - 0.5) * 0.2,
+          particlePosA.z + (level.random.nextDouble() - 0.5) * 0.2,
+          direction.x, direction.y, direction.z);
         level.addParticle(ParticleTypes.SMOKE,
-            particlePosB.x + (level.random.nextDouble() - 0.5) * 0.2,
-            particlePosB.y + (level.random.nextDouble() - 0.5) * 0.2,
-            particlePosB.z + (level.random.nextDouble() - 0.5) * 0.2,
-            direction.x, direction.y, direction.z);
+          particlePosB.x + (level.random.nextDouble() - 0.5) * 0.2,
+          particlePosB.y + (level.random.nextDouble() - 0.5) * 0.2,
+          particlePosB.z + (level.random.nextDouble() - 0.5) * 0.2,
+          direction.x, direction.y, direction.z);
     }
     
     private static boolean isJetpackStarted(Player player, Level level, boolean up) {

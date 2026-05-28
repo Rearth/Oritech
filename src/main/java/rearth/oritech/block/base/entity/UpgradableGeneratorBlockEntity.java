@@ -160,7 +160,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             
         } else {
             var inserted = energyStorage.internalInsert(produced, transaction);
-            if (inserted < 1) return false; // allows it to fully fill, potentially loosing some RF, but failing if nothing was inserted (e.g. inserted doesnt have to equal produced)
+            return inserted >= 1; // allows it to fully fill, potentially loosing some RF, but failing if nothing was inserted (e.g. inserted doesnt have to equal produced)
         }
         
         return true;

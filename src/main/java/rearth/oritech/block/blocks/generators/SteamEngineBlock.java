@@ -68,7 +68,6 @@ public class SteamEngineBlock extends MultiblockMachine {
             }
             
             
-            
         }
         
         return super.useWithoutItem(state, level, pos, player, hit);

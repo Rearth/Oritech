@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.accelerator.AcceleratorRingBlock;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 
 import java.util.*;

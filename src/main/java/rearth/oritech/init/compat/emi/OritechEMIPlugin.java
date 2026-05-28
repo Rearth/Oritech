@@ -79,7 +79,7 @@ public class OritechEMIPlugin implements EmiPlugin {
         registry.addRecipeHandler(ModScreens.CENTRIFUGE_SCREEN, new EmiTransferHandler<>(RecipeContent.CENTRIFUGE.getIdentifier()));
         registry.addRecipeHandler(ModScreens.CENTRIFUGE_SCREEN, new EmiTransferHandler<>(RecipeContent.CENTRIFUGE_FLUID.getIdentifier()));
         registry.addRecipeHandler(ModScreens.REFINERY_SCREEN, new EmiTransferHandler<>(RecipeContent.REFINERY.getIdentifier()));
-
+        
         registry.addDragDropHandler(ItemFilterScreen.class, new EmiItemFilterDragDropHandler());
         
         registry.addGenericExclusionArea((screen, consumer) -> {

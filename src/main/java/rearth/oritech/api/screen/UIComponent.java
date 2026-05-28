@@ -1,7 +1,6 @@
 package rearth.oritech.api.screen;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
@@ -40,8 +39,8 @@ public abstract class UIComponent {
         
         if (!surface.isNone()) {
             surface.render(graphics,
-                x - padding.left(), y - padding.top(),
-                width + padding.horizontal(), height + padding.vertical());
+              x - padding.left(), y - padding.top(),
+              width + padding.horizontal(), height + padding.vertical());
         }
         
         renderContent(graphics, mouseX, mouseY, delta);
@@ -57,7 +56,8 @@ public abstract class UIComponent {
     /**
      * Called every screen tick (~20 times/second) for animations or data updates.
      */
-    public void tick() {}
+    public void tick() {
+    }
     
     public boolean isMouseOver(double mouseX, double mouseY) {
         int px = x - padding.left();
@@ -67,45 +67,113 @@ public abstract class UIComponent {
         return mouseX >= px && mouseX < px + pw && mouseY >= py && mouseY < py + ph;
     }
     
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public int getWidth() { return width; }
-    public int getHeight() { return height; }
-    public Insets getPadding() { return padding; }
-    public OritechSurface getSurface() { return surface; }
-    public int getZIndex() { return zIndex; }
-    public boolean isVisible() { return visible; }
+    public int getX() {
+        return x;
+    }
     
-    public void setX(int x) { this.x = x; }
-    public void setY(int y) { this.y = y; }
+    public int getY() {
+        return y;
+    }
+    
+    public int getWidth() {
+        return width;
+    }
+    
+    public int getHeight() {
+        return height;
+    }
+    
+    public Insets getPadding() {
+        return padding;
+    }
+    
+    public OritechSurface getSurface() {
+        return surface;
+    }
+    
+    public int getZIndex() {
+        return zIndex;
+    }
+    
+    public boolean isVisible() {
+        return visible;
+    }
+    
+    public void setX(int x) {
+        this.x = x;
+    }
+    
+    public void setY(int y) {
+        this.y = y;
+    }
+    
     public void setPosition(int x, int y) {
         this.x = x;
         this.y = y;
     }
     
-    public void setWidth(int width) { this.width = width; }
-    public void setHeight(int height) { this.height = height; }
+    public void setWidth(int width) {
+        this.width = width;
+    }
+    
+    public void setHeight(int height) {
+        this.height = height;
+    }
+    
     public void setSize(int width, int height) {
         this.width = width;
         this.height = height;
     }
     
-    public void setPadding(Insets padding) { this.padding = padding; }
-    public void setSurface(OritechSurface surface) { this.surface = surface; }
-    public void setZIndex(int zIndex) { this.zIndex = zIndex; }
-    public void setVisible(boolean visible) { this.visible = visible; }
+    public void setPadding(Insets padding) {
+        this.padding = padding;
+    }
+    
+    public void setSurface(OritechSurface surface) {
+        this.surface = surface;
+    }
+    
+    public void setZIndex(int zIndex) {
+        this.zIndex = zIndex;
+    }
+    
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
     
     // Content area helpers (with outward padding, content = widget bounds)
-    public int contentX() { return x; }
-    public int contentY() { return y; }
-    public int contentWidth() { return width; }
-    public int contentHeight() { return height; }
+    public int contentX() {
+        return x;
+    }
+    
+    public int contentY() {
+        return y;
+    }
+    
+    public int contentWidth() {
+        return width;
+    }
+    
+    public int contentHeight() {
+        return height;
+    }
     
     // Padded (total visual) area helpers
-    public int paddedX() { return x - padding.left(); }
-    public int paddedY() { return y - padding.top(); }
-    public int paddedWidth() { return width + padding.horizontal(); }
-    public int paddedHeight() { return height + padding.vertical(); }
+    public int paddedX() {
+        return x - padding.left();
+    }
+    
+    public int paddedY() {
+        return y - padding.top();
+    }
+    
+    public int paddedWidth() {
+        return width + padding.horizontal();
+    }
+    
+    public int paddedHeight() {
+        return height + padding.vertical();
+    }
     
     // Fluent setters
     public UIComponent withSurface(OritechSurface surface) {
@@ -167,8 +235,19 @@ public abstract class UIComponent {
     
     // mouse events (override in interactive widgets)
     
-    public boolean handleClick(double mouseX, double mouseY, int button) { return false; }
-    public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) { return false; }
-    public boolean handleMouseRelease(double mouseX, double mouseY, int button) { return false; }
-    public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) { return false; }
+    public boolean handleClick(double mouseX, double mouseY, int button) {
+        return false;
+    }
+    
+    public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+        return false;
+    }
+    
+    public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+        return false;
+    }
+    
+    public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
+        return false;
+    }
 }

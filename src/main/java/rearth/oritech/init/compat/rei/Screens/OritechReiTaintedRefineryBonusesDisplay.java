@@ -49,8 +49,8 @@ public class OritechReiTaintedRefineryBonusesDisplay implements DisplayCategory<
         
         // title
         widgets.add(Widgets.createLabel(
-            new Point(x + 6, y + 6),
-            Component.translatable("emi.title.oritech.tainted_bonus." + bonusType)
+          new Point(x + 6, y + 6),
+          Component.translatable("emi.title.oritech.tainted_bonus." + bonusType)
         ).leftAligned().color(0xFFFFFF).noShadow());
         
         // block grid (8 columns)
@@ -60,14 +60,14 @@ public class OritechReiTaintedRefineryBonusesDisplay implements DisplayCategory<
             var col = i % cols;
             var row = i / cols;
             widgets.add(Widgets.createSlot(new Point(x + 6 + col * 18, y + 18 + row * 18))
-                .entries(entries.get(i)).markInput());
+                          .entries(entries.get(i)).markInput());
         }
         
         // description text at bottom
         var rows = (entries.size() + cols - 1) / cols;
         widgets.add(Widgets.createLabel(
-            new Point(x + 6, y + 20 + rows * 18),
-            Component.translatable("emi.description.oritech.tainted_bonus." + bonusType)
+          new Point(x + 6, y + 20 + rows * 18),
+          Component.translatable("emi.description.oritech.tainted_bonus." + bonusType)
         ).leftAligned().color(0xFFFFFF).noShadow());
         
         return widgets;

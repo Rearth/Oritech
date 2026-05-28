@@ -2,7 +2,6 @@ package rearth.oritech.api.recipe;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
@@ -10,18 +9,17 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import rearth.oritech.Oritech;
-import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.SizedIngredient;
+import rearth.oritech.init.datapack.AugmentData;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static rearth.oritech.api.recipe.util.RecipeHelpers.of;
+
 public class AugmentRecipeBuilder {
-    private final RegistrySupplier<RecipeType<AugmentDataRecipe>> type;
     private final String resourcePath;
     
     private boolean toggleable;
@@ -35,15 +33,19 @@ public class AugmentRecipeBuilder {
     private int time;
     private long rfCost;
     
-    private AugmentDataRecipe.AugmentDefinition definition;
+    private AugmentData.AugmentDefinition definition;
     
-    private AugmentRecipeBuilder(RegistrySupplier<RecipeType<AugmentDataRecipe>> type, String resourcePath) {
-        this.type = type;
+    private AugmentRecipeBuilder(String resourcePath) {
         this.resourcePath = resourcePath;
     }
     
     public static AugmentRecipeBuilder build() {
-        return new AugmentRecipeBuilder(RecipeContent.AUGMENT_DATA, "augment");
+        return new AugmentRecipeBuilder("augment");
+    }
+    
+    @FunctionalInterface
+    public interface Output {
+        void accept(Identifier id, AugmentData augmentData);
     }
     
     public AugmentRecipeBuilder researchCost(List<SizedIngredient> researchCosts) {
@@ -61,7 +63,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder researchCost(Ingredient researchCost, int count) {
-        return researchCost(new SizedIngredient(count, researchCost));
+        return researchCost(new SizedIngredient(researchCost, count));
     }
     
     public AugmentRecipeBuilder researchCost(Ingredient researchCost) {
@@ -69,7 +71,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder researchCost(TagKey<Item> researchCostTag, int count) {
-        return researchCost(Ingredient.of(researchCostTag), count);
+        return researchCost(of(researchCostTag), count);
     }
     
     public AugmentRecipeBuilder researchCost(TagKey<Item> researchCostTag) {
@@ -77,7 +79,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder researchCost(ItemLike researchCost, int count) {
-        return researchCost(Ingredient.of(researchCost), count);
+        return researchCost(of(researchCost), count);
     }
     
     public AugmentRecipeBuilder researchCost(ItemLike researchCost) {
@@ -99,7 +101,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder applyCost(Ingredient applyCost, int count) {
-        return applyCost(new SizedIngredient(count, applyCost));
+        return applyCost(new SizedIngredient(applyCost, count));
     }
     
     public AugmentRecipeBuilder applyCost(Ingredient applyCost) {
@@ -107,7 +109,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder applyCost(TagKey<Item> applyCostTag, int count) {
-        return applyCost(Ingredient.of(applyCostTag), count);
+        return applyCost(of(applyCostTag), count);
     }
     
     public AugmentRecipeBuilder applyCost(TagKey<Item> applyCostTag) {
@@ -115,7 +117,7 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder applyCost(ItemLike applyCost, int count) {
-        return applyCost(Ingredient.of(applyCost), count);
+        return applyCost(of(applyCost), count);
     }
     
     public AugmentRecipeBuilder applyCost(ItemLike applyCost) {
@@ -172,47 +174,47 @@ public class AugmentRecipeBuilder {
     }
     
     public AugmentRecipeBuilder effectDefinition(Holder<MobEffect> entry, int amplifier) {
-        this.definition = new AugmentDataRecipe.EffectDefinition(BuiltInRegistries.MOB_EFFECT.getKey(entry.value()), amplifier);
+        this.definition = new AugmentData.EffectDefinition(BuiltInRegistries.MOB_EFFECT.getKey(entry.value()), amplifier);
         return this;
     }
     
     public AugmentRecipeBuilder modifierDefinition(Holder<Attribute> entry, float amount, AttributeModifier.Operation op) {
-        this.definition = new AugmentDataRecipe.ModifierDefinition(BuiltInRegistries.ATTRIBUTE.getKey(entry.value()), op.id(), amount);
+        this.definition = new AugmentData.ModifierDefinition(BuiltInRegistries.ATTRIBUTE.getKey(entry.value()), op.id(), amount);
         return this;
     }
     
     public AugmentRecipeBuilder customAugmentDefinition(Identifier customAugmentId) {
-        this.definition = new AugmentDataRecipe.CustomAugmentDefinition(customAugmentId);
+        this.definition = new AugmentData.CustomAugmentDefinition(customAugmentId);
         return this;
     }
     
     private void validate(Identifier id) throws IllegalStateException {
         if (researchCosts == null || researchCosts.isEmpty())
-            throw new IllegalStateException("Research costs expected for recipe " + id + " (type " + type + ")");
+            throw new IllegalStateException("Research costs expected for augment " + id);
         if (applyCosts == null || applyCosts.isEmpty())
-            throw new IllegalStateException("Apply costs expected for recipe " + id + " (type " + type + ")");
+            throw new IllegalStateException("Apply costs expected for augment " + id);
         if (requiredStation == null)
-            throw new IllegalStateException("required station expected for recipe " + id + " (type " + type + ")");
+            throw new IllegalStateException("Required station expected for augment " + id);
         
         if (definition == null)
-            throw new IllegalStateException("Augment definition expected for recipe " + id + " (type " + type + ")");
+            throw new IllegalStateException("Augment definition expected for augment " + id);
     }
     
-    public void export(RecipeOutput exporter, String suffix) {
+    public void export(Output exporter, String suffix) {
         var id = Oritech.id(resourcePath + "/" + suffix);
         validate(id);
         
-                exporter.accept(id, new AugmentDataRecipe(
-                    toggleable,
-                    researchCosts,
-                    applyCosts,
-                    requirements != null ? requirements : List.of(),
-                    requiredStation,
-                    uiX,
-                    uiY,
-                    time,
-                    rfCost,
-                    definition
-                ), null);
+        exporter.accept(id, new AugmentData(
+          toggleable,
+          researchCosts,
+          applyCosts,
+          requirements != null ? requirements : List.of(),
+          requiredStation,
+          uiX,
+          uiY,
+          time,
+          rfCost,
+          definition
+        ));
     }
 }

@@ -2,7 +2,6 @@
   "itemGroup.oritech": "Example Mod Tab",
   "block.oritech.example_block": "Example Block",
   "item.oritech.example_item": "Example Item",
-
   "oritech.configuration.title": "Oritech Configs",
   "oritech.configuration.section.oritech.common.toml": "Oritech Configs",
   "oritech.configuration.section.oritech.common.toml.title": "Oritech Configs",

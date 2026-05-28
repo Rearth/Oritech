@@ -4,15 +4,15 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class ParticleCollisionRecipeBuilder extends OritechRecipeBuilder {
-
+    
     protected ParticleCollisionRecipeBuilder() {
         super(RecipeContent.PARTICLE_COLLISION, "particle");
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new ParticleCollisionRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs == null || inputs.size() != 2)

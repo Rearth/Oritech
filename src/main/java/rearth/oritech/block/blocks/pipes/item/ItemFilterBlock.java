@@ -42,7 +42,7 @@ import java.util.List;
 public class ItemFilterBlock extends Block implements EntityBlock {
     
     public static final DirectionProperty TARGET_DIR = DirectionProperty.create("target_dir");
-
+    
     private static final VoxelShape[] BOUNDING_SHAPES;
     
     public ItemFilterBlock(Properties settings) {
@@ -77,7 +77,7 @@ public class ItemFilterBlock extends Block implements EntityBlock {
         
         if (!level.isClientSide()) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;
@@ -104,12 +104,12 @@ public class ItemFilterBlock extends Block implements EntityBlock {
         
         super.appendHoverText(stack, context, tooltip, options);
     }
-
-        @Override
+    
+    @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BOUNDING_SHAPES[state.getValue(TARGET_DIR).get3DDataValue()];
     }
-
+    
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShape(state, level, pos, context);
@@ -134,23 +134,23 @@ public class ItemFilterBlock extends Block implements EntityBlock {
         
         return super.playerWillDestroy(level, pos, state, player);
     }
-
+    
     static {
         BOUNDING_SHAPES = new VoxelShape[Direction.values().length];
         for (var facing : Direction.values()) {
             BOUNDING_SHAPES[facing.ordinal()] = Shapes.or(
-                Geometry.rotateVoxelShape(Shapes.box(0.25, 0.25, -0.00375, 0.75, 0.75, 0.125), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0, 0.375, 0.375, 0.125, 0.625, 0.625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.375, 0.875, 0.375, 0.625, 1, 0.625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.875, 0.375, 0.375, 1, 0.625, 0.625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.375, 0, 0.375, 0.625, 0.125, 0.625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.375, 0.375, 0.875, 0.625, 0.625, 1), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.1875, 0.1875, 0.8125, 0.8125, 0.8125), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, -0.03125, 0.5625, 0.8125, 0.1875), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.4375, -0.03125, 0.8125, 0.5625, 0.1875), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.125, 0.4375, 0.4375, 0.875, 0.5625, 0.5625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.4375, 0.5625, 0.875, 0.5625), facing, AttachFace.FLOOR),
-                Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.4375, 0.8125, 0.5625, 0.5625, 0.875), facing, AttachFace.FLOOR));
+              Geometry.rotateVoxelShape(Shapes.box(0.25, 0.25, -0.00375, 0.75, 0.75, 0.125), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0, 0.375, 0.375, 0.125, 0.625, 0.625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.375, 0.875, 0.375, 0.625, 1, 0.625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.875, 0.375, 0.375, 1, 0.625, 0.625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.375, 0, 0.375, 0.625, 0.125, 0.625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.375, 0.375, 0.875, 0.625, 0.625, 1), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.1875, 0.1875, 0.8125, 0.8125, 0.8125), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, -0.03125, 0.5625, 0.8125, 0.1875), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.4375, -0.03125, 0.8125, 0.5625, 0.1875), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.125, 0.4375, 0.4375, 0.875, 0.5625, 0.5625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.4375, 0.5625, 0.875, 0.5625), facing, AttachFace.FLOOR),
+              Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.4375, 0.8125, 0.5625, 0.5625, 0.875), facing, AttachFace.FLOOR));
         }
     }
 }

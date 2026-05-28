@@ -37,7 +37,9 @@ import java.util.function.Consumer;
 
 public class PromethiumAxeItem extends AxeItem implements GeoItem {
     
-    public record PendingBlock(Level level, BlockPos pos, ItemStack tool) {};
+    public record PendingBlock(Level level, BlockPos pos, ItemStack tool) {
+    }
+    
     public static final Deque<PendingBlock> pendingBlocks = new ArrayDeque<>();
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
@@ -48,11 +50,11 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
         // this lets PromethiumAxeItem extend AxeItem (for the right-click actions) and still ignore
         // the default tool components set up by AxeItem
         var toolComponent = new Tool(List.of(
-            Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
-            Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
-            Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
-            Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
-            1.0F, 1);
+          Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
+          Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
+          Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
+          Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
+          1.0F, 1);
         this.components = settings.component(DataComponents.TOOL, toolComponent).buildAndValidateComponents();
     }
     
@@ -91,7 +93,8 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             level.playSound(null, candidatePos, candidateState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.5f, 1f);
             level.addDestroyBlockEffect(candidatePos, candidateState);
             
-            if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+            if (level instanceof ServerLevel sl)
+                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
             
             if (candidateState.is(BlockTags.LOGS)) break;
         }

@@ -18,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -68,7 +67,8 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
         
         try {
             return getBlockEntityType().getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(pos, state);
-        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException |
+                 IllegalAccessException e) {
             Oritech.LOGGER.error("Unable to create blockEntity for " + getBlockEntityType().getSimpleName() + " at " + this);
             return new PulverizerBlockEntity(pos, state);
         }
@@ -118,7 +118,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide()) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;

@@ -27,7 +27,7 @@ public class DelegatingInventoryStorage implements ResourceHandler<ItemResource>
         if (canUseBackend()) return backingStorage.get().size();
         return 0;
     }
-
+    
     @Override
     public ItemResource getResource(int index) {
         if (canUseBackend()) return backingStorage.get().getResource(index);
@@ -57,19 +57,19 @@ public class DelegatingInventoryStorage implements ResourceHandler<ItemResource>
         if (canUseBackend()) return backingStorage.get().insert(index, resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int insert(ItemResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().insert(resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().extract(index, resource, amount, transaction);
         return 0;
     }
-
+    
     @Override
     public int extract(ItemResource resource, int amount, TransactionContext transaction) {
         if (canUseBackend()) return backingStorage.get().extract(resource, amount, transaction);

@@ -41,7 +41,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         
         Vec3 target;
         var isIdle = false;
-        if (laserEntity.getCurrentTarget() == null || laserEntity.getCurrentTarget().closerThan(BlockPos.ZERO, 0.1f))  {
+        if (laserEntity.getCurrentTarget() == null || laserEntity.getCurrentTarget().closerThan(BlockPos.ZERO, 0.1f)) {
             target = getIdleTarget(laserEntity);
             isIdle = true;
         } else {
@@ -112,7 +112,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
         var offsetB = new Vec3(Math.pow(Math.sin(entity.getLevel().getGameTime() / 40f + 1.3f), 3), 0, 0);
         
         if (entity.getLevel().getRandom().nextFloat() > 0.9f) {
-             lastActivePlayerPos = Minecraft.getInstance().player.getEyePosition();
+            lastActivePlayerPos = Minecraft.getInstance().player.getEyePosition();
         }
         
         if (lastActivePlayerPos.equals(Vec3.ZERO))
@@ -124,7 +124,7 @@ public class LaserArmModel<T extends LaserArmBlockEntity & GeoAnimatable> extend
     }
     
     public static float lerp(float a, float b, float f) {
-        if (Math.abs(b-a) > 350 * Geometry.DEG_TO_RAD) return b;
+        if (Math.abs(b - a) > 350 * Geometry.DEG_TO_RAD) return b;
         return a + f * (b - a);
     }
     

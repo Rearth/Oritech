@@ -1,58 +1,66 @@
 package rearth.oritech.block.entity.augmenter;
 
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.block.MultiblockMachine;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.client.ui.PlayerModifierScreenHandler;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
-import rearth.oritech.init.recipes.AugmentDataRecipe;
-import rearth.oritech.util.*;
-import software.bernie.geckolib.animatable.GeoBlockEntity;
-import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
-import software.bernie.geckolib.animation.AnimatableManager;
-import software.bernie.geckolib.animation.AnimationController;
-import software.bernie.geckolib.util.GeckoLibUtil;
+import rearth.oritech.init.datapack.AugmentData;
+import rearth.oritech.util.Geometry;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.ScreenProvider;
 
 import java.util.*;
 
 public class AugmentApplicationEntity extends NetworkedBlockEntity implements MultiblockMachineController, GeoBlockEntity,
-                                                                       ExtendedMenuProvider, ItemApi.BlockProvider, EnergyApi.BlockProvider, ScreenProvider {
+                                                                                MenuProvider, ItemProvider, EnergyProvider, ScreenProvider {
     
     // config
     public static long maxEnergyTransfer = OritechConfig.augmenterMaxEnergy.get() / 10;
@@ -76,11 +84,11 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::setChanged);
     
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    private final SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::setChanged);
+    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(maxEnergyStored, maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::setChanged, false);
     
     
     public AugmentApplicationEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, pos, state);
+        super(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY.get(), pos, state);
     }
     
     @Override
@@ -107,7 +115,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         inventory.serialize(output);
-        output.putLong("rf", energyStorage.getAmount());
+        energyStorage.serialize(output);
         serializeMultiblock(output);
         
         var list = output.childrenList("researched");
@@ -128,8 +136,10 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         inventory.deserialize(input);
-        energyStorage.setAmount(input.getLongOr("rf", 0));
+        energyStorage.deserialize(input);
         deserializeMultiblock(input);
+        
+        researchedAugments.clear();
         
         for (var element : input.childrenListOrEmpty("researched")) {
             element.read("id", Identifier.CODEC).ifPresent(researchedAugments::add);
@@ -138,44 +148,29 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     public void researchAugment(Identifier augment, boolean creative, Player player) {
+        var currentLevel = Objects.requireNonNull(level);
         
-        if (!PlayerAugments.allAugments.containsKey(augment)) {
-            Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
+        if (PlayerAugments.getAugment(currentLevel.registryAccess(), augment) == null) {
+            Oritech.LOGGER.error("Player augment with id {} not found. This should never happen", augment);
             return;
         }
         
         if (researchedAugments.contains(augment)) {
-            Oritech.LOGGER.warn("Player tried to research already researched augment " + augment);
+            Oritech.LOGGER.warn("Player tried to research already researched augment {}", augment);
             return;
         }
         
-        var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
+        var augmentData = getAugmentData(augment);
+        if (augmentData == null) return;
         
-        var extracted = energyStorage.extract(recipe.rfCost(), false);
-        
-        // remove available resources
-        for (var wantedInput : recipe.researchCost()) {
-            var type = wantedInput.ingredient();
-            var missingCount = wantedInput.count();
+        try (var transaction = Transaction.openRoot()) {
             
-            for (var stack : this.inventory.heldStacks) {
-                if (type.test(stack)) {
-                    var takeAmount = Math.min(stack.getCount(), missingCount);
-                    missingCount -= takeAmount;
-                    stack.shrink(takeAmount);
-                    
-                    if (missingCount <= 0) break;
-                }
-            }
-            for (var stack : player.getInventory().items) {
-                if (type.test(stack)) {
-                    var takeAmount = Math.min(stack.getCount(), missingCount);
-                    missingCount -= takeAmount;
-                    stack.shrink(takeAmount);
-                    
-                    if (missingCount <= 0) break;
-                }
-            }
+            var extracted = energyStorage.internalExtract(augmentData.rfCost(), transaction);
+            if (extracted != augmentData.rfCost() && !creative) return;
+            
+            if (!consumeIngredients(augmentData.researchCost(), player, transaction) && !creative) return;
+            
+            transaction.commit();
         }
         
         // assign first idle station
@@ -185,12 +180,12 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             if (station.working) continue;
             
             
-            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(recipe.requiredStation())) continue;
+            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(augmentData.requiredStation())) continue;
             
             station.selectedResearch = augment;
             station.working = true;
-            station.researchStartedAt = level.getGameTime();
-            station.workTime = creative ? 5 : recipe.time();
+            station.researchStartedAt = currentLevel.getGameTime();
+            station.workTime = creative ? 5 : augmentData.time();
             
             break;
             
@@ -198,9 +193,9 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         this.setChanged();
     }
     
-    public void installAugmentToPlayer(Identifier augment, Player player) {
+    public void installAugmentToPlayer(Identifier augment, boolean creative, Player player) {
         
-        if (!PlayerAugments.allAugments.containsKey(augment)) {
+        if (PlayerAugments.getAugment(Objects.requireNonNull(level).registryAccess(), augment) == null) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
             return;
         }
@@ -210,61 +205,44 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return;
         }
         
-        var recipe = (AugmentDataRecipe) level.getRecipeManager().byKey(augment).get().value();
+        var augmentData = getAugmentData(augment);
+        if (augmentData == null) return;
         
-        // remove available resources
-        for (var wantedInput : recipe.applyCost()) {
-            var type = wantedInput.ingredient();
-            var missingCount = wantedInput.count();
-            
-            for (var stack : this.inventory.heldStacks) {
-                if (type.test(stack)) {
-                    var takeAmount = Math.min(stack.getCount(), missingCount);
-                    missingCount -= takeAmount;
-                    stack.shrink(takeAmount);
-                    
-                    if (missingCount <= 0) break;
-                }
-            }
-            
-            for (var stack : player.getInventory().items) {
-                if (type.test(stack)) {
-                    var takeAmount = Math.min(stack.getCount(), missingCount);
-                    missingCount -= takeAmount;
-                    stack.shrink(takeAmount);
-                    
-                    if (missingCount <= 0) break;
-                }
-            }
+        try (var transaction = Transaction.openRoot()) {
+            if (!consumeIngredients(augmentData.applyCost(), player, transaction) && !creative) return;
+            transaction.commit();
         }
         
-        var augmentInstance = PlayerAugments.allAugments.get(augment);
+        var augmentInstance = PlayerAugments.getAugment(player.registryAccess(), augment);
+        if (augmentInstance == null) return;
         augmentInstance.installToPlayer(player);
         this.setChanged();
         
-        player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO, SoundSource.BLOCKS);
+        player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO.value(), SoundSource.BLOCKS);
     }
     
     public void removeAugmentFromPlayer(Identifier augment, Player player) {
         
-        if (!PlayerAugments.allAugments.containsKey(augment)) {
+        if (PlayerAugments.getAugment(Objects.requireNonNull(level).registryAccess(), augment) == null) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
             return;
         }
         
-        var augmentInstance = PlayerAugments.allAugments.get(augment);
+        var augmentInstance = PlayerAugments.getAugment(player.registryAccess(), augment);
+        if (augmentInstance == null) return;
         augmentInstance.removeFromPlayer(player);
         this.setChanged();
     }
     
     public static void toggleAugmentForPlayer(Identifier augment, Player player) {
         
-        if (!PlayerAugments.allAugments.containsKey(augment)) {
+        if (PlayerAugments.getAugment(player.registryAccess(), augment) == null) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
             return;
         }
         
-        var augmentInstance = PlayerAugments.allAugments.get(augment);
+        var augmentInstance = PlayerAugments.getAugment(player.registryAccess(), augment);
+        if (augmentInstance == null) return;
         
         if (!augmentInstance.isInstalled(player)) {
             Oritech.LOGGER.error("Tried toggling not-installed augment id: " + augment + ". This should never happen");
@@ -276,20 +254,22 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     
     public boolean hasPlayerAugment(Identifier augment, Player player) {
         
-        if (!PlayerAugments.allAugments.containsKey(augment)) {
+        if (PlayerAugments.getAugment(player.registryAccess(), augment) == null) {
             Oritech.LOGGER.error("Player augment with id" + augment + " not found. This should never happen");
             return false;
         }
         
-        var augmentInstance = PlayerAugments.allAugments.get(augment);
+        var augmentInstance = PlayerAugments.getAugment(player.registryAccess(), augment);
+        if (augmentInstance == null) return false;
         return augmentInstance.isInstalled(player);
         
     }
     
     public void loadResearchesFromPlayer(Player player) {
         
-        for (var augmentId : PlayerAugments.allAugments.keySet()) {
-            var augment = PlayerAugments.allAugments.get(augmentId);
+        for (var entry : PlayerAugments.getAllAugments(player.registryAccess()).entrySet()) {
+            var augmentId = entry.getKey();
+            var augment = entry.getValue();
             var isInstalled = augment.isInstalled(player);
             var isResearched = researchedAugments.contains(augmentId);
             
@@ -301,6 +281,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     
     public void loadAvailableStations(Player player) {
         var facing = this.getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var currentLevel = Objects.requireNonNull(level);
         
         var targetPositions = List.of(
           new BlockPos(0, 0, -2),
@@ -312,8 +293,9 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             var candidatePosOffset = targetPositions.get(i);
             var candidatePos = new BlockPos(Geometry.offsetToWorldPosition(facing, candidatePosOffset, worldPosition));
             
-            var candidateState = level.getBlockState(candidatePos);
+            var candidateState = currentLevel.getBlockState(candidatePos);
             if (!(candidateState.getBlock() instanceof AugmentResearchStationBlock) || !candidateState.getValue(MultiblockMachine.ASSEMBLED)) {
+                availableStations.remove(i);
                 continue;
             }
             
@@ -375,12 +357,12 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return inventory;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
     
@@ -391,22 +373,6 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
-            
-            if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
-                    return state.setAndContinue(MachineBlockEntity.IDLE);
-                } else {
-                    return state.setAndContinue(MachineBlockEntity.SETUP);
-                }
-            }
-            
-            if (this.getBlockState().getValue(MultiblockMachine.ASSEMBLED)) {
-                return state.setAndContinue(MachineBlockEntity.IDLE);
-            } else {
-                return state.setAndContinue(MachineBlockEntity.PACKAGED);
-            }
-        }).setSoundKeyframeHandler(new MachineSoundHandler<>()).triggerableAnim("setup", MachineBlockEntity.SETUP));
     }
     
     @Override
@@ -433,16 +399,6 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             return new OritechScreenHandler(syncId, playerInventory, this);
         
         return new PlayerModifierScreenHandler(syncId, playerInventory, this);
-    }
-    
-    @Override
-    public EnergyApi.EnergyStorage getEnergyStorage(Direction direction) {
-        return energyStorage;
-    }
-    
-    @Override
-    public ItemApi.InventoryStorage getInventoryStorage(Direction direction) {
-        return inventory;
     }
     
     @Override
@@ -492,13 +448,71 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
     
     @Override
-    public Container getDisplayedInventory() {
+    public MenuType<?> getScreenHandlerType() {
+        return ModScreens.AUGMENTER_INV_SCREEN.get();
+    }
+    
+    @Override
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
+        return energyStorage;
+    }
+    
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
     
     @Override
-    public MenuType<?> getScreenHandlerType() {
-        return ModScreens.AUGMENTER_INV_SCREEN;
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
+        return inventory;
+    }
+    
+    private @Nullable AugmentData getAugmentData(Identifier augment) {
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return null;
+        }
+        
+        var augmentData = PlayerAugments.getAugmentData(serverLevel.registryAccess(), augment);
+        if (augmentData == null) {
+            Oritech.LOGGER.warn("Player augment definition with id {} not found", augment);
+            return null;
+        }
+        
+        return augmentData;
+    }
+    
+    private boolean consumeIngredients(List<SizedIngredient> costs, Player player, Transaction transaction) {
+        
+        for (var wantedInput : costs) {
+            var missingCount = wantedInput.count();
+            var ingredient = wantedInput.ingredient();
+            
+            var stacks = inventory.getStacks();
+            for (var i = 0; i < stacks.size(); i++) {
+                var stack = stacks.get(i);
+                if (ingredient.test(stack)) { // using size-ignoring test to allow ingredient to be consumed from multiple slots
+                    var taken = inventory.extract(i, ItemResource.of(stack), missingCount, transaction);
+                    missingCount -= taken;
+                    if (missingCount <= 0) break;
+                }
+            }
+            
+            if (missingCount > 0) {
+                var playerInv = PlayerInventoryWrapper.of(player).getMainSlots();
+                for (var i = 0; i < playerInv.size(); i++) {
+                    var kind = playerInv.getResource(i);
+                    if (ingredient.test(kind.toStack())) {
+                        var taken = playerInv.extract(i, kind, missingCount, transaction);
+                        missingCount -= taken;
+                        if (missingCount <= 0) break;
+                    }
+                }
+            }
+            
+            if (missingCount != 0) return false;
+        }
+        
+        return true;
     }
     
     public static class ResearchState {
@@ -510,7 +524,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
         public long researchStartedAt;
         
         public static StreamCodec<RegistryFriendlyByteBuf, ResearchState> PACKET_CODEC = StreamCodec.composite(
-          Identifier.STREAM_CODEC.map(BuiltInRegistries.BLOCK::get, BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
+          Identifier.STREAM_CODEC.map(id -> BuiltInRegistries.BLOCK.get(id).orElseThrow().value(), BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
           ByteBufCodecs.BOOL, ResearchState::getWorking,
           Identifier.STREAM_CODEC, ResearchState::getSelectedResearch,
           ByteBufCodecs.INT, ResearchState::getWorkTime,

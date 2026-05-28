@@ -10,9 +10,9 @@ import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.SimpleEnergyStorage;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +74,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         if (targets == null) return;    // this should never happen
         
         var targetHash = targets.hashCode();
-
+        
         if (this.cacheHash != targetHash) {
             this.cachedTargets = targets.stream()
                                    .map(target -> new ExtractablePipeInterfaceEntity.CachedTarget<>(target.getA(), target.getB(), EnergyApi.BLOCK.createCache(level, target.getA(), target.getB())))

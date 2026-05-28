@@ -35,7 +35,7 @@ public class PlayerModifierScreenHandler extends AbstractContainerMenu {
         if (blockEntity == null) {
             blockPos = BlockPos.ZERO;
             player = playerInventory.player;
-            machineBlock = BlockContent.AUGMENT_APPLICATION_BLOCK.defaultBlockState();
+            machineBlock = BlockContent.AUGMENT_APPLICATION_BLOCK.get().defaultBlockState();
             this.blockEntity = null;
             return;
         }

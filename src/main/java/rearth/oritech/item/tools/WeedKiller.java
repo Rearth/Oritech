@@ -51,7 +51,7 @@ public class WeedKiller extends Item {
                 for (int y = -1; y <= 1; y++) {
                     for (int z = -spreadRange; z <= spreadRange; z++) {
                         
-                        var target = new BlockPos(candidate.offset(x,y,z));
+                        var target = new BlockPos(candidate.offset(x, y, z));
                         
                         if (visited.contains(target)) continue;
                         var distance = target.distManhattan(startPos);

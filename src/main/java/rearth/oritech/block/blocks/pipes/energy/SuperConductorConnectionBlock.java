@@ -71,31 +71,31 @@ public class SuperConductorConnectionBlock extends GenericPipeConnectionBlock {
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
         return SUPERCONDUCTOR_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
-
-	public static class FramedSuperConductorConnectionBlock extends SuperConductorConnectionBlock {
-
-		public FramedSuperConductorConnectionBlock(Properties settings) {
-			super(settings);
-		}
-
-		@Override
-		public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-			return Shapes.block();
-		}
-
-		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-			return state.getShape(level, pos);
-		}
-
-		@Override
-		public BlockState getNormalBlock() {
-			return BlockContent.FRAMED_SUPERCONDUCTOR.defaultBlockState();
-		}
-
-		@Override
-		public BlockState getConnectionBlock() {
-			return BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.defaultBlockState();
-		}
-	}
+    
+    public static class FramedSuperConductorConnectionBlock extends SuperConductorConnectionBlock {
+        
+        public FramedSuperConductorConnectionBlock(Properties settings) {
+            super(settings);
+        }
+        
+        @Override
+        public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return Shapes.block();
+        }
+        
+        @Override
+        public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return state.getShape(level, pos);
+        }
+        
+        @Override
+        public BlockState getNormalBlock() {
+            return BlockContent.FRAMED_SUPERCONDUCTOR.defaultBlockState();
+        }
+        
+        @Override
+        public BlockState getConnectionBlock() {
+            return BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.defaultBlockState();
+        }
+    }
 }

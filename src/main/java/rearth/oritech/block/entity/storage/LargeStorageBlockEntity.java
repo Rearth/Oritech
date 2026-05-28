@@ -5,8 +5,8 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.ExpandableMultiblockEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
 
@@ -19,14 +19,14 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,-1),
-          new Vec3i(0, 0,1),
-          new Vec3i(0, 1,-1),
-          new Vec3i(0, 1,1),
-          new Vec3i(1, 0,-1),
-          new Vec3i(1, 0,1),
-          new Vec3i(1, 1,-1),
-          new Vec3i(1, 1,1)
+          new Vec3i(0, 0, -1),
+          new Vec3i(0, 0, 1),
+          new Vec3i(0, 1, -1),
+          new Vec3i(0, 1, 1),
+          new Vec3i(1, 0, -1),
+          new Vec3i(1, 0, 1),
+          new Vec3i(1, 1, -1),
+          new Vec3i(1, 1, 1)
         );
     }
     
@@ -48,9 +48,9 @@ public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBl
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1,0),
-          new Vec3i(1, 0,0),
-          new Vec3i(1, 1,0)
+          new Vec3i(0, 1, 0),
+          new Vec3i(1, 0, 0),
+          new Vec3i(1, 1, 0)
         );
     }
     

@@ -3,12 +3,12 @@ package rearth.oritech.client.ui;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
-import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.init.BlockContent;
 
@@ -29,7 +29,7 @@ public class UnstableContainerScreen extends EnergyStorageScreen<UpgradableOrite
     
     private void addUnstableContainerPanel() {
         if (this.menu.blockEntity instanceof UnstableContainerBlockEntity unstableContainer) {
-            var container = (DynamicEnergyStorage) unstableContainer.getEnergyStorageForMultiblock(null);
+            var container = unstableContainer.getEnergyStorageForMultiblock(null);
             var capacity = container.maxInsert;
             var capacityMultiplier = capacity / (UnstableContainerBlockEntity.BASE_CAPACITY * unstableContainer.qualityMultiplier);   // in percent, exponential
             var tooltipText = List.of(

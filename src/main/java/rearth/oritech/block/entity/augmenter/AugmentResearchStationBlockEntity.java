@@ -3,14 +3,16 @@ package rearth.oritech.block.entity.augmenter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.item.ItemApi;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -80,12 +82,12 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     }
     
     @Override
-    public ItemApi.InventoryStorage getInventoryForMultiblock() {
+    public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return null;
     }
     
     @Override
-    public EnergyApi.EnergyStorage getEnergyStorageForMultiblock(Direction direction) {
+    public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
     

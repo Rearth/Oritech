@@ -17,14 +17,14 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +70,8 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.4, 0.6, 0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
         
     }
     
@@ -79,13 +80,13 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
         super.resetAddons();
         hasByproductAddon = false;
     }
-
+    
     @Override
     public void gatherAddonStats(List<AddonBlock> addons) {
         hasByproductAddon = false;
         super.gatherAddonStats(addons);
     }
-
+    
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
@@ -167,13 +168,13 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1,0),    // middle
-          new Vec3i(0, 0,1),    // left
-          new Vec3i(0, 1,1),
-          new Vec3i(1, 0,1),    // back left
-          new Vec3i(1, 1,1),
+          new Vec3i(0, 1, 0),    // middle
+          new Vec3i(0, 0, 1),    // left
+          new Vec3i(0, 1, 1),
+          new Vec3i(1, 0, 1),    // back left
+          new Vec3i(1, 1, 1),
           new Vec3i(1, 0, 0),    // back middle
-          new Vec3i(1, 1,0)
+          new Vec3i(1, 1, 0)
         );
     }
     
@@ -181,11 +182,11 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,2),
-          new Vec3i(1, 0,2),
-          new Vec3i(2, 0,0),
-          new Vec3i(1, 0,-1),
-          new Vec3i(-1, 0,1)
+          new Vec3i(0, 0, 2),
+          new Vec3i(1, 0, 2),
+          new Vec3i(2, 0, 0),
+          new Vec3i(1, 0, -1),
+          new Vec3i(-1, 0, 1)
         );
     }
 }

@@ -58,10 +58,21 @@ public class ToggleWidget extends UIComponent {
         return this;
     }
     
-    public boolean getValue() { return value; }
-    public void setValue(boolean value) { this.value = value; }
-    public void setLabel(Component label) { this.label = label; }
-    public void setActive(boolean active) { this.active = active; }
+    public boolean getValue() {
+        return value;
+    }
+    
+    public void setValue(boolean value) {
+        this.value = value;
+    }
+    
+    public void setLabel(Component label) {
+        this.label = label;
+    }
+    
+    public void setActive(boolean active) {
+        this.active = active;
+    }
     
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {

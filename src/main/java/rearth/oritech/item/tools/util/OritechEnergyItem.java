@@ -13,7 +13,9 @@ import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 public interface OritechEnergyItem extends EnergyApi.ItemProvider {
     
-    default long getEnergyCapacity(ItemStack stack) {return 10_000;}
+    default long getEnergyCapacity(ItemStack stack) {
+        return 10_000;
+    }
     
     default long getEnergyMaxInput(ItemStack stack) {
         return 500;
@@ -23,7 +25,7 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
         return 0;
     }
     
-    default boolean tryUseEnergy(ItemStack stack, long amount, Player player){
+    default boolean tryUseEnergy(ItemStack stack, long amount, Player player) {
         RandomSource random = RandomSource.create();
         
         int unbreakingLevel = getUnbreakingLevel(stack);

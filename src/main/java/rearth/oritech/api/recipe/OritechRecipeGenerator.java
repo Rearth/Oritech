@@ -54,7 +54,6 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addLaserTransformations(exporter);
         addUraniumProcessing(exporter);
         addReactorBlocks(exporter);
-        addAugmentRecipes(exporter);
         addPaintRecipes(exporter);
     }
     
@@ -619,7 +618,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         GrinderRecipeBuilder.build().input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
         
         // clay beads
-        offerBeadsRecipe(exporter,ItemContent.CLAY_CATALYST_BEADS, 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
+        offerBeadsRecipe(exporter, ItemContent.CLAY_CATALYST_BEADS, 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
         AssemblerRecipeBuilder.build().input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
         
         // magnetic coils
@@ -721,17 +720,17 @@ public class OritechRecipeGenerator extends RecipeProvider {
         addCompactingRecipe(exporter, BlockContent.URANIUM_DUST_BLOCK, ItemContent.URANIUM_DUST, of(TagContent.URANIUM_DUSTS), of(getStorageBlockTag("uranium_dust")));
         
     }
-
+    
     // offerSmelting, offerBlasting, and offerMultipleOptions copied from RecipeProvider, and altered to force Oritech id onto recipes
     // I don't really like this, but any other way I found to get these recipes to have the oritech namespace in Neoforge wasn't working.
     public static void oreSmelting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
-      oreCooking(exporter, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
+        oreCooking(exporter, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
     }
-
+    
     public static void oreBlasting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
-      oreCooking(exporter, RecipeSerializer.BLASTING_RECIPE, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
+        oreCooking(exporter, RecipeSerializer.BLASTING_RECIPE, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
     }
-
+    
     public static <T extends AbstractCookingRecipe> void oreCooking(RecipeOutput exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.Factory<T> recipeFactory, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group, String suffix) {
         
         for (var itemConvertible : inputs) {
@@ -943,11 +942,11 @@ public class OritechRecipeGenerator extends RecipeProvider {
         
     }
     
-    private void addAugmentRecipes(RecipeOutput exporter) {
+    public static void addAugmentData(AugmentRecipeBuilder.Output exporter) {
         
-        var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION);
-        var ADVANCED_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ADVANCED_AUGMENT_STATION);
-        var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION);
+        var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION.get());
+        var ADVANCED_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ADVANCED_AUGMENT_STATION.get());
+        var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION.get());
         
         AugmentRecipeBuilder.build()
           .researchCost(TagContent.MACHINE_PLATING, 64)
@@ -1186,19 +1185,20 @@ public class OritechRecipeGenerator extends RecipeProvider {
           .toggleable()
           .export(exporter, "gravity");
         
-        AugmentRecipeBuilder.build()
-          .researchCost(ItemContent.ION_THRUSTER, 64)
-          .researchCost(Items.WIND_CHARGE, 16)
-          .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
-          .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
-          .applyCost(ItemContent.ION_THRUSTER, 4)
-          .requirement(Oritech.id("augment/betterarmor"))
-          .requirement(Oritech.id("augment/portal"))
-          .requiredStation(ARCANE_AUGMENT_STATION_ID)
-          .uiX(155).uiY(30).time(3600).rfCost(500_000_000)
-          .customAugmentDefinition(CustomAugmentsCollection.flight.id)
-          .toggleable()
-          .export(exporter, "flight");
+        // todo
+//        AugmentRecipeBuilder.build()
+//          .researchCost(ItemContent.ION_THRUSTER, 64)
+//          .researchCost(Items.WIND_CHARGE, 16)
+//          .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
+//          .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
+//          .applyCost(ItemContent.ION_THRUSTER, 4)
+//          .requirement(Oritech.id("augment/betterarmor"))
+//          .requirement(Oritech.id("augment/portal"))
+//          .requiredStation(ARCANE_AUGMENT_STATION_ID)
+//          .uiX(155).uiY(30).time(3600).rfCost(500_000_000)
+//          .customAugmentDefinition(CustomAugmentsCollection.flight.id)
+//          .toggleable()
+//          .export(exporter, "flight");
         
         AugmentRecipeBuilder.build()
           .researchCost(Items.ENDER_EYE, 8)

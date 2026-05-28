@@ -35,10 +35,6 @@ public final class OritechClient {
         
         // used for augment UI
         ClientTickEvent.CLIENT_PRE.register(client -> {
-            
-            if (PlayerAugments.allAugments.isEmpty() && client.level != null)
-                PlayerAugments.loadAllAugments(client.level.getRecipeManager());
-            
             if (AUGMENT_SELECTOR.consumeClick() && activeScreen == null) {
                 activeScreen = new AugmentSelectionScreen();
                 client.setScreen(activeScreen);
@@ -51,7 +47,7 @@ public final class OritechClient {
             var player = client.player;
             if (player == null) return;
             
-            for (var augment : PlayerAugments.allAugments.values()) {
+            for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
                 if (augment.isEnabled(player))
                     augment.refreshClient(player);
             }
@@ -74,7 +70,7 @@ public final class OritechClient {
         // interrupt left mouse for portable lasers (only seems to work on fabric)
         ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
                                                          handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
-                
+        
         Oritech.LOGGER.info("Oritech client initialization done");
     }
     

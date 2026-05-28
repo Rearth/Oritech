@@ -71,5 +71,6 @@ public class OritechJeiTaintedRefineryCreation implements IRecipeCategory<Oritec
     }
     
     // Dummy record to serve as JEI "recipe" type
-    public record CreationInfo() {}
+    public record CreationInfo() {
+    }
 }

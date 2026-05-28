@@ -65,7 +65,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
     public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
     
-    public record EnchanterStatistics(int requiredCatalysts, int availableCatalysts){
+    public record EnchanterStatistics(int requiredCatalysts, int availableCatalysts) {
         public static EnchanterStatistics EMPTY = new EnchanterStatistics(-1, -1);
     }
     

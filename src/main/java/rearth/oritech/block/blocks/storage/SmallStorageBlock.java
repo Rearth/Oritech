@@ -70,7 +70,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SmallStorageBlockEntity(pos, state);
     }
-
+    
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
@@ -112,7 +112,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
             machineEntity.initAddons();
             
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
             
         }
         
@@ -122,16 +122,16 @@ public class SmallStorageBlock extends Block implements EntityBlock {
     @Override
     protected List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var droppedStacks = super.getDrops(state, builder);
-
+        
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
             droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
             storageEntity.inventory.clearContent();
         }
-
+        
         return droppedStacks;
     }
-
+    
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return getStackWithData(level, pos);

@@ -4,16 +4,16 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class RefineryRecipeBuilder extends OritechRecipeBuilder {
-
+    
     protected RefineryRecipeBuilder() {
         super(RecipeContent.REFINERY, "refinery");
         this.time = 80;
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new RefineryRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs != null && inputs.size() > 1)

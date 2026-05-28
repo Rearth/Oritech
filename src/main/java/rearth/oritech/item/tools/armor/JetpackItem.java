@@ -11,15 +11,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
-import rearth.oritech.init.ComponentContent;
 import rearth.oritech.config.OritechStartupConfig;
+import rearth.oritech.init.ComponentContent;
 import software.bernie.geckolib.animatable.GeoItem;
 import software.bernie.geckolib.animatable.client.GeoRenderProvider;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
@@ -169,7 +171,8 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
             stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(Identifier.parse(packet.fluidType)), packet.fluidAmount));
     }
     
-    public record JetpackUsageUpdatePacket(long energyStored, String fluidType, long fluidAmount) implements CustomPacketPayload {
+    public record JetpackUsageUpdatePacket(long energyStored, String fluidType,
+                                           long fluidAmount) implements CustomPacketPayload {
         
         public static final Type<JetpackUsageUpdatePacket> PACKET_ID = new Type<>(Oritech.id("jetpack_use"));
         

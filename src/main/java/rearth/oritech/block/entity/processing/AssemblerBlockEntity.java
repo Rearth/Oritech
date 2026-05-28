@@ -9,12 +9,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.Geometry;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.Geometry;
 
 import java.util.List;
 
@@ -64,7 +64,8 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0.6, 0.5), facing);
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
         
-        if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
+        if (level instanceof ServerLevel sl)
+            sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
         
     }
     
@@ -81,18 +82,18 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,1),
-          new Vec3i(0, 1,0),
-          new Vec3i(0, 1,1)
+          new Vec3i(0, 0, 1),
+          new Vec3i(0, 1, 0),
+          new Vec3i(0, 1, 1)
         );
     }
     
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,-1),
-          new Vec3i(0, 0,2),
-          new Vec3i(1, 0,0)
+          new Vec3i(0, 0, -1),
+          new Vec3i(0, 0, 2),
+          new Vec3i(1, 0, 0)
         );
     }
 }

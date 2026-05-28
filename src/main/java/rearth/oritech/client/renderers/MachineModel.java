@@ -33,6 +33,6 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
     
     
     public Identifier getBaseTexturePath(T animatable) {
-            return super.getTextureResource(animatable);
+        return super.getTextureResource(animatable);
     }
 }

@@ -27,7 +27,7 @@ public class InventoryProxyAddonBlock extends MachineAddonBlock {
         
         if (!level.isClientSide && state.getValue(ADDON_USED)) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;

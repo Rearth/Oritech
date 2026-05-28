@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class UnstableContainerBlockEntity extends NetworkedBlockEntity implements ScreenProvider, MenuProvider, ColorableMachine,
-                                                                            GeoBlockEntity, MultiblockMachineController, EnergyProvider {
+                                                                                    GeoBlockEntity, MultiblockMachineController, EnergyProvider {
     
     public static final RawAnimation SETUP = RawAnimation.begin().thenPlay("setup").thenPlay("idle");
     public static final RawAnimation IDLE = RawAnimation.begin().thenPlay("idle");
@@ -133,7 +133,10 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
         
         if (energyStorage.capacity < energyStorage.maxInsert * 0.9999) {
             // growing, spawn particles
-            if (level instanceof ServerLevel sl) { var c = worldPosition.getCenter(); sl.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, c.x, c.y, c.z, 2, 2, 2, 2, 0); }
+            if (level instanceof ServerLevel sl) {
+                var c = worldPosition.getCenter();
+                sl.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, c.x, c.y, c.z, 2, 2, 2, 2, 0);
+            }
         }
         
         if (energyStorage.energy > energyStorage.capacity) {
@@ -322,7 +325,8 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
     
     @Override
-    public void triggerSetupAnimation() {}
+    public void triggerSetupAnimation() {
+    }
     
     @Override
     public void onCoreBroken(BlockPos corePos) {

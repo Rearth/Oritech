@@ -1,5 +1,12 @@
 package rearth.oritech.block.entity.decorative;
 
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.state.AnimationTest;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.block.Block;
@@ -10,13 +17,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.block.blocks.decorative.TechDoorBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ColorableMachine;
-import com.geckolib.animatable.GeoBlockEntity;
-import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animatable.manager.AnimatableManager;
-import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.RawAnimation;
-import com.geckolib.animation.state.AnimationTest;
-import com.geckolib.util.GeckoLibUtil;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -73,34 +73,34 @@ public class TechDoorBlockEntity extends BlockEntity implements GeoBlockEntity, 
           }, 1000
         );
     }
-
+    
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         serializeColor(output);
     }
-
+    
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         deserializeColor(input);
     }
-
-
+    
+    
     @Override
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
-
+    
     @Override
     public ColorVariant getCurrentColor() {
         return currentColor;
     }
-
+    
     @Override
     public void assignColor(ColorVariant color) {
         currentColor = color;
-
+        
         if (level != null) {
             setChanged();
             if (!level.isClientSide()) {

@@ -17,7 +17,7 @@ public class TankScreen extends OritechMachineScreen<OritechScreenHandler> {
     @Override
     protected void addExtraComponents() {
         addComponent(new TextureWidget(57, 36, 12, 23,
-            TANK_ARROWS, 0, 0, 7, 17, 7, 17));
-
+          TANK_ARROWS, 0, 0, 7, 17, 7, 17));
+        
     }
 }

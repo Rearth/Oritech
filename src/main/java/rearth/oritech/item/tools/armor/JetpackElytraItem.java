@@ -8,7 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -145,7 +147,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     
     @Override
     public int getRfUsage() {
-        return (int) OritechStartupConfig.elytraJetpack.energyUsage.get();
+        return OritechStartupConfig.elytraJetpack.energyUsage.get();
     }
     
     @Override

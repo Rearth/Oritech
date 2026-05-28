@@ -51,7 +51,7 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-
+    
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new CreativeStorageBlockEntity(pos, state);
@@ -62,7 +62,7 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
         
         if (!level.isClientSide()) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;
@@ -83,5 +83,5 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
         super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
     }
-
+    
 }

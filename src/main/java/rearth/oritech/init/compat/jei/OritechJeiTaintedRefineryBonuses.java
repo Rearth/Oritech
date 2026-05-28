@@ -76,8 +76,8 @@ public class OritechJeiTaintedRefineryBonuses implements IRecipeCategory<Oritech
             var col = i % cols;
             var row = i / cols;
             builder.addInputSlot(2 + col * 18, 14 + row * 18)
-                .addItemStack(new ItemStack(recipe.blocks().get(i)))
-                .setBackground(background, -1, -1);
+              .addItemStack(new ItemStack(recipe.blocks().get(i)))
+              .setBackground(background, -1, -1);
         }
     }
     

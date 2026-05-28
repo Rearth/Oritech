@@ -6,7 +6,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -35,8 +34,8 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.addons.EnergyAcceptorAddonBlockEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechStartupConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
@@ -501,7 +500,8 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     
     // AddonSettings is an immutable configuration record for a machine addon, and should be constructed in BlockContent
     public record AddonSettings(boolean extender, float speedMultiplier, float efficiencyMultiplier, long addedCapacity,
-                                long addedInsert, boolean acceptEnergy, boolean needsSupport, int chamberCount, int burstTicks,
+                                long addedInsert, boolean acceptEnergy, boolean needsSupport, int chamberCount,
+                                int burstTicks,
                                 VoxelShape[][] boundingShape) {
         
         public static AddonSettings getDefaultSettings() {

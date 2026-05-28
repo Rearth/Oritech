@@ -4,24 +4,18 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.AddServerReloadListenersEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import net.neoforged.neoforge.resource.NeoForgeReloadListeners;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
@@ -30,7 +24,6 @@ import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.processing.RefineryBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
-import rearth.oritech.block.entity.addons.AddonBlockEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
@@ -38,6 +31,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.*;
+import rearth.oritech.init.datapack.AugmentContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -65,10 +59,10 @@ public final class Oritech {
         neoEventBus.addListener(this::onServerTickPost);
         neoEventBus.addListener(this::onLevelTickPos);
         neoEventBus.addListener(this::onPlayerTickPost);
-        neoEventBus.addListener(this::addServerReloadListeners);
         
         // registration events
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(AugmentContent::registerDataPackRegistries);
         
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
@@ -90,6 +84,7 @@ public final class Oritech {
         ComponentContent.COMPONENTS.register(modEventBus);
         FeatureContent.FEATURES.register(modEventBus);
         ModScreens.MENUS.register(modEventBus);
+        AttachmentContent.ATTACHMENT_TYPES.register(modEventBus);
         
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);
@@ -113,7 +108,6 @@ public final class Oritech {
     
     private void onServerTickPost(ServerTickEvent.Post event) {
         AcceleratorParticleLogic.onTickEnd();
-        AddonBlockEntity.completeInits();
         RefineryBlock.updateTaintEvents();
     }
     
@@ -130,32 +124,10 @@ public final class Oritech {
     }
     
     private void onServerStarted(ServerStartedEvent event) {
-        
-        // load augments from recipes
-        PlayerAugments.loadAllAugments(event.getServer().getRecipeManager());
-        
         // load pipe data to memory
         event.getServer().getAllLevels().forEach(this::loadLevelPipeData);
     }
     
-    private void addServerReloadListeners(AddServerReloadListenersEvent event) {
-        
-        var id = id("augment_recipe_watcher");
-        
-        // refresh augments when recipes are reloaded
-        event.addListener(id, new SimplePreparableReloadListener<Void>() {
-            @Override
-            protected @NotNull Void prepare(@NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
-                return null;
-            }
-            
-            @Override
-            protected void apply(@NotNull Void ignored, @NotNull ResourceManager resourceManager, @NotNull ProfilerFiller profiler) {
-                PlayerAugments.loadAllAugments(event.getServerResources().getRecipeManager());
-            }
-        });
-        event.addDependency(NeoForgeReloadListeners.RECIPE_PRIORITIES, id);
-    }
     
     private void addNetworkHandlers(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");

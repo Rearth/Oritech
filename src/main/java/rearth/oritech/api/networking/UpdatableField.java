@@ -8,8 +8,11 @@ import net.minecraft.network.codec.StreamCodec;
 public interface UpdatableField<T, R> {
     
     R getDeltaData();
+    
     T getFullData();
+    
     StreamCodec<? extends ByteBuf, R> getDeltaCodec();
+    
     StreamCodec<? extends ByteBuf, T> getFullCodec();
     
     default boolean useDeltaOnly(SyncType type) {
@@ -17,6 +20,7 @@ public interface UpdatableField<T, R> {
     }
     
     void handleFullUpdate(T updatedData);
+    
     void handleDeltaUpdate(R updatedData);
     
 }

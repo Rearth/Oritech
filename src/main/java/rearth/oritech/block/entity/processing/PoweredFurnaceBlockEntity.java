@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
@@ -67,13 +67,15 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
                 lastWorkedAt = level.getGameTime();
                 
                 if (level.random.nextFloat() > 0.8)
-                    if (level instanceof ServerLevel sl) sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+                    if (level instanceof ServerLevel sl)
+                        sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
                 
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
                     
                     for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
-                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty()) break;
+                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty())
+                            break;
                         craftFurnaceItem(activeRecipe);
                     }
                     
@@ -186,14 +188,14 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1,0)
+          new Vec3i(0, 1, 0)
         );
     }
     
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1,0)
+          new Vec3i(0, -1, 0)
         );
     }
 }

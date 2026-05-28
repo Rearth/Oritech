@@ -20,7 +20,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class MetalProcessingChainBuilder {
-    private String metalName;
+    private final String metalName;
     private String resourcePath = "";
     // ingredient should generally be used for recipe inputs and item for recipe output
     // wherever possible, use ConventionalItemTags (Fabric) or Tags.Items (Neoforge) for ingredients
@@ -226,7 +226,7 @@ public class MetalProcessingChainBuilder {
             throw new IllegalStateException("ore is required for metal processing chain " + path);
         if (rawOreItem == null)
             throw new IllegalStateException("raw ore is required for metal processing chain " + path);
-        if ((dustItem != null || vanillaProcessing == true) && ingotItem == null)
+        if ((dustItem != null || vanillaProcessing) && ingotItem == null)
             throw new IllegalStateException("ingot is required if dust is provided or vanilla processing is required for metal processing chain " + path);
         if ((smallClumpItem != null || smallDustItem != null) && nuggetItem == null)
             throw new IllegalStateException("nugget item is required if small clump or small dust are provided for metal processing chain " + path);

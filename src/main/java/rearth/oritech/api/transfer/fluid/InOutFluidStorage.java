@@ -130,11 +130,11 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     public void handleDeltaUpdate(List<FluidStack> updatedData) {
         this.setStacks(NonNullList.copyOf(updatedData));
     }
-
+    
     public void serialize(ValueOutput output) {
         output.store("fluids", FluidStack.OPTIONAL_CODEC.listOf(), stacks);
     }
-
+    
     public void deserialize(ValueInput input) {
         input.read("fluids", FluidStack.OPTIONAL_CODEC.listOf()).ifPresent(this::handleDeltaUpdate);
     }

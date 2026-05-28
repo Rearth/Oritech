@@ -1,7 +1,6 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.util.ColorHelper;
 
@@ -43,12 +42,12 @@ public class OverlayWidget extends UIComponent {
         this.bgColor = argb;
         return this;
     }
-
+    
     public OverlayWidget withConsumeOutsideClicks(boolean consumeOutsideClicks) {
         this.consumeOutsideClicks = consumeOutsideClicks;
         return this;
     }
-
+    
     public OverlayWidget withConsumeOutsideScroll(boolean consumeOutsideScroll) {
         this.consumeOutsideScroll = consumeOutsideScroll;
         return this;

@@ -6,8 +6,8 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
@@ -61,9 +61,9 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0,1),
-          new Vec3i(0, 1,0),
-          new Vec3i(0, 1,1)
+          new Vec3i(0, 0, 1),
+          new Vec3i(0, 1, 0),
+          new Vec3i(0, 1, 1)
         );
     }
     
@@ -71,8 +71,8 @@ public class FoundryBlockEntity extends MultiblockMachineEntity {
     public List<Vec3i> getAddonSlots() {
         
         return List.of(
-          new Vec3i(0, 0,-1),
-          new Vec3i(0, 0,2)
+          new Vec3i(0, 0, -1),
+          new Vec3i(0, 0, 2)
         );
     }
 }

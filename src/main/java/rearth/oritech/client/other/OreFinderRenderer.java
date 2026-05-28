@@ -73,7 +73,7 @@ public class OreFinderRenderer {
         BitSet bitSet = new BitSet(3);
         BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
         
-        for(Direction direction : DIRECTIONS) {
+        for (Direction direction : DIRECTIONS) {
             random.setSeed(seed);
             List<BakedQuad> list = model.getQuads(state, direction, random);
             if (!list.isEmpty()) {

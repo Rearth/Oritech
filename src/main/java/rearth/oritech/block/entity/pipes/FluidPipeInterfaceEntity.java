@@ -11,8 +11,8 @@ import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -92,7 +92,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
             return;
         }
-
+        
         refreshTargetCaches(level, targets);
         
         Collections.shuffle(filteredFluidTargetsCached);
@@ -121,13 +121,13 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         }
         
     }
-
+    
     private void refreshTargetCaches(Level level, Set<Tuple<BlockPos, Direction>> targets) {
         var netHash = targets.hashCode();
         if (netHash == filteredTargetsNetHash && filteredFluidTargetsCached != null) {
             return;
         }
-
+        
         filteredFluidTargetsCached = targets.stream()
                                        .filter(target -> {
                                            var direction = target.getB();
@@ -140,7 +140,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                                        })
                                        .map(target -> new CachedTarget<>(target.getA(), target.getB(), FluidApi.BLOCK.createCache(level, target.getA(), target.getB())))
                                        .collect(Collectors.toList());
-
+        
         filteredTargetsNetHash = netHash;
     }
 }

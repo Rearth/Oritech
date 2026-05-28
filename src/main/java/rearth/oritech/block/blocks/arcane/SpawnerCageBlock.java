@@ -28,7 +28,7 @@ public class SpawnerCageBlock extends Block {
     
     public SpawnerCageBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(UP, false).setValue(DOWN, false).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST,false));
+        this.registerDefaultState(defaultBlockState().setValue(UP, false).setValue(DOWN, false).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
     }
     
     @Override

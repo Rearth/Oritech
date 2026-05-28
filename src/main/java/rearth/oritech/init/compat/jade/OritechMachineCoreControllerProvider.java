@@ -13,18 +13,18 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 public enum OritechMachineCoreControllerProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
-
+    
     INSTANCE;
-
+    
     private static final Identifier ID = Oritech.id("machine_core_controller");
-
+    
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getServerData().contains("controller")) {
             tooltip.add(Component.translatable(accessor.getServerData().getString("controller")).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.ITALIC));
         }
     }
-
+    
     @Override
     public void appendServerData(CompoundTag data, BlockAccessor accessor) {
         if (accessor.getBlockEntity() instanceof MachineCoreEntity coreEntity) {
@@ -35,10 +35,10 @@ public enum OritechMachineCoreControllerProvider implements IBlockComponentProvi
             }
         }
     }
-
+    
     @Override
     public Identifier getUid() {
         return ID;
     }
-        
+    
 }

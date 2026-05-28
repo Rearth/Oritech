@@ -10,9 +10,9 @@ import rearth.oritech.api.networking.NetworkedEventHandler;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.TagContent;
 
 import java.util.HashMap;

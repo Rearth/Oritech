@@ -25,8 +25,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.decorative.TechDoorBlockEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
 import java.util.Objects;
@@ -71,7 +71,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
         var isOpen = state.getValue(OPENED);
         var isPowered = level.hasNeighborSignal(pos) || level.hasNeighborSignal(pos.above());
         if (isOpen == isPowered) return;
-
+        
         var aboveState = level.getBlockState(pos.above());
         
         if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE)) return;

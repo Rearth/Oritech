@@ -7,7 +7,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 
 import java.util.List;
 
-public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<Identifier> nodeOres, float nodeOreChance, List<Identifier> boulderOres, Identifier overlayBlock, int overlayHeight) implements FeatureConfiguration {
+public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<Identifier> nodeOres, float nodeOreChance,
+                                        List<Identifier> boulderOres, Identifier overlayBlock,
+                                        int overlayHeight) implements FeatureConfiguration {
     
     public static final Codec<ResourceNodeFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
       Codec.INT.fieldOf("nodeSize").forGetter(ResourceNodeFeatureConfig::nodeSize),

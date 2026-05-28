@@ -30,8 +30,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
 import java.util.ArrayDeque;
@@ -40,26 +40,26 @@ import java.util.List;
 import java.util.Set;
 
 public class HangarDoorBlock extends Block implements EntityBlock {
-
+    
     public static final DirectionProperty SURFACE = BlockStateProperties.FACING;
     public static final BooleanProperty OPENED = BooleanProperty.create("open");
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
-
+    
     private static final VoxelShape FULL_BLOCK_SHAPE = Shapes.block();
     private static final VoxelShape SUPPORT_SHAPE_Z = Block.box(0, 0, 3, 16, 16, 13);    // for vertical rotated, facing north-south (e.g. Z axis)
     private static final VoxelShape SUPPORT_SHAPE_X = Block.box(3, 0, 0, 13, 16, 16);    // for vertical non-rotated, facing east-west (e.g. X axis)
     private static final VoxelShape SUPPORT_SHAPE_Y = Block.box(0, 3, 0, 16, 13, 16);    // for horizontal non-rotated, facing up-down (e.g. Y axis)
-
+    
     public HangarDoorBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(SURFACE, Direction.NORTH).setValue(OPENED, false).setValue(ROTATED, false));
     }
-
+    
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(SURFACE, OPENED, ROTATED);
     }
-
+    
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
@@ -68,85 +68,85 @@ public class HangarDoorBlock extends Block implements EntityBlock {
         var state = defaultBlockState().setValue(SURFACE, surface).setValue(ROTATED, rotated);
         return canPlaceDoor(ctx.getLevel(), ctx.getClickedPos(), state) ? state : null;
     }
-
+    
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
         if (level.isClientSide()) return;
-
+        
         // create segment blocks
         var segmentDirection = getSegmentDirection(state);
         for (int part = 1; part <= 2; part++) {
             level.setBlockAndUpdate(pos.relative(segmentDirection, part), BlockContent.HANGAR_DOOR_HELPER.defaultBlockState()
-              .setValue(HangarDoorHelperBlock.PART, part)
-              .setValue(SURFACE, state.getValue(SURFACE))
-              .setValue(OPENED, state.getValue(OPENED))
-              .setValue(ROTATED, state.getValue(ROTATED)));
+                                                                            .setValue(HangarDoorHelperBlock.PART, part)
+                                                                            .setValue(SURFACE, state.getValue(SURFACE))
+                                                                            .setValue(OPENED, state.getValue(OPENED))
+                                                                            .setValue(ROTATED, state.getValue(ROTATED)));
         }
     }
-
+    
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
-
+        
         if (level.isClientSide()) return;
         updateDoorState(level, pos, state);
     }
-
+    
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return FULL_BLOCK_SHAPE;
     }
-
+    
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return FULL_BLOCK_SHAPE;
     }
-
+    
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
         return true;
     }
-
+    
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
             removeHelpers(level, pos, state);
         }
-
+        
         return super.playerWillDestroy(level, pos, state, player);
     }
-
+    
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
         if (!state.is(newState.getBlock()) && !level.isClientSide()) {
             removeHelpers(level, pos, state);
         }
-
+        
         super.onRemove(state, level, pos, newState, movedByPiston);
     }
-
+    
     @Override
     protected MapCodec<? extends Block> codec() {
         return null;
     }
-
+    
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new HangarDoorBlockEntity(pos, state);
     }
-
+    
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-
+    
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         tooltip.add(Component.translatable("tooltip.oritech.hangar_door.1").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.oritech.hangar_door.2").withStyle(ChatFormatting.GRAY));
     }
-
+    
     public static VoxelShape getClosedShape(Direction surface, boolean rotated) {
         
         // on floor/ceiling
@@ -163,25 +163,25 @@ public class HangarDoorBlock extends Block implements EntityBlock {
             default -> null;    // should never happen
         };
     }
-
+    
     public static Direction getSegmentDirection(BlockState state) {
         return getSegmentDirection(state.getValue(SURFACE), state.getValue(ROTATED));
     }
-
+    
     public static Direction getSegmentDirection(Direction surface, boolean rotated) {
         return surface;
     }
-
+    
     public static BlockPos getAnchorPos(BlockPos helperPos, BlockState helperState) {
         return helperPos.relative(getSegmentDirection(helperState), -helperState.getValue(HangarDoorHelperBlock.PART));
     }
-
+    
     public static boolean isStructureValid(LevelReader level, BlockPos anchorPos, BlockState anchorState) {
         var surface = anchorState.getValue(SURFACE);
         var opened = anchorState.getValue(OPENED);
         var rotated = anchorState.getValue(ROTATED);
         var segmentDirection = getSegmentDirection(anchorState);
-
+        
         for (int part = 1; part <= 2; part++) {
             var helperPos = anchorPos.relative(segmentDirection, part);
             var helperState = level.getBlockState(helperPos);
@@ -191,46 +191,46 @@ public class HangarDoorBlock extends Block implements EntityBlock {
             if (helperState.getValue(OPENED) != opened) return false;
             if (helperState.getValue(ROTATED) != rotated) return false;
         }
-
+        
         return true;
     }
-
+    
     public static void updateDoorState(Level level, BlockPos anchorPos, BlockState anchorState) {
         if (!anchorState.is(BlockContent.HANGAR_DOOR)) return;
-
+        
         if (!isStructureValid(level, anchorPos, anchorState)) {
             return;
         }
-
+        
         var connectedAnchors = collectConnectedAnchors(level, anchorPos);
         var powered = isAnyDoorPowered(level, connectedAnchors);
-
+        
         if (powered == anchorState.getValue(OPENED)) return;
-
+        
         var blockEntity = level.getBlockEntity(anchorPos);
         if (blockEntity instanceof HangarDoorBlockEntity hangarDoor && hangarDoor.shouldPlaySoundAgain()) {
             level.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
         }
-
+        
         for (var connectedAnchorPos : connectedAnchors) {
             var connectedAnchorState = level.getBlockState(connectedAnchorPos);
             if (!connectedAnchorState.is(BlockContent.HANGAR_DOOR) || !isStructureValid(level, connectedAnchorPos, connectedAnchorState)) {
                 continue;
             }
-
+            
             setDoorOpenState(level, connectedAnchorPos, connectedAnchorState, powered);
         }
     }
-
+    
     private static Set<BlockPos> collectConnectedAnchors(Level level, BlockPos startPos) {
         var connectedAnchors = new HashSet<BlockPos>();
         var queue = new ArrayDeque<BlockPos>();
         queue.add(startPos);
-
+        
         while (!queue.isEmpty()) {
             var currentPos = queue.removeFirst();
             if (!connectedAnchors.add(currentPos)) continue;
-
+            
             for (var direction : Direction.values()) {
                 var neighborPos = currentPos.relative(direction);
                 var neighborState = level.getBlockState(neighborPos);
@@ -239,28 +239,28 @@ public class HangarDoorBlock extends Block implements EntityBlock {
                 }
             }
         }
-
+        
         return connectedAnchors;
     }
-
+    
     private static boolean isAnyDoorPowered(Level level, Set<BlockPos> connectedAnchors) {
         for (var anchorPos : connectedAnchors) {
             var anchorState = level.getBlockState(anchorPos);
             if (!anchorState.is(BlockContent.HANGAR_DOOR) || !isStructureValid(level, anchorPos, anchorState)) {
                 continue;
             }
-
+            
             if (level.hasNeighborSignal(anchorPos)) {
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     private static void setDoorOpenState(Level level, BlockPos anchorPos, BlockState anchorState, boolean opened) {
         level.setBlockAndUpdate(anchorPos, anchorState.setValue(OPENED, opened));
-
+        
         var segmentDirection = getSegmentDirection(anchorState);
         for (int part = 1; part <= 2; part++) {
             var helperPos = anchorPos.relative(segmentDirection, part);
@@ -290,30 +290,30 @@ public class HangarDoorBlock extends Block implements EntityBlock {
         
         level.setBlock(anchorPos, Blocks.AIR.defaultBlockState(), 3);
     }
-
+    
     private boolean canPlaceDoor(LevelReader level, BlockPos anchorPos, BlockState anchorState) {
         var segmentDirection = getSegmentDirection(anchorState);
         for (int part = 1; part <= 2; part++) {
             var candidateState = level.getBlockState(anchorPos.relative(segmentDirection, part));
             if (!candidateState.canBeReplaced()) return false;
         }
-
+        
         return true;
     }
-
+    
     private static boolean chooseRotated(Direction surface, BlockPlaceContext ctx) {
         var player = ctx.getPlayer();
         if (player == null) {
             return surface.getAxis().isVertical() && ctx.getHorizontalDirection().getAxis() == Direction.Axis.X;
         }
-
+        
         var horizontalAxis = ctx.getHorizontalDirection().getAxis();
-
+        
         // on floors or ceilings
         if (surface.getAxis().isVertical()) {
             return horizontalAxis == Direction.Axis.X;
         }
-
+        
         // on walls
         var look = player.getLookAngle();
         var horizontalStrength = Math.max(Math.abs(look.x), Math.abs(look.z));

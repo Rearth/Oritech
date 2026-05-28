@@ -29,7 +29,7 @@ public class TooltipHelper {
             return getFormatted(amount / 1_000.0) + I18n.get("tooltip.oritech.thousand_abbrev");
         } else if (amount < 1_000_000_000) {
             return getFormatted(amount / 1_000_000.0) + I18n.get("tooltip.oritech.million_abbrev");
-        } else if (amount < 1_000_000_000_000L)  {
+        } else if (amount < 1_000_000_000_000L) {
             return getFormatted(amount / 1_000_000_000.0) + I18n.get("tooltip.oritech.billion_abbrev");
         } else {
             return getFormatted(amount / 1_000_000_000_000.0) + I18n.get("tooltip.oritech.trillion_abbrev");
@@ -46,7 +46,7 @@ public class TooltipHelper {
     public static void addMachineTooltip(List<Component> tooltip, Block block, EntityBlock entityProvider) {
         var showExtra = Boolean.TRUE.equals(Screen.hasShiftDown());
         
-        if (Boolean.TRUE.equals(showExtra)) {
+        if (showExtra) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
             
             var isAtomicForge = entity instanceof AtomicForgeBlockEntity;

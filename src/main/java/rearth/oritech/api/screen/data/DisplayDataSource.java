@@ -86,8 +86,8 @@ public abstract class DisplayDataSource {
     public static Component getFluidTooltip(FluidStack stack) {
         
         return stack.amount() > 0
-                            ? Component.translatable("tooltip.oritech.tank_content", stack.amount() * 1000L / FluidType.BUCKET_VOLUME, stack.getHoverName().getString())
-                            : Component.translatable("tooltip.oritech.tank_empty");
+                 ? Component.translatable("tooltip.oritech.tank_content", stack.amount() * 1000L / FluidType.BUCKET_VOLUME, stack.getHoverName().getString())
+                 : Component.translatable("tooltip.oritech.tank_empty");
     }
     
     public static class EnergyDataSource extends DisplayDataSource {
@@ -122,70 +122,70 @@ public abstract class DisplayDataSource {
         
         return res;
     }
-
+    
     public static class SoulDataSource extends DisplayDataSource {
-
+        
         private SoulDataSource(long capacity, Supplier<Long> amountSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
             super(capacity, amountSupplier, tooltipSupplier, config);
         }
     }
-
+    
     public static SoulDataSource CreateSoul(long capacity, Supplier<Long> amountSupplier, ScreenProvider.BarConfiguration config) {
-
+        
         return new SoulDataSource(
           capacity,
           amountSupplier,
           () -> getSoulTooltip(amountSupplier.get(), capacity),
           config);
     }
-
+    
     public static Component getSoulTooltip(long amount, long max) {
         return Component.translatable("tooltip.oritech.spawner.collected_souls", amount, max);
     }
-
+    
     public static class ProgressDataSource extends DisplayDataSource {
-
+        
         private ProgressDataSource(long capacity, Supplier<Long> amountSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
             super(capacity, amountSupplier, tooltipSupplier, config);
         }
     }
-
+    
     public static ProgressDataSource CreateProgress(ScreenProvider provider, BlockEntity blockEntity) {
         
         var config = provider.getIndicatorConfiguration();
         
         return new ProgressDataSource(
           1000,
-            () -> (long) Math.round(provider.getProgress() * 1000),
+          () -> (long) Math.round(provider.getProgress() * 1000),
           () -> getProgressTooltip(blockEntity),
           new ScreenProvider.BarConfiguration(config.x(), config.y(), config.width(), config.height()));
     }
-
+    
     public static Component getProgressTooltip(BlockEntity blockEntity) {
         if (blockEntity instanceof MachineBlockEntity machineEntity
-            && (machineEntity.getRecipeDuration() > 0 || machineEntity.progress > 0)) {
-
+              && (machineEntity.getRecipeDuration() > 0 || machineEntity.progress > 0)) {
+            
             var progressTicks = machineEntity.progress;
             var recipeDurationTicks = machineEntity.getRecipeDuration();
             var effectiveDurationTicks = (int) (recipeDurationTicks * machineEntity.getSpeedMultiplier());
-
+            
             if (machineEntity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
                 if (recipeDurationTicks <= 0)
                     recipeDurationTicks = (int) (generatorBlock.currentMaxBurnTime / generatorBlock.getSpeedMultiplier() * generatorBlock.getEfficiencyMultiplier());
                 effectiveDurationTicks = generatorBlock.currentMaxBurnTime;
             }
-
+            
             if (machineEntity instanceof BasicGeneratorEntity generatorEntity)
                 recipeDurationTicks = generatorEntity.currentMaxBurnTime;
             
-
+            
             return Component.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks);
         } else if (blockEntity instanceof EnchanterBlockEntity enchanterBlock && enchanterBlock.progress > 0) {
             var maxTicks = enchanterBlock.maxProgress * 5;
             var progress = enchanterBlock.progress * 5;
             return Component.translatable("tooltip.oritech.progress_indicator", progress, maxTicks, maxTicks);
         }
-
+        
         return Component.empty();
     }
     

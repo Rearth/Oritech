@@ -4,8 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 import java.util.List;
@@ -19,8 +19,8 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0,-1),
-          new Vec3i(0, 0,1)
+          new Vec3i(0, 0, -1),
+          new Vec3i(0, 0, 1)
         );
     }
     
@@ -38,7 +38,7 @@ public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity 
     public long getDefaultExtractionRate() {
         return OritechConfig.smallEnergyStorage.maxEnergyExtraction.get();
     }
-
+    
     @Override
     public int getComparatorOutput() {
         if (energyStorage.energy <= 0) return 0;

@@ -19,11 +19,11 @@ import java.util.List;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class CreativeFluidTank extends SmallFluidTank {
-
+    
     public CreativeFluidTank(Properties settings) {
         super(settings);
     }
-
+    
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
@@ -31,7 +31,7 @@ public class CreativeFluidTank extends SmallFluidTank {
         if (Screen.hasControlDown())
             tooltip.add(Component.translatable("tooltip.oritech.creative_tank").withStyle(ChatFormatting.GRAY));
     }
-
+    
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
@@ -41,7 +41,8 @@ public class CreativeFluidTank extends SmallFluidTank {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         
-        if(level.isClientSide || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity)) return super.useWithoutItem(state, level, pos, player, hit);
+        if (level.isClientSide || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity))
+            return super.useWithoutItem(state, level, pos, player, hit);
         
         // todo use proper api here
         var mainHandStack = player.getMainHandItem();

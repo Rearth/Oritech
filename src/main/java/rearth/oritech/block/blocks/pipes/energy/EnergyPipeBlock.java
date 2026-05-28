@@ -19,8 +19,8 @@ import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockContent;
 
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +47,7 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     public BlockState getNormalBlock() {
         return BlockContent.ENERGY_PIPE.defaultBlockState();
     }
-
+    
     @Override
     protected VoxelShape[] createShapes() {
         return THIN_SHAPES;
@@ -76,35 +76,35 @@ public class EnergyPipeBlock extends GenericPipeBlock {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var text = Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY)
-            .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.energyPipeTransferRate.get()).withStyle(ChatFormatting.GOLD));
+                     .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.energyPipeTransferRate.get()).withStyle(ChatFormatting.GOLD));
         tooltip.add(text);
         super.appendHoverText(stack, context, tooltip, options);
     }
-
-	public static class FramedEnergyPipeBlock extends EnergyPipeBlock {
-
-		public FramedEnergyPipeBlock(Properties settings) {
-			super(settings);
-		}
-
-		@Override
-		public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-			return Shapes.block();
-		}
-
-		@Override
-		public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-			return state.getShape(level, pos);
-		}
-
-		@Override
-		public BlockState getNormalBlock() {
-			return BlockContent.FRAMED_ENERGY_PIPE.defaultBlockState();
-		}
-
-		@Override
-		public BlockState getConnectionBlock() {
-			return BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.defaultBlockState();
-		}
-	}
+    
+    public static class FramedEnergyPipeBlock extends EnergyPipeBlock {
+        
+        public FramedEnergyPipeBlock(Properties settings) {
+            super(settings);
+        }
+        
+        @Override
+        public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return Shapes.block();
+        }
+        
+        @Override
+        public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+            return state.getShape(level, pos);
+        }
+        
+        @Override
+        public BlockState getNormalBlock() {
+            return BlockContent.FRAMED_ENERGY_PIPE.defaultBlockState();
+        }
+        
+        @Override
+        public BlockState getConnectionBlock() {
+            return BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.defaultBlockState();
+        }
+    }
 }

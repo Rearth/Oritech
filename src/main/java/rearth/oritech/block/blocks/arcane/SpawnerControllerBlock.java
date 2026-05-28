@@ -81,11 +81,11 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-
+        
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onBlockInteracted(player);
         }
-
+        
         return InteractionResult.SUCCESS;
     }
     

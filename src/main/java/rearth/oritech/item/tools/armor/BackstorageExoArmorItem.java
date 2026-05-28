@@ -48,7 +48,7 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
         
         var packStorage = new SimpleEnergyItemStorage(getEnergyMaxInput(pack), getEnergyMaxOutput(pack), getEnergyCapacity(pack), pack);
         if (packStorage.getAmount() < 10) return;
-
+        
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             var stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || stack == pack || slot == i) continue;

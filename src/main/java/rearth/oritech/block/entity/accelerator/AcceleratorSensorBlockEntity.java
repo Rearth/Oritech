@@ -43,7 +43,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         this.measuredTime = level.getGameTime();
         dirty = true;
     }
-
+    
     @Override
     public int getComparatorOutput() {
         if (measuredSpeed <= 0) {

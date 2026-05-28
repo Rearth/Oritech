@@ -9,8 +9,6 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 
@@ -30,31 +28,31 @@ public class ItemGroups {
     
     
     public static final Supplier<CreativeModeTab> COMPONENT_GROUP = TABS.register("machine_group", () ->
-                                                                                                   CreativeModeTab.builder()
-                                                                                                     .title(Component.translatable("itemgroup.oritech.components"))
-                                                                                                     .icon(() -> new ItemStack(ItemContent.SUPER_AI_CHIP.value()))
-                                                                                                     .displayItems((params, output) -> {
-                                                                                                         ItemGroups.AddItemsToGroup(output, ItemContent.Groups.COMPONENTS);
-                                                                                                     })
-                                                                                                     .build());
+                                                                                                     CreativeModeTab.builder()
+                                                                                                       .title(Component.translatable("itemgroup.oritech.components"))
+                                                                                                       .icon(() -> new ItemStack(ItemContent.SUPER_AI_CHIP.value()))
+                                                                                                       .displayItems((params, output) -> {
+                                                                                                           ItemGroups.AddItemsToGroup(output, ItemContent.Groups.COMPONENTS);
+                                                                                                       })
+                                                                                                       .build());
     
     public static final Supplier<CreativeModeTab> EQUIPMENT_GROUP = TABS.register("machine_group", () ->
-                                                                                                   CreativeModeTab.builder()
-                                                                                                     .title(Component.translatable("itemgroup.oritech.equipment"))
-                                                                                                     .icon(() -> new ItemStack(ToolsContent.CHAINSAW.value()))
-                                                                                                     .displayItems((params, output) -> {
-                                                                                                         ItemGroups.AddItemsToGroup(output, ItemContent.Groups.EQUIPMENT);
-                                                                                                     })
-                                                                                                     .build());
+                                                                                                     CreativeModeTab.builder()
+                                                                                                       .title(Component.translatable("itemgroup.oritech.equipment"))
+                                                                                                       .icon(() -> new ItemStack(ToolsContent.CHAINSAW.value()))
+                                                                                                       .displayItems((params, output) -> {
+                                                                                                           ItemGroups.AddItemsToGroup(output, ItemContent.Groups.EQUIPMENT);
+                                                                                                       })
+                                                                                                       .build());
     
     public static final Supplier<CreativeModeTab> DECORATIVE_GROUP = TABS.register("machine_group", () ->
-                                                                                                   CreativeModeTab.builder()
-                                                                                                     .title(Component.translatable("itemgroup.oritech.decorative"))
-                                                                                                     .icon(() -> new ItemStack(BlockContent.RESOURCE_NODE_PLATINUM.value()))
-                                                                                                     .displayItems((params, output) -> {
-                                                                                                         ItemGroups.AddItemsToGroup(output, ItemContent.Groups.DECORATIVE);
-                                                                                                     })
-                                                                                                     .build());
+                                                                                                      CreativeModeTab.builder()
+                                                                                                        .title(Component.translatable("itemgroup.oritech.decorative"))
+                                                                                                        .icon(() -> new ItemStack(BlockContent.RESOURCE_NODE_PLATINUM.value()))
+                                                                                                        .displayItems((params, output) -> {
+                                                                                                            ItemGroups.AddItemsToGroup(output, ItemContent.Groups.DECORATIVE);
+                                                                                                        })
+                                                                                                        .build());
     
     @SuppressWarnings("unchecked")
     private static void AddItemsToGroup(CreativeModeTab.Output output, ItemContent.Groups targetGroup) {

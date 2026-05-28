@@ -16,7 +16,7 @@ public class ChargerBlockRenderer implements BlockEntityRenderer<ChargerBlockEnt
         if (inputStack.isEmpty()) return;
         
         matrices.pushPose();
-        matrices.translate(0.5f, 8/16f, 0.5f);
+        matrices.translate(0.5f, 8 / 16f, 0.5f);
         
         Minecraft.getInstance().getItemRenderer().renderStatic(
           inputStack,

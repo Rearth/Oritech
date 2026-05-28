@@ -56,6 +56,7 @@ public class Geometry {
             case DOWN -> new BlockPos(relativePos.getZ(), relativePos.getX(), relativePos.getY());
         };
     }
+    
     public static Vec3 rotatePosition(Vec3 relativePos, Direction facing) {
         return switch (facing) {
             case NORTH -> new Vec3(relativePos.z(), relativePos.y(), relativePos.x());
@@ -132,24 +133,24 @@ public class Geometry {
             pos = blockPos;
         }
     }
-
+    
     public static VoxelShape rotateVoxelShape(VoxelShape shape, Direction facing, AttachFace face) {
-
+        
         var minX = shape.min(Axis.X);
         var maxX = shape.max(Axis.X);
         var minY = shape.min(Axis.Y);
         var maxY = shape.max(Axis.Y);
         var minZ = shape.min(Axis.Z);
         var maxZ = shape.max(Axis.Z);
-
+        
         if (facing == NORTH) {
             if (face == AttachFace.FLOOR) return shape;
-            if (face == AttachFace.WALL) 
+            if (face == AttachFace.WALL)
                 return Shapes.box(1 - maxX, 1 - maxZ, 1 - maxY, 1 - minX, 1 - minZ, 1 - minY);
             if (face == AttachFace.CEILING)
                 return Shapes.box(minX, 1 - maxY, 1 - maxZ, maxX, 1 - minY, 1 - minZ);
         }
-
+        
         if (facing == SOUTH) {
             if (face == AttachFace.FLOOR)
                 return Shapes.box(1 - maxX, minY, 1 - maxZ, 1 - minX, maxY, 1 - minZ);
@@ -157,9 +158,9 @@ public class Geometry {
                 return Shapes.box(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY);
             if (face == AttachFace.CEILING)
                 return Shapes.box(1 - maxX, 1 - maxY, minZ, 1 - minX, 1 - minY, maxZ);
-
+            
         }
-
+        
         if (facing == Direction.EAST) {
             if (face == AttachFace.FLOOR)
                 return Shapes.box(1 - maxZ, minY, minX, 1 - minZ, maxY, maxX);
@@ -168,7 +169,7 @@ public class Geometry {
             if (face == AttachFace.CEILING)
                 return Shapes.box(minZ, 1 - maxY, minX, maxZ, 1 - minY, maxX);
         }
-
+        
         if (facing == Direction.WEST) {
             if (face == AttachFace.FLOOR)
                 return Shapes.box(minZ, minY, 1 - maxX, maxZ, maxY, 1 - minX);
@@ -177,15 +178,15 @@ public class Geometry {
             if (face == AttachFace.CEILING)
                 return Shapes.box(1 - maxZ, 1 - maxY, 1 - maxX, 1 - minZ, 1 - minY, 1 - minX);
         }
-
+        
         if (facing == Direction.UP) {
             return Shapes.box(minX, 1 - maxZ, minY, maxX, 1 - minZ, maxY);
         }
-
+        
         if (facing == Direction.DOWN) {
             return Shapes.box(minX, minZ, minY, maxX, maxZ, maxY);
         }
-                
+        
         return shape;
     }
 }

@@ -105,7 +105,7 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
             cachedController.onRedstoneEvent(isPowered);
         
     }
-
+    
     @Override
     public int getComparatorOutput() {
         return currentOutput;
@@ -151,13 +151,18 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     
     public interface RedstoneControllable extends ComparatorOutputProvider {
         int getComparatorEnergyAmount();
+        
         int getComparatorSlotAmount(int slot);
+        
         int getComparatorProgress();
+        
         int getComparatorActiveState();
+        
         void onRedstoneEvent(boolean isPowered);
-
+        
         /**
          * A redstone controllable machine only outputs a readable comparator signal from the controller addon block.
+         *
          * @return 0
          */
         @Override
@@ -167,7 +172,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     }
     
     // we need 2 here because Neoforge is annoying as always and doesnt let me register it in both directions
-    public record RedstoneAddonClientUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPacketPayload {
+    public record RedstoneAddonClientUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode,
+                                            int currentOutput) implements CustomPacketPayload {
         
         public static final Type<RedstoneAddonClientUpdate> PACKET_ID = new Type<>(Oritech.id("redstoneaddonclient"));
         
@@ -177,7 +183,8 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
         }
     }
     
-    public record RedstoneAddonServerUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode, int currentOutput) implements CustomPacketPayload {
+    public record RedstoneAddonServerUpdate(BlockPos position, BlockPos controllerPos, int targetSlot, int targetMode,
+                                            int currentOutput) implements CustomPacketPayload {
         
         public static final Type<RedstoneAddonServerUpdate> PACKET_ID = new Type<>(Oritech.id("redstoneaddonserver"));
         

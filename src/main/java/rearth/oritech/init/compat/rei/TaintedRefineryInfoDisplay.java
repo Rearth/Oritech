@@ -25,8 +25,8 @@ public class TaintedRefineryInfoDisplay implements Display {
     // For creation display
     public TaintedRefineryInfoDisplay(CategoryIdentifier<?> categoryId, List<ItemStack> inputStacks, List<ItemStack> outputStacks) {
         this.categoryId = categoryId;
-        this.inputs = inputStacks.stream().map(EntryIngredients::of).map(e -> (EntryIngredient) e).toList();
-        this.outputs = outputStacks.stream().map(EntryIngredients::of).map(e -> (EntryIngredient) e).toList();
+        this.inputs = inputStacks.stream().map(EntryIngredients::of).map(e -> e).toList();
+        this.outputs = outputStacks.stream().map(EntryIngredients::of).map(e -> e).toList();
         this.bonusType = null;
     }
     

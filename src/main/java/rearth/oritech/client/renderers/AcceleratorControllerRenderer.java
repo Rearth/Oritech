@@ -31,6 +31,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     public boolean shouldRenderOffScreen(AcceleratorControllerBlockEntity blockEntity) {
         return true;
     }
+    
     @Override
     public void render(AcceleratorControllerBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         

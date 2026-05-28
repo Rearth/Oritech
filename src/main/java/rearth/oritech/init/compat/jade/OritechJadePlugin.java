@@ -9,13 +9,13 @@ import snownee.jade.api.WailaPlugin;
 
 @WailaPlugin
 public class OritechJadePlugin implements IWailaPlugin {
-
+    
     @Override
     public void register(IWailaCommonRegistration registration) {
         Oritech.LOGGER.info("Registering Jade providers");
         registration.registerBlockDataProvider(OritechMachineCoreControllerProvider.INSTANCE, MachineCoreBlock.class);
     }
-
+    
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         Oritech.LOGGER.info("Registering Jade client providers");

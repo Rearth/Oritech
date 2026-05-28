@@ -9,18 +9,18 @@ import rearth.oritech.block.entity.processing.RefineryBlockEntity;
 import rearth.oritech.util.ColorHelper;
 
 public class RefineryScreen extends OritechMachineScreen<RefineryScreenHandler> {
-
+    
     public RefineryScreen(RefineryScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
-
+    
     @Override
     protected void addExtraComponents() {
         super.addExtraComponents();
-
+        
         var refinery = (RefineryBlockEntity) menu.blockEntity;
         var moduleCount = refinery.getModuleCount();
-
+        
         if (moduleCount < 1) {
             var blocker = new SurfaceWidget(92 + 27, 6, 21, 74, OritechSurface.PANEL_DARK);
             blocker.withTooltip(Component.translatable("tooltip.oritech.refinery_module_missing")).withZIndex(1);

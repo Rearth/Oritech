@@ -48,7 +48,8 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         if (!OritechClient.laserActive && singleShotAge > 10) return;
         
         if (!heldStack.getItem().equals(ToolsContent.PORTABLE_LASER)) return;
-        if (animatable.getStoredEnergy(heldStack) < OritechStartupConfig.portableLaserConfig.energyPerTick.get()) return;
+        if (animatable.getStoredEnergy(heldStack) < OritechStartupConfig.portableLaserConfig.energyPerTick.get())
+            return;
         
         // at this point we know a laser is held and fired
         

@@ -52,17 +52,17 @@ public class OritechReiLaserDisplay implements DisplayCategory<Display> {
         
         // laser background texture
         widgets.add(Widgets.createTexturedWidget(LASER_RECIPE_OVERLAY, x + 5, y + 5, 0, 0, 80, 80, 300, 300, 300, 300));
-
+        
         // input slot
         widgets.add(Widgets.createSlot(new Point(x + 80, y + 15))
-            .entries(oDisplay.getInputEntries().get(0)).markInput());
+                      .entries(oDisplay.getInputEntries().get(0)).markInput());
         
         // arrow
         widgets.add(Widgets.createArrow(new Point(x + 105, y + 15)));
         
         // output slot
         widgets.add(Widgets.createSlot(new Point(x + 135, y + 15))
-            .entries(oDisplay.getOutputEntries().get(0)).markOutput());
+                      .entries(oDisplay.getOutputEntries().get(0)).markOutput());
         
         return widgets;
     }

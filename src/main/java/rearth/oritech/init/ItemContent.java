@@ -3,14 +3,10 @@ package rearth.oritech.init;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.Foods;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import oshi.util.tuples.Pair;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.UnstableContainerItem;
 import rearth.oritech.item.other.ColorCartridgeItem;
@@ -26,8 +22,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.List;
 
 @SuppressWarnings("NullableProblems")
 public class ItemContent {
@@ -43,7 +38,7 @@ public class ItemContent {
     public static final DeferredItem<Item> WEED_KILLER = ITEMS.registerItem("weed_killer", WeedKiller::new, props -> props.stacksTo(1));
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
-
+    
     // region metals
     // nickel
     public static final DeferredItem<Item> NICKEL_INGOT = ITEMS.registerSimpleItem("nickel_ingot");
@@ -157,7 +152,7 @@ public class ItemContent {
     public static final DeferredItem<Item> INDUSTRIAL_PAINT = ITEMS.registerItem("industrial_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.INDUSTRIAL));
     public static final DeferredItem<Item> NETHERITE_PAINT = ITEMS.registerItem("netherite_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.NETHERITE));
     public static final DeferredItem<Item> SCULK_PAINT = ITEMS.registerItem("sculk_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.SCULK));
-
+    
     // tank items (with custom item class)
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
@@ -177,7 +172,7 @@ public class ItemContent {
     public @interface ItemGroupTarget {
         Groups value();
     }
-
+    
     // todo (both here and in blockcontent)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})

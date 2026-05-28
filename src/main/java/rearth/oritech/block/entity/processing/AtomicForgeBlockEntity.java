@@ -3,7 +3,6 @@ package rearth.oritech.block.entity.processing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -12,8 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeType;
 import rearth.oritech.init.recipes.RecipeContent;
@@ -66,7 +65,8 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
     
     @Override
-    public void updateEnergyContainer() { } // energy storage is updated by this class (based on the recipe amount), not the usual methods
+    public void updateEnergyContainer() {
+    } // energy storage is updated by this class (based on the recipe amount), not the usual methods
     
     @Override
     public boolean canEnergyStorageChangeWhileGUIOpen() {

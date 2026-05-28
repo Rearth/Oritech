@@ -77,11 +77,11 @@ public class SimpleFluidStorage extends FluidStacksResourceHandler implements Up
     public void handleDeltaUpdate(FluidStack updatedData) {
         this.set(0, FluidResource.of(updatedData), updatedData.amount());
     }
-
+    
     public void serialize(ValueOutput output) {
         output.store("fluid", FluidStack.OPTIONAL_CODEC, getContent());
     }
-
+    
     public void deserialize(ValueInput input) {
         input.read("fluid", FluidStack.OPTIONAL_CODEC).ifPresent(this::handleDeltaUpdate);
     }

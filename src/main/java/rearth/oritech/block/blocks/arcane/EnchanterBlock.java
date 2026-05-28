@@ -64,7 +64,7 @@ public class EnchanterBlock extends HorizontalDirectionalBlock implements Entity
         
         if (!level.isClientSide()) {
             var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
         }
         
         return InteractionResult.SUCCESS;

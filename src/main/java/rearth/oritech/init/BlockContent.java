@@ -53,9 +53,9 @@ public class BlockContent {
     public static final List<Pair<DeferredItem<BlockItem>, ItemContent.Groups>> BLOCK_GROUPS = new ArrayList<>();
     
     public static final DeferredBlock<Block> SPAWNER_CAGE_BLOCK = BLOCKS.registerBlock("spawner_cage_block", SpawnerCageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion()); // sample 1
-
+    
     public static final DeferredBlock<Block> MACHINE_FRAME_BLOCK = BLOCKS.registerBlock("machine_frame_block", MachineFrameBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS)); // sample 2 new
-
+    
     public static final DeferredBlock<Block> FLUID_PIPE = BLOCKS.registerBlock("fluid_pipe", FluidPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final DeferredBlock<Block> FRAMED_FLUID_PIPE = BLOCKS.registerBlock("framed_fluid_pipe", FluidPipeBlock.FramedFluidPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final DeferredBlock<Block> FLUID_PIPE_DUCT_BLOCK = BLOCKS.registerBlock("fluid_pipe_duct_block", FluidPipeDuctBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
@@ -70,7 +70,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> FRAMED_ITEM_PIPE = BLOCKS.registerBlock("framed_item_pipe", ItemPipeBlock.FramedItemPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final DeferredBlock<Block> ITEM_PIPE_DUCT_BLOCK = BLOCKS.registerBlock("item_pipe_duct_block", ItemPipeDuctBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> ITEM_FILTER_BLOCK = BLOCKS.registerBlock("item_filter_block", ItemFilterBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
-
+    
     @NoBlockItem
     public static final DeferredBlock<Block> FLUID_PIPE_CONNECTION = BLOCKS.registerBlock("fluid_pipe_connection", FluidPipeConnectionBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
@@ -89,9 +89,9 @@ public class BlockContent {
     public static final DeferredBlock<Block> FRAMED_ITEM_PIPE_CONNECTION = BLOCKS.registerBlock("framed_item_pipe_connection", ItemPipeConnectionBlock.FramedItemPipeConnectionBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     @NoBlockItem
     public static final DeferredBlock<Block> TRANSPARENT_ITEM_PIPE_CONNECTION = BLOCKS.registerBlock("transparent_item_pipe_connection", ItemPipeConnectionBlock.TransparentItemPipeConnectionBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
-
+    
     public static final DeferredBlock<Block> POWER_POLE_BLOCK = BLOCKS.registerBlock("power_pole_block", PowerPoleBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     @NoBlockItem
     public static final DeferredBlock<Block> FRAME_GANTRY_ARM = BLOCKS.registerSimpleBlock("frame_gantry_arm", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN).noOcclusion());
     @NoBlockItem
@@ -110,7 +110,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> BLACK_HOLE_MIDDLE = BLOCKS.registerSimpleBlock("black_hole_middle", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN).noOcclusion().lightLevel(item -> 5));
     @NoBlockItem
     public static final DeferredBlock<Block> BLACK_HOLE_OUTER = BLOCKS.registerSimpleBlock("black_hole_outer", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_CHAIN).noOcclusion().lightLevel(item -> 5));
-
+    
     @NoBlockItem
     public static final DeferredBlock<Block> ADDON_INDICATOR_BLOCK = BLOCKS.registerSimpleBlock("addon_indicator_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS));
     @NoBlockItem
@@ -119,7 +119,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> REACTOR_MEDIUM_INDICATOR_BLOCK = BLOCKS.registerSimpleBlock("reactor_medium_indicator_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS));
     @NoBlockItem
     public static final DeferredBlock<Block> REACTOR_HOT_INDICATOR_BLOCK = BLOCKS.registerSimpleBlock("reactor_hot_indicator_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS));
-
+    
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> PULVERIZER_BLOCK = BLOCKS.registerBlock("pulverizer_block", PulverizerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
@@ -164,30 +164,30 @@ public class BlockContent {
     public static final DeferredBlock<Block> DRONE_PORT_BLOCK = BLOCKS.registerBlock("drone_port_block", DronePortBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> SHRINKER_BLOCK = BLOCKS.registerBlock("shrinker_block", ShrinkerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     @NoAutoDrop
     @DispenserPlace
     public static final DeferredBlock<Block> SMALL_STORAGE_BLOCK = BLOCKS.registerBlock("small_storage_block", SmallStorageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().pushReaction(PushReaction.DESTROY));
     public static final DeferredBlock<Block> LARGE_STORAGE_BLOCK = BLOCKS.registerBlock("large_storage_block", LargeStorageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @DispenserPlace
     public static final DeferredBlock<Block> CREATIVE_STORAGE_BLOCK = BLOCKS.registerBlock("creative_storage_block", CreativeStorageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().pushReaction(PushReaction.BLOCK).destroyTime(-1.0F));
-
+    
     @NoAutoDrop
     @DispenserPlace
     @NoBlockItem
     public static final DeferredBlock<Block> SMALL_TANK_BLOCK = BLOCKS.registerBlock("small_tank_block", SmallFluidTank::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().pushReaction(PushReaction.DESTROY).lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 15 : 0));
-
+    
     @NoAutoDrop
     @DispenserPlace
     @NoBlockItem
     public static final DeferredBlock<Block> CREATIVE_TANK_BLOCK = BLOCKS.registerBlock("creative_tank_block", CreativeFluidTank::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().pushReaction(PushReaction.BLOCK).lightLevel(state -> state.getValue(BlockStateProperties.LIT) ? 15 : 0).destroyTime(-1.0F));
-
+    
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> AUGMENT_APPLICATION_BLOCK = BLOCKS.registerBlock("augment_application_block", AugmentApplicationBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> SIMPLE_AUGMENT_STATION = BLOCKS.registerBlock("simple_augment_station", AugmentResearchStationBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(item -> 2));
     public static final DeferredBlock<Block> ADVANCED_AUGMENT_STATION = BLOCKS.registerBlock("advanced_augment_station", AugmentResearchStationBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(item -> 2));
     public static final DeferredBlock<Block> ARCANE_AUGMENT_STATION = BLOCKS.registerBlock("arcane_augment_station", AugmentResearchStationBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(item -> 2));
-
+    
     public static final DeferredBlock<Block> PLACER_BLOCK = BLOCKS.registerBlock("placer_block", PlacerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> DESTROYER_BLOCK = BLOCKS.registerBlock("destroyer_block", DestroyerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> FERTILIZER_BLOCK = BLOCKS.registerBlock("fertilizer_block", FertilizerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -195,7 +195,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> TREEFELLER_BLOCK = BLOCKS.registerBlock("treefeller_block", TreefellerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> PIPE_BOOSTER_BLOCK = BLOCKS.registerBlock("pipe_booster_block", PipeBoosterBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     @UseGeoBlockItem(scale = 0.7f)
     @ItemRarity(Rarity.RARE)
     public static final DeferredBlock<Block> ENCHANTMENT_CATALYST_BLOCK = BLOCKS.registerBlock("enchantment_catalyst_block", EnchantmentCatalystBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -206,23 +206,23 @@ public class BlockContent {
     public static final DeferredBlock<Block> SPAWNER_CONTROLLER_BLOCK = BLOCKS.registerBlock("spawner_controller_block", SpawnerControllerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @NoAutoDrop
     public static final DeferredBlock<Block> WITHER_CROP_BLOCK = BLOCKS.registerBlock("wither_crop_block", WitheredCropBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.WHEAT));
-
+    
     @NoBlockItem
     public static final DeferredBlock<Block> UNSTABLE_CONTAINER = BLOCKS.registerBlock("unstable_container", UnstableContainerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(80, 1900f).noOcclusion().forceSolidOn());
-
+    
     public static final DeferredBlock<Block> ACCELERATOR_RING = BLOCKS.registerBlock("accelerator_ring", AcceleratorRingBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> ACCELERATOR_MOTOR = BLOCKS.registerBlock("accelerator_motor", AcceleratorMotorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().lightLevel(item -> 5));
     public static final DeferredBlock<Block> ACCELERATOR_CONTROLLER = BLOCKS.registerBlock("accelerator_controller", AcceleratorControllerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> ACCELERATOR_SENSOR = BLOCKS.registerBlock("accelerator_sensor", AcceleratorSensorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @ItemRarity(Rarity.EPIC)
     public static final DeferredBlock<Block> BLACK_HOLE_BLOCK = BLOCKS.registerBlock("black_hole_block", BlackHoleBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.END_PORTAL).lightLevel(item -> 12).noOcclusion().forceSolidOn());
-
+    
     public static final DeferredBlock<Block> PARTICLE_COLLECTOR_BLOCK = BLOCKS.registerBlock("particle_collector_block", ParticleCollectorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).noOcclusion());
-
+    
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> PUMP_BLOCK = BLOCKS.registerBlock("pump_block", PumpBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> CHARGER_BLOCK = BLOCKS.registerBlock("charger_block", ChargerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     public static final DeferredBlock<Block> MACHINE_CORE_1 = BLOCKS.registerBlock("machine_core_1", props -> new MachineCoreBlock(props, 1), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_CORE_2 = BLOCKS.registerBlock("machine_core_2", props -> new MachineCoreBlock(props, 2), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_CORE_3 = BLOCKS.registerBlock("machine_core_3", props -> new MachineCoreBlock(props, 3), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -232,7 +232,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> MACHINE_CORE_7 = BLOCKS.registerBlock("machine_core_7", props -> new MachineCoreBlock(props, 7), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @NoBlockItem
     public static final DeferredBlock<Block> MACHINE_CORE_HIDDEN = BLOCKS.registerBlock("machine_core_hidden", props -> new MachineCoreBlock(props, 1), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(80, 1900f).noOcclusion().forceSolidOn());
-
+    
     public static final DeferredBlock<Block> MACHINE_SPEED_ADDON = BLOCKS.registerBlock("machine_speed_addon", props -> new MachineAddonBlock(props, AddonSettings.getDefaultSettings().withSpeedMultiplier(OritechStartupConfig.speedAddonSpeed.get().floatValue()).withEfficiencyMultiplier(OritechStartupConfig.speedAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_SPEED_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_EFFICIENCY_ADDON = BLOCKS.registerBlock("machine_efficiency_addon", props -> new MachineAddonBlock(props, AddonSettings.getDefaultSettings().withEfficiencyMultiplier(OritechStartupConfig.efficiencyAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_EFFICIENCY_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_ULTIMATE_ADDON = BLOCKS.registerBlock("machine_ultimate_addon", props -> new MachineAddonBlock(props, AddonSettings.getDefaultSettings().withSpeedMultiplier(OritechStartupConfig.ultimateAddonSpeed.get().floatValue()).withEfficiencyMultiplier(OritechStartupConfig.ultimateAddonEfficiency.get().floatValue()).withBoundingShape(MachineAddonBlock.MACHINE_ULTIMATE_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -251,12 +251,12 @@ public class BlockContent {
     public static final DeferredBlock<Block> MACHINE_REDSTONE_ADDON = BLOCKS.registerBlock("machine_redstone_addon", props -> new RedstoneAddonBlock(props, AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_REDSTONE_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_SILK_TOUCH_ADDON = BLOCKS.registerBlock("machine_silk_touch_addon", props -> new MachineAddonBlock(props, AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_SILK_TOUCH_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> MACHINE_BURST_ADDON = BLOCKS.registerBlock("machine_burst_addon", props -> new MachineAddonBlock(props, AddonSettings.getDefaultSettings().withBurstTicks(OritechStartupConfig.burstAddonTicks.get()).withBoundingShape(MachineAddonBlock.MACHINE_BURST_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion()); // todo config settings
-
+    
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.NONE)
     @ItemRarity(Rarity.EPIC)
     public static final DeferredBlock<Block> MACHINE_COMBI_ADDON = BLOCKS.registerBlock("machine_combi_addon", props -> new CombiAddonBlock(props, AddonSettings.getDefaultSettings().withBoundingShape(MachineAddonBlock.MACHINE_COMBI_ADDON_SHAPE)), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     //region reactor
     @ItemRarity(Rarity.UNCOMMON)
     public static final DeferredBlock<Block> REACTOR_CONTROLLER = BLOCKS.registerBlock("reactor_controller", ReactorControllerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 5));
@@ -272,11 +272,11 @@ public class BlockContent {
     public static final DeferredBlock<Block> REACTOR_ABSORBER_PORT = BLOCKS.registerBlock("reactor_absorber_port", ReactorAbsorberPortBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> REACTOR_ENERGY_PORT = BLOCKS.registerBlock("reactor_energy_port", ReactorEnergyPortBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> REACTOR_REDSTONE_PORT = BLOCKS.registerBlock("reactor_redstone_port", ReactorRedstonePortBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-
+    
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> URANIUM_CRYSTAL = BLOCKS.registerBlock("uranium_crystal", props -> new AmethystClusterBlock(7, 3, props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.AMETHYST_CLUSTER).lightLevel(state -> 5));
-
+    
     @NoBlockItem
     public static final DeferredBlock<Block> REACTOR_EXPLOSION_SMALL = BLOCKS.registerBlock("reactor_explosion_small", props -> new NuclearExplosionBlock(props, 9), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @NoBlockItem
@@ -285,15 +285,15 @@ public class BlockContent {
     public static final DeferredBlock<Block> REACTOR_EXPLOSION_LARGE = BLOCKS.registerBlock("reactor_explosion_large", props -> new NuclearExplosionBlock(props, 20), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> LOW_YIELD_NUKE = BLOCKS.registerBlock("low_yield_nuke", props -> new NukeBlock(props, true), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> NUKE = BLOCKS.registerBlock("nuke", props -> new NukeBlock(props, false), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
-
+    
     // cooling cell, early game re-fillable component
-
+    
     // lategame, second stage components:
     // plasma conduit, advanced heat transfer system
     // entropy dampener, reduce degradation rate of nearby components
     // quantum stabilizer, massively increase heat capacity of reactor
     //endregion
-
+    
     //region metals
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
@@ -311,7 +311,7 @@ public class BlockContent {
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> DEEPSLATE_URANIUM_ORE = BLOCKS.registerSimpleBlock("deepslate_uranium_ore", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.DEEPSLATE_DIAMOND_ORE));
     //endregion
-
+    
     //region resource nodes
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
@@ -346,7 +346,7 @@ public class BlockContent {
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> RESOURCE_NODE_URANIUM = BLOCKS.registerSimpleBlock("resource_node_uranium", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
-
+    
     // region decorative
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> CEILING_LIGHT = BLOCKS.registerBlock("ceiling_light", props -> new WallMountedLight(props, 2), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLOWSTONE).noOcclusion());

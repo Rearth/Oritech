@@ -37,9 +37,9 @@ public class SheolFireFluidBlock extends LiquidBlock {
         var blockpos = pos.above();
         if (level.getBlockState(blockpos).isAir() && !level.getBlockState(blockpos).isSolidRender(level, blockpos)) {
             if (random.nextInt(40) == 0) {
-                double d0 = (double)pos.getX() + random.nextDouble();
-                double d1 = (double)pos.getY() + 1.0;
-                double d2 = (double)pos.getZ() + random.nextDouble();
+                double d0 = (double) pos.getX() + random.nextDouble();
+                double d1 = (double) pos.getY() + 1.0;
+                double d2 = (double) pos.getZ() + random.nextDouble();
                 level.addParticle(ParticleTypes.LAVA, d0, d1, d2, 0.0, 0.0, 0.0);
                 level.playLocalSound(
                   d0, d1, d2, SoundEvents.LAVA_POP, SoundSource.BLOCKS, 0.2F + random.nextFloat() * 0.2F, 0.9F + random.nextFloat() * 0.15F, false

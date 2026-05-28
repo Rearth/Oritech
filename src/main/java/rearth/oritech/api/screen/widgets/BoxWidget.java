@@ -1,7 +1,6 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.api.screen.UIComponent;
 
 /**
@@ -26,11 +25,21 @@ public class BoxWidget extends UIComponent {
         return new BoxWidget(x, y, width, height, argbColor, false);
     }
     
-    public int getColor() { return color; }
-    public void setColor(int color) { this.color = color; }
+    public int getColor() {
+        return color;
+    }
     
-    public boolean isFilled() { return filled; }
-    public void setFilled(boolean filled) { this.filled = filled; }
+    public void setColor(int color) {
+        this.color = color;
+    }
+    
+    public boolean isFilled() {
+        return filled;
+    }
+    
+    public void setFilled(boolean filled) {
+        this.filled = filled;
+    }
     
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {

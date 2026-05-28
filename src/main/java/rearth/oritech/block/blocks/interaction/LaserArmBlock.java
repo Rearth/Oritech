@@ -40,7 +40,7 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class LaserArmBlock extends Block implements EntityBlock {
-
+    
     private static final LaserArmBlockBehavior DEFAULT_BLOCK_BEHAVIOR = new LaserArmBlockBehavior();
     public static final Map<Block, LaserArmBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     private static final LaserArmEntityBehavior DEFAULT_ENTITY_BEHAVIOR = new LaserArmEntityBehavior();
@@ -52,19 +52,19 @@ public class LaserArmBlock extends Block implements EntityBlock {
         LaserArmBlockBehavior.registerDefaults();
         LaserArmEntityBehavior.registerDefaults();
     }
-
+    
     public static void registerBlockBehavior(Block targetBlock, LaserArmBlockBehavior behavior) {
         BLOCK_BEHAVIORS.put(targetBlock, behavior);
     }
-
+    
     public static void registerEntityBehavior(EntityType<?> entityType, LaserArmEntityBehavior behavior) {
         ENTITY_BEHAVIORS.put(entityType, behavior);
     }
-
+    
     public static LaserArmBlockBehavior getBehaviorForBlock(Block targetBlock) {
         return BLOCK_BEHAVIORS.getOrDefault(targetBlock, DEFAULT_BLOCK_BEHAVIOR);
     }
-
+    
     public static LaserArmEntityBehavior getBehaviorForEntity(EntityType<?> targetEntityType) {
         return ENTITY_BEHAVIORS.getOrDefault(targetEntityType, DEFAULT_ENTITY_BEHAVIOR);
     }

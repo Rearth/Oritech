@@ -68,18 +68,18 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         return itemsMatching && fluidsMatching;
     }
     
-    public static boolean itemsMatch(List<Ingredient> itemInputs, OritechRecipeInput input) {
-        if (itemInputs.isEmpty()) return true;
+    public static boolean itemsMatch(List<Ingredient> recipeIngredients, OritechRecipeItemInput input) {
+        if (recipeIngredients.isEmpty()) return true;
         
         if (input.isEmpty()) return false;
         
         // multiple inputs require fuzzy matching
-        if (itemInputs.size() > 1) {
-            return fuzzyItemMatches(itemInputs, input);
+        if (recipeIngredients.size() > 1) {
+            return fuzzyItemMatches(recipeIngredients, input);
         }
         
         // if we have just one input, just test that one
-        return itemInputs.getFirst().test(input.getItem(0));
+        return recipeIngredients.getFirst().test(input.getItem(0));
     }
     
     private boolean fluidsMatch(OritechRecipeInput input, Level level) {
@@ -87,13 +87,13 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
         return fluidInput.test(input.fluidStack());
     }
     
-    private static boolean fuzzyItemMatches(List<Ingredient> itemInputs, OritechRecipeInput input) {
+    private static boolean fuzzyItemMatches(List<Ingredient> itemIngredients, OritechRecipeItemInput input) {
         
         // Input does not need to be in the correct slots / split into different slots.
         // We just check if we can remove all ingredients from the inventory, and fail if any input is not able to be removed.
-        var sourceItems = input.itemStacks().stream().filter(stack -> !stack.isEmpty()).toList();
+        var sourceItems = input.getStacks().stream().filter(stack -> !stack.isEmpty()).toList();
         
-        for (var ingredient : itemInputs) {
+        for (var ingredient : itemIngredients) {
             var found = false;
             
             for (var heldStack : sourceItems) {

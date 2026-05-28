@@ -27,8 +27,8 @@ public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
     public WallMountedLight(Properties settings, int height) {
         super(settings);
         this.registerDefaultState(defaultBlockState()
-                               .setValue(FACING, Direction.NORTH)
-                               .setValue(FACE, AttachFace.FLOOR)
+                                    .setValue(FACING, Direction.NORTH)
+                                    .setValue(FACE, AttachFace.FLOOR)
         );
         
         SOUTH_WALL_SHAPE = Block.box(5.0, 0, 0.0, 11.0, 16.0, height);

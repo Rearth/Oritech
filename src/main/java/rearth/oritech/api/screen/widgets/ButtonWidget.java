@@ -2,7 +2,6 @@ package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -23,7 +22,7 @@ public class ButtonWidget extends UIComponent {
     private Component label;
     private OritechSurface normalSurface = OritechSurface.PANEL;
     private OritechSurface hoverSurface = OritechSurface.PANEL_HOVER;
-    private OritechSurface pressedSurface = OritechSurface.PANEL_PRESSED;
+    private final OritechSurface pressedSurface = OritechSurface.PANEL_PRESSED;
     private OritechSurface disabledSurface = OritechSurface.PANEL_DARK;
     private Insets surfacePadding = Insets.NONE;
     private int textColor = DEFAULT_TEXT_COLOR;
@@ -65,10 +64,21 @@ public class ButtonWidget extends UIComponent {
         return this;
     }
     
-    public void setLabel(Component label) { this.label = label; }
-    public Component getLabel() { return label; }
-    public void setActive(boolean active) { this.active = active; }
-    public boolean isActive() { return active; }
+    public void setLabel(Component label) {
+        this.label = label;
+    }
+    
+    public Component getLabel() {
+        return label;
+    }
+    
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    
+    public boolean isActive() {
+        return active;
+    }
     
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
@@ -99,10 +109,10 @@ public class ButtonWidget extends UIComponent {
         else activeSurface = normalSurface;
         
         activeSurface.render(graphics,
-            x - surfacePadding.left(),
-            y - surfacePadding.top(),
-            width + surfacePadding.horizontal(),
-            height + surfacePadding.vertical());
+          x - surfacePadding.left(),
+          y - surfacePadding.top(),
+          width + surfacePadding.horizontal(),
+          height + surfacePadding.vertical());
         
         var font = Minecraft.getInstance().font;
         int textY = y + (height - 8) / 2 + ((hovered && active) ? 1 : 0);

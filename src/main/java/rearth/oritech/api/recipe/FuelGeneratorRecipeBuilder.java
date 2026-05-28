@@ -7,11 +7,11 @@ public class FuelGeneratorRecipeBuilder extends OritechRecipeBuilder {
     private FuelGeneratorRecipeBuilder() {
         super(RecipeContent.FUEL_GENERATOR, "fuelgen");
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new FuelGeneratorRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (fluidInput == null || fluidInput.isEmpty())

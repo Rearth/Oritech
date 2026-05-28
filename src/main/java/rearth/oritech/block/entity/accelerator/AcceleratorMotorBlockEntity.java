@@ -10,8 +10,8 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
-import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyProvider {
     

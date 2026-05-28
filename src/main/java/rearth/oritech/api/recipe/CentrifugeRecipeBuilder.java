@@ -4,16 +4,16 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
-
+    
     protected CentrifugeRecipeBuilder() {
         super(RecipeContent.CENTRIFUGE, "centrifuge");
         this.time = 100;
     }
-
+    
     public static OritechRecipeBuilder build() {
         return new CentrifugeRecipeBuilder();
     }
-
+    
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if ((inputs == null || inputs.isEmpty()) || (results == null || results.isEmpty()))

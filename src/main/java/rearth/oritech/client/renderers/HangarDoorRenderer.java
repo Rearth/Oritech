@@ -47,7 +47,7 @@ public class HangarDoorRenderer extends GeoBlockRenderer<HangarDoorBlockEntity> 
         }
         
         if (rotated && surface.getAxis().isHorizontal())
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+            poseStack.mulPose(Axis.YP.rotationDegrees(90));
     }
     
     public AABB getRenderBoundingBox(HangarDoorBlockEntity blockEntity) {

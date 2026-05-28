@@ -19,7 +19,9 @@ public abstract class BaseReactorBlock extends Block {
         super(settings);
     }
     
-    public boolean validForWalls() { return false; }
+    public boolean validForWalls() {
+        return false;
+    }
     
     public Block requiredStackCeiling() {
         return Blocks.AIR;

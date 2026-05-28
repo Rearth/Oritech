@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public abstract class AbstractDataDisplayWidget extends UIComponent {
-
+    
     protected final long capacity;
     protected final Supplier<Long> amountSupplier;
     protected final Supplier<Component> tooltipSupplier;
     protected long currentAmount;
     protected double displayedAmount;
-
+    
     protected AbstractDataDisplayWidget(DisplayDataSource source) {
         super(source.config().x(), source.config().y(), source.config().width(), source.config().height());
         this.capacity = source.capacity();
@@ -23,7 +23,7 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
         this.currentAmount = Mth.clamp(source.amountSupplier().get(), 0L, capacity);
         this.displayedAmount = currentAmount;
     }
-
+    
     @Override
     public void tick() {
         // smoothly moves displayed amount to target amount
@@ -47,24 +47,24 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
     protected boolean applySmoothing() {
         return true;
     }
-
+    
     protected long getCapacity() {
         return capacity;
     }
-
+    
     protected long getCurrentAmount() {
         return currentAmount;
     }
-
+    
     protected long getTargetAmount() {
         return Mth.clamp(amountSupplier.get(), 0L, capacity);
     }
-
+    
     protected float getFillRatio() {
         if (capacity <= 0) {
             return 0f;
         }
-
+        
         return Mth.clamp((float) (displayedAmount / capacity), 0f, 1f);
     }
 }

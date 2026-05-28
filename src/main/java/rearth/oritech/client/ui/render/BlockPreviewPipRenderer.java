@@ -15,27 +15,27 @@ import net.minecraft.client.renderer.MultiBufferSource;
  * compiling and the PIP infrastructure functions; it just draws nothing for now.
  */
 public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPreviewRenderState> {
-
+    
     public BlockPreviewPipRenderer(MultiBufferSource.BufferSource bufferSource) {
         super(bufferSource);
     }
-
+    
     @Override
     public Class<BlockPreviewRenderState> getRenderStateClass() {
         return BlockPreviewRenderState.class;
     }
-
+    
     @Override
     protected void renderToTexture(BlockPreviewRenderState state, PoseStack poseStack) {
         // Stub: block-in-PIP rendering needs to be rebuilt against the new 26.1
         // block rendering pipeline. See the file-level javadoc for context.
     }
-
+    
     @Override
     protected float getTranslateY(int height, int guiScale) {
         return height / 2.0F;
     }
-
+    
     @Override
     protected String getTextureLabel() {
         return "oritech_block_preview";

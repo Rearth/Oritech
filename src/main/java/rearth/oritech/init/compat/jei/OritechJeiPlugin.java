@@ -110,8 +110,8 @@ public class OritechJeiPlugin implements IModPlugin {
         // tainted refinery synthetic recipes
         registration.addRecipes(OritechJeiTaintedRefineryCreation.RECIPE_TYPE, List.of(new OritechJeiTaintedRefineryCreation.CreationInfo()));
         registration.addRecipes(OritechJeiTaintedRefineryBonuses.RECIPE_TYPE, List.of(
-            OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_SCULK_BLOCKS, "sculk"),
-            OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_ARCANE_BLOCKS, "arcane")
+          OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_SCULK_BLOCKS, "sculk"),
+          OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_ARCANE_BLOCKS, "arcane")
         ));
         
     }
@@ -170,8 +170,8 @@ public class OritechJeiPlugin implements IModPlugin {
                 return screen.getExclusionZones();
             }
         });
-
+        
         registration.addGhostIngredientHandler(ItemFilterScreen.class, new JeiItemFilterGhostHandler());
     }
-
+    
 }

@@ -5,12 +5,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
@@ -21,7 +24,7 @@ import rearth.oritech.api.screen.data.EnergyDisplayWidget;
 import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.init.recipes.AugmentDataRecipe;
+import rearth.oritech.init.datapack.AugmentData;
 import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
@@ -118,12 +121,12 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         lineWidget.withZIndex(0);
         augmentCanvas.addChild(lineWidget);
         
-        for (var augmentId : PlayerAugments.allAugments.keySet()) {
-            var recipeEntry = menu.player.level().getRecipeManager().byKey(augmentId);
-            if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe recipe)) continue;
+        for (var entry : PlayerAugments.getAllAugmentData(registryAccess()).entrySet()) {
+            var augmentId = entry.getKey();
+            var augmentData = entry.getValue();
             
-            int x = GRAPH_LEFT_OFFSET + recipe.uiX() * 4 - NODE_SIZE / 2;
-            int y = (int) (recipe.uiY() / 100f * graphHeight) - NODE_SIZE / 2;
+            int x = GRAPH_LEFT_OFFSET + augmentData.uiX() * 4 - NODE_SIZE / 2;
+            int y = (int) (augmentData.uiY() / 100f * graphHeight) - NODE_SIZE / 2;
             maxY = Math.max(maxY, y + NODE_SIZE + 12);
             
             var node = new AugmentNodeWidget(x, y, augmentId);
@@ -133,11 +136,11 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         for (var augmentId : augmentNodes.keySet()) {
-            var recipeEntry = menu.player.level().getRecipeManager().byKey(augmentId);
-            if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe recipe)) continue;
+            var augmentData = PlayerAugments.getAugmentData(registryAccess(), augmentId);
+            if (augmentData == null) continue;
             
             var fromNode = augmentNodes.get(augmentId);
-            for (var dependencyId : recipe.requirements()) {
+            for (var dependencyId : augmentData.requirements()) {
                 var dependencyNode = augmentNodes.get(dependencyId);
                 if (dependencyNode == null) continue;
                 dependencyLines.add(new DependencyLine(fromNode.centerX(), fromNode.centerY(), dependencyNode.centerX(), dependencyNode.centerY()));
@@ -189,7 +192,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         addComponent(panel);
         
         addComponent(new EnergyDisplayWidget(DisplayDataSource.CreateEnergy(
-          this.menu.blockEntity.getEnergyStorage(null),
+          this.menu.blockEntity.getEnergyStorageForMultiblock(null),
           new ScreenProvider.BarConfiguration(x + 7, y + 8, 17, 80),
           this.menu.blockEntity)).withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(1)));
         
@@ -219,6 +222,9 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     }
     
     private void updateResearchPanels() {
+        var level = this.menu.blockEntity.getLevel();
+        if (level == null) return;
+        
         for (int i = 0; i < 3; i++) {
             if (i >= researchLabels.size()) continue;
             var panelData = researchLabels.get(i);
@@ -226,7 +232,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             if (researchData == null || panelData == null) continue;
             
             Component text;
-            var time = this.menu.blockEntity.getLevel().getGameTime();
+            var time = level.getGameTime();
             if (!researchData.working) {
                 var ticks = time % 20 / 7;
                 text = Component.translatable("text.oritech.accelerator.ui.waiting." + ticks);
@@ -244,9 +250,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         for (var entry : augmentNodes.entrySet()) {
             var augmentId = entry.getKey();
             var node = entry.getValue();
-            var recipeEntry = this.menu.player.level().getRecipeManager().byKey(augmentId);
-            if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe augmentRecipe))
-                continue;
+            var augmentData = PlayerAugments.getAugmentData(registryAccess(), augmentId);
+            if (augmentData == null) continue;
             
             var isResearched = this.menu.blockEntity.researchedAugments.contains(augmentId);
             var isResearching = this.menu.blockEntity.availableStations.values().stream()
@@ -259,14 +264,14 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             var missingRequirements = new ArrayList<Component>();
             var hasRequirements = true;
             
-            for (var requirementId : augmentRecipe.requirements()) {
+            for (var requirementId : augmentData.requirements()) {
                 if (!this.menu.blockEntity.researchedAugments.contains(requirementId)) {
                     hasRequirements = false;
                     missingRequirements.add(Component.translatable(augmentKey(requirementId)).withStyle(ChatFormatting.ITALIC, ChatFormatting.RED));
                 }
             }
             
-            var requiredStationBlock = BuiltInRegistries.BLOCK.get(augmentRecipe.requiredStation());
+            var requiredStationBlock = getRequiredStationBlock(augmentData);
             var hasResearchStation = this.menu.blockEntity.availableStations.values().stream()
                                        .filter(Objects::nonNull)
                                        .anyMatch(station -> station.type.equals(requiredStationBlock));
@@ -278,11 +283,11 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             
             node.setOperation(operation);
             node.setBlocked(operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH && !hasRequirements);
-            node.setTooltip(buildNodeTooltip(augmentId, augmentRecipe, operation, missingRequirements));
+            node.setTooltip(buildNodeTooltip(augmentId, augmentData, operation, missingRequirements));
         }
     }
     
-    private List<Component> buildNodeTooltip(Identifier augmentId, AugmentDataRecipe recipe,
+    private List<Component> buildNodeTooltip(Identifier augmentId, AugmentData augmentData,
                                              PlayerAugments.AugmentApplicatorOperation operation,
                                              List<Component> missingRequirements) {
         var tooltip = new ArrayList<Component>();
@@ -299,8 +304,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            tooltip.add(Component.translatable("oritech.text.augment_research_time", recipe.time() / 20));
-            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.rfCost())));
+            tooltip.add(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
+            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
         }
         
         if (!missingRequirements.isEmpty()) {
@@ -331,7 +336,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         PacketDistributor.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
         
         int loadedAugmentsCount = 0;
-        for (var entry : PlayerAugments.allAugments.entrySet()) {
+        for (var entry : PlayerAugments.getAllAugments(registryAccess()).entrySet()) {
             var augment = entry.getValue();
             var isResearched = this.menu.blockEntity.researchedAugments.contains(entry.getKey());
             var isInstalled = augment.isInstalled(menu.player);
@@ -353,14 +358,14 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     private void showAugmentDialog(Identifier id, PlayerAugments.AugmentApplicatorOperation operation) {
         removeDialogOverlay();
         
-        var recipeEntry = this.menu.blockEntity.getLevel().getRecipeManager().byKey(id);
-        if (recipeEntry.isEmpty() || !(recipeEntry.get().value() instanceof AugmentDataRecipe recipe)) return;
+        var augmentData = PlayerAugments.getAugmentData(registryAccess(), id);
+        if (augmentData == null) return;
         
         boolean isCreative = this.menu.player.isCreative();
         boolean hasResources = true;
         boolean hasEnergy = true;
         
-        var requiredStationBlock = BuiltInRegistries.BLOCK.get(recipe.requiredStation());
+        var requiredStationBlock = getRequiredStationBlock(augmentData);
         boolean hasRequiredStation = false;
         for (int i = 0; i < 3; i++) {
             var station = this.menu.blockEntity.availableStations.getOrDefault(i, null);
@@ -372,15 +377,21 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         var shownCost = operation == PlayerAugments.AugmentApplicatorOperation.ADD
-                          ? recipe.applyCost()
-                          : recipe.researchCost();
+                          ? augmentData.applyCost()
+                          : augmentData.researchCost();
         
         if (operation != PlayerAugments.AugmentApplicatorOperation.REMOVE) {
             for (var wantedInput : shownCost) {
                 var type = wantedInput.ingredient();
                 var count = wantedInput.count();
-                var machineMatching = this.menu.blockEntity.inventory.heldStacks.stream().filter(type).mapToInt(ItemStack::getCount).sum();
-                var playerMatching = this.menu.player.getInventory().items.stream().filter(type).mapToInt(ItemStack::getCount).sum();
+                var machineMatching = this.menu.blockEntity.inventory.getStacks().stream().filter(type).mapToInt(ItemStack::getCount).sum();
+                var playerMatching = 0;
+                for (int i = 0; i < this.menu.player.getInventory().getContainerSize(); i++) {
+                    var stack = this.menu.player.getInventory().getItem(i);
+                    if (type.test(stack)) {
+                        playerMatching += stack.getCount();
+                    }
+                }
                 if (machineMatching + playerMatching < count) {
                     hasResources = false;
                     break;
@@ -389,7 +400,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         }
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            hasEnergy = this.menu.blockEntity.getEnergyStorageForMultiblock(null).getAmount() >= recipe.rfCost();
+            hasEnergy = this.menu.blockEntity.getEnergyStorageForMultiblock(null).getAmountAsLong() >= augmentData.rfCost();
         }
         
         var overlay = new OverlayWidget(width, height).withDismissHandler(this::removeDialogOverlay);
@@ -423,9 +434,9 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
             cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-              Component.translatable("oritech.text.augment_research_time", recipe.time() / 20), LabelWidget.Alignment.LEFT);
+              Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20), LabelWidget.Alignment.LEFT);
             cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-              Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(recipe.rfCost())), LabelWidget.Alignment.LEFT);
+              Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())), LabelWidget.Alignment.LEFT);
         }
         
         if (operation != PlayerAugments.AugmentApplicatorOperation.REMOVE) {
@@ -436,17 +447,15 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             int itemX = panelX + 12;
             int itemY = cursorY;
             for (var input : shownCost) {
-                if (input.ingredient().getItems().length == 0) continue;
+                var shownStacks = getDisplayStacks(input);
+                if (shownStacks.isEmpty()) continue;
                 
-                var shownStack = Arrays.stream(input.ingredient().getItems()).findFirst().orElse(ItemStack.EMPTY).copy();
-                shownStack.setCount(input.count());
+                var shownStack = shownStacks.getFirst().copyWithCount(input.count());
                 
                 var itemWidget = new ItemWidget(itemX, itemY, shownStack).withTooltipFromStack(false);
                 var tooltip = new ArrayList<Component>();
                 tooltip.add(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
-                Arrays.stream(input.ingredient().getItems())
-                  .map(ItemStack::getHoverName)
-                  .forEach(tooltip::add);
+                shownStacks.stream().map(ItemStack::getHoverName).forEach(component -> tooltip.add(component));
                 itemWidget.withTooltip(tooltip);
                 dialogChildren.add(itemWidget);
                 itemX += 20;
@@ -554,11 +563,23 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     
     @Override
     public BlockState getTitleState() {
-        return menu.blockEntity != null ? menu.blockEntity.getBlockState() : BlockContent.AUGMENT_APPLICATION_BLOCK.defaultBlockState();
+        return menu.blockEntity != null ? menu.blockEntity.getBlockState() : BlockContent.AUGMENT_APPLICATION_BLOCK.get().defaultBlockState();
     }
     
     public static String augmentKey(Identifier id) {
         return "oritech.text." + id.getPath().replace('/', '.');
+    }
+    
+    private RegistryAccess registryAccess() {
+        return menu.player.registryAccess();
+    }
+    
+    private static Block getRequiredStationBlock(AugmentData augmentData) {
+        return BuiltInRegistries.BLOCK.get(augmentData.requiredStation()).orElseThrow().value();
+    }
+    
+    private static List<ItemStack> getDisplayStacks(SizedIngredient input) {
+        return input.ingredient().items().map(holder -> holder.value().getDefaultInstance()).toList();
     }
     
     private record DependencyLine(int fromX, int fromY, int toX, int toY) {

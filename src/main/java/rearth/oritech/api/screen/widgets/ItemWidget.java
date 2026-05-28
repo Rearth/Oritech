@@ -2,7 +2,6 @@ package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -29,8 +28,13 @@ public class ItemWidget extends UIComponent {
         this.stack = stack;
     }
     
-    public ItemStack getStack() { return stack; }
-    public void setStack(ItemStack stack) { this.stack = stack; }
+    public ItemStack getStack() {
+        return stack;
+    }
+    
+    public void setStack(ItemStack stack) {
+        this.stack = stack;
+    }
     
     public ItemWidget withShowOverlay(boolean show) {
         this.showOverlay = show;
@@ -78,7 +82,7 @@ public class ItemWidget extends UIComponent {
     public List<Component> getTooltip() {
         if (tooltipFromStack && stack != null && !stack.isEmpty()) {
             return Screen.getTooltipFromItem(
-                Minecraft.getInstance(), stack);
+              Minecraft.getInstance(), stack);
         }
         return super.getTooltip();
     }

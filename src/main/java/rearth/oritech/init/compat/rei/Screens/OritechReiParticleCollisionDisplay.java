@@ -42,22 +42,22 @@ public class OritechReiParticleCollisionDisplay implements DisplayCategory<Displ
         
         // particle collision overlay
         widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) ->
-            graphics.blit(PARTICLE_RECIPE_OVERLAY, x + 60, y + 17, 0, 0, 36, 24, 36, 24)));
+                                                   graphics.blit(PARTICLE_RECIPE_OVERLAY, x + 60, y + 17, 0, 0, 36, 24, 36, 24)));
         
         // input slots
         widgets.add(Widgets.createSlot(new Point(x + 42, y + 20))
-            .entries(oDisplay.getInputEntries().get(0)).markInput());
+                      .entries(oDisplay.getInputEntries().get(0)).markInput());
         widgets.add(Widgets.createSlot(new Point(x + 96, y + 20))
-            .entries(oDisplay.getInputEntries().get(1)).markInput());
+                      .entries(oDisplay.getInputEntries().get(1)).markInput());
         
         // output slot
         widgets.add(Widgets.createSlot(new Point(x + 70, y + 20))
-            .entries(oDisplay.getOutputEntries().get(0)).markOutput());
+                      .entries(oDisplay.getOutputEntries().get(0)).markOutput());
         
         // collision speed label
         widgets.add(Widgets.createLabel(
-            new Point(x + 6, y + bounds.height - 12),
-            Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
+          new Point(x + 6, y + bounds.height - 12),
+          Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
         ).leftAligned().color(0xFFFFFF).noShadow());
         
         return widgets;

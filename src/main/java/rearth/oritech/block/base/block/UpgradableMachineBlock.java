@@ -37,14 +37,14 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
     
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-
+        
         if (!level.isClientSide()) {
             var entity = level.getBlockEntity(pos);
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
         }
-
+        
         return super.playerWillDestroy(level, pos, state, player);
     }
     

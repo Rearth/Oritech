@@ -187,7 +187,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         
         return EventResult.pass();
     }
-
+    
     // to avoid recusion on neoforge
     private static boolean canBreakOffsetBlock(Level level, BlockPos offsetPos, BlockState offsetState, ServerPlayer player) {
         var wasCheckingOffsetBreakPermission = CHECKING_OFFSET_BREAK_PERMISSION.get();
@@ -199,11 +199,11 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
         }
     }
     
-        public static ItemAttributeModifiers createPromethiumAttributes(ToolMaterial toolMaterial, float attackDamage, float attackSpeed, float range) {
+    public static ItemAttributeModifiers createPromethiumAttributes(ToolMaterial toolMaterial, float attackDamage, float attackSpeed, float range) {
         return ItemAttributeModifiers.builder()
                  .add(
                    Attributes.ATTACK_DAMAGE,
-                                     new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + toolMaterial.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
+                   new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + toolMaterial.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
                    EquipmentSlotGroup.MAINHAND
                  )
                  .add(

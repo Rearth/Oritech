@@ -25,7 +25,7 @@ public class PortalEntity extends Entity implements GeoEntity {
     
     private final AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
     
-    private int age = 0;
+    private final int age = 0;
     
     public GlobalPos target;
     protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
@@ -44,22 +44,22 @@ public class PortalEntity extends Entity implements GeoEntity {
     @Override
     public void playerTouch(Player player) {
         if (level().isClientSide()) return;
-
+        
         if (target != null) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
             
             ServerLevel targetWorld = this.getServer().getLevel(target.dimension());
-
+            
             if (targetWorld != null) {
                 BlockPos targetPos = target.pos();
                 Vec3 centerPos = targetPos.getCenter();
                 
                 AugmentApplicationBlock.lastTeleportedPlayer = new Tuple<>(targetWorld.getGameTime(), serverPlayer);
-
+                
                 serverPlayer.teleportTo(
-                    targetWorld,
-                    centerPos.x, centerPos.y, centerPos.z,
-                    serverPlayer.getYRot(), serverPlayer.getXRot()
+                  targetWorld,
+                  centerPos.x, centerPos.y, centerPos.z,
+                  serverPlayer.getYRot(), serverPlayer.getXRot()
                 );
             } else {
                 Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().location());

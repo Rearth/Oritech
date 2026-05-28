@@ -53,7 +53,7 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
         
         var bottomEnd = surfacePos.below(depth);
         var center = bottomEnd.offset(random.nextIntBetweenInclusive(-2, 2), random.nextIntBetweenInclusive(-3, 3), random.nextIntBetweenInclusive(0, height / 2));
-
+        
         var perlinSampler = new ImprovedNoise(random);
         
         // iterate through a cube, calculate distance from center to get a good circle
