@@ -23,48 +23,48 @@ public class AcceleratorPassthroughBlock extends HorizontalDirectionalBlock {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
         super.onRemove(state, level, pos, newState, moved);
         AcceleratorParticleLogic.resetCachedGate(pos);
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         AcceleratorParticleLogic.resetCachedGate(pos);
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (!level.isClientSide()) {
             AcceleratorParticleLogic.resetNearbyCache(pos);
         }
     }
-    
+
     @Override
     public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
         super.wasExploded(level, pos, explosion);
         AcceleratorParticleLogic.resetCachedGate(pos);
     }
-    
+
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;

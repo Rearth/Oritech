@@ -5,7 +5,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -37,92 +36,91 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class PowerPoleBlock extends Block implements EntityBlock {
-    
+
     public PowerPoleBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED, BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(@NotNull BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getClockWise().getOpposite());
     }
-    
+
     @Override
     public @NotNull InteractionResult useWithoutItem(@NotNull BlockState state, Level level, @NotNull BlockPos pos, @NotNull Player player, @NotNull BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
-            
+
             if (!(entity instanceof PowerPoleEntity powerPole)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var wasAssembled = state.getValue(ASSEMBLED);
-            
+
             if (!wasAssembled) {
                 var corePlaced = powerPole.tryPlaceNextCore(player);
                 if (corePlaced) return InteractionResult.SUCCESS;
             }
-            
+
             var isAssembled = powerPole.initMultiblock(state);
-            
+
             // first time created
             if (isAssembled && !wasAssembled) {
                 powerPole.triggerSetupAnimation();
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!isAssembled) {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
                 return InteractionResult.SUCCESS;
             }
-            
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
-            
+
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
+
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public @NotNull BlockState playerWillDestroy(Level level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull Player player) {
-        
+
         if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
-            
+
             if (entity instanceof PowerPoleEntity poleBlock) {
                 poleBlock.onRemoved();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public @NotNull RenderShape getRenderShape(@NotNull BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pos, @NotNull BlockState state) {
         return new PowerPoleEntity(pos, state);
     }
-    
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level level, @NotNull BlockState state, @NotNull BlockEntityType<T> type) {
@@ -131,17 +129,17 @@ public class PowerPoleBlock extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
         var showExtra = Screen.hasControlDown();
-        
+
         if (!showExtra)
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));
-        
+
         addMachineTooltip(tooltip, this, this);
-        
+
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.2").withStyle(ChatFormatting.GRAY));

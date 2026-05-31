@@ -24,10 +24,10 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.BIO_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
     }
-    
+
     @Override
     protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
-        
+
         var res = new HashSet<Tuple<BlockPos, Direction>>();
         res.add(new Tuple<>(pos.above(2), Direction.DOWN));
         res.add(new Tuple<>(pos.below(), Direction.DOWN));
@@ -39,60 +39,60 @@ public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
         res.add(new Tuple<>(pos.west().above(), Direction.EAST));
         res.add(new Tuple<>(pos.north(), Direction.SOUTH));
         res.add(new Tuple<>(pos.north().above(), Direction.SOUTH));
-        
+
         return res;
-        
+
     }
-    
+
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
         return RecipeContent.BIO_GENERATOR.get();
     }
-    
+
     @Override
     public ContainerSlotAssignment getSlotAssignments() {
         return new ContainerSlotAssignment(0, 1, 1, 0);
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 80, 21));
+                new GuiSlot(0, 80, 21));
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.BIO_GENERATOR_SCREEN.get();
     }
-    
+
     @Override
     public int getInventorySize() {
         return 1;
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
-        
+
         return List.of(
-          new Vec3i(1, 0, 0),
-          new Vec3i(1, 1, 0)
+                new Vec3i(1, 0, 0),
+                new Vec3i(1, 1, 0)
         );
     }
-    
+
     @Override
     public long getDefaultExtractionRate() {
         return OritechConfig.generators.bioGeneratorData.maxEnergyExtraction.get();
     }
-    
+
     @Override
     public long getDefaultCapacity() {
         return OritechConfig.generators.bioGeneratorData.energyCapacity.get();
     }
-    
+
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1, 0)
+                new Vec3i(0, 1, 0)
         );
     }
 }

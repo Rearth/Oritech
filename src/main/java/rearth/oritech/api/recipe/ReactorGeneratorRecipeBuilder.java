@@ -4,15 +4,15 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
-    
+
     protected ReactorGeneratorRecipeBuilder() {
         super(RecipeContent.REACTOR, "reactorgen");
     }
-    
+
     public static OritechRecipeBuilder build() {
         return new ReactorGeneratorRecipeBuilder();
     }
-    
+
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs == null || inputs.isEmpty())

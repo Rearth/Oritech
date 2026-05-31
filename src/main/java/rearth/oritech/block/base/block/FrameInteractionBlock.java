@@ -4,8 +4,8 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -36,57 +36,56 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public static final BooleanProperty HAS_FRAME = BooleanProperty.create("has_frame");
-    
+
     public FrameInteractionBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(HAS_FRAME, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING, HAS_FRAME);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (!(entity instanceof FrameInteractionBlockEntity machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var frameValid = machineEntity.tryFindFrame();
             level.setBlockAndUpdate(pos, state.setValue(HAS_FRAME, frameValid));
-            
+
             if (frameValid) {
                 if (entity instanceof MachineAddonController addonController)
                     addonController.initAddons();
-                
-                var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+
+                player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
             } else {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine_frame.missing_frame"));
             }
-            
+
         }
         return InteractionResult.SUCCESS;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -96,19 +95,19 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide() && state.getValue(HAS_FRAME)) {
-            
+
             var ownEntity = (FrameInteractionBlockEntity) level.getBlockEntity(pos);
             ownEntity.cleanup();
-            
+
             if (ownEntity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
-            
+
             if (ownEntity instanceof ItemEnergyFrameInteractionBlockEntity itemContainer) {
                 var stacks = itemContainer.inventory.heldStacks;
                 for (var stack : stacks) {
@@ -117,15 +116,15 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
                         level.addFreshEntity(itemEntity);
                     }
                 }
-                
+
                 itemContainer.inventory.heldStacks.clear();
                 itemContainer.inventory.setChanged();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         addMachineTooltip(tooltip, this, this);

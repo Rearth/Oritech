@@ -34,49 +34,49 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements AdditionalNetworkingProvider {
-    
+
     private ServerPlayer placerPlayerEntity = null;
-    
+
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PLACER_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     protected boolean hasWorkAvailable(BlockPos toolPosition) {
-        
+
         var firstBlock = getFirstInInventory();
         if (firstBlock == null) return false;
         var block = Block.byItem(firstBlock.getItem());
         if (block == null) return false;
-        
+
         var targetPosition = toolPosition.below();
         return Objects.requireNonNull(level).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.defaultBlockState().canSurvive(level, targetPosition);
     }
-    
+
     @Override
     public void finishBlockWork(BlockPos processed) {
-        
+
         var firstBlock = getFirstInInventory();
         if (firstBlock == null) return;
         var block = Block.byItem(firstBlock.getItem());
         if (block == null) return;
-        
+
         var targetPosition = processed.below();
         var direction = Direction.DOWN;
-        
+
         var hitResult = new BlockHitResult(
-          new Vec3(
-            (double) targetPosition.getX() + 0.5 + (double) direction.getStepX() * 0.5,
-            (double) targetPosition.getY() + 0.5 + (double) direction.getStepY() * 0.5,
-            (double) targetPosition.getZ() + 0.5 + (double) direction.getStepZ() * 0.5
-          ),
-          direction,
-          targetPosition,
-          false
+                new Vec3(
+                        (double) targetPosition.getX() + 0.5 + (double) direction.getStepX() * 0.5,
+                        (double) targetPosition.getY() + 0.5 + (double) direction.getStepY() * 0.5,
+                        (double) targetPosition.getZ() + 0.5 + (double) direction.getStepZ() * 0.5
+                ),
+                direction,
+                targetPosition,
+                false
         );
-        
+
         var placementState = block.getStateForPlacement(new BlockPlaceContext(getPlacerPlayerEntity(), InteractionHand.MAIN_HAND, firstBlock, hitResult));
-        
+
         if (Objects.requireNonNull(level).getBlockState(targetPosition).isAir() && placementState != null && placementState.canSurvive(level, targetPosition)) {
             level.setBlockAndUpdate(targetPosition, placementState);
             block.setPlacedBy(level, targetPosition, placementState, getPlacerPlayerEntity(), firstBlock);
@@ -85,70 +85,70 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
             super.finishBlockWork(processed);
         }
     }
-    
+
     private ItemStack getFirstInInventory() {
         for (var stack : inventory.heldStacks) {
             if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
                 return stack;
             }
         }
-        
+
         return null;
     }
-    
+
     @Override
     public float getCoreQuality() {
         return 3f;
     }
-    
+
     @Override
     public BlockState getMachineHead() {
         return BlockContent.BLOCK_PLACER_HEAD.defaultBlockState();
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1, 0)
+                new Vec3i(0, -1, 0)
         );
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 38));
+                new GuiSlot(0, 56, 38));
     }
-    
+
     @Override
     public ItemStack getToolheadAdditionalRender() {
         return getFirstInInventory();
     }
-    
+
     @Override
     public float getMoveTime() {
         return OritechConfig.placerConfig.moveDuration.get() * this.getSpeedMultiplier();
     }
-    
+
     @Override
     public float getWorkTime() {
         return OritechConfig.placerConfig.workDuration.get() * this.getSpeedMultiplier();
     }
-    
+
     @Override
     public int getMoveEnergyUsage() {
         return OritechConfig.placerConfig.moveEnergyUsage.get();
     }
-    
+
     @Override
     public int getOperationEnergyUsage() {
         return OritechConfig.placerConfig.workEnergyUsage.get();
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.PLACER_SCREEN.get();
     }
-    
+
     @Override
     public List<Field> additionalSyncedFields(SyncType type) {
         if (type.equals(SyncType.TICK)) {
@@ -160,12 +160,12 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         }
         return List.of();
     }
-    
+
     private Player getPlacerPlayerEntity() {
         if (placerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
             placerPlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_placer"), inventory);
         }
-        
+
         return placerPlayerEntity;
     }
 }

@@ -24,38 +24,38 @@ import rearth.oritech.init.BlockEntitiesContent;
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 
 public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEntityTicker<ParticleCollectorBlockEntity>, EnergyProvider {
-    
+
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.collectorEnergyStorage.get(), 0, OritechConfig.collectorEnergyStorage.get(), 0, this::setChanged, false);
-    
+
     public ParticleCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.PARTICLE_COLLECTOR_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
-    
+
     public void onParticleCollided() {
         onParticleCollided(OritechConfig.blackHoleTachyonEnergy.get());
     }
-    
+
     public void onParticleCollided(int amount) {
-        
+
         try (var transaction = Transaction.openRoot()) {
             energyStorage.internalInsert(amount, transaction);
             transaction.commit();
         }
-        
+
         triggerAnimation();
     }
-    
+
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, ParticleCollectorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
-        
+
         if (energyStorage.energy <= 0) return;
-        
+
         // output energy to back
         // todo caching?
         var target = getOutputPosition(pos, getBlockState().getValue(DirectionalBlock.FACING).getOpposite());
@@ -70,19 +70,19 @@ public class ParticleCollectorBlockEntity extends BlockEntity implements BlockEn
             }
         }
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         energyStorage.serialize(output);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         energyStorage.deserialize(input);
     }
-    
+
     public void triggerAnimation() {
         if (level instanceof ServerLevel serverLevel) {
             var forward = getBlockState().getValue(DirectionalBlock.FACING).getUnitVec3i();

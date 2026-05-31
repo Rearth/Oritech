@@ -14,7 +14,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 @SuppressWarnings("SwitchStatementWithTooFewBranches")
 public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
-    
+
     protected VoxelShape NORTH_WALL_SHAPE;
     protected VoxelShape SOUTH_WALL_SHAPE;
     protected VoxelShape WEST_WALL_SHAPE;
@@ -23,14 +23,14 @@ public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
     protected VoxelShape FLOOR_X_AXIS_SHAPE;
     protected VoxelShape CEILING_Z_AXIS_SHAPE;
     protected VoxelShape CEILING_X_AXIS_SHAPE;
-    
+
     public WallMountedLight(Properties settings, int height) {
         super(settings);
         this.registerDefaultState(defaultBlockState()
-                                    .setValue(FACING, Direction.NORTH)
-                                    .setValue(FACE, AttachFace.FLOOR)
+                .setValue(FACING, Direction.NORTH)
+                .setValue(FACE, AttachFace.FLOOR)
         );
-        
+
         SOUTH_WALL_SHAPE = Block.box(5.0, 0, 0.0, 11.0, 16.0, height);
         NORTH_WALL_SHAPE = Block.box(5.0, 0, 16 - height, 11.0, 16.0, 16.0);
         WEST_WALL_SHAPE = Block.box(16 - height, 0, 5.0, 16.0, 16.0, 11.0);
@@ -40,7 +40,7 @@ public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
         CEILING_Z_AXIS_SHAPE = Block.box(5.0, 16 - height, 0, 11.0, 16.0, 16.0);
         CEILING_X_AXIS_SHAPE = Block.box(0.0, 16 - height, 5.0, 16.0, 16.0, 11.0);
     }
-    
+
     // copied from LeverBlock
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
@@ -65,13 +65,13 @@ public class WallMountedLight extends FaceAttachedHorizontalDirectionalBlock {
             default -> CEILING_Z_AXIS_SHAPE;
         };
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
         builder.add(FACE);
     }
-    
+
     @Override
     protected MapCodec<? extends FaceAttachedHorizontalDirectionalBlock> codec() {
         return null;

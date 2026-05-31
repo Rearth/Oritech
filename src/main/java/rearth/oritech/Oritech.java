@@ -41,42 +41,42 @@ import rearth.oritech.util.ServerZiplineHandler;
 
 @Mod(Oritech.MOD_ID)
 public final class Oritech {
-    
+
     public static final String MOD_ID = "oritech";
     public static final Logger LOGGER = LogUtils.getLogger();
-    
+
     public static Identifier id(String path) {
         return Identifier.fromNamespaceAndPath(MOD_ID, path);
     }
-    
+
     public Oritech(IEventBus modEventBus, ModContainer modContainer) {
-        
+
         LOGGER.info("Hello from Oritech!");
-        
+
         // runtime events
         var neoEventBus = NeoForge.EVENT_BUS;
         neoEventBus.addListener(this::onServerStarted);
         neoEventBus.addListener(this::onServerTickPost);
         neoEventBus.addListener(this::onLevelTickPos);
         neoEventBus.addListener(this::onPlayerTickPost);
-        
+
         // registration events
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(AugmentContent::registerDataPackRegistries);
-        
+
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
         modContainer.registerConfig(ModConfig.Type.STARTUP, OritechStartupConfig.STARTUP_SPEC);
-        
+
         // codecs for reflective builders
         NetworkManager.loadDefaultCodecs();
-        
+
         // registrations
         ItemContent.ITEMS.register(modEventBus);
         BlockContent.BLOCKS.register(modEventBus);
         BlockContent.BLOCK_ITEMS.register(modEventBus);
         ToolsContent.EQUIPMENT.register(modEventBus);
-        
+
         ItemGroups.TABS.register(modEventBus);
         SoundContent.SOUND_EVENTS.register(modEventBus);
         LootContent.LOOT_FUNCTIONS.register(modEventBus);
@@ -85,74 +85,74 @@ public final class Oritech {
         FeatureContent.FEATURES.register(modEventBus);
         ModScreens.MENUS.register(modEventBus);
         AttachmentContent.ATTACHMENT_TYPES.register(modEventBus);
-        
+
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);
         FluidContent.FLUID_BLOCKS.register(modEventBus);
         FluidContent.BUCKET_ITEMS.register(modEventBus);
-        
+
         // register networking
         modEventBus.addListener(this::addNetworkHandlers);
-        
+
         // post processing / extra registrations
         BlockContent.AddBlockItems();
-        
+
         LOGGER.info("All events registered to the event busses");
     }
-    
+
     private void commonSetup(FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
-        
+
     }
-    
+
     private void onServerTickPost(ServerTickEvent.Post event) {
         AcceleratorParticleLogic.onTickEnd();
         RefineryBlock.updateTaintEvents();
     }
-    
+
     private void onLevelTickPos(LevelTickEvent.Post event) {
         if (event.getLevel().isClientSide()) return;
         ElectricMaceItem.processLightningEvents(event.getLevel());
     }
-    
+
     private void onPlayerTickPost(PlayerTickEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             ServerZiplineHandler.onPlayerTick(serverPlayer);
             PlayerAugments.serverTickAugments(serverPlayer);
         }
     }
-    
+
     private void onServerStarted(ServerStartedEvent event) {
         // load pipe data to memory
         event.getServer().getAllLevels().forEach(this::loadLevelPipeData);
     }
-    
-    
+
+
     private void addNetworkHandlers(RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar("1");
         NetworkManager.initClientBound(registrar);
         NetworkManager.initServerBound(registrar);
     }
-    
+
     private void loadLevelPipeData(ServerLevel level) {
         var dimId = level.dimension().identifier();
         var dataId = "energy_" + dimId + "_" + dimId.getPath();
         var result = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
         EnergyPipeBlock.ENERGY_PIPE_DATA.put(dimId, result);
-        
+
         var fluidDataId = "fluid_" + dimId.getNamespace() + "_" + dimId.getPath();
         var fluidResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
         FluidPipeBlock.FLUID_PIPE_DATA.put(dimId, fluidResult);
-        
+
         var itemDataId = "item_" + dimId.getNamespace() + "_" + dimId.getPath();
         var itemResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
         ItemPipeBlock.ITEM_PIPE_DATA.put(dimId, itemResult);
-        
+
         var superConductorDataId = "superconductor_" + dimId.getNamespace() + "_" + dimId.getPath();
         var superConductorResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
         SuperConductorBlock.SUPERCONDUCTOR_DATA.put(dimId, superConductorResult);
-        
+
         var powerPoleId = "pole_" + dimId.getNamespace() + "_" + dimId.getPath();
         var powerPoleResult = level.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE, powerPoleId);
         PowerPoleEntity.POLE_NETWORK_DATA.put(dimId, powerPoleResult);

@@ -26,39 +26,39 @@ public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBl
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.FACING, ctx.getNearestLookingDirection().getOpposite());
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReactorEnergyPortEntity(pos, state);
     }
-    
+
     @Override
     public boolean validForWalls() {
         return true;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
-        
+
         var showExtra = Screen.hasControlDown();
-        
+
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.reactor_energy_port.rate", OritechConfig.reactorMaxEnergyOutput.get()));
         }
-        
+
     }
 }

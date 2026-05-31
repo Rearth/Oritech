@@ -6,7 +6,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
 
 public interface ItemProvider {
-    
+
     ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction);
-    
+
 }

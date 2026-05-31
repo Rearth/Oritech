@@ -13,13 +13,13 @@ import java.util.concurrent.CompletableFuture;
 
 // todo move this to datagen
 public class OritechAugmentDataGenerator implements DataProvider {
-    
+
     private final PackOutput.PathProvider pathProvider;
-    
+
     public OritechAugmentDataGenerator(PackOutput output) {
         this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "augments");
     }
-    
+
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
         var augmentData = new LinkedHashMap<Identifier, AugmentData>();
@@ -29,16 +29,16 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 throw new IllegalStateException("Duplicate augment definition for id " + id);
             }
         });
-        
+
         var tasks = new ArrayList<CompletableFuture<?>>();
         augmentData.forEach((id, data) -> {
             var encoded = AugmentData.CODEC.encodeStart(JsonOps.INSTANCE, data).getOrThrow(IllegalStateException::new);
             tasks.add(DataProvider.saveStable(output, encoded, pathProvider.json(id)));
         });
-        
+
         return CompletableFuture.allOf(tasks.toArray(CompletableFuture[]::new));
     }
-    
+
     @Override
     public String getName() {
         return "Oritech augment data";

@@ -4,16 +4,16 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class AssemblerRecipeBuilder extends OritechRecipeBuilder {
-    
+
     protected AssemblerRecipeBuilder() {
         super(RecipeContent.ASSEMBLER, "assembler");
         this.time = 120;
     }
-    
+
     public static OritechRecipeBuilder build() {
         return new AssemblerRecipeBuilder();
     }
-    
+
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs == null || inputs.size() != 4)

@@ -20,63 +20,63 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OritechReiLaserDisplay implements DisplayCategory<Display> {
-    
+
     protected final OritechRecipeType recipeType;
     protected final ItemLike icon;
     public static final Identifier LASER_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/laser_recipe_background.png");
-    
+
     public OritechReiLaserDisplay(OritechRecipeType recipeType, ItemLike icon) {
         this.recipeType = recipeType;
         this.icon = icon;
     }
-    
+
     @Override
     public int getDisplayHeight() {
         return 80;
     }
-    
+
     @Override
     public int getDisplayWidth(Display display) {
         return 170;
     }
-    
+
     @Override
     public List<Widget> setupDisplay(Display display, Rectangle bounds) {
         var widgets = new ArrayList<Widget>();
         var oDisplay = (OritechDisplay) display;
         var x = bounds.x;
         var y = bounds.y;
-        
+
         // background
         widgets.add(Widgets.createRecipeBase(bounds));
-        
+
         // laser background texture
         widgets.add(Widgets.createTexturedWidget(LASER_RECIPE_OVERLAY, x + 5, y + 5, 0, 0, 80, 80, 300, 300, 300, 300));
-        
+
         // input slot
         widgets.add(Widgets.createSlot(new Point(x + 80, y + 15))
-                      .entries(oDisplay.getInputEntries().get(0)).markInput());
-        
+                .entries(oDisplay.getInputEntries().get(0)).markInput());
+
         // arrow
         widgets.add(Widgets.createArrow(new Point(x + 105, y + 15)));
-        
+
         // output slot
         widgets.add(Widgets.createSlot(new Point(x + 135, y + 15))
-                      .entries(oDisplay.getOutputEntries().get(0)).markOutput());
-        
+                .entries(oDisplay.getOutputEntries().get(0)).markOutput());
+
         return widgets;
     }
-    
+
     @Override
     public CategoryIdentifier<? extends Display> getCategoryIdentifier() {
         return CategoryIdentifier.of(recipeType.getIdentifier());
     }
-    
+
     @Override
     public Component getTitle() {
         return Component.translatable("rei.process." + recipeType.getIdentifier());
     }
-    
+
     @Override
     public Renderer getIcon() {
         return EntryStacks.of(icon);

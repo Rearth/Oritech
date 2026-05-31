@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class TooltipHelper {
-    
+
     public static String getEnergyText(long amount) {
         if (amount < 1000) {
             return String.valueOf(amount);
@@ -35,22 +35,22 @@ public class TooltipHelper {
             return getFormatted(amount / 1_000_000_000_000.0) + I18n.get("tooltip.oritech.trillion_abbrev");
         }
     }
-    
+
     private static String getFormatted(double number) {
         var formatter = NumberFormat.getNumberInstance(Locale.ROOT);
         formatter.setMinimumFractionDigits(0);
         formatter.setMaximumFractionDigits(2);
         return formatter.format(number);
     }
-    
+
     public static void addMachineTooltip(List<Component> tooltip, Block block, EntityBlock entityProvider) {
         var showExtra = Boolean.TRUE.equals(Screen.hasShiftDown());
-        
+
         if (showExtra) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
-            
+
             var isAtomicForge = entity instanceof AtomicForgeBlockEntity;
-            
+
             if (entity instanceof MultiblockMachineController multiblockController) {
                 var corePositions = multiblockController.getCorePositions();
                 tooltip.add(Component.translatable("tooltip.oritech.core_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(corePositions.size())).withStyle(ChatFormatting.GOLD)));
@@ -73,16 +73,16 @@ public class TooltipHelper {
                 var transferRate = energyStorage.getDefaultExtractionRate();
                 tooltip.add(Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", transferRate).withStyle(ChatFormatting.GOLD)));
             }
-            
-            
+
+
             if (entity instanceof EnergyProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getEnergyLookup(null).getCapacityAsLong());
                 if (!isAtomicForge)
                     tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
-                
+
                 if (isAtomicForge || energyProvider instanceof DeepDrillEntity)
                     tooltip.add(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
-                
+
                 var id = BuiltInRegistries.BLOCK.getKey(block);
                 if (I18n.exists("tooltip.oritech." + id.getPath() + ".extra")) {
                     tooltip.add(Component.translatable("tooltip.oritech." + id.getPath() + ".extra").withStyle(ChatFormatting.GRAY));
@@ -92,17 +92,17 @@ public class TooltipHelper {
             tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
-    
+
     public static Component getFormattedEnergyChangeTooltip(long amount, String unit) {
         var formatted = getEnergyText(amount);
         var text = amount > 0 ? "+" + formatted : formatted;
         return Component.literal(text).withStyle(ChatFormatting.GOLD).append(unit).withStyle(ChatFormatting.GOLD);
     }
-    
+
     public static Component getFormattedValueChangeTooltip(int amount) {
         var text = amount > 0 ? "+" + amount : String.valueOf(amount);
         var color = amount > 0 ? ChatFormatting.GREEN : ChatFormatting.RED;
         return Component.literal(text).withStyle(color).append("%").withStyle(color);
     }
-    
+
 }

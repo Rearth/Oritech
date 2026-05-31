@@ -9,41 +9,41 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEntityTicker<AcceleratorSensorBlockEntity>, ComparatorOutputProvider {
-    
+
     private float measuredSpeed;
     private long measuredTime;
-    
+
     private boolean dirty = false;
-    
+
     public AcceleratorSensorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_SENSOR_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, AcceleratorSensorBlockEntity blockEntity) {
         if (level.isClientSide()) return;
-        
+
         if (measuredSpeed != 0) {
             var age = level.getGameTime() - measuredTime;
-            
+
             if (age > 8) {
                 measuredSpeed = 0;
                 dirty = true;
             }
         }
-        
+
         if (dirty) {
             dirty = false;
             level.updateNeighbourForOutputSignal(pos, getBlockState().getBlock());
         }
     }
-    
+
     public void measureParticle(AcceleratorParticleLogic.ActiveParticle particle) {
         this.measuredSpeed = particle.velocity;
         this.measuredTime = level.getGameTime();
         dirty = true;
     }
-    
+
     @Override
     public int getComparatorOutput() {
         if (measuredSpeed <= 0) {
@@ -77,7 +77,7 @@ public class AcceleratorSensorBlockEntity extends BlockEntity implements BlockEn
         } else if (measuredSpeed <= 15000) {
             return 14;
         }
-        
+
         return 15;
     }
 }

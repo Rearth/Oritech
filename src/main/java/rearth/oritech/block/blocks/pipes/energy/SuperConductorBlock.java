@@ -26,83 +26,83 @@ import java.util.HashMap;
 import java.util.List;
 
 public class SuperConductorBlock extends GenericPipeBlock {
-    
+
     public static HashMap<Identifier, GenericPipeInterfaceEntity.PipeNetworkData> SUPERCONDUCTOR_DATA = new HashMap<>();
-    
+
     public SuperConductorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
         return ((level, pos, direction) -> EnergyApi.BLOCK.find(level, pos, direction) != null);
     }
-    
+
     @Override
     public BlockState getConnectionBlock() {
         return BlockContent.SUPERCONDUCTOR_CONNECTION.defaultBlockState();
     }
-    
+
     @Override
     public BlockState getNormalBlock() {
         return BlockContent.SUPERCONDUCTOR.defaultBlockState();
     }
-    
+
     @Override
     public String getPipeTypeName() {
         return "superconductor";
     }
-    
+
     @Override
     public boolean connectToOwnBlockType(Block block) {
         return block instanceof SuperConductorBlock || block instanceof SuperConductorConnectionBlock || block instanceof SuperConductorDuctBlock;
     }
-    
+
     @Override
     protected VoxelShape[] createShapes() {
         return EXTRA_THICK_SHAPES;
     }
-    
+
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
         return SUPERCONDUCTOR_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
-    
+
     @Override
     public boolean isCompatibleTarget(Block block) {
         return !block.equals(BlockContent.ENERGY_PIPE_CONNECTION);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var text = Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY)
-                     .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.superConductorTransferRate.get()).withStyle(ChatFormatting.GOLD));
+                .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.superConductorTransferRate.get()).withStyle(ChatFormatting.GOLD));
         tooltip.add(text);
         tooltip.add(Component.translatable("tooltip.oritech.superconductor").withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, context, tooltip, options);
     }
-    
+
     public static class FramedSuperConductorBlock extends SuperConductorBlock {
-        
+
         public FramedSuperConductorBlock(Properties settings) {
             super(settings);
         }
-        
+
         @Override
         public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return Shapes.block();
         }
-        
+
         @Override
         public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
             return state.getShape(level, pos);
         }
-        
+
         @Override
         public BlockState getNormalBlock() {
             return BlockContent.FRAMED_SUPERCONDUCTOR.defaultBlockState();
         }
-        
+
         @Override
         public BlockState getConnectionBlock() {
             return BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.defaultBlockState();

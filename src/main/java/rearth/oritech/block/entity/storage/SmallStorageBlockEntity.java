@@ -11,40 +11,40 @@ import rearth.oritech.util.ComparatorOutputProvider;
 import java.util.List;
 
 public class SmallStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
-    
+
     public SmallStorageBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.SMALL_STORAGE_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0, -1),
-          new Vec3i(0, 0, 1)
+                new Vec3i(0, 0, -1),
+                new Vec3i(0, 0, 1)
         );
     }
-    
+
     @Override
     public long getDefaultCapacity() {
         return OritechConfig.smallEnergyStorage.energyCapacity.get();
     }
-    
+
     @Override
     public long getDefaultInsertRate() {
         return OritechConfig.smallEnergyStorage.maxEnergyInsertion.get();
     }
-    
+
     @Override
     public long getDefaultExtractionRate() {
         return OritechConfig.smallEnergyStorage.maxEnergyExtraction.get();
     }
-    
+
     @Override
     public int getComparatorOutput() {
         if (energyStorage.energy <= 0) return 0;
         return (int) (1 + ((energyStorage.energy / (float) energyStorage.capacity) * 14));
     }
-    
+
     @Override
     public float getCoreQuality() {
         return 3;

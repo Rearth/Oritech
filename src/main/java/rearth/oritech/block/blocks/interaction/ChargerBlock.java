@@ -39,47 +39,47 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Block.box(0, 0, 0, 16, 8, 16);
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ChargerBlockEntity(pos, state);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ChargerBlockEntity machine) {
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, machine);
+            ((ServerPlayer) player).openMenu(machine, pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
             var entity = (ChargerBlockEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
@@ -89,14 +89,14 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
                     level.addFreshEntity(itemEntity);
                 }
             }
-            
+
             entity.inventory.heldStacks.clear();
             entity.inventory.setChanged();
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -106,7 +106,7 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var showExtra = Screen.hasControlDown();

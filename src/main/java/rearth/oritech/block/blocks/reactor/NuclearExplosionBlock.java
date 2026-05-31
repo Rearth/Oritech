@@ -13,25 +13,25 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.reactor.NuclearExplosionEntity;
 
 public class NuclearExplosionBlock extends Block implements EntityBlock {
-    
+
     private final int size;
-    
+
     public NuclearExplosionBlock(Properties settings, int size) {
         super(settings);
         this.size = size;
     }
-    
+
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new NuclearExplosionEntity(pos, state, size);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override

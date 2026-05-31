@@ -12,28 +12,28 @@ import java.util.List;
 
 // holds the recipe data, which is then utilized by the different categories
 public class OritechDisplay implements Display {
-    
+
     public final RecipeHolder<OritechRecipe> entry;
-    
+
     public OritechDisplay(RecipeHolder<OritechRecipe> entry) {
         this.entry = entry;
     }
-    
+
     @Override
     public List<EntryIngredient> getInputEntries() {
         return CollectionUtils.map(entry.value().getInputs(), EntryIngredients::ofIngredient);
     }
-    
+
     @Override
     public List<EntryIngredient> getOutputEntries() {
         return CollectionUtils.map(entry.value().getResults(), EntryIngredients::of);
     }
-    
+
     @Override
     public CategoryIdentifier<?> getCategoryIdentifier() {
         return CategoryIdentifier.of(entry.value().getOriType().getIdentifier());
     }
-    
+
     public RecipeHolder<OritechRecipe> getEntry() {
         return entry;
     }

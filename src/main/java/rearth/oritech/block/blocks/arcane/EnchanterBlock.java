@@ -5,7 +5,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -32,50 +31,49 @@ import java.util.List;
 import java.util.Objects;
 
 public class EnchanterBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public EnchanterBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new EnchanterBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -85,11 +83,11 @@ public class EnchanterBlock extends HorizontalDirectionalBlock implements Entity
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     // drop inv
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
             var entity = (EnchanterBlockEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
@@ -99,14 +97,14 @@ public class EnchanterBlock extends HorizontalDirectionalBlock implements Entity
                     level.addFreshEntity(itemEntity);
                 }
             }
-            
+
             entity.inventory.heldStacks.clear();
             entity.inventory.setChanged();
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

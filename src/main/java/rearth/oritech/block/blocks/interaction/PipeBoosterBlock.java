@@ -29,39 +29,39 @@ import java.util.Objects;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public class PipeBoosterBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public PipeBoosterBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new PipeBoosterBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -71,7 +71,7 @@ public class PipeBoosterBlock extends HorizontalDirectionalBlock implements Enti
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

@@ -37,15 +37,15 @@ import java.util.List;
 
 @JeiPlugin
 public class OritechJeiPlugin implements IModPlugin {
-    
+
     @Override
     public @NotNull Identifier getPluginUid() {
         return Oritech.id("jei_plugin");
     }
-    
+
     @Override
     public void registerCategories(@NotNull IRecipeCategoryRegistration registration) {
-        
+
         registerOritechCategory(registration, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, PulverizerBlockEntity.class);
         registerOritechCategory(registration, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, FragmentForgeBlockEntity.class);
         registerOritechCategory(registration, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK, AssemblerBlockEntity.class);
@@ -55,38 +55,38 @@ public class OritechJeiPlugin implements IModPlugin {
         registerOritechCategory(registration, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registration, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, CentrifugeBlockEntity.class);
         registerOritechCategory(registration, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, AtomicForgeBlockEntity.class);
-        
+
         // generators
         registerOritechCategory(registration, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, BioGeneratorEntity.class);
         registerOritechCategory(registration, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, FuelGeneratorEntity.class);
         registerOritechCategory(registration, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, LavaGeneratorEntity.class);
         registerOritechCategory(registration, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK, SteamEngineEntity.class);
-        
+
         // reactor
         registerCustom(registration, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, true, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new ContainerSlotAssignment(0, 1, 1, 0));
-        
+
         registration.addRecipeCategories(new OritechJeiParticleCollisionRecipe(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new OritechJeiLaserRecipe(registration.getJeiHelpers().getGuiHelper()));
-        
+
         // tainted refinery info categories
         registration.addRecipeCategories(new OritechJeiTaintedRefineryCreation(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new OritechJeiTaintedRefineryBonuses(registration.getJeiHelpers().getGuiHelper()));
-        
+
     }
-    
+
     private void registerOritechCategory(IRecipeCategoryRegistration registration, OritechRecipeType type, Block block, Class<? extends MachineBlockEntity> machineClass) {
         registration.addRecipeCategories(
-          new OritechJeiRecipeCategory(type, machineClass, block, registration.getJeiHelpers().getGuiHelper()));
+                new OritechJeiRecipeCategory(type, machineClass, block, registration.getJeiHelpers().getGuiHelper()));
     }
-    
+
     private void registerCustom(IRecipeCategoryRegistration registration, OritechRecipeType type, Block block, Boolean isGenerator, List<ScreenProvider.GuiSlot> slots, ContainerSlotAssignment assignments) {
         registration.addRecipeCategories(
-          new OritechJeiRecipeCategory(type, block, registration.getJeiHelpers().getGuiHelper(), isGenerator, slots, assignments));
+                new OritechJeiRecipeCategory(type, block, registration.getJeiHelpers().getGuiHelper(), isGenerator, slots, assignments));
     }
-    
+
     @Override
     public void registerRecipes(@NotNull IRecipeRegistration registration) {
-        
+
         registerRecipe(registration, RecipeContent.PULVERIZER);
         registerRecipe(registration, RecipeContent.GRINDER);
         registerRecipe(registration, RecipeContent.ASSEMBLER);
@@ -96,36 +96,36 @@ public class OritechJeiPlugin implements IModPlugin {
         registerRecipe(registration, RecipeContent.CENTRIFUGE);
         registerRecipe(registration, RecipeContent.CENTRIFUGE_FLUID);
         registerRecipe(registration, RecipeContent.ATOMIC_FORGE);
-        
+
         // generators
         registerRecipe(registration, RecipeContent.BIO_GENERATOR);
         registerRecipe(registration, RecipeContent.FUEL_GENERATOR);
         registerRecipe(registration, RecipeContent.LAVA_GENERATOR);
         registerRecipe(registration, RecipeContent.STEAM_ENGINE);
-        
+
         registerRecipe(registration, RecipeContent.PARTICLE_COLLISION);
         registerRecipe(registration, RecipeContent.LASER);
         registerRecipe(registration, RecipeContent.REACTOR);
-        
+
         // tainted refinery synthetic recipes
         registration.addRecipes(OritechJeiTaintedRefineryCreation.RECIPE_TYPE, List.of(new OritechJeiTaintedRefineryCreation.CreationInfo()));
         registration.addRecipes(OritechJeiTaintedRefineryBonuses.RECIPE_TYPE, List.of(
-          OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_SCULK_BLOCKS, "sculk"),
-          OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_ARCANE_BLOCKS, "arcane")
+                OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_SCULK_BLOCKS, "sculk"),
+                OritechJeiTaintedRefineryBonuses.BonusInfo.fromTag(TagContent.REFINERY_ARCANE_BLOCKS, "arcane")
         ));
-        
+
     }
-    
+
     public void registerRecipe(IRecipeRegistration registration, OritechRecipeType type) {
         // this feels incredibly hacky, but seems to be the way to go?
         var level = Minecraft.getInstance().level;
         var data = level.getRecipeManager().getAllRecipesFor(type).stream().map(RecipeHolder::value).toList();
         registration.addRecipes(RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class), data);
     }
-    
+
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-        
+
         registerCatalyst(registration, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
         registerCatalyst(registration, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
         registerCatalyst(registration, RecipeContent.ASSEMBLER, BlockContent.ASSEMBLER_BLOCK);
@@ -135,33 +135,33 @@ public class OritechJeiPlugin implements IModPlugin {
         registerCatalyst(registration, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK);
         registerCatalyst(registration, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK);
         registerCatalyst(registration, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK);
-        
+
         // generators
         registerCatalyst(registration, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK);
         registerCatalyst(registration, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK);
         registerCatalyst(registration, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK);
         registerCatalyst(registration, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK);
-        
+
         registerCatalyst(registration, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER);
         registerCatalyst(registration, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK);
         registerCatalyst(registration, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER);
-        
+
         // tainted refinery catalysts
         registration.addRecipeCatalyst(BlockContent.REFINERY_BLOCK, OritechJeiTaintedRefineryCreation.RECIPE_TYPE);
         registration.addRecipeCatalyst(BlockContent.ENCHANTMENT_CATALYST_BLOCK, OritechJeiTaintedRefineryCreation.RECIPE_TYPE);
         registration.addRecipeCatalyst(BlockContent.TAINTED_REFINERY_BLOCK, OritechJeiTaintedRefineryBonuses.RECIPE_TYPE);
     }
-    
+
     private void registerCatalyst(IRecipeCatalystRegistration registration, OritechRecipeType type, Block... blocks) {
         var recipeType = RecipeType.create(type.getIdentifier().getNamespace(), type.getIdentifier().getPath(), OritechRecipe.class);
         for (var block : blocks)
             registration.addRecipeCatalyst(block, recipeType);
     }
-    
+
     @Override
     public void registerGuiHandlers(@NotNull IGuiHandlerRegistration registration) {
         IModPlugin.super.registerGuiHandlers(registration);
-        
+
         registration.addGenericGuiContainerHandler(ReactorScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(PlayerModifierScreen.class, new JeiExclusionZoneHandler());
         registration.addGenericGuiContainerHandler(OritechMachineScreen.class, new IGuiContainerHandler<OritechMachineScreen<?>>() {
@@ -170,8 +170,8 @@ public class OritechJeiPlugin implements IModPlugin {
                 return screen.getExclusionZones();
             }
         });
-        
+
         registration.addGhostIngredientHandler(ItemFilterScreen.class, new JeiItemFilterGhostHandler());
     }
-    
+
 }

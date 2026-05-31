@@ -14,24 +14,24 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 
 public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyProvider {
-    
+
     private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), 0, this::setChanged, false);
-    
+
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         energyStorage.serialize(output);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);

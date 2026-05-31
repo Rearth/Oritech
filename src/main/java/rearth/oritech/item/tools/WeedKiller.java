@@ -21,71 +21,71 @@ public class WeedKiller extends Item {
     public WeedKiller(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public InteractionResult useOn(UseOnContext context) {
         if (context.getLevel().isClientSide())
             return super.useOn(context);
-        
+
         var startPos = context.getClickedPos();
-        
+
         new Thread(() -> doWeedKilling(context.getLevel(), startPos)).start();
-        
+
         context.getItemInHand().consume(1, context.getPlayer());
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     private void doWeedKilling(Level level, BlockPos startPos) {
-        
+
         var maxRange = 20;
         var spreadRange = 3;
         var visited = new HashSet<BlockPos>();
         var open = new ArrayDeque<BlockPos>();
         open.add(startPos);
-        
+
         while (!open.isEmpty()) {
             var candidate = open.pop();
-            
+
             for (int x = -spreadRange; x <= spreadRange; x++) {
                 for (int y = -1; y <= 1; y++) {
                     for (int z = -spreadRange; z <= spreadRange; z++) {
-                        
+
                         var target = new BlockPos(candidate.offset(x, y, z));
-                        
+
                         if (visited.contains(target)) continue;
                         var distance = target.distManhattan(startPos);
-                        
+
                         if (isWeedBlock(target, level) && distance < maxRange) {
                             open.add(target);
                             level.setBlockAndUpdate(target, Blocks.AIR.defaultBlockState());
-                            
+
                             ParticleContent.WeedKiller(level, candidate.getCenter(), target.getCenter());
-                            
+
                             try {
                                 Thread.sleep(50);
                             } catch (InterruptedException e) {
                                 throw new RuntimeException(e);
                             }
-                            
+
                         }
-                        
+
                         visited.add(target);
-                        
+
                     }
                 }
             }
-            
+
         }
-        
+
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
         tooltip.add(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
     }
-    
+
     private boolean isWeedBlock(BlockPos pos, Level level) {
         var state = level.getBlockState(pos);
         if (state.isAir() || state.getFluidState().isSource()) return false;

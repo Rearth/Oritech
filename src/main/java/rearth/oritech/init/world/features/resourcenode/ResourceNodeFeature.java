@@ -17,24 +17,24 @@ import rearth.oritech.config.OritechConfig;
 import java.util.List;
 
 public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
-    
+
     public ResourceNodeFeature(Codec<ResourceNodeFeatureConfig> configCodec) {
         super(configCodec);
     }
-    
+
     @Override
     public boolean place(FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
-        
+
         var level = context.level();
         var origin = context.origin();
-        
+
         if (level.isClientSide()) return false;
-        
+
         var solidBlockFound = false;
         var testPos = new BlockPos(origin);
         var deepNodePos = testPos;
         var boulderPos = testPos;
-        
+
         for (int y = origin.getY(); y > level.getMinY(); y--) { // todo validate that minY is actually bedrock start
             var downPos = testPos.below();
             var testState = level.getBlockState(downPos);
@@ -48,46 +48,46 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
                 testPos = downPos;
             }
         }
-        
+
         // edge case: if no solid block was found, or the boulder is too close to the deep node, don't generate
         if (!solidBlockFound || boulderPos.getY() < (deepNodePos.getY() + 10))
             return false;
-        
+
         if (OritechConfig.easyFindFeatures.get())
             placeSurfaceBoulder(boulderPos, context);
         placeBedrockNode(deepNodePos, context);
         Oritech.LOGGER.debug("placing resource node at " + boulderPos + " with deep " + deepNodePos);
         return true;
-        
+
     }
-    
+
     private BlockState getRandomBlockFromList(List<Identifier> list, RandomSource random) {
         return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).get().value().defaultBlockState();
     }
-    
+
     private Identifier getRandomFromList(List<Identifier> list, RandomSource random) {
         return list.get(random.nextInt(list.size()));
     }
-    
+
     private void placeBedrockNode(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
-        
+
         var level = context.level();
         var random = context.random();
         var ores = context.config().nodeOres();
-        
+
         var radius = context.config().nodeSize();
         var overlayBlock = BuiltInRegistries.BLOCK.get(context.config().overlayBlock()).get().value().defaultBlockState();
         var overlayHeight = context.config().overlayHeight();
-        
+
         var noise = new ImprovedNoise(random);
-        
+
         // the bottom of the "bowl" should start below the top layer of bedrock
         BlockPos centerPos = startPos.above(radius - 2);
-        
+
         for (BlockPos pos : BlockPos.withinManhattan(centerPos, radius, radius, radius)) {
             // skip anything outside the radius, or outside the vertical cutoff
             if (Math.sqrt(pos.distSqr(centerPos)) + noise.noise(pos.getX(), pos.getY(), pos.getZ()) > radius
-                  || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.noise(pos.getX(), pos.getY() + 2, pos.getZ()))
+                    || pos.getY() >= startPos.getY() + overlayHeight + 3 + noise.noise(pos.getX(), pos.getY() + 2, pos.getZ()))
                 continue;
             // randomly replace some blocks below bedrock level with resource nodes
             if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.config().nodeOreChance()) {
@@ -101,16 +101,16 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
             }
         }
     }
-    
+
     private void placeSurfaceBoulder(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
-        
+
         var level = context.level();
         var random = context.random();
         var radius = context.config().boulderRadius();
         var movedCenter = startPos.relative(Axis.getRandom(random), random.nextIntBetweenInclusive(0, radius - 1));
         var ores = context.config().boulderOres();
         var noise = new ImprovedNoise(random);
-        
+
         for (BlockPos pos : BlockPos.withinManhattan(movedCenter, radius, radius, radius)) {
             if (Math.sqrt(pos.distSqr(movedCenter)) > radius + noise.noise(pos.getX(), pos.getY(), pos.getZ()))
                 continue;

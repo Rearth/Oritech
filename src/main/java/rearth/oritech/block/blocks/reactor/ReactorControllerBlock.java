@@ -3,7 +3,6 @@ package rearth.oritech.block.blocks.reactor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -27,30 +26,30 @@ public class ReactorControllerBlock extends BaseReactorBlock implements EntityBl
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReactorControllerBlockEntity(pos, state);
     }
-    
+
     @Override
     public boolean validForWalls() {
         return true;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -60,24 +59,23 @@ public class ReactorControllerBlock extends BaseReactorBlock implements EntityBl
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorControllerBlockEntity reactorController) {
             reactorController.init(player);
-            
+
             if (level.getGameTime() < reactorController.disabledUntil) {
                 player.sendSystemMessage(Component.translatable("text.oritech.reactor.cooldown"));
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (reactorController.active) {
-                var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-                MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+                player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
             }
         }
-        
+
         return InteractionResult.SUCCESS;
     }
 }

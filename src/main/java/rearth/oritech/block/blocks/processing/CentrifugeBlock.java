@@ -7,11 +7,11 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 
 public class CentrifugeBlock extends MultiblockMachine implements EntityBlock {
-    
+
     public CentrifugeBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return CentrifugeBlockEntity.class;

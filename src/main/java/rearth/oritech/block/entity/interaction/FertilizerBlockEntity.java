@@ -9,18 +9,22 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.CropBlock;
-import net.minecraft.world.level.block.FarmBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -32,120 +36,118 @@ import rearth.oritech.init.TagContent;
 import java.util.List;
 import java.util.Objects;
 
-public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidApi.BlockProvider {
-    
-    public static final long FLUID_USAGE = (long) (OritechConfig.fertilizerConfig.liquidPerBlockUsage.get() * FluidStackHooks.bucketAmount());   // per block, tick usage is this divided by work time
-    
+public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements FluidProvider {
+
+    public static final long FLUID_USAGE = (long) (OritechConfig.fertilizerConfig.liquidPerBlockUsage.get() * FluidType.BUCKET_VOLUME);   // per block, tick usage is this divided by work time
+
     @SyncField(SyncType.GUI_TICK)
-    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidStackHooks.bucketAmount(), this::setChanged) {
-        
+    private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidType.BUCKET_VOLUME, this::setChanged) {
+
         @Override
-        public long insert(FluidStack toInsert, boolean simulate) {
-            var fluid = toInsert.getFluid();
-            if (fluid.equals(FluidContent.STILL_MINERAL_SLURRY.get()) || fluid.equals(Fluids.WATER))
-                return super.insert(toInsert, simulate);
-            
+        public int insert(FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+            if (resource.is(FluidContent.STILL_MINERAL_SLURRY.get()) || resource.is(Fluids.WATER))
+                return super.insert(resource, amount, transaction);
+
             return 0;
         }
     };
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         fluidStorage.serialize(output);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         fluidStorage.deserialize(input);
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 38));
+                new GuiSlot(0, 56, 38));
     }
-    
+
     public FertilizerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     private long getWaterUsagePerTick() {
         return (long) (FLUID_USAGE / getWorkTime());
     }
-    
+
     private boolean hasEnoughWater() {
         return fluidStorage.getAmount() >= getWaterUsagePerTick();
     }
-    
+
     @Override
     protected boolean canProgress() {
         return hasEnoughWater() && super.canProgress();
     }
-    
+
     @Override
     protected boolean hasWorkAvailable(BlockPos toolPosition) {
-        
+
         var targetPosition = toolPosition.below();
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
-        
+
         // skip not grown crops
         if (canFertilizeFarmland(toolPosition)) return true;
         return targetState.getBlock() instanceof BonemealableBlock fertilizable && fertilizable.isValidBonemealTarget(level, targetPosition, targetState);
     }
-    
+
     private boolean canFertilizeFarmland(BlockPos toolPosition) {
         var targetPosition = toolPosition.below(2);
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
-        
-        if (targetState.getBlock() instanceof FarmBlock) {
+
+        if (targetState.is(Blocks.FARMLAND)) {
             var moistureStatus = targetState.getValue(BlockStateProperties.MOISTURE);
             return moistureStatus != 7;
         }
-        
+
         return false;
     }
-    
+
     @Override
     public void finishBlockWork(BlockPos processed) {
-        
+
         var inventoryStack = inventory.getItem(0);
         var fertilizerInInventory = !inventoryStack.isEmpty() && inventoryStack.is(TagContent.CONVENTIONAL_FERTILIZER);
         var mineralSlurried = fluidStorage.getFluid().equals(FluidContent.STILL_MINERAL_SLURRY.get());
         var fertilizerStrength = fertilizerInInventory ? 2 : 1;
         fertilizerStrength *= mineralSlurried ? 2 : 1;
         var fertilized = false;
-        
+
         var targetPosition = processed.below();
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
-        
+
         if (!hasWorkAvailable(processed)) return;
-        
+
         if (targetState.getBlock() instanceof CropBlock cropBlock) {
             var newAge = cropBlock.getAge(targetState) + fertilizerStrength;
             newAge = Math.min(newAge, cropBlock.getMaxAge());
             level.setBlock(targetPosition, cropBlock.getStateForAge(newAge), Block.UPDATE_CLIENTS);
             fertilized = true;
         } else if (targetState.getBlock() instanceof BonemealableBlock fertilizable) {
-            fertilizable.performBonemeal((ServerLevel) level, level.random, targetPosition, targetState);
+            fertilizable.performBonemeal((ServerLevel) level, level.getRandom(), targetPosition, targetState);
             if (fertilizerInInventory) {
-                fertilizable.performBonemeal((ServerLevel) level, level.random, targetPosition, targetState);
+                fertilizable.performBonemeal((ServerLevel) level, level.getRandom(), targetPosition, targetState);
                 fertilized = true;
             }
         }
-        
+
         var farmlandPosition = processed.below(2);
         var farmlandState = level.getBlockState(farmlandPosition);
-        
-        if (farmlandState.getBlock() instanceof FarmBlock && farmlandState.getValue(BlockStateProperties.MOISTURE) != 7) {
+
+        if (farmlandState.is(Blocks.FARMLAND) && farmlandState.getValue(BlockStateProperties.MOISTURE) != 7) {
             level.setBlockAndUpdate(farmlandPosition, farmlandState.setValue(BlockStateProperties.MOISTURE, 7));
         }
-        
+
         if (fertilized) {
             if (fertilizerInInventory) {
                 inventoryStack.shrink(1);
-                inventory.setItem(0, inventoryStack);
             }
             super.finishBlockWork(processed);
             if (level instanceof ServerLevel sl)
@@ -153,58 +155,61 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
-    
+
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_FERTILIZER_HEAD.defaultBlockState();
+        return BlockContent.BLOCK_FERTILIZER_HEAD.get().defaultBlockState();
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1, 0)
+                new Vec3i(0, -1, 0)
         );
     }
-    
+
     @Override
     protected void doProgress(boolean moving) {
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
-            fluidStorage.setAmount(fluidStorage.getAmount() - getWaterUsagePerTick());
+            try (var transaction = Transaction.openRoot()) {
+                fluidStorage.extract(FluidResource.of(fluidStorage.getContent()), (int) getWaterUsagePerTick(), transaction);
+                transaction.commit();
+            }
             if (level instanceof ServerLevel sl) {
                 var bp = getCurrentTarget().below();
                 sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0);
             }
         }
     }
-    
+
     @Override
     public float getMoveTime() {
         return OritechConfig.fertilizerConfig.moveDuration.get() * this.getSpeedMultiplier();
     }
-    
+
     @Override
     public float getWorkTime() {
         return OritechConfig.fertilizerConfig.workDuration.get() * this.getSpeedMultiplier();
     }
-    
+
     @Override
     public int getMoveEnergyUsage() {
         return OritechConfig.fertilizerConfig.moveEnergyUsage.get();
     }
-    
+
     @Override
     public int getOperationEnergyUsage() {
         return OritechConfig.fertilizerConfig.workEnergyUsage.get();
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.DESTROYER_SCREEN.get();
     }
-    
+
     @Override
-    public FluidApi.FluidStorage getFluidStorage(Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(Direction direction) {
         return fluidStorage;
     }
 }

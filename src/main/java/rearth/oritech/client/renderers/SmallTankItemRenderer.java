@@ -16,14 +16,14 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.ColorHelper;
 
 public class SmallTankItemRenderer {
-    
+
     private BakedModel tankVisualModel;
     private final Identifier TANK_VISUAL_MODEL_ID;
-    
+
     public SmallTankItemRenderer(Identifier tankVisualModelId) {
         TANK_VISUAL_MODEL_ID = tankVisualModelId;
     }
-    
+
     public void loadModels() {
         if (tankVisualModel == null) {
             this.tankVisualModel = Minecraft.getInstance().getModelManager().getModel(new ModelIdentifier(TANK_VISUAL_MODEL_ID, ""));
@@ -33,63 +33,63 @@ public class SmallTankItemRenderer {
             }
         }
     }
-    
+
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        
+
         matrices.pushPose();
         matrices.translate(0, 0.25, 0);
         matrices.scale(0.84f, 0.84f, 0.84f);
-        
+
         matrices.pushPose();
         matrices.translate(0.5, 0.5, 0.5);
         matrices.scale(0.9f, 0.9f, 0.9f);
-        
+
         if (tankVisualModel == null || tankVisualModel == Minecraft.getInstance().getModelManager().getMissingModel()) {
             loadModels();
         }
-        
+
         // render the original tank model
         if (this.tankVisualModel != null && this.tankVisualModel != Minecraft.getInstance().getModelManager().getMissingModel()) {
             Minecraft.getInstance().getItemRenderer().render(
-              stack,
-              ItemDisplayContext.NONE,
-              false,
-              matrices,
-              vertexConsumers,
-              light,
-              overlay,
-              this.tankVisualModel
+                    stack,
+                    ItemDisplayContext.NONE,
+                    false,
+                    matrices,
+                    vertexConsumers,
+                    light,
+                    overlay,
+                    this.tankVisualModel
             );
         }
-        
+
         matrices.popPose();
-        
+
         var storage = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
         if (storage.isEmpty()) {
             matrices.popPose();
             return;
         }
-        
+
         var fluid = storage.getFluid();
         var fill = storage.getAmount() / (float) (OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount());
-        
+
         var sprite = FluidStackHooks.getStillTexture(fluid);
         var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
         var consumer = vertexConsumers.getBuffer(RenderType.translucent());
-        
+
         matrices.pushPose();
         matrices.translate(0.126, 0.126, 0.126);
         matrices.scale(0.745f, 0.745f * fill, 0.745f);
-        
+
         var entry = matrices.last();
         var modelMatrix = entry.pose();
-        
+
         // Draw the cube using quads
         for (Direction direction : Direction.values()) {
             if (direction.equals(Direction.DOWN)) continue; // skip bottom, as it's never visible
             SmallTankRenderer.drawQuad(direction, consumer, modelMatrix, entry, sprite, spriteColor, light, overlay);
         }
-        
+
         matrices.popPose();
         matrices.popPose();
     }

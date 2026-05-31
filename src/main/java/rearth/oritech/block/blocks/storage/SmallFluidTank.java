@@ -2,7 +2,6 @@ package rearth.oritech.block.blocks.storage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -40,50 +39,49 @@ import java.util.List;
 
 public class SmallFluidTank extends Block implements EntityBlock {
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    
+
     public SmallFluidTank(Properties settings) {
         super(settings);
         this.registerDefaultState(this.defaultBlockState().setValue(LIT, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(LIT);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SmallTankEntity(pos, state, false);
     }
-    
+
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
-    
+
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
-            
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
+
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         var blockEntity = level.getBlockEntity(pos);
@@ -92,12 +90,12 @@ public class SmallFluidTank extends Block implements EntityBlock {
             if (stack.getCount() > 1) {
                 usedStack = stack.copyWithCount(1);
             }
-            
+
             var candidate = usedStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forStack(usedStack));
             if (candidate != null) {
                 if (!level.isClientSide()) {
                     int moved = 0;
-                    
+
                     try (var transaction = Transaction.openRoot()) {
                         var itemResource = candidate.getResource(0);
                         if (itemResource.isEmpty()) { // from tank to item
@@ -124,7 +122,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
                             }
                         }
                     }
-                    
+
                     if (moved > 0) {
                         if (stack.getCount() > 1) {
                             stack.shrink(1);
@@ -134,65 +132,65 @@ public class SmallFluidTank extends Block implements EntityBlock {
                         } else {
                             player.setItemInHand(hand, usedStack);
                         }
-                        
+
                         level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f);
                     }
                 }
-                
+
                 return ItemInteractionResult.sidedSuccess(true);
             }
         }
-        
+
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
-    
+
     @Override
     protected @NotNull List<ItemStack> getDrops(BlockState state, LootParams.Builder builder) {
         var droppedStacks = super.getDrops(state, builder);
-        
+
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
             droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
             tankEntity.inventory.clearContent();
         }
-        
+
         return droppedStacks;
     }
-    
+
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return getStackWithData(level, pos);
     }
-    
+
     @NotNull
     private static ItemStack getStackWithData(LevelReader level, BlockPos pos) {
         var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
-        
+
         if (tankEntity.fluidStorage.getAmount() > 0) {
             var fluidStack = tankEntity.fluidStorage.getStack().copy();
             stack.set(FluidApi.ITEM.getFluidComponent(), fluidStack);
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
-        
+
         return stack;
     }
-    
+
     public static ItemStack getBasePickStack(boolean creative) {
         return new ItemStack(creative ? BlockContent.CREATIVE_TANK_BLOCK.asItem() : BlockContent.SMALL_TANK_BLOCK.asItem());
     }
-    
+
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.setPlacedBy(level, pos, state, placer, itemStack);
-        
+
         if (itemStack.has(FluidApi.ITEM.getFluidComponent())) {
             var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
             tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
             tankEntity.setChanged();
         }
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -202,5 +200,5 @@ public class SmallFluidTank extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
 }

@@ -9,7 +9,7 @@ public class BioGeneratorBlock extends MultiblockMachine {
     public BioGeneratorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return BioGeneratorEntity.class;

@@ -16,19 +16,19 @@ import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 
 public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlock {
-    
+
     public PulverizerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return PulverizerBlockEntity.class;
     }
-    
+
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
-        
+
         if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
             var targetPos = pos.getCenter().add(0, 0.5f, 0);
             var entityDist = entity.distanceToSqr(targetPos);

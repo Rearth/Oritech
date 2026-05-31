@@ -13,75 +13,75 @@ import rearth.oritech.api.networking.UpdatableField;
 
 // simple one-stack fluid storage
 public class SimpleFluidStorage extends FluidStacksResourceHandler implements UpdatableField<Void, FluidStack> {
-    
+
     private final Runnable onUpdate;
-    
+
     public SimpleFluidStorage(int capacity, Runnable onUpdate) {
         super(1, capacity);
         this.onUpdate = onUpdate;
     }
-    
+
     public FluidStack getContent() {
         return this.stacks.get(0);
     }
-    
+
     public int getAmount() {
         return getContent().amount();
     }
-    
+
     public Fluid getFluid() {
         return getContent().getFluid();
     }
-    
+
     public int getCapacity() {
         return capacity;
     }
-    
+
     @Override
     protected void onContentsChanged(int index, FluidStack previousContents) {
         super.onContentsChanged(index, previousContents);
         onUpdate.run();
     }
-    
+
     @Override
     public FluidStack getDeltaData() {
         return this.stacks.get(0);
     }
-    
+
     @Override
     public Void getFullData() {
         return null;
     }
-    
+
     @Override
     public StreamCodec<? extends ByteBuf, FluidStack> getDeltaCodec() {
         return FluidStack.OPTIONAL_STREAM_CODEC;
     }
-    
+
     @Override
     public StreamCodec<? extends ByteBuf, Void> getFullCodec() {
         return null;
     }
-    
+
     @Override
     public boolean useDeltaOnly(SyncType type) {
         return true;
     }
-    
+
     @Override
     public void handleFullUpdate(Void updatedData) {
-    
+
     }
-    
+
     @Override
     public void handleDeltaUpdate(FluidStack updatedData) {
         this.set(0, FluidResource.of(updatedData), updatedData.amount());
     }
-    
+
     public void serialize(ValueOutput output) {
         output.store("fluid", FluidStack.OPTIONAL_CODEC, getContent());
     }
-    
+
     public void deserialize(ValueInput input) {
         input.read("fluid", FluidStack.OPTIONAL_CODEC).ifPresent(this::handleDeltaUpdate);
     }

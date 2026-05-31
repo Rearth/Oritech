@@ -13,27 +13,27 @@ public class FluidPipeDuctBlock extends GenericPipeDuctBlock {
     public FluidPipeDuctBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public BlockState getConnectionBlock() {
         return getNormalBlock();
     }
-    
+
     @Override
     public BlockState getNormalBlock() {
         return BlockContent.FLUID_PIPE_DUCT_BLOCK.defaultBlockState();
     }
-    
+
     @Override
     public String getPipeTypeName() {
         return "fluid";
     }
-    
+
     @Override
     public boolean connectToOwnBlockType(Block block) {
         return block instanceof FluidPipeDuctBlock || block instanceof FluidPipeBlock || block instanceof FluidPipeConnectionBlock;
     }
-    
+
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
         return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());

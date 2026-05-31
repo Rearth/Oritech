@@ -13,46 +13,46 @@ import java.util.List;
  * Can be dismissed by clicking outside the content area with a custom onDismiss runnable.
  */
 public class OverlayWidget extends UIComponent {
-    
+
     private final List<UIComponent> children = new ArrayList<>();
     private Runnable onDismiss;
     private int bgColor = ColorHelper.argb(0f, 0f, 0f, 0.5f);
     private boolean consumeOutsideClicks = true;
     private boolean consumeOutsideScroll = true;
-    
+
     public OverlayWidget(int screenWidth, int screenHeight) {
         super(0, 0, screenWidth, screenHeight);
         this.zIndex = 9000;
     }
-    
+
     public void addChild(UIComponent child) {
         children.add(child);
     }
-    
+
     public List<UIComponent> getChildren() {
         return children;
     }
-    
+
     public OverlayWidget withDismissHandler(Runnable onDismiss) {
         this.onDismiss = onDismiss;
         return this;
     }
-    
+
     public OverlayWidget withBackgroundColor(int argb) {
         this.bgColor = argb;
         return this;
     }
-    
+
     public OverlayWidget withConsumeOutsideClicks(boolean consumeOutsideClicks) {
         this.consumeOutsideClicks = consumeOutsideClicks;
         return this;
     }
-    
+
     public OverlayWidget withConsumeOutsideScroll(boolean consumeOutsideScroll) {
         this.consumeOutsideScroll = consumeOutsideScroll;
         return this;
     }
-    
+
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
         // Dispatch to children first
@@ -69,7 +69,7 @@ public class OverlayWidget extends UIComponent {
         if (onDismiss != null) onDismiss.run();
         return consumeOutsideClicks;
     }
-    
+
     @Override
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
         for (var child : children) {
@@ -78,12 +78,12 @@ public class OverlayWidget extends UIComponent {
         }
         return consumeOutsideScroll;
     }
-    
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         // Translucent background
         graphics.fill(x, y, x + width, y + height, bgColor);
-        
+
         var sorted = new ArrayList<>(children);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
         for (var child : sorted) {
@@ -91,13 +91,13 @@ public class OverlayWidget extends UIComponent {
                 child.render(graphics, mouseX, mouseY, delta);
         }
     }
-    
+
     @Override
     public void tick() {
         for (var child : children)
             child.tick();
     }
-    
+
     public UIComponent getTopmostHovered(double mouseX, double mouseY) {
         UIComponent result = null;
         for (var child : children) {

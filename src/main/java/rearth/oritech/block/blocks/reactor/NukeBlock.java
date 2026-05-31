@@ -27,39 +27,39 @@ import rearth.oritech.init.BlockContent;
 import java.util.List;
 
 public class NukeBlock extends Block {
-    
+
     private final boolean small;
-    
+
     public NukeBlock(Properties settings, boolean small) {
         super(settings);
         this.small = small;
     }
-    
+
     protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (!oldState.is(state.getBlock())) {
             if (level.hasNeighborSignal(pos)) {
                 primeTnt(level, pos);
             }
-            
+
         }
     }
-    
+
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         if (level.hasNeighborSignal(pos)) {
             primeTnt(level, pos);
         }
-        
+
     }
-    
+
     public void wasExploded(Level level, BlockPos pos, Explosion explosion) {
         if (!level.isClientSide()) {
             primeTnt(level, pos);
         }
     }
-    
+
     private void primeTnt(Level level, BlockPos pos) {
         if (!level.isClientSide()) {
-            
+
             if (OritechConfig.boringNukes.get()) {
                 var center = pos.getCenter();
                 level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -67,13 +67,13 @@ public class NukeBlock extends Block {
                 level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.LAVA_POP, SoundSource.BLOCKS, 1.0F, 1.0F);
                 return;
             }
-            
+
             var target = small ? BlockContent.REACTOR_EXPLOSION_MEDIUM : BlockContent.REACTOR_EXPLOSION_LARGE;
             level.setBlockAndUpdate(pos, target.defaultBlockState());
             level.playSound(null, pos.getX(), pos.getY(), pos.getZ(), SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0F, 1.0F);
         }
     }
-    
+
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (!stack.is(Items.FLINT_AND_STEEL) && !stack.is(Items.FIRE_CHARGE)) {
             return super.useItemOn(stack, state, level, pos, player, hand, hit);
@@ -85,12 +85,12 @@ public class NukeBlock extends Block {
             } else {
                 stack.consume(1, player);
             }
-            
+
             player.awardStat(Stats.ITEM_USED.get(item));
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
         }
     }
-    
+
     protected void onProjectileHit(Level level, BlockState state, BlockHitResult hit, Projectile projectile) {
         if (!level.isClientSide()) {
             var blockPos = hit.getBlockPos();
@@ -98,9 +98,9 @@ public class NukeBlock extends Block {
                 primeTnt(level, blockPos);
             }
         }
-        
+
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

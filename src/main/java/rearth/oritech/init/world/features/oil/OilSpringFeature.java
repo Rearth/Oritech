@@ -14,48 +14,48 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     public OilSpringFeature(Codec<OilSpringFeatureConfig> configCodec) {
         super(configCodec);
     }
-    
+
     @Override
     public boolean place(FeaturePlaceContext<OilSpringFeatureConfig> context) {
-        
+
         var level = context.level();
         var origin = context.origin();
-        
+
         if (level.isClientSide()) return false;
-        
-        
+
+
         var testPos = new BlockPos(origin);
         for (int y = 0; y < level.getHeight(); y++) {
             testPos = testPos.above();
-            
+
             if (level.getBlockState(testPos).is(BlockTags.DIRT) || level.getBlockState(testPos).is(BlockTags.SAND)) {
                 if (level.getBlockState(testPos.above()).is(Blocks.AIR)) {
                     placeStructure(testPos, context);
                     return true;
                 }
             }
-            
+
         }
-        
+
         return false;
     }
-    
+
     private void placeStructure(BlockPos surfacePos, FeaturePlaceContext<OilSpringFeatureConfig> context) {
-        
+
         var random = context.random();
         var config = context.config();
         var state = BuiltInRegistries.BLOCK.get(config.blockId()).get().value().defaultBlockState();
         var level = context.level();
-        
+
         var variation = random.nextIntBetweenInclusive((int) (-config.number() * 0.5f), config.number());
         var height = Math.max(config.number() + variation, 13);
         var depth = height * 2;
-        
+
         var bottomEnd = surfacePos.below(depth);
         var center = bottomEnd.offset(random.nextIntBetweenInclusive(-2, 2), random.nextIntBetweenInclusive(-3, 3), random.nextIntBetweenInclusive(0, height / 2));
-        
+
         var perlinSampler = new ImprovedNoise(random);
-        
+
         // iterate through a cube, calculate distance from center to get a good circle
         for (int x = 0; x < depth + 2; x++) {
             for (int y = 0; y < depth + 2; y++) {
@@ -71,18 +71,18 @@ public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
                 }
             }
         }
-        
+
         // fountain up
         if (OritechConfig.easyFindFeatures.get()) {
             for (int i = 0; i < height; i++) {
                 level.setBlock(surfacePos.above(i), state, 0x10);
             }
         }
-        
+
         // down
         for (int i = 1; i < depth + 5; i++) {
             level.setBlock(surfacePos.below(i), state, 0x10);
         }
-        
+
     }
 }

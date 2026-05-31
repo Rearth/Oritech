@@ -27,34 +27,34 @@ import java.util.List;
 import java.util.Objects;
 
 public class ParticleCollectorBlock extends DirectionalBlock implements EntityBlock {
-    
+
     public ParticleCollectorBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(DirectionalBlock.FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(DirectionalBlock.FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(DirectionalBlock.FACING, ctx.getNearestLookingDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends DirectionalBlock> codec() {
         return null;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ParticleCollectorBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -64,14 +64,14 @@ public class ParticleCollectorBlock extends DirectionalBlock implements EntityBl
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var showExtra = Screen.hasControlDown();
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.particle_collector").withStyle(ChatFormatting.GRAY));
         }
-        
+
         TooltipHelper.addMachineTooltip(tooltip, this, this);
     }
 }

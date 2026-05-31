@@ -26,48 +26,48 @@ import rearth.oritech.init.SoundContent;
 import java.util.List;
 
 public class Wrench extends Item {
-    
+
     public static int ACTION_COOLDOWN = 8;
-    
+
     public Wrench(Properties settings) {
         super(settings);
     }
-    
+
     public static Tool createToolComponent() {
         return new Tool(List.of(
-          Tool.Rule.minesAndDrops(List.of(
-            BlockContent.ENERGY_PIPE,
-            BlockContent.SUPERCONDUCTOR,
-            BlockContent.FLUID_PIPE,
-            BlockContent.ITEM_PIPE,
-            BlockContent.TRANSPARENT_ITEM_PIPE,
-            BlockContent.ENERGY_PIPE_CONNECTION,
-            BlockContent.SUPERCONDUCTOR_CONNECTION,
-            BlockContent.FLUID_PIPE_CONNECTION,
-            BlockContent.ITEM_PIPE_CONNECTION,
-            BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION,
-            BlockContent.ENERGY_PIPE_DUCT_BLOCK,
-            BlockContent.SUPERCONDUCTOR_DUCT_BLOCK,
-            BlockContent.FLUID_PIPE_DUCT_BLOCK,
-            BlockContent.ITEM_PIPE_DUCT_BLOCK,
-            BlockContent.FRAMED_ENERGY_PIPE,
-            BlockContent.FRAMED_SUPERCONDUCTOR,
-            BlockContent.FRAMED_FLUID_PIPE,
-            BlockContent.FRAMED_ITEM_PIPE,
-            BlockContent.FRAMED_ENERGY_PIPE_CONNECTION,
-            BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION,
-            BlockContent.FRAMED_FLUID_PIPE_CONNECTION,
-            BlockContent.FRAMED_ITEM_PIPE_CONNECTION,
-            BlockContent.MACHINE_FRAME_BLOCK
-          ), 25f)
+                Tool.Rule.minesAndDrops(List.of(
+                        BlockContent.ENERGY_PIPE,
+                        BlockContent.SUPERCONDUCTOR,
+                        BlockContent.FLUID_PIPE,
+                        BlockContent.ITEM_PIPE,
+                        BlockContent.TRANSPARENT_ITEM_PIPE,
+                        BlockContent.ENERGY_PIPE_CONNECTION,
+                        BlockContent.SUPERCONDUCTOR_CONNECTION,
+                        BlockContent.FLUID_PIPE_CONNECTION,
+                        BlockContent.ITEM_PIPE_CONNECTION,
+                        BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION,
+                        BlockContent.ENERGY_PIPE_DUCT_BLOCK,
+                        BlockContent.SUPERCONDUCTOR_DUCT_BLOCK,
+                        BlockContent.FLUID_PIPE_DUCT_BLOCK,
+                        BlockContent.ITEM_PIPE_DUCT_BLOCK,
+                        BlockContent.FRAMED_ENERGY_PIPE,
+                        BlockContent.FRAMED_SUPERCONDUCTOR,
+                        BlockContent.FRAMED_FLUID_PIPE,
+                        BlockContent.FRAMED_ITEM_PIPE,
+                        BlockContent.FRAMED_ENERGY_PIPE_CONNECTION,
+                        BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION,
+                        BlockContent.FRAMED_FLUID_PIPE_CONNECTION,
+                        BlockContent.FRAMED_ITEM_PIPE_CONNECTION,
+                        BlockContent.MACHINE_FRAME_BLOCK
+                ), 25f)
         ), 1.f, 1);
     }
-    
+
     @Override
     public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
-        
+
         var stack = user.getItemInHand(hand);
-        
+
         if (level.isClientSide()) {
             var hit = ClientCableFinder.findLookedAtCable(user, 6f);
             if (hit != null) {
@@ -75,10 +75,10 @@ public class Wrench extends Item {
                 return InteractionResultHolder.success(stack);
             }
         }
-        
+
         return useWrench(stack, user, hand) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
     }
-    
+
     /**
      * Attempts to use the wrench on a block
      *
@@ -88,13 +88,13 @@ public class Wrench extends Item {
     protected boolean useWrench(ItemStack item, Player player, InteractionHand hand) {
         if (player.getCooldowns().isOnCooldown(this)) return false;
         player.getCooldowns().addCooldown(this, ACTION_COOLDOWN);
-        
+
         if (!(player instanceof ServerPlayer)) return false;
-        
+
         var level = player.level();
         var result = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
         if (result.getType() != HitResult.Type.BLOCK) return false;
-        
+
         var blockPos = result.getBlockPos();
         var blockState = level.getBlockState(blockPos);
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {
@@ -109,7 +109,7 @@ public class Wrench extends Item {
             var direction = result.getDirection();
             var neighborPos = blockPos.relative(direction);
             var neighborState = level.getBlockState(neighborPos);
-            
+
             // If the neighbor block is wrenchable, call the onWrenchUseNeighbor method
             if (neighborState.getBlock() instanceof Wrenchable wrenchable) {
                 var resultAction = wrenchable.onWrenchUseNeighbor(neighborState, blockState, level, neighborPos, blockPos, direction, player, hand);
@@ -119,24 +119,24 @@ public class Wrench extends Item {
                 }
             }
         }
-        
+
         return false;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
         tooltipComponents.add(Component.translatable("tooltip.oritech.wrench"));
     }
-    
+
     protected void onUsed(ItemStack item, Player player, InteractionHand hand) {
         playSound(player.level(), player);
     }
-    
+
     protected void playSound(Level level, Player player) {
         level.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
     }
-    
+
     /**
      * Interface for blocks that be interacted with by a wrench
      */
@@ -151,7 +151,7 @@ public class Wrench extends Item {
          * @return the result of the wrench use
          */
         InteractionResult onWrenchUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand);
-        
+
         /**
          * Called when a wrench is used on a neighbor block
          *

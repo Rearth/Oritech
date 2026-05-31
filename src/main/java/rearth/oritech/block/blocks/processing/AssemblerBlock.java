@@ -7,11 +7,11 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.AssemblerBlockEntity;
 
 public class AssemblerBlock extends MultiblockMachine implements EntityBlock {
-    
+
     public AssemblerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return AssemblerBlockEntity.class;

@@ -33,58 +33,58 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class MachineCoreBlock extends Block implements EntityBlock {
-    
+
     public static final BooleanProperty USED = BooleanProperty.create("core_used");
-    
+
     private final float coreQuality;
-    
+
     public MachineCoreBlock(Properties settings, float coreQuality) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(USED, false));
         this.coreQuality = coreQuality;
     }
-    
+
     public float getCoreQuality() {
         return coreQuality;
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(USED);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         tooltip.add(Component.translatable("tooltip.oritech.machine_core_block").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
         super.appendHoverText(stack, context, tooltip, options);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return state.getValue(USED) ? RenderShape.INVISIBLE : RenderShape.MODEL;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         onBlockRemoved(state, level, pos);
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public void playerDestroy(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack tool) {
         onBlockRemoved(state, level, pos);
         super.playerDestroy(level, player, pos, state, blockEntity, tool);
     }
-    
+
     @Override
     public void destroy(LevelAccessor level, BlockPos pos, BlockState state) {
         onBlockRemoved(state, level, pos);
         super.destroy(level, pos, state);
     }
-    
+
     @Override
     protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        
+
         // forward explosion to refinery
         if (state.getValue(USED)) {
             var controller = getControllerPos(level, pos);
@@ -94,10 +94,10 @@ public class MachineCoreBlock extends Block implements EntityBlock {
                 return;
             }
         }
-        
+
         super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
-    
+
     private static void onBlockRemoved(BlockState state, LevelAccessor level, BlockPos pos) {
         if (!level.isClientSide() && state.getValue(USED) && level.getBlockEntity(pos) instanceof MachineCoreEntity coreEntity) {
             var controllerPos = coreEntity.getControllerPos();
@@ -106,23 +106,23 @@ public class MachineCoreBlock extends Block implements EntityBlock {
             }
         }
     }
-    
+
     @NotNull
     public static BlockPos getControllerPos(LevelAccessor level, BlockPos pos) {
         var coreEntity = (MachineCoreEntity) level.getBlockEntity(pos);
         return Objects.requireNonNull(coreEntity).getControllerPos();
     }
-    
+
     @Nullable
     public static BlockEntity getControllerEntity(LevelAccessor level, BlockPos pos) {
         return level.getBlockEntity(getControllerPos(level, pos));
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!state.getValue(USED)) return InteractionResult.PASS;
-        
+
         if (!level.isClientSide()) {
             var controllerPos = getControllerPos(level, pos);
             var controllerBlock = level.getBlockState(controllerPos);
@@ -134,16 +134,16 @@ public class MachineCoreBlock extends Block implements EntityBlock {
                 return controllerBlock.useWithoutItem(level, player, new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside()));
             }
         }
-        
+
         return InteractionResult.SUCCESS;
-        
+
     }
-    
+
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        
+
         if (!state.getValue(USED)) super.useItemOn(stack, state, level, pos, player, hand, hit);
-        
+
         if (!level.isClientSide()) {
             var controllerPos = getControllerPos(level, pos);
             var controllerBlock = level.getBlockState(controllerPos);
@@ -153,10 +153,10 @@ public class MachineCoreBlock extends Block implements EntityBlock {
                 return machineBlock.useItemOn(stack, state, level, pos, player, hand, hit);
             }
         }
-        
+
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

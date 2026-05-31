@@ -21,33 +21,33 @@ import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.init.BlockContent;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
-    
+
     private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.defaultBlockState();
     private static final float BEAM_DEPTH = 3 / 16f;
     private static final RandomSource renderRandom = RandomSource.create(100);
-    
+
     @Override
     public int getViewDistance() {
         return 128;
     }
-    
+
     @Override
     public boolean shouldRenderOffScreen(FrameInteractionBlockEntity blockEntity) {
         return true;
     }
-    
+
     @Override
     public void render(FrameInteractionBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        
+
         var state = entity.getBlockState();
         if (!state.getValue(FrameInteractionBlock.HAS_FRAME) || entity.getAreaMin() == null || entity.getLastTarget() == null)
             return;
-        
+
         var currentTarget = entity.getCurrentTarget();
         var renderedPosition = Vec3.atLowerCornerOf(currentTarget);
-        
+
         var movingOffset = new Vec3(0, 0, 0);
-        
+
         if (entity.isMoving()) {
             var lastPosition = Vec3.atLowerCornerOf(entity.getLastTarget());
             var progress = (entity.getCurrentProgress()) / entity.getMoveTime();
@@ -59,110 +59,110 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             var offsetY = renderRandom.nextFloat() * 0.012 - 0.004;
             movingOffset = new Vec3(0, offsetY, 0);
         }
-        
-        
+
+
         renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
         entity.lastRenderedPosition = renderedPosition;
         var targetOffset = renderedPosition.subtract(Vec3.atLowerCornerOf(entity.getBlockPos())).add(movingOffset);
-        
+
         matrices.pushPose();
         matrices.translate(targetOffset.x(), targetOffset.y(), targetOffset.z());
-        
+
         var pos = entity.getCurrentTarget(); // relevant for correct lighting, actual rendered position is determined by matrix
         int lightAtHead = LevelRenderer.getLightColor(entity.getLevel(), currentTarget);
         var renderer = Minecraft.getInstance().getBlockRenderer();
-        
+
         renderer.renderSingleBlock(
-          entity.getMachineHead(),
-          matrices,
-          vertexConsumers,
-          lightAtHead,
-          overlay);
-        
+                entity.getMachineHead(),
+                matrices,
+                vertexConsumers,
+                lightAtHead,
+                overlay);
+
         matrices.popPose();
-        
+
         var length = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 2 - BEAM_DEPTH * 2f;
         var target = new Vec3(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
-        
-        
+
+
         matrices.pushPose();
-        
+
         matrices.translate(target.x(), target.y(), target.z());
         matrices.scale(length, 1, 1);
-        
+
         renderer.renderSingleBlock(
-          renderedBeam,
-          matrices,
-          vertexConsumers,
-          lightAtHead,
-          overlay);
-        
+                renderedBeam,
+                matrices,
+                vertexConsumers,
+                lightAtHead,
+                overlay);
+
         matrices.popPose();
-        
+
         var renderedItem = entity.getToolheadAdditionalRender();
         if (renderedItem != null) {
             matrices.pushPose();
             matrices.translate(targetOffset.x() + 0.4, targetOffset.y(), targetOffset.z() + 0.4);
             matrices.mulPose(Axis.YP.rotationDegrees(30));
             // matrices.scale(0.3f, 0.3f, 0.3f);
-            
+
             Minecraft.getInstance().getItemRenderer().renderStatic(
-              renderedItem,
-              ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
-              light,
-              OverlayTexture.NO_OVERLAY,
-              matrices,
-              vertexConsumers,
-              entity.getLevel(),
-              0
+                    renderedItem,
+                    ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
+                    light,
+                    OverlayTexture.NO_OVERLAY,
+                    matrices,
+                    vertexConsumers,
+                    entity.getLevel(),
+                    0
             );
-            
+
             matrices.popPose();
         }
-        
+
         if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1) && !destroyerBlock.quarryTarget.equals(BlockPos.ZERO)) {
-            
+
             var beamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
-            
+
             var beamRing = BlockContent.QUARRY_BEAM_RING.defaultBlockState();
-            
+
             var offset = targetOffset.add(0, -1, 0);
-            
+
             var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
             var baseThickness = 0.035f;
             var thickness = (float) (baseThickness * 2 + Math.sin((entity.getLevel().getGameTime() + tickDelta) * 0.54) * 0.02f);
-            
+
             BeamRenderer.renderStraightBeam(
-              matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
-              baseThickness,
-              LightTexture.FULL_BRIGHT,
-              LaserArmRenderer.CORE_COLOR_START,
-              LaserArmRenderer.CORE_COLOR_END
+                    matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
+                    baseThickness,
+                    LightTexture.FULL_BRIGHT,
+                    LaserArmRenderer.CORE_COLOR_START,
+                    LaserArmRenderer.CORE_COLOR_END
             );
-            
+
             // render glow
             BeamRenderer.renderStraightBeam(
-              matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
-              thickness,
-              LightTexture.FULL_BRIGHT,
-              LaserArmRenderer.GLOW_COLOR_START,
-              LaserArmRenderer.GLOW_COLOR_END
+                    matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
+                    thickness,
+                    LightTexture.FULL_BRIGHT,
+                    LaserArmRenderer.GLOW_COLOR_START,
+                    LaserArmRenderer.GLOW_COLOR_END
             );
-            
+
             // beam ring
             matrices.pushPose();
             var ringHeight = Math.sin((entity.getLevel().getGameTime() + tickDelta) / 4f);
             var heightOffset = beamHeight * 0.5 * ringHeight + beamHeight * 0.5;
             matrices.translate(offset.x(), offset.y() - heightOffset + 1, offset.z());
-            
+
             // outer beam
             renderer.renderSingleBlock(
-              beamRing,
-              matrices,
-              vertexConsumers,
-              lightAtHead,
-              overlay);
-            
+                    beamRing,
+                    matrices,
+                    vertexConsumers,
+                    lightAtHead,
+                    overlay);
+
             matrices.popPose();
         }
     }

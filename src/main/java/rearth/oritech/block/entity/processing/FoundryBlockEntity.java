@@ -16,64 +16,64 @@ import rearth.oritech.util.ContainerSlotAssignment;
 import java.util.List;
 
 public class FoundryBlockEntity extends MultiblockMachineEntity {
-    
+
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FOUNDRY_ENTITY.get(), pos, state, OritechConfig.processingMachines.foundryData.energyPerTick.get());
     }
-    
+
     @Override
     public long getDefaultCapacity() {
         return OritechConfig.processingMachines.foundryData.energyCapacity.get();
     }
-    
+
     @Override
     public long getDefaultInsertRate() {
         return OritechConfig.processingMachines.foundryData.maxEnergyInsertion.get();
     }
-    
+
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
         return RecipeContent.FOUNDRY.get();
     }
-    
+
     @Override
     public ContainerSlotAssignment getSlotAssignments() {
         return new ContainerSlotAssignment(0, 2, 2, 1);
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 26),
-          new GuiSlot(1, 56, 44),
-          new GuiSlot(2, 117, 36, true));
+                new GuiSlot(0, 56, 26),
+                new GuiSlot(1, 56, 44),
+                new GuiSlot(2, 117, 36, true));
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.FOUNDRY_SCREEN.get();
     }
-    
+
     @Override
     public int getInventorySize() {
         return 3;
     }
-    
+
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0, 1),
-          new Vec3i(0, 1, 0),
-          new Vec3i(0, 1, 1)
+                new Vec3i(0, 0, 1),
+                new Vec3i(0, 1, 0),
+                new Vec3i(0, 1, 1)
         );
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
-        
+
         return List.of(
-          new Vec3i(0, 0, -1),
-          new Vec3i(0, 0, 2)
+                new Vec3i(0, 0, -1),
+                new Vec3i(0, 0, 2)
         );
     }
 }

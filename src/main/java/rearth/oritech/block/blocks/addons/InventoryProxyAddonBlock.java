@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.addons;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -12,25 +11,24 @@ import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 
 public class InventoryProxyAddonBlock extends MachineAddonBlock {
-    
+
     public InventoryProxyAddonBlock(Properties settings, AddonSettings addonSettings) {
         super(settings, addonSettings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return InventoryProxyAddonBlockEntity.class;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
-        if (!level.isClientSide && state.getValue(ADDON_USED)) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+
+        if (!level.isClientSide()) {
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
 }

@@ -30,35 +30,35 @@ public class SteamEngineBlock extends MultiblockMachine {
     public SteamEngineBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return SteamEngineEntity.class;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
-        
+
         if (Screen.hasControlDown()) {
             tooltip.add(Component.translatable("tooltip.oritech.steam_engine").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("tooltip.oritech.steam_engine.1").withStyle(ChatFormatting.GRAY));
             tooltip.add(Component.translatable("tooltip.oritech.steam_engine.2").withStyle(ChatFormatting.GRAY));
         }
-        
+
         super.appendHoverText(stack, context, tooltip, options);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
@@ -66,10 +66,10 @@ public class SteamEngineBlock extends MultiblockMachine {
                 ParticleContent.HighlightBlock(level, Vec3.atLowerCornerOf(entity.get().master.getBlockPos()));
                 return InteractionResult.SUCCESS;
             }
-            
-            
+
+
         }
-        
+
         return super.useWithoutItem(state, level, pos, player, hit);
     }
 }

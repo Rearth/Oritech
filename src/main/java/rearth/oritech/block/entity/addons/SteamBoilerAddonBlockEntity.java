@@ -15,30 +15,30 @@ import rearth.oritech.util.MachineAddonController;
 import java.util.Objects;
 
 public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements FluidProvider {
-    
+
     private UpgradableGeneratorBlockEntity cachedController;
-    
+
     public SteamBoilerAddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.STEAM_BOILER_ADDON_ENTITY.get(), pos, state);
     }
-    
+
     private boolean isConnected() {
         var isUsed = this.getBlockState().getValue(MachineAddonBlock.ADDON_USED);
         return isUsed && getCachedController() != null;
     }
-    
+
     private MachineAddonController getCachedController() {
-        
+
         if (cachedController != null)
             return cachedController;
-        
+
         var candidate = Objects.requireNonNull(level).getBlockEntity(getControllerPos());
         if (candidate instanceof UpgradableGeneratorBlockEntity generator) {
             cachedController = generator;
         }
         return cachedController;
     }
-    
+
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         if (!isConnected()) return null;

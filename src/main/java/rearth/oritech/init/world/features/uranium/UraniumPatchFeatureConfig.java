@@ -7,11 +7,11 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 
 public record UraniumPatchFeatureConfig(int number, Identifier blockId,
                                         Identifier crystalId) implements FeatureConfiguration {
-    
+
     public static final Codec<UraniumPatchFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-      Codec.INT.fieldOf("number").forGetter(UraniumPatchFeatureConfig::number),
-      Identifier.CODEC.fieldOf("blockId").forGetter(UraniumPatchFeatureConfig::blockId),
-      Identifier.CODEC.fieldOf("crystalId").forGetter(UraniumPatchFeatureConfig::crystalId)
+            Codec.INT.fieldOf("number").forGetter(UraniumPatchFeatureConfig::number),
+            Identifier.CODEC.fieldOf("blockId").forGetter(UraniumPatchFeatureConfig::blockId),
+            Identifier.CODEC.fieldOf("crystalId").forGetter(UraniumPatchFeatureConfig::crystalId)
     ).apply(instance, UraniumPatchFeatureConfig::new));
-    
+
 }

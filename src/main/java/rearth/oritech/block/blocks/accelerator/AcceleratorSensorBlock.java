@@ -20,27 +20,27 @@ import rearth.oritech.util.ComparatorOutputProvider;
 import java.util.List;
 
 public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implements EntityBlock {
-    
+
     public AcceleratorSensorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
-    
+
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new AcceleratorSensorBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -50,7 +50,7 @@ public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implemen
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         var showExtra = Screen.hasControlDown();

@@ -31,57 +31,57 @@ import rearth.oritech.util.FakeMachinePlayer;
 import java.util.*;
 
 public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTicker<NuclearExplosionEntity> {
-    
+
     private long startTime = -1;
     private final Set<BlockPos> removedBlocks = new HashSet<>();
     private final Set<BlockPos> borderBlocks = new HashSet<>();
     private final Set<DirectionExplosionWave> waves = new HashSet<>();
     private final int size;
-    
+
     private ServerPlayer nukePlayerEntity = null;
-    
+
     public NuclearExplosionEntity(BlockPos pos, BlockState state, int size) {
         super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
         this.size = size;
     }
-    
+
     public NuclearExplosionEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
         this.size = 9;
     }
-    
+
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, NuclearExplosionEntity blockEntity) {
         if (level.isClientSide()) return;
-        
+
         var initialRadius = size;
-        
+
         if (startTime == -1) {
             startTime = level.getGameTime();
             explosionSphere(initialRadius + 7, 200, pos);
             level.playSound(null, pos, SoundContent.NUKE_EXPLOSION, SoundSource.BLOCKS, 30f, 1f);
         }
-        
+
         var age = level.getGameTime() - startTime;
-        
+
         if (age == 1) {
             createExplosionWaves(initialRadius);
         }
-        
+
         if (age > 1) {
             waves.forEach(DirectionExplosionWave::nextGeneration);
             processBorderBlocks(initialRadius * initialRadius);
         }
-        
+
         if (age > initialRadius * 2L) {
             // done
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
-        
+
     }
-    
+
     private void createExplosionWaves(int initialRadius) {
-        
+
         var rayCount = initialRadius / 2 + 3;
         var directions = getRandomRayDirections(rayCount);
         for (var direction : directions) {
@@ -89,22 +89,22 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             waves.add(data);
         }
     }
-    
+
     private void processBorderBlocks(int maxDist) {
-        
+
         borderBlocks.forEach(target -> {
             if (removedBlocks.contains(target)) return;
             var distSq = target.distSqr(worldPosition);
             var targetBlock = level.getBlockState(target);
             var percentageDist = distSq / (maxDist * maxDist) * 8;
             var percentageVaried = percentageDist * (level.random.nextFloat() * 0.6 - 0.3 + 1);
-            
+
             if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetBlock, getNukePlayerEntity()))
                 return;
-            
+
             var replaced = false;
             var replacementState = Blocks.AIR.defaultBlockState();
-            
+
             if (targetBlock.is(BlockTags.LOGS)) {
                 replaced = true;
                 replacementState = level.random.nextFloat() < 0.8 ? Blocks.BASALT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
@@ -128,7 +128,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 } else {
                     replacementState = Blocks.DIRT.defaultBlockState();
                 }
-                
+
                 if (level.random.nextFloat() > 0.7) replaced = false;
             } else if (targetBlock.is(Blocks.DIRT)) {
                 replaced = true;
@@ -141,7 +141,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 } else {
                     replaced = false;
                 }
-                
+
                 if (level.random.nextFloat() > 0.1) replaced = false;
             } else if (targetBlock.is(BlockTags.BASE_STONE_OVERWORLD)) {
                 replaced = true;
@@ -161,23 +161,23 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 } else {
                     replacementState = Blocks.GLASS.defaultBlockState();
                 }
-                
+
                 if (percentageVaried > 0.8) replaced = false;
             }
-            
+
             if (replaced) {
                 level.setBlock(target, replacementState, Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 1);
-                
+
                 // random fire chance
                 if (level.getBlockState(target.above()).canBeReplaced() && level.random.nextFloat() > 0.97) {
                     level.setBlock(target.above(), Blocks.FIRE.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
                 }
             }
         });
-        
+
         borderBlocks.clear();
     }
-    
+
     private void collectExtraEdgeBlocks(BlockPos center) {
         BlockPos.betweenClosed(center.offset(-8, -8, -8), center.offset(8, 8, 8)).forEach(target -> {
             if (removedBlocks.contains(target)) return;
@@ -186,20 +186,20 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             borderBlocks.add(target.immutable());
         });
     }
-    
+
     // remove all blocks in X radius below hardness 'power', return amount of hardness used in total
     // also damage entities
     private int explosionSphere(int radius, int power, BlockPos pos) {
-        
+
         var radiusSq = radius * radius;
         var radiusSqExtra = (radius + 3) * (radius + 3);
         var usedPower = 0;
         var hardBusters = radius;
-        
+
         for (var target : BlockPos.withinManhattan(pos, radius + 3, radius + 3, radius + 3)) {
             if (removedBlocks.contains(target)) continue;
             var distSq = target.distSqr(pos);
-            
+
             if (distSq > radiusSq) {
                 if (distSq <= (radiusSqExtra)) {
                     // border block, was almost destroyed
@@ -207,106 +207,106 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 }
                 continue;
             }
-            
+
             // if less than half dist, 100%, then slowly ramp up to 0%
             var removalPercentage = (distSq - radiusSq / 2f) / radiusSq;
             if (level.random.nextFloat() < removalPercentage - 0.2) {
                 borderBlocks.add(target.immutable());
                 continue;
             }
-            
+
             var targetState = level.getBlockState(target);
             var targetBlock = targetState.getBlock();
             var targetHardness = targetBlock.getExplosionResistance();
-            
+
             if (targetBlock instanceof NuclearExplosionBlock || targetState.isAir() || targetState.getDestroySpeed(level, target) < 0)
                 continue;
-            
+
             // skip too hard blocks (except for the first few)
             if (targetHardness > power && hardBusters-- < 0) continue;
-            
+
             usedPower += targetHardness;
-            
+
             if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetState, getNukePlayerEntity()))
                 return 1000;
-            
+
             targetBlock.destroy(level, pos, targetState);
             level.setBlock(target, Blocks.AIR.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
             removedBlocks.add(target.immutable());
             borderBlocks.remove(target.immutable());
-            
+
             // damages all entities in radius based on distance
             var entityCandidates = level.getEntitiesOfClass(
-              LivingEntity.class,
-              new AABB(pos.subtract(new Vec3i(radius, radius, radius)).getCenter(), pos.offset(new Vec3i(radius, radius, radius)).getCenter()),
-              EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR));
-            
+                    LivingEntity.class,
+                    new AABB(pos.subtract(new Vec3i(radius, radius, radius)).getCenter(), pos.offset(new Vec3i(radius, radius, radius)).getCenter()),
+                    EntitySelector.LIVING_ENTITY_STILL_ALIVE.and(EntitySelector.NO_CREATIVE_OR_SPECTATOR));
+
             entityCandidates.forEach(entity -> {
                 var entityDist = entity.distanceToSqr(pos.getCenter());
                 var distPercentage = entityDist / radiusSq;
                 var damage = radiusSq / distPercentage; // closer entities take much more damage
                 entity.hurt(new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.EXPLOSION)), (float) damage);
             });
-            
+
         }
-        
+
         return usedPower;
     }
-    
+
     private List<Vec3> getRandomRayDirections(int count) {
         List<Vec3> rayDirections = new ArrayList<>(count);
-        
+
         // Divide the circle into 12 equal parts
         var angleIncrement = 2 * Math.PI / count; // 360 degrees / 12
-        
+
         for (int i = 0; i < count; i++) {
             // Calculate the base angle for this ray
             var baseAngle = i * angleIncrement;
-            
+
             // Add a small random perturbation to the angle
             var randomPerturbation = (level.random.nextFloat() - 0.5) * (angleIncrement / 2);
-            
+
             // Final angle with randomness
             var angle = baseAngle + randomPerturbation;
-            
+
             // Calculate the direction vector
             var x = Math.cos(angle);
             var z = Math.sin(angle);
-            
+
             rayDirections.add(new Vec3(x, 0, z)); // Horizontal direction
         }
-        
+
         return rayDirections;
     }
-    
+
     private Vec3 addRandomOffset(Vec3 direction, float amount) {
         return direction.add(level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2);
     }
-    
+
     private Player getNukePlayerEntity() {
         if (nukePlayerEntity == null && level instanceof ServerLevel serverWorld) {
             nukePlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_nuke"), new SimpleInventoryStorage(2, () -> {
             }));
         }
-        
+
         return nukePlayerEntity;
     }
-    
+
     private class DirectionExplosionWave {
-        
+
         private final Vec3 direction;
-        
+
         private int lastRadius;
         private BlockPos lastPosition;
         private int lastRadiusReduction;
-        
+
         private DirectionExplosionWave(int initialRadius, Vec3 direction, BlockPos pos) {
             this.direction = direction;
             this.lastRadius = initialRadius;
             this.lastPosition = pos;
             this.lastRadiusReduction = 1;
         }
-        
+
         private void nextGeneration() {
             var currentRadius = lastRadius - lastRadiusReduction;
             if (currentRadius <= 1) return;
@@ -315,17 +315,17 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var power = currentRadius * 3;
             lastRadius = currentRadius;
             lastPosition = target;
-            
+
             var usedPower = explosionSphere(currentRadius, power, target);
             var expectedPower = currentRadius * currentRadius * currentRadius * 3;
             if (usedPower > expectedPower) {
                 lastRadiusReduction = 2;
             }
-            
+
             var isLastGeneration = currentRadius - lastRadiusReduction <= 1;
             if (isLastGeneration)
                 collectExtraEdgeBlocks(target.offset(BlockPos.containing(rayOffset.scale(3))));
-            
+
         }
     }
 }

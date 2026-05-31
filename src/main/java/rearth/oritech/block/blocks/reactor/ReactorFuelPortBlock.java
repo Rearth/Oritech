@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.reactor;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -17,32 +16,31 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
     public ReactorFuelPortBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new ReactorFuelPortEntity(pos, state);
     }
-    
+
     @Override
     public boolean validForWalls() {
         return true;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorFuelPortEntity) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
             var entity = (ReactorFuelPortEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
@@ -52,11 +50,11 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
                     level.addFreshEntity(itemEntity);
                 }
             }
-            
+
             entity.inventory.heldStacks.clear();
             entity.inventory.setChanged();
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
 }

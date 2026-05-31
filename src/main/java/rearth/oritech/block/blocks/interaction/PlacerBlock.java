@@ -11,7 +11,7 @@ public class PlacerBlock extends FrameInteractionBlock {
     public PlacerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

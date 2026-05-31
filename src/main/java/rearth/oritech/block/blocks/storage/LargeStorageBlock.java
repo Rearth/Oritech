@@ -25,78 +25,78 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
 public class LargeStorageBlock extends SmallStorageBlock {
-    
+
     public LargeStorageBlock(Properties settings) {
         super(settings.lightLevel(value -> 2));
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
-    
+
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new LargeStorageBlockEntity(pos, state);
     }
-    
+
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(TARGET_DIR, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return new ItemStack(this);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (!(entity instanceof MultiblockMachineController machineEntity)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var wasAssembled = state.getValue(ASSEMBLED);
-            
+
             if (!wasAssembled) {
                 var corePlaced = machineEntity.tryPlaceNextCore(player);
                 if (corePlaced) return InteractionResult.SUCCESS;
             }
-            
+
             var isAssembled = machineEntity.initMultiblock(state);
-            
+
             // first time created
             if (isAssembled && !wasAssembled) {
                 // NetworkContent.MACHINE_CHANNEL.serverHandle(machineEntity).send(new NetworkContent.MachineSetupEventPacket(pos));
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!isAssembled) {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
                 return InteractionResult.SUCCESS;
             }
-            
+
         }
-        
+
         return super.useWithoutItem(state, level, pos, player, hit);
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
-            
+
             if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
@@ -105,12 +105,12 @@ public class LargeStorageBlock extends SmallStorageBlock {
                         level.addFreshEntity(itemEntity);
                     }
                 }
-                
+
                 storageBlock.inventory.heldStacks.clear();
                 storageBlock.inventory.setChanged();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
 }

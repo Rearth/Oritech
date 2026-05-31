@@ -42,7 +42,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
-    
+
     @SyncField(SyncType.GUI_OPEN)
     public boolean hasCropFilterAddon;
     @SyncField(SyncType.GUI_OPEN)
@@ -51,18 +51,18 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public int yieldAddons = 0;
     @SyncField({SyncType.GUI_OPEN, SyncType.SPARSE_TICK})
     public int range = 1;
-    
+
     // non-persistent
     @SyncField
     public BlockPos quarryTarget = BlockPos.ZERO;
-    
+
     public float targetHardness = 1f;
     private ServerPlayer destroyerPlayerEntity = null;
-    
+
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public void gatherAddonStats(List<AddonBlock> addons) {
         range = 1;
@@ -70,37 +70,37 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         hasSilkTouchAddon = false;
         super.gatherAddonStats(addons);
     }
-    
+
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasCropFilter())
             hasCropFilterAddon = true;
-        
+
         if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
             range *= 8;
-        
+
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getQuarryCount() > 0) {
             for (int i = 0; i < combi.getQuarryCount(); i++) {
                 range *= 8;
             }
         }
-        
+
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
             yieldAddons++;
-        
+
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
             yieldAddons += combi.getYieldCount();
         }
-        
+
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasSilk())
             hasSilkTouchAddon = true;
-        
-        
+
+
         super.getAdditionalStatFromAddon(addonBlock);
-        
+
         yieldAddons = Math.min(yieldAddons, 3);
     }
-    
+
     @Override
     public void resetAddons() {
         super.resetAddons();
@@ -109,7 +109,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         range = 1;
         yieldAddons = 0;
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
@@ -118,7 +118,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         output.putInt("range", range);
         output.putInt("yield", yieldAddons);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
@@ -127,45 +127,45 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         range = input.getIntOr("range", 1);
         yieldAddons = input.getIntOr("yield", 0);
     }
-    
+
     @Override
     protected boolean hasWorkAvailable(BlockPos toolPosition) {
-        
+
         if (range > 1) {
             return hasQuarryTarget(toolPosition);
         }
-        
+
         var targetPosition = toolPosition.below();
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
-        
+
         // skip not grown crops
         if (hasCropFilterAddon && isImmatureCrop(targetState, level, targetPosition)) {
             return false;
         }
-        
+
         return !targetState.getBlock().equals(Blocks.AIR);
     }
-    
+
     private Player getDestroyerPlayerEntity() {
         if (destroyerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
             destroyerPlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_destroyer"), inventory);
         }
-        
+
         return destroyerPlayerEntity;
     }
-    
+
     private boolean hasQuarryTarget(BlockPos toolPosition) {
         return getQuarryDownwardState(toolPosition) != null;
     }
-    
+
     public static boolean isImmatureCrop(BlockState targetState, LevelReader reader, BlockPos targetPos) {
         Block targetBlock = targetState.getBlock();
         return (targetBlock instanceof BonemealableBlock cropBlock && cropBlock.isValidBonemealTarget(reader, targetPos, targetState))
-                 // some crops arent bonemealable but still growing
-                 || (targetBlock instanceof NetherWartBlock && targetState.getValue(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
-                 || (targetBlock instanceof TorchflowerCropBlock && targetState.getValue(TorchflowerCropBlock.AGE) < TorchflowerCropBlock.MAX_AGE);
+                // some crops arent bonemealable but still growing
+                || (targetBlock instanceof NetherWartBlock && targetState.getValue(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
+                || (targetBlock instanceof TorchflowerCropBlock && targetState.getValue(TorchflowerCropBlock.AGE) < TorchflowerCropBlock.MAX_AGE);
     }
-    
+
     private Tuple<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
         for (int i = 1; i <= range; i++) {
             var checkPos = toolPosition.below(i);
@@ -176,17 +176,17 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 return new Tuple<>(checkPos, targetState);
             }
         }
-        
+
         quarryTarget = BlockPos.ZERO;
         return null;
     }
-    
+
     @Override
     public void finishBlockWork(BlockPos processed) {
-        
+
         var targetPosition = processed.below();
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
-        
+
         if (range > 1) {
             if (quarryTarget != BlockPos.ZERO) {
                 targetPosition = quarryTarget;
@@ -198,22 +198,22 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 targetState = data.getB();
             }
         }
-        
+
         // remove fluids
         if (!targetState.getFluidState().isEmpty()) {
             level.setBlockAndUpdate(targetPosition, Blocks.AIR.defaultBlockState());
         }
-        
+
         var targetHardness = targetState.getBlock().defaultDestroyTime();
         if (targetHardness < 0) return;    // skip undestroyable blocks, such as bedrock
-        
+
         // skip not grown crops
         if (range == 1 && hasCropFilterAddon && isImmatureCrop(targetState, level, targetPosition)) {
             return;
         }
-        
+
         if (!targetState.getBlock().equals(Blocks.AIR)) {
-            
+
             var targetEntity = level.getBlockEntity(targetPosition);
             List<ItemStack> dropped;
             if (hasSilkTouchAddon) {
@@ -223,65 +223,65 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             } else {
                 dropped = Block.getDrops(targetState, (ServerLevel) level, targetPosition, targetEntity);
             }
-            
+
             if (dropped.isEmpty()) {
                 // If the block doesn't drop any loot, try to break it again with shears
                 // Good for seagrass, cobwebs, vines, etc.
                 dropped = Block.getDrops(targetState, (ServerLevel) level, targetPosition, targetEntity, null, new ItemStack(Items.SHEARS));
             }
-            
+
             // only proceed if all itemStacks fit
             for (var stack : dropped) {
                 if (this.inventory.insert(stack, true) != stack.getCount()) return;
             }
-            
+
             for (var stack : dropped) {
                 this.inventory.insert(stack, false);
             }
-            
+
             targetState.getBlock().playerWillDestroy(level, targetPosition, targetState, getDestroyerPlayerEntity());
             level.playSound(null, targetPosition, targetState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
             level.destroyBlock(targetPosition, false);
             super.finishBlockWork(processed);
         }
     }
-    
+
     public static List<ItemStack> getLootDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable Player entity) {
-        
+
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
         var fortuneEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.FORTUNE).get();
         sampleTool.enchant(fortuneEntry, Math.min(yieldAddons, 3));
-        
+
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                        .withParameter(LootContextParams.TOOL, sampleTool)
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
+                .withParameter(LootContextParams.TOOL, sampleTool)
+                .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
         if (entity != null)
             builder.withOptionalParameter(LootContextParams.THIS_ENTITY, entity);
         return state.getDrops(builder);
     }
-    
+
     public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Player entity) {
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
         var silkTouchEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
         sampleTool.enchant(silkTouchEntry, 1);
-        
+
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-                        .withParameter(LootContextParams.TOOL, sampleTool)
-                        .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
+                .withParameter(LootContextParams.TOOL, sampleTool)
+                .withOptionalParameter(LootContextParams.BLOCK_ENTITY, blockEntity);
         if (entity != null)
             builder.withOptionalParameter(LootContextParams.THIS_ENTITY, entity);
         return state.getDrops(builder);
     }
-    
+
     @Override
     protected void doProgress(boolean moving) {
         super.doProgress(moving);
-        
+
         if (moving)
             return;
-        
+
         if (range > 1 && quarryTarget != BlockPos.ZERO) {
             if (level instanceof ServerLevel sl)
                 sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
@@ -291,82 +291,82 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
         }
     }
-    
+
     @Override
     public List<Tuple<Component, Component>> getExtraExtensionLabels() {
         if (range == 1 && yieldAddons == 0 && !hasSilkTouchAddon) return super.getExtraExtensionLabels();
         if (hasSilkTouchAddon) {
             return List.of(new Tuple<>(
-                Component.translatable("title.oritech.machine.addon_range", range),
-                Component.translatable("tooltip.oritech.block_destroyer.addon_range")),
-              new Tuple<>(Component.translatable("enchantment.minecraft.silk_touch"),
-                Component.translatable("tooltip.oritech.machine.addon_silk_touch")));
+                            Component.translatable("title.oritech.machine.addon_range", range),
+                            Component.translatable("tooltip.oritech.block_destroyer.addon_range")),
+                    new Tuple<>(Component.translatable("enchantment.minecraft.silk_touch"),
+                            Component.translatable("tooltip.oritech.machine.addon_silk_touch")));
         }
         return List.of(new Tuple<>(Component.translatable("title.oritech.machine.addon_range", range), Component.translatable("tooltip.oritech.block_destroyer.addon_range")), new Tuple<>(Component.translatable("title.oritech.machine.addon_fortune", yieldAddons), Component.translatable("tooltip.oritech.machine.addon_fortune")));
     }
-    
+
     @Override
     public BlockState getMachineHead() {
         return BlockContent.BLOCK_DESTROYER_HEAD.get().defaultBlockState();
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 117, 20, true),
-          new GuiSlot(1, 117, 38, true),
-          new GuiSlot(2, 135, 20, true),
-          new GuiSlot(3, 135, 38, true));
+                new GuiSlot(0, 117, 20, true),
+                new GuiSlot(1, 117, 38, true),
+                new GuiSlot(2, 135, 20, true),
+                new GuiSlot(3, 135, 38, true));
     }
-    
+
     @Override
     public int getInventorySize() {
         return 4;
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, 0, -2),
-          new Vec3i(-1, 0, -1),
-          new Vec3i(0, 0, 2),
-          new Vec3i(-1, 0, 1)
+                new Vec3i(0, 0, -2),
+                new Vec3i(-1, 0, -1),
+                new Vec3i(0, 0, 2),
+                new Vec3i(-1, 0, 1)
         );
     }
-    
+
     @Override
     public float getMoveTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
         return OritechConfig.destroyerConfig.moveDuration.get() * this.getSpeedMultiplier() * quarrySpeedBonus;
     }
-    
+
     @Override
     public float getWorkTime() {
         var quarrySpeedBonus = range > 1 ? 0.15f : 1f;
         return (float) (OritechConfig.destroyerConfig.workDuration.get() * this.getSpeedMultiplier() * Math.pow(targetHardness, OritechConfig.blockBreakHardnessExponentialFactor.get()) * quarrySpeedBonus);
     }
-    
+
     @Override
     public int getMoveEnergyUsage() {
         return OritechConfig.destroyerConfig.moveEnergyUsage.get();
     }
-    
+
     @Override
     public int getOperationEnergyUsage() {
         var quarryCostBonus = range > 1 ? 4 : 1;
         return OritechConfig.destroyerConfig.workEnergyUsage.get() * quarryCostBonus;
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.DESTROYER_SCREEN.get();
     }
-    
+
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0, -1),
-          new Vec3i(0, 0, 1)
+                new Vec3i(0, 0, -1),
+                new Vec3i(0, 0, 1)
         );
     }
 }

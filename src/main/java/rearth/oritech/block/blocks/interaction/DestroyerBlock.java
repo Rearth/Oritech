@@ -11,7 +11,7 @@ public class DestroyerBlock extends MultiblockFrameInteractionBlock {
     public DestroyerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

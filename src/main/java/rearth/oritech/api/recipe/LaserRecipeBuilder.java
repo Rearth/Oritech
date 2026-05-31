@@ -4,17 +4,17 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class LaserRecipeBuilder extends OritechRecipeBuilder {
-    
+
     protected LaserRecipeBuilder() {
         super(RecipeContent.LASER, "laser");
         // Set the default time for laser recipes
         this.time = 1;
     }
-    
+
     public static OritechRecipeBuilder build() {
         return new LaserRecipeBuilder();
     }
-    
+
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs == null || inputs.size() != 1)

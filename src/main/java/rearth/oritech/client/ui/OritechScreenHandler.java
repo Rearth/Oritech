@@ -43,7 +43,7 @@ import java.util.Objects;
  * energy storage reference, fluid storage references, screen data.
  */
 public class OritechScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
-    
+
     @NotNull
     public final Inventory playerInventory;
     @NotNull
@@ -52,42 +52,42 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     public final BlockPos blockPos;
     @NotNull
     public final ScreenProvider screenData;
-    
+
     private final List<DisplayDataSource> dataDisplays = new ArrayList<>();
     public final List<ResourceHandler<FluidResource>> fluidStorages;
-    
+
     public BlockState machineBlock;
     public BlockEntity blockEntity;
     public List<Integer> armorSlots;
-    
+
     // client constructor
     public OritechScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
-    
+
     // server constructor (and forwarded client constructor)
     public OritechScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(((ScreenProvider) blockEntity).getScreenHandlerType(), syncId);
-        
+
         this.screenData = (ScreenProvider) blockEntity;
         this.blockPos = blockEntity.getBlockPos();
         this.playerInventory = playerInventory;
         this.machineBlock = blockEntity.getBlockState();
         this.blockEntity = blockEntity;
         this.inventory = screenData.getDisplayedInventory();
-        
+
         addEnergyDisplay();
         addProgressDisplay();
         addFluidDisplay();
         addAdditionalDisplays();
-        
+
         fluidStorages = new ArrayList<>(screenData.getInteractableFluidStorages());
-        
+
         assignFluidTankIndices();
-        
+
         buildItemSlots();
     }
-    
+
     public void addFluidDisplay() {
         if (blockEntity instanceof FluidProvider blockProvider) {
             var storage = blockProvider.getFluidLookup(null);
@@ -97,27 +97,27 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             }
         }
     }
-    
+
     protected void addEnergyDisplay() {
         if (screenData.showEnergy() && blockEntity instanceof EnergyProvider energyProvider) {
             var storage = energyProvider.getEnergyLookup(null);
             dataDisplays.add(DisplayDataSource.CreateEnergy(storage, screenData.getEnergyConfiguration(), screenData));
         }
     }
-    
+
     protected void addProgressDisplay() {
         if (screenData.showProgress()) {
             dataDisplays.add(DisplayDataSource.CreateProgress(screenData, blockEntity));
         }
     }
-    
+
     protected void addAdditionalDisplays() {
     }
-    
+
     public Collection<DisplayDataSource> getDataDisplays() {
         return dataDisplays;
     }
-    
+
     /**
      * Matches each FluidDataSource to its index in the fluidStorages list
      * by comparing storage references. This enables the client to send
@@ -135,16 +135,16 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             }
         }
     }
-    
+
     private void buildItemSlots() {
         // Machine inventory slots
         for (var slot : screenData.getGuiSlots()) {
             addMachineSlot(slot.index(), slot.x(), slot.y(), slot.output());
         }
-        
+
         // Player inventory (3 rows of 9, starting at x=8, y=84)
         addPlayerInventory(playerInventory, 8, 84 + (isTall() ? 20 : 0));
-        
+
         // Armor slots (optional): 4 armor + 1 offhand
         if (screenData.showArmor()) {
             armorSlots = new ArrayList<>(5);
@@ -164,11 +164,11 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             }
         }
     }
-    
+
     public boolean isTall() {
         return false;
     }
-    
+
     public void addMachineSlot(int inventorySlot, int x, int y, boolean output) {
         if (output) {
             this.addSlot(new BasicMachineOutputSlot(inventory, inventorySlot, x, y));
@@ -176,7 +176,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             this.addSlot(new Slot(inventory, inventorySlot, x, y));
         }
     }
-    
+
     /**
      * Adds the standard player inventory slots (27 main + 9 hotbar).
      */
@@ -192,20 +192,20 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             this.addSlot(new Slot(playerInventory, col, startX + col * 18, startY + 58));
         }
     }
-    
+
     @Override
     public ItemStack quickMoveStack(Player player, int invSlot) {
         var slot = this.slots.get(invSlot);
-        
+
         if (slot.hasItem()) {
             var originalStack = slot.getItem();
             var newStack = originalStack.copy();
-            
+
             int machineSize = this.inventory.getContainerSize();
             int playerInvStart = getPlayerInvStartSlot(newStack);
             int playerInvEnd = getPlayerInvEndSlot(newStack);
             int totalSize = this.slots.size();
-            
+
             // Machine → player
             if (invSlot < machineSize) {
                 if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true))
@@ -221,83 +221,83 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
                 if (!this.moveItemStackTo(originalStack, playerInvStart, playerInvEnd, true))
                     return ItemStack.EMPTY;
             }
-            
+
             if (originalStack.isEmpty()) {
                 slot.setByPlayer(ItemStack.EMPTY);
             } else {
                 slot.setChanged();
             }
-            
+
             return newStack;
         }
-        
+
         return ItemStack.EMPTY;
     }
-    
+
     public int getPlayerInvStartSlot(ItemStack stack) {
         return this.inventory.getContainerSize();
     }
-    
+
     public int getPlayerInvEndSlot(ItemStack stack) {
         return getPlayerInvStartSlot(stack) + 36;
     }
-    
+
     public int getMachineInvStartSlot(ItemStack stack) {
         return 0;
     }
-    
+
     public int getMachineInvEndSlot(ItemStack stack) {
         return this.inventory.getContainerSize();
     }
-    
+
     @Override
     public boolean stillValid(Player player) {
         return this.inventory.stillValid(player);
     }
-    
+
     @Override
     public BlockEntity getBlockEntity() {
         return blockEntity;
     }
-    
+
     public boolean showRedstoneAddon() {
         return screenData.hasRedstoneControlAvailable();
     }
-    
+
     @Override
     public void broadcastChanges() {
         if (blockEntity instanceof NetworkedBlockEntity networkedBlockEntity)
             networkedBlockEntity.sendUpdate(SyncType.GUI_TICK, (ServerPlayer) playerInventory.player);
         super.broadcastChanges();
     }
-    
+
     public record FluidContainerInteractionPacket(BlockPos position, int tankIndex,
                                                   boolean extract) implements CustomPacketPayload {
         public static final Type<FluidContainerInteractionPacket> PACKET_ID =
-          new Type<>(Oritech.id("fluid_container_interaction"));
-        
+                new Type<>(Oritech.id("fluid_container_interaction"));
+
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }
-    
+
     public static void handleFluidContainerInteraction(FluidContainerInteractionPacket packet, IPayloadContext context) {
         var player = context.player();
         if (!(player.containerMenu instanceof OritechScreenHandler handler)) return;
         if (packet.tankIndex() < 0 || packet.tankIndex() >= handler.fluidStorages.size()) return;
-        
+
         var carriedStack = player.containerMenu.getCarried();
         if (carriedStack.isEmpty()) return;
-        
+
         // Resolve a fluid handler for the player's cursor stack. Single-item access (oneByOne)
         // matches the previous behavior of acting on one stack at a time.
         var cursorAccess = ItemAccess.forPlayerCursor(player, player.containerMenu).oneByOne();
         var itemFluidStorage = cursorAccess.getCapability(Capabilities.Fluid.ITEM);
         if (itemFluidStorage == null) return;
-        
+
         var tankStorage = handler.fluidStorages.get(packet.tankIndex());
-        
+
         try (var transaction = Transaction.openRoot()) {
             if (packet.extract()) {
                 // Right click: tank → item
@@ -309,6 +309,6 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             transaction.commit();
         }
     }
-    
+
     // endregion
 }

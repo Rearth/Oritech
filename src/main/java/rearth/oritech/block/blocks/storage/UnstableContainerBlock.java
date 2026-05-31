@@ -1,7 +1,6 @@
 package rearth.oritech.block.blocks.storage;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,45 +24,45 @@ import rearth.oritech.init.BlockEntitiesContent;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 public class UnstableContainerBlock extends Block implements EntityBlock {
-    
+
     public static final BooleanProperty SETUP_DONE = BooleanProperty.create("setup");
-    
+
     public UnstableContainerBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(SETUP_DONE, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
         builder.add(SETUP_DONE);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Override
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new UnstableContainerBlockEntity(pos, state);
     }
-    
+
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        
+
         super.setPlacedBy(level, pos, state, placer, itemStack);
-        
+
         if (level.isClientSide()) {
             return;
         }
-        
+
         var machineCandidate = level.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY);
         if (machineCandidate.isEmpty()) return;
         var machine = machineCandidate.get();
         var corePositions = machine.getCorePositions();
-        
+
         for (var coreOffset : corePositions) {
             var coreWorldPos = pos.offset(coreOffset);
             var coreState = level.getBlockState(coreWorldPos);
@@ -74,22 +73,21 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
             }
             level.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
         }
-        
+
         machine.initMultiblock(state);
-        
+
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override

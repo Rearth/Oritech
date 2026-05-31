@@ -13,7 +13,7 @@ public abstract class PassiveGeneratorBlock extends Block implements EntityBlock
     public PassiveGeneratorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {

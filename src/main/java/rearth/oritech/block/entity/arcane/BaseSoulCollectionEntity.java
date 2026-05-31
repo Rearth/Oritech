@@ -18,56 +18,56 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 
 public abstract class BaseSoulCollectionEntity extends BlockEntity implements GameEventListener.Provider<BaseSoulCollectionEntity.DeathListener> {
-    
+
     private final DeathListener deathListener;
-    
+
     public BaseSoulCollectionEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         deathListener = new DeathListener(pos);
     }
-    
+
     @Override
     public DeathListener getListener() {
         return deathListener;
     }
-    
+
     public static float getSoulTravelDuration(float distance) {
         return (float) (Math.sqrt(distance * 20) * 3);
     }
-    
+
     public abstract boolean canAcceptSoul();
-    
+
     public abstract void onSoulIncoming(Vec3 emitter);
-    
+
     public class DeathListener implements GameEventListener {
-        
+
         private final PositionSource position;
-        
+
         private static final HashSet<Vec3> consumedEvents = new HashSet<>();
-        
+
         public static void resetEvents() {
             consumedEvents.clear();
         }
-        
+
         public DeathListener(BlockPos pos) {
             this.position = new BlockPositionSource(pos);
         }
-        
+
         @Override
         public PositionSource getListenerSource() {
             return position;
         }
-        
+
         @Override
         public int getListenerRadius() {
             return 23;
         }
-        
+
         @Override
         public DeliveryMode getDeliveryMode() {
             return DeliveryMode.BY_DISTANCE;
         }
-        
+
         @Override
         public boolean handleGameEvent(ServerLevel level, Holder<GameEvent> event, GameEvent.Context emitter, Vec3 emitterPos) {
             if (event.is(GameEvent.ENTITY_DIE.key()) && isValidEntity(emitter.sourceEntity()) && canAcceptSoul() && !consumedEvents.contains(emitterPos)) {
@@ -75,10 +75,10 @@ public abstract class BaseSoulCollectionEntity extends BlockEntity implements Ga
                 consumedEvents.add(emitterPos);
                 return true;
             }
-            
+
             return false;
         }
-        
+
         private boolean isValidEntity(@Nullable Entity entity) {
             // We allow null entities as the Soul Flower triggers a ENTITY_DIE game event with a null entity
             return entity == null || entity instanceof LivingEntity;

@@ -55,12 +55,12 @@ import java.util.*;
 
 @SuppressWarnings("unchecked")
 public class NetworkManager {
-    
+
     private static final Map<Type, StreamCodec<? extends ByteBuf, ?>> AUTO_CODECS = new HashMap<>();
     private static final Map<Integer, List<Field>> CACHED_FIELDS = new HashMap<Integer, List<Field>>();
-    
+
     public static void loadDefaultCodecs() {
-        
+
         registerCodec(ByteBufCodecs.INT, Integer.class, int.class);
         registerCodec(ByteBufCodecs.VAR_LONG, Long.class, long.class);
         registerCodec(ByteBufCodecs.FLOAT, Float.class, float.class);
@@ -82,14 +82,14 @@ public class NetworkManager {
         registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
         registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
         registerCodec(AugmentApplicationEntity.ResearchState.PACKET_CODEC, AugmentApplicationEntity.ResearchState.class);
-        
+
     }
-    
+
     public static <T> void registerCodec(StreamCodec<? extends ByteBuf, T> codec, Type... classes) {
         for (var clazz : classes)
             AUTO_CODECS.put(clazz, codec);
     }
-    
+
     public static void initServerBound(PayloadRegistrar registrar) {
         registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registrar.playToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
@@ -107,9 +107,9 @@ public class NetworkManager {
         registrar.playToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
         registrar.playToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
         registrar.playToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
-        
+
     }
-    
+
     public static void initClientBound(PayloadRegistrar registrar) {
         registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
         registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
@@ -120,12 +120,12 @@ public class NetworkManager {
         registrar.playToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
         registrar.playToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
     }
-    
+
     public static void receiveMessage(MessagePayload message, IPayloadContext context) {
-        
+
         var level = context.player().level();
         var registryAccess = context.player().registryAccess();
-        
+
         var receivedBuf = new RegistryFriendlyByteBuf(Unpooled.wrappedBuffer(message.message), registryAccess, ConnectionType.NEOFORGE);
         var receiverEntity = level.getBlockEntity(message.pos);
         var receiverType = registryAccess.lookupOrThrow(Registries.BLOCK_ENTITY_TYPE).get(message.targetEntityType);
@@ -138,13 +138,13 @@ public class NetworkManager {
             Oritech.LOGGER.debug("Unable to start decoding for block entity type {} at {}. Target Mismatch!", receiverType, message.pos);
         }
     }
-    
+
     // returns the number of encoded fields
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static int encodeFields(Object target, SyncType type, ByteBuf byteBuf, @Nullable Level level) {
-        
+
         var fields = getCachedFields(target, type);
-        
+
         var encodedCount = 0;
         for (var field : fields) {
             try {
@@ -167,22 +167,22 @@ public class NetworkManager {
                         codec.encode(byteBuf, value);
                     }
                 }
-                
+
                 encodedCount++;
-                
+
             } catch (Exception ex) {
                 Oritech.LOGGER.warn("failed to encode field: {}", field.getName(), ex);
             }
         }
-        
+
         return encodedCount;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static void decodeFields(Object target, SyncType type, ByteBuf byteBuf, Level level) {
-        
+
         var fields = getCachedFields(target, type);
-        
+
         for (var field : fields) {
             try {
                 // fields that implement UpdatableField either get a delta or full update. Otherwise, we just set the full value
@@ -211,18 +211,18 @@ public class NetworkManager {
                     }
                     field.set(target, value);
                 }
-                
+
             } catch (Exception ex) {
                 Oritech.LOGGER.warn("failed to decode field: {}", field.getName(), ex);
             }
         }
     }
-    
+
     private static @NotNull List<Field> getCachedFields(Object target, SyncType type) {
         var key = target.getClass().hashCode() + type.hashCode();
         return CACHED_FIELDS.computeIfAbsent(key, elem -> getSyncFields(target, type));
     }
-    
+
     private static @NotNull List<Field> getSyncFields(Object target, SyncType type) {
         var fields = new ArrayList<>(Arrays.asList(target.getClass().getDeclaredFields()));
         var superClass = target.getClass().getSuperclass();
@@ -230,13 +230,13 @@ public class NetworkManager {
             fields.addAll(Arrays.asList(superClass.getDeclaredFields()));
             superClass = superClass.getSuperclass();
         }
-        
+
         var filteredFields = new ArrayList<Field>();
         fields.stream().filter(field -> hasSyncType(field.getAnnotation(SyncField.class), type)).forEachOrdered(field -> {
             field.setAccessible(true);
             filteredFields.add(field);
         });
-        
+
         if (target instanceof AdditionalNetworkingProvider additionalNetworkingProvider) {
             var addedFields = additionalNetworkingProvider.additionalSyncedFields(type);
             addedFields.forEach(field -> {
@@ -244,13 +244,13 @@ public class NetworkManager {
                 filteredFields.add(field);
             });
         }
-        
+
         return filteredFields;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static StreamCodec getAutoCodec(Class<?> type) {
-        
+
         // try to create codec for records
         if (!AUTO_CODECS.containsKey(type)) {
             if (type.isRecord()) {
@@ -265,14 +265,14 @@ public class NetworkManager {
                 return computedCodec;
             }
         }
-        
+
         if (!AUTO_CODECS.containsKey(type)) {
             Oritech.LOGGER.error("No codec defined for: {}", type);
         }
-        
+
         return AUTO_CODECS.get(type);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static StreamCodec getAutoCodec(Field field) {
         var listType = getListType(field.getGenericType());
@@ -289,18 +289,18 @@ public class NetworkManager {
         if (mapType.isPresent()) {
             var keyCodec = getAutoCodec((Class<?>) mapType.get().getA());
             var valueCodec = getAutoCodec((Class<?>) mapType.get().getB());
-            
+
             if (keyCodec == null)
                 Oritech.LOGGER.error("Unable to get codec for map key type: {}", field.getType());
             if (valueCodec == null)
                 Oritech.LOGGER.error("Unable to get codec for map value type: {}", field.getType());
-            
+
             return ByteBufCodecs.map(HashMap::new, keyCodec, valueCodec);
         }
-        
+
         return getAutoCodec(field.getType());
     }
-    
+
     // Method for checking if a given type is a List and for retrieving its type parameter
     public static Optional<Type> getListType(Type type) {
         if (type instanceof ParameterizedType pType) {
@@ -311,7 +311,7 @@ public class NetworkManager {
         }
         return Optional.empty();
     }
-    
+
     // Method for checking if a given type is a Set and for retrieving its type parameter
     public static Optional<Type> getSetType(Type type) {
         if (type instanceof ParameterizedType pType) {
@@ -322,7 +322,7 @@ public class NetworkManager {
         }
         return Optional.empty();
     }
-    
+
     // Method for checking if a given type is a Map and for retrieving its type parameters
     public static Optional<Tuple<Type, Type>> getMapType(Type type) {
         if (type instanceof ParameterizedType pType) {
@@ -334,31 +334,31 @@ public class NetworkManager {
         }
         return Optional.empty();
     }
-    
+
     private static boolean hasSyncType(SyncField annotation, SyncType type) {
         if (annotation == null) return false;
-        
+
         for (var value : annotation.value()) {
             if (value.equals(type)) return true;
         }
         return false;
     }
-    
+
     public record MessagePayload(BlockPos pos, Identifier targetEntityType, SyncType syncType,
                                  byte[] message) implements CustomPacketPayload {
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return GENERIC_PACKET_ID;
         }
-        
+
         public static final Type<MessagePayload> GENERIC_PACKET_ID = new Type<>(Oritech.id("generic"));
-        
+
         public static final StreamCodec<RegistryFriendlyByteBuf, MessagePayload> PACKET_CODEC = new StreamCodec<>() {
             @Override
             public MessagePayload decode(RegistryFriendlyByteBuf buf) {
                 return new MessagePayload(BlockPos.STREAM_CODEC.decode(buf), Identifier.STREAM_CODEC.decode(buf), SyncType.PACKET_CODEC.decode(buf), ByteBufCodecs.BYTE_ARRAY.decode(buf));
             }
-            
+
             @Override
             public void encode(RegistryFriendlyByteBuf buf, MessagePayload value) {
                 BlockPos.STREAM_CODEC.encode(buf, value.pos);
@@ -368,35 +368,35 @@ public class NetworkManager {
             }
         };
     }
-    
+
     static <B extends ByteBuf, V> StreamCodec.CodecOperation<B, V, Set<V>> toSet() {
         return (codec) -> ByteBufCodecs.collection(HashSet::new, codec);
     }
-    
+
     // transmits only the block type, with the default block state. Custom properties are not sent.
     public static StreamCodec<RegistryFriendlyByteBuf, BlockState> SIMPLE_BLOCK_STATE_PACKET_CODEC = new StreamCodec<>() {
         @Override
         public BlockState decode(RegistryFriendlyByteBuf buf) {
             return BuiltInRegistries.BLOCK.get(Identifier.STREAM_CODEC.decode(buf)).get().value().defaultBlockState();
         }
-        
+
         @Override
         public void encode(RegistryFriendlyByteBuf buf, BlockState value) {
             Identifier.STREAM_CODEC.encode(buf, BuiltInRegistries.BLOCK.getKey(value.getBlock()));
         }
     };
-    
+
     public static StreamCodec<RegistryFriendlyByteBuf, Vector2i> VEC2I_PACKED_CODEC = StreamCodec.composite(
-      ByteBufCodecs.INT, Vector2i::x,
-      ByteBufCodecs.INT, Vector2i::y,
-      Vector2i::new
+            ByteBufCodecs.INT, Vector2i::x,
+            ByteBufCodecs.INT, Vector2i::y,
+            Vector2i::new
     );
-    
+
     @SuppressWarnings("unchecked")
     public static <K, V> StreamCodec<RegistryFriendlyByteBuf, HashMap<K, V>> createMapCodec(Class<K> keyType, Class<V> valueType) {
         return ByteBufCodecs.map(HashMap::new, getAutoCodec(keyType), getAutoCodec(valueType));
     }
-    
+
     public static StreamCodec<RegistryFriendlyByteBuf, Vec3> VEC3D_PACKET_CODEC = new StreamCodec<>() {
         @Override
         public Vec3 decode(RegistryFriendlyByteBuf buf) {
@@ -405,7 +405,7 @@ public class NetworkManager {
             var z = buf.readDouble();
             return new Vec3(x, y, z);
         }
-        
+
         @Override
         public void encode(RegistryFriendlyByteBuf buf, Vec3 value) {
             buf.writeDouble(value.x);
@@ -413,5 +413,5 @@ public class NetworkManager {
             buf.writeDouble(value.z);
         }
     };
-    
+
 }

@@ -7,11 +7,11 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 
 public class TaintedRefineryBlock extends MultiblockMachine implements EntityBlock {
-    
+
     public TaintedRefineryBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return TaintedRefineryBlockEntity.class;

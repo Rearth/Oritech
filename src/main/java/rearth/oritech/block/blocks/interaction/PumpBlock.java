@@ -33,52 +33,52 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class PumpBlock extends Block implements EntityBlock {
-    
+
     public PumpBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Override
     public boolean isSignalSource(BlockState state) {
         return true;
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new PumpBlockEntity(pos, state);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
             var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
             pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
         }
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
             // break all trunk blocks below
             var checkPos = pos.below();
@@ -87,10 +87,10 @@ public class PumpBlock extends Block implements EntityBlock {
                 checkPos = checkPos.below();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -100,12 +100,12 @@ public class PumpBlock extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
         var showExtra = Screen.hasControlDown();
-        
+
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.pump_redstone"));
         }

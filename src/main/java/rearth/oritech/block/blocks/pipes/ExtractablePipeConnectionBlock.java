@@ -17,9 +17,9 @@ import rearth.oritech.init.ItemContent;
 import java.util.HashSet;
 
 public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnectionBlock {
-    
+
     public static final int EXTRACT = 2;
-    
+
     // 0 = no connection, 1 = normal connection, 2 = extractable connection
     public static final IntegerProperty NORTH = IntegerProperty.create("north", 0, 2);
     public static final IntegerProperty EAST = IntegerProperty.create("east", 0, 2);
@@ -27,41 +27,41 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     public static final IntegerProperty WEST = IntegerProperty.create("west", 0, 2);
     public static final IntegerProperty UP = IntegerProperty.create("up", 0, 2);
     public static final IntegerProperty DOWN = IntegerProperty.create("down", 0, 2);
-    
+
     public ExtractablePipeConnectionBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (player.isHolding(ItemContent.WRENCH)) return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
-        
+
         var interactDir = getInteractDirection(state, pos, player);
         if (!hasMachineInDirection(interactDir, level, pos, apiValidationFunction()))
             return InteractionResult.PASS;
-        
+
         var property = directionToProperty(interactDir);
         var connection = state.getValue(property);
         level.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_KNOWN_SHAPE, 0);
-        
+
         level.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
-        
+
         // Invalidate cache
         invalidateTargetCache(level, pos);
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     public boolean hasExtractingSide(BlockState state) {
         for (var direction : UPDATE_SHAPE_ORDER) {
             var property = directionToProperty(direction);
             if (state.getValue(property) == EXTRACT) return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Invalidates the target cache of the block entity at the given position
      *
@@ -73,13 +73,13 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
         var network = data.pipeNetworkLinks.getOrDefault(pos, null);
         if (network != null) {
             var checked = new HashSet<BlockPos>();
-            
+
             // Invalidate all pipe connection nodes in the network
             for (var pipeInterface : data.pipeNetworkInterfaces.get(network)) {
                 // Skip node if already checked (node has multiple interface connections)
                 var pipePos = pipeInterface.getA().relative(pipeInterface.getB());
                 if (checked.contains(pipePos)) continue;
-                
+
                 checked.add(pipePos);
                 var pipeEntity = level.getBlockEntity(pipePos);
                 if (pipeEntity instanceof ExtractablePipeInterfaceEntity)
@@ -87,28 +87,28 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
             }
         }
     }
-    
+
     @Override
     public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, boolean createConnection) {
-        
+
         state = addFluidState(state, pos, level);
-        
+
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, level, createConnection);
-            
+
             if (connection && state.getValue(property) == EXTRACT) continue; // don't override extractable connections
             state = state.setValue(property, connection ? CONNECTION : NO_CONNECTION);
         }
-        
+
         return addStraightState(state);
     }
-    
+
     @Override
     public BlockState addConnectionStates(BlockState state, Level level, BlockPos pos, Direction createDirection) {
-        
+
         state = addFluidState(state, pos, level);
-        
+
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, level, direction.equals(createDirection));
@@ -117,7 +117,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
         }
         return addStraightState(state);
     }
-    
+
     /**
      * Checks if the block state is extractable from any side
      *
@@ -129,10 +129,10 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
             if (isSideExtractable(state, side))
                 return true;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Checks if the block state is extractable from a specific side
      *
@@ -143,32 +143,32 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
     public boolean isSideExtractable(BlockState state, Direction side) {
         return directionToPropertyValue(state, side) == EXTRACT;
     }
-    
+
     @Override
     public IntegerProperty getNorthProperty() {
         return NORTH;
     }
-    
+
     @Override
     public IntegerProperty getEastProperty() {
         return EAST;
     }
-    
+
     @Override
     public IntegerProperty getSouthProperty() {
         return SOUTH;
     }
-    
+
     @Override
     public IntegerProperty getWestProperty() {
         return WEST;
     }
-    
+
     @Override
     public IntegerProperty getUpProperty() {
         return UP;
     }
-    
+
     @Override
     public IntegerProperty getDownProperty() {
         return DOWN;

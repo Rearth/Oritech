@@ -9,7 +9,7 @@ public class BasicGeneratorBlock extends UpgradableMachineBlock {
     public BasicGeneratorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return BasicGeneratorEntity.class;

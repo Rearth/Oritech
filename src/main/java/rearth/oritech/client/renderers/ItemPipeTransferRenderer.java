@@ -13,25 +13,25 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import java.util.HashSet;
 
 public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity> {
-    
+
     @Override
     public int getViewDistance() {
         return 256;
     }
-    
+
     @Override
     public boolean shouldRenderOffScreen(ItemPipeInterfaceEntity blockEntity) {
         return true;
     }
-    
+
     @Override
     public void render(ItemPipeInterfaceEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        
+
         if (entity.activeStacks == null || entity.activeStacks.isEmpty()) return;
-        
+
         var time = entity.getLevel().getGameTime() + tickDelta;
         var removedStacks = new HashSet<ItemPipeInterfaceEntity.RenderStackData>();
-        
+
         for (var renderedStack : entity.activeStacks) {
             var age = time - renderedStack.startedAt();
             var neededTime = ItemPipeInterfaceEntity.calculatePathLength(renderedStack.pathLength());    // about 2 blocks/s, but much faster on longer paths
@@ -40,18 +40,18 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
                 removedStacks.add(renderedStack);
                 continue;
             }
-            
+
             progress = sigmoidFitted(progress);
-            
+
             // get position in path at current progress (traverse path to current progress)
             var targetPathProgress = renderedStack.pathLength() * progress;
             var pathProgress = 0;
             var pathPosition = renderedStack.path().getFirst();
             Vec3 targetPos = Vec3.ZERO;
-            
+
             for (var segment : renderedStack.path()) {
                 var segmentDist = segment.distManhattan(pathPosition);
-                
+
                 if (pathProgress + segmentDist < targetPathProgress) {
                     pathProgress += segmentDist;
                     pathPosition = segment;
@@ -61,42 +61,42 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
                     targetPos = Vec3.atLowerCornerOf(pathPosition).add(targetOffset);
                     break;
                 }
-                
+
             }
-            
+
             var offset = targetPos.subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
-            
+
             matrices.pushPose();
             matrices.translate(offset.x + 0.5, offset.y + 0.5, offset.z + 0.5);
             matrices.scale(0.4f, 0.4f, 0.4f);
             matrices.mulPose(Axis.YP.rotationDegrees(-140));
             matrices.mulPose(Axis.XP.rotationDegrees(-30));
-            
+
             var renderedItem = renderedStack.rendered();
-            
+
             Minecraft.getInstance().getItemRenderer().renderStatic(
-              renderedItem,
-              ItemDisplayContext.GUI,
-              light,
-              OverlayTexture.NO_OVERLAY,
-              matrices,
-              vertexConsumers,
-              entity.getLevel(),
-              0
+                    renderedItem,
+                    ItemDisplayContext.GUI,
+                    light,
+                    OverlayTexture.NO_OVERLAY,
+                    matrices,
+                    vertexConsumers,
+                    entity.getLevel(),
+                    0
             );
-            
+
             matrices.popPose();
-            
+
         }
-        
+
         entity.activeStacks.removeAll(removedStacks);
-        
+
     }
-    
+
     private static double sigmoidFitted(double x) {
         return sigmoid((x - 0.5) * 2) + 0.5f;
     }
-    
+
     private static double sigmoid(double x) {
         return x / (1 + Math.abs(x));
     }

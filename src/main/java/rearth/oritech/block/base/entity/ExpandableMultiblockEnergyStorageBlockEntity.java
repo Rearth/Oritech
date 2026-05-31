@@ -18,70 +18,70 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.ArrayList;
 
 public abstract class ExpandableMultiblockEnergyStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements MultiblockMachineController {
-    
+
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
-    
+
     @SyncField(SyncType.GUI_OPEN)
     private float coreQuality = 1f;
-    
+
     public ExpandableMultiblockEnergyStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         serializeMultiblock(output);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         deserializeMultiblock(input);
     }
-    
+
     @Override
     public Direction getFacingForMultiblock() {
         return super.getFacingForAddon();
     }
-    
+
     @Override
     public ArrayList<BlockPos> getConnectedCores() {
         return coreBlocksConnected;
     }
-    
+
     @Override
     public void setCoreQuality(float quality) {
         this.coreQuality = quality;
     }
-    
+
     @Override
     public float getCoreQuality() {
         return this.coreQuality;
     }
-    
+
     @Override
     public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return inventory;
     }
-    
+
     @Override
     public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
     }
-    
+
     @Override
     public BlockPos getPosForMultiblock() {
         return worldPosition;
     }
-    
+
     @Override
     public Level getWorldForMultiblock() {
         return level;
     }
-    
+
     @Override
     public void triggerSetupAnimation() {
-    
+
     }
 }

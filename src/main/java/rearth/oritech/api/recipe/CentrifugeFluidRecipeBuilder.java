@@ -4,16 +4,16 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
-    
+
     protected CentrifugeFluidRecipeBuilder() {
         super(RecipeContent.CENTRIFUGE_FLUID, "centrifuge/fluid");
         this.time = 100;
     }
-    
+
     public static OritechRecipeBuilder build() {
         return new CentrifugeFluidRecipeBuilder();
     }
-    
+
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs != null && inputs.size() > 1)
@@ -21,5 +21,5 @@ public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
         if ((fluidInput == null || fluidInput.isEmpty()) && fluidOutputs.isEmpty())
             throw new IllegalStateException("fluid input or output required for recipe " + id + " (type " + type + ")");
     }
-    
+
 }

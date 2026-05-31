@@ -31,10 +31,10 @@ import java.util.List;
 import java.util.function.BiFunction;
 
 public class OritechREIPlugin implements REIClientPlugin {
-    
+
     @Override
     public void registerCategories(CategoryRegistry registry) {
-        
+
         // recipe types
         registerOritechCategory(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, PulverizerBlockEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, FragmentForgeBlockEntity.class, icon));
@@ -45,28 +45,28 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOritechCategory(registry, RecipeContent.CENTRIFUGE, BlockContent.CENTRIFUGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, CentrifugeBlockEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, CentrifugeBlockEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, AtomicForgeBlockEntity.class, icon));
-        
+
         // generators
         registerOritechCategory(registry, RecipeContent.BIO_GENERATOR, BlockContent.BIO_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, BioGeneratorEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, FuelGeneratorEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.LAVA_GENERATOR, BlockContent.LAVA_GENERATOR_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, LavaGeneratorEntity.class, icon));
         registerOritechCategory(registry, RecipeContent.STEAM_ENGINE, BlockContent.STEAM_ENGINE_BLOCK, (recipeType, icon) -> new OritechReiDisplay(recipeType, SteamEngineEntity.class, icon));
-        
+
         // other
         registerOritechCategory(registry, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER, OritechReiParticleCollisionDisplay::new);
         registerOritechCategory(registry, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK, OritechReiLaserDisplay::new);
         registerOritechCategory(registry, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER, (recipeType, icon) -> new OritechReiDisplay(recipeType, icon, false, List.of(new ScreenProvider.GuiSlot(0, 55, 35)), new ContainerSlotAssignment(0, 1, 1, 0)));
-        
+
         // tainted refinery info categories
         var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));
         registry.add(new OritechReiTaintedRefineryCreationDisplay(creationCategoryId, BlockContent.TAINTED_REFINERY_BLOCK));
         registry.addWorkstations(creationCategoryId, EntryStacks.of(BlockContent.REFINERY_BLOCK));
         registry.addWorkstations(creationCategoryId, EntryStacks.of(BlockContent.ENCHANTMENT_CATALYST_BLOCK));
-        
+
         var bonusesCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_bonuses"));
         registry.add(new OritechReiTaintedRefineryBonusesDisplay(bonusesCategoryId, BlockContent.TAINTED_REFINERY_BLOCK));
         registry.addWorkstations(bonusesCategoryId, EntryStacks.of(BlockContent.TAINTED_REFINERY_BLOCK));
-        
+
         // workstations
         registerOriWorkstation(registry, RecipeContent.PULVERIZER, BlockContent.PULVERIZER_BLOCK);
         registerOriWorkstation(registry, RecipeContent.GRINDER, BlockContent.FRAGMENT_FORGE_BLOCK);
@@ -84,14 +84,14 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerOriWorkstation(registry, RecipeContent.PARTICLE_COLLISION, BlockContent.ACCELERATOR_CONTROLLER);
         registerOriWorkstation(registry, RecipeContent.LASER, BlockContent.LASER_ARM_BLOCK);
         registerOriWorkstation(registry, RecipeContent.REACTOR, BlockContent.REACTOR_CONTROLLER);
-        
+
         registry.addWorkstations(CategoryIdentifier.of("minecraft", "plugins/smelting"), EntryStacks.of(BlockContent.POWERED_FURNACE_BLOCK));
     }
-    
+
     // creates a screen instance that displays all recipes of that recipe type
     @Override
     public void registerDisplays(DisplayRegistry registry) {
-        
+
         // recipes again for some reason
         registerMachineRecipeType(registry, RecipeContent.PULVERIZER);
         registerMachineRecipeType(registry, RecipeContent.ASSEMBLER);
@@ -109,20 +109,20 @@ public class OritechREIPlugin implements REIClientPlugin {
         registerMachineRecipeType(registry, RecipeContent.PARTICLE_COLLISION);
         registerMachineRecipeType(registry, RecipeContent.LASER);
         registerMachineRecipeType(registry, RecipeContent.REACTOR);
-        
+
         // tainted refinery synthetic displays
         var creationCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_creation"));
         registry.add(new TaintedRefineryInfoDisplay(
-          creationCategoryId,
-          List.of(new ItemStack(BlockContent.REFINERY_BLOCK), new ItemStack(BlockContent.ENCHANTMENT_CATALYST_BLOCK)),
-          List.of(new ItemStack(BlockContent.TAINTED_REFINERY_BLOCK))
+                creationCategoryId,
+                List.of(new ItemStack(BlockContent.REFINERY_BLOCK), new ItemStack(BlockContent.ENCHANTMENT_CATALYST_BLOCK)),
+                List.of(new ItemStack(BlockContent.TAINTED_REFINERY_BLOCK))
         ));
-        
+
         var bonusesCategoryId = CategoryIdentifier.of(Oritech.id("tainted_refinery_bonuses"));
         registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_SCULK_BLOCKS, "sculk"));
         registry.add(new TaintedRefineryInfoDisplay(bonusesCategoryId, TagContent.REFINERY_ARCANE_BLOCKS, "arcane"));
     }
-    
+
     @Override
     public void registerScreens(ScreenRegistry registry) {
         registry.registerDraggableStackVisitor(new ReiItemFilterDraggableStackVisitor());
@@ -135,16 +135,16 @@ public class OritechREIPlugin implements REIClientPlugin {
             return zones;
         });
     }
-    
+
     private void registerOritechCategory(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machineIcon, BiFunction<OritechRecipeType, ItemLike, ? extends DisplayCategory<Display>> screenType) {
         var oriCategory = screenType.apply(recipeType, machineIcon);
         registry.add(oriCategory);
     }
-    
+
     private void registerOriWorkstation(CategoryRegistry registry, OritechRecipeType recipeType, ItemLike machine) {
         registry.addWorkstations(CategoryIdentifier.of(recipeType.getIdentifier()), EntryStacks.of(machine));
     }
-    
+
     private void registerMachineRecipeType(DisplayRegistry registry, OritechRecipeType recipeType) {
         registry.registerRecipeFiller(OritechRecipe.class, recipeType, OritechDisplay::new);
     }

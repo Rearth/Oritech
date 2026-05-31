@@ -28,44 +28,44 @@ import java.util.List;
 import java.util.Objects;
 
 public class MachineFrameBlock extends Block {
-    
-    
+
+
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
     public static final BooleanProperty EAST = PipeBlock.EAST;
     public static final BooleanProperty SOUTH = PipeBlock.SOUTH;      // south and west are only needed for voxel shapes
     public static final BooleanProperty WEST = PipeBlock.WEST;
     public static final BooleanProperty UP = PipeBlock.UP;
     public static final BooleanProperty DOWN = PipeBlock.DOWN;        // used to connect to pillars to make things look nice
-    
+
     protected final VoxelShape[] boundingShapes;
-    
+
     public MachineFrameBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false).setValue(UP, false).setValue(DOWN, false));
         boundingShapes = createShapes();
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.machine_frame").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("tooltip.oritech.machine_frame.1", OritechConfig.processingMachines.machineFrameMaxLength.get(), OritechConfig.processingMachines.machineFrameMaxLength.get()).withStyle(ChatFormatting.GRAY));
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     private VoxelShape getShape(BlockState state) {
         return boundingShapes[packStates(state)];
     }
-    
+
     private static int packStates(BlockState state) {
         int i = 0;
         if (state.getValue(NORTH)) i |= 1;
@@ -76,57 +76,57 @@ public class MachineFrameBlock extends Block {
         if (state.getValue(DOWN)) i |= 32;
         return i;
     }
-    
+
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (!OritechStartupConfig.tightMachineFrameHitboxes.get())
             return super.getShape(state, level, pos, context);
         return getShape(state);
     }
-    
+
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShape(state);
     }
-    
+
     protected VoxelShape[] createShapes() {
         return GenericPipeBlock.createShapes(
-          Block.box(5, 5, 5, 11, 11, 11),
-          Block.box(5, 5, 0, 11, 11, 5),
-          Block.box(11, 5, 5, 16, 11, 11),
-          Block.box(5, 5, 11, 11, 11, 16),
-          Block.box(0, 5, 5, 5, 11, 11),
-          Block.box(5, 5, 5, 11, 16, 11),
-          Block.box(5, 0, 5, 11, 5, 11)
+                Block.box(5, 5, 5, 11, 11, 11),
+                Block.box(5, 5, 0, 11, 11, 5),
+                Block.box(11, 5, 5, 16, 11, 11),
+                Block.box(5, 5, 11, 11, 11, 16),
+                Block.box(0, 5, 5, 5, 11, 11),
+                Block.box(5, 5, 5, 11, 16, 11),
+                Block.box(5, 0, 5, 11, 5, 11)
         );
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         var baseState = super.getStateForPlacement(ctx);
-        
+
         var northConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().north()).getBlock() == this;
         var eastConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().east()).getBlock() == this;
         var southConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().south()).getBlock() == this;
         var westConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().west()).getBlock() == this;
         var upConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().above()).is(TagContent.MACHINE_FRAME_SUPPORT);
         var downConnected = ctx.getLevel().getBlockState(ctx.getClickedPos().below()).is(TagContent.MACHINE_FRAME_SUPPORT);
-        
+
         return Objects.requireNonNull(baseState).setValue(NORTH, northConnected).setValue(EAST, eastConnected).setValue(SOUTH, southConnected).setValue(WEST, westConnected).setValue(UP, upConnected).setValue(DOWN, downConnected);
     }
-    
+
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        
+
         var northConnected = level.getBlockState(pos.north()).getBlock() == this;
         var eastConnected = level.getBlockState(pos.east()).getBlock() == this;
         var southConnected = level.getBlockState(pos.south()).getBlock() == this;
         var westConnected = level.getBlockState(pos.west()).getBlock() == this;
         var upConnected = level.getBlockState(pos.above()).is(TagContent.MACHINE_FRAME_SUPPORT);
         var downConnected = level.getBlockState(pos.below()).is(TagContent.MACHINE_FRAME_SUPPORT);
-        
+
         return state.setValue(NORTH, northConnected).setValue(EAST, eastConnected).setValue(SOUTH, southConnected).setValue(WEST, westConnected).setValue(UP, upConnected).setValue(DOWN, downConnected);
-        
+
     }
 }

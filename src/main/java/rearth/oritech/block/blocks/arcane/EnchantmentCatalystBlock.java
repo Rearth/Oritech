@@ -5,7 +5,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -38,60 +37,59 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public EnchantmentCatalystBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
-    
+
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new EnchantmentCatalystBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -101,11 +99,11 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     // drop inv
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
             var entity = (EnchantmentCatalystBlockEntity) level.getBlockEntity(pos);
             var stacks = entity.inventory.heldStacks;
@@ -115,23 +113,23 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
                     level.addFreshEntity(itemEntity);
                 }
             }
-            
+
             entity.inventory.heldStacks.clear();
             entity.inventory.setChanged();
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
-        
+
         var ownState = level.getBlockEntity(pos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY);
         if (ownState.isEmpty() || ownState.get().collectedSouls <= 0) {
             super.onExplosionHit(state, level, pos, explosion, dropConsumer);
             return;
         }
-        
+
         // find nearby refinery, trigger it first
         for (var checkPos : BlockPos.withinManhattan(pos, 6, 5, 6)) {
             var checkState = level.getBlockState(checkPos);
@@ -141,11 +139,11 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
                     refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, dropConsumer);
             }
         }
-        
-        
+
+
         super.onExplosionHit(state, level, pos, explosion, dropConsumer);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

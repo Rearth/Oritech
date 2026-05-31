@@ -26,75 +26,75 @@ import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import java.util.List;
 
 public class SpawnerControllerBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public SpawnerControllerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         super.stepOn(level, pos, state, entity);
-        
+
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onEntitySteppedOn(entity);
         }
-        
+
     }
-    
+
     @Override
     public boolean isSignalSource(BlockState state) {
         return true;
     }
-    
+
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
-        
+
         if (level.isClientSide()) return;
-        
+
         var isPowered = level.hasNeighborSignal(pos);
-        
+
         var entity = (SpawnerControllerBlockEntity) level.getBlockEntity(pos);
         entity.setRedstonePowered(isPowered);
-        
+
     }
-    
+
     @Override
     protected boolean hasAnalogOutputSignal(BlockState state) {
         return true;
     }
-    
+
     @Override
     protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return ((SpawnerControllerBlockEntity) level.getBlockEntity(pos)).getComparatorOutput();
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onBlockInteracted(player);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SpawnerControllerBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -104,7 +104,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

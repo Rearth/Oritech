@@ -10,7 +10,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TechRedstoneButton extends ButtonBlock {
-    
+
     protected static final VoxelShape CEILING_X_SHAPE = Block.box(2.0, 12.0, 2.0, 14.0, 16.0, 14.0);
     protected static final VoxelShape CEILING_Z_SHAPE = Block.box(2.0, 12.0, 2.0, 14.0, 16.0, 14.0);
     protected static final VoxelShape FLOOR_X_SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 4.0, 14.0);
@@ -19,11 +19,11 @@ public class TechRedstoneButton extends ButtonBlock {
     protected static final VoxelShape SOUTH_SHAPE = Block.box(2.0, 2.0, 0.0, 14.0, 14.0, 4.0);
     protected static final VoxelShape WEST_SHAPE = Block.box(12.0, 2.0, 2.0, 16.0, 14.0, 14.0);
     protected static final VoxelShape EAST_SHAPE = Block.box(0.0, 2.0, 2.0, 4.0, 14.0, 14.0);
-    
+
     public TechRedstoneButton(BlockSetType blockSetType, int pressTicks, Properties settings) {
         super(blockSetType, pressTicks, settings);
     }
-    
+
     // copied from lever block
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

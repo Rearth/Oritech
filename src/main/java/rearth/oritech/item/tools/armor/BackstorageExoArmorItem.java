@@ -24,75 +24,75 @@ import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
 
 public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEnergyItem {
-    
+
     public BackstorageExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
         super(material, type, settings);
     }
-    
+
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (level.isClientSide()) return;
-        
+
         var tickPeriod = 10;
         if (level.getGameTime() % tickPeriod != 0) return;
-        
+
         var isPlayer = entity instanceof Player;
         var isEquipped = ((Player) entity).getItemBySlot(EquipmentSlot.CHEST).equals(stack);
-        
+
         if (isPlayer && isEquipped) {
             distributePower((Player) entity, stack, slot);
         }
     }
-    
+
     private void distributePower(Player player, ItemStack pack, int slot) {
-        
+
         var packStorage = new SimpleEnergyItemStorage(getEnergyMaxInput(pack), getEnergyMaxOutput(pack), getEnergyCapacity(pack), pack);
         if (packStorage.getAmount() < 10) return;
-        
+
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             var stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || stack == pack || slot == i) continue;
-            
+
             final int finalI = i;
             var stackRef = new StackContext(stack, updated -> player.getInventory().setItem(finalI, updated));
             var stackStorage = EnergyApi.ITEM.find(stackRef);
             if (stackStorage == null || stackStorage.getAmount() >= stackStorage.getCapacity()) continue;
-            
+
             EnergyApi.transfer(packStorage, stackStorage, Long.MAX_VALUE, false);
-            
+
             // player.getInventory().setStack(i, stackContext.getStack());
         }
     }
-    
+
     @Override
     public long getEnergyCapacity(ItemStack stack) {
         return OritechStartupConfig.exoChestplate.energyCapacity.get();
     }
-    
+
     @Override
     public long getEnergyMaxInput(ItemStack stack) {
         return OritechStartupConfig.exoChestplate.chargeSpeed.get();
     }
-    
+
     @Override
     public long getEnergyMaxOutput(ItemStack stack) {
         return OritechStartupConfig.exoChestplate.energyUsage.get();
     }
-    
+
     @Override
     public boolean isBarVisible(ItemStack stack) {
         return true;
     }
-    
+
     @Override
     public int getBarColor(ItemStack stack) {
         return 0xff7007;
     }
-    
+
     public int getBarWidth(ItemStack stack) {
         return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);

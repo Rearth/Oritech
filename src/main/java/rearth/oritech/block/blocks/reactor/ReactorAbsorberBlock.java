@@ -7,7 +7,7 @@ public class ReactorAbsorberBlock extends BaseReactorBlock {
     public ReactorAbsorberBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public Block requiredStackCeiling() {
         return BlockContent.REACTOR_ABSORBER_PORT;

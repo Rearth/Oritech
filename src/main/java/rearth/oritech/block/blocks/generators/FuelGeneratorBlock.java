@@ -15,14 +15,14 @@ public class FuelGeneratorBlock extends MultiblockMachine {
     public FuelGeneratorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         // because the model is inverted, we dont do the opposite here
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection());
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return FuelGeneratorEntity.class;

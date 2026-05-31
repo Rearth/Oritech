@@ -9,7 +9,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class TechLever extends LeverBlock {
-    
+
     protected static final VoxelShape CEILING_X_SHAPE = Block.box(2.0, 10.0, 2.0, 14.0, 16.0, 14.0);
     protected static final VoxelShape CEILING_Z_SHAPE = Block.box(2.0, 10.0, 2.0, 14.0, 16.0, 14.0);
     protected static final VoxelShape FLOOR_X_SHAPE = Block.box(2.0, 0.0, 2.0, 14.0, 6.0, 14.0);
@@ -18,11 +18,11 @@ public class TechLever extends LeverBlock {
     protected static final VoxelShape SOUTH_SHAPE = Block.box(2.0, 2.0, 0.0, 14.0, 14.0, 6.0);
     protected static final VoxelShape WEST_SHAPE = Block.box(10.0, 2.0, 2.0, 16.0, 14.0, 14.0);
     protected static final VoxelShape EAST_SHAPE = Block.box(0.0, 2.0, 2.0, 6.0, 14.0, 14.0);
-    
+
     public TechLever(Properties settings) {
         super(settings);
     }
-    
+
     // copied from lever block
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {

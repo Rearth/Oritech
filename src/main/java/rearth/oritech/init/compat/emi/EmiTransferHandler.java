@@ -15,59 +15,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EmiTransferHandler<S extends AbstractContainerMenu & MachineMenuHandler> implements StandardRecipeHandler<S> {
-    
+
     private final Identifier categoryId;
-    
+
     public EmiTransferHandler(Identifier categoryId) {
         this.categoryId = categoryId;
     }
-    
+
     @Override
     public List<Slot> getInputSources(S handler) {
         return handler.slots;
     }
-    
+
     @Override
     public List<Slot> getCraftingSlots(S handler) {
-        
+
         if (!(handler.getBlockEntity() instanceof MachineBlockEntity machine)) return List.of();
-        
+
         var res = new ArrayList<Slot>();
-        
+
         for (int i = handler.getMachineInvStartSlot(ItemStack.EMPTY); i < handler.getMachineInvStartSlot(ItemStack.EMPTY) + machine.getSlotAssignments().inputCount(); i++) {
             res.add(handler.slots.get(i));
         }
-        
+
         return res;
-        
+
     }
-    
+
     @Override
     public boolean supportsRecipe(EmiRecipe recipe) {
-        
+
         if (!(recipe instanceof OritechEMIRecipe oriRecipe)) return false;
-        
+
         var id = oriRecipe.getCategory().getId();
         return id.equals(categoryId);
     }
-    
+
     @Override
     public boolean craft(EmiRecipe recipe, EmiCraftContext<S> context) {
-        
+
         var stacks = EmiRecipeFiller.getStacks(this, recipe, context.getScreen(), context.getAmount());
         if (stacks != null) {
             return EmiRecipeFiller.clientFill(this, recipe, context.getScreen(), stacks, context.getDestination());
         }
         return false;
     }
-    
+
     @Override
     public boolean canCraft(EmiRecipe recipe, EmiCraftContext<S> context) {
-        
+
         var handler = context.getScreenHandler();
         if (getCraftingSlots(handler).stream().anyMatch(slot -> slot.hasItem() && !slot.getItem().isEmpty())) // check if a non-empty slot is present
             return false;
-        
+
         return StandardRecipeHandler.super.canCraft(recipe, context);
     }
 }

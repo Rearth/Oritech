@@ -4,15 +4,15 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
-    
+
     protected LavaGeneratorRecipeBuilder() {
         super(RecipeContent.LAVA_GENERATOR, "lavagen");
     }
-    
+
     public static OritechRecipeBuilder build() {
         return new LavaGeneratorRecipeBuilder();
     }
-    
+
     @Override
     public void validate(Identifier id) throws IllegalStateException {
         if (fluidInput == null || fluidInput.isEmpty())

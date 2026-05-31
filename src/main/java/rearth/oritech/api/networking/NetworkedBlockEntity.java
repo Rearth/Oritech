@@ -21,15 +21,15 @@ import rearth.oritech.Oritech;
 // important: when implementing this class and the block has a GUI, make sure to call `this.sendUpdate(SyncType.GUI_OPEN);` in the `writeClientSideData()` method.
 // also ensure the `gui_tick` event type is sent from the screenhandler `sendContentUpdates` call, e.g. `blockEntity.sendUpdate(SyncType.GUI_TICK);`
 public abstract class NetworkedBlockEntity extends BlockEntity implements BlockEntityTicker<NetworkedBlockEntity> {
-    
+
     private boolean networkDirty = false;
     private boolean needsInitialUpdate = false;
     private long lastSentTickUpdate = 0;
-    
+
     public NetworkedBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    
+
     // this should never be used in child classes, always use serverTick / clientTick
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
@@ -37,14 +37,14 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             clientTick(level, pos, state, blockEntity);
             return;
         }
-        
+
         serverTick(level, pos, state, blockEntity);
-        
+
         var time = level.getGameTime();
-        
+
         if ((time + this.worldPosition.asLong()) % getSparseUpdateInterval() == 0)
             sendUpdate(SyncType.SPARSE_TICK);
-        
+
         if (networkDirty && time >= lastSentTickUpdate + getTickUpdateInterval()) {
             networkDirty = false;
             sendUpdate(SyncType.TICK);
@@ -55,68 +55,68 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             sendUpdate(SyncType.INITIAL);
         }
     }
-    
+
     public abstract void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
-    
+
     public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
     }
-    
+
     public int getSparseUpdateInterval() {
         return 100;
     }
-    
+
     public int getTickUpdateInterval() {
         return 4;
     }
-    
+
     @Override
     public void setChanged() {
         setChanged(false);
     }
-    
+
     public void setChanged(boolean updateComparator) {
         if (this.level != null) {
             setChanged(this.level, this.worldPosition, this.getBlockState());
             if (updateComparator)
                 level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
-        
+
         networkDirty = true;
     }
-    
+
     public void preNetworkUpdate(SyncType type) {
     }
-    
+
     public void sendUpdate(SyncType type) {
         if (level == null || !(level instanceof ServerLevel serverLevel)) {
             Oritech.LOGGER.warn("unable to send update for {} at {}.", getType(), worldPosition);
             return;
         }
-        
+
         preNetworkUpdate(type);
-        
+
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-        
+
         PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
-    
+
     public void sendUpdate(SyncType type, ServerPlayer player) {
         if (level == null) {
             Oritech.LOGGER.warn("unable to send player update: Level is null.");
             return;
         }
-        
+
         preNetworkUpdate(type);
-        
+
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
-        
+
         PacketDistributor.sendToPlayer(player, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
-    
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
         needsInitialUpdate = true;

@@ -4,9 +4,9 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -39,32 +39,32 @@ import java.util.function.BiConsumer;
 import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 public abstract class MachineBlock extends HorizontalDirectionalBlock implements EntityBlock {
-    
+
     public MachineBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        
+
         try {
             return getBlockEntityType().getDeclaredConstructor(BlockPos.class, BlockState.class).newInstance(pos, state);
         } catch (InstantiationException | InvocationTargetException | NoSuchMethodException |
@@ -73,19 +73,19 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
             return new PulverizerBlockEntity(pos, state);
         }
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         onBlockRemoved(level, pos);
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         onBlockRemoved(level, pos);
         super.onExplosionHit(state, level, pos, explosion, stackMerger);
     }
-    
+
     private static void onBlockRemoved(Level level, BlockPos pos) {
         if (!level.isClientSide && level.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
             var stacks = entity.inventory.heldStacks;
@@ -95,15 +95,15 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
                     level.addFreshEntity(itemEntity);
                 }
             }
-            
+
             entity.inventory.heldStacks.clear();
             entity.inventory.setChanged();
         }
     }
-    
+
     @NotNull
     public abstract Class<? extends BlockEntity> getBlockEntityType();
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -113,22 +113,21 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
         if (!level.isClientSide()) {
-            var handler = (ExtendedMenuProvider) level.getBlockEntity(pos);
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, handler);
+            player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
-    
+
     // todo
     //    @Override
 //    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
@@ -137,7 +136,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
 //
 //        return super.useItemOn(stack, state, level, pos, player, hand, hit);
 //    }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         addMachineTooltip(tooltip, this, this);

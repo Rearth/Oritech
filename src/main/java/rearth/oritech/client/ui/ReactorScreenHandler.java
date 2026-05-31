@@ -14,32 +14,32 @@ import rearth.oritech.client.init.ModScreens;
 import java.util.Objects;
 
 public class ReactorScreenHandler extends AbstractContainerMenu {
-    
+
     public final ReactorControllerBlockEntity reactorEntity;
     public final Level level;
-    
+
     // this calls the second version
     public ReactorScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
-    
+
     // on server, also called from client constructor
     public ReactorScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.REACTOR_SCREEN, syncId);
-        
+
         reactorEntity = (ReactorControllerBlockEntity) blockEntity;
         level = blockEntity.getLevel();
     }
-    
+
     @Override
     public ItemStack quickMoveStack(Player player, int slot) {
         return ItemStack.EMPTY;
     }
-    
+
     public boolean stillValid(Player player) {
         return true;
     }
-    
+
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();

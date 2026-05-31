@@ -18,24 +18,24 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class AttachmentContent {
-    
+
     public static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES = DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Oritech.MOD_ID);
-    
+
     public static final Supplier<AttachmentType<GlobalPos>> PORTAL_TARGET = ATTACHMENT_TYPES.register(
-      "portal_target", () -> AttachmentType.builder(() -> GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO))
-                               .sync(GlobalPos.STREAM_CODEC)
-                               .serialize(GlobalPos.MAP_CODEC)
-                               .copyOnDeath()
-                               .build()
+            "portal_target", () -> AttachmentType.builder(() -> GlobalPos.of(Level.OVERWORLD, BlockPos.ZERO))
+                    .sync(GlobalPos.STREAM_CODEC)
+                    .serialize(GlobalPos.MAP_CODEC)
+                    .copyOnDeath()
+                    .build()
     );
-    
+
     @SuppressWarnings("unchecked")
     public static final Supplier<AttachmentType<Map<Identifier, Augment.AugmentState>>> ACTIVE_AUGMENTS = ATTACHMENT_TYPES.register(
-      "playeraugments", () -> AttachmentType.builder(() -> new HashMap<Identifier, Augment.AugmentState>())
-                                .sync(ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, NetworkManager.getAutoCodec(Augment.AugmentState.class)))
-                                .serialize(Codec.unboundedMap(Identifier.CODEC, Augment.AugmentState.CODEC).fieldOf("augments"))
-                                .copyOnDeath()
-                                .build()
+            "playeraugments", () -> AttachmentType.builder(() -> new HashMap<Identifier, Augment.AugmentState>())
+                    .sync(ByteBufCodecs.map(HashMap::new, Identifier.STREAM_CODEC, NetworkManager.getAutoCodec(Augment.AugmentState.class)))
+                    .serialize(Codec.unboundedMap(Identifier.CODEC, Augment.AugmentState.CODEC).fieldOf("augments"))
+                    .copyOnDeath()
+                    .build()
     );
-    
+
 }

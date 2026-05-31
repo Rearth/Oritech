@@ -14,14 +14,14 @@ import static rearth.oritech.api.networking.NetworkManager.getAutoCodec;
 
 
 public class ReflectiveCodecBuilder {
-    
+
     public static <E extends Enum<E>> StreamCodec<RegistryFriendlyByteBuf, E> createForEnum(Class<E> enumClass) {
         return new StreamCodec<>() {
             @Override
             public void encode(RegistryFriendlyByteBuf buf, E value) {
                 buf.writeShort(value.ordinal());
             }
-            
+
             @Override
             public E decode(RegistryFriendlyByteBuf buf) {
                 var ordinal = buf.readShort();
@@ -29,7 +29,7 @@ public class ReflectiveCodecBuilder {
             }
         };
     }
-    
+
     /**
      * Creates a PacketCodec for a given record type using reflection.
      * The record's components must have corresponding PacketCodecs registered in TYPE_TO_CODEC_MAP.
@@ -44,14 +44,14 @@ public class ReflectiveCodecBuilder {
         if (!recordClass.isRecord()) {
             throw new IllegalArgumentException(recordClass.getName() + " is not a record type.");
         }
-        
+
         var recordComponents = recordClass.getRecordComponents();
         var lookup = MethodHandles.publicLookup();
-        
+
         var accessors = new ArrayList<MethodHandle>(recordComponents.length);
         var componentCodecs = new ArrayList<StreamCodec<RegistryFriendlyByteBuf, ?>>(recordComponents.length);
         var componentTypes = new Class<?>[recordComponents.length];
-        
+
         for (int i = 0; i < recordComponents.length; i++) {
             var component = recordComponents[i];
             componentTypes[i] = component.getType();
@@ -81,7 +81,7 @@ public class ReflectiveCodecBuilder {
                 throw new RuntimeException("Failed to get codec for component: " + component.getName() + " in " + recordClass.getName(), e);
             }
         }
-        
+
         MethodHandle constructorHandle;
         try {
             Constructor<T> constructor = recordClass.getDeclaredConstructor(componentTypes);
@@ -90,7 +90,7 @@ public class ReflectiveCodecBuilder {
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new RuntimeException("Failed to find or unreflect canonical constructor for record: " + recordClass.getName(), e);
         }
-        
+
         return new StreamCodec<>() {
             @Override
             public T decode(RegistryFriendlyByteBuf buffer) {
@@ -108,7 +108,7 @@ public class ReflectiveCodecBuilder {
                     throw new RuntimeException("Error constructing record " + recordClass.getName(), e);
                 }
             }
-            
+
             @Override
             public void encode(RegistryFriendlyByteBuf buffer, T recordInstance) {
                 for (int i = 0; i < recordComponents.length; i++) {

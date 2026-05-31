@@ -20,59 +20,59 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class OritechReiParticleCollisionDisplay implements DisplayCategory<Display> {
-    
+
     protected final OritechRecipeType recipeType;
     protected final ItemLike icon;
     public static final Identifier PARTICLE_RECIPE_OVERLAY = Oritech.id("textures/gui/modular/particle_recipe_overlay.png");
-    
+
     public OritechReiParticleCollisionDisplay(OritechRecipeType recipeType, ItemLike icon) {
         this.recipeType = recipeType;
         this.icon = icon;
     }
-    
+
     @Override
     public List<Widget> setupDisplay(Display display, Rectangle bounds) {
         var widgets = new ArrayList<Widget>();
         var oDisplay = (OritechDisplay) display;
         var x = bounds.x;
         var y = bounds.y;
-        
+
         // background
         widgets.add(Widgets.createRecipeBase(bounds));
-        
+
         // particle collision overlay
         widgets.add(Widgets.createDrawableWidget((graphics, mouseX, mouseY, delta) ->
-                                                   graphics.blit(PARTICLE_RECIPE_OVERLAY, x + 60, y + 17, 0, 0, 36, 24, 36, 24)));
-        
+                graphics.blit(PARTICLE_RECIPE_OVERLAY, x + 60, y + 17, 0, 0, 36, 24, 36, 24)));
+
         // input slots
         widgets.add(Widgets.createSlot(new Point(x + 42, y + 20))
-                      .entries(oDisplay.getInputEntries().get(0)).markInput());
+                .entries(oDisplay.getInputEntries().get(0)).markInput());
         widgets.add(Widgets.createSlot(new Point(x + 96, y + 20))
-                      .entries(oDisplay.getInputEntries().get(1)).markInput());
-        
+                .entries(oDisplay.getInputEntries().get(1)).markInput());
+
         // output slot
         widgets.add(Widgets.createSlot(new Point(x + 70, y + 20))
-                      .entries(oDisplay.getOutputEntries().get(0)).markOutput());
-        
+                .entries(oDisplay.getOutputEntries().get(0)).markOutput());
+
         // collision speed label
         widgets.add(Widgets.createLabel(
-          new Point(x + 6, y + bounds.height - 12),
-          Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
+                new Point(x + 6, y + bounds.height - 12),
+                Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
         ).leftAligned().color(0xFFFFFF).noShadow());
-        
+
         return widgets;
     }
-    
+
     @Override
     public CategoryIdentifier<? extends Display> getCategoryIdentifier() {
         return CategoryIdentifier.of(recipeType.getIdentifier());
     }
-    
+
     @Override
     public Component getTitle() {
         return Component.translatable("rei.process." + recipeType.getIdentifier());
     }
-    
+
     @Override
     public Renderer getIcon() {
         return EntryStacks.of(icon);

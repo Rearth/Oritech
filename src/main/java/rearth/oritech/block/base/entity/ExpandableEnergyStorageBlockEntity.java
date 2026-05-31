@@ -55,33 +55,33 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockEntity implements ItemProvider, EnergyProvider, MachineAddonController,
-                                                                                                   ScreenProvider, MenuProvider {
-    
+        ScreenProvider, MenuProvider {
+
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> connectedAddons = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
     private final List<BlockPos> openSlots = new ArrayList<>();
     @SyncField(SyncType.GUI_OPEN)
     private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
-    
+
     @SyncField(SyncType.GUI_TICK)
     private boolean redstonePowered;
-    
+
     @SyncField(SyncType.GUI_TICK)
     public DynamicStatisticEnergyStorage.EnergyStatistics currentStats;
-    
+
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
-    
+
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public int rfOutputOverride = -1;
-    
+
     //own storage
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(
-      getDefaultCapacity(),
-      getDefaultInsertRate(),
-      getDefaultExtractionRate(),
-      this::setChanged) {
+            getDefaultCapacity(),
+            getDefaultInsertRate(),
+            getDefaultExtractionRate(),
+            this::setChanged) {
         @Override
         public int extract(int amount, TransactionContext transaction) {
             if (rfOutputOverride > 0) {
@@ -90,317 +90,317 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
             return super.extract(amount, transaction);
         }
     };
-    
+
     private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
-    
+
     public ExpandableEnergyStorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
-    
+
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (level.isClientSide()) return;
-        
+
         energyStorage.tick((int) level.getGameTime());
-        
+
         if (!redstonePowered)
             outputEnergy();
-        
+
         inputFromCrystal();
     }
-    
+
     private void inputFromCrystal() {
         if (energyStorage.energy >= energyStorage.capacity || inventory.getResource(0).isEmpty()) return;
-        
+
         if (!inventory.getResource(0).getItem().equals(ItemContent.OVERCHARGED_CRYSTAL.get())) return;
-        
+
         try (var transaction = Transaction.openRoot()) {
             var inserted = energyStorage.insert(OritechConfig.overchargedCrystalChargeRate.get(), transaction);
             if (inserted > 0) transaction.commit();
         }
     }
-    
+
     private void outputEnergy() {
-        
+
         if (energyStorage.getAmountAsLong() <= 0 || !(level instanceof ServerLevel serverLevel)) return;
-        
+
         chargeItems();
-        
+
         if (cachedOutputTarget == null) {
             var target = getOutputPosition(worldPosition, getFacing());
             cachedOutputTarget = BlockCapabilityCache.create(Capabilities.Energy.BLOCK, serverLevel, target.getB(), target.getA().getOpposite());
         }
-        
+
         var available = Math.min(energyStorage.getAmountAsLong(), energyStorage.getMaxExtract());
-        
+
         try (var transaction = Transaction.openRoot()) {
             var candidate = cachedOutputTarget.getCapability();
             if (candidate != null) {
                 var inserted = candidate.insert((int) available, transaction);
                 if (inserted <= 0) return;
-                
+
                 energyStorage.internalExtract(inserted, transaction);
                 transaction.commit();
             }
         }
     }
-    
+
     private void chargeItems() {
-        
+
         var heldStack = inventory.getStacks().get(0);
         if (heldStack.isEmpty() || heldStack.getCount() > 1) return;
-        
+
         try (var transaction = Transaction.openRoot()) {
-            
+
             var candidate = heldStack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
             if (candidate == null) return;
-            
+
             var available = Math.min(energyStorage.getAmountAsLong(), energyStorage.getMaxExtract());
             var inserted = candidate.insert((int) available, transaction);
             if (inserted <= 0) return;
-            
+
             energyStorage.internalExtract(inserted, transaction);
-            
+
             transaction.commit();
-            
+
         }
     }
-    
+
     public static Tuple<Direction, BlockPos> getOutputPosition(BlockPos pos, Direction facing) {
         var blockInFront = (BlockPos) Geometry.offsetToWorldPosition(facing, new Vec3i(-1, 0, 0), pos);
         var worldOffset = blockInFront.subtract(pos);
         var direction = Direction.getApproximateNearest(worldOffset.getX(), worldOffset.getY(), worldOffset.getZ());
-        
+
         return new Tuple<>(direction, blockInFront);
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        
+
         serializeAddonData(output);
-        
+
         energyStorage.serialize(output);
         inventory.serialize(output);
-        
+
         output.putBoolean("redstone", redstonePowered);
         output.putInt("rfOutputOverride", rfOutputOverride);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        
+
         deserializeAddonData(input);
-        
+
         energyStorage.deserialize(input);
         inventory.deserialize(input);
-        
+
         redstonePowered = input.getBooleanOr("redstone", false);
         rfOutputOverride = input.getIntOr("rfOutputOverride", -1);
     }
-    
+
     @Override
     public void preNetworkUpdate(SyncType type) {
         super.preNetworkUpdate(type);
         currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
     }
-    
+
     public Direction getFacing() {
         return getBlockState().getValue(SmallStorageBlock.TARGET_DIR);
     }
-    
+
     @Override
     public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
-    
+
     @Override
     public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         if (direction == null)
             return energyStorage;
-        
+
         if (direction.equals(getFacing())) {
             return energyStorage.getOutputStorage();
         } else {
             return energyStorage.getInputStorage();
         }
     }
-    
+
     @Override
     public List<BlockPos> getConnectedAddons() {
         return connectedAddons;
     }
-    
+
     @Override
     public List<BlockPos> getOpenAddonSlots() {
         return openSlots;
     }
-    
+
     @Override
     public Direction getFacingForAddon() {
         var facing = Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(SmallStorageBlock.TARGET_DIR);
-        
+
         if (facing.equals(Direction.UP) || facing.equals(Direction.DOWN))
             return Direction.NORTH;
-        
+
         return facing;
     }
-    
+
     @Override
     public DynamicEnergyStorage getStorageForAddon() {
         return energyStorage;
     }
-    
+
     @Override
     public StacksResourceHandler<ItemStack, ItemResource> getInventoryForAddon() {
         return inventory;
     }
-    
+
     @Override
     public ScreenProvider getScreenProvider() {
         return this;
     }
-    
+
     @Override
     public BaseAddonData getBaseAddonData() {
         return addonData;
     }
-    
+
     @Override
     public void setBaseAddonData(BaseAddonData data) {
         this.addonData = data;
     }
-    
+
     @Override
     public void updateEnergyContainer() {
         MachineAddonController.super.updateEnergyContainer();
         energyStorage.maxExtract = getDefaultExtractionRate() + addonData.energyBonusTransfer();
-        
+
     }
-    
+
     @Override
     public float getDisplayedEnergyTransfer() {
         return energyStorage.maxInsert;
     }
-    
+
     public abstract long getDefaultExtractionRate();
-    
-    
+
+
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
         buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
     }
-    
+
     @Override
     public Component getDisplayName() {
         return Component.literal("");
     }
-    
+
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
         return new UpgradableOritechScreenHandler(syncId, playerInventory, this);
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(new GuiSlot(0, 40, 38));
     }
-    
+
     @Override
     public float getDisplayedEnergyUsage() {
         return 0;
     }
-    
+
     @Override
     public float getProgress() {
         return 0;
     }
-    
-    
+
+
     @Override
     public BlockPos getPosForAddon() {
         return getBlockPos();
     }
-    
+
     @Override
     public Level getWorldForAddon() {
         return getLevel();
     }
-    
+
     @Override
     public InventoryInputMode getInventoryInputMode() {
         return InventoryInputMode.FILL_LEFT_TO_RIGHT;
     }
-    
+
     @Override
     public boolean inputOptionsEnabled() {
         return false;
     }
-    
+
     @Override
     public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.STORAGE_SCREEN;
     }
-    
+
     @Override
     public boolean showProgress() {
         return false;
     }
-    
+
     @Override
     public Property<Direction> getBlockFacingProperty() {
         return SmallStorageBlock.TARGET_DIR;
     }
-    
+
     public void setRedstonePowered(boolean isPowered) {
         this.redstonePowered = isPowered;
     }
-    
+
     @Override
     public boolean hasRedstoneControlAvailable() {
         return true;
     }
-    
+
     @Override
     public int receivedRedstoneSignal() {
         if (redstonePowered) return 15;
         return level.getBestNeighborSignal(worldPosition);
     }
-    
+
     @Override
     public String currentRedstoneEffect() {
         if (receivedRedstoneSignal() > 0) return "tooltip.oritech.redstone_disabled_storage";
         return "tooltip.oritech.redstone_enabled_direct";
     }
-    
+
     @Override
     public BarConfiguration getEnergyConfiguration() {
         return new BarConfiguration(8, 24, 17, 54 + 20);
     }
-    
+
     public static void handleLimitPacket(StorageLimitPacket payload, IPayloadContext context) {
         var level = context.player().level();
         if (level == null) return;
         var storageCandidate = level.getBlockEntity(payload.position());
         if (!(storageCandidate instanceof ExpandableEnergyStorageBlockEntity storageEntity)) return;
-        
+
         storageEntity.rfOutputOverride = payload.limit();
         storageEntity.setChanged();
-        
+
     }
-    
+
     public record StorageLimitPacket(BlockPos position, int limit) implements CustomPacketPayload {
-        
+
         public static final Type<StorageLimitPacket> PACKET_ID = new Type<>(Oritech.id("storage_limit"));
-        
+
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;

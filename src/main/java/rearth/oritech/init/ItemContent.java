@@ -26,9 +26,9 @@ import java.util.List;
 
 @SuppressWarnings("NullableProblems")
 public class ItemContent {
-    
+
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Oritech.MOD_ID);
-    
+
     @ItemGroupTarget(Groups.COMPONENTS)
     @Compostable(0.65F)
     public static final DeferredItem<Item> BANANA = ITEMS.registerItem("banana", Item::new, props -> props.food(Foods.APPLE));
@@ -38,7 +38,7 @@ public class ItemContent {
     public static final DeferredItem<Item> WEED_KILLER = ITEMS.registerItem("weed_killer", WeedKiller::new, props -> props.stacksTo(1));
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
-    
+
     // region metals
     // nickel
     public static final DeferredItem<Item> NICKEL_INGOT = ITEMS.registerSimpleItem("nickel_ingot");
@@ -93,7 +93,7 @@ public class ItemContent {
     public static final DeferredItem<Item> STEEL_INGOT = ITEMS.registerSimpleItem("steel_ingot");
     public static final DeferredItem<Item> STEEL_DUST = ITEMS.registerSimpleItem("steel_dust");
     //endregion
-    
+
     // region crafting components
     public static final DeferredItem<Item> COAL_DUST = ITEMS.registerSimpleItem("coal_dust");
     public static final DeferredItem<Item> CARBON_FIBRE_STRANDS = ITEMS.registerSimpleItem("carbon_fibre_strands");
@@ -124,12 +124,12 @@ public class ItemContent {
     public static final DeferredItem<Item> PACKED_WHEAT = ITEMS.registerSimpleItem("packed_wheat");
     public static final DeferredItem<Item> QUARTZ_DUST = ITEMS.registerSimpleItem("quartz_dust");
     public static final DeferredItem<Item> UNSTABLE_CONTAINER = ITEMS.registerItem("unstable_container", props -> new UnstableContainerItem(props.stacksTo(1), 0.23f, "unstable_container"));
-    
+
     // bio
     @Compostable(0.3F)
     public static final DeferredItem<Item> BIOMASS = ITEMS.registerItem("biomass", Item::new, props -> props.food(Foods.POISONOUS_POTATO));
     public static final DeferredItem<Item> SOLID_BIOFUEL = ITEMS.registerSimpleItem("solid_biofuel");
-    
+
     // reactor items
     public static final DeferredItem<Item> RAW_URANIUM = ITEMS.registerSimpleItem("raw_uranium");
     public static final DeferredItem<Item> URANIUM_GEM = ITEMS.registerSimpleItem("uranium_gem");
@@ -141,7 +141,7 @@ public class ItemContent {
     public static final DeferredItem<Item> URANIUM_PELLET = ITEMS.registerItem("uranium_pellet", props -> new CustomTooltipItem(props, "tooltip.oritech.uranium_pellet"));
     public static final DeferredItem<Item> SMALL_PLUTONIUM_PELLET = ITEMS.registerItem("small_plutonium_pellet", props -> new CustomTooltipItem(props, "tooltip.oritech.small_plutonium_pellet"));
     public static final DeferredItem<Item> PLUTONIUM_PELLET = ITEMS.registerItem("plutonium_pellet", props -> new CustomTooltipItem(props, "tooltip.oritech.plutonium_pellet"));
-    
+
     // colors
     public static final DeferredItem<Item> DIAMOND_PAINT = ITEMS.registerItem("diamond_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.DIAMOND));
     public static final DeferredItem<Item> REDSTONE_PAINT = ITEMS.registerItem("redstone_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.REDSTONE));
@@ -152,27 +152,27 @@ public class ItemContent {
     public static final DeferredItem<Item> INDUSTRIAL_PAINT = ITEMS.registerItem("industrial_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.INDUSTRIAL));
     public static final DeferredItem<Item> NETHERITE_PAINT = ITEMS.registerItem("netherite_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.NETHERITE));
     public static final DeferredItem<Item> SCULK_PAINT = ITEMS.registerItem("sculk_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.SCULK));
-    
+
     // tank items (with custom item class)
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
     public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
-    
-    
+
+
     public enum Groups {
         MACHINES, COMPONENTS, EQUIPMENT, DECORATIVE, NONE
     }
-    
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface NoModelGeneration {
     }
-    
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface ItemGroupTarget {
         Groups value();
     }
-    
+
     // todo (both here and in blockcontent)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})

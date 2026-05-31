@@ -18,46 +18,46 @@ import rearth.oritech.api.networking.NetworkManager;
 import java.util.concurrent.CompletableFuture;
 
 public class ParticleContent {
-    
+
     public enum EffectType {
         HIGHLIGHT_BLOCK, WEED_KILLER, DEBUG_BLOCK, WANDERING_SOUL,
         LASER_BOOM, CATALYST_CONNECTION, BLACK_HOLE_EMISSION, ACCELERATING
     }
-    
+
     // public stuff
-    
+
     public static void HighlightBlock(Level level, Vec3 pos) {
         sendParticle(level, new Payload(EffectType.HIGHLIGHT_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
-    
+
     public static void DebugBlock(Level level, Vec3 pos) {
         sendParticle(level, new Payload(EffectType.DEBUG_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
-    
+
     public static void Accelerating(Level level, Vec3 pos) {
         sendParticle(level, new Payload(EffectType.ACCELERATING, pos, Vec3.ZERO, Vec3.ZERO, 0));
     }
-    
+
     public static void WeedKiller(Level level, Vec3 start, Vec3 end) {
         sendParticle(level, new Payload(EffectType.WEED_KILLER, start, start, end, 0));
     }
-    
+
     public static void WanderingSoul(Level level, Vec3 pos, Vec3 offset, int duration) {
         sendParticle(level, new Payload(EffectType.WANDERING_SOUL, pos, offset, Vec3.ZERO, duration));
     }
-    
+
     public static void LaserBoom(Level level, Vec3 start, Vec3 end) {
         sendParticle(level, new Payload(EffectType.LASER_BOOM, start, end, Vec3.ZERO, 0));
     }
-    
+
     public static void CatalystConnection(Level level, Vec3 source, Vec3 dest) {
         sendParticle(level, new Payload(EffectType.CATALYST_CONNECTION, source, source, dest, 0));
     }
-    
+
     public static void BlackHoleEmission(Level level, Vec3 origin, Vec3 target) {
         sendParticle(level, new Payload(EffectType.BLACK_HOLE_EMISSION, origin, target, Vec3.ZERO, 0));
     }
-    
+
     private static void sendParticle(Level level, Payload payload) {
         if (level instanceof ServerLevel sl) {
             double radius = 64;
@@ -71,13 +71,13 @@ public class ParticleContent {
             handleOnClient(payload, level, null);
         }
     }
-    
+
     // client handler
-    
+
     public static void handleOnClient(Payload payload, IPayloadContext context) {
         context.enqueueWork(() -> handleOnClient(payload, context.player().level(), context.player().registryAccess()));
     }
-    
+
     public static void handleOnClient(Payload payload, Level level, RegistryAccess access) {
         var type = EffectType.values()[payload.effectId];
         switch (type) {
@@ -97,35 +97,35 @@ public class ParticleContent {
                 spawnLineStaggered(ParticleTypes.SONIC_BOOM, level, payload.pos, payload.data1, count, 20);
             }
             case CATALYST_CONNECTION ->
-              spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
+                    spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
             case BLACK_HOLE_EMISSION -> {
                 var dist = (int) payload.data1.distanceTo(payload.pos);
                 spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.random.nextInt(3), 0.2f);
             }
         }
     }
-    
+
     // client utilities
-    
+
     private static void spawnCubeOutline(ParticleOptions particle, Vec3 origin, float size, int duration, int segments) {
         spawnLineWithAge(particle, origin, origin.add(size, 0, 0), segments, duration);
         spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
         spawnLineWithAge(particle, origin, origin.add(0, 0, size), segments, duration);
         spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(size, 0, size), segments, duration);
-        
+
         origin = origin.add(0, size, 0);
-        
+
         spawnLineWithAge(particle, origin, origin.add(size, 0, 0), segments, duration);
         spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
         spawnLineWithAge(particle, origin, origin.add(0, 0, size), segments, duration);
         spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(size, 0, size), segments, duration);
-        
+
         spawnLineWithAge(particle, origin, origin.add(0, -size, 0), segments, duration);
         spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, -size, 0), segments, duration);
         spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(0, -size, size), segments, duration);
         spawnLineWithAge(particle, origin.add(size, 0, size), origin.add(size, -size, size), segments, duration);
     }
-    
+
     private static void spawnLineWithAge(ParticleOptions particle, Vec3 start, Vec3 end, float count, int maxAge) {
         var mc = Minecraft.getInstance();
         Vec3 step = end.subtract(start).scale(1f / count);
@@ -135,34 +135,34 @@ public class ParticleContent {
             start = start.add(step);
         }
     }
-    
+
     private static void spawnWithVelocityAndMaxAge(ParticleOptions particle, Vec3 pos, Vec3 velocity, int maxAge) {
         var p = Minecraft.getInstance().particleEngine.createParticle(particle, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
         if (p != null) p.setLifetime(maxAge);
     }
-    
+
     private static void spawnLine(ParticleOptions particle, Level level, Vec3 start, Vec3 end, int count, float spread) {
         Vec3 diff = end.subtract(start);
         for (int i = 0; i < count; i++) {
             double t = count > 1 ? (double) i / (count - 1) : 0;
             Vec3 pos = start.add(diff.scale(t));
             level.addParticle(particle,
-              pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
-              pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
-              pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
-              0, 0, 0);
+                    pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
+                    pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
+                    pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
+                    0, 0, 0);
         }
     }
-    
+
     private static void spawnEnchantParticles(Level level, Vec3 source, Vec3 dest, float spread) {
         Vec3 diff = dest.subtract(source);
         level.addParticle(ParticleTypes.ENCHANT,
-          source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
-          source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
-          source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
-          diff.x, diff.y, diff.z);
+                source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
+                source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
+                source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
+                diff.x, diff.y, diff.z);
     }
-    
+
     private static void spawnLineStaggered(ParticleOptions particle, Level level, Vec3 start, Vec3 end, float count, long pauseMillis) {
         var step = end.subtract(start).scale(1f / count);
         CompletableFuture.runAsync(() -> {
@@ -177,28 +177,28 @@ public class ParticleContent {
             }
         });
     }
-    
+
     // Network payload
-    
+
     public record Payload(int effectId, Vec3 pos, Vec3 data1, Vec3 data2, int extraInt) implements CustomPacketPayload {
         public static final Type<Payload> PACKET_ID = new Type<>(Oritech.id("complex_particle"));
-        
+
         Payload(EffectType type, Vec3 pos, Vec3 data1, Vec3 data2, int extraInt) {
             this(type.ordinal(), pos, data1, data2, extraInt);
         }
-        
+
         public static final StreamCodec<RegistryFriendlyByteBuf, Payload> PACKET_CODEC = new StreamCodec<>() {
             @Override
             public Payload decode(RegistryFriendlyByteBuf buf) {
                 return new Payload(
-                  buf.readInt(),
-                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                  NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
-                  buf.readInt()
+                        buf.readInt(),
+                        NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                        NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                        NetworkManager.VEC3D_PACKET_CODEC.decode(buf),
+                        buf.readInt()
                 );
             }
-            
+
             @Override
             public void encode(RegistryFriendlyByteBuf buf, Payload value) {
                 buf.writeInt(value.effectId);
@@ -208,15 +208,15 @@ public class ParticleContent {
                 buf.writeInt(value.extraInt);
             }
         };
-        
+
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;
         }
     }
-    
+
     public static void registerParticles() {
         Oritech.LOGGER.debug("Oritech particles are registered via clientbound payload handlers");
     }
-    
+
 }

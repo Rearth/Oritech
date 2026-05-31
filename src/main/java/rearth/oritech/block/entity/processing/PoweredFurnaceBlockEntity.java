@@ -24,124 +24,124 @@ import java.util.List;
 import java.util.Objects;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
-    
+
     private final float FURNACE_SPEED_MULTIPLIER = OritechConfig.processingMachines.furnaceData.speedMultiplier.get().floatValue();
-    
+
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.POWERED_FURNACE_ENTITY.get(), pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
     }
-    
+
     @Override
     public long getDefaultCapacity() {
         return OritechConfig.processingMachines.furnaceData.energyCapacity.get();
     }
-    
+
     @Override
     public long getDefaultInsertRate() {
         return OritechConfig.processingMachines.furnaceData.maxEnergyInsertion.get();
     }
-    
+
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
         return RecipeContent.ASSEMBLER.get();
     }   // not used in this special case
-    
+
     @Override
     protected float calculateEnergyUsage() {
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier()) / 2;
     }
-    
+
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        
+
         if (!isAssembled(state)) return;
-        
+
         var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
-        
+
         if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1))) {
             if (hasEnoughEnergy()) {
-                
+
                 var activeRecipe = recipeCandidate.get().value();
                 useEnergy();
                 progress++;
                 lastWorkedAt = level.getGameTime();
-                
+
                 if (level.random.nextFloat() > 0.8)
                     if (level instanceof ServerLevel sl)
                         sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
-                
+
                 if (furnaceCraftingFinished(activeRecipe)) {
                     craftFurnaceItem(activeRecipe);
-                    
+
                     for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
                         if (!canAddToSlot(recipeCandidate.get().value().getResultItem(level.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty())
                             break;
                         craftFurnaceItem(activeRecipe);
                     }
-                    
+
                     resetProgress();
                 }
-                
+
                 setChanged();
-                
+
             }
         } else {
             // this happens if either the input slot is empty, or the output slot is blocked
             if (progress > 0) resetProgress();
         }
-        
+
         addBurstTicks();
-        
+
         if (level.getGameTime() % 18 == 0)
             updateFurnaceState(state);
-        
+
     }
-    
+
     private void updateFurnaceState(BlockState state) {
         var wasLit = state.getValue(BlockStateProperties.LIT);
         var isLit = isActivelyWorking();
-        
+
         if (wasLit != isLit) {
             level.setBlockAndUpdate(worldPosition, state.setValue(BlockStateProperties.LIT, isLit));
         }
-        
+
     }
-    
+
     private void craftFurnaceItem(SmeltingRecipe activeRecipe) {
         var result = activeRecipe.getResultItem(level.registryAccess());
         var outSlot = inventory.heldStacks.get(1);
         var inSlot = inventory.heldStacks.get(0);
-        
+
         inSlot.shrink(1);
         if (outSlot.isEmpty()) {
             inventory.heldStacks.set(1, result.copy());
         } else {
             outSlot.grow(result.getCount());
         }
-        
+
     }
-    
+
     private boolean furnaceCraftingFinished(SmeltingRecipe activeRecipe) {
         return progress >= activeRecipe.getCookingTime() * getSpeedMultiplier();
     }
-    
+
     private SingleRecipeInput getFurnaceInput() {
         return new SingleRecipeInput(getInputView().get(0));
     }
-    
+
     @SuppressWarnings("OptionalIsPresent")
     @Override
     public float getProgress() {
         if (progress == 0) return 0;
-        
+
         var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
         if (recipeCandidate.isPresent()) {
             return (float) progress / getRecipeDuration();
         }
-        
+
         return 0;
     }
-    
+
     @SuppressWarnings("OptionalIsPresent")
     @Override
     public int getRecipeDuration() {
@@ -149,53 +149,53 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         if (recipeCandidate.isPresent()) {
             return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());
         }
-        
+
         return 120;
     }
-    
+
     @Override
     public float getSpeedMultiplier() {
         return super.getSpeedMultiplier() * FURNACE_SPEED_MULTIPLIER;
     }
-    
+
     @Override
     public ContainerSlotAssignment getSlotAssignments() {
         return new ContainerSlotAssignment(0, 1, 1, 1);
     }
-    
+
     @Override
     public boolean inputOptionsEnabled() {
         return false;
     }
-    
+
     @Override
     public List<GuiSlot> getGuiSlots() {
         return List.of(
-          new GuiSlot(0, 56, 38),
-          new GuiSlot(1, 117, 38, true));
+                new GuiSlot(0, 56, 38),
+                new GuiSlot(1, 117, 38, true));
     }
-    
+
     @Override
     public MenuType<?> getScreenHandlerType() {
         return ModScreens.POWERED_FURNACE_SCREEN.get();
     }
-    
+
     @Override
     public int getInventorySize() {
         return 2;
     }
-    
+
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 1, 0)
+                new Vec3i(0, 1, 0)
         );
     }
-    
+
     @Override
     public List<Vec3i> getAddonSlots() {
         return List.of(
-          new Vec3i(0, -1, 0)
+                new Vec3i(0, -1, 0)
         );
     }
 }

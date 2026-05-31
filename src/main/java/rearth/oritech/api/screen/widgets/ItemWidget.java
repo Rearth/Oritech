@@ -13,48 +13,48 @@ import java.util.List;
  * Renders an ItemStack with optional count overlay and tooltip derived from the stack.
  */
 public class ItemWidget extends UIComponent {
-    
+
     private ItemStack stack;
     private boolean showOverlay = true;
     private boolean tooltipFromStack = true;
-    
+
     public ItemWidget(int x, int y, ItemStack stack) {
         super(x, y, 16, 16);
         this.stack = stack;
     }
-    
+
     public ItemWidget(int x, int y, int size, ItemStack stack) {
         super(x, y, size, size);
         this.stack = stack;
     }
-    
+
     public ItemStack getStack() {
         return stack;
     }
-    
+
     public void setStack(ItemStack stack) {
         this.stack = stack;
     }
-    
+
     public ItemWidget withShowOverlay(boolean show) {
         this.showOverlay = show;
         return this;
     }
-    
+
     public ItemWidget withTooltipFromStack(boolean fromStack) {
         this.tooltipFromStack = fromStack;
         return this;
     }
-    
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (stack == null || stack.isEmpty()) return;
-        
+
         int cx = contentX();
         int cy = contentY();
         int cw = contentWidth();
         int ch = contentHeight();
-        
+
         int targetSize = Math.min(cw, ch);
         if (targetSize != 16 && targetSize > 0) {
             float scale = targetSize / 16f;
@@ -71,18 +71,18 @@ public class ItemWidget extends UIComponent {
                 graphics.itemDecorations(Minecraft.getInstance().font, stack, cx, cy);
         }
     }
-    
+
     @Override
     public boolean hasTooltip() {
         boolean hasStackTooltip = tooltipFromStack && stack != null && !stack.isEmpty();
         return hasStackTooltip || super.hasTooltip();
     }
-    
+
     @Override
     public List<Component> getTooltip() {
         if (tooltipFromStack && stack != null && !stack.isEmpty()) {
             return Screen.getTooltipFromItem(
-              Minecraft.getInstance(), stack);
+                    Minecraft.getInstance(), stack);
         }
         return super.getTooltip();
     }

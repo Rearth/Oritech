@@ -21,33 +21,33 @@ import static rearth.oritech.block.blocks.decorative.TechDoorBlock.OPENED;
 
 // this is the upper section of the tech door
 public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
-    
+
     public TechDoorBlockHinge(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(OPENED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(OPENED);
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
+
     @Override
     public boolean isSignalSource(BlockState state) {
         return true;
     }
-    
+
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
-        
+
         // forward the event to bottom block
         if (level.isClientSide()) return;
         level.neighborChanged(pos.below(), sourceBlock, sourcePos);
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
         if (!level.isClientSide()) {
@@ -56,27 +56,27 @@ public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
                 Block.dropResources(belowState, level, pos.below());
             level.setBlockAndUpdate(pos.below(), Blocks.AIR.defaultBlockState());
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return TechDoorBlock.getClosedShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
-    
+
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         if (state.getValue(OPENED))
             return Shapes.empty();
         return super.getCollisionShape(state, level, pos, context);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.INVISIBLE;
     }
-    
+
     @Override
     protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
         return null;

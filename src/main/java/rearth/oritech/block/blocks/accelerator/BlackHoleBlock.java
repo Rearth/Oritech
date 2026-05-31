@@ -26,27 +26,27 @@ import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import java.util.List;
 
 public class BlackHoleBlock extends Block implements EntityBlock {
-    
+
     public BlackHoleBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BlackHoleBlockEntity(pos, state);
     }
-    
+
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return Block.box(3, 3, 3, 13, 13, 13);
     }
-    
+
     @Override
     protected RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -56,14 +56,14 @@ public class BlackHoleBlock extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         // yes this will also kill creative players. This is intentional. Don't annoy me about this by opening a bugfix PR
         // (looking at you jshipley)
         entity.kill();
     }
-    
+
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         double d = (double) pos.getX() + random.nextDouble();
@@ -71,7 +71,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
         double f = (double) pos.getZ() + random.nextDouble();
         level.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         tooltip.add(Component.translatable("tooltip.oritech.black_hole").withStyle(ChatFormatting.GOLD));

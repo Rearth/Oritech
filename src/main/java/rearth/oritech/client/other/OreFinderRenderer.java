@@ -26,53 +26,53 @@ import static net.minecraft.client.renderer.LevelRenderer.DIRECTIONS;
 import static net.minecraft.client.renderer.RenderStateShard.*;
 
 public class OreFinderRenderer {
-    
+
     public static List<BlockPos> renderedBlocks;
     public static long receivedAt;
-    
+
     private static final RenderType OVERLAY = RenderType.create("overlay",
-      DefaultVertexFormat.BLOCK,
-      VertexFormat.Mode.QUADS,
-      4194304,
-      true,
-      false,
-      RenderType.CompositeState.builder()
-        .setLightmapState(LIGHTMAP)
-        .setShaderState(RENDERTYPE_SOLID_SHADER)
-        .setTextureState(BLOCK_SHEET_MIPPED)
-        .setCullState(CULL)
-        .setOutputState(OUTLINE_TARGET)
-        .createCompositeState(false));
-    
+            DefaultVertexFormat.BLOCK,
+            VertexFormat.Mode.QUADS,
+            4194304,
+            true,
+            false,
+            RenderType.CompositeState.builder()
+                    .setLightmapState(LIGHTMAP)
+                    .setShaderState(RENDERTYPE_SOLID_SHADER)
+                    .setTextureState(BLOCK_SHEET_MIPPED)
+                    .setCullState(CULL)
+                    .setOutputState(OUTLINE_TARGET)
+                    .createCompositeState(false));
+
     public static void doRender(PoseStack matrices, Camera camera, MultiBufferSource vertexConsumers) {
         var level = Minecraft.getInstance().level;
         if (level == null || renderedBlocks == null) return;
         var age = level.getGameTime() - receivedAt;
-        
+
         if (age > 15) return;
-        
+
         for (var pos : renderedBlocks) {
             var state = level.getBlockState(pos);
-            
+
             matrices.pushPose();
             //Offset by the camera position so that the render is relative to the camera
             matrices.translate(pos.getX() - camera.getPosition().x, pos.getY() - camera.getPosition().y, pos.getZ() - camera.getPosition().z);
-            
-            
+
+
             var renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
             var vertexProvider = vertexConsumers.getBuffer(OVERLAY);
-            
+
             OreFinderRenderer.tesselateWithoutAO(renderer, level, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, level.random, 0, 0);
-            
+
             matrices.popPose();
         }
     }
-    
-    
+
+
     public static void tesselateWithoutAO(ModelBlockRenderer renderer, BlockAndTintGetter level, BakedModel model, BlockState state, BlockPos pos, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random, long seed, int packedOverlay) {
         BitSet bitSet = new BitSet(3);
         BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
-        
+
         for (Direction direction : DIRECTIONS) {
             random.setSeed(seed);
             List<BakedQuad> list = model.getQuads(state, direction, random);
@@ -84,13 +84,13 @@ public class OreFinderRenderer {
                 }
             }
         }
-        
+
         random.setSeed(seed);
         List<BakedQuad> list2 = model.getQuads(state, null, random);
         if (!list2.isEmpty()) {
             int i = LightTexture.FULL_BRIGHT;
             renderer.renderModelFaceFlat(level, state, pos, i, packedOverlay, true, poseStack, consumer, list2, bitSet);
         }
-        
+
     }
 }

@@ -8,16 +8,16 @@ import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import java.util.Objects;
 
 public class AcceleratorScreenHandler extends OritechScreenHandler {
-    
+
     protected final AcceleratorControllerBlockEntity accelerator;
-    
+
     public AcceleratorScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
-    
+
     public AcceleratorScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
-        
+
         accelerator = (AcceleratorControllerBlockEntity) this.blockEntity;
     }
 }

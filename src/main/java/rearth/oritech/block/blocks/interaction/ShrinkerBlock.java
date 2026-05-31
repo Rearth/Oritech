@@ -7,16 +7,16 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 
 public class ShrinkerBlock extends MultiblockMachine {
-    
+
     public ShrinkerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return ShrinkerBlockEntity.class;
     }
-    
+
     @Override
     protected boolean isSignalSource(BlockState state) {
         return true;

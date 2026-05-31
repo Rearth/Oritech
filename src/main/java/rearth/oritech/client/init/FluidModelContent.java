@@ -13,7 +13,7 @@ import rearth.oritech.util.ColorHelper;
 
 @EventBusSubscriber(modid = Oritech.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class FluidModelContent {
-    
+
     private static final Material GAS_DARK = new Material(Oritech.id("block/fluid/fluid_gas_dark"));
     private static final Material STRANGE_PALE = new Material(Oritech.id("block/fluid/fluid_strange_pale_2"));
     private static final Material STEAM = new Material(Oritech.id("block/fluid/fluid_steam"));
@@ -21,10 +21,10 @@ public final class FluidModelContent {
     private static final Material MOLTEN_METAL = new Material(Oritech.id("block/fluid/molten_metal"));
     private static final Material ROILING_PLASMA = new Material(Oritech.id("block/fluid/fluid_roiling_plasma"));
     private static final Material STRANGE_MIXTURE = new Material(Oritech.id("block/fluid/fluid_strange_mixture"));
-    
+
     private FluidModelContent() {
     }
-    
+
     @SubscribeEvent
     public static void registerFluidModels(RegisterFluidModelsEvent event) {
         event.register(new FluidModel.Unbaked(GAS_DARK, GAS_DARK, null, FluidTintSources.constant(ColorHelper.argb(0.478f, 0.478f, 0.478f))), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);

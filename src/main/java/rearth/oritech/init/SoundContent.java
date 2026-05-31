@@ -7,9 +7,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 
 public class SoundContent {
-    
+
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, Oritech.MOD_ID);
-    
+
     // public static final Holder<SoundEvent> CABLE_MOVING = SOUND_EVENTS.register("cable_moving", () -> SoundEvent.createVariableRangeEvent(SOUND_EVENTS.id("cable_moving")));
     public static final Holder<SoundEvent> CABLE_MOVING = SOUND_EVENTS.register("cable_moving", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> SERVO_NOISES = SOUND_EVENTS.register("servo_noises", SoundEvent::createVariableRangeEvent);
@@ -36,5 +36,5 @@ public class SoundContent {
     public static final Holder<SoundEvent> NUKE_EXPLOSION = SOUND_EVENTS.register("nuke_explosion", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> ELECTRIC_SHOCK = SOUND_EVENTS.register("electric_shock", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> BEDROCK_EXTRACTOR = SOUND_EVENTS.register("bedrock_extractor", SoundEvent::createVariableRangeEvent);
-    
+
 }

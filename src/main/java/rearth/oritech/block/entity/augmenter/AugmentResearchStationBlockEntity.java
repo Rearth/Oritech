@@ -20,79 +20,79 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AugmentResearchStationBlockEntity extends BlockEntity implements MultiblockMachineController {
-    
+
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
     private float coreQuality = 1f;
-    
+
     public AugmentResearchStationBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         serializeMultiblock(output);
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         deserializeMultiblock(input);
     }
-    
+
     @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
-          new Vec3i(0, 0, 1),
-          new Vec3i(0, 1, 1),
-          new Vec3i(0, 1, 0)
+                new Vec3i(0, 0, 1),
+                new Vec3i(0, 1, 1),
+                new Vec3i(0, 1, 0)
         );
     }
-    
+
     @Override
     public Direction getFacingForMultiblock() {
         var state = getBlockState();
         return state.getValue(BlockStateProperties.FACING).getOpposite();
     }
-    
+
     @Override
     public BlockPos getPosForMultiblock() {
         return worldPosition;
     }
-    
+
     @Override
     public Level getWorldForMultiblock() {
         return level;
     }
-    
+
     @Override
     public ArrayList<BlockPos> getConnectedCores() {
         return coreBlocksConnected;
     }
-    
+
     @Override
     public void setCoreQuality(float quality) {
         this.coreQuality = quality;
     }
-    
+
     @Override
     public float getCoreQuality() {
         return coreQuality;
     }
-    
+
     @Override
     public StacksResourceHandler<ItemStack, ItemResource> getInventoryForMultiblock() {
         return null;
     }
-    
+
     @Override
     public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return null;
     }
-    
+
     @Override
     public void triggerSetupAnimation() {
-    
+
     }
 }

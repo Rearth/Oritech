@@ -28,80 +28,80 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
-    
+
     public BigSolarPanelBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BigSolarPanelEntity(pos, state);
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (!(entity instanceof BigSolarPanelEntity solarPanel)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var wasAssembled = state.getValue(ASSEMBLED);
-            
+
             if (!wasAssembled) {
                 var corePlaced = solarPanel.tryPlaceNextCore(player);
                 if (corePlaced) return InteractionResult.SUCCESS;
             }
-            
+
             var isAssembled = solarPanel.initMultiblock(state);
-            
+
             // first time created
             if (isAssembled && !wasAssembled) {
                 solarPanel.triggerSetupAnimation();
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!isAssembled) {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
             } else {
                 solarPanel.sendInfoMessageToPlayer(player);
             }
             return InteractionResult.SUCCESS;
-            
+
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

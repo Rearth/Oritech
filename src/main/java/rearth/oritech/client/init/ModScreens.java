@@ -11,17 +11,17 @@ import rearth.oritech.client.ui.*;
 import java.util.function.Supplier;
 
 public class ModScreens {
-    
+
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, Oritech.MOD_ID);
-    
+
     public static final Supplier<MenuType<OritechScreenHandler>> TREEFELLER_SCREEN = MENUS.register("treefeller_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
-    
+
     public static final Supplier<MenuType<OritechScreenHandler>> ATOMIC_FORGE_SCREEN = MENUS.register("atomic_forge_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> TANK_SCREEN = MENUS.register("tank_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> CHARGER_SCREEN = MENUS.register("charger_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> FUEL_PORT_SCREEN = MENUS.register("fuel_port_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> AUGMENTER_INV_SCREEN = MENUS.register("augmenter_inv_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
-    
+
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> LASER_SCREEN = MENUS.register("laser_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> PULVERIZER_SCREEN = MENUS.register("pulverizer_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> GRINDER_SCREEN = MENUS.register("grinder_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
@@ -40,9 +40,9 @@ public class ModScreens {
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> DESTROYER_SCREEN = MENUS.register("destroyer_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> PLACER_SCREEN = MENUS.register("placer_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> FERTILIZER_SCREEN = MENUS.register("fertilizer_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
-    
+
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> SHRINKER_SCREEN = MENUS.register("shrinker_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
-    
+
     public static final Supplier<MenuType<ReactorScreenHandler>> REACTOR_SCREEN = MENUS.register("reactor_screen", () -> IMenuTypeExtension.create(ReactorScreenHandler::new));
     public static final Supplier<MenuType<CatalystScreenHandler>> CATALYST_SCREEN = MENUS.register("catalyst_screen", () -> IMenuTypeExtension.create(CatalystScreenHandler::new));
     public static final Supplier<MenuType<EnchanterScreenHandler>> ENCHANTER_SCREEN = MENUS.register("enchanter_screen", () -> IMenuTypeExtension.create(EnchanterScreenHandler::new));
@@ -52,15 +52,15 @@ public class ModScreens {
     public static final Supplier<MenuType<RedstoneAddonScreenHandler>> REDSTONE_ADDON_SCREEN = MENUS.register("redstone_addon_screen", () -> IMenuTypeExtension.create(RedstoneAddonScreenHandler::new));
     public static final Supplier<MenuType<RefineryScreenHandler>> REFINERY_SCREEN = MENUS.register("refinery_screen", () -> IMenuTypeExtension.create(RefineryScreenHandler::new));
     public static final Supplier<MenuType<TaintedRefineryScreenHandler>> TAINTED_REFINERY_SCREEN = MENUS.register("tainted_refinery_screen", () -> IMenuTypeExtension.create(TaintedRefineryScreenHandler::new));
-    
+
     public static final Supplier<MenuType<DroneScreenHandler>> DRONE_SCREEN = MENUS.register("drone_screen", () -> IMenuTypeExtension.create(DroneScreenHandler::new));
     public static final Supplier<MenuType<CentrifugeScreenHandler>> CENTRIFUGE_SCREEN = MENUS.register("centrifuge_screen", () -> IMenuTypeExtension.create(CentrifugeScreenHandler::new));
     public static final Supplier<MenuType<InventoryProxyScreenHandler>> INVENTORY_PROXY_SCREEN = MENUS.register("inventory_proxy_screen", () -> IMenuTypeExtension.create(InventoryProxyScreenHandler::new));
-    
+
     // todo OritechClient full rewrite + wire this in (similar to how Oritech class does it)
     public static void registerScreens(RegisterMenuScreensEvent event) {
-        
-        
+
+
         event.register(TREEFELLER_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
         event.register(TANK_SCREEN.get(), TankScreen::new);
         event.register(ATOMIC_FORGE_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
@@ -72,7 +72,7 @@ public class ModScreens {
         event.register(AUGMENTER_INV_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
         event.register(REFINERY_SCREEN.get(), RefineryScreen::new);
         event.register(TAINTED_REFINERY_SCREEN.get(), TaintedRefineryScreen::new);
-        
+
         event.register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         event.register(GRINDER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         event.register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
@@ -92,7 +92,7 @@ public class ModScreens {
         event.register(LASER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
         event.register(CENTRIFUGE_SCREEN.get(), UpgradableOritechScreen<CentrifugeScreenHandler>::new);
         event.register(SHRINKER_SCREEN.get(), ShrinkerScreen::new);
-        
+
         event.register(INVENTORY_PROXY_SCREEN.get(), InventoryProxyScreen::new);
         event.register(REACTOR_SCREEN.get(), ReactorScreen::new);
         event.register(MODIFIER_SCREEN.get(), PlayerModifierScreen::new);

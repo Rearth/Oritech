@@ -19,37 +19,37 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
 
 public class MetalBeamBlock extends Block {
-    
+
     // 0 = foot, 1 = inner, 2 = head
     private static final IntegerProperty BEAM_STATE = IntegerProperty.create("beam", 0, 2);
-    
+
     private static final VoxelShape BEAM_SHAPE = Block.box(4, 0, 4, 12, 16, 12);
-    
+
     public MetalBeamBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(BEAM_STATE, 0));
     }
-    
+
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.setPlacedBy(level, pos, state, placer, itemStack);
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(BEAM_STATE);
     }
-    
+
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BEAM_SHAPE;
     }
-    
+
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return BEAM_SHAPE;
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
@@ -57,25 +57,25 @@ public class MetalBeamBlock extends Block {
         var pos = ctx.getClickedPos();
         return getTargetState(level, pos);
     }
-    
+
     private BlockState getTargetState(LevelAccessor level, BlockPos pos) {
         var isFrameSupport = level.getBlockState(pos).is(TagContent.MACHINE_FRAME_SUPPORT);
         var blockBelow = level.getBlockState(pos.below()).getBlock();
         var beamBelow = blockBelow.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME_BLOCK));
         var blockAbove = level.getBlockState(pos.above()).getBlock();
         var beamAbove = blockAbove.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME_BLOCK));
-        
+
         var state = defaultBlockState();
-        
+
         if (beamBelow && beamAbove)
             return state.setValue(BEAM_STATE, 1);
-        
+
         if (beamBelow)
             return state.setValue(BEAM_STATE, 2);
-        
+
         return state.setValue(BEAM_STATE, 0);
     }
-    
+
     @Override
     protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         return getTargetState(level, pos);

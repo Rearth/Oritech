@@ -40,118 +40,118 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class LaserArmBlock extends Block implements EntityBlock {
-    
+
     private static final LaserArmBlockBehavior DEFAULT_BLOCK_BEHAVIOR = new LaserArmBlockBehavior();
     public static final Map<Block, LaserArmBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     private static final LaserArmEntityBehavior DEFAULT_ENTITY_BEHAVIOR = new LaserArmEntityBehavior();
     public static final Map<EntityType<?>, LaserArmEntityBehavior> ENTITY_BEHAVIORS = new Object2ObjectOpenHashMap<>();
-    
+
     public LaserArmBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.FACING, Direction.UP));
         LaserArmBlockBehavior.registerDefaults();
         LaserArmEntityBehavior.registerDefaults();
     }
-    
+
     public static void registerBlockBehavior(Block targetBlock, LaserArmBlockBehavior behavior) {
         BLOCK_BEHAVIORS.put(targetBlock, behavior);
     }
-    
+
     public static void registerEntityBehavior(EntityType<?> entityType, LaserArmEntityBehavior behavior) {
         ENTITY_BEHAVIORS.put(entityType, behavior);
     }
-    
+
     public static LaserArmBlockBehavior getBehaviorForBlock(Block targetBlock) {
         return BLOCK_BEHAVIORS.getOrDefault(targetBlock, DEFAULT_BLOCK_BEHAVIOR);
     }
-    
+
     public static LaserArmEntityBehavior getBehaviorForEntity(EntityType<?> targetEntityType) {
         return ENTITY_BEHAVIORS.getOrDefault(targetEntityType, DEFAULT_ENTITY_BEHAVIOR);
     }
-    
+
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.FACING, ctx.getClickedFace());
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED);
         builder.add(BlockStateProperties.FACING);
     }
-    
+
     @Override
     public boolean isSignalSource(BlockState state) {
         return true;
     }
-    
+
     @Override
     public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
-        
+
         if (level.isClientSide()) return;
-        
+
         var isPowered = level.hasNeighborSignal(pos);
-        
+
         var laserEntity = (LaserArmBlockEntity) level.getBlockEntity(pos);
         laserEntity.setRedstonePowered(isPowered);
-        
+
     }
-    
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (!(entity instanceof LaserArmBlockEntity laserArm)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var wasAssembled = state.getValue(ASSEMBLED);
-            
+
             if (!wasAssembled) {
                 var corePlaced = laserArm.tryPlaceNextCore(player);
                 if (corePlaced) return InteractionResult.SUCCESS;
             }
-            
+
             var isAssembled = laserArm.initMultiblock(state);
-            
+
             // first time created
             if (isAssembled && !wasAssembled) {
                 laserArm.triggerSetupAnimation();
                 laserArm.initAddons();
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!isAssembled) {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
                 return InteractionResult.SUCCESS;
             }
-            
+
             laserArm.initAddons();
-            MenuRegistry.openExtendedMenu((ServerPlayer) player, laserArm);
-            
+            ((ServerPlayer) player).openMenu(laserArm, pos);
+
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (state.getValue(ASSEMBLED) && entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
-            
+
             if (entity instanceof MachineAddonController machineEntity) {
                 machineEntity.resetAddons();
             }
-            
+
             if (entity instanceof LaserArmBlockEntity storageBlock) {
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
@@ -160,26 +160,26 @@ public class LaserArmBlock extends Block implements EntityBlock {
                         level.addFreshEntity(itemEntity);
                     }
                 }
-                
+
                 storageBlock.inventory.heldStacks.clear();
                 storageBlock.inventory.setChanged();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new LaserArmBlockEntity(pos, state);
     }
-    
+
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
@@ -189,7 +189,7 @@ public class LaserArmBlock extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

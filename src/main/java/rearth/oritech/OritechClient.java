@@ -16,23 +16,23 @@ import rearth.oritech.item.tools.util.Helpers;
 
 
 public final class OritechClient {
-    
+
     public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.oritech.hotkey_category");
-    
+
     public static AugmentSelectionScreen activeScreen = null;
-    
+
     public static boolean laserActive = false;
-    
+
     public static void initialize() {
-        
+
         Oritech.LOGGER.info("Oritech client initialization");
         ModScreens.registerScreens();
-        
+
         KeyMappingRegistry.register(AUGMENT_SELECTOR);
-        
+
         // used mainly for prometheum pick
         ClientTickEvent.CLIENT_PRE.register(Helpers::onClientTickEvent);
-        
+
         // used for augment UI
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (AUGMENT_SELECTOR.consumeClick() && activeScreen == null) {
@@ -42,17 +42,17 @@ public final class OritechClient {
                 activeScreen.onClose();
             }
         });
-        
+
         ClientTickEvent.CLIENT_PRE.register(client -> {
             var player = client.player;
             if (player == null) return;
-            
+
             for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
                 if (augment.isEnabled(player))
                     augment.refreshClient(player);
             }
         });
-        
+
         // send mining laser use events to server
         ClientTickEvent.CLIENT_PRE.register(client -> {
             if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
@@ -61,19 +61,19 @@ public final class OritechClient {
                 laserActive = false;
             }
         });
-        
+
         ClientTickEvent.CLIENT_POST.register((client) -> {
             ClientZiplineHandler.onClientTick();
             ZiplineFxHandler.tick();
         });
-        
+
         // interrupt left mouse for portable lasers (only seems to work on fabric)
         ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
-                                                         handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
-        
+                handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
+
         Oritech.LOGGER.info("Oritech client initialization done");
     }
-    
+
     // returns true if the event is cancelled
     public static boolean handleMouseClicked(Minecraft client, int button, int action, int mods) {
         if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && button == 0 && client.screen == null) {
@@ -82,9 +82,9 @@ public final class OritechClient {
         }
         return false;
     }
-    
+
     public static void registerRenderers() {
-        
+
         Oritech.LOGGER.info("Registering oritech renderers");
         ModRenderers.registerRenderers();
     }

@@ -33,75 +33,75 @@ import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class DeepDrillBlock extends Block implements EntityBlock {
-    
+
     public DeepDrillBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED).add(BlockStateProperties.HORIZONTAL_FACING);
     }
-    
-    
+
+
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        
+
         if (!level.isClientSide()) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (!(entity instanceof DeepDrillEntity deepDrill)) {
                 return InteractionResult.SUCCESS;
             }
-            
+
             var wasAssembled = state.getValue(ASSEMBLED);
-            
+
             if (!wasAssembled) {
                 var corePlaced = deepDrill.tryPlaceNextCore(player);
                 if (corePlaced) return InteractionResult.SUCCESS;
             }
-            
+
             var isAssembled = deepDrill.initMultiblock(state);
-            
+
             // first time created
             if (isAssembled && !wasAssembled) {
                 deepDrill.triggerSetupAnimation();
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!isAssembled) {
                 player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
                 return InteractionResult.SUCCESS;
             }
-            
+
             if (!deepDrill.init(true)) {
                 player.sendSystemMessage(Component.translatable("message.oritech.deep_drill.ore_placement"));
                 return InteractionResult.SUCCESS;
             }
-            
+
         }
-        
+
         return InteractionResult.SUCCESS;
     }
-    
+
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-        
+
         if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
-            
+
             var entity = level.getBlockEntity(pos);
             if (entity instanceof MultiblockMachineController machineEntity) {
                 machineEntity.onControllerBroken();
             }
-            
+
             if (entity instanceof DeepDrillEntity storageBlock) {
                 var stacks = storageBlock.inventory.heldStacks;
                 for (var heldStack : stacks) {
@@ -110,26 +110,26 @@ public class DeepDrillBlock extends Block implements EntityBlock {
                         level.addFreshEntity(itemEntity);
                     }
                 }
-                
+
                 storageBlock.inventory.heldStacks.clear();
                 storageBlock.inventory.setChanged();
             }
         }
-        
+
         return super.playerWillDestroy(level, pos, state, player);
     }
-    
+
     @Override
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new DeepDrillEntity(pos, state);
     }
-    
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
@@ -138,7 +138,7 @@ public class DeepDrillBlock extends Block implements EntityBlock {
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);

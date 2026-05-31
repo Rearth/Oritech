@@ -18,18 +18,18 @@ import java.util.List;
 
 public class NbtBlockLootFunction extends LootItemConditionalFunction {
     public static final String NAME = "nbt_block_loot_function";
-    
+
     public NbtBlockLootFunction(List<LootItemCondition> conditions) {
         super(conditions);
     }
-    
+
     @Override
     public @NotNull ItemStack run(@NotNull ItemStack stack, LootContext context) {
-        
+
         // todo
-        
+
         var blockEntity = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        
+
         if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.hasStoredFluidForDrops()) {
             stack.set(ComponentContent.STORED_FLUID.get(), tankEntity.getStoredFluidForDrops());
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
@@ -38,19 +38,19 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
         } else if (blockEntity instanceof CombiAddonEntity combiAddon && combiAddon.storedData != null) {
             stack.set(ComponentContent.ADDON_DATA.get(), combiAddon.storedData);
         }
-        
+
         return stack;
     }
-    
+
     public static Builder<?> builder() {
         return LootItemConditionalFunction.simpleBuilder(NbtBlockLootFunction::new);
     }
-    
+
     @Override
     public MapCodec<NbtBlockLootFunction> codec() {
         return CODEC;
     }
-    
+
     public static final MapCodec<NbtBlockLootFunction> CODEC = RecordCodecBuilder.mapCodec(
-      instance -> LootItemConditionalFunction.commonFields(instance).apply(instance, NbtBlockLootFunction::new));
+            instance -> LootItemConditionalFunction.commonFields(instance).apply(instance, NbtBlockLootFunction::new));
 }

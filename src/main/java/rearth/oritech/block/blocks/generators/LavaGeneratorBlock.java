@@ -9,7 +9,7 @@ public class LavaGeneratorBlock extends MultiblockMachine {
     public LavaGeneratorBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return LavaGeneratorEntity.class;

@@ -3,15 +3,15 @@ package rearth.oritech.config;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class OritechConfig {
-    
+
     // Server config
     private static final ModConfigSpec.Builder COMMON = new ModConfigSpec.Builder();
-    
+
     // Machine settings
     static {
         COMMON.push("machineSettings");
     }
-    
+
     public static final ProcessingMachines processingMachines = new ProcessingMachines(COMMON);
     public static final Generators generators = new Generators(COMMON);
     public static final LaserArmConfig laserArmConfig = new LaserArmConfig(COMMON);
@@ -20,324 +20,324 @@ public class OritechConfig {
     public static final FertilizerConfig fertilizerConfig = new FertilizerConfig(COMMON);
     public static final MachineFrameConfig placerConfig = new MachineFrameConfig(COMMON, "placerConfig", 10, 5, 8, 64);
     public static final AddonConfig addonConfig = new AddonConfig(COMMON);
-    
+
     public static final ModConfigSpec.BooleanValue additiveAddons = COMMON
-                                                                      .comment("Whether addon bonuses are added additive or multiplicative")
-                                                                      .worldRestart()
-                                                                      .define("additiveAddons", true);
-    
+            .comment("Whether addon bonuses are added additive or multiplicative")
+            .worldRestart()
+            .define("additiveAddons", true);
+
     public static final ModConfigSpec.BooleanValue layeredExtenders = COMMON
-                                                                        .comment("When enabled, machine core quality determines how many layers of machine extenders can be used. If false, it's the direct amount.")
-                                                                        .define("layeredExtenders", false);
-    
+            .comment("When enabled, machine core quality determines how many layers of machine extenders can be used. If false, it's the direct amount.")
+            .define("layeredExtenders", false);
+
     public static final ModConfigSpec.DoubleValue blockBreakHardnessExponentialFactor = COMMON
-                                                                                          .comment("Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.")
-                                                                                          .defineInRange("blockBreakHardnessExponentialFactor", 0.5, 0.0, 10.0);
-    
+            .comment("Applies to the destroyer block and enderic laser. Lower = hardness has a lower effect on speed.")
+            .defineInRange("blockBreakHardnessExponentialFactor", 0.5, 0.0, 10.0);
+
     static {
         COMMON.pop();
     }
-    
+
     // Storage blocks
     static {
         COMMON.push("storageBlocks");
     }
-    
+
     public static final BasicMachineConfig smallEnergyStorage = new BasicMachineConfig(COMMON, "smallEnergyStorage", 1_000_000, 5_000, 5_000, 0);
     public static final BasicMachineConfig largeEnergyStorage = new BasicMachineConfig(COMMON, "largeEnergyStorage", 20_000_000, 10_000, 10_000, 0);
-    
+
     public static final ModConfigSpec.IntValue portableTankCapacityBuckets = COMMON
-                                                                               .comment("Portable tank fluid capacity in buckets")
-                                                                               .defineInRange("portableTankCapacityBuckets", 256, 1, Integer.MAX_VALUE);
-    
+            .comment("Portable tank fluid capacity in buckets")
+            .defineInRange("portableTankCapacityBuckets", 256, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue overchargedCrystalChargeRate = COMMON
-                                                                                .comment("Overcharged crystal energy generation rate in RF/t")
-                                                                                .defineInRange("overchargedCrystalChargeRate", 10, 1, Integer.MAX_VALUE);
-    
+            .comment("Overcharged crystal energy generation rate in RF/t")
+            .defineInRange("overchargedCrystalChargeRate", 10, 1, Integer.MAX_VALUE);
+
     static {
         COMMON.pop();
     }
-    
+
     // Logistics
     static {
         COMMON.push("logistics");
     }
-    
+
     public static final ModConfigSpec.IntValue itemPipeTransferAmount = COMMON
-                                                                          .comment("Items transferred per pipe cycle")
-                                                                          .worldRestart()
-                                                                          .defineInRange("itemPipeTransferAmount", 8, 1, Integer.MAX_VALUE);
-    
+            .comment("Items transferred per pipe cycle")
+            .worldRestart()
+            .defineInRange("itemPipeTransferAmount", 8, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue itemPipeIntervalDuration = COMMON
-                                                                            .comment("Ticks between item pipe transfers")
-                                                                            .worldRestart()
-                                                                            .defineInRange("itemPipeIntervalDuration", 5, 1, Integer.MAX_VALUE);
-    
+            .comment("Ticks between item pipe transfers")
+            .worldRestart()
+            .defineInRange("itemPipeIntervalDuration", 5, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.DoubleValue fluidPipeExtractAmountBuckets = COMMON
-                                                                                    .comment("Fluid extracted per pipe cycle in buckets")
-                                                                                    .worldRestart()
-                                                                                    .defineInRange("fluidPipeExtractAmountBuckets", 0.5, 0.0, 1000.0);
-    
+            .comment("Fluid extracted per pipe cycle in buckets")
+            .worldRestart()
+            .defineInRange("fluidPipeExtractAmountBuckets", 0.5, 0.0, 1000.0);
+
     public static final ModConfigSpec.IntValue fluidPipeExtractIntervalDuration = COMMON
-                                                                                    .comment("Ticks between fluid pipe extractions")
-                                                                                    .worldRestart()
-                                                                                    .defineInRange("fluidPipeExtractIntervalDuration", 3, 1, Integer.MAX_VALUE);
-    
+            .comment("Ticks between fluid pipe extractions")
+            .worldRestart()
+            .defineInRange("fluidPipeExtractIntervalDuration", 3, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.DoubleValue fluidPipeInternalStorageBuckets = COMMON
-                                                                                      .comment("Fluid pipe internal buffer size in buckets")
-                                                                                      .defineInRange("fluidPipeInternalStorageBuckets", 2.0, 0.0, 1000.0);
-    
+            .comment("Fluid pipe internal buffer size in buckets")
+            .defineInRange("fluidPipeInternalStorageBuckets", 2.0, 0.0, 1000.0);
+
     public static final ModConfigSpec.LongValue energyPipeTransferRate = COMMON
-                                                                           .comment("Energy pipe transfer rate in RF/t")
-                                                                           .defineInRange("energyPipeTransferRate", 10_000L, 0L, Long.MAX_VALUE);
-    
+            .comment("Energy pipe transfer rate in RF/t")
+            .defineInRange("energyPipeTransferRate", 10_000L, 0L, Long.MAX_VALUE);
+
     public static final ModConfigSpec.LongValue superConductorTransferRate = COMMON
-                                                                               .comment("Superconductor cable transfer rate in RF/t")
-                                                                               .defineInRange("superConductorTransferRate", 4_194_304L, 0L, Long.MAX_VALUE);
-    
+            .comment("Superconductor cable transfer rate in RF/t")
+            .defineInRange("superConductorTransferRate", 4_194_304L, 0L, Long.MAX_VALUE);
+
     public static final PowerPoleConfig poleConfig = new PowerPoleConfig(COMMON);
-    
+
     static {
         COMMON.pop();
     }
-    
+
     // Equipment
     static {
         COMMON.push("equipment");
     }
-    
+
     public static final BasicMachineConfig charger = new BasicMachineConfig(COMMON, "charger", 500_000, 10_000, 5_000, 0);
-    
+
     public static final ModConfigSpec.BooleanValue chainsawTreeCutting = COMMON
-                                                                           .comment("Enable tree cutting for the chainsaw")
-                                                                           .define("chainsawTreeCutting", true);
-    
+            .comment("Enable tree cutting for the chainsaw")
+            .define("chainsawTreeCutting", true);
+
     static {
         COMMON.pop();
     }
-    
+
     // Level generation
     static {
         COMMON.push("worldGeneration");
     }
-    
+
     public static final ModConfigSpec.BooleanValue easyFindFeatures = COMMON
-                                                                        .comment("Makes oil wells and bedrock ore nodes easier to find. Oil wells show a small fountain, ore nodes a boulder on the surface.")
-                                                                        .define("easyFindFeatures", true);
-    
+            .comment("Makes oil wells and bedrock ore nodes easier to find. Oil wells show a small fountain, ore nodes a boulder on the surface.")
+            .define("easyFindFeatures", true);
+
     static {
         COMMON.pop();
     }
-    
+
     // Reactor
     static {
         COMMON.push("reactor");
     }
-    
+
     public static final ModConfigSpec.BooleanValue safeMode = COMMON
-                                                                .comment("With safe mode enabled, the reactor enters a cooldown period instead of exploding when overheated")
-                                                                .define("safeMode", false);
-    
+            .comment("With safe mode enabled, the reactor enters a cooldown period instead of exploding when overheated")
+            .define("safeMode", false);
+
     public static final ModConfigSpec.IntValue safeModeCooldown = COMMON
-                                                                    .comment("Reactor safe mode cooldown duration in ticks")
-                                                                    .defineInRange("safeModeCooldown", 2400, 0, Integer.MAX_VALUE);
-    
+            .comment("Reactor safe mode cooldown duration in ticks")
+            .defineInRange("safeModeCooldown", 2400, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue maxSize = COMMON
-                                                           .comment("Maximum reactor multiblock size")
-                                                           .worldRestart()
-                                                           .defineInRange("maxSize", 64, 1, Integer.MAX_VALUE);
-    
+            .comment("Maximum reactor multiblock size")
+            .worldRestart()
+            .defineInRange("maxSize", 64, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue reactorMaxEnergyStored = COMMON
-                                                                          .comment("Maximum energy stored in the reactor in RF")
-                                                                          .worldRestart()
-                                                                          .defineInRange("reactorMaxEnergyStored", 50_000_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Maximum energy stored in the reactor in RF")
+            .worldRestart()
+            .defineInRange("reactorMaxEnergyStored", 50_000_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue reactorMaxEnergyOutput = COMMON
-                                                                          .comment("Maximum energy output in RF/t per energy port")
-                                                                          .worldRestart()
-                                                                          .defineInRange("reactorMaxEnergyOutput", 25_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Maximum energy output in RF/t per energy port")
+            .worldRestart()
+            .defineInRange("reactorMaxEnergyOutput", 25_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue rfPerPulse = COMMON
-                                                              .comment("RF generated per reactor pulse")
-                                                              .worldRestart()
-                                                              .defineInRange("rfPerPulse", 64, 0, Integer.MAX_VALUE);
-    
+            .comment("RF generated per reactor pulse")
+            .worldRestart()
+            .defineInRange("rfPerPulse", 64, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue absorberRate = COMMON
-                                                                .comment("Neutron absorber heat reduction rate")
-                                                                .worldRestart()
-                                                                .defineInRange("absorberRate", 16, 0, Integer.MAX_VALUE);
-    
+            .comment("Neutron absorber heat reduction rate")
+            .worldRestart()
+            .defineInRange("absorberRate", 16, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue ventBaseRate = COMMON
-                                                                .comment("Vent base cooling rate")
-                                                                .worldRestart()
-                                                                .defineInRange("ventBaseRate", 4, 0, Integer.MAX_VALUE);
-    
+            .comment("Vent base cooling rate")
+            .worldRestart()
+            .defineInRange("ventBaseRate", 4, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue ventRelativeRate = COMMON
-                                                                    .comment("Vent proportional cooling rate")
-                                                                    .worldRestart()
-                                                                    .defineInRange("ventRelativeRate", 100, 0, Integer.MAX_VALUE);
-    
+            .comment("Vent proportional cooling rate")
+            .worldRestart()
+            .defineInRange("ventRelativeRate", 100, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue maxHeat = COMMON
-                                                           .comment("Maximum heat before reactor meltdown")
-                                                           .worldRestart()
-                                                           .defineInRange("maxHeat", 2000, 0, Integer.MAX_VALUE);
-    
+            .comment("Maximum heat before reactor meltdown")
+            .worldRestart()
+            .defineInRange("maxHeat", 2000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue maxUnstableTicks = COMMON
-                                                                    .comment("Ticks before an overheated reactor explodes")
-                                                                    .worldRestart()
-                                                                    .defineInRange("maxUnstableTicks", 600, 0, Integer.MAX_VALUE);
-    
+            .comment("Ticks before an overheated reactor explodes")
+            .worldRestart()
+            .defineInRange("maxUnstableTicks", 600, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.BooleanValue boringNukes = COMMON
-                                                                   .comment("Disable fancy reactor explosion effects")
-                                                                   .define("boringNukes", false);
-    
+            .comment("Disable fancy reactor explosion effects")
+            .define("boringNukes", false);
+
     static {
         COMMON.pop();
     }
-    
+
     // Arcane
     static {
         COMMON.push("arcane");
     }
-    
+
     public static final ModConfigSpec.IntValue enchanterCostMultiplier = COMMON
-                                                                           .comment("Enchanter soul cost multiplier")
-                                                                           .defineInRange("enchanterCostMultiplier", 5, 0, Integer.MAX_VALUE);
-    
+            .comment("Enchanter soul cost multiplier")
+            .defineInRange("enchanterCostMultiplier", 5, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue catalystBaseSouls = COMMON
-                                                                     .comment("Catalyst base soul capacity")
-                                                                     .defineInRange("catalystBaseSouls", 50, 0, Integer.MAX_VALUE);
-    
+            .comment("Catalyst base soul capacity")
+            .defineInRange("catalystBaseSouls", 50, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue catalystRFPerSoul = COMMON
-                                                                     .comment("RF/t per catalyst soul capacity level increase")
-                                                                     .defineInRange("catalystRFPerSoul", 20, 0, Integer.MAX_VALUE);
-    
+            .comment("RF/t per catalyst soul capacity level increase")
+            .defineInRange("catalystRFPerSoul", 20, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue catalystCostMultiplier = COMMON
-                                                                          .comment("Catalyst soul cost multiplier")
-                                                                          .defineInRange("catalystCostMultiplier", 2, 0, Integer.MAX_VALUE);
-    
+            .comment("Catalyst soul cost multiplier")
+            .defineInRange("catalystCostMultiplier", 2, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue catalystHyperMultiplier = COMMON
-                                                                           .comment("Additional hyper enchanting cost multiplier")
-                                                                           .defineInRange("catalystHyperMultiplier", 2, 0, Integer.MAX_VALUE);
-    
+            .comment("Additional hyper enchanting cost multiplier")
+            .defineInRange("catalystHyperMultiplier", 2, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.DoubleValue catalystHyperExpFactor = COMMON
-                                                                             .comment("Exponential factor for hyper enchanting cost. Increase carefully, makes higher levels MUCH more expensive.")
-                                                                             .defineInRange("catalystHyperExpFactor", 1.15, 0.0, 100.0);
-    
+            .comment("Exponential factor for hyper enchanting cost. Increase carefully, makes higher levels MUCH more expensive.")
+            .defineInRange("catalystHyperExpFactor", 1.15, 0.0, 100.0);
+
     public static final ModConfigSpec.IntValue spawnerCostMultiplier = COMMON
-                                                                         .comment("Spawner soul cost multiplier")
-                                                                         .defineInRange("spawnerCostMultiplier", 1, 0, Integer.MAX_VALUE);
-    
+            .comment("Spawner soul cost multiplier")
+            .defineInRange("spawnerCostMultiplier", 1, 0, Integer.MAX_VALUE);
+
     static {
         COMMON.pop();
     }
-    
+
     // Particle accelerator
     static {
         COMMON.push("particleAccelerator");
     }
-    
+
     public static final ModConfigSpec.IntValue maxGateDist = COMMON
-                                                               .comment("Maximum particle gate distance")
-                                                               .defineInRange("maxGateDist", 10, 1, Integer.MAX_VALUE);
-    
+            .comment("Maximum particle gate distance")
+            .defineInRange("maxGateDist", 10, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.DoubleValue bendFactor = COMMON
-                                                                 .comment("Particle curve requirement factor")
-                                                                 .defineInRange("bendFactor", 2.5, 0.0, 100.0);
-    
+            .comment("Particle curve requirement factor")
+            .defineInRange("bendFactor", 2.5, 0.0, 100.0);
+
     public static final ModConfigSpec.IntValue accelerationRFCost = COMMON
-                                                                      .comment("Base RF cost per particle acceleration step")
-                                                                      .defineInRange("accelerationRFCost", 10, 0, Integer.MAX_VALUE);
-    
+            .comment("Base RF cost per particle acceleration step")
+            .defineInRange("accelerationRFCost", 10, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.LongValue acceleratorMotorRFCapacity = COMMON
-                                                                               .comment("Accelerator motor RF storage capacity")
-                                                                               .defineInRange("acceleratorMotorRFCapacity", 5_000_000L, 0L, Long.MAX_VALUE);
-    
+            .comment("Accelerator motor RF storage capacity")
+            .defineInRange("acceleratorMotorRFCapacity", 5_000_000L, 0L, Long.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue endPortalRequiredSpeed = COMMON
-                                                                          .comment("Minimum collision energy to activate an end portal")
-                                                                          .defineInRange("endPortalRequiredSpeed", 10_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Minimum collision energy to activate an end portal")
+            .defineInRange("endPortalRequiredSpeed", 10_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue netherPortalRequiredSpeed = COMMON
-                                                                             .comment("Minimum collision energy to activate a nether portal")
-                                                                             .defineInRange("netherPortalRequiredSpeed", 5_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Minimum collision energy to activate a nether portal")
+            .defineInRange("netherPortalRequiredSpeed", 5_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue blackHoleRequiredSpeed = COMMON
-                                                                          .comment("Minimum collision energy to create a black hole")
-                                                                          .defineInRange("blackHoleRequiredSpeed", 15_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Minimum collision energy to create a black hole")
+            .defineInRange("blackHoleRequiredSpeed", 15_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue collectorEnergyStorage = COMMON
-                                                                          .comment("Tachyon collector energy capacity in RF")
-                                                                          .defineInRange("collectorEnergyStorage", 1_000_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Tachyon collector energy capacity in RF")
+            .defineInRange("collectorEnergyStorage", 1_000_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.DoubleValue tachyonCollisionEnergyFactor = COMMON
-                                                                                   .comment("Particle collision tachyon RF multiplier")
-                                                                                   .defineInRange("tachyonCollisionEnergyFactor", 1.0, 0.0, 100.0);
-    
+            .comment("Particle collision tachyon RF multiplier")
+            .defineInRange("tachyonCollisionEnergyFactor", 1.0, 0.0, 100.0);
+
     static {
         COMMON.pop();
     }
-    
+
     // Black hole
     static {
         COMMON.push("blackHole");
     }
-    
+
     public static final ModConfigSpec.IntValue pullTimeMultiplier = COMMON
-                                                                      .comment("Black hole pull time multiplier")
-                                                                      .defineInRange("pullTimeMultiplier", 8, 0, Integer.MAX_VALUE);
-    
+            .comment("Black hole pull time multiplier")
+            .defineInRange("pullTimeMultiplier", 8, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue pullRange = COMMON
-                                                             .comment("Black hole pull range in blocks")
-                                                             .defineInRange("pullRange", 16, 0, Integer.MAX_VALUE);
-    
+            .comment("Black hole pull range in blocks")
+            .defineInRange("pullRange", 16, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue idleWaitTicks = COMMON
-                                                                 .comment("Black hole idle wait ticks between operations")
-                                                                 .defineInRange("idleWaitTicks", 200, 0, Integer.MAX_VALUE);
-    
+            .comment("Black hole idle wait ticks between operations")
+            .defineInRange("idleWaitTicks", 200, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue blackHoleTachyonEnergy = COMMON
-                                                                          .comment("Energy of tachyons produced by black holes")
-                                                                          .defineInRange("blackHoleTachyonEnergy", 50_000, 0, Integer.MAX_VALUE);
-    
+            .comment("Energy of tachyons produced by black holes")
+            .defineInRange("blackHoleTachyonEnergy", 50_000, 0, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.LongValue unstableContainerBaseCapacity = COMMON
-                                                                                  .comment("Unstable container base RF storage capacity")
-                                                                                  .worldRestart()
-                                                                                  .defineInRange("unstableContainerBaseCapacity", 20_000_000L, 0L, Long.MAX_VALUE);
-    
+            .comment("Unstable container base RF storage capacity")
+            .worldRestart()
+            .defineInRange("unstableContainerBaseCapacity", 20_000_000L, 0L, Long.MAX_VALUE);
+
     static {
         COMMON.pop();
     }
-    
+
     // Augments
     static {
         COMMON.push("augments");
     }
-    
+
     public static final ModConfigSpec.LongValue augmenterMaxEnergy = COMMON
-                                                                       .comment("Cybernetical station maximum energy storage")
-                                                                       .worldRestart()
-                                                                       .defineInRange("augmenterMaxEnergy", 500_000_000L, 0L, Long.MAX_VALUE);
-    
+            .comment("Cybernetical station maximum energy storage")
+            .worldRestart()
+            .defineInRange("augmenterMaxEnergy", 500_000_000L, 0L, Long.MAX_VALUE);
+
     static {
         COMMON.pop();
     }
-    
+
     // block / sound interactions
     static {
         COMMON.push("interaction");
     }
-    
+
     public static final ModConfigSpec.DoubleValue machineVolumeMultiplier = COMMON
-                                                                              .comment("Machine sound volume multiplier")
-                                                                              .defineInRange("machineVolumeMultiplier", 1.0, 0.0, 10.0);
-    
+            .comment("Machine sound volume multiplier")
+            .defineInRange("machineVolumeMultiplier", 1.0, 0.0, 10.0);
+
     static {
         COMMON.pop();
     }
-    
+
     public static final ModConfigSpec COMMON_SPEC = COMMON.build();
-    
+
     // Config section classes
-    
+
     public static class ProcessingMachines {
         public final ModConfigSpec.IntValue machineFrameMaxLength;
         public final BasicMachineConfig assemblerData;
@@ -349,7 +349,7 @@ public class OritechConfig {
         public final FurnaceConfig furnaceData;
         public final BasicMachineConfig pulverizerData;
         public final BasicMachineConfig refineryData;
-        
+
         ProcessingMachines(ModConfigSpec.Builder b) {
             b.push("processingMachines");
             machineFrameMaxLength = b.comment("Maximum machine frame chain length").worldRestart().defineInRange("machineFrameMaxLength", 64, 1, Integer.MAX_VALUE);
@@ -365,7 +365,7 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class Generators {
         public final ModConfigSpec.DoubleValue animationSpeedMultiplier;
         public final ModConfigSpec.ConfigValue<String> steamId;
@@ -375,7 +375,7 @@ public class OritechConfig {
         public final BasicMachineConfig fuelGeneratorData;
         public final SteamEngineConfig steamEngineData;
         public final BasicMachineConfig solarGeneratorData;
-        
+
         Generators(ModConfigSpec.Builder b) {
             b.push("generators");
             animationSpeedMultiplier = b.comment("Generator animation speed multiplier").defineInRange("animationSpeedMultiplier", 10.0, 0.0, 1000.0);
@@ -389,7 +389,7 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class LaserArmConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyInsertion;
@@ -397,7 +397,7 @@ public class OritechConfig {
         public final ModConfigSpec.IntValue blockBreakEnergyBase;
         public final ModConfigSpec.DoubleValue damageTickBase;
         public final ModConfigSpec.IntValue range;
-        
+
         LaserArmConfig(ModConfigSpec.Builder b) {
             b.push("laserArmConfig");
             energyCapacity = b.defineInRange("energyCapacity", 20_000L, 0L, Long.MAX_VALUE);
@@ -409,12 +409,12 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class DeepDrillConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.IntValue stepsPerOre;
         public final ModConfigSpec.IntValue energyPerStep;
-        
+
         DeepDrillConfig(ModConfigSpec.Builder b) {
             b.push("deepDrillConfig");
             energyCapacity = b.defineInRange("energyCapacity", 20_000L, 0L, Long.MAX_VALUE);
@@ -423,12 +423,12 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class AddonConfig {
         public final ModConfigSpec.DoubleValue burstAddonSpeedMultiplier;
         public final ModConfigSpec.DoubleValue burstAddonThrottleMultiplier;
         public final ModConfigSpec.LongValue addonShrinkerRF;
-        
+
         AddonConfig(ModConfigSpec.Builder b) {
             b.push("addonConfig");
             burstAddonSpeedMultiplier = b.comment("Burst addon processing speed multiplier").defineInRange("burstAddonSpeedMultiplier", 8.0, 0.0, 1000.0);
@@ -437,12 +437,12 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class PowerPoleConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.IntValue minRange;
         public final ModConfigSpec.IntValue maxRange;
-        
+
         PowerPoleConfig(ModConfigSpec.Builder b) {
             b.push("poleConfig");
             energyCapacity = b.comment("Energy transmission rate and capacity in RF/t").defineInRange("energyCapacity", 1_000_000L, 0L, Long.MAX_VALUE);
@@ -451,14 +451,14 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class FertilizerConfig {
         public final ModConfigSpec.IntValue moveDuration;
         public final ModConfigSpec.IntValue workDuration;
         public final ModConfigSpec.IntValue moveEnergyUsage;
         public final ModConfigSpec.IntValue workEnergyUsage;
         public final ModConfigSpec.DoubleValue liquidPerBlockUsage;
-        
+
         FertilizerConfig(ModConfigSpec.Builder b) {
             b.push("fertilizerConfig");
             moveDuration = b.defineInRange("moveDuration", 10, 1, Integer.MAX_VALUE);
@@ -469,13 +469,13 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class CentrifugeConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyInsertion;
         public final ModConfigSpec.IntValue energyPerTick;
         public final ModConfigSpec.LongValue tankSizeInBuckets;
-        
+
         CentrifugeConfig(ModConfigSpec.Builder b) {
             b.push("centrifugeData");
             energyCapacity = b.defineInRange("energyCapacity", 10_000L, 0L, Long.MAX_VALUE);
@@ -485,13 +485,13 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class FurnaceConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyInsertion;
         public final ModConfigSpec.IntValue energyPerTick;
         public final ModConfigSpec.DoubleValue speedMultiplier;
-        
+
         FurnaceConfig(ModConfigSpec.Builder b) {
             b.push("furnaceData");
             energyCapacity = b.defineInRange("energyCapacity", 10_000L, 0L, Long.MAX_VALUE);
@@ -501,7 +501,7 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class SteamEngineConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyExtraction;
@@ -510,7 +510,7 @@ public class OritechConfig {
         public final ModConfigSpec.BooleanValue stopOnEnergyFull;
         public final ModConfigSpec.BooleanValue stopOnWaterFull;
         public final ModConfigSpec.IntValue steamBoilerCapacityBuckets;
-        
+
         SteamEngineConfig(ModConfigSpec.Builder b) {
             b.push("steamEngineData");
             energyCapacity = b.defineInRange("energyCapacity", 100_000L, 0L, Long.MAX_VALUE);
@@ -523,15 +523,15 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     // Reusable config types
-    
+
     public static class BasicMachineConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyInsertion;
         public final ModConfigSpec.LongValue maxEnergyExtraction;
         public final ModConfigSpec.IntValue energyPerTick;
-        
+
         BasicMachineConfig(ModConfigSpec.Builder b, String name, long defCap, long defIns, long defExt, int defTick) {
             b.push(name);
             energyCapacity = b.defineInRange("energyCapacity", defCap, 0L, Long.MAX_VALUE);
@@ -541,13 +541,13 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
     public static class MachineFrameConfig {
         public final ModConfigSpec.IntValue moveDuration;
         public final ModConfigSpec.IntValue workDuration;
         public final ModConfigSpec.IntValue moveEnergyUsage;
         public final ModConfigSpec.IntValue workEnergyUsage;
-        
+
         MachineFrameConfig(ModConfigSpec.Builder b, String name, int defMove, int defWork, int defMoveEnergy, int defWorkEnergy) {
             b.push(name);
             moveDuration = b.defineInRange("moveDuration", defMove, 1, Integer.MAX_VALUE);
@@ -557,5 +557,5 @@ public class OritechConfig {
             b.pop();
         }
     }
-    
+
 }

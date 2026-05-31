@@ -12,11 +12,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ModRenderers {
-    
+
     public static Map<Block, RenderType> RENDER_LAYERS = new HashMap<>();  // this is used in client-specific parts to set render layers
-    
+
     public static void registerRenderers() {
-        
+
         // processing
         BlockEntityRenderers.register(BlockEntitiesContent.PULVERIZER_ENTITY, ctx -> new MachineRenderer<>("models/pulverizer_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY, ctx -> new MachineRenderer<>("models/fragment_forge_block"));
@@ -29,9 +29,9 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.REFINERY_ENTITY, ctx -> new RefineryRenderer<>("models/refinery_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.TAINTED_REFINERY_ENTITY, ctx -> new TaintedRefineryRenderer<>("models/tainted_refinery_block")); // todo
         BlockEntityRenderers.register(BlockEntitiesContent.REFINERY_MODULE_ENTITY, ctx -> new MachineRenderer<>("models/refinery_module_block"));
-        
+
         BlockEntityRenderers.register(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY, ctx -> new MachineRenderer<>("models/augment_application_block"));
-        
+
         // generators
         BlockEntityRenderers.register(BlockEntitiesContent.BIO_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/bio_generator_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.BASIC_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/basic_generator_block", false));
@@ -39,7 +39,7 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.LAVA_GENERATOR_ENTITY, ctx -> new MachineRenderer<>("models/lava_generator_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.STEAM_ENGINE_ENTITY, ctx -> new MachineRenderer<>("models/steam_engine_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.BIG_SOLAR_ENTITY, ctx -> new SolarPanelRenderer<>("models/big_solar_panel_block"));
-        
+
         // interactions
         BlockEntityRenderers.register(BlockEntitiesContent.LASER_ARM_ENTITY, ctx -> new LaserArmRenderer<>("models/laser_arm_block"));
         BlockEntityRenderers.register(BlockEntitiesContent.DEEP_DRILL_ENTITY, ctx -> new MachineRenderer<>("models/deep_drill_block"));
@@ -55,7 +55,7 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.SMALL_TANK_ENTITY, ctx -> new SmallTankRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.CREATIVE_TANK_ENTITY, ctx -> new SmallTankRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY, ctx -> new ShrinkerBlockRenderer("models/shrinker_block"));
-        
+
         BlockEntityRenderers.register(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY, ctx -> new SpawnerControllerRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY, ctx -> new AcceleratorControllerRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.BLACK_HOLE_ENTITY, ctx -> new BlackHoleRenderer());
@@ -63,10 +63,10 @@ public class ModRenderers {
         BlockEntityRenderers.register(BlockEntitiesContent.CHARGER_BLOCK_ENTITY, ctx -> new ChargerBlockRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.POWER_POLE_ENTITY, ctx -> new PowerPoleCableRenderer());
         BlockEntityRenderers.register(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY, ctx -> new UnstableContainerRenderer("models/unstable_container"));
-        
+
         BlockEntityRenderers.register(BlockEntitiesContent.TECH_DOOR_ENTITY, ctx -> new MachineRenderer<>("models/tech_door"));
         BlockEntityRenderers.register(BlockEntitiesContent.HANGAR_DOOR_ENTITY, ctx -> new HangarDoorRenderer("models/hangar_door"));
-        
+
         // cutout renders
         RENDER_LAYERS.put(BlockContent.MACHINE_FRAME_BLOCK, RenderType.cutout());
         RENDER_LAYERS.put(BlockContent.REACTOR_ABSORBER_PORT, RenderType.cutout());
@@ -103,10 +103,10 @@ public class ModRenderers {
         RENDER_LAYERS.put(BlockContent.REACTOR_REDSTONE_PORT, RenderType.translucent());
         RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE, RenderType.translucent());
         RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderType.translucent());
-        
+
         Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
-        
-        
+
+
     }
-    
+
 }

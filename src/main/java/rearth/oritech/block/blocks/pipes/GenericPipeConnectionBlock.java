@@ -24,44 +24,44 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import java.util.HashSet;
 
 public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implements EntityBlock {
-    
+
     public GenericPipeConnectionBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean notify) {
         if (oldState.getBlock().equals(state.getBlock())) return;
         GenericPipeInterfaceEntity.addNode(level, pos, true, state, getNetworkData(level));
-        
+
         var regKey = level.dimension().location();
         var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
         Oritech.LOGGER.debug("saving for: " + dataId);
         ((ServerLevel) level).getDataStorage().set(dataId, getNetworkData(level));
     }
-    
+
     @Override
     protected void onBlockRemoved(BlockPos pos, BlockState oldState, Level level) {
         updateNeighbors(level, pos, false);
         GenericPipeInterfaceEntity.removeNode(level, pos, true, oldState, getNetworkData(level));
     }
-    
+
     @Override
     public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-        
+
         if (!(level instanceof ServerLevel serverLevel)) return state;
-        
+
         if (state.getValue(BlockStateProperties.WATERLOGGED))
             level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
-        
+
         if (!hasNeighboringMachine(state, serverLevel, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
             GenericPipeInterfaceEntity.removeStaleMachinePipeNeighbors(pos, getNetworkData(serverLevel));
-            
+
             var normalState = getNormalBlock();
             return ((GenericPipeBlock) normalState.getBlock()).addConnectionStates(normalState, serverLevel, pos, false);
         }
-        
+
         var interfaceState = state;
         if (!(neighborState.getBlock() instanceof AbstractPipeBlock)) {
             // only update connection if neighbor is a new machine
@@ -69,30 +69,30 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
             if (neighborState.is(Blocks.AIR) || !hasMachine) {
                 interfaceState = addConnectionStates(state, serverLevel, pos, direction);
             }
-            
+
             if (!interfaceState.equals(state)) {
                 // reload connection when state has changed (e.g. machine added/removed)
                 GenericPipeInterfaceEntity.addNode(serverLevel, pos, true, interfaceState, getNetworkData(serverLevel));
             }
         }
-        
+
         return interfaceState;
     }
-    
+
     @Override
     protected boolean toggleSideConnection(BlockState state, Direction side, Level level, BlockPos pos) {
         var property = directionToProperty(side);
         var createConnection = state.getValue(property) == NO_CONNECTION;
-        
+
         // check if connection would be valid if state is toggled
         var targetPos = pos.relative(side);
         if (createConnection && !isValidConnectionTarget(level.getBlockState(targetPos).getBlock(), level, side.getOpposite(), targetPos))
             return false;
-        
+
         // toggle connection state
         int nextConnectionState = getNextConnectionState(state, side, level, pos, state.getValue(property));
         var newState = addStraightState(state.setValue(property, nextConnectionState));
-        
+
         // transform to interface block if side is being enabled and machine is connected
         if (!hasNeighboringMachine(newState, level, pos, false)) {
             var normalBlock = (GenericPipeBlock) getNormalBlock().getBlock();
@@ -102,18 +102,18 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         } else {
             level.setBlockAndUpdate(pos, newState);
             GenericPipeInterfaceEntity.addNode(level, pos, true, newState, getNetworkData(level));
-            
+
             // update neighbor if it's a pipe
             updateNeighbors(level, pos, true);
         }
-        
+
         // play sound
         var soundGroup = getSoundType(state);
         level.playSound(null, pos, soundGroup.getPlaceSound(), SoundSource.BLOCKS, soundGroup.getVolume() * .5f, soundGroup.getPitch());
-        
+
         return true;
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Nullable
     @Override
@@ -123,7 +123,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
                 ticker.tick(world1, pos, state1, blockEntity);
         };
     }
-    
+
     @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return new ItemStack(getNormalBlock().getBlock());

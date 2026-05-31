@@ -10,20 +10,20 @@ import net.minecraft.world.item.TooltipFlag;
 import java.util.List;
 
 public class CustomTooltipItem extends Item {
-    
+
     private final String translationKey;
-    
+
     public CustomTooltipItem(Properties settings, String translationKey) {
         super(settings);
         this.translationKey = translationKey;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
-        
+
         var showExtra = Screen.hasControlDown();
-        
+
         if (showExtra) {
             tooltip.add(Component.translatable(translationKey).withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
         } else {

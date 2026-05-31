@@ -15,11 +15,11 @@ import rearth.oritech.item.tools.armor.JetpackExoElytraItem;
 
 @Mixin(CapeLayer.class)
 public class CapeLayerMixin {
-    
+
     @Inject(method = "render(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;ILnet/minecraft/client/player/AbstractClientPlayer;FFFFFF)V", at = @At("HEAD"), cancellable = true)
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, AbstractClientPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
         ItemStack chestStack = player.getItemBySlot(EquipmentSlot.CHEST);
-        
+
         if (chestStack.getItem() instanceof JetpackElytraItem || chestStack.getItem() instanceof JetpackExoElytraItem) {
             ci.cancel();
         }

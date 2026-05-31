@@ -26,75 +26,75 @@ import java.util.Queue;
 import java.util.function.BiConsumer;
 
 public class RefineryBlock extends MultiblockMachine implements EntityBlock {
-    
+
     public static Queue<Runnable> DELAYED_TAINT_EVENTS = new ArrayDeque<>();
-    
+
     public RefineryBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return RefineryBlockEntity.class;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
-        
+
         var showExtra = Screen.hasControlDown();
-        
+
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.refinery_block").withStyle(ChatFormatting.GRAY));
         }
     }
-    
+
     @Override
     public void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
-        
+
         var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY);
-        
+
         if (level.isClientSide() || refineryEntity.isEmpty()) {
             super.onExplosionHit(state, level, pos, explosion, stackMerger);
             return;
         }
-        
+
         var crystalCandidate = refineryEntity.get().getNearbyNonEmptyCatalyst();
         if (crystalCandidate.isEmpty()) {
             super.onExplosionHit(state, level, pos, explosion, stackMerger);
             return;
         }
-        
+
         refineryEntity.get().taintTransform();
         var color = refineryEntity.get().currentColor;
-        
+
         // custom merger to void refinery self drop
         super.onExplosionHit(state, level, pos, explosion, ((itemStack, blockPos) -> {
         }));
-        
+
         // explode crystal
         crystalCandidate.get().doExplosion();
-        
+
         var targetPos = pos.immutable();
-        
+
         // run in next tick to avoid explosion block weirdness
         DELAYED_TAINT_EVENTS.add(() -> {
             // create + init refinery
             level.setBlockAndUpdate(targetPos,
-              BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
-                .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
+                    BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
+                            .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
             );
-            
+
             if (level.getBlockEntity(targetPos) instanceof TaintedRefineryBlockEntity taintedRefinery) {
                 taintedRefinery.afterCreation();
                 taintedRefinery.assignColor(color);
             }
         });
-        
+
         // idea / potential todo: particles released from catalyst to refinery (along random offset paths?)
-        
+
     }
-    
+
     // todo maybe this can be cleaned up using server.execute or something similar()?
     public static void updateTaintEvents() {
         for (var elem : DELAYED_TAINT_EVENTS) {

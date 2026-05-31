@@ -7,11 +7,11 @@ import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.entity.processing.FoundryBlockEntity;
 
 public class FoundryBlock extends MultiblockMachine implements EntityBlock {
-    
+
     public FoundryBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Override
     public @NotNull Class<? extends BlockEntity> getBlockEntityType() {
         return FoundryBlockEntity.class;

@@ -20,67 +20,67 @@ import java.util.HashSet;
 import java.util.Map;
 
 public class BlackHoleBlockEntity extends NetworkedBlockEntity implements NetworkedEventHandler {
-    
+
     public BlockState currentlyPulling;
-    
+
     @SyncField
     public BlockPos currentlyPullingFrom;
     @SyncField
     public long pullingStartedAt;
     @SyncField
     public long pullTime;
-    
+
     // if nothing is in influence, don't search so often
     private int waitTicks;
-    
+
     // cache for outgoing hits
     private final Map<BlockPos, ParticleCollectorBlockEntity> cachedCollectors = new HashMap<>();
-    
+
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.BLACK_HOLE_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (waitTicks-- > 0) return;
-        
+
         if (currentlyPullingFrom != null && pullingStartedAt + pullTime - 5 < level.getGameTime()) {
             onPullingFinished();
             currentlyPullingFrom = null;
         }
-        
+
         if (currentlyPullingFrom != null) return;
-        
+
         int pullRange = OritechConfig.pullRange.get();
-        
+
         for (var candidate : BlockPos.withinManhattan(pos, pullRange, pullRange, pullRange)) {
             var candidateState = level.getBlockState(candidate);
             if (candidate.equals(pos) || candidateState.isAir() || candidateState.is(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
                 continue;
-            
+
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
             pullingStartedAt = level.getGameTime();
             pullTime = (long) candidate.distManhattan(pos) * OritechConfig.pullTimeMultiplier.get();
             level.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
             setChanged();
-            
+
             return;
         }
-        
+
         if (currentlyPullingFrom == null) {
             waitTicks = OritechConfig.idleWaitTicks.get();
         }
     }
-    
+
     private void onPullingFinished() {
         var from = currentlyPullingFrom;
         var pulledDir = Vec3.atLowerCornerOf(worldPosition.subtract(from));
         pulledDir = pulledDir.normalize();
-        
+
         for (int i = 0; i < 5; i++) {
             var shootDir = pulledDir.offsetRandom(level.getRandom(), 0.5f);
-            
+
             var cacheKey = getRayEnd(worldPosition.getCenter(), shootDir.normalize());
             var cachedHit = tryGetCachedCollector(cacheKey);
             if (cachedHit != null) {
@@ -92,7 +92,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
                 var impactPos = basicRaycast(worldPosition.getCenter().add(pulledDir.scale(1.2)), shootDir, 12, level);
                 if (impactPos != null) {
                     ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), impactPos.getCenter());
-                    
+
                     var candidate = level.getBlockEntity(impactPos);
                     if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
                         collectorEntity.onParticleCollided();
@@ -101,7 +101,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
                         // only cast one particle if no collector has been found (for performance sake to avoid all those searches)
                         break;
                     }
-                    
+
                 } else {
                     // only cast one particle if no block has been found (for performance sake to avoid all those searches)
                     ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), worldPosition.getCenter().add(shootDir.scale(15)));
@@ -109,15 +109,15 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
                 }
             }
         }
-        
+
     }
-    
+
     private static BlockPos getRayEnd(Vec3 shotFrom, Vec3 shotDirection) {
         return BlockPos.containing(shotFrom.add(shotDirection.scale(12)));
     }
-    
+
     private ParticleCollectorBlockEntity tryGetCachedCollector(BlockPos key) {
-        
+
         var cachedResult = cachedCollectors.get(key);
         if (cachedResult == null) {
             // no cache
@@ -126,35 +126,35 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
             cachedCollectors.remove(key);
             return null;
         }
-        
+
         return cachedResult;
     }
-    
+
     public static BlockPos basicRaycast(Vec3 from, Vec3 direction, int range, Level level) {
-        
+
         var checkedPositions = new HashSet<BlockPos>();
-        
+
         for (float i = 0; i < range; i += 0.3f) {
             var to = from.add(direction.scale(i));
             var targetBlockPos = BlockPos.containing(to);
-            
+
             // avoid double checks
             if (checkedPositions.contains(targetBlockPos)) continue;
             checkedPositions.add(targetBlockPos);
-            
+
             var targetState = level.getBlockState(targetBlockPos);
             if (!canPassThrough(targetState, targetBlockPos)) return targetBlockPos;
         }
-        
+
         return null;
     }
-    
-    
+
+
     private static boolean canPassThrough(BlockState state, BlockPos blockPos) {
         // When targetting entities, don't let grass, vines, small mushrooms, pressure plates, etc. get in the way of the laser
         return state.isAir() || !state.getFluidState().isEmpty() || state.is(TagContent.LASER_PASSTHROUGH) || state.getBlock() instanceof AcceleratorPassthroughBlock;
     }
-    
+
     @Override
     public void onNetworkUpdated() {
         if (currentlyPullingFrom != null)

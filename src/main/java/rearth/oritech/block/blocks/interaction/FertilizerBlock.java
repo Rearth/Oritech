@@ -11,7 +11,7 @@ public class FertilizerBlock extends FrameInteractionBlock {
     public FertilizerBlock(Properties settings) {
         super(settings);
     }
-    
+
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {

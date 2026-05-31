@@ -1,5 +1,11 @@
 package rearth.oritech.client.renderers;
 
+import com.geckolib.animatable.GeoAnimatable;
+import com.geckolib.cache.texture.AutoGlowingTexture;
+import com.geckolib.cache.texture.GeoAbstractTexture;
+import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.GeoRenderer;
+import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -7,60 +13,54 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
-import com.geckolib.animatable.GeoAnimatable;
-import com.geckolib.cache.texture.AutoGlowingTexture;
-import com.geckolib.cache.texture.GeoAbstractTexture;
-import com.geckolib.renderer.GeoBlockRenderer;
-import com.geckolib.renderer.GeoRenderer;
-import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
 
 public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public MachineRenderer(String modelPath) {
         super(new MachineModel<>(modelPath));
     }
-    
+
     public MachineRenderer(String modelPath, boolean glowing) {
         super(new MachineModel<>(modelPath));
-        
+
         if (glowing) {
             addRenderLayer(new CustomGlowingGeoLayer<>(this));
         }
     }
-    
+
     @Override
     protected void rotateBlock(Direction facing, PoseStack poseStack) {
-        
+
         if (facing.equals(Direction.UP)) {
             poseStack.translate(0, 0.5, -0.5);
         } else if (facing.equals(Direction.DOWN)) {
             poseStack.translate(0, 0.5, 0.5);
         }
-        
+
         super.rotateBlock(facing, poseStack);
-        
+
     }
-    
+
     // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
     // the override annotation
     public AABB getRenderBoundingBox(BlockEntity blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
     }
-    
+
     public static class CustomGlowingGeoLayer<T extends BlockEntity & GeoAnimatable> extends AutoGlowingGeoLayer<T> {
-        
+
         public CustomGlowingGeoLayer(GeoRenderer<T> renderer) {
             super(renderer);
         }
-        
+
         @Override
         protected @Nullable RenderType getRenderType(T animatable, @Nullable MultiBufferSource bufferSource) {
-            
+
             if (this.renderer.getGeoModel() instanceof MachineModel<T> machineModel) {
                 var basePath = machineModel.getBaseTexturePath(animatable);
                 var path = GeoAbstractTexture.appendToPath(basePath, "_glowmask");
                 return AutoGlowingTexture.getRenderType(path);
             }
-            
+
             return AutoGlowingTexture.getRenderType(getTextureResource(animatable));
         }
     }

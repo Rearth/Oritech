@@ -1,9 +1,9 @@
 package rearth.oritech.client.renderers;
 
-import net.minecraft.resources.Identifier;
-import rearth.oritech.item.tools.armor.ExoArmorItem;
 import com.geckolib.model.DefaultedEntityGeoModel;
 import com.geckolib.renderer.GeoArmorRenderer;
+import net.minecraft.resources.Identifier;
+import rearth.oritech.item.tools.armor.ExoArmorItem;
 
 public class ExosuitArmorRenderer extends GeoArmorRenderer<ExoArmorItem> {
     public ExosuitArmorRenderer(Identifier model, Identifier texture) {

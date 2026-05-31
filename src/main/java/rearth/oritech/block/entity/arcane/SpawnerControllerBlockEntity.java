@@ -34,46 +34,46 @@ import java.util.UUID;
 
 public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity implements BlockEntityTicker<SpawnerControllerBlockEntity>, ComparatorOutputProvider {
     private static final String[] STRIPPED_MOB_NBT_KEYS = {
-      "ArmorDropChances", "ArmorItems", "BodyArmorDropChance", "body_armor_drop_chance", "BodyArmorItem", "body_armor_item",
-      "CanPickUpLoot", "ChestedHorse", "DecorItem", "HandDropChances", "HandItems", "Inventory", "Item", "Items",
-      "Leash", "Passengers", "SaddleItem"
+            "ArmorDropChances", "ArmorItems", "BodyArmorDropChance", "body_armor_drop_chance", "BodyArmorItem", "body_armor_item",
+            "CanPickUpLoot", "ChestedHorse", "DecorItem", "HandDropChances", "HandItems", "Inventory", "Item", "Items",
+            "Leash", "Passengers", "SaddleItem"
     };
-    
+
     public int maxSouls = 100_000;
     public int collectedSouls = 0;
-    
+
     public CompoundTag mobNbt = new CompoundTag();
     public Entity renderedEntity;
     private boolean networkDirty;
     public boolean hasCage;
     private int lastComparatorOutput;
     private boolean redstonePowered;
-    
-    
+
+
     // client only
     public float lastProgress = 0f;
-    
+
     public SpawnerControllerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), pos, state);
     }
-    
+
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, SpawnerControllerBlockEntity blockEntity) {
         if (level.isClientSide()) return;
-        
+
         if (networkDirty) {
             updateNetwork();
             DeathListener.resetEvents();
         }
-        
+
         if (mobNbt.isEmpty() || !hasCage || redstonePowered) return;
-        
+
         if (collectedSouls >= maxSouls && level.getGameTime() % 4 == 0) {
             spawnMob();
             updateComparator();
         }
     }
-    
+
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
@@ -85,7 +85,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             output.store("mobNbt", CompoundTag.CODEC, mobNbt);
         }
     }
-    
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
@@ -96,39 +96,39 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         mobNbt = sanitizeMobNbt(input.read("mobNbt", CompoundTag.CODEC).orElse(new CompoundTag()));
         lastComparatorOutput = getComparatorOutput();
     }
-    
+
     private void spawnMob() {
         // try and find a valid position within 10 attempts
-        
+
         var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> {
             var spawnRange = 4;
             var requiredHeight = Math.round(entity.getBbHeight() + 0.5f);
             var targetPosition = findSpawnPosition(spawnRange, requiredHeight);
-            
+
             if (targetPosition == null) return null;
-            
+
             var center = targetPosition.getCenter();
             entity.teleportTo(center.x, center.y, center.z);
             entity.setUUID(UUID.randomUUID());
-            
+
             clearMobEquipment(entity);
-            
+
             if (level instanceof ServerLevel sl) {
                 var c = targetPosition.getCenter();
                 sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0);
             }
-            
+
             return entity;
         });
-        
+
         if (spawned == null) return;
-        
+
         level.addFreshEntity(spawned);
         collectedSouls -= maxSouls;
         this.setChanged();
-        
+
     }
-    
+
     private BlockPos findSpawnPosition(int spawnRange, int requiredHeight) {
         for (int i = 0; i < 10; i++) {
             var candidate = worldPosition.offset(level.getRandom().nextIntBetweenInclusive(-spawnRange, spawnRange), 3, level.getRandom().nextIntBetweenInclusive(-spawnRange, spawnRange));
@@ -141,27 +141,27 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     if (foundFree >= requiredHeight) {
                         // found target
                         return candidate.below(j - 1);
-                        
+
                     } else {
                         foundFree = 0;
                     }
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     private void updateNetwork() {
         networkDirty = false;
-        
+
         if (!mobNbt.isEmpty())
             PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new SpawnerSyncPacket(worldPosition, mobNbt, hasCage, collectedSouls, maxSouls));
     }
-    
+
     public static void receiveUpdatePacket(SpawnerSyncPacket message, IPayloadContext context) {
         var level = context.player().level();
-        
+
         if (level.getBlockEntity(message.position) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.mobNbt = message.spawnedMob;
             spawnerEntity.hasCage = message.hasCage;
@@ -171,135 +171,135 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
             spawnerEntity.loadRendererFromUpdate();
         }
     }
-    
+
     public void loadRendererFromUpdate() {
-        
+
         var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> entity);
         if (spawned == null) return;
-        
+
         if (renderedEntity == null || spawned.getType() != renderedEntity.getType()) {
             renderedEntity = spawned;
         }
     }
-    
+
     @Override
     public void setChanged() {
         super.setChanged();
         this.networkDirty = true;
     }
-    
+
     @Override
     public boolean canAcceptSoul() {
         return collectedSouls < maxSouls;
     }
-    
+
     private void updateComparator() {
         var progress = getComparatorOutput();
         if (lastComparatorOutput != progress) {
             lastComparatorOutput = progress;
             level.updateNeighbourForOutputSignal(worldPosition, getBlockState().getBlock());
         }
-        
+
     }
-    
+
     @Override
     public int getComparatorOutput() {
         if (mobNbt.isEmpty() || maxSouls == 0) return 0;
-        
+
         return (int) (collectedSouls / (float) maxSouls * 15);
     }
-    
+
     public void setRedstonePowered(boolean active) {
         if (this.redstonePowered == active) return;
         this.redstonePowered = active;
         this.setChanged();
     }
-    
+
     @Override
     public void onSoulIncoming(Vec3 source) {
         var distance = (float) source.distanceTo(worldPosition.getCenter());
         collectedSouls++;
-        
+
         var soulPath = worldPosition.getCenter().subtract(source);
         ParticleContent.WanderingSoul(level, source.add(0, 0.7f, 0), soulPath, (int) getSoulTravelDuration(distance));
         updateComparator();
         this.setChanged();
     }
-    
+
     private int getSoulCost(int maxHp) {
         return (int) (Math.sqrt(maxHp) + 0.5f) * OritechConfig.spawnerCostMultiplier.get();
     }
-    
+
     public void onEntitySteppedOn(Entity entity) {
         if (!mobNbt.isEmpty()) return;
-        
+
         if (entity instanceof Mob mobEntity) {
-            
+
             if (mobEntity.getType().builtInRegistryHolder().is(TagContent.SPAWNER_BLACKLIST)) {
                 Oritech.LOGGER.debug("Ignored blacklisted entity for spawner: " + mobEntity.getType());
                 return;
             }
-            
+
             var output = TagValueOutput.createWithoutContext(ProblemReporter.DISCARDING);
-            
+
             mobEntity.save(output);
             var mobNbt = output.buildResult();
             this.mobNbt = sanitizeMobNbt(mobNbt);
-            
+
             maxSouls = getSoulCost((int) mobEntity.getMaxHealth());
-            
+
             mobEntity.remove(Entity.RemovalReason.DISCARDED);
             reloadCage(null);
-            
+
             this.setChanged();
         }
     }
-    
+
     public void onBlockInteracted(Player player) {
-        
+
         if (mobNbt.isEmpty()) {
             player.sendSystemMessage(Component.translatable("message.oritech.spawner.no_mob"));
             return;
         }
-        
+
         reloadCage(player);
-        
+
         if (hasCage)
             player.sendSystemMessage(Component.translatable("tooltip.oritech.spawner.collected_souls", collectedSouls, maxSouls));
     }
-    
+
     private void reloadCage(@Nullable Player player) {
-        
+
         var spawned = EntityType.loadEntityRecursive(mobNbt, level, EntitySpawnReason.SPAWNER, (entity) -> entity);
         if (spawned == null) return;
-        
+
         var cageSize = new Vec3i(Math.round(spawned.getBbWidth() * 2 + 0.5f), Math.round(spawned.getBbHeight() + 0.5f), Math.round(spawned.getBbWidth() * 2 + 0.5f));
         var offset = cageSize.getX() / 2;
-        
+
         hasCage = true;
-        
+
         for (int x = 0; x < cageSize.getX(); x++) {
             for (int y = 0; y < cageSize.getY(); y++) {
                 for (int z = 0; z < cageSize.getZ(); z++) {
                     var candidate = worldPosition.offset(-offset + x, -y - 1, -offset + z);
-                    
+
                     // block type is a placeholder
                     if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
                         hasCage = false;
                         ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(candidate));
                     }
-                    
+
                 }
             }
         }
-        
+
         if (!hasCage && player != null) {
             player.sendSystemMessage(Component.translatable("message.oritech.spawner.no_cage"));
         }
-        
+
         this.setChanged();
     }
-    
+
     private CompoundTag sanitizeMobNbt(CompoundTag nbt) {
         var sanitizedNbt = nbt.copy();
         for (var key : STRIPPED_MOB_NBT_KEYS) {
@@ -307,20 +307,20 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
         }
         return sanitizedNbt;
     }
-    
+
     private void clearMobEquipment(Entity entity) {
         if (!(entity instanceof Mob mobEntity)) return;
-        
+
         for (var slot : EquipmentSlot.values()) {
             mobEntity.setItemSlot(slot, ItemStack.EMPTY);
         }
     }
-    
+
     public record SpawnerSyncPacket(BlockPos position, CompoundTag spawnedMob, boolean hasCage, int collectedSouls,
                                     int maxSouls) implements CustomPacketPayload {
-        
+
         public static final Type<SpawnerSyncPacket> PACKET_ID = new Type<>(Oritech.id("spawner"));
-        
+
         @Override
         public Type<? extends CustomPacketPayload> type() {
             return PACKET_ID;

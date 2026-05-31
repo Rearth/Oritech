@@ -14,29 +14,29 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.List;
 
 public abstract class BaseReactorBlock extends Block {
-    
+
     public BaseReactorBlock(Properties settings) {
         super(settings);
     }
-    
+
     public boolean validForWalls() {
         return false;
     }
-    
+
     public Block requiredStackCeiling() {
         return Blocks.AIR;
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
-        
+
         var showExtra = Screen.hasControlDown();
-        
+
         if (showExtra) {
             var machineId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
             tooltip.add(Component.translatable("tooltip.oritech." + machineId));
-            
+
             for (int i = 0; i < 6; i++) {
                 var key = "tooltip.oritech." + machineId + "." + i;
                 if (I18n.exists(key)) {
@@ -46,6 +46,6 @@ public abstract class BaseReactorBlock extends Block {
         } else {
             tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
-        
+
     }
 }

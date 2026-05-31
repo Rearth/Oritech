@@ -14,28 +14,28 @@ import rearth.oritech.client.init.ModScreens;
 import java.util.Objects;
 
 public class RedstoneAddonScreenHandler extends AbstractContainerMenu {
-    
+
     @NotNull
     protected final BlockPos blockPos;
     @NotNull
     protected final RedstoneAddonBlockEntity blockEntity;
-    
+
     public RedstoneAddonScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
     }
-    
+
     public RedstoneAddonScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.REDSTONE_ADDON_SCREEN, syncId);
-        
+
         this.blockPos = blockEntity.getBlockPos();
         this.blockEntity = (RedstoneAddonBlockEntity) blockEntity;
     }
-    
+
     @Override
     public ItemStack quickMoveStack(Player player, int slot) {
         return ItemStack.EMPTY;
     }
-    
+
     @Override
     public boolean stillValid(Player player) {
         return true;

@@ -18,24 +18,24 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class SpawnerCageBlock extends Block {
-    
+
     public static BooleanProperty UP = BooleanProperty.create("up");
     public static BooleanProperty DOWN = BooleanProperty.create("down");
     public static BooleanProperty NORTH = BooleanProperty.create("north");
     public static BooleanProperty EAST = BooleanProperty.create("east");
     public static BooleanProperty SOUTH = BooleanProperty.create("south");
     public static BooleanProperty WEST = BooleanProperty.create("west");
-    
+
     public SpawnerCageBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(UP, false).setValue(DOWN, false).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false));
     }
-    
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST);
     }
-    
+
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
@@ -43,11 +43,11 @@ public class SpawnerCageBlock extends Block {
         var pos = ctx.getClickedPos();
         return getTargetState(level, pos);
     }
-    
+
     private BlockState getTargetState(LevelAccessor level, BlockPos pos) {
-        
+
         var state = defaultBlockState();
-        
+
         if (level.getBlockState(pos.above()).is(this.asBlock()))
             state = state.setValue(UP, true);
         if (level.getBlockState(pos.below()).is(this.asBlock()))
@@ -60,15 +60,15 @@ public class SpawnerCageBlock extends Block {
             state = state.setValue(SOUTH, true);
         if (level.getBlockState(pos.west()).is(this.asBlock()))
             state = state.setValue(WEST, true);
-        
+
         return state;
     }
-    
+
     @Override
     protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
         return getTargetState(level, pos);
     }
-    
+
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
