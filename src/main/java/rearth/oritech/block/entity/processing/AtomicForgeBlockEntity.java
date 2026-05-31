@@ -158,7 +158,6 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
     }
 
     @Override

@@ -591,7 +591,6 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         sendUpdate(SyncType.GUI_OPEN);
     }
 

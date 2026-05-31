@@ -413,7 +413,6 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
     }
 
     @Override

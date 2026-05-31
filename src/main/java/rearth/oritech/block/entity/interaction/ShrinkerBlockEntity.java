@@ -253,7 +253,6 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         sendUpdate(SyncType.GUI_OPEN);
     }
 

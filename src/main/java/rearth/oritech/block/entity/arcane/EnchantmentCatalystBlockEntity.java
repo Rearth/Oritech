@@ -322,7 +322,6 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
     }
 
     @Override

@@ -128,7 +128,6 @@ public class ReactorFuelPortEntity extends BlockEntity implements MenuProvider, 
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
     }
 
     @Override
