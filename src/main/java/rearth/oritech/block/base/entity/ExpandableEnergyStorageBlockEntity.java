@@ -289,7 +289,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
     }
 

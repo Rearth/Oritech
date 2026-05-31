@@ -155,7 +155,6 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidPro
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
     }
 

@@ -331,7 +331,6 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
     }
 

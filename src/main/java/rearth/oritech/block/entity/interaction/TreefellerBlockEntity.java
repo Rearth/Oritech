@@ -341,7 +341,6 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         this.sendUpdate(SyncType.GUI_OPEN);
     }
 }
