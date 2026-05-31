@@ -31,6 +31,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -98,10 +99,10 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (level.isClientSide()) return;
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (serverLevel.isClientSide()) return;
 
-        energyStorage.tick((int) level.getGameTime());
+        energyStorage.tick((int) serverLevel.getGameTime());
 
         if (!redstonePowered)
             outputEnergy();

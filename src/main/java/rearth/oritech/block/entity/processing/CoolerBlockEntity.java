@@ -7,7 +7,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -47,12 +46,12 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.serverTick(level, pos, state, blockEntity);
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(serverLevel, pos, state, blockEntity);
 
         if (!initialized) {
             initialized = true;
-            var biome = level.getBiome(pos);
+            var biome = serverLevel.getBiome(pos);
             inColdArea = biome.is(TagContent.CONVENTIONAL_COLD);
         }
 

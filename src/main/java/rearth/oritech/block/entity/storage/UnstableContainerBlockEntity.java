@@ -99,14 +99,14 @@ public class UnstableContainerBlockEntity extends NetworkedBlockEntity implement
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         age++;
         if (age > 10 && !state.getValue(UnstableContainerBlock.SETUP_DONE)) {
-            level.setBlockAndUpdate(pos, state.setValue(UnstableContainerBlock.SETUP_DONE, true));
+            serverLevel.setBlockAndUpdate(pos, state.setValue(UnstableContainerBlock.SETUP_DONE, true));
         }
 
-        energyStorage.tick((int) level.getGameTime());
+        energyStorage.tick((int) serverLevel.getGameTime());
 
         adjustEnergyStorageSize();
 

@@ -88,7 +88,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         // fills/drains buckets
 
         // in creative, set tank fill level
@@ -106,7 +106,7 @@ public class SmallTankEntity extends NetworkedBlockEntity implements FluidProvid
         if (fluidStorage.getAmount() > 0)
             outputToBelow();
 
-        updateComparators(level, pos, state);
+        updateComparators(serverLevel, pos, state);
     }
 
     private void outputToBelow() {

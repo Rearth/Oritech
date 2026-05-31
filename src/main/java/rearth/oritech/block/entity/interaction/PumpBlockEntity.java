@@ -96,9 +96,9 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        if ((initialized && pendingLiquidPositions.isEmpty() && level.getGameTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && level.getGameTime() % 62 == 0)) {
+        if ((initialized && pendingLiquidPositions.isEmpty() && serverLevel.getGameTime() % 62 == 0) || (!initialized && toolheadLowered && !searchActive && serverLevel.getGameTime() % 62 == 0)) {
             // reset
             initialized = false;
             toolheadLowered = false;
@@ -111,19 +111,19 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
             return;
         }
 
-        if (level.getGameTime() % PUMP_RATE == 0 && hasEnoughEnergy() && level.getBestNeighborSignal(pos) <= 0) {
+        if (serverLevel.getGameTime() % PUMP_RATE == 0 && hasEnoughEnergy() && serverLevel.getBestNeighborSignal(pos) <= 0) {
 
             if (pendingLiquidPositions.isEmpty() || tankIsFull()) return;
 
             var targetBlock = pendingLiquidPositions.peekLast();
 
             // Only drain the source (still) fluid, so it doesn't keep pumping infinitely
-            if (!level.getBlockState(targetBlock).getFluidState().isSource()) {
+            if (!serverLevel.getBlockState(targetBlock).getFluidState().isSource()) {
                 pendingLiquidPositions.pollLast();
                 return;
             }
 
-            var targetState = level.getFluidState(targetBlock);
+            var targetState = serverLevel.getFluidState(targetBlock);
             if (!targetState.getType().isSame(Fluids.WATER)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
@@ -132,13 +132,13 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
             addLiquidToTank(targetState);
             useEnergy();
             this.setChanged();
-            lastWorkTime = level.getGameTime();
+            lastWorkTime = serverLevel.getGameTime();
 
 
-            var targetPos = pos.getCenter().offsetRandom(level.getRandom(), 0.5f);
+            var targetPos = pos.getCenter().offsetRandom(serverLevel.getRandom(), 0.5f);
             var targetType = targetState.getDripParticle();
 
-            if (targetType != null && level instanceof ServerLevel serverWorld)
+            if (targetType != null && serverLevel instanceof ServerLevel serverWorld)
                 serverWorld.sendParticles(targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
         }
 

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -63,8 +62,8 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidPro
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        if (level.isClientSide()) return;
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        if (serverLevel.isClientSide()) return;
 
         // stop if no input is given, or it's a stackable item
         if (inventory.getItem(0).isEmpty() || inventory.getItem(0).getCount() > 1) return;
@@ -89,7 +88,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidPro
         }
 
         if (fluidStorage.getAmount() != startFluid || energyStorage.energy != startEnergy) {
-            if (level instanceof ServerLevel sl) {
+            if (serverLevel instanceof ServerLevel sl) {
                 var c = pos.getCenter().add(0.1, 0.1, 0);
                 sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
             }

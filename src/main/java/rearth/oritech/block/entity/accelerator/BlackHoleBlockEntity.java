@@ -1,6 +1,7 @@
 package rearth.oritech.block.entity.accelerator;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,10 +42,10 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (waitTicks-- > 0) return;
 
-        if (currentlyPullingFrom != null && pullingStartedAt + pullTime - 5 < level.getGameTime()) {
+        if (currentlyPullingFrom != null && pullingStartedAt + pullTime - 5 < serverLevel.getGameTime()) {
             onPullingFinished();
             currentlyPullingFrom = null;
         }
@@ -54,15 +55,15 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity implements Networ
         int pullRange = OritechConfig.pullRange.get();
 
         for (var candidate : BlockPos.withinManhattan(pos, pullRange, pullRange, pullRange)) {
-            var candidateState = level.getBlockState(candidate);
+            var candidateState = serverLevel.getBlockState(candidate);
             if (candidate.equals(pos) || candidateState.isAir() || candidateState.is(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK))
                 continue;
 
             currentlyPullingFrom = candidate;
             currentlyPulling = candidateState;
-            pullingStartedAt = level.getGameTime();
+            pullingStartedAt = serverLevel.getGameTime();
             pullTime = (long) candidate.distManhattan(pos) * OritechConfig.pullTimeMultiplier.get();
-            level.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
+            serverLevel.setBlockAndUpdate(candidate, Blocks.AIR.defaultBlockState());
             setChanged();
 
             return;

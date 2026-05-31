@@ -38,7 +38,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             return;
         }
 
-        serverTick(level, pos, state, blockEntity);
+        serverTick((ServerLevel) level, pos, state, blockEntity);
 
         var time = level.getGameTime();
 
@@ -56,7 +56,7 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
         }
     }
 
-    public abstract void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
+    public abstract void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity);
 
     public void clientTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
     }

@@ -18,7 +18,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -70,7 +69,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         // enabled later in this method if working
         energyStorage.setMaxInsert(0);
@@ -98,7 +97,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
             if (energyStorage.getAmount() > OritechConfig.processingMachines.refineryData.energyPerTick.get()) {   // needs a min energy amount to work at all
                 var activeRecipe = recipeCandidate.get().value();
                 currentRecipe = activeRecipe;
-                lastWorkedAt = level.getGameTime();
+                lastWorkedAt = serverLevel.getGameTime();
 
                 // use all energy, calculate progression based on amount (and arcane factor)
                 var steps = getAndDrainProgress();

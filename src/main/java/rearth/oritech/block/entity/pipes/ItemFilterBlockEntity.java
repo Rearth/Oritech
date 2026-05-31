@@ -8,12 +8,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -105,7 +105,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         // if non-empty and inventory in target, move it
         if (inventory.isEmpty()) return;
@@ -113,7 +113,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         if (cachedTargetInventory == null) {
             var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
             var targetPos = pos.offset(targetDirection.getNormal());
-            cachedTargetInventory = ItemApi.BLOCK.createCache(level, targetPos, targetDirection);
+            cachedTargetInventory = ItemApi.BLOCK.createCache(serverLevel, targetPos, targetDirection);
         }
 
         var targetInv = cachedTargetInventory.find();

@@ -24,7 +24,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.storage.ValueInput;
@@ -36,6 +35,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -96,11 +96,11 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         activeAnimation = "idle";
 
-        if (level.getGameTime() % 80 == 0)
+        if (serverLevel.getGameTime() % 80 == 0)
             triggerAnim("machine", activeAnimation);
 
         // return early if there is no work to do
@@ -125,21 +125,21 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
 
         maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
 
-        if (canProgress(existingLevel + 1) && level.getGameTime() % 5 == 0) {
+        if (canProgress(existingLevel + 1) && serverLevel.getGameTime() % 5 == 0) {
             this.setChanged();
             energyStorage.energy -= (long) getDisplayedEnergyUsage();
             progress++;
             activeAnimation = "working";
 
             var center = pos.getCenter();
-            var r = level.getRandom();
+            var r = serverLevel.getRandom();
             var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
-            ParticleContent.WeedKiller(level, center, offset);
+            ParticleContent.WeedKiller(serverLevel, center, offset);
 
             if (progress >= maxProgress) {
                 progress = 0;
                 finishEnchanting();
-                if (level instanceof ServerLevel sl) {
+                if (serverLevel instanceof ServerLevel sl) {
                     var target = pos.getCenter();
                     sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
                 }

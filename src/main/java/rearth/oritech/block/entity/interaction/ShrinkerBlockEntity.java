@@ -36,6 +36,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
@@ -100,9 +101,9 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        var currentRedstone = level.hasNeighborSignal(pos);
+        var currentRedstone = serverLevel.hasNeighborSignal(pos);
 
         if (currentRedstone && !wasRedstoneActive) {
             // recently enabled redstone

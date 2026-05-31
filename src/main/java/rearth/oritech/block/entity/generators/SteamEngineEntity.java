@@ -19,6 +19,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -76,13 +77,13 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        if (level.isClientSide() || !isAssembled(state)) return;
+        if (serverLevel.isClientSide() || !isAssembled(state)) return;
 
         var slaved = inSlaveMode();
         var hasInput = boilerStorage.getInputContainer().getAmountAsInt(0) > 0;
-        if (level.getGameTime() % 80 == 0 && !slaved && hasInput)
+        if (serverLevel.getGameTime() % 80 == 0 && !slaved && hasInput)
             setupMaster();
 
         if (!slaved && hasInput) tickMaster();

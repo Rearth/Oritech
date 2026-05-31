@@ -11,7 +11,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -20,11 +19,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -36,11 +37,9 @@ import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
-import rearth.oritech.util.ColorableMachine;
-import rearth.oritech.util.Geometry;
-import rearth.oritech.util.MachineSoundHandler;
-import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
     // work data
     private boolean initialized;
     public final List<Block> targetedOre = new ArrayList<>();
-    public int progress;
+    public ProgressStorage progress = new ProgressStorage();
     @SyncField
     private long lastWorkTime;
 
@@ -63,11 +62,12 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
     // storage
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.deepDrillConfig.energyCapacity.get(), getMaxRfInput(), 0, 0, this::setChanged, false);
 
-    public final SimpleInventoryStorage inventory = createInventoryStorage();
-
-    private @NotNull SimpleInventoryStorage createInventoryStorage() {
-        return new SimpleInventoryStorage(1, this::setChanged);
-    }
+    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged) {
+        @Override
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            return 0;
+        }
+    };
 
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -100,43 +100,40 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
 
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        if (isActive(state) && !initialized && (level.getGameTime() + pos.asLong()) % 60 == 0) {
+        if (isActive(state) && !initialized && (serverLevel.getGameTime() + pos.asLong()) % 60 == 0) {
             init(false);
         }
 
-        if (level.isClientSide() || !initialized || targetedOre.isEmpty()) return;
-        if (!inventory.isEmpty() && inventory.getStacks().getFirst().getCount() >= inventory.getStacks().getFirst().getMaxStackSize())
+        if (!initialized || targetedOre.isEmpty()) return;
+
+        if (inventory.getStacks().getFirst().getCount() >= inventory.getStacks().getFirst().getMaxStackSize())
             return;    // inv full
 
         var energyPerStep = getRfPerStep();
+        if (energyStorage.energy < energyPerStep) return;
 
-        if (energyStorage.energy >= energyPerStep) {
-            progress++;
-            energyStorage.energy -= energyPerStep;
-            lastWorkTime = level.getGameTime();
-            setChanged();
+        try (var transaction = Transaction.openRoot()) {
 
-            var particlePos = getCenter(0);
-            if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
-        }
-
-        // try increasing faster if too much energy is provided
-        for (int i = 0; i < OritechConfig.deepDrillConfig.stepsPerOre.get(); i++) {
-            if (energyStorage.energy >= energyPerStep) {
-                progress++;
-                energyStorage.energy -= energyPerStep;
-            } else {
-                break;
+            var usedEnergy = 0L;
+            while (energyStorage.energy >= energyPerStep) {
+                progress.increment(transaction);
+                usedEnergy += energyStorage.internalExtract(energyPerStep, transaction);
             }
-        }
 
-        if (progress >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
-            craftResult(level, pos);
-            progress -= OritechConfig.deepDrillConfig.stepsPerOre.get();
-            this.setChanged();
+            while (progress.get() >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
+                craftResult(transaction, serverLevel);
+            }
+
+            if (usedEnergy > 0) {
+                transaction.commit();
+                lastWorkTime = serverLevel.getGameTime();
+
+                var particlePos = getCenter(0);
+                serverLevel.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+
+            }
         }
 
     }
@@ -166,39 +163,42 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
         }
     }
 
-    private void craftResult(Level level, BlockPos pos) {
-        var usedOre = targetedOre.get(level.random.nextInt(0, targetedOre.size()));
+    private void craftResult(Transaction transaction, ServerLevel serverLevel) {
+        var usedOre = targetedOre.get(level.getRandom().nextInt(0, targetedOre.size()));
         var nodeOreBlockItem = usedOre.asItem();
-        var sampleInv = new SingleRecipeInput(new ItemStack(nodeOreBlockItem, 1));
+        var sampleInv = new OritechRecipeInput(List.of(new ItemStack(nodeOreBlockItem, 1)), FluidStack.EMPTY);
 
-        var recipeCandidate = level.getRecipeManager().getRecipeFor(RecipeContent.DEEP_DRILL.get(), sampleInv, level);
+        var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(RecipeContent.DEEP_DRILL.get(), sampleInv, level);
         if (recipeCandidate.isEmpty())
             return;
 
         var output = recipeCandidate.get().value().itemResults().getFirst().create();
-        try (var transaction = Transaction.openRoot()) {
-            var inserted = inventory.insert(ItemResource.of(output), output.getCount(), transaction);
-            if (inserted == output.getCount()) {
-                transaction.commit();
-            }
-        }
+        var inserted = inventory.insert(ItemResource.of(output), output.getCount(), transaction);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+
         inventory.serialize(output);
+        progress.serialize(output);
+
         serializeMultiblock(output);
         serializeColor(output);
+
         output.putLong("energy_stored", energyStorage.energy);
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+
         inventory.deserialize(input);
+        progress.deserialize(input);
+
         deserializeMultiblock(input);
         deserializeColor(input);
+
         energyStorage.energy = input.getLongOr("energy_stored", 0);
     }
 
@@ -324,10 +324,10 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
     }
 
     private AnimationController<DeepDrillEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
+        AnimationController<DeepDrillEntity> controller = new AnimationController<>("machine", state -> {
 
             if (state.isCurrentAnimation(SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
+                if (state.controller().hasAnimationFinished()) {
                     state.setAndContinue(IDLE);
                 } else {
                     return state.setAndContinue(SETUP);
@@ -346,11 +346,10 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new MachineSoundHandler<>()).triggerableAnim("setup", SETUP);
-    }
-
-    public void setLastWorkTime(long lastWorkTime) {
-        this.lastWorkTime = lastWorkTime;
+        });
+        controller.setSoundKeyframeHandler(new MachineSoundHandler<>());
+        controller.triggerableAnim("setup", SETUP);
+        return controller;
     }
 
     private boolean isActive(BlockState state) {

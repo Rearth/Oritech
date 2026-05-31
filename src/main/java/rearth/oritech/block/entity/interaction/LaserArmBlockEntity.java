@@ -152,16 +152,16 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (!isActive(state))
             return;
 
         if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
-                fireAtLivingEntities(level, pos, state, this);
+                fireAtLivingEntities(serverLevel, pos, state, this);
             } else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
-                fireAtBlocks(level, pos, state, this);
-            } else if (targetDirection != null && !targetDirection.equals(BlockPos.ZERO) && (level.getGameTime() + pos.getZ()) % 40 == 0) {
+                fireAtBlocks(serverLevel, pos, state, this);
+            } else if (targetDirection != null && !targetDirection.equals(BlockPos.ZERO) && (serverLevel.getGameTime() + pos.getZ()) % 40 == 0) {
                 // target pos is set, but no target is found (e.g. all blocks already mined). Periodically scan again for new blocks.
                 findNextBlockBreakTarget();
             }

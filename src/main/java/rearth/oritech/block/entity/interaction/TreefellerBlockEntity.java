@@ -80,15 +80,15 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (energyStorage.energy >= LOG_COST) {
-            if (pendingBlocks.isEmpty() && level.getGameTime() % 20 == 0) {
+            if (pendingBlocks.isEmpty() && serverLevel.getGameTime() % 20 == 0) {
                 findTarget();
             }
 
             for (int i = 0; i < 6 && !pendingBlocks.isEmpty(); i++) {
                 var candidate = pendingBlocks.peekLast();
-                var candidateState = level.getBlockState(candidate);
+                var candidateState = serverLevel.getBlockState(candidate);
                 var isLog = candidateState.is(TagContent.CUTTER_LOGS_MINEABLE);
 
                 var energyCost = isLog ? LOG_COST : LEAF_COST;
@@ -98,7 +98,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 if (actionResult == InteractionResult.FAIL) break;
                 pendingBlocks.pollLast();
                 if (actionResult == InteractionResult.PASS) continue;
-                lastWorkedAt = level.getGameTime();
+                lastWorkedAt = serverLevel.getGameTime();
 
                 energyStorage.energy -= energyCost;
                 setChanged();
@@ -107,8 +107,8 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
             }
         }
 
-        if (level.getGameTime() % 10 == 0) {
-            var idleTicks = level.getGameTime() - lastWorkedAt;
+        if (serverLevel.getGameTime() % 10 == 0) {
+            var idleTicks = serverLevel.getGameTime() - lastWorkedAt;
             var isWorking = idleTicks < 20;
             var animName = isWorking ? "work" : "idle";
             playWorkAnimation(animName);

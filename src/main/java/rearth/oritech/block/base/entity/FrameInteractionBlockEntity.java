@@ -3,9 +3,9 @@ package rearth.oritech.block.base.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -176,7 +176,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (!isActive(state) || !state.getValue(FrameInteractionBlock.HAS_FRAME) || getAreaMin() == null)
             return;
 
@@ -212,7 +212,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
 
         doProgress(moving);
         currentProgress++;
-        lastWorkedAt = level.getGameTime();
+        lastWorkedAt = serverLevel.getGameTime();
     }
 
     @Override

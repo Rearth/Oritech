@@ -12,6 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -132,13 +133,13 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         checkPositionCard();
 
         if (incomingPacket != null)
             checkIncomingAnimation();
 
-        if (level.getGameTime() % 20 == 0) {
+        if (serverLevel.getGameTime() % 20 == 0) {
             if (incomingPacket != null) {
                 tryReceivePacket();
             } else if (canSend()) {

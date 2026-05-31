@@ -57,7 +57,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         // check remaining burn time
         // if burn time is zero, try to consume item thus adding burn time

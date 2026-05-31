@@ -92,7 +92,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         screenInvOverride = false;
 
         // update research stations
@@ -100,7 +100,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
             var station = availableStations.getOrDefault(i, null);
             if (station == null) continue;
             if (station.working) {
-                var isDone = level.getGameTime() > station.researchStartedAt + station.workTime;
+                var isDone = serverLevel.getGameTime() > station.researchStartedAt + station.workTime;
                 if (!isDone) continue;
 
                 researchedAugments.add(station.selectedResearch);

@@ -2,7 +2,7 @@ package rearth.oritech.block.base.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
@@ -46,13 +46,13 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        if (bucketInputAllowed() && !level.isClientSide() && isAssembled(state)) {
+        if (bucketInputAllowed() && !serverLevel.isClientSide() && isAssembled(state)) {
             processBuckets();
         }
 
-        super.serverTick(level, pos, state, blockEntity);
+        super.serverTick(serverLevel, pos, state, blockEntity);
     }
 
     // tries to load content from buckets / fluid containers

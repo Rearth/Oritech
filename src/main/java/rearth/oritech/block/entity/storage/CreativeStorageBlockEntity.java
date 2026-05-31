@@ -2,7 +2,7 @@ package rearth.oritech.block.entity.storage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
@@ -49,8 +49,8 @@ public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEnti
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         energyStorage.energy = (long) (Integer.MAX_VALUE * 0.9f);
-        super.serverTick(level, pos, state, blockEntity);
+        super.serverTick(serverLevel, pos, state, blockEntity);
     }
 }

@@ -13,7 +13,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -65,10 +64,10 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
-        super.serverTick(level, pos, state, blockEntity);
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        super.serverTick(serverLevel, pos, state, blockEntity);
 
-        if (level.getGameTime() % 25 == 0) {
+        if (serverLevel.getGameTime() % 25 == 0) {
             refreshModules();
         }
     }

@@ -37,6 +37,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -95,20 +96,20 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
 
     @Override
-    public void serverTick(Level level, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
         outputEnergy();
 
-        energyStorage.tick(level.getGameTime());
+        energyStorage.tick(serverLevel.getGameTime());
 
-        if (level.getRandom().nextFloat() > 0.95f) {
+        if (serverLevel.getRandom().nextFloat() > 0.95f) {
 
-            var stats = this.energyStorage.getCurrentStatistics(level.getGameTime());
+            var stats = this.energyStorage.getCurrentStatistics(serverLevel.getGameTime());
             var moved = stats.insertedLastTickTotal() + stats.extractedLastTickTotal();
 
-            if (moved > 10 && level instanceof ServerLevel serverLevel) {
-                var at = worldPosition.getCenter().add(level.getRandom().nextFloat() * 0.4, level.getRandom().nextFloat() * 0.4, level.getRandom().nextFloat() * 0.4);
-                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
+            if (moved > 10 && serverLevel instanceof ServerLevel serverLevel) {
+                var at = worldPosition.getCenter().add(serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4);
+                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), 0.15f);
             }
         }
 
