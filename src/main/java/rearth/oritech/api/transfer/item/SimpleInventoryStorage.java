@@ -73,6 +73,10 @@ public class SimpleInventoryStorage extends ItemStacksResourceHandler implements
         onUpdate.run();
     }
 
+    public boolean isEmpty() {
+        return stacks.stream().allMatch(ItemStack::isEmpty);
+    }
+
     public NonNullList<ItemStack> getStacks() {
         return stacks;
     }

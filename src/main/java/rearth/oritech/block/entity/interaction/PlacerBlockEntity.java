@@ -14,10 +14,10 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.AdditionalNetworkingProvider;
 import rearth.oritech.api.networking.SyncType;
@@ -26,11 +26,9 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.FakeMachinePlayer;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity implements AdditionalNetworkingProvider {
@@ -47,10 +45,9 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
         var firstBlock = getFirstInInventory();
         if (firstBlock == null) return false;
         var block = Block.byItem(firstBlock.getItem());
-        if (block == null) return false;
 
         var targetPosition = toolPosition.below();
-        return Objects.requireNonNull(level).getBlockState(targetPosition).getBlock().equals(Blocks.AIR) && block.defaultBlockState().canSurvive(level, targetPosition);
+        return level.getBlockState(targetPosition).getBlock().defaultBlockState().isAir() && block.defaultBlockState().canSurvive(level, targetPosition);
     }
 
     @Override
@@ -77,7 +74,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
 
         var placementState = block.getStateForPlacement(new BlockPlaceContext(getPlacerPlayerEntity(), InteractionHand.MAIN_HAND, firstBlock, hitResult));
 
-        if (Objects.requireNonNull(level).getBlockState(targetPosition).isAir() && placementState != null && placementState.canSurvive(level, targetPosition)) {
+        if (level.getBlockState(targetPosition).isAir() && placementState != null && placementState.canSurvive(level, targetPosition)) {
             level.setBlockAndUpdate(targetPosition, placementState);
             block.setPlacedBy(level, targetPosition, placementState, getPlacerPlayerEntity(), firstBlock);
             firstBlock.shrink(1);
@@ -87,7 +84,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     }
 
     private ItemStack getFirstInInventory() {
-        for (var stack : inventory.heldStacks) {
+        for (var stack : inventory.getStacks()) {
             if (stack != null && !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
                 return stack;
             }
@@ -103,7 +100,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
 
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_PLACER_HEAD.defaultBlockState();
+        return BlockContent.BLOCK_PLACER_HEAD.get().defaultBlockState();
     }
 
     @Override
@@ -163,7 +160,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
 
     private Player getPlacerPlayerEntity() {
         if (placerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            placerPlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_placer"), inventory);
+            placerPlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_placer"));
         }
 
         return placerPlayerEntity;

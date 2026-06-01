@@ -2,7 +2,7 @@ package rearth.oritech.block.entity.interaction;
 
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.util.GeckoLibUtil;
 import com.mojang.authlib.GameProfile;
@@ -18,12 +18,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.Container;
+import net.minecraft.util.Unit;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.WaterAnimal;
+import net.minecraft.world.entity.animal.fish.WaterAnimal;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -31,7 +31,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
@@ -44,16 +43,24 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.LevelPacketCodec;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
@@ -68,6 +75,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
 
@@ -78,14 +86,14 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
 public class LaserArmBlockEntity extends NetworkedBlockEntity implements
-        GeoBlockEntity, EnergyApi.BlockProvider, ScreenProvider, MenuProvider, MultiblockMachineController, MachineAddonController,
-        ItemApi.BlockProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
+        GeoBlockEntity, EnergyProvider, ScreenProvider, MenuProvider, MultiblockMachineController, MachineAddonController,
+        ItemProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
 
     private static final String LASER_PLAYER_NAME = "oritech_laser";
 
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, 0, this::setChanged, false);
 
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(3, this::setChanged);
 
@@ -156,7 +164,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         if (!isActive(state))
             return;
 
-        if (!redstonePowered && energyStorage.getAmount() >= energyRequiredToFire()) {
+        if (!redstonePowered && energyStorage.energy >= energyRequiredToFire()) {
             if (hunterAddons > 0) {
                 fireAtLivingEntities(serverLevel, pos, state, this);
             } else if (currentTarget != null && !currentTarget.equals(BlockPos.ZERO)) {
@@ -236,18 +244,20 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             dropped = Block.getDrops(targetBlockState, (ServerLevel) level, targetPos, targetEntity, getLaserPlayerEntity(), ItemStack.EMPTY);
         }
 
-        var blockRecipe = tryGetRecipeOfBlock(targetBlockState, level);
+        var blockRecipe = tryGetRecipeOfBlock(targetBlockState, (ServerLevel) level);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1 + yieldAddons;
-            dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
+            dropped = List.of(new ItemStack(recipe.itemResults().getFirst().item(), farmedCount));
             if (level instanceof ServerLevel sl)
                 sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
 
         // yes, this will discard items that wont fit anymore
-        for (var stack : dropped) {
-            this.inventory.insert(stack, false);
+        try (var transaction = Transaction.openRoot()){
+            for (var stack : dropped) {
+                this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
+            }
         }
 
         try {
@@ -262,28 +272,28 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
         findNextBlockBreakTarget();
     }
 
-    public static RecipeHolder<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, Level level) {
+    public static RecipeHolder<OritechRecipe> tryGetRecipeOfBlock(BlockState destroyed, ServerLevel level) {
         var inputItem = destroyed.getBlock().asItem();
-        var inputInv = new SimpleCraftingInventory(new ItemStack(inputItem));
-        var candidate = level.getRecipeManager().getRecipeFor(RecipeContent.LASER.get(), inputInv, level);
+        var inputInv = new OritechRecipeInput(List.of(new ItemStack(inputItem)), FluidStack.EMPTY);
+        var candidate = level.recipeAccess().getRecipeFor(RecipeContent.LASER.get(), inputInv, level);
         return candidate.orElse(null);
     }
 
     public Player getLaserPlayerEntity() {
-        if (!(level instanceof ServerLevel))
+        if (!(level instanceof ServerLevel serverLevel))
             return null;
 
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = FakeMachinePlayer.create((ServerLevel) level, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
+            laserPlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME));
             laserPlayerEntity.setPos(Vec3.atLowerCornerOf(getBlockPos()));
         }
 
         if (hunterAddons > 0 && yieldAddons > 0) {
             var lootingSword = new ItemStack(Items.NETHERITE_SWORD);
-            lootingSword.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-            var lootingEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.LOOTING).get();
+            lootingSword.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+            var lootingEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.LOOTING);
             lootingSword.enchant(lootingEntry, Math.min(yieldAddons, 3));
-            laserPlayerEntity.getInventory().items.set(laserPlayerEntity.getInventory().selected, lootingSword);
+            laserPlayerEntity.getInventory().setSelectedItem(lootingSword);
         }
 
         return laserPlayerEntity;
@@ -658,12 +668,6 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
     //endregion
 
-    // energyprovider
-    @Override
-    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
-        return energyStorage;
-    }
-
     //region addons
     @Override
     public List<BlockPos> getConnectedAddons() {
@@ -736,10 +740,10 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     private AnimationController<LaserArmBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
+        return new AnimationController<LaserArmBlockEntity>("machine", state -> {
 
             if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
+                if (state.controller().hasAnimationFinished()) {
                     state.setAndContinue(MachineBlockEntity.IDLE);
                 } else {
                     return state.setAndContinue(MachineBlockEntity.SETUP);
@@ -777,12 +781,6 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     public boolean isActive(BlockState state) {
         return state.getValue(ASSEMBLED);
     }
-
-    @Override
-    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
-        return inventory;
-    }
-
     //endregion
 
 
@@ -836,7 +834,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     public boolean isTargetingEnergyContainer() {
-        var storageCandidate = EnergyApi.BLOCK.find(level, currentTarget, null);
+        var storageCandidate = level.getCapability(Capabilities.Energy.BLOCK, currentTarget, null);
         var block = level.getBlockState(currentTarget).getBlock();
         return storageCandidate != null || isTargetingAtomicForge(block) || isTargetingDeepdrill(block) || isTargetingCatalyst(block) || isTargetingUnstableContainer(block);
     }
@@ -900,7 +898,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
 
@@ -942,7 +940,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
 
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.heldStacks.size() <= slot) return 0;
+        if (inventory.getStacks().size() <= slot) return 0;
 
         var stack = inventory.getItem(slot);
         if (stack.isEmpty()) return 0;
@@ -1005,6 +1003,16 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             this.setChanged(false);
             this.sendUpdate(SyncType.SPARSE_TICK);
         }
+    }
+
+    @Override
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
+        return energyStorage;
+    }
+
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        return inventory;
     }
 
     public enum HunterTargetMode {

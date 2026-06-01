@@ -1,13 +1,12 @@
 package rearth.oritech.block.entity.interaction;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -25,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
@@ -37,7 +37,6 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -107,7 +106,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             var stats = this.energyStorage.getCurrentStatistics(serverLevel.getGameTime());
             var moved = stats.insertedLastTickTotal() + stats.extractedLastTickTotal();
 
-            if (moved > 10 && serverLevel instanceof ServerLevel serverLevel) {
+            if (moved > 10) {
                 var at = worldPosition.getCenter().add(serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4);
                 serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), 0.15f);
             }
@@ -132,7 +131,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
 
         var candidate = cachedOutputTarget.getCapability();
         if (candidate != null) {
-            var available = (int) Math.min(Integer.MAX_VALUE, energyStorage.getAmountAsLong());
+            var available = (int) Math.min(energyStorage.maxExtract, energyStorage.getAmountAsLong());
             try (var transaction = Transaction.openRoot()) {
                 var inserted = candidate.insert(available, transaction);
                 if (inserted <= 0) return;
@@ -143,7 +142,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     }
 
     public void assignNewTarget(BlockPos target, Player player) {
-        Oritech.LOGGER.info("Assigning new power pole target");
+        Oritech.LOGGER.debug("Assigning new power pole target");
 
         // adjust for core blocks
         var targetState = level.getBlockState(target);
@@ -598,6 +597,18 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
     // even if some poles are in the middle of it
     public static class PoleNetworkData extends SavedData {
 
+        // Codec for the whole saved data. The stored representation is simply the list of unique
+        // networks. The runtime per-pole lookup map is reconstructed from each network's poles on load.
+        public static final Codec<PoleNetworkData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                PoleNetwork.CODEC.listOf().fieldOf("networks").forGetter(PoleNetworkData::getUniqueNetworks)
+        ).apply(instance, PoleNetworkData::fromNetworks));
+
+        public static final SavedDataType<PoleNetworkData> TYPE = new SavedDataType<>(
+                Oritech.id("poleData"),
+                PoleNetworkData::new,
+                CODEC,
+                null);
+
         // runtime lookup map. Pole positions are also stored in the network, so for saving the keys can be reconstructed later here
         private final Map<BlockPos, PoleNetwork> activeNetworks = new HashMap<>();
 
@@ -609,61 +620,15 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
             });
         }
 
-        public static Factory<PoleNetworkData> TYPE = new Factory<>(PoleNetworkData::new, PoleNetworkData::fromNbt, null);
-
-        @Override
-        public @NotNull CompoundTag save(@NotNull CompoundTag tag, @NotNull HolderLookup.Provider registryLookup) {
-
-            var networksList = new ListTag();
-
-            var uniqueNetworks = new HashSet<>(activeNetworks.values());
-
-            // Iterate the unique networks and save them
-            for (var network : uniqueNetworks) {
-
-                var networkCompound = new CompoundTag();
-                networkCompound.putLong("energy", network.storedEnergy);
-
-                var poleList = new ListTag();
-                for (var polePair : network.poles.entrySet()) {
-                    var data = new CompoundTag();
-                    data.putLong("pos", polePair.getKey().asLong());
-                    data.putLongArray("cons", polePair.getValue().stream().mapToLong(BlockPos::asLong).toArray());
-                    poleList.add(data);
-                }
-
-                networkCompound.put("poles", poleList);
-                networksList.add(networkCompound);
-            }
-
-            tag.put("networks", networksList);
-            return tag;
+        // the set of distinct networks currently tracked, used by the codec when writing to disk
+        private List<PoleNetwork> getUniqueNetworks() {
+            return new ArrayList<>(new HashSet<>(activeNetworks.values()));
         }
 
-        public static PoleNetworkData fromNbt(CompoundTag nbt, HolderLookup.Provider registryLookup) {
-
+        // rebuilds the per-pole lookup map from the decoded list of networks
+        private static PoleNetworkData fromNetworks(List<PoleNetwork> networks) {
             var data = new PoleNetworkData();
-
-            if (!nbt.contains("networks")) return data;
-
-            var networksList = nbt.getList("networks").orElse(new ListTag());
-
-            for (var networkTag : networksList) {
-
-                var tag = (CompoundTag) networkTag;
-
-                var energy = tag.getLong("energy").orElse(0L);
-                var poles = new HashMap<BlockPos, Set<BlockPos>>();
-                var poleDataList = tag.getList("poles").orElse(new ListTag());
-                for (var poleDataTag : poleDataList) {
-                    var poleData = (CompoundTag) poleDataTag;
-                    var polePos = BlockPos.of(poleData.getLong("pos").orElse(0L));
-                    var poleConnections = new HashSet<>(Arrays.stream(poleData.getLongArray("cons").orElse(new long[0])).mapToObj(BlockPos::of).toList());
-                    poles.put(polePos, poleConnections);
-                }
-
-                var network = new PoleNetwork(poles, energy);
-
+            for (var network : networks) {
                 for (var polePos : network.getPoles())
                     data.activeNetworks.put(polePos, network);
             }
@@ -755,6 +720,30 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
 
     // stores the energy in a network. Also includes a list of poles and their connection (only used for floodfill when splitting networks)
     public static class PoleNetwork {
+
+        // a set of block positions, stored on disk as a simple list of longs
+        private static final Codec<Set<BlockPos>> POS_SET_CODEC = BlockPos.CODEC.listOf().xmap(HashSet::new, List::copyOf);
+
+        // a single pole and the positions it connects to, used as the serialized representation of the poles map
+        private record PoleEntry(BlockPos pos, Set<BlockPos> connections) {
+            private static final Codec<PoleEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                    BlockPos.CODEC.fieldOf("pos").forGetter(PoleEntry::pos),
+                    POS_SET_CODEC.fieldOf("cons").forGetter(PoleEntry::connections)
+            ).apply(instance, PoleEntry::new));
+        }
+
+        public static final Codec<PoleNetwork> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.LONG.fieldOf("energy").forGetter(network -> network.storedEnergy),
+                PoleEntry.CODEC.listOf().fieldOf("poles").forGetter(network ->
+                        network.poles.entrySet().stream()
+                                .map(entry -> new PoleEntry(entry.getKey(), entry.getValue()))
+                                .toList())
+        ).apply(instance, (energy, poles) -> {
+            var poleMap = new HashMap<BlockPos, Set<BlockPos>>();
+            for (var entry : poles)
+                poleMap.put(entry.pos(), entry.connections());
+            return new PoleNetwork(poleMap, energy);
+        }));
 
         // contains all poles as key, and 0-N positions as value
         private final Map<BlockPos, Set<BlockPos>> poles;

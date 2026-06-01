@@ -2,7 +2,7 @@ package rearth.oritech.block.entity.interaction;
 
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
@@ -19,7 +19,6 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -34,18 +33,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
@@ -62,7 +64,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 import static rearth.oritech.block.base.entity.MachineBlockEntity.*;
 
-public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, GeoBlockEntity, MenuProvider,
+public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemProvider, EnergyProvider, GeoBlockEntity, MenuProvider,
         ScreenProvider, MultiblockMachineController, MachineAddonController, ColorableMachine {
 
     public static final RawAnimation SHRINK = RawAnimation.begin().thenPlay("work");
@@ -70,7 +72,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
 
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, this::setChanged);
+    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(getDefaultCapacity(), getDefaultInsertRate(), 0, 0, this::setChanged, false);
 
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged);
 
@@ -116,19 +118,18 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
 
     public void doShrink() {
 
-        if (energyStorage.getAmount() < getDefaultCapacity()) return;
+        if (energyStorage.energy < getDefaultCapacity()) return;
 
         initAddons();
 
         if (currentCandidate == null || connectedAddons.isEmpty() || !inventory.isEmpty()) return;
 
-        energyStorage.setAmount(energyStorage.getAmount() - getDefaultCapacity());
-        energyStorage.update();
+        energyStorage.set(energyStorage.energy - getDefaultCapacity());
 
         var createdStack = new ItemStack(BlockContent.MACHINE_COMBI_ADDON.asItem());
         createdStack.set(ComponentContent.ADDON_DATA.get(), currentCandidate);
 
-        inventory.setStackInSlot(0, createdStack);
+        inventory.set(0, ItemResource.of(createdStack), 1);
 
         for (var addonPos : connectedAddons.reversed()) {
 
@@ -165,11 +166,11 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
         var silk = false;
 
         for (var addon : addons) {
-            if (addon.addonBlock().equals(BlockContent.MACHINE_FLUID_ADDON)) fluid = true;
-            if (addon.addonBlock().equals(BlockContent.QUARRY_ADDON)) quarryCount++;
-            if (addon.addonBlock().equals(BlockContent.MACHINE_YIELD_ADDON)) yieldCount++;
-            if (addon.addonBlock().equals(BlockContent.CROP_FILTER_ADDON)) cropFilter = true;
-            if (addon.addonBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON)) silk = true;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get())) fluid = true;
+            if (addon.addonBlock().equals(BlockContent.QUARRY_ADDON.get())) quarryCount++;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get())) yieldCount++;
+            if (addon.addonBlock().equals(BlockContent.CROP_FILTER_ADDON.get())) cropFilter = true;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get())) silk = true;
         }
 
         currentCandidate = new ShrunkAddonData(data, fluid, quarryCount, yieldCount, cropFilter, silk);
@@ -216,15 +217,15 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
 
     @Override
-    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
         return energyStorage;
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
+        controllers.add(new AnimationController<>("machine", 0, state -> {
             if (state.isCurrentAnimation(SETUP)) {
-                if (state.getController().hasAnimationFinished()) {
+                if (state.controller().hasAnimationFinished()) {
                     state.setAndContinue(IDLE);
                 } else {
                     return state.setAndContinue(SETUP);
@@ -409,7 +410,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
 
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
 
@@ -438,7 +439,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemApi
     }
 
     @Override
-    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
 

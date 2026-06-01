@@ -150,7 +150,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
 
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
-            droppedStacks.addAll(tankEntity.inventory.getHeldStacks());
+            droppedStacks.addAll(tankEntity.inventory.getStacks());
             tankEntity.inventory.clearContent();
         }
 

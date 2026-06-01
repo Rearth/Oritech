@@ -21,6 +21,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
@@ -44,7 +45,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     private final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidType.BUCKET_VOLUME, this::setChanged) {
 
         @Override
-        public int insert(FluidResource resource, int amount, net.neoforged.neoforge.transfer.transaction.TransactionContext transaction) {
+        public int insert(FluidResource resource, int amount, TransactionContext transaction) {
             if (resource.is(FluidContent.STILL_MINERAL_SLURRY.get()) || resource.is(Fluids.WATER))
                 return super.insert(resource, amount, transaction);
 

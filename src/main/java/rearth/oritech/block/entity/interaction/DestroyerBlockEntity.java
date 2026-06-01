@@ -11,11 +11,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
+import net.minecraft.util.Unit;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
@@ -26,6 +26,9 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -35,7 +38,6 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.util.FakeMachinePlayer;
 
 import java.util.List;
 import java.util.Objects;
@@ -148,7 +150,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     private Player getDestroyerPlayerEntity() {
         if (destroyerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            destroyerPlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_destroyer"), inventory);
+            destroyerPlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_destroyer"));
         }
 
         return destroyerPlayerEntity;
@@ -212,7 +214,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             return;
         }
 
-        if (!targetState.getBlock().equals(Blocks.AIR)) {
+        if (!targetState.isAir()) {
 
             var targetEntity = level.getBlockEntity(targetPosition);
             List<ItemStack> dropped;
@@ -230,13 +232,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 dropped = Block.getDrops(targetState, (ServerLevel) level, targetPosition, targetEntity, null, new ItemStack(Items.SHEARS));
             }
 
-            // only proceed if all itemStacks fit
-            for (var stack : dropped) {
-                if (this.inventory.insert(stack, true) != stack.getCount()) return;
-            }
-
-            for (var stack : dropped) {
-                this.inventory.insert(stack, false);
+            try (var transaction = Transaction.openRoot()) {
+                for (var stack : dropped) {
+                    if (this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction) != stack.getCount())
+                        return;
+                    transaction.commit();
+                }
             }
 
             targetState.getBlock().playerWillDestroy(level, targetPosition, targetState, getDestroyerPlayerEntity());
@@ -249,8 +250,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public static List<ItemStack> getLootDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, int yieldAddons, @Nullable Player entity) {
 
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
-        sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-        var fortuneEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.FORTUNE).get();
+        sampleTool.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+        var fortuneEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.FORTUNE);
         sampleTool.enchant(fortuneEntry, Math.min(yieldAddons, 3));
 
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
@@ -263,8 +264,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Player entity) {
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
-        sampleTool.set(DataComponents.UNBREAKABLE, new Unbreakable(false));
-        var silkTouchEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
+        sampleTool.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+        var silkTouchEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.SILK_TOUCH);
         sampleTool.enchant(silkTouchEntry, 1);
 
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))

@@ -103,7 +103,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
                 energyStorage.energy -= energyCost;
                 setChanged();
 
-                if (isLog) break; // only harvest 1 log, but multiple leaves
+                if (isLog) break; // only harvest 1 log, but multiple leaves (up to 6)
             }
         }
 

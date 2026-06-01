@@ -123,7 +123,7 @@ public class SmallStorageBlock extends Block implements EntityBlock {
 
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SmallStorageBlockEntity storageEntity) {
-            droppedStacks.addAll(storageEntity.inventory.getHeldStacks());
+            droppedStacks.addAll(storageEntity.inventory.getStacks());
             storageEntity.inventory.clearContent();
         }
 

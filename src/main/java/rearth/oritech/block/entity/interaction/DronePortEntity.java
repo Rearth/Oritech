@@ -2,10 +2,10 @@ package rearth.oritech.block.entity.interaction;
 
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
 import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +13,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,17 +25,25 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleFluidStorage;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.interaction.DronePortBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
@@ -59,7 +66,7 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
 public class DronePortEntity extends NetworkedBlockEntity
-        implements ItemApi.BlockProvider, FluidApi.BlockProvider, EnergyApi.BlockProvider,
+        implements ItemProvider, FluidProvider, EnergyProvider,
         GeoBlockEntity, MultiblockMachineController, MachineAddonController, MenuProvider,
         ScreenProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine {
 
@@ -75,12 +82,12 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     // storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 32, 10000, 0, this::setChanged);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(1024 * 32, 10000, 0, 0, this::setChanged, false);
 
     public final DronePortItemInventory inventory = new DronePortItemInventory(15, this::setChanged);
 
     @SyncField(SyncType.GUI_TICK)
-    public final DronePortFluidStorage fluidStorage = new DronePortFluidStorage(128 * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final DronePortFluidStorage fluidStorage = new DronePortFluidStorage(128 * 1000, this::setChanged);
 
     // not persisted, only to assign targets
     protected final SimpleContainer cardInventory = new SimpleContainer(2) {
@@ -203,10 +210,10 @@ public class DronePortEntity extends NetworkedBlockEntity
         MachineAddonController.super.initAddons();
 
         // Trigger block updates for pipes to connect
-        level.blockUpdated(worldPosition, getBlockState().getBlock());
+        level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
         for (Vec3i corePosition : getCorePositions()) {
             var worldPos = new BlockPos(Geometry.offsetToWorldPosition(getFacingForMultiblock(), corePosition, getPosForAddon()));
-            level.blockUpdated(worldPos, level.getBlockState(worldPos).getBlock());
+            level.updateNeighborsAt(worldPos, level.getBlockState(worldPos).getBlock());
         }
     }
 
@@ -235,35 +242,36 @@ public class DronePortEntity extends NetworkedBlockEntity
 
         Oritech.LOGGER.debug("receiving drone package: " + incomingPacket);
 
-        receivingPackage = true;
-        long totalToInsert = incomingPacket.transferredStacks.stream().mapToLong(ItemStack::getCount).sum();
-        long totalInserted = 0;
-        for (var stack : incomingPacket.transferredStacks) {
-            totalInserted += inventory.insert(stack, false);
-        }
+        try (var transaction = Transaction.openRoot()) {
+            receivingPackage = true;
+            for (var stack : incomingPacket.transferredStacks) {
+                var inserted = inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
+                if (inserted != stack.getCount()) {
+                    Oritech.LOGGER.warn("Drone failed to insert item amount. This should never happen! At: {}", worldPosition.toShortString());
+                    return;
+                }
+            }
 
-        if (totalInserted != totalToInsert) {
-            Oritech.LOGGER.warn("Something weird has happened with drone port item storage. Caused at: " + worldPosition);
-            return;
-        }
+            if (!incomingPacket.movedFluid.isEmpty()) {
+                var inserted = fluidStorage.insertFromDrone(FluidResource.of(incomingPacket.movedFluid), incomingPacket.movedFluid.amount(), transaction);
+                if (inserted != incomingPacket.movedFluid().amount()) {
+                    Oritech.LOGGER.warn("Drone failed to insert correct fluid amount. This should never happen! At: {}", worldPosition.toShortString());
+                }
+            }
 
-        if (!incomingPacket.movedFluid.isEmpty()) {
-            fluidStorage.insertFromDrone(incomingPacket.movedFluid, false);
+            receivingPackage = false;
+            incomingPacket = null;
         }
-
-        receivingPackage = false;
-        incomingPacket = null;
-        setChanged();
     }
 
     private void sendDrone() {
         var targetPort = (DronePortEntity) level.getBlockEntity(targetPosition);
         var arriveTime = level.getGameTime() + takeOffTime + landTime;
-        var data = new DroneTransferData(inventory.getHeldStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getStack(), arriveTime);
+        var data = new DroneTransferData(inventory.getStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getContent(), arriveTime);
         targetPort.setIncomingPacket(data);
 
-        inventory.clearContent();
-        fluidStorage.setStack(FluidStack.empty());
+        inventory.getStacks().clear();
+        fluidStorage.set(0, FluidResource.EMPTY, 0);
         lastSentAt = level.getGameTime();
         energyStorage.energy -= calculateEnergyUsage();
 
@@ -281,7 +289,12 @@ public class DronePortEntity extends NetworkedBlockEntity
             return false;
 
         // fail if fluid is incoming and would not match
-        return fluid.isEmpty() || (hasFluidAddon && fluidStorage.insert(fluid, true) == fluid.getAmount());
+        if (fluid.isEmpty()) return true;
+        if (!hasFluidAddon) return false;
+
+        try (var transaction = Transaction.openRoot()){
+            return fluidStorage.insert(FluidResource.of(fluid), fluid.amount(), transaction) == fluid.getAmount();
+        }
     }
 
     /**
@@ -301,7 +314,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.energy < calculateEnergyUsage() || incomingPacket != null)
             return false;
         var targetEntity = level.getBlockEntity(targetPosition);
-        if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getHeldStacks(), fluidStorage.getStack()))
+        if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getStacks(), fluidStorage.getContent()))
             return false;
 
 
@@ -366,16 +379,6 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     @Override
-    public DynamicEnergyStorage getEnergyStorage(Direction direction) {
-        return energyStorage;
-    }
-
-    @Override
-    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
-        return inventory;
-    }
-
-    @Override
     public List<Vec3i> getCorePositions() {
         return List.of(
                 new Vec3i(0, 0, 1),
@@ -430,11 +433,6 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public DynamicEnergyStorage getEnergyStorageForMultiblock(Direction direction) {
         return energyStorage;
-    }
-
-    @Override
-    public @Nullable FluidApi.FluidStorage getFluidStorage(Direction direction) {
-        return hasFluidAddon ? fluidStorage : null;
     }
 
     @Override
@@ -522,10 +520,10 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "machine", 0, state -> {
-            if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED)) {
+        controllers.add(new AnimationController<>("machine", 0, state -> {
+            if (state.controller().getPlayState().equals(PlayState.STOP)) {
                 var targetAnim = isActive(getBlockState()) ? MachineBlockEntity.IDLE : MachineBlockEntity.PACKAGED;
-                state.resetCurrentAnimation();
+                // state.resetCurrentAnimation();
                 return state.setAndContinue(targetAnim);
             } else {
                 // playing animation, keep going
@@ -550,7 +548,7 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public int getComparatorSlotAmount(int slot) {
-        if (inventory.getHeldStacks().size() <= slot)
+        if (inventory.getStacks().size() <= slot)
             return hasFluidAddon ? ComparatorOutputProvider.getFluidStorageComparatorOutput(fluidStorage) : 0;
 
         var stack = inventory.getItem(slot);
@@ -602,7 +600,6 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        buffer.writeBlockPos(getBlockPos());
         sendUpdate(SyncType.GUI_OPEN);
     }
 
@@ -656,7 +653,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     @Override
-    public Container getDisplayedInventory() {
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
         return inventory;
     }
 
@@ -693,6 +690,21 @@ public class DronePortEntity extends NetworkedBlockEntity
         return level;
     }
 
+    @Override
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
+        return energyStorage;
+    }
+
+    @Override
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
+        return hasFluidAddon ? fluidStorage : null;
+    }
+
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        return inventory;
+    }
+
     public record DroneTransferData(List<ItemStack> transferredStacks, FluidStack movedFluid, long arrivesAt) {
     }
 
@@ -703,29 +715,27 @@ public class DronePortEntity extends NetworkedBlockEntity
         }
 
         @Override
-        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
             if (DronePortEntity.this.incomingPacket != null && !receivingPackage) return 0;
-            return super.insertToSlot(addedStack, slot, simulate);
+            return super.insert(index, resource, amount, transaction);
         }
     }
 
     public class DronePortFluidStorage extends SimpleFluidStorage {
 
-        public DronePortFluidStorage(Long capacity, Runnable onUpdate) {
+        public DronePortFluidStorage(int capacity, Runnable onUpdate) {
             super(capacity, onUpdate);
         }
 
         @Override
-        public long insert(FluidStack toInsert, boolean simulate) {
-            if (DronePortEntity.this.incomingPacket != null) return 0;
-            return super.insert(toInsert, simulate);
+        public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+            if (DronePortEntity.this.incomingPacket != null && !receivingPackage) return 0;
+            return super.insert(index, resource, amount, transaction);
         }
 
-        /**
-         * Insert from drone, bypasses the incoming packet check
-         */
-        public long insertFromDrone(FluidStack toInsert, boolean simulate) {
-            return super.insert(toInsert, simulate);
+        public int insertFromDrone(FluidResource resource, int amount, TransactionContext transaction) {
+            // bypasses insert check
+            return super.insert(0, resource, amount, transaction);
         }
     }
 }
