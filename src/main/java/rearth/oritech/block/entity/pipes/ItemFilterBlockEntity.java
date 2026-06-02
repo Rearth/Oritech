@@ -15,28 +15,34 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
-import rearth.oritech.api.lookup.BlockLookupCache;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
+import rearth.oritech.api.transfer.item.DelegatingInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.client.ui.ItemFilterScreenHandler;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
-public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemApi.BlockProvider, MenuProvider {
+public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemProvider, MenuProvider {
 
-    public final FilterBlockInventory inventory = new FilterBlockInventory(1, this::setChanged);
-    private BlockLookupCache<StacksResourceHandler<ItemStack, ItemResource>> cachedTargetInventory;
+    private final DelegatingFilterInventory inventory = new DelegatingFilterInventory(this::getBackingStorage, null);
+    private BlockCapabilityCache<ResourceHandler<ItemResource>, Direction> lookupCache;
 
     @SyncField(SyncType.GUI_OPEN)
     protected FilterData filterSettings = new FilterData(false, true, false, new HashMap<>());
@@ -44,7 +50,6 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        inventory.serialize(output);
         output.putBoolean("whitelist", filterSettings.useWhitelist);
         output.putBoolean("useNbt", filterSettings.useNbt);
         output.putBoolean("useComponents", filterSettings.useComponents);
@@ -60,7 +65,6 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        inventory.deserialize(input);
 
         var whiteList = input.getBooleanOr("whitelist", true);
         var useNbt = input.getBooleanOr("useNbt", false);
@@ -83,7 +87,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
     }
 
     @Override
-    public StacksResourceHandler<ItemStack, ItemResource> getInventoryStorage(Direction direction) {
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
         return inventory;
     }
 
@@ -103,25 +107,21 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         return new ItemFilterScreenHandler(syncId, playerInventory, this);
     }
 
-    @Override
-    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    private @Nullable ResourceHandler<ItemResource> getBackingStorage() {
 
-        // if non-empty and inventory in target, move it
-        if (inventory.isEmpty()) return;
-
-        if (cachedTargetInventory == null) {
-            var targetDirection = getBlockState().getValue(ItemFilterBlock.TARGET_DIR);
-            var targetPos = pos.offset(targetDirection.getNormal());
-            cachedTargetInventory = ItemApi.BLOCK.createCache(serverLevel, targetPos, targetDirection);
+        if (lookupCache == null) {
+            var targetDirection = getBlockState().getValue(BlockStateProperties.FACING);
+            var targetPos = worldPosition.offset(targetDirection.getUnitVec3i());
+            lookupCache = BlockCapabilityCache.create(Capabilities.Item.BLOCK, (ServerLevel) level, targetPos, targetDirection.getOpposite());
         }
 
-        var targetInv = cachedTargetInventory.find();
-        if (targetInv == null) return;
+        return lookupCache.getCapability();
 
-        var firstItem = inventory.heldStacks.getFirst();
-        var inserted = targetInv.insert(firstItem.copy(), false);
-        firstItem.shrink(inserted);
+    }
 
+    @Override
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+        // inventory is delegating now, so we don't really need this anymore
     }
 
     public FilterData getFilterSettings() {
@@ -177,13 +177,27 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
         );
     }
 
-    public class FilterBlockInventory extends SimpleInventoryStorage {
+    public class DelegatingFilterInventory extends DelegatingInventoryStorage {
 
-        public FilterBlockInventory(int size, Runnable onUpdate) {
-            super(size, onUpdate);
+        public DelegatingFilterInventory(Supplier<ResourceHandler<ItemResource>> backingStorage, @Nullable BooleanSupplier validPredicate) {
+            super(backingStorage, validPredicate);
         }
 
-        public boolean canInsert(ItemStack stack) {
+        @Override
+        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+            if (!canInsert(resource, amount)) return 0;
+            return super.insert(resource, amount, transaction);
+        }
+
+        @Override
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            if (!canInsert(resource, amount)) return 0;
+            return super.insert(index, resource, amount, transaction);
+        }
+
+        public boolean canInsert(ItemResource resource, int amount) {
+
+            var stack = resource.toStack(amount);
 
             // check filter settings
             var checkNbt = filterSettings.useNbt;
@@ -192,15 +206,16 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
 
             for (var filterItem : filterSettings.items.values()) {
 
-                if (Platform.isModLoaded("ftbfiltersystem")) {
-                    var filterApi = dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI.api();
-                    if (filterApi.isFilterItem(filterItem)) {
-                        if (filterApi.doesFilterMatch(filterItem, stack, getLevel().registryAccess())) {
-                            matchesFilterItems = true;
-                            break;
-                        }
-                    }
-                }
+                // todo
+//                if (ModList.get().isLoaded("ftbfiltersystem")) {
+//                    var filterApi = dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI.api();
+//                    if (filterApi.isFilterItem(filterItem)) {
+//                        if (filterApi.doesFilterMatch(filterItem, stack, getLevel().registryAccess())) {
+//                            matchesFilterItems = true;
+//                            break;
+//                        }
+//                    }
+//                }
 
                 var matchesType = stack.getItem().equals(filterItem.getItem());
                 if (!matchesType) continue;
@@ -239,15 +254,6 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemA
                 // blacklist list, if we have a match we return false
                 return !matchesFilterItems;
             }
-        }
-
-        @Override
-        public int insertToSlot(ItemStack addedStack, int slot, boolean simulate) {
-
-            if (!canInsert(addedStack))
-                return 0;
-
-            return super.insertToSlot(addedStack, slot, simulate);
         }
     }
 }

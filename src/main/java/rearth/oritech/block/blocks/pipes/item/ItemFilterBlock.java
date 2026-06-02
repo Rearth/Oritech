@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.AttachFace;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -40,18 +41,16 @@ import java.util.List;
 // filter options: whitelist/blacklist, ignore damage, ignore nbt
 public class ItemFilterBlock extends Block implements EntityBlock {
 
-    public static final DirectionProperty TARGET_DIR = DirectionProperty.create("target_dir");
-
     private static final VoxelShape[] BOUNDING_SHAPES;
 
     public ItemFilterBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(TARGET_DIR, Direction.NORTH));
+        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(TARGET_DIR);
+        builder.add(BlockStateProperties.FACING);
     }
 
     @Override
@@ -62,7 +61,7 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return super.getStateForPlacement(ctx).setValue(TARGET_DIR, ctx.getClickedFace().getOpposite());
+        return super.getStateForPlacement(ctx).setValue(BlockStateProperties.FACING, ctx.getClickedFace().getOpposite());
     }
 
     @Nullable
