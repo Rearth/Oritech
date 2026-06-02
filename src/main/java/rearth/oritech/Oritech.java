@@ -137,24 +137,19 @@ public final class Oritech {
 
     private void loadLevelPipeData(ServerLevel level) {
         var dimId = level.dimension().identifier();
-        var dataId = "energy_" + dimId + "_" + dimId.getPath();
-        var result = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, dataId);
+        var result = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.ENERGY_TYPE);
         EnergyPipeBlock.ENERGY_PIPE_DATA.put(dimId, result);
 
-        var fluidDataId = "fluid_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var fluidResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, fluidDataId);
+        var fluidResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.FLUID_TYPE);
         FluidPipeBlock.FLUID_PIPE_DATA.put(dimId, fluidResult);
 
-        var itemDataId = "item_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var itemResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, itemDataId);
+        var itemResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.ITEM_TYPE);
         ItemPipeBlock.ITEM_PIPE_DATA.put(dimId, itemResult);
 
-        var superConductorDataId = "superconductor_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var superConductorResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.TYPE, superConductorDataId);
+        var superConductorResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.SUPERCONDUCTOR_TYPE);
         SuperConductorBlock.SUPERCONDUCTOR_DATA.put(dimId, superConductorResult);
 
-        var powerPoleId = "pole_" + dimId.getNamespace() + "_" + dimId.getPath();
-        var powerPoleResult = level.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE, powerPoleId);
+        var powerPoleResult = level.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE);
         PowerPoleEntity.POLE_NETWORK_DATA.put(dimId, powerPoleResult);
     }
 }

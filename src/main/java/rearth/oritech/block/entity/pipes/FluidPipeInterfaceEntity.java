@@ -15,7 +15,6 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -42,26 +41,27 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         if (level.getGameTime() % TRANSFER_PERIOD != 0 && !boosted)
             return;
 
-        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(level.dimension().location(), new PipeNetworkData());
+        var data = FluidPipeBlock.FLUID_PIPE_DATA.getOrDefault(level.dimension().identifier(), new PipeNetworkData());
         var transferAmount = boosted ? MAX_TRANSFER_RATE * 100 : MAX_TRANSFER_RATE;
 
         // try to get fluid to transfer
         // one transaction for each side
         var stackToMove = FluidStack.empty();
         FluidApi.FluidStorage takenFrom = null;
-        var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
+        var sourceDirections = data.getMachineDirections(pos);
 
-        for (var sourcePos : sources) {
-            var offset = pos.subtract(sourcePos);
-            var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
-            if (!block.isSideExtractable(state, direction.getOpposite())) continue;
+        for (var machineDirection : sourceDirections) {
+            if (!block.isSideExtractable(state, machineDirection)) continue;
+
+            var sourcePos = pos.relative(machineDirection);
+            var accessDirection = machineDirection.getOpposite();
 
             var sourceBlock = level.getBlockState(sourcePos);
 
             if (sourceBlock.is(BlockTags.CAULDRONS))
                 transferAmount = (int) FluidStackHooks.bucketAmount();
 
-            var sourceContainer = FluidApi.BLOCK.find(level, sourcePos, sourceBlock, null, direction);
+            var sourceContainer = FluidApi.BLOCK.find(level, sourcePos, sourceBlock, null, accessDirection);
             if (sourceContainer == null || !sourceContainer.supportsExtraction()) continue;
 
             var contents = sourceContainer.getContent();
@@ -131,7 +131,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         filteredFluidTargetsCached = targets.stream()
                 .filter(target -> {
                     var direction = target.getB();
-                    var pipePos = target.getA().offset(direction.getNormal());
+                    var pipePos = target.getA().relative(direction);
                     var pipeState = level.getBlockState(pipePos);
                     if (!(pipeState.getBlock() instanceof FluidPipeConnectionBlock fluidBlock))
                         return true;

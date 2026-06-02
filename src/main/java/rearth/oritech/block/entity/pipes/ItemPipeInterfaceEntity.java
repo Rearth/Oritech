@@ -60,7 +60,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         // find first itemstack from connected invs (that can be extracted)
         // try to move it to one of the destinations
 
-        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(level.dimension().location(), new PipeNetworkData());
+        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(level.dimension().identifier(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
         if (targets == null) {
             System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
@@ -69,7 +69,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         refreshTargetCaches(level, pos, targets);
 
-        var sources = data.machineInterfaces.getOrDefault(pos, new HashSet<>());
+        var sourceDirections = data.getMachineDirections(pos);
         var stackToMove = ItemStack.EMPTY;
         StacksResourceHandler<ItemStack, ItemResource> moveFromInventory = null;
         BlockPos takenFrom = null;
@@ -77,17 +77,17 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         var hasMotor = state.getValue(ItemPipeConnectionBlock.HAS_MOTOR);
 
-        for (var sourcePos : sources) {
+        for (var machineDirection : sourceDirections) {
+            if (!block.isSideExtractable(state, machineDirection)) continue;
+
+            var sourcePos = pos.relative(machineDirection);
             var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
             if (level.getGameTime() < blockedTimer) continue;
 
             if (blockedTimer > 0)   // if timer has expired but was set
                 blockedUntil.remove(sourcePos);
 
-            var offset = pos.subtract(sourcePos);
-            var direction = Direction.getApproximateNearest(offset.getX(), offset.getY(), offset.getZ());
-            if (!block.isSideExtractable(state, direction.getOpposite())) continue;
-            var inventory = ItemApi.BLOCK.find(level, sourcePos, direction);
+            var inventory = ItemApi.BLOCK.find(level, sourcePos, machineDirection.getOpposite());
             if (inventory == null || !inventory.supportsExtraction()) continue;
 
             for (int i = 0; i < inventory.getSlotCount(); i++) {
@@ -123,7 +123,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     moved += inserted;
 
                     if (inserted > 0) {
-                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.pipeNetworks.getOrDefault(data.pipeNetworkLinks.getOrDefault(this.worldPosition, 0), new HashSet<>()), level, stackToMove.getItem(), inserted, wasEmptyStorage);
+                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.getNetworkNodes(this.worldPosition), level, stackToMove.getItem(), inserted, wasEmptyStorage);
                     }
 
                     if (remainingToMove <= 0) break;  // target has been found for all items
@@ -157,7 +157,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         filteredTargetItemStorages = targets.stream()
                 .filter(target -> {
                     var targetDir = target.getB();
-                    var pipePos = target.getA().offset(targetDir.getNormal());
+                    var pipePos = target.getA().relative(targetDir);
                     var pipeState = level.getBlockState(pipePos);
                     if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
                         return true;

@@ -70,12 +70,12 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
      */
     protected void invalidateTargetCache(Level level, BlockPos pos) {
         var data = getNetworkData(level);
-        var network = data.pipeNetworkLinks.getOrDefault(pos, null);
-        if (network != null) {
+        var targets = data.getNetworkTargets(pos);
+        if (!targets.isEmpty()) {
             var checked = new HashSet<BlockPos>();
 
             // Invalidate all pipe connection nodes in the network
-            for (var pipeInterface : data.pipeNetworkInterfaces.get(network)) {
+            for (var pipeInterface : targets) {
                 // Skip node if already checked (node has multiple interface connections)
                 var pipePos = pipeInterface.getA().relative(pipeInterface.getB());
                 if (checked.contains(pipePos)) continue;
