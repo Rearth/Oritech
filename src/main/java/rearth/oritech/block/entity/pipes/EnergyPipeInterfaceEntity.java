@@ -22,16 +22,14 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implements EnergyProvider {
 
     private final SimpleEnergyHandler energyStorage;
     private final boolean isSuperConductor;
 
-    private List<BlockCapabilityCache<EnergyHandler, Direction>> cachedTargets = new ArrayList<>();
+    private final List<BlockCapabilityCache<EnergyHandler, Direction>> cachedTargets = new ArrayList<>();
     private int cacheHash;
 
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
@@ -68,38 +66,44 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         // if energy is available
         // gather all connection targets supporting insertion
-        // shuffle em
+        // rotate starting target each tick
         // insert until no more energy is available
 
         if (level.isClientSide() || energyStorage.getAmountAsInt() <= 0) return;
 
         var dataSource = isSuperConductor ? SuperConductorBlock.SUPERCONDUCTOR_DATA : EnergyPipeBlock.ENERGY_PIPE_DATA;
 
-        var data = dataSource.getOrDefault(level.dimension().identifier(), new PipeNetworkData());
+        var data = dataSource.get(level.dimension().identifier());
+        if (data == null) return;   // this should also never happen
         var targets = findNetworkTargets(pos, data);    // list of connected machine positions
-
-        if (targets == null) return;    // this should never happen
 
         var targetHash = targets.hashCode();
 
         if (this.cacheHash != targetHash) {
-            this.cachedTargets = targets.stream().map(target -> BlockCapabilityCache.create(Capabilities.Energy.BLOCK, (ServerLevel) level, target.getA(), target.getB())).collect(Collectors.toList());
+            cachedTargets.clear();
+            for (var target : targets) {
+                cachedTargets.add(BlockCapabilityCache.create(Capabilities.Energy.BLOCK, (ServerLevel) level, target.machinePos(), target.insertedFrom()));
+            }
             this.cacheHash = targetHash;
         }
 
-        Collections.shuffle(this.cachedTargets);
+        if (this.cachedTargets.isEmpty()) return;
 
         var totalMoved = 0;
         try (var transaction = Transaction.openRoot()) {
-            for (var cachedTarget : this.cachedTargets) {
-                if (energyStorage.getAmountAsInt() <= 0) break;
+
+            for (int i = 0; i < this.cachedTargets.size(); i++) {
+                if (energyStorage.getAmountAsLong() <= 0) break;
+
+                // offset for round-robin (offset by world-time + blockpos to avoid all pipes starting at the same spot)
+                var cachedTarget = this.cachedTargets.get((int) ((level.getGameTime() + getBlockPos().asLong() + i) % this.cachedTargets.size()));
 
                 var targetStorage = cachedTarget.getCapability();
                 if (targetStorage == null) continue;
 
-                var prev = energyStorage.getAmountAsInt();
+                var prev = energyStorage.getAmountAsLong();
                 var inserted = targetStorage.insert(energyStorage.getAmountAsInt(), transaction);
-                var extracted = targetStorage.extract(inserted, transaction);
+                var extracted = energyStorage.extract(inserted, transaction);
 
                 totalMoved += extracted;
 

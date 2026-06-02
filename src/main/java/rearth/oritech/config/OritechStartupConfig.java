@@ -39,10 +39,10 @@ public class OritechStartupConfig {
             .comment("Burst time in ticks per addon")
             .defineInRange("burstAddonTicks", 240, 0, Integer.MAX_VALUE);
 
-    public static final JetpackConfig basicJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "basicJetpack", 100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.4);
-    public static final JetpackConfig exoJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoJetpack", 5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.5);
-    public static final JetpackConfig elytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "elytraJetpack", 100_000, 4 * FluidStackHooks.bucketAmount(), 128, (int) (10 * (FluidStackHooks.bucketAmount() / 1000)), 1024, 0.6);
-    public static final JetpackConfig exoElytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoElytraJetpack", 5_000_000, 32 * FluidStackHooks.bucketAmount(), 256, (int) (15 * (FluidStackHooks.bucketAmount() / 1000)), 10_000, 1.4);
+    public static final JetpackConfig basicJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "basicJetpack", 100_000, 4 * FluidType.BUCKET_VOLUME, 128, (int) (10 * (FluidType.BUCKET_VOLUME / 1000)), 1024, 0.4);
+    public static final JetpackConfig exoJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoJetpack", 5_000_000, 32 * FluidType.BUCKET_VOLUME, 256, (int) (15 * (FluidType.BUCKET_VOLUME / 1000)), 10_000, 1.5);
+    public static final JetpackConfig elytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "elytraJetpack", 100_000, 4 * FluidType.BUCKET_VOLUME, 128, (int) (10 * (FluidType.BUCKET_VOLUME / 1000)), 1024, 0.6);
+    public static final JetpackConfig exoElytraJetpack = new JetpackConfig(OritechStartupConfig.STARTUP, "exoElytraJetpack", 5_000_000, 32 * FluidType.BUCKET_VOLUME, 256, (int) (15 * (FluidType.BUCKET_VOLUME / 1000)), 10_000, 1.4);
     public static final ToolConfig exoChestplate = new ToolConfig(OritechStartupConfig.STARTUP, "exoChestplate", 5_000_000, 10_000, 10_000);
     public static final ToolConfig basicDrill = new ToolConfig(OritechStartupConfig.STARTUP, "basicDrill", 10_000, 10, 512);
     public static final ToolConfig chainSaw = new ToolConfig(OritechStartupConfig.STARTUP, "chainSaw", 10_000, 10, 512);

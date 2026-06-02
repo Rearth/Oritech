@@ -92,11 +92,11 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out, float bucketAmount) {
-        return fluidOutput(FluidStack.create(out, (long) (bucketAmount * FluidStackHooks.bucketAmount())));
+        return fluidOutput(FluidStack.create(out, (long) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out) {
-        return fluidOutput(FluidStack.create(out, FluidStackHooks.bucketAmount()));
+        return fluidOutput(FluidStack.create(out, FluidType.BUCKET_VOLUME));
     }
 
     public OritechRecipeBuilder result(ItemStack out) {

@@ -78,7 +78,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         var hasMotor = state.getValue(ItemPipeConnectionBlock.HAS_MOTOR);
 
         for (var machineDirection : sourceDirections) {
-            if (!block.isSideExtractable(state, machineDirection)) continue;
+            if (!block.isSideExtracting(state, machineDirection)) continue;
 
             var sourcePos = pos.relative(machineDirection);
             var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
@@ -148,7 +148,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
     }
 
-    private void refreshTargetCaches(Level level, BlockPos pos, Set<Tuple<BlockPos, Direction>> targets) {
+    private void refreshTargetCaches(Level level, BlockPos pos, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {
         var netHash = targets.hashCode();
         if (netHash == filteredTargetsNetHash && filteredTargetItemStorages != null) {
             return;
@@ -156,15 +156,13 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         filteredTargetItemStorages = targets.stream()
                 .filter(target -> {
-                    var targetDir = target.getB();
-                    var pipePos = target.getA().relative(targetDir);
-                    var pipeState = level.getBlockState(pipePos);
+                    var pipeState = level.getBlockState(target.getPipePos());
                     if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
                         return true;
-                    var extracting = itemBlock.isSideExtractable(pipeState, targetDir.getOpposite());
+                    var extracting = itemBlock.isSideExtracting(pipeState, target.getPipeFacing());
                     return !extracting;
                 })
-                .map(target -> new CachedTarget<>(target.getA(), target.getB(), ItemApi.BLOCK.createCache(level, target.getA(), target.getB())))
+                .map(target -> new CachedTarget<>(target.machinePos(), target.insertedFrom(), ItemApi.BLOCK.createCache(level, target.machinePos(), target.insertedFrom())))
                 .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(pos)))
                 .toList();
 

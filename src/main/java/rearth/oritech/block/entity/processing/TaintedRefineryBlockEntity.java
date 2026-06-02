@@ -51,7 +51,7 @@ import java.util.*;
 public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
 
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidStackHooks.bucketAmount(), this::setChanged);
+    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidType.BUCKET_VOLUME, this::setChanged);
 
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public EnvironmentFactor arcaneFactor = EnvironmentFactor.DEFAULT;

@@ -26,7 +26,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
         if (data.isEmpty()) {
             tooltip.add(Component.translatable("tooltip.oritech.fluid_empty"));
         } else {
-            var amount = data.getAmount() / (float) FluidStackHooks.bucketAmount();
+            var amount = data.getAmount() / (float) FluidType.BUCKET_VOLUME;
             tooltip.add(Component.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).withStyle(ChatFormatting.GRAY));
         }
 
@@ -46,7 +46,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
 
     @Override
     public FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
-        return new SimpleItemFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount(), stack);
+        return new SimpleItemFluidStorage(OritechConfig.portableTankCapacityBuckets.get() * FluidType.BUCKET_VOLUME, stack);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     @Override
     public int getBarWidth(ItemStack stack) {
 
-        var capacity = OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount();
+        var capacity = OritechConfig.portableTankCapacityBuckets.get() * FluidType.BUCKET_VOLUME;
         var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
 
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;

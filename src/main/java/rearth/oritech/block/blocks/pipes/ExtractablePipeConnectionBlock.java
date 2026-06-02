@@ -77,7 +77,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
             // Invalidate all pipe connection nodes in the network
             for (var pipeInterface : targets) {
                 // Skip node if already checked (node has multiple interface connections)
-                var pipePos = pipeInterface.getA().relative(pipeInterface.getB());
+                var pipePos = pipeInterface.getPipePos();
                 if (checked.contains(pipePos)) continue;
 
                 checked.add(pipePos);
@@ -112,7 +112,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
         for (var direction : Direction.values()) {
             var property = directionToProperty(direction);
             var connection = shouldConnect(state, direction, pos, level, direction.equals(createDirection));
-            var newValue = connection ? isSideExtractable(state, direction) ? EXTRACT : CONNECTION : NO_CONNECTION;
+            var newValue = connection ? isSideExtracting(state, direction) ? EXTRACT : CONNECTION : NO_CONNECTION;
             state = state.setValue(property, newValue);
         }
         return addStraightState(state);
@@ -126,7 +126,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
      */
     public boolean isExtractable(BlockState state) {
         for (Direction side : Direction.values()) {
-            if (isSideExtractable(state, side))
+            if (isSideExtracting(state, side))
                 return true;
         }
 
@@ -140,7 +140,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
      * @param side  the side to check
      * @return true if the block state is extractable from the side
      */
-    public boolean isSideExtractable(BlockState state, Direction side) {
+    public boolean isSideExtracting(BlockState state, Direction side) {
         return directionToPropertyValue(state, side) == EXTRACT;
     }
 

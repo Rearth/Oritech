@@ -1,12 +1,10 @@
 package rearth.oritech.block.entity.pipes;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Tuple;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -61,7 +59,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             if (cachedBooster != null) cachedBooster = null;
             return null;
         } else if (cachedBooster == null) { // booster freshly set
-            var candidate = Objects.requireNonNull(level).getBlockEntity(connectedBooster);
+            var candidate = level.getBlockEntity(connectedBooster);
             if (candidate instanceof PipeBoosterBlockEntity booster) {
                 cachedBooster = booster;
                 return cachedBooster;
@@ -141,7 +139,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         var foundMachines = findConnectedMachines(foundNetwork, data);
 
         Oritech.LOGGER.debug("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
-        Oritech.LOGGER.debug("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.getA() + ":" + elem.getB()).toList());
+        Oritech.LOGGER.debug("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.machinePos() + ":" + elem.insertedFrom()).toList());
 
         var netID = foundNetwork.hashCode();
         data.pipeNetworks.put(netID, foundNetwork);
@@ -163,22 +161,49 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         data.setDirty();
     }
 
-    private static Set<Tuple<BlockPos, Direction>> findConnectedMachines(Set<BlockPos> network, PipeNetworkData data) {
+    private static Set<PipeNetworkTarget> findConnectedMachines(Set<BlockPos> network, PipeNetworkData data) {
 
-        var res = new HashSet<Tuple<BlockPos, Direction>>();
+        var res = new HashSet<PipeNetworkTarget>();
 
         for (var node : network) {
             for (var machineDirection : data.getMachineDirections(node)) {
                 var machinePos = node.relative(machineDirection);
-                res.add(new Tuple<>(machinePos, machineDirection.getOpposite()));
+                res.add(new PipeNetworkTarget(machinePos, machineDirection.getOpposite()));
             }
         }
 
         return res;
     }
 
-    public static Set<Tuple<BlockPos, Direction>> findNetworkTargets(BlockPos from, PipeNetworkData data) {
+    public static Set<PipeNetworkTarget> findNetworkTargets(BlockPos from, PipeNetworkData data) {
         return data.getNetworkTargets(from);
+    }
+
+    /**
+     * Describes a machine that can be reached by a pipe network.
+     *
+     * @param machinePos    the position of the connected machine block
+     * @param insertedFrom  the side the network inserts into, from the machine's perspective
+     */
+    public record PipeNetworkTarget(BlockPos machinePos, Direction insertedFrom) {
+
+        /**
+         * Gets the pipe interface position that is connected to this machine.
+         *
+         * @return the neighboring pipe position adjacent to the machine on {@code insertedFrom}
+         */
+        public BlockPos getPipePos() {
+            return machinePos.relative(insertedFrom);
+        }
+
+        /**
+         * Gets the facing of the pipe interface towards the machine.
+         *
+         * @return the pipe-side direction that points back at the connected machine
+         */
+        public Direction getPipeFacing() {
+            return insertedFrom.getOpposite();
+        }
     }
 
     /**
@@ -281,7 +306,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         public final HashMap<BlockPos, Integer> pipeNetworkLinks = new HashMap<>(); // which blockpos belongs to which network (ID)
         public final HashMap<BlockPos, Set<Direction>> machineInterfaceDirections = new HashMap<>(); // directions of connected machines per interface/connection block
         public final HashMap<Integer, Set<BlockPos>> pipeNetworks = new HashMap<>();   // networks are never updated, and instead always replaced by new ones with different ids
-        public final HashMap<Integer, Set<Tuple<BlockPos, Direction>>> pipeNetworkInterfaces = new HashMap<>(); // list of machines that are connected to the network
+        public final HashMap<Integer, Set<PipeNetworkTarget>> pipeNetworkInterfaces = new HashMap<>(); // list of machines and insertion faces connected to the network
         public final HashMap<BlockPos, Set<Direction>> machinePipeNeighbors = new HashMap<>(); // List of neighboring pipes per machine, and the direction they are in. Missing direction means no connection
 
         @Override
@@ -315,13 +340,13 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         private static final Codec<Set<BlockPos>> POS_SET_CODEC = BlockPos.CODEC.listOf().xmap(HashSet::new, List::copyOf);
         private static final Codec<Set<Direction>> DIRECTION_SET_CODEC = Direction.CODEC.listOf().xmap(HashSet::new, List::copyOf);
 
-        private static final Codec<Tuple<BlockPos, Direction>> INTERFACE_TARGET_CODEC = Codec.pair(
-                BlockPos.CODEC.fieldOf("pos").codec(),
-                Direction.CODEC.fieldOf("direction").codec()
-        ).xmap(pair -> new Tuple<>(pair.getFirst(), pair.getSecond()), target -> Pair.of(target.getA(), target.getB()));
+        private static final Codec<PipeNetworkTarget> PIPE_NETWORK_TARGET_CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                BlockPos.CODEC.fieldOf("pos").forGetter(PipeNetworkTarget::machinePos),
+                Direction.CODEC.fieldOf("direction").forGetter(PipeNetworkTarget::insertedFrom)
+        ).apply(instance, PipeNetworkTarget::new));
 
-        private static final Codec<Set<Tuple<BlockPos, Direction>>> INTERFACE_TARGET_SET_CODEC =
-                INTERFACE_TARGET_CODEC.listOf().xmap(HashSet::new, List::copyOf);
+        private static final Codec<Set<PipeNetworkTarget>> INTERFACE_TARGET_SET_CODEC =
+                PIPE_NETWORK_TARGET_CODEC.listOf().xmap(HashSet::new, List::copyOf);
 
         private static final Codec<HashMap<BlockPos, Integer>> PIPE_NETWORK_LINKS_CODEC =
                 Codec.unboundedMap(BLOCK_POS_KEY_CODEC, Codec.INT).xmap(HashMap::new, map -> map);
@@ -332,7 +357,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         private static final Codec<HashMap<Integer, Set<BlockPos>>> PIPE_NETWORKS_CODEC =
                 Codec.unboundedMap(INT_KEY_CODEC, POS_SET_CODEC).xmap(HashMap::new, map -> map);
 
-        private static final Codec<HashMap<Integer, Set<Tuple<BlockPos, Direction>>>> PIPE_NETWORK_INTERFACES_CODEC =
+        private static final Codec<HashMap<Integer, Set<PipeNetworkTarget>>> PIPE_NETWORK_INTERFACES_CODEC =
                 Codec.unboundedMap(INT_KEY_CODEC, INTERFACE_TARGET_SET_CODEC).xmap(HashMap::new, map -> map);
 
         private static final Codec<HashMap<BlockPos, Set<Direction>>> MACHINE_PIPE_NEIGHBORS_CODEC =
@@ -367,14 +392,14 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             return pipeNetworks.getOrDefault(pipeNetworkLinks.getOrDefault(pipePos, -1), Set.of());
         }
 
-        public Set<Tuple<BlockPos, Direction>> getNetworkTargets(BlockPos pipePos) {
+        public Set<PipeNetworkTarget> getNetworkTargets(BlockPos pipePos) {
             return pipeNetworkInterfaces.getOrDefault(pipeNetworkLinks.getOrDefault(pipePos, -1), Set.of());
         }
 
         private static PipeNetworkData fromCodec(HashMap<BlockPos, Integer> links,
                                                  HashMap<BlockPos, Set<Direction>> machineInterfaceDirections,
                                                  HashMap<Integer, Set<BlockPos>> networks,
-                                                 HashMap<Integer, Set<Tuple<BlockPos, Direction>>> networkInterfaces,
+                                                 HashMap<Integer, Set<PipeNetworkTarget>> networkInterfaces,
                                                  HashMap<BlockPos, Set<Direction>> machineNeighbors) {
             var data = new PipeNetworkData();
             data.pipeNetworkLinks.putAll(links);
