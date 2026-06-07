@@ -3,17 +3,22 @@ package rearth.oritech.block.entity.pipes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.apache.commons.lang3.time.StopWatch;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.item.ItemApi;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.ExtractablePipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
@@ -23,13 +28,12 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private static final int TRANSFER_AMOUNT = OritechConfig.itemPipeTransferAmount.get();
     private static final int TRANSFER_PERIOD = OritechConfig.itemPipeIntervalDuration.get();
 
-    private List<CachedTarget<StacksResourceHandler<ItemStack, ItemResource>>> filteredTargetItemStorages;
+    private List<BlockCapabilityCache<ResourceHandler<ItemResource>, Direction>> filteredItemTargetsCached;
 
     // item path cache (invalidated on network update)
     private final HashMap<BlockPos, Tuple<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
@@ -46,115 +50,115 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
     }
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         var block = (ExtractablePipeConnectionBlock) state.getBlock();
         if (level.isClientSide() || !block.isExtractable(state))
             return;
 
+        var boosted = isBoostAvailable();
+
         // boosted pipe works every tick, otherwise only every N tick
-        if ((level.getGameTime() + this.worldPosition.asLong()) % TRANSFER_PERIOD != 0 && !isBoostAvailable())
+        if (level.getGameTime() % TRANSFER_PERIOD != 0 && !boosted)
             return;
 
-        // find first itemstack from connected invs (that can be extracted)
-        // try to move it to one of the destinations
+        var data = ItemPipeBlock.ITEM_PIPE_DATA.get(level.dimension().identifier());
+        if (data == null) return;   // this should never happen
 
-        var data = ItemPipeBlock.ITEM_PIPE_DATA.getOrDefault(level.dimension().identifier(), new PipeNetworkData());
         var targets = findNetworkTargets(pos, data);
+
         if (targets == null) {
-            System.err.println("Yeah your pipe network likely is too long. At: " + this.getBlockPos());
+            System.err.println("Yeah your pipe network likely is too long (or something else errored. At: " + this.getBlockPos());
             return;
         }
 
-        refreshTargetCaches(level, pos, targets);
+        refreshTargetCaches(level, targets);
 
-        var sourceDirections = data.getMachineDirections(pos);
-        var stackToMove = ItemStack.EMPTY;
-        StacksResourceHandler<ItemStack, ItemResource> moveFromInventory = null;
-        BlockPos takenFrom = null;
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
+        // var hasMotor = state.getValue(ItemPipeConnectionBlock.HAS_MOTOR);   // todo benchmark / decide if motor needs to be kept
 
-        var hasMotor = state.getValue(ItemPipeConnectionBlock.HAS_MOTOR);
-
-        for (var machineDirection : sourceDirections) {
+        // do the whole thing for each direction (neighboring item container) items are taken from (usually just 1, but could be multiple)
+        // tries to extract from each side (for each slot on that source machine) and then tries to insert it to any matching containers
+        for (var machineDirection : data.getMachineDirections(pos)) {
             if (!block.isSideExtracting(state, machineDirection)) continue;
 
             var sourcePos = pos.relative(machineDirection);
+            var accessDirection = machineDirection.getOpposite();
+
+            // blocking for visual delays if needed
             var blockedTimer = blockedUntil.getOrDefault(sourcePos, 0L);
             if (level.getGameTime() < blockedTimer) continue;
 
             if (blockedTimer > 0)   // if timer has expired but was set
                 blockedUntil.remove(sourcePos);
 
-            var inventory = ItemApi.BLOCK.find(level, sourcePos, machineDirection.getOpposite());
-            if (inventory == null || !inventory.supportsExtraction()) continue;
+            var machineMoveCapacity = moveCapacity;
 
-            for (int i = 0; i < inventory.getSlotCount(); i++) {
-                var slotStack = inventory.getStackInSlot(i);
-                if (slotStack.isEmpty()) continue;
-                var canTake = inventory.extractFromSlot(slotStack.copyWithCount(moveCapacity), i, true);
-                if (canTake > 0) {
-                    stackToMove = slotStack.copyWithCount(canTake);
-                    moveFromInventory = inventory;
-                    takenFrom = sourcePos;
-                } else {
-                    stackToMove = ItemStack.EMPTY;
-                }
+            var sourceBlock = level.getBlockState(sourcePos);
 
-                if (stackToMove.isEmpty()) continue;
+            var sourceContainer = level.getCapability(Capabilities.Item.BLOCK, sourcePos, sourceBlock, null, accessDirection);
+            if (sourceContainer == null) continue;
 
-                var remainingToMove = stackToMove.getCount();
+            // one transaction per machine that is being extracted from
+            try (var transaction = Transaction.openRoot()) {
                 var moved = 0;
+                // do the whole thing for each slot in the source container
+                for (int i = 0; i < sourceContainer.size(); i++) {
+                    var extractedResource = sourceContainer.getResource(i);
+                    if (extractedResource.isEmpty()) continue;
 
-                for (var cachedTarget : filteredTargetItemStorages) {
-                    if (cachedTarget.pos().equals(takenFrom))
-                        continue;    // skip when targeting same machine
-
-                    var targetStorage = cachedTarget.lookup().find();
-                    if (targetStorage == null || !targetStorage.supportsInsertion()) {
-                        continue;
+                    // with directly canceled transaction just to figure out how much can be moved / extracted
+                    var availableAmount = 0;
+                    try (var simulation = Transaction.open(transaction)) {
+                        availableAmount = sourceContainer.extract(i, extractedResource, machineMoveCapacity, simulation);
+                        if (availableAmount <= 0) continue;
                     }
 
-                    var wasEmptyStorage = IntStream.range(0, targetStorage.getSlotCount()).allMatch(slot -> targetStorage.getStackInSlot(slot).isEmpty());
 
-                    var inserted = targetStorage.insert(stackToMove.copyWithCount(remainingToMove), false);
-                    remainingToMove -= inserted;
-                    moved += inserted;
+                    // go through all targets and try to insert
+                    for (var cachedTarget : filteredItemTargetsCached) {
+                        var targetContainer = cachedTarget.getCapability();
+                        if (targetContainer == null) continue;
 
-                    if (inserted > 0) {
-                        onItemMoved(this.worldPosition, takenFrom, cachedTarget.pos(), data.getNetworkNodes(this.worldPosition), level, stackToMove.getItem(), inserted, wasEmptyStorage);
+                        var inserted = targetContainer.insert(extractedResource, availableAmount, transaction);
+                        var taken = sourceContainer.extract(i, extractedResource, inserted, transaction);
+
+                        if (taken != inserted) {
+                            Oritech.LOGGER.warn("Item Pipe Insertion Error! Handler Misbehaving. At: {}, inserted: {}, extracted: {},  amount: {}. From pipe at: {}",
+                                    cachedTarget.pos(), inserted, taken, availableAmount, worldPosition);
+                            return;  // this should never happen
+                        }
+
+                        availableAmount -= inserted;
+                        moved += inserted;
+
+                        if (inserted > 0) {
+                            onItemMoved(worldPosition, sourcePos, cachedTarget.pos(), data.getNetworkNodes(worldPosition), level, extractedResource.getItem(), inserted);
+                            machineMoveCapacity -= moved;
+                        }
+
+                        // this slot's extracted amount is fully distributed, no point probing the remaining (farther) targets
+                        // or if there's been enough moved already
+                        if (availableAmount <= 0 || machineMoveCapacity <= 0) break;
                     }
-
-                    if (remainingToMove <= 0) break;  // target has been found for all items
                 }
-                var extracted = moveFromInventory.extract(stackToMove.copyWithCount(moved), false);
-
-                if (extracted != moved) {
-                    Oritech.LOGGER.warn("Invalid state while transferring inventory. Caused at position {}", pos);
+                if (moved > 0) {
+                    transaction.commit();
+                    onBoostUsed();
                 }
 
-                // only move one slot content
-                if (moved > 0)
-                    break;
-
-                // only try to move the first non-empty stack without motors
-                if (!hasMotor)
-                    break;
             }
         }
 
-        if (moveCapacity > TRANSFER_AMOUNT) onBoostUsed();
-
     }
 
-    private void refreshTargetCaches(Level level, BlockPos pos, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {
+    private void refreshTargetCaches(Level level, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {
         var netHash = targets.hashCode();
-        if (netHash == filteredTargetsNetHash && filteredTargetItemStorages != null) {
+        if (netHash == filteredTargetsNetHash && filteredItemTargetsCached != null) {
             return;
         }
 
-        filteredTargetItemStorages = targets.stream()
+        filteredItemTargetsCached = targets.stream()
                 .filter(target -> {
                     var pipeState = level.getBlockState(target.getPipePos());
                     if (!(pipeState.getBlock() instanceof ItemPipeConnectionBlock itemBlock))
@@ -162,15 +166,15 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     var extracting = itemBlock.isSideExtracting(pipeState, target.getPipeFacing());
                     return !extracting;
                 })
-                .map(target -> new CachedTarget<>(target.machinePos(), target.insertedFrom(), ItemApi.BLOCK.createCache(level, target.machinePos(), target.insertedFrom())))
-                .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(pos)))
+                .map(target -> BlockCapabilityCache.create(Capabilities.Item.BLOCK, (ServerLevel) level, target.machinePos(), target.insertedFrom()))
+                .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(worldPosition)))
                 .toList();
 
         filteredTargetsNetHash = netHash;
         cachedTransferPaths.clear();
     }
 
-    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level level, Item moved, int movedCount, boolean wasEmpty) {
+    private void onItemMoved(BlockPos startPos, BlockPos from, BlockPos to, Set<BlockPos> network, Level level, Item moved, int movedCount) {
         if (!renderItems) return;
         var path = cachedTransferPaths.computeIfAbsent(to, ignored -> calculatePath(startPos, from, to, network, level));
         if (path == null) return;
@@ -183,12 +187,12 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             pathLength += nextPathPos.distManhattan(pathPos);
         }
         var packet = new RenderStackData(worldPosition, new ItemStack(moved, movedCount), codedPath, level.getGameTime(), pathLength);
-        PacketDistributor.sendToPlayersTrackingChunk((net.minecraft.server.level.ServerLevel) level, ChunkPos.containing(worldPosition), packet);
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), packet);
 
-        if (wasEmpty) {
-            var arrivalTime = level.getGameTime() + (int) calculatePathLength(path.getB());
-            blockedUntil.putIfAbsent(to, arrivalTime);
-        }
+        // used to be called on if target was empty, but check has been skipped now due to the fact that we need don't check individual slots manually anymore with new
+        // transfer api
+        var arrivalTime = level.getGameTime() + (int) calculatePathLength(path.getB());
+        blockedUntil.putIfAbsent(to, arrivalTime);
 
     }
 

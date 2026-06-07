@@ -110,6 +110,8 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                         availableAmount -= inserted;
                         moved += inserted;
 
+                        if (availableAmount <= 0) break;
+
                     }
                 }
                 if (moved > 0) {
