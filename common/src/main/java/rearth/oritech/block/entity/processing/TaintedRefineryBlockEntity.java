@@ -268,9 +268,10 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         
         // filter out recipes based on input tank. Have the ones with input items first.
         return candidates
-                 .stream()
-                 .filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(ownStorage.getInputContainer().getStack(), candidate.value()))
-                 .findAny();
+                .stream()
+                .filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(ownStorage.getInputContainer().getStack(), candidate.value()))
+                .sorted(Comparator.comparingInt(a -> -a.value().getInputs().size()))
+                .findAny();
         
     }
     
