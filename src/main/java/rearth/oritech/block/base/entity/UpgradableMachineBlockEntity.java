@@ -73,8 +73,8 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
     }
 
     @Override
-    protected boolean finishCrafting(Transaction transaction) {
-        var initialSuccess = super.finishCrafting(transaction);
+    protected boolean onProgressCompleted(Transaction transaction) {
+        var initialSuccess = super.onProgressCompleted(transaction);
 
         if (!initialSuccess) return false;
 
@@ -92,7 +92,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
             // try to craft the current recipe N times, with a nested transaction for each
             try (var nested = Transaction.open(transaction)) {
 
-                var success = super.finishCrafting(nested);
+                var success = createCraftingOutputs(nested) && removeCraftingInputs(nested);
 
                 if (!success) break;    // dont commit transaction, dont try again
                 nested.commit();    // succeed nested transaction

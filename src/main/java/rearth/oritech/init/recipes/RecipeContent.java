@@ -34,6 +34,7 @@ public class RecipeContent {
     public static final Supplier<RecipeType<OritechRecipe>> COOLER = RECIPE_TYPES.register("cooler", () -> recipeType("cooler"));
     public static final Supplier<RecipeType<OritechRecipe>> REACTOR = RECIPE_TYPES.register("reactor", () -> recipeType("reactor"));
     public static final Supplier<RecipeType<OritechRecipe>> LASER = RECIPE_TYPES.register("laser", () -> recipeType("laser"));
+    public static final Supplier<RecipeType<OritechRecipe>> FURNACE_ADAPTER = RECIPE_TYPES.register("furnace_adapter", () -> recipeType("furnace_adapter"));
 
     private static <T extends Recipe<?>> RecipeType<T> recipeType(String path) {
         return new RecipeType<>() {

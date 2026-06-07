@@ -2,25 +2,24 @@ package rearth.oritech.block.entity.processing;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
-import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import rearth.oritech.api.networking.NetworkedBlockEntity;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.List;
-import java.util.Objects;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
 
@@ -42,7 +41,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
 
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
-        return RecipeContent.ASSEMBLER.get();
+        return RecipeContent.FURNACE_ADAPTER.get();
     }   // not used in this special case
 
     @Override
@@ -50,50 +49,30 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         return energyPerTick * getEfficiencyMultiplier() * (1 / getSpeedMultiplier()) / 2;
     }
 
+    // uses a furnace recipe type adapter to
     @Override
-    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+    protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
+        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY;
 
-        if (!isAssembled(state)) return;
+        // existing recipe matches (if non-empty)
+        if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
 
-        var recipeCandidate = serverLevel.getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), serverLevel);
+        var input = new SingleRecipeInput(inventory.getItem(0));
 
-        if (recipeCandidate.isPresent() && canAddToSlot(recipeCandidate.get().value().getResultItem(serverLevel.registryAccess()), inventory.heldStacks.get(1))) {
-            if (hasEnoughEnergy()) {
+        var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(RecipeType.SMELTING, input, level);
+        if (recipeCandidate.isEmpty()) return OritechRecipe.EMPTY;
 
-                var activeRecipe = recipeCandidate.get().value();
-                useEnergy();
-                progress++;
-                lastWorkedAt = serverLevel.getGameTime();
+        var furnaceRecipe = recipeCandidate.get().value();
 
-                if (serverLevel.random.nextFloat() > 0.8)
-                    if (serverLevel instanceof ServerLevel sl)
-                        sl.sendParticles(ParticleTypes.LAVA, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+        return new OritechRecipe(List.of(furnaceRecipe.input()), List.of(furnaceRecipe.result), SizedFluidIngredient.of(Fluids.EMPTY, 0), List.of(), furnaceRecipe.cookingTime(), RecipeContent.FURNACE_ADAPTER.get());
+    }
 
-                if (furnaceCraftingFinished(activeRecipe)) {
-                    craftFurnaceItem(activeRecipe);
+    @Override
+    protected void onProgressed() {
+        super.onProgressed();
 
-                    for (int i = 0; i < this.getBaseAddonData().extraChambers(); i++) {
-                        if (!canAddToSlot(recipeCandidate.get().value().getResultItem(serverLevel.registryAccess()), inventory.heldStacks.get(1)) || inventory.heldStacks.get(0).isEmpty())
-                            break;
-                        craftFurnaceItem(activeRecipe);
-                    }
-
-                    resetProgress();
-                }
-
-                setChanged();
-
-            }
-        } else {
-            // this happens if either the input slot is empty, or the output slot is blocked
-            if (progress > 0) resetProgress();
-        }
-
-        addBurstTicks();
-
-        if (serverLevel.getGameTime() % 18 == 0)
-            updateFurnaceState(state);
-
+        if (level.getGameTime() % 18 == 0)
+            updateFurnaceState(getBlockState());
     }
 
     private void updateFurnaceState(BlockState state) {
@@ -104,52 +83,6 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
             level.setBlockAndUpdate(worldPosition, state.setValue(BlockStateProperties.LIT, isLit));
         }
 
-    }
-
-    private void craftFurnaceItem(SmeltingRecipe activeRecipe) {
-        var result = activeRecipe.getResultItem(level.registryAccess());
-        var outSlot = inventory.heldStacks.get(1);
-        var inSlot = inventory.heldStacks.get(0);
-
-        inSlot.shrink(1);
-        if (outSlot.isEmpty()) {
-            inventory.heldStacks.set(1, result.copy());
-        } else {
-            outSlot.grow(result.getCount());
-        }
-
-    }
-
-    private boolean furnaceCraftingFinished(SmeltingRecipe activeRecipe) {
-        return progress >= activeRecipe.getCookingTime() * getSpeedMultiplier();
-    }
-
-    private SingleRecipeInput getFurnaceInput() {
-        return new SingleRecipeInput(getInputView().get(0));
-    }
-
-    @SuppressWarnings("OptionalIsPresent")
-    @Override
-    public float getProgress() {
-        if (progress == 0) return 0;
-
-        var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
-        if (recipeCandidate.isPresent()) {
-            return (float) progress / getRecipeDuration();
-        }
-
-        return 0;
-    }
-
-    @SuppressWarnings("OptionalIsPresent")
-    @Override
-    public int getRecipeDuration() {
-        var recipeCandidate = Objects.requireNonNull(level).getRecipeManager().getRecipeFor(RecipeType.SMELTING, getFurnaceInput(), level);
-        if (recipeCandidate.isPresent()) {
-            return (int) (recipeCandidate.get().value().getCookingTime() * getSpeedMultiplier());
-        }
-
-        return 120;
     }
 
     @Override

@@ -14,10 +14,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -139,7 +137,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             progress.increment(transaction);
 
             if (checkCraftingFinished(currentRecipe)) {
-                var crafted = finishCrafting(transaction);
+                var crafted = onProgressCompleted(transaction);
 
                 if (!crafted) {
                     Oritech.LOGGER.warn("crafting results failed! This should never happen. At: {}", worldPosition.toShortString());
@@ -151,10 +149,11 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
             transaction.commit();
             setChanged();
-
+            onProgressed();
         }
     }
 
+    // called if the machine has done any work
     protected void onProgressed() {
     }
 
@@ -171,13 +170,18 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         // at this point: Either machine inputs were changed, or we have a current recipe
 
         var recipeInput = getRecipeInput();
+        var type = getOwnRecipeType();
+        return loadRecipeFromInput(serverLevel, recipeInput, type);
+    }
+
+    protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
         if (recipeInput.isEmpty()) return OritechRecipe.EMPTY;
 
         // existing recipe matches (if non-empty)
         if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
 
         // return a potential match, or empty
-        var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(getOwnRecipeType(), recipeInput, level);
+        var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(type, recipeInput, level);
         return recipeCandidate.map(RecipeHolder::value).orElse(OritechRecipe.EMPTY);
     }
 
@@ -199,19 +203,32 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         return activeRecipe.itemResults();
     }
 
-    // uses the transaction and tries to do all steps. If input is missing or output doesn't match, return false.
-    protected boolean finishCrafting(Transaction transaction) {
+    // mostly here so that subclasses (like for burst addon, etc.) can easier extend this behavior
+    protected boolean onProgressCompleted(Transaction transaction) {
+        return createCraftingOutputs(transaction) && removeCraftingInputs(transaction);
+    }
+
+    // If output doesn't match, return false. This needs to be overridden if fluids are part of the output.
+    protected boolean createCraftingOutputs(Transaction transaction) {
 
         var results = getCraftingResults(currentRecipe);
-        var recipeIngredients = currentRecipe.itemInputs();
         var outputInv = inventory.getOutputContainer();
-        var inputInv = inventory.getInputContainer();
 
         // create outputs
         for (var result : results) {
             var added = outputInv.insert(ItemResource.of(result), result.count(), transaction);
             if (added != result.count()) return false;
         }
+
+        return true;
+
+    }
+
+    // If input is missing, return false. This needs to be overridden if fluids are part of the input.
+    protected boolean removeCraftingInputs(Transaction transaction) {
+
+        var recipeIngredients = currentRecipe.itemInputs();
+        var inputInv = inventory.getInputContainer();
 
         // remove inputs. Each input is 1 ingredient.
         var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
@@ -246,30 +263,19 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         progress.set(0);
     }
 
-    // check if output slots are valid, meaning: each slot is either empty, or of the same type and can add the target amount without overfilling
+    // check if output slots are valid, meaning: each slot is either empty, or the targets can be inserted. This needs to be overridden if fluids are part of the output.
     public boolean canOutputRecipe(OritechRecipe recipe) {
 
-        var outInv = getOutputCopy();
+        var outputInventory = inventory.getOutputContainer();
 
-        if (outInv.isEmpty()) return true;
-
-        var results = recipe.itemResults();
-        for (int i = 0; i < results.size(); i++) {
-            var result = results.get(i);
-            var outSlot = outInv.getItem(i);
-
-            if (outSlot.isEmpty()) continue;
-
-            if (!canAddToSlot(result.create(), outSlot)) return false;
+        try (var simulated = Transaction.openRoot()) {
+            for (var result : recipe.itemResults()) {
+                var inserted = outputInventory.insert(ItemResource.of(result), result.count(), simulated);
+                if (inserted != result.count()) return false;
+            }
         }
 
         return true;
-    }
-
-    protected boolean canAddToSlot(ItemStack input, ItemStack slot) {
-        if (slot.isEmpty()) return true;
-        if (!slot.getItem().equals(input.getItem())) return false;  // type mismatch
-        return slot.getCount() + input.getCount() <= slot.getMaxStackSize();  // count too high
     }
 
     protected abstract RecipeType<OritechRecipe> getOwnRecipeType();
@@ -279,15 +285,6 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected List<ItemStack> getInputView() {
         var slots = getSlotAssignments();
         return this.inventory.getStacks().subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
-    }
-
-    protected List<ItemStack> getOutputView() {
-        var slots = getSlotAssignments();
-        return this.inventory.getStacks().subList(slots.outputStart(), slots.outputStart() + slots.outputCount());
-    }
-
-    protected Container getOutputCopy() {
-        return new SimpleContainer(getOutputView().toArray(ItemStack[]::new));
     }
 
     // new:

@@ -170,7 +170,7 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
     }
 
     private AnimationController<RefineryModuleBlockEntity> getAnimationController() {
-        return new AnimationController<>(this, state -> {
+        return new AnimationController<RefineryModuleBlockEntity>("machine", state -> {
 
             if (state.isCurrentAnimation(SETUP)) {
                 if (state.controller().hasAnimationFinished()) {

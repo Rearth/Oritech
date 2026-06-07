@@ -6,7 +6,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
@@ -20,7 +19,6 @@ import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
@@ -29,39 +27,25 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected boolean canProceed(OritechRecipe value) {     // recipe times are 1 tick, but energy storage needs to be full (sized according to recipe)
-        return hasEnoughEnergy() && super.canProceed(value);
-    }
-
-    @Override
-    protected boolean hasEnoughEnergy() {
-        return energyStorage.getCapacity() > 10 && energyStorage.getAmount() >= energyStorage.getCapacity();
+    protected float calculateEnergyUsage() {
+        return energyStorage.capacity > 10 ? energyStorage.capacity : OritechConfig.processingMachines.atomicForgeData.energyPerTick.get();
     }
 
     @Override
     protected boolean checkCraftingFinished(OritechRecipe activeRecipe) {
-        return progress > 0;
+        return progress.get() > 0;
     }
 
     @Override
-    protected void useEnergy() {
-        energyStorage.energy = 0;
-    }
+    protected void resetProgress() {
+        super.resetProgress();
 
-    @Override
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
-        var result = super.getRecipe();
-
-        // also adjust energy storage when getting recipe
-        if (result.isPresent()) {
-            energyStorage.setCapacity((long) OritechConfig.processingMachines.atomicForgeData.energyPerTick.get() * result.get().value().getTime());
-        } else {
+        if (currentRecipe.isEmpty()) {
             energyStorage.setCapacity(1);
-            energyStorage.setAmount(0);
+            energyStorage.set(0);
+        } else {
+            energyStorage.setCapacity((long) OritechConfig.processingMachines.atomicForgeData.energyPerTick.get() * currentRecipe.time());
         }
-
-        return result;
-
     }
 
     @Override
@@ -70,7 +54,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public boolean canEnergyStorageChangeWhileGUIOpen() {
-        return true;
+        return true;// tells the storage to always sync the full data to the client gui
     }
 
     @Override
@@ -90,7 +74,7 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public float getProgress() {
-        return (float) energyStorage.getAmount() / energyStorage.getCapacity();
+        return (float) energyStorage.getAmountAsLong() / energyStorage.getCapacityAsLong();
     }
 
     @Override
@@ -162,11 +146,11 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public float getDisplayedEnergyTransfer() {
-        return energyStorage.getCapacity();
+        return energyStorage.getCapacityAsLong();
     }
 
     @Override
     public float getDisplayedEnergyUsage() {
-        return energyStorage.getCapacity();
+        return energyStorage.getCapacityAsLong();
     }
 }

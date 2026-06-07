@@ -7,12 +7,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
@@ -61,10 +62,10 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected void useEnergy() {
-        super.useEnergy();
+    protected void onProgressed() {
+        super.onProgressed();
 
-        if (level.random.nextFloat() > 0.8) return;
+        if (level.getRandom().nextFloat() > 0.8) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.4, 0.6, 0.5), facing);
@@ -72,7 +73,6 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
 
         if (level instanceof ServerLevel sl)
             sl.sendParticles(ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
-
     }
 
     @Override
@@ -100,23 +100,23 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
-        PulverizerBlockEntity.combineSmallDusts(outputInventory, level);
+    protected boolean createCraftingOutputs(Transaction transaction) {
+        PulverizerBlockEntity.CombineSmallDusts(transaction, level, inventory.getOutputContainer());
+        return super.createCraftingOutputs(transaction);
     }
 
     @Override
-    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
+    public List<ItemStackTemplate> getCraftingResults(OritechRecipe activeRecipe) {
         if (hasByproductAddon) {
-            var result = new ArrayList<ItemStack>(activeRecipe.getResults().size());
-            var source = activeRecipe.getResults();
+            var result = new ArrayList<ItemStackTemplate>(activeRecipe.itemResults().size());
+            var source = activeRecipe.itemResults();
             for (int i = 0; i < source.size(); i++) {
                 var item = source.get(i);
                 if (i == 0) {
                     result.add(item);
                 } else {
-                    var newCount = item.getCount() * 2;
-                    var newItem = new ItemStack(item.getItem(), newCount);
+                    var newCount = item.count() * 2;
+                    var newItem = new ItemStackTemplate(item.item(), newCount);
                     result.add(newItem);
                 }
             }

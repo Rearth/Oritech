@@ -11,6 +11,9 @@ import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.block.base.entity.UpgradableMachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -29,38 +32,36 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
 
     @Override
-    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
-        combineSmallDusts(outputInventory, level);
+    protected boolean createCraftingOutputs(Transaction transaction) {
+        PulverizerBlockEntity.CombineSmallDusts(transaction, level, inventory.getOutputContainer());
+        return super.createCraftingOutputs(transaction);
     }
 
-    public static void combineSmallDusts(List<ItemStack> outputInventory, Level level) {
-        // try compacting
-        var smallDustStack = outputInventory.get(1);
-        var baseResult = outputInventory.get(0);
-        if (smallDustStack.isEmpty() || smallDustStack.getCount() < 9 || baseResult.getCount() >= baseResult.getMaxStackSize())
-            return;
+    public static void CombineSmallDusts(Transaction transaction, Level level, ResourceHandler<ItemResource> outputInventory) {
 
-        var recipeInputStacks = new ArrayList<ItemStack>(9);
-        for (int i = 0; i < 9; i++) {
-            recipeInputStacks.add(i, smallDustStack.copyWithCount(1));
-        }
-        var craftingInv = CraftingInput.of(3, 3, recipeInputStacks);
+        try (var inner = Transaction.open(transaction)) {
 
-        var matches = level.getRecipeManager().getRecipesFor(RecipeType.CRAFTING, craftingInv, level);
+            // try taking 9 items from slot 1
+            var dustResource = outputInventory.getResource(1);
+            var removed = outputInventory.extract(1, dustResource, 9, inner);
+            if (removed != 9) return;
 
-        if (matches.isEmpty()) return;
+            // see if they can be combined
+            var recipeInputStacks = new ArrayList<ItemStack>(9);
+            for (int i = 0; i < 9; i++) {
+                recipeInputStacks.add(i, dustResource.toStack(1));
+            }
+            var craftingInv = CraftingInput.of(3, 3, recipeInputStacks);
+            var recipeCandidate = ((ServerLevel) level).recipeAccess().getRecipeFor(RecipeType.CRAFTING, craftingInv, level);
+            if (recipeCandidate.isEmpty()) return;
 
-        // gets the result stack of each entry, then filters if the type matches, and then checks if there is a result
-        var foundResult = !matches
-                .stream()
-                .map(elem -> elem.value().getResultItem(null))
-                .filter(elem -> baseResult.getItem().equals(elem.getItem()))
-                .toList().isEmpty();
+            var itemResult = recipeCandidate.get().value().assemble(craftingInv);
 
-        if (foundResult) {
-            smallDustStack.shrink(9);
-            baseResult.grow(1);
+            // try inserting result into slot 0, commit if successful
+            var inserted = outputInventory.insert(0, ItemResource.of(itemResult), itemResult.count(), inner);
+
+            if (inserted == 1) inner.commit();
+
         }
     }
 
@@ -108,19 +109,17 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
     }
 
     @Override
-    protected void useEnergy() {
-        super.useEnergy();
+    protected void onProgressed() {
+        super.onProgressed();
 
-        if (level.random.nextFloat() > 0.7 && !inventory.getItem(0).isEmpty()) {
-            var effect = new ItemParticleOption(ParticleTypes.ITEM, inventory.getItem(0).copy());
+        if (level.getRandom().nextFloat() > 0.7 && !inventory.getItem(0).isEmpty()) {
+            var effect = new ItemParticleOption(ParticleTypes.ITEM, inventory.getItem(0).getItem());
             var spawnAt = worldPosition.getCenter().add(0, 0.3, 0);
-            var offsetX = (level.random.nextFloat() - 0.5) * 0.1;
-            var offsetY = (level.random.nextFloat()) * 0.1;
-            var offsetZ = (level.random.nextFloat() - 0.5) * 0.1;
+            var offsetX = (level.getRandom().nextFloat() - 0.5) * 0.1;
+            var offsetY = (level.getRandom().nextFloat()) * 0.1;
+            var offsetZ = (level.getRandom().nextFloat() - 0.5) * 0.1;
             ((ServerLevel) level).sendParticles(effect, spawnAt.x(), spawnAt.y(), spawnAt.z(), 3, offsetX, offsetY, offsetZ, 0.08);
         }
-
-
     }
 
     @Override

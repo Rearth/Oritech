@@ -8,18 +8,19 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.entity.addons.CombiAddonEntity;
 import rearth.oritech.client.init.ModScreens;
@@ -28,17 +29,16 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
-public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
+public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidProvider {
 
-    @SyncField({SyncType.GUI_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage fluidContainer = new SimpleInOutFluidStorage(OritechConfig.processingMachines.centrifugeData.tankSizeInBuckets.get() * FluidType.BUCKET_VOLUME, this::setChanged);
+    @SyncField({SyncType.GUI_TICK, SyncType.INITIAL, SyncType.GUI_OPEN})
+    public final InOutFluidStorage fluidContainer = new InOutFluidStorage((int) (OritechConfig.processingMachines.centrifugeData.tankSizeInBuckets.get() * FluidType.BUCKET_VOLUME), this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
 
     @SyncField({SyncType.GUI_OPEN, SyncType.INITIAL})
     public boolean hasFluidAddon = false;
@@ -58,100 +58,61 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
 
     @Override
-    protected boolean canProceed(OritechRecipe recipe) {
+    protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
 
-        if (!hasFluidAddon) return super.canProceed(recipe);
+        // try fluid first if applicable
+        if (hasFluidAddon) {
+            var fluidInput = getFluidRecipeInput();
+            var candidate = super.loadRecipeFromInput(serverLevel, fluidInput, RecipeContent.CENTRIFUGE_FLUID.get());
+            if (!candidate.isEmpty()) return candidate;
+        }
 
-        if (!recipeInputMatchesTank(fluidContainer.getInStack(), recipe)) return false;
+        return super.loadRecipeFromInput(serverLevel, recipeInput, type);
+    }
 
-        // check if output fluid would fit
-        var output = recipe.getFluidOutputs().isEmpty() ? null : recipe.getFluidOutputs().getFirst();
-        if (output != null && !output.isEmpty()) { // only verify fluid output if fluid output exists
+    protected OritechRecipeInput getFluidRecipeInput() {
+        return new OritechRecipeInput(getInputView(), fluidContainer.getInStack());
+    }
 
-            if (fluidContainer.getOutStack().getAmount() + output.getAmount() > fluidContainer.getCapacity())
-                return false; // output too full
+    @Override
+    public boolean canOutputRecipe(OritechRecipe recipe) {
+        var itemsMatch = super.canOutputRecipe(recipe);
+        if (!itemsMatch || !hasFluidAddon) return itemsMatch;
 
-            return fluidContainer.getOutStack().isEmpty() || output.isFluidEqual(fluidContainer.getOutStack());   // output type mismatch
+        var outputInventory = fluidContainer.getOutputContainer();
+
+        try (var simulated = Transaction.openRoot()) {
+            for (var result : recipe.fluidOutputs()) {
+                var inserted = outputInventory.insert(FluidResource.of(result), result.amount(), simulated);
+                if (inserted != result.amount()) return false;
+            }
         }
 
         return true;
-
     }
 
     @Override
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
+    protected boolean removeCraftingInputs(Transaction transaction) {
 
-        if (inputEmpty()) return Optional.empty();
-
-        if (!hasFluidAddon)
-            return super.getRecipe();
-
-        // get recipes matching input items
-        var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
-        // filter out recipes based on input tank
-        var fluidRecipe = candidates.stream().filter(candidate -> recipeInputMatchesTank(fluidContainer.getInStack(), candidate.value())).findAny();
-        if (fluidRecipe.isPresent()) {
-            return fluidRecipe;
+        var fluidInput = currentRecipe.fluidInput();
+        if (fluidInput.amount() > 0) {
+            // we assume that the fluid content matches here, as this was checked in earlier steps already
+            var extracted = fluidContainer.getInputContainer().extract(FluidResource.of(fluidContainer.getInStack()), fluidInput.amount(), transaction);
+            if(extracted != fluidInput.amount()) return false;
         }
 
-        return getNormalRecipe();
+        return super.removeCraftingInputs(transaction);
     }
 
     @Override
-    protected boolean inputEmpty() {
-        var fluidEmpty = fluidContainer.getInStack().isEmpty();
-        return fluidEmpty && super.inputEmpty();
-    }
+    protected boolean createCraftingOutputs(Transaction transaction) {
 
-    // this is provided as fallback for fluid centrifuges that may still process normal stuff
-    private Optional<RecipeHolder<OritechRecipe>> getNormalRecipe() {
-        return level.getRecipeManager().getRecipeFor(RecipeContent.CENTRIFUGE.get(), getInputInventory(), level);
-    }
-
-    public static boolean recipeInputMatchesTank(FluidStack available, OritechRecipe recipe) {
-
-        var recipeNeedsFluid = recipe.getFluidInput() != null && recipe.getFluidInput().amount() > 0;
-        if (!recipeNeedsFluid) return true;
-
-        var isTankEmpty = available.isEmpty();
-        if (isTankEmpty) return false;
-
-        var recipeFluid = recipe.getFluidInput();
-        return recipeFluid.matchesFluid(available) && available.getAmount() >= recipe.getFluidInput().amount();
-    }
-
-    @Override
-    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-
-        var chamberCount = getBaseAddonData().extraChambers() + 1;
-
-        for (int i = 0; i < chamberCount; i++) {
-            var newRecipe = getRecipe();
-            if (newRecipe.isEmpty() || !newRecipe.get().value().equals(currentRecipe) || !canOutputRecipe(activeRecipe) || !canProceed(activeRecipe))
-                break;
-            super.finishCrafting(activeRecipe, outputInventory, inputInventory);
-
-            if (hasFluidAddon) {
-                craftFluids(activeRecipe);
-            }
+        for (var fluidOutput : currentRecipe.fluidOutputs()) {
+            var inserted = fluidContainer.getOutputContainer().insert(FluidResource.of(fluidOutput), fluidOutput.amount(), transaction);
+            if (inserted != fluidOutput.amount()) return false;
         }
-    }
 
-    @Override
-    public boolean supportExtraChambersAuto() {
-        return false;
-    }
-
-    private void craftFluids(OritechRecipe activeRecipe) {
-
-        var input = activeRecipe.getFluidInput();
-        var output = activeRecipe.getFluidOutputs().isEmpty() ? null : activeRecipe.getFluidOutputs().getFirst();
-
-        if (input != null && input.amount() > 0)
-            fluidContainer.getInputContainer().extract(fluidContainer.getInStack().copyWithAmount(input.amount()), false);
-        if (output != null && output.getAmount() > 0)
-            fluidContainer.getOutputContainer().insert(output, false);
-
+        return super.createCraftingOutputs(transaction);
     }
 
     @Override
@@ -183,12 +144,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
                 core.resetCaches();
             }
 
-            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition);
-            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, worldPosition.above());
+            level.invalidateCapabilities(worldPosition);
+            level.invalidateCapabilities(worldPosition.above());
 
             // trigger block update to allow pipes to connect/disconnect
-            level.blockUpdated(worldPosition, getBlockState().getBlock());
-            level.blockUpdated(worldPosition.above(), level.getBlockState(worldPosition.above()).getBlock());
+            level.updateNeighborsAt(worldPosition, getBlockState().getBlock());
+            level.updateNeighborsAt(worldPosition.above(), level.getBlockState(worldPosition.above()).getBlock());
         }
     }
 
@@ -209,7 +170,6 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
 
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
-        if (hasFluidAddon) return RecipeContent.CENTRIFUGE_FLUID.get();
         return RecipeContent.CENTRIFUGE.get();
     }
 
@@ -269,13 +229,13 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     }
 
     @Override
-    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         if (!hasFluidAddon) return null;
-        return fluidContainer;
+        return fluidContainer.getInputContainer();
     }
 
     @Override
-    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+    public List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
         if (!hasFluidAddon) return List.of();
         return List.of(fluidContainer.getInputContainer(), fluidContainer.getOutputContainer());
     }

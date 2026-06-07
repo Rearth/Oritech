@@ -23,15 +23,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.fluid.FluidApi;
-import rearth.oritech.api.fluid.containers.SimpleInOutFluidStorage;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
@@ -48,10 +48,10 @@ import rearth.oritech.util.Geometry;
 
 import java.util.*;
 
-public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidApi.BlockProvider {
+public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidProvider {
 
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
-    public final SimpleInOutFluidStorage ownStorage = new SimpleInOutFluidStorage(16 * FluidType.BUCKET_VOLUME, this::setChanged);
+    public final InOutFluidStorage ownStorage = new InOutFluidStorage(16 * FluidType.BUCKET_VOLUME, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
 
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public EnvironmentFactor arcaneFactor = EnvironmentFactor.DEFAULT;
@@ -159,7 +159,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
     @Override
     protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.finishCrafting(activeRecipe, outputInventory, inputInventory);
+        super.createCraftingOutputs(activeRecipe, outputInventory, inputInventory);
         craftFluids(activeRecipe);
     }
 

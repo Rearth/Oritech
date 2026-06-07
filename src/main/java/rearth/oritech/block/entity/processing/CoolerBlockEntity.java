@@ -12,15 +12,15 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
-import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -39,7 +39,7 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
     private boolean initialized = false;
 
     @SyncField(SyncType.GUI_TICK)
-    public final SimpleFluidStorage fluidStorage = new SimpleFluidStorage(4 * FluidType.BUCKET_VOLUME, this::setChanged);
+    public final InOutFluidStorage fluidStorage = new InOutFluidStorage(4 * FluidType.BUCKET_VOLUME, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 0));
 
     public CoolerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.COOLER_ENTITY.get(), pos, state, OritechConfig.processingMachines.coolerData.energyPerTick.get());
@@ -87,46 +87,20 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
 
     @Override
     protected OritechRecipeInput getRecipeInput() {
-        return new OritechRecipeInput(List.of(), fluidStorage.getContent());
+        return new OritechRecipeInput(List.of(), fluidStorage.getInStack());
     }
 
     @Override
-    protected boolean finishCrafting(Transaction transaction) {
-        var craftCount = 1 + getBaseAddonData().extraChambers();
-        var crafted = false;
+    protected boolean removeCraftingInputs(Transaction transaction) {
 
-        for (int i = 0; i < craftCount; i++) {
-            try (var nested = Transaction.open(transaction)) {
-                if (!processCraftInstance(currentRecipe, nested)) {
-                    return crafted;
-                }
-
-                nested.commit();
-                crafted = true;
-            }
+        var fluidInput = currentRecipe.fluidInput();
+        if (fluidInput.amount() > 0) {
+            // we assume that the fluid content matches here, as this was checked in earlier steps already
+            var extracted = fluidStorage.extract(FluidResource.of(fluidStorage.getInStack()), fluidInput.amount(), transaction);
+            if (extracted != fluidInput.amount()) return false;
         }
 
-        return crafted;
-    }
-
-    // returns true if crafting has been successful
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean processCraftInstance(OritechRecipe activeRecipe, Transaction transaction) {
-        var results = getCraftingResults(activeRecipe);
-        if (results.isEmpty()) return false;
-        var result = results.getFirst();
-
-        var inserted = inventory.getOutputContainer().insert(ItemResource.of(result), result.count(), transaction);
-        if (inserted != result.count()) return false;
-
-        var input = activeRecipe.fluidInput();
-        if (input.amount() <= 0) return true;
-
-        var fluidResource = fluidStorage.getResource(0);
-        if (fluidResource.isEmpty()) return false;
-
-        var extracted = fluidStorage.extract(0, fluidResource, input.amount(), transaction);
-        return extracted == input.amount();
+        return super.removeCraftingInputs(transaction);
     }
 
     @Override
@@ -193,8 +167,8 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
     }
 
     @Override
-    public net.neoforged.neoforge.transfer.ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
-        return fluidStorage;
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
+        return fluidStorage.getInputContainer();
     }
 
 }

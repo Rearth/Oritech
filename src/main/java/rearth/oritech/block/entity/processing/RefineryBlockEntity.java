@@ -76,16 +76,16 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ownStorage.serialize(output);
-        output.store("nodeA", FluidStack.OPTIONAL_CODEC, nodeA.getContent());
-        output.store("nodeB", FluidStack.OPTIONAL_CODEC, nodeB.getContent());
+        nodeA.serialize(output);
+        nodeB.serialize(output);
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownStorage.deserialize(input);
-        input.read("nodeA", FluidStack.OPTIONAL_CODEC).ifPresent(nodeA::handleDeltaUpdate);
-        input.read("nodeB", FluidStack.OPTIONAL_CODEC).ifPresent(nodeB::handleDeltaUpdate);
+        nodeA.deserialize(input);
+        nodeB.deserialize(input);
     }
 
     private void refreshModules() {
@@ -113,9 +113,13 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
 
     @Override
-    protected boolean finishCrafting(Transaction transaction) {
-        if (!super.finishCrafting(transaction)) return false;
-        return craftFluids(currentRecipe, transaction);
+    protected boolean createCraftingOutputs(Transaction transaction) {
+        return createFluidResults(transaction) && super.createCraftingOutputs(transaction);
+    }
+
+    @Override
+    protected boolean removeCraftingInputs(Transaction transaction) {
+        return removeFluidInputs(transaction) && super.removeCraftingInputs(transaction);
     }
 
     @Override
@@ -126,10 +130,9 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         return List.of(first.withCount(first.count() * getItemOutputMultiplier(activeRecipe)));
     }
 
-    private boolean craftFluids(OritechRecipe activeRecipe, Transaction transaction) {
-        if (!extractFluidInput(activeRecipe, transaction)) return false;
+    private boolean createFluidResults(Transaction transaction) {
 
-        var outputs = calculateOutputFluids(activeRecipe);
+        var outputs = calculateOutputFluids(currentRecipe);
         for (int i = 0; i < outputs.size(); i++) {
             var output = outputs.get(i);
             if (output.isEmpty()) continue;
@@ -142,8 +145,8 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         return true;
     }
 
-    private boolean extractFluidInput(OritechRecipe recipe, Transaction transaction) {
-        var input = recipe.fluidInput();
+    private boolean removeFluidInputs(Transaction transaction) {
+        var input = currentRecipe.fluidInput();
         if (input.amount() <= 0) return true;
 
         var inputTank = ownStorage.getInputContainer();

@@ -56,10 +56,10 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    protected void useEnergy() {
-        super.useEnergy();
+    protected void onProgressed() {
+        super.onProgressed();
 
-        if (level.random.nextFloat() > 0.4) return;
+        if (level.getRandom().nextFloat() > 0.4) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3(0, 0.6, 0.5), facing);
@@ -67,7 +67,6 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
 
         if (level instanceof ServerLevel sl)
             sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
-
     }
 
     @Override
