@@ -39,7 +39,7 @@ side = "BOTH"
 modId = "athena"
 type = "required"
 ordering = "AFTER"
-side = "BOTH"
+side = "CLIENT"
 
 [[dependencies.oritech]]
 modId = "geckolib"
