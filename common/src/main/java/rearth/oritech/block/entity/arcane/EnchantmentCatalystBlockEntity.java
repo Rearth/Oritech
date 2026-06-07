@@ -259,8 +259,11 @@ public class EnchantmentCatalystBlockEntity extends BaseSoulCollectionEntity
         
         var bookCandidate = inventory.getItem(0);
         if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.has(DataComponents.STORED_ENCHANTMENTS)) {
+
+            var data = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS);
+            if (data == null || data.isEmpty()) return false;
             
-            var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
+            var enchantment = data.keySet().stream().findFirst().get();
             var maxLevel = enchantment.value().getMaxLevel();
             var level = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
             
