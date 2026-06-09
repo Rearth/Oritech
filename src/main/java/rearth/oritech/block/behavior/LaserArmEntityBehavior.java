@@ -1,7 +1,5 @@
 package rearth.oritech.block.behavior;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -33,7 +31,7 @@ public class LaserArmEntityBehavior {
         if (level.getGameTime() % 10 != 0) return true; // entities can only be damaged twice per second?
 
         entity.hurt(
-                new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), laserEntity.getLaserPlayerEntity()),
+                level.damageSources().source(DamageTypes.LIGHTNING_BOLT),
                 laserEntity.getDamageTick());
 
 

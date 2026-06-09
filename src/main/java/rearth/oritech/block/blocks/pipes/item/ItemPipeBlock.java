@@ -39,9 +39,9 @@ public class ItemPipeBlock extends GenericPipeBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
 
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
         if (showExtra) {
             for (int i = 1; i <= 4; i++) {
                 tooltip.add(Component.translatable("tooltip.oritech.item_pipe." + i).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));

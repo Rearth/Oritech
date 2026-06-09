@@ -37,8 +37,8 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
-        var showExtra = Screen.hasControlDown();
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        var showExtra = Minecraft.getInstance().hasControlDown();
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.accelerator_motor").withStyle(ChatFormatting.GRAY));
         }

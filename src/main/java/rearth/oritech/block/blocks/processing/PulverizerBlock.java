@@ -29,7 +29,7 @@ public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlo
     @Override
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
 
-        if (!level.isClientSide && entity instanceof LivingEntity livingEntity) {
+        if (!level.isClientSide() && entity instanceof LivingEntity livingEntity) {
             var targetPos = pos.getCenter().add(0, 0.5f, 0);
             var entityDist = entity.distanceToSqr(targetPos);
             if (entityDist > 0.7) return;

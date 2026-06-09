@@ -78,7 +78,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
 
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
-        if (!level.isClientSide && stack.has(DataComponents.INTANGIBLE_PROJECTILE)) {
+        if (!level.isClientSide() && stack.has(DataComponents.INTANGIBLE_PROJECTILE)) {
             var enchantments = stack.getEnchantments();
             var builder = new ItemEnchantments.Mutable(enchantments);
             builder.removeIf(elem -> elem.is(Enchantments.SILK_TOUCH));
@@ -100,7 +100,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
 
-        if (!level.isClientSide && user.isShiftKeyDown()) {
+        if (!level.isClientSide() && user.isShiftKeyDown()) {
             var stack = user.getItemInHand(hand);
 
             var wasArea = isAreaEnabled(stack);

@@ -61,7 +61,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
 
-        if (!level.isClientSide && miner.isShiftKeyDown()) {
+        if (!level.isClientSide() && miner.isShiftKeyDown()) {
             var startPos = pos.above();
             var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {

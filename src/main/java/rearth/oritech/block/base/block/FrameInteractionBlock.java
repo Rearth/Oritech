@@ -126,7 +126,7 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         addMachineTooltip(tooltip, this, this);
     }
 }

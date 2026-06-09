@@ -87,7 +87,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
 
     private static void onBlockRemoved(Level level, BlockPos pos) {
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
             var stacks = entity.inventory.heldStacks;
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
@@ -138,7 +138,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
 //    }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         addMachineTooltip(tooltip, this, this);
     }
 }

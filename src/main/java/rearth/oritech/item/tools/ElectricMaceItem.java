@@ -152,7 +152,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
         tooltip.add(text.withStyle(ChatFormatting.GOLD));
 
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.electric_mace").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));

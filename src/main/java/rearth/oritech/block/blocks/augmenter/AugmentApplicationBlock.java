@@ -113,7 +113,7 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 
-        if (level.isClientSide || !state.getValue(ASSEMBLED)) return;
+        if (level.isClientSide() || !state.getValue(ASSEMBLED)) return;
 
         if (!(entity instanceof Player player)) return;
 
@@ -251,7 +251,7 @@ public class AugmentApplicationBlock extends HorizontalDirectionalBlock implemen
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         var hotkey = OritechClient.AUGMENT_SELECTOR.key.getDisplayName();
         tooltip.add(Component.translatable("tooltip.oritech.augmenter.1").withStyle(ChatFormatting.GRAY));

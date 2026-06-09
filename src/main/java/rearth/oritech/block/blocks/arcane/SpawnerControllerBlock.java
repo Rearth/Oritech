@@ -35,7 +35,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     public void stepOn(Level level, BlockPos pos, BlockState state, Entity entity) {
         super.stepOn(level, pos, state, entity);
 
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onEntitySteppedOn(entity);
         }
 
@@ -82,7 +82,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof SpawnerControllerBlockEntity spawnerEntity) {
             spawnerEntity.onBlockInteracted(player);
         }
 
@@ -106,7 +106,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.spawner").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.oritech.spawner2").withStyle(ChatFormatting.GRAY));

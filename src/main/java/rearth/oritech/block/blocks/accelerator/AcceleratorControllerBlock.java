@@ -2,16 +2,16 @@ package rearth.oritech.block.blocks.accelerator;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -28,10 +28,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class AcceleratorControllerBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class AcceleratorControllerBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
     public AcceleratorControllerBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
@@ -67,8 +67,8 @@ public class AcceleratorControllerBlock extends HorizontalDirectionalBlock imple
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof AcceleratorControllerBlockEntity accelerator) {
-            ((ServerPlayer) player).openMenu(accelerator, pos);
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof AcceleratorControllerBlockEntity accelerator) {
+            player.openMenu(accelerator, pos);
         }
 
         return InteractionResult.SUCCESS;
@@ -85,12 +85,12 @@ public class AcceleratorControllerBlock extends HorizontalDirectionalBlock imple
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
-        var showExtra = Screen.hasControlDown();
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        var showExtra = Minecraft.getInstance().hasControlDown();
         if (!showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.accelerator").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.accelerator").withStyle(ChatFormatting.GRAY));
         }
     }
 }

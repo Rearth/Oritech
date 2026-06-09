@@ -84,7 +84,7 @@ public class LaserArmBlockBehavior {
 
                 try (var transaction = Transaction.openRoot()) {
                     var inserted = storageCandidate.insert(transferCapacity, transaction);
-                    if (inserted > 0 && inserted <= transferCapacity) {
+                    if (inserted > 0) {
                         transaction.commit();
 
                         if (blockEntity instanceof AtomicForgeBlockEntity atomicForgeBlock)

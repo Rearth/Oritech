@@ -103,10 +103,10 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
-        if (Screen.hasControlDown())
+        if (Minecraft.getInstance().hasControlDown())
             tooltip.add(Component.translatable("tooltip.oritech.solar_generation").withStyle(ChatFormatting.GRAY));
     }
 }

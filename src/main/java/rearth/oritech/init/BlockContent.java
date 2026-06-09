@@ -1,7 +1,12 @@
 package rearth.oritech.init;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
@@ -42,6 +47,7 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 @SuppressWarnings("NullableProblems")
 public class BlockContent {
@@ -466,7 +472,19 @@ public class BlockContent {
                     fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
                 }
 
-                var blockItem = BLOCK_ITEMS.registerSimpleBlockItem(value);
+                DeferredItem<BlockItem> blockItem = BLOCK_ITEMS.registerItem(
+                        value.unwrapKey().orElseThrow().identifier().getPath(),
+                        props -> new BlockItem(value.value(), props) {
+                            @Override
+                            public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+                                super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+
+                                if (value.get() instanceof TooltipProvider tooltipProvider) {
+                                    tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
+                                }
+                            }
+                        }
+                );
                 BLOCK_GROUPS.add(new Pair<>(blockItem, fieldGroup));
 
             } catch (IllegalAccessException e) {

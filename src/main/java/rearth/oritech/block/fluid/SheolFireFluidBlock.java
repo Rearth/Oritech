@@ -6,36 +6,33 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Supplier;
 
 public class SheolFireFluidBlock extends LiquidBlock {
 
-    public SheolFireFluidBlock(Supplier<? extends FlowingFluid> fluid, Properties properties) {
+    public SheolFireFluidBlock(FlowingFluid fluid, Properties properties) {
         super(fluid, properties);
     }
 
     @Override
-    protected void entityInside(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull Entity entity) {
-        super.entityInside(state, level, pos, entity);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
+        super.entityInside(state, level, pos, entity, effectApplier, isPrecise);
 
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.hurt(level.damageSources().lava(), 8);
             livingEntity.setRemainingFireTicks(8 * 20);
         }
-
     }
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         var blockpos = pos.above();
-        if (level.getBlockState(blockpos).isAir() && !level.getBlockState(blockpos).isSolidRender(level, blockpos)) {
+        if (level.getBlockState(blockpos).isAir() && !level.getBlockState(blockpos).isSolidRender()) {
             if (random.nextInt(40) == 0) {
                 double d0 = (double) pos.getX() + random.nextDouble();
                 double d1 = (double) pos.getY() + 1.0;

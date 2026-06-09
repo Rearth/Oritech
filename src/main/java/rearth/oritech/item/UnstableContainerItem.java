@@ -72,7 +72,7 @@ public class UnstableContainerItem extends Item implements GeoItem {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
 
         var shiftPressed = Screen.hasShiftDown();
-        var ctrlPressed = Screen.hasControlDown();
+        var ctrlPressed = Minecraft.getInstance().hasControlDown();
 
         if (shiftPressed) {
             tooltip.add(Component.translatable("tooltip.oritech.unstable_container.low").withStyle(ChatFormatting.DARK_PURPLE));

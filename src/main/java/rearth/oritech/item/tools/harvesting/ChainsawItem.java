@@ -75,7 +75,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
 
         var energySuccess = this.tryUseEnergy(stack, (long) amount, player);
 
-        if (!level.isClientSide && miner.isShiftKeyDown() && energySuccess && OritechConfig.chainsawTreeCutting.get()) {
+        if (!level.isClientSide() && miner.isShiftKeyDown() && energySuccess && OritechConfig.chainsawTreeCutting.get()) {
             var startPos = pos.above();
             var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {

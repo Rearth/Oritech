@@ -63,7 +63,7 @@ public class ReactorControllerBlock extends BaseReactorBlock implements EntityBl
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorControllerBlockEntity reactorController) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ReactorControllerBlockEntity reactorController) {
             reactorController.init(player);
 
             if (level.getGameTime() < reactorController.disabledUntil) {

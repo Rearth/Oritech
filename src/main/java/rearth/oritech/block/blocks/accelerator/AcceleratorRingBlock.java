@@ -95,8 +95,8 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
-        var showExtra = Screen.hasControlDown();
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        var showExtra = Minecraft.getInstance().hasControlDown();
         if (!showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {

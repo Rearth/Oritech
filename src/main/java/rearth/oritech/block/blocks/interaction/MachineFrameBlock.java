@@ -51,7 +51,7 @@ public class MachineFrameBlock extends Block {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.machine_frame").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tooltip.add(Component.translatable("tooltip.oritech.machine_frame.1", OritechConfig.processingMachines.machineFrameMaxLength.get(), OritechConfig.processingMachines.machineFrameMaxLength.get()).withStyle(ChatFormatting.GRAY));

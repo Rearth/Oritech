@@ -402,7 +402,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
                 .append(Component.translatable("tooltip.oritech.portable_laser.status.hint").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         tooltip.add(miningText);
 
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             for (int i = 1; i <= 5; i++) {

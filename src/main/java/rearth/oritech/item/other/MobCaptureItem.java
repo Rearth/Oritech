@@ -55,7 +55,7 @@ public class MobCaptureItem extends Item {
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
 
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             tooltip.add(Component.translatable("tooltip.oritech.capture_item_desc_1"));

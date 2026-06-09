@@ -31,7 +31,7 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (!level.isClientSide && level.getBlockEntity(pos) instanceof ReactorFuelPortEntity) {
+        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ReactorFuelPortEntity) {
             player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
         }
 

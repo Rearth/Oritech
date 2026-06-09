@@ -106,7 +106,7 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
     }

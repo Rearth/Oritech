@@ -50,7 +50,7 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     @Override
     protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
-        if (level.isClientSide || !hasExtractingSide(state) || state.getValue(HAS_MOTOR))
+        if (level.isClientSide() || !hasExtractingSide(state) || state.getValue(HAS_MOTOR))
             return super.useItemOn(stack, state, level, pos, player, hand, hit);
 
         var ownEntity = level.getBlockEntity(pos);
@@ -67,7 +67,7 @@ public class ItemPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
 
-        if (!level.isClientSide && state.getValue(HAS_MOTOR)) {
+        if (!level.isClientSide() && state.getValue(HAS_MOTOR)) {
             level.addFreshEntity(new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ItemContent.MOTOR)));
         }
 

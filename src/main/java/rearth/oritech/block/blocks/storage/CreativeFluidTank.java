@@ -25,10 +25,10 @@ public class CreativeFluidTank extends SmallFluidTank {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         addMachineTooltip(tooltip, this, this);
-        if (Screen.hasControlDown())
+        if (Minecraft.getInstance().hasControlDown())
             tooltip.add(Component.translatable("tooltip.oritech.creative_tank").withStyle(ChatFormatting.GRAY));
     }
 
@@ -41,7 +41,7 @@ public class CreativeFluidTank extends SmallFluidTank {
     @Override
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
-        if (level.isClientSide || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity))
+        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity))
             return super.useWithoutItem(state, level, pos, player, hit);
 
         // todo use proper api here

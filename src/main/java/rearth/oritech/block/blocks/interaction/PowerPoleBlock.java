@@ -133,7 +133,7 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     @Override
     public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag options) {
         super.appendHoverText(stack, context, tooltip, options);
-        var showExtra = Screen.hasControlDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (!showExtra)
             tooltip.add(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));

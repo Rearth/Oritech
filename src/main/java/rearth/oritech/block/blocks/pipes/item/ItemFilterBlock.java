@@ -91,7 +91,7 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         tooltip.add(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
 
 

@@ -145,7 +145,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag options) {
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
         tooltip.add(Component.translatable("tooltip.oritech.catalyst").withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("tooltip.oritech.catalyst_warning").withStyle(ChatFormatting.DARK_PURPLE));
