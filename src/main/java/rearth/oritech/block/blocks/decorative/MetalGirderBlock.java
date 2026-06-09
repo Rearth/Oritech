@@ -3,9 +3,11 @@ package rearth.oritech.block.blocks.decorative;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,11 +51,11 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
 
         var facing = state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        var blockInBack = level.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
-        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInBack = level.getBlockState(pos.offset(facing.getUnitVec3i())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getUnitVec3i())).is(BlockContent.METAL_GIRDER_BLOCK);
         var straight = false;
         if (blockInFront && !blockInBack) {
             facing = facing.getOpposite();
@@ -62,7 +64,6 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
         }
 
         return state.setValue(BlockStateProperties.HORIZONTAL_FACING, facing).setValue(HEADING, !straight);
-
     }
 
     @Nullable
@@ -80,8 +81,8 @@ public class MetalGirderBlock extends HorizontalDirectionalBlock {
             facing = ctx.getHorizontalDirection().getOpposite();
         }
 
-        var blockInBack = level.getBlockState(pos.offset(facing.getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
-        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getNormal())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInBack = level.getBlockState(pos.offset(facing.getUnitVec3i())).is(BlockContent.METAL_GIRDER_BLOCK);
+        var blockInFront = level.getBlockState(pos.offset(facing.getOpposite().getUnitVec3i())).is(BlockContent.METAL_GIRDER_BLOCK);
         var straight = false;
         if (blockInFront && !blockInBack) {
             facing = facing.getOpposite();

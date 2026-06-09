@@ -4,14 +4,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -154,39 +155,26 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         updateNeighbors(level, pos, false);
     }
 
-    // also known as 'getStateForNeighborUpdate'
     @Override
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
-
-        if (!(worldAccess instanceof ServerLevel level)) return state;
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+        if (!(level instanceof ServerLevel serverLevel)) return state;
 
         if (state.getValue(BlockStateProperties.WATERLOGGED))
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            serverLevel.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 
         // transform to interface when machine is placed as neighbor
-        if (hasMachineInDirection(direction, level, pos, apiValidationFunction())) {
+        if (hasMachineInDirection(directionToNeighbour, serverLevel, pos, apiValidationFunction())) {
             // Only update if the neighbor is a new machine
-            var hasMachine = getNetworkData(level).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
+            var hasMachine = getNetworkData(serverLevel).machinePipeNeighbors.getOrDefault(neighbourPos, HashSet.newHashSet(0)).contains(directionToNeighbour.getOpposite());
             if (hasMachine) return state;
 
             var connectionBlock = getConnectionBlock();
-            return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, level, pos, direction);
-        } else if (neighborState.is(Blocks.AIR))
+            return ((GenericPipeBlock) connectionBlock.getBlock()).addConnectionStates(connectionBlock, serverLevel, pos, directionToNeighbour);
+        } else if (neighbourState.is(Blocks.AIR))
             // remove potential stale machine -> neighboring pipes mapping
-            getNetworkData(level).machinePipeNeighbors.remove(neighborPos);
+            getNetworkData(serverLevel).machinePipeNeighbors.remove(neighbourPos);
 
         return state;
-    }
-
-    @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, level, pos, newState, moved);
-
-        if (!state.is(newState.getBlock()) && !(newState.getBlock() instanceof GenericPipeBlock)) {
-            // block was removed/replaced instead of updated
-            onBlockRemoved(pos, state, level);
-        }
-
     }
 
     @Override
@@ -229,14 +217,14 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 
-        if (!level.isClientSide() && stack.is(TagContent.WRENCHES) && !stack.is(ItemContent.WRENCH)) {
+        if (!level.isClientSide() && itemStack.is(TagContent.WRENCHES) && !itemStack.is(ItemContent.WRENCH)) {
             this.onWrenchUse(state, level, pos, player, hand);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
@@ -284,7 +272,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             // center hit
             diff = hitPos.subtract(center.add(Vec3.atLowerCornerOf(pos)));
 
-        return Direction.getNearest(diff.x, diff.y, diff.z);
+        return Direction.getNearest((int) diff.x, (int) diff.y, (int) diff.z, Direction.UP);
     }
 
     // only returns the outside shapes

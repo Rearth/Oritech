@@ -1,13 +1,13 @@
 package rearth.oritech.block.blocks.generators;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -23,8 +23,8 @@ import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 public class SteamEngineBlock extends MultiblockMachine {
     public SteamEngineBlock(Properties settings) {
@@ -51,7 +51,7 @@ public class SteamEngineBlock extends MultiblockMachine {
             consumer.accept(Component.translatable("tooltip.oritech.steam_engine.2").withStyle(ChatFormatting.GRAY));
         }
 
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class SteamEngineBlock extends MultiblockMachine {
 
         if (!level.isClientSide()) {
 
-            var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY);
+            var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
                 player.sendSystemMessage(Component.translatable("message.oritech.steamengine.controller_link"));

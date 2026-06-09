@@ -3,6 +3,7 @@ package rearth.oritech.block.blocks.pipes.energy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import rearth.oritech.block.blocks.pipes.GenericPipeDuctBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
@@ -19,12 +20,12 @@ public class SuperConductorDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.defaultBlockState();
+        return BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.get().defaultBlockState();
     }
 
     @Override
-    public String getPipeTypeName() {
-        return "superconductor";
+    public SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType() {
+        return GenericPipeInterfaceEntity.PipeNetworkData.SUPERCONDUCTOR_TYPE;
     }
 
     @Override
@@ -34,6 +35,6 @@ public class SuperConductorDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
-        return SuperConductorBlock.SUPERCONDUCTOR_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+        return SuperConductorBlock.SUPERCONDUCTOR_DATA.computeIfAbsent(level.dimension().identifier(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }

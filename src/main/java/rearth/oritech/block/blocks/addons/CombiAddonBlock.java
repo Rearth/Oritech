@@ -1,8 +1,9 @@
 package rearth.oritech.block.blocks.addons;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
@@ -19,7 +20,7 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class CombiAddonBlock extends MachineAddonBlock {
 
@@ -43,11 +44,11 @@ public class CombiAddonBlock extends MachineAddonBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
-        if (showExtra) {
+        if (showExtra && dataComponentGetter instanceof ItemStack stack) {
 
             if (!stack.has(ComponentContent.ADDON_DATA.get())) return;
 
@@ -56,7 +57,7 @@ public class CombiAddonBlock extends MachineAddonBlock {
 
             consumer.accept(Component.translatable("tooltip.oritech.combi_addon_desc").withStyle(ChatFormatting.GRAY));
 
-            consumer.acceptAll(foundTexts);
+            foundTexts.forEach(consumer);
 
         }
     }

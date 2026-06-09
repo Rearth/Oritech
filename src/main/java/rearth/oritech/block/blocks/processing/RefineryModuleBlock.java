@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
+
 
 
 public class RefineryModuleBlock extends HorizontalDirectionalBlock implements EntityBlock {
@@ -63,7 +63,7 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Override
@@ -102,7 +102,7 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
         if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand))
             return ItemInteractionResult.sidedSuccess(true);
@@ -132,9 +132,9 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
         consumer.accept(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 
 

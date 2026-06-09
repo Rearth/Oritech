@@ -43,7 +43,7 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
 
         if (!level.isClientSide()) {
             var entity = (ReactorFuelPortEntity) level.getBlockEntity(pos);
-            var stacks = entity.inventory.heldStacks;
+            var stacks = entity.inventory.getStacks();
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
                     var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -51,8 +51,8 @@ public class ReactorFuelPortBlock extends BaseReactorBlock implements EntityBloc
                 }
             }
 
-            entity.inventory.heldStacks.clear();
-            entity.inventory.setChanged();
+            entity.inventory.getStacks().clear();
+            entity.setChanged();
         }
 
         return super.playerWillDestroy(level, pos, state, player);

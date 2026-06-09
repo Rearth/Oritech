@@ -1,13 +1,13 @@
 package rearth.oritech.block.blocks.generators;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -20,11 +20,11 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.PassiveGeneratorBlock;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
 public class BigSolarPanelBlock extends PassiveGeneratorBlock {
@@ -99,13 +99,12 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
         if (Minecraft.getInstance().hasControlDown())
             consumer.accept(Component.translatable("tooltip.oritech.solar_generation").withStyle(ChatFormatting.GRAY));
     }

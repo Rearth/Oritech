@@ -1,12 +1,13 @@
 package rearth.oritech.block.blocks.accelerator;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,9 +18,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorMotorBlockEntity;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implements EntityBlock {
+public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implements EntityBlock, TooltipProvider {
 
     public AcceleratorMotorBlock(Properties settings) {
         super(settings);
@@ -40,9 +41,9 @@ public class AcceleratorMotorBlock extends AcceleratorPassthroughBlock implement
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.accelerator_motor").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.accelerator_motor").withStyle(ChatFormatting.GRAY));
         }
 
-        TooltipHelper.addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

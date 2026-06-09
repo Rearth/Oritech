@@ -103,7 +103,7 @@ public class NukeBlock extends Block {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
         var key = small ? "block.oritech.low_yield_nuke.tooltip" : "block.oritech.nuke.tooltip";
         consumer.accept(Component.translatable(key).withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));
         consumer.accept(Component.translatable(key + ".2").withStyle(ChatFormatting.GOLD, ChatFormatting.ITALIC));

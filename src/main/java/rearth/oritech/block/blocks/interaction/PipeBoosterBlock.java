@@ -4,10 +4,11 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -22,13 +23,13 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.PipeBoosterBlockEntity;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class PipeBoosterBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class PipeBoosterBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public PipeBoosterBlock(Properties settings) {
         super(settings);
@@ -53,7 +54,7 @@ public class PipeBoosterBlock extends HorizontalDirectionalBlock implements Enti
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Nullable
@@ -74,8 +75,7 @@ public class PipeBoosterBlock extends HorizontalDirectionalBlock implements Enti
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         consumer.accept(Component.translatable("tooltip.oritech.pipe_booster").withStyle(ChatFormatting.DARK_GRAY));
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

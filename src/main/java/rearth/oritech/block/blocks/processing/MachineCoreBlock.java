@@ -2,14 +2,16 @@ package rearth.oritech.block.blocks.processing;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -28,11 +30,11 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class MachineCoreBlock extends Block implements EntityBlock {
+public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvider {
 
     public static final BooleanProperty USED = BooleanProperty.create("core_used");
 
@@ -56,7 +58,6 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         consumer.accept(Component.translatable("tooltip.oritech.machine_core_block").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
-        super.appendHoverText(stack, context, tooltip, options);
     }
 
     @Override
@@ -83,19 +84,18 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
         // forward explosion to refinery
         if (state.getValue(USED)) {
             var controller = getControllerPos(level, pos);
             var controllerState = level.getBlockState(controller);
             if (controllerState.getBlock() instanceof RefineryBlock refineryBlock) {
-                refineryBlock.onExplosionHit(controllerState, level, controller, explosion, stackMerger);
+                refineryBlock.onExplosionHit(controllerState, level, controller, explosion, onHit);
                 return;
             }
         }
-
-        super.onExplosionHit(state, level, pos, explosion, stackMerger);
+        super.onExplosionHit(state, level, pos, explosion, onHit);
     }
 
     private static void onBlockRemoved(BlockState state, LevelAccessor level, BlockPos pos) {
@@ -140,7 +140,7 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
         if (!state.getValue(USED)) super.useItemOn(stack, state, level, pos, player, hand, hit);
 

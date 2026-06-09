@@ -1,15 +1,17 @@
 package rearth.oritech.block.blocks.interaction;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -29,13 +31,13 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class PowerPoleBlock extends Block implements EntityBlock {
+
+public class PowerPoleBlock extends Block implements EntityBlock, TooltipProvider {
 
     public PowerPoleBlock(Properties properties) {
         super(properties);
@@ -131,14 +133,13 @@ public class PowerPoleBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, Item.@NotNull TooltipContext context, @NotNull List<Component> tooltip, @NotNull TooltipFlag options) {
-        super.appendHoverText(stack, context, tooltip, options);
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (!showExtra)
             consumer.accept(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));
 
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
 
         if (showExtra) {
             consumer.accept(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));

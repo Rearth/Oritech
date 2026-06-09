@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
-import rearth.oritech.api.energy.EnergyApi;
+
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 
 public interface OritechEnergyItem extends EnergyApi.ItemProvider {

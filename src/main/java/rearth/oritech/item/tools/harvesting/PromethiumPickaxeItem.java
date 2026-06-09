@@ -136,7 +136,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
                 for (int x = -1; x <= 1; x++) {
                     for (int z = -1; z <= 1; z++) {
                         if (x == 0 && z == 0) continue;
-                        var neighborPos = pos.offset(perpA.getNormal().multiply(x)).offset(perpB.getNormal().multiply(z));
+                        var neighborPos = pos.offset(perpA.getUnitVec3i().multiply(x)).offset(perpB.getUnitVec3i().multiply(z));
                         breakBlocks.add(neighborPos);
                     }
                 }

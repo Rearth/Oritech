@@ -16,7 +16,7 @@ import rearth.oritech.block.entity.storage.SmallTankEntity;
 
 import java.util.List;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
+
 
 public class CreativeFluidTank extends SmallFluidTank {
 
@@ -26,8 +26,8 @@ public class CreativeFluidTank extends SmallFluidTank {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
+        TooltipHelper.addMachineTooltip(consumer, this, this);
         if (Minecraft.getInstance().hasControlDown())
             consumer.accept(Component.translatable("tooltip.oritech.creative_tank").withStyle(ChatFormatting.GRAY));
     }

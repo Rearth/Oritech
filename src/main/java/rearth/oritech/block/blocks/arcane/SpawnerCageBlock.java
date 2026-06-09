@@ -3,21 +3,24 @@ package rearth.oritech.block.blocks.arcane;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public class SpawnerCageBlock extends Block {
+public class SpawnerCageBlock extends Block implements TooltipProvider {
 
     public static BooleanProperty UP = BooleanProperty.create("up");
     public static BooleanProperty DOWN = BooleanProperty.create("down");
@@ -44,7 +47,7 @@ public class SpawnerCageBlock extends Block {
         return getTargetState(level, pos);
     }
 
-    private BlockState getTargetState(LevelAccessor level, BlockPos pos) {
+    private BlockState getTargetState(LevelReader level, BlockPos pos) {
 
         var state = defaultBlockState();
 
@@ -65,13 +68,13 @@ public class SpawnerCageBlock extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+
         return getTargetState(level, pos);
     }
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         consumer.accept(Component.translatable("tooltip.oritech.spawner_cage").withStyle(ChatFormatting.GRAY));
     }
 }

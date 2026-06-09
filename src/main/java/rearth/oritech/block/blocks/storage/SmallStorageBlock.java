@@ -36,7 +36,7 @@ import rearth.oritech.util.MachineAddonController;
 import java.util.List;
 import java.util.Objects;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
+
 
 
 public class SmallStorageBlock extends Block implements EntityBlock {
@@ -185,9 +185,9 @@ public class SmallStorageBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
 
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 
 }

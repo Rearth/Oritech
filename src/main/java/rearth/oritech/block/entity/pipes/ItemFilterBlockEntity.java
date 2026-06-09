@@ -41,7 +41,7 @@ import java.util.function.Supplier;
 
 public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemProvider, MenuProvider {
 
-    private final DelegatingFilterInventory inventory = new DelegatingFilterInventory(this::getBackingStorage, null);
+    public final DelegatingFilterInventory inventory = new DelegatingFilterInventory(this::getBackingStorage, null);
     private BlockCapabilityCache<ResourceHandler<ItemResource>, Direction> lookupCache;
 
     @SyncField(SyncType.GUI_OPEN)

@@ -98,7 +98,7 @@ public class LargeStorageBlock extends SmallStorageBlock {
             }
 
             if (entity instanceof ExpandableEnergyStorageBlockEntity storageBlock) {
-                var stacks = storageBlock.inventory.heldStacks;
+                var stacks = storageBlock.inventory.getStacks();
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
@@ -106,8 +106,8 @@ public class LargeStorageBlock extends SmallStorageBlock {
                     }
                 }
 
-                storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.setChanged();
+                storageBlock.inventory.getStacks().clear();
+                storageBlock.setChanged();
             }
         }
 

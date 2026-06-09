@@ -20,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -63,8 +64,8 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
 
         if (level.isClientSide()) return;
 
@@ -79,7 +80,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
         var entity = (TechDoorBlockEntity) level.getBlockEntity(pos);
 
         if (entity.shouldPlaySoundAgain())
-            level.playSound(null, pos, SoundContent.PRESS, SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.3f);
+            level.playSound(null, pos, SoundContent.PRESS.value(), SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.3f);
 
         level.setBlockAndUpdate(pos, state.setValue(OPENED, isPowered));
         level.setBlockAndUpdate(pos.above(), aboveState.setValue(OPENED, isPowered));
@@ -119,7 +120,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack itemStack) {
         if (!level.isClientSide())
-            level.setBlockAndUpdate(pos.above(), BlockContent.TECH_DOOR_HINGE.defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
+            level.setBlockAndUpdate(pos.above(), BlockContent.TECH_DOOR_HINGE.get().defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
     }
 
     @Override
@@ -143,6 +144,6 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 }

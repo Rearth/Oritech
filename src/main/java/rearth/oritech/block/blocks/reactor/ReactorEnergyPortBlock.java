@@ -52,7 +52,7 @@ public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBl
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 

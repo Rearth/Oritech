@@ -4,13 +4,16 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -24,7 +27,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -36,12 +40,12 @@ import rearth.oritech.init.SoundContent;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
-public class HangarDoorBlock extends Block implements EntityBlock {
+public class HangarDoorBlock extends Block implements EntityBlock, TooltipProvider {
 
-    public static final DirectionProperty SURFACE = BlockStateProperties.FACING;
+    public static final EnumProperty<Direction> SURFACE = BlockStateProperties.FACING;
     public static final BooleanProperty OPENED = BooleanProperty.create("open");
     public static final BooleanProperty ROTATED = BooleanProperty.create("rotated");
 
@@ -76,7 +80,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
         // create segment blocks
         var segmentDirection = getSegmentDirection(state);
         for (int part = 1; part <= 2; part++) {
-            level.setBlockAndUpdate(pos.relative(segmentDirection, part), BlockContent.HANGAR_DOOR_HELPER.defaultBlockState()
+            level.setBlockAndUpdate(pos.relative(segmentDirection, part), BlockContent.HANGAR_DOOR_HELPER.get().defaultBlockState()
                     .setValue(HangarDoorHelperBlock.PART, part)
                     .setValue(SURFACE, state.getValue(SURFACE))
                     .setValue(OPENED, state.getValue(OPENED))
@@ -85,9 +89,8 @@ public class HangarDoorBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
-
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
         if (level.isClientSide()) return;
         updateDoorState(level, pos, state);
     }
@@ -117,12 +120,11 @@ public class HangarDoorBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (!state.is(newState.getBlock()) && !level.isClientSide()) {
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        if (!state.is(state.getBlock()) && !level.isClientSide()) {
             removeHelpers(level, pos, state);
         }
-
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
     }
 
     @Override
@@ -138,7 +140,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Override
@@ -209,7 +211,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
         var blockEntity = level.getBlockEntity(anchorPos);
         if (blockEntity instanceof HangarDoorBlockEntity hangarDoor && hangarDoor.shouldPlaySoundAgain()) {
-            level.playSound(null, anchorPos, SoundContent.PRESS, SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
+            level.playSound(null, anchorPos, SoundContent.PRESS.value(), SoundSource.BLOCKS, OritechConfig.machineVolumeMultiplier.get().floatValue() * 0.18f, 1.15f);
         }
 
         for (var connectedAnchorPos : connectedAnchors) {

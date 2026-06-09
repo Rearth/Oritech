@@ -62,7 +62,7 @@ public class PortalEntity extends Entity implements GeoEntity {
                         serverPlayer.getYRot(), serverPlayer.getXRot()
                 );
             } else {
-                Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().location());
+                Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().identifier());
             }
         }
 

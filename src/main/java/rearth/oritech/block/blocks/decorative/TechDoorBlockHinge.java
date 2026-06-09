@@ -13,9 +13,11 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jspecify.annotations.Nullable;
 
 import static rearth.oritech.block.blocks.decorative.TechDoorBlock.OPENED;
 
@@ -40,12 +42,12 @@ public class TechDoorBlockHinge extends HorizontalDirectionalBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
 
         // forward the event to bottom block
         if (level.isClientSide()) return;
-        level.neighborChanged(pos.below(), sourceBlock, sourcePos);
+        level.neighborChanged(pos.below(), block, orientation);
     }
 
     @Override

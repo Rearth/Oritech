@@ -29,18 +29,18 @@ public class TechRedstoneButton extends ButtonBlock {
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return switch (state.getValue(FACE)) {
             case FLOOR -> switch (state.getValue(FACING).getAxis()) {
-                case X -> FLOOR_AABB_X;
-                default -> FLOOR_AABB_Z;
+                case X -> FLOOR_X_SHAPE;
+                default -> FLOOR_Z_SHAPE;
             };
             case WALL -> switch (state.getValue(FACING)) {
-                case EAST -> EAST_AABB;
-                case WEST -> WEST_AABB;
-                case SOUTH -> SOUTH_AABB;
-                default -> NORTH_AABB;
+                case EAST -> EAST_SHAPE;
+                case WEST -> WEST_SHAPE;
+                case SOUTH -> SOUTH_SHAPE;
+                default -> NORTH_SHAPE;
             };
             default -> switch (state.getValue(FACING).getAxis()) {
-                case X -> CEILING_AABB_X;
-                default -> CEILING_AABB_Z;
+                case X -> CEILING_X_SHAPE;
+                default -> CEILING_Z_SHAPE;
             };
         };
     }

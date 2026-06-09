@@ -3,7 +3,9 @@ package rearth.oritech.block.base.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -30,15 +33,15 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
+import rearth.oritech.util.TooltipHelper;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public abstract class MachineBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public abstract class MachineBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public MachineBlock(Properties settings) {
         super(settings);
@@ -81,14 +84,14 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
         onBlockRemoved(level, pos);
-        super.onExplosionHit(state, level, pos, explosion, stackMerger);
+        super.onExplosionHit(state, level, pos, explosion, onHit);
     }
 
     private static void onBlockRemoved(Level level, BlockPos pos) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof MachineBlockEntity entity) {
-            var stacks = entity.inventory.heldStacks;
+            var stacks = entity.inventory.getStacks();
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
                     var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -96,8 +99,8 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
                 }
             }
 
-            entity.inventory.heldStacks.clear();
-            entity.inventory.setChanged();
+            entity.inventory.getStacks().clear();
+            entity.setChanged();
         }
     }
 
@@ -124,7 +127,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    public InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
 
@@ -139,6 +142,6 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

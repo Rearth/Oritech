@@ -1,14 +1,15 @@
 package rearth.oritech.block.blocks.accelerator;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -16,16 +17,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
+public class AcceleratorRingBlock extends AcceleratorPassthroughBlock implements TooltipProvider {
 
     public static final IntegerProperty BENT = IntegerProperty.create("bent", 0, 2);    // 0 = straight, 1 = left, 2 = right
     public static final IntegerProperty REDSTONE_STATE = IntegerProperty.create("redstone_state", 0, 3);    // 0-2 = same as bent, 3 = was never powered
@@ -59,8 +61,8 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
 
         if (level.isClientSide()) return;
 
@@ -81,7 +83,6 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
             level.setBlock(pos, state.setValue(REDSTONE_STATE, 0).setValue(BENT, lastRedstone), Block.UPDATE_CLIENTS, 1);
             AcceleratorParticleLogic.resetCachedGate(pos);
         }
-
     }
 
     @Override
@@ -98,9 +99,9 @@ public class AcceleratorRingBlock extends AcceleratorPassthroughBlock {
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (!showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.accelerator_ring").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.accelerator_ring").withStyle(ChatFormatting.GRAY));
         }
     }
 }

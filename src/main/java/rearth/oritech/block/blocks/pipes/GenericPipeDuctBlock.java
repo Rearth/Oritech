@@ -3,12 +3,12 @@ package rearth.oritech.block.blocks.pipes;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,7 +18,7 @@ import org.apache.commons.lang3.function.TriFunction;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.item.tools.Wrench;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements Wrench.Wrenchable {
 
@@ -123,7 +123,6 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         consumer.accept(Component.translatable("tooltip.oritech.pipe_duct_warning").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 

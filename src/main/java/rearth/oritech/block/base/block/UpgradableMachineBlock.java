@@ -1,6 +1,7 @@
 package rearth.oritech.block.base.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +50,7 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
         if (!level.isClientSide()) {
             var entity = level.getBlockEntity(pos);
@@ -57,7 +58,6 @@ public abstract class UpgradableMachineBlock extends MachineBlock {
                 machineEntity.resetAddons();
             }
         }
-
-        super.onExplosionHit(state, level, pos, explosion, stackMerger);
+        super.onExplosionHit(state, level, pos, explosion, onHit);
     }
 }

@@ -1,9 +1,6 @@
 package rearth.oritech.block.blocks.processing;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -33,9 +30,9 @@ public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlo
             var targetPos = pos.getCenter().add(0, 0.5f, 0);
             var entityDist = entity.distanceToSqr(targetPos);
             if (entityDist > 0.7) return;
-            var isWorking = level.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY).get().progress > 0;
+            var isWorking = level.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY.get()).get().progress.get() > 0;
             if (isWorking)
-                livingEntity.hurt(new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(DamageTypes.CRAMMING).get()), 1f);
+                livingEntity.hurt(level.damageSources().cramming(), 1f);
         }
         super.stepOn(level, pos, state, entity);
     }

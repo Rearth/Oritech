@@ -4,10 +4,12 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -16,9 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 
 import java.util.HashSet;
@@ -34,10 +34,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         if (oldState.getBlock().equals(state.getBlock())) return;
         GenericPipeInterfaceEntity.addNode(level, pos, true, state, getNetworkData(level));
 
-        var regKey = level.dimension().location();
-        var dataId = getPipeTypeName() + "_" + regKey.getNamespace() + "_" + regKey.getPath();
-        Oritech.LOGGER.debug("saving for: " + dataId);
-        ((ServerLevel) level).getDataStorage().set(dataId, getNetworkData(level));
+        ((ServerLevel) level).getDataStorage().set(getNetworkDataType(), getNetworkData(level));
     }
 
     @Override
@@ -47,12 +44,11 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
 
     @Override
-    public @NotNull BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
         if (!(level instanceof ServerLevel serverLevel)) return state;
 
         if (state.getValue(BlockStateProperties.WATERLOGGED))
-            level.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
+            serverLevel.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(level));
 
         if (!hasNeighboringMachine(state, serverLevel, pos, false)) {
             // remove stale machine -> neighboring pipes mapping
@@ -63,11 +59,11 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
         }
 
         var interfaceState = state;
-        if (!(neighborState.getBlock() instanceof AbstractPipeBlock)) {
+        if (!(neighbourState.getBlock() instanceof AbstractPipeBlock)) {
             // only update connection if neighbor is a new machine
-            var hasMachine = getNetworkData(serverLevel).machinePipeNeighbors.getOrDefault(neighborPos, HashSet.newHashSet(0)).contains(direction.getOpposite());
-            if (neighborState.is(Blocks.AIR) || !hasMachine) {
-                interfaceState = addConnectionStates(state, serverLevel, pos, direction);
+            var hasMachine = getNetworkData(serverLevel).machinePipeNeighbors.getOrDefault(neighbourPos, HashSet.newHashSet(0)).contains(directionToNeighbour.getOpposite());
+            if (neighbourState.is(Blocks.AIR) || !hasMachine) {
+                interfaceState = addConnectionStates(state, serverLevel, pos, directionToNeighbour);
             }
 
             if (!interfaceState.equals(state)) {
@@ -125,7 +121,7 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return new ItemStack(getNormalBlock().getBlock());
     }
 }

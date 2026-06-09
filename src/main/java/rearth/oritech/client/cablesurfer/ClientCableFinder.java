@@ -61,14 +61,14 @@ public class ClientCableFinder {
             var startCenter = Vec3.atCenterOf(startPos);
             // Replicate Renderer Geometry: Get offset vector
             var startFacing = startPole.getFacingForMultiblock();
-            var startSideVec = Vec3.atLowerCornerOf(startFacing.getNormal()); // Assuming Geometry.getForward maps to this
+            var startSideVec = Vec3.atLowerCornerOf(startFacing.getUnitVec3i()); // Assuming Geometry.getForward maps to this
 
             for (var target : startPole.getConnections()) {
                 var endPos = target.pos();
 
                 var endCenter = Vec3.atCenterOf(endPos);
                 var endFacing = target.facing();
-                var endSideVec = Vec3.atLowerCornerOf(endFacing.getNormal());
+                var endSideVec = Vec3.atLowerCornerOf(endFacing.getUnitVec3i());
 
                 if (!isPlayerNearCableBounds(player, startCenter, endCenter, reachDistance)) {
                     continue;

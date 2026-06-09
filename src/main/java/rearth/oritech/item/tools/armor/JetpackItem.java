@@ -26,7 +26,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.energy.EnergyApi;
+
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ComponentContent;

@@ -11,7 +11,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import rearth.oritech.api.energy.EnergyApi;
+
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;

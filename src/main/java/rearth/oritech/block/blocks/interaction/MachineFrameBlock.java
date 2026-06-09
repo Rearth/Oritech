@@ -3,13 +3,16 @@ package rearth.oritech.block.blocks.interaction;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
 import net.minecraft.world.level.block.RenderShape;
@@ -24,10 +27,10 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.TagContent;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class MachineFrameBlock extends Block {
+public class MachineFrameBlock extends Block implements TooltipProvider {
 
 
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
@@ -52,7 +55,6 @@ public class MachineFrameBlock extends Block {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         consumer.accept(Component.translatable("tooltip.oritech.machine_frame").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         consumer.accept(Component.translatable("tooltip.oritech.machine_frame.1", OritechConfig.processingMachines.machineFrameMaxLength.get(), OritechConfig.processingMachines.machineFrameMaxLength.get()).withStyle(ChatFormatting.GRAY));
     }
@@ -117,8 +119,7 @@ public class MachineFrameBlock extends Block {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
-
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
         var northConnected = level.getBlockState(pos.north()).getBlock() == this;
         var eastConnected = level.getBlockState(pos.east()).getBlock() == this;
         var southConnected = level.getBlockState(pos.south()).getBlock() == this;

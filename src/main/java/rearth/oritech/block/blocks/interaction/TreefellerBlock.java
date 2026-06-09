@@ -3,13 +3,15 @@ package rearth.oritech.block.blocks.interaction;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -25,13 +27,13 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-public class TreefellerBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class TreefellerBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public TreefellerBlock(Properties settings) {
         super(settings);
@@ -56,7 +58,7 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Nullable
@@ -80,7 +82,7 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
 
         if (!level.isClientSide()) {
             var entity = (TreefellerBlockEntity) level.getBlockEntity(pos);
-            var stacks = entity.inventory.heldStacks;
+            var stacks = entity.inventory.getStacks();
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
                     var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -88,8 +90,8 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
                 }
             }
 
-            entity.inventory.heldStacks.clear();
-            entity.inventory.setChanged();
+            entity.inventory.getStacks().clear();
+            entity.setChanged();
         }
 
         return super.playerWillDestroy(level, pos, state, player);
@@ -107,7 +109,6 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

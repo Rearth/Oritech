@@ -1,12 +1,14 @@
 package rearth.oritech.block.blocks.accelerator;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,9 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorSensorBlockEntity;
 import rearth.oritech.util.ComparatorOutputProvider;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implements EntityBlock {
+public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implements EntityBlock, TooltipProvider {
 
     public AcceleratorSensorBlock(Properties settings) {
         super(settings);
@@ -31,7 +33,7 @@ public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implemen
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
 
@@ -55,9 +57,9 @@ public class AcceleratorSensorBlock extends AcceleratorPassthroughBlock implemen
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (!showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.accelerator_sensor").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.accelerator_sensor").withStyle(ChatFormatting.GRAY));
         }
     }
 }

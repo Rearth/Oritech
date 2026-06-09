@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static rearth.oritech.block.blocks.storage.SmallStorageBlock.TARGET_DIR;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
+
 
 public class CreativeStorageBlock extends Block implements EntityBlock {
 
@@ -78,8 +78,7 @@ public class CreativeStorageBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 
 }

@@ -6,7 +6,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
-import rearth.oritech.api.energy.EnergyApi;
+
 import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.TooltipHelper;

@@ -2,17 +2,24 @@ package rearth.oritech.block.blocks.pipes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.apache.commons.lang3.function.TriFunction;
@@ -20,7 +27,9 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.config.OritechStartupConfig;
 
-public abstract class AbstractPipeBlock extends Block {
+import java.util.function.Consumer;
+
+public abstract class AbstractPipeBlock extends Block implements TooltipProvider {
 
     protected VoxelShape[] boundingShapes;
 
@@ -56,13 +65,13 @@ public abstract class AbstractPipeBlock extends Block {
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor worldAccess, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
 
-        if (!(worldAccess instanceof ServerLevel level)) return state;
+        if (!(level instanceof ServerLevel serverLevel)) return state;
 
-        if (neighborState.is(Blocks.AIR))
+        if (neighbourState.isAir())
             // remove potential stale machine -> neighboring pipes mapping
-            getNetworkData(level).machinePipeNeighbors.remove(neighborPos);
+            getNetworkData(serverLevel).machinePipeNeighbors.remove(neighbourPos);
 
         return state;
     }
@@ -73,14 +82,14 @@ public abstract class AbstractPipeBlock extends Block {
     }
 
     @Override
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, level, pos, newState, moved);
+    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
+        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+        onBlockRemoved(pos, state, level);
+    }
 
-        if (!state.is(newState.getBlock()) && !(newState.getBlock() instanceof AbstractPipeBlock)) {
-            // block was removed/replaced instead of updated
-            onBlockRemoved(pos, state, level);
-        }
-
+    @Override
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        // nothing here
     }
 
     /**
@@ -182,7 +191,7 @@ public abstract class AbstractPipeBlock extends Block {
      * @return Boolean whether a machine is connected
      */
     public boolean hasMachineInDirection(Direction direction, Level level, BlockPos ownPos, TriFunction<Level, BlockPos, Direction, Boolean> lookup) {
-        var neighborPos = ownPos.offset(direction.getNormal());
+        var neighborPos = ownPos.offset(direction.getUnitVec3i());
         var neighborState = level.getBlockState(neighborPos);
         return !(neighborState.getBlock() instanceof GenericPipeBlock) && lookup.apply(level, neighborPos, direction.getOpposite());
     }
@@ -236,11 +245,11 @@ public abstract class AbstractPipeBlock extends Block {
 
     public abstract BlockState getNormalBlock();
 
-    public abstract String getPipeTypeName();
-
     public abstract boolean connectToOwnBlockType(Block block);
 
     public abstract GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level);
+
+    public abstract SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType();
 
     protected abstract void onBlockRemoved(BlockPos pos, BlockState oldState, Level level);
 }

@@ -3,14 +3,14 @@ package rearth.oritech.block.blocks.pipes.item;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -32,14 +32,14 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.util.Geometry;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 // how this block works:
 // points to block/storage that player was facing when placing (e.g. similar to addons)
 // connects via pipes to other nearby inventories
 // has a GUI to configure filter options (n amount of slots available, and some buttons to filter based on metadata)
 // filter options: whitelist/blacklist, ignore damage, ignore nbt
-public class ItemFilterBlock extends Block implements EntityBlock {
+public class ItemFilterBlock extends Block implements EntityBlock, TooltipProvider {
 
     private static final VoxelShape[] BOUNDING_SHAPES;
 
@@ -94,42 +94,21 @@ public class ItemFilterBlock extends Block implements EntityBlock {
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         consumer.accept(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
 
+//  todo
+//        if (Platform.isModLoaded("ftbfiltersystem")) {
+//            consumer.accept(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
+//        }
 
-        if (Platform.isModLoaded("ftbfiltersystem")) {
-            consumer.accept(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
-        }
-
-        super.appendHoverText(stack, context, tooltip, options);
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return BOUNDING_SHAPES[state.getValue(TARGET_DIR).get3DDataValue()];
+        return BOUNDING_SHAPES[state.getValue(BlockStateProperties.FACING).get3DDataValue()];
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return getShape(state, level, pos, context);
-    }
-
-    @Override
-    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
-
-        if (!level.isClientSide()) {
-            var entity = (ItemFilterBlockEntity) level.getBlockEntity(pos);
-            var stacks = entity.inventory.heldStacks;
-            for (var stack : stacks) {
-                if (!stack.isEmpty()) {
-                    var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
-                    level.addFreshEntity(itemEntity);
-                }
-            }
-
-            entity.inventory.heldStacks.clear();
-            entity.inventory.setChanged();
-        }
-
-        return super.playerWillDestroy(level, pos, state, player);
     }
 
     static {

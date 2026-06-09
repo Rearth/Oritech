@@ -2,13 +2,16 @@ package rearth.oritech.block.blocks.accelerator;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,9 +26,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public class BlackHoleBlock extends Block implements EntityBlock {
+public class BlackHoleBlock extends Block implements EntityBlock, TooltipProvider {
 
     public BlackHoleBlock(Properties settings) {
         super(settings);
@@ -44,7 +47,7 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -58,10 +61,11 @@ public class BlackHoleBlock extends Block implements EntityBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier effectApplier, boolean isPrecise) {
         // yes this will also kill creative players. This is intentional. Don't annoy me about this by opening a bugfix PR
         // (looking at you jshipley)
-        entity.kill();
+        if (level instanceof ServerLevel serverLevel)
+            entity.kill(serverLevel);
     }
 
     @Override

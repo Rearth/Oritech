@@ -2,13 +2,14 @@ package rearth.oritech.block.blocks.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -24,15 +25,15 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
-public class DeepDrillBlock extends Block implements EntityBlock {
+public class DeepDrillBlock extends Block implements EntityBlock, TooltipProvider {
 
     public DeepDrillBlock(Properties settings) {
         super(settings);
@@ -103,7 +104,7 @@ public class DeepDrillBlock extends Block implements EntityBlock {
             }
 
             if (entity instanceof DeepDrillEntity storageBlock) {
-                var stacks = storageBlock.inventory.heldStacks;
+                var stacks = storageBlock.inventory.getStacks();
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
@@ -111,8 +112,8 @@ public class DeepDrillBlock extends Block implements EntityBlock {
                     }
                 }
 
-                storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.setChanged();
+                storageBlock.inventory.getStacks().clear();
+                storageBlock.setChanged();
             }
         }
 
@@ -121,7 +122,7 @@ public class DeepDrillBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Nullable
@@ -141,7 +142,6 @@ public class DeepDrillBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

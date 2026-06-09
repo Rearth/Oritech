@@ -7,16 +7,18 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import org.apache.commons.lang3.function.TriFunction;
-import rearth.oritech.api.fluid.FluidApi;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class FluidPipeBlock extends GenericPipeBlock {
@@ -29,30 +31,31 @@ public class FluidPipeBlock extends GenericPipeBlock {
 
     @Override
     public TriFunction<Level, BlockPos, Direction, Boolean> apiValidationFunction() {
-        return ((level, pos, direction) -> FluidApi.BLOCK.find(level, pos, direction) != null);
+        return ((level, pos, direction) -> level.getCapability(Capabilities.Fluid.BLOCK, pos, direction) != null);
     }
 
     @Override
     public BlockState getConnectionBlock() {
-        return BlockContent.FLUID_PIPE_CONNECTION.defaultBlockState();
+        return BlockContent.FLUID_PIPE_CONNECTION.get().defaultBlockState();
     }
 
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.FLUID_PIPE.defaultBlockState();
+        return BlockContent.FLUID_PIPE.get().defaultBlockState();
     }
 
     @Override
-    public String getPipeTypeName() {
-        return "fluid";
+    public SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType() {
+        return GenericPipeInterfaceEntity.PipeNetworkData.FLUID_TYPE;
     }
 
     // to connect when a neighboring block emits a block update (e.g. the centrifuge getting a fluid addon)
     @Override
     protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
 
-        level.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), level.getBlockState(sourcePos), level, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
+        // todo:
+        // level.setBlock(pos, updateShape(state, level, Direction.getNearest(Vec3.atLowerCornerOf(pos.subtract(pos))), level.getBlockState(pos), level, pos, pos), Block.UPDATE_CLIENTS, 0);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class FluidPipeBlock extends GenericPipeBlock {
 
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
-        return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+        return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().identifier(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 
     public static class FramedFluidPipeBlock extends FluidPipeBlock {
@@ -83,12 +86,12 @@ public class FluidPipeBlock extends GenericPipeBlock {
 
         @Override
         public BlockState getNormalBlock() {
-            return BlockContent.FRAMED_FLUID_PIPE.defaultBlockState();
+            return BlockContent.FRAMED_FLUID_PIPE.get().defaultBlockState();
         }
 
         @Override
         public BlockState getConnectionBlock() {
-            return BlockContent.FRAMED_FLUID_PIPE_CONNECTION.defaultBlockState();
+            return BlockContent.FRAMED_FLUID_PIPE_CONNECTION.get().defaultBlockState();
         }
     }
 }

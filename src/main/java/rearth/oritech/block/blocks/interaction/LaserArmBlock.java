@@ -3,6 +3,7 @@ package rearth.oritech.block.blocks.interaction;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -10,8 +11,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.behavior.LaserArmBlockBehavior;
@@ -30,16 +32,16 @@ import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
 
-public class LaserArmBlock extends Block implements EntityBlock {
+public class LaserArmBlock extends Block implements EntityBlock, TooltipProvider {
 
     private static final LaserArmBlockBehavior DEFAULT_BLOCK_BEHAVIOR = new LaserArmBlockBehavior();
     public static final Map<Block, LaserArmBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
@@ -87,8 +89,8 @@ public class LaserArmBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @org.jspecify.annotations.Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
 
         if (level.isClientSide()) return;
 
@@ -96,7 +98,6 @@ public class LaserArmBlock extends Block implements EntityBlock {
 
         var laserEntity = (LaserArmBlockEntity) level.getBlockEntity(pos);
         laserEntity.setRedstonePowered(isPowered);
-
     }
 
     @Override
@@ -153,7 +154,7 @@ public class LaserArmBlock extends Block implements EntityBlock {
             }
 
             if (entity instanceof LaserArmBlockEntity storageBlock) {
-                var stacks = storageBlock.inventory.heldStacks;
+                var stacks = storageBlock.inventory.getStacks();
                 for (var heldStack : stacks) {
                     if (!heldStack.isEmpty()) {
                         var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), heldStack);
@@ -161,8 +162,8 @@ public class LaserArmBlock extends Block implements EntityBlock {
                     }
                 }
 
-                storageBlock.inventory.heldStacks.clear();
-                storageBlock.inventory.setChanged();
+                storageBlock.inventory.getStacks().clear();
+                storageBlock.setChanged();
             }
         }
 
@@ -171,7 +172,7 @@ public class LaserArmBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Nullable
@@ -192,7 +193,6 @@ public class LaserArmBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

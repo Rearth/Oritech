@@ -1,14 +1,15 @@
 package rearth.oritech.block.blocks.interaction;
 
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -25,14 +26,13 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.PumpBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-
-public class PumpBlock extends Block implements EntityBlock {
+public class PumpBlock extends Block implements EntityBlock, TooltipProvider {
 
     public PumpBlock(Properties settings) {
         super(settings);
@@ -57,7 +57,7 @@ public class PumpBlock extends Block implements EntityBlock {
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Nullable
@@ -70,7 +70,7 @@ public class PumpBlock extends Block implements EntityBlock {
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
         if (!level.isClientSide()) {
-            var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK);
+            var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK.get());
             pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
         }
         return InteractionResult.SUCCESS;
@@ -103,12 +103,11 @@ public class PumpBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             consumer.accept(Component.translatable("tooltip.oritech.pump_redstone"));
         }
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

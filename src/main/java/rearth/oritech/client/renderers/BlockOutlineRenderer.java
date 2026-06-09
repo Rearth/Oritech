@@ -69,7 +69,7 @@ public class BlockOutlineRenderer {
         if (!(block instanceof EntityBlock entityProvider) || !block.defaultBlockState().hasProperty(MultiblockMachine.ASSEMBLED))
             return;
 
-        var machinePos = blockPos.offset(((BlockHitResult) player.minecraft.hitResult).getDirection().getNormal());
+        var machinePos = blockPos.offset(((BlockHitResult) player.minecraft.hitResult).getDirection().getUnitVec3i());
         if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER))
             machinePos = blockPos;
         var placementState = block.getStateForPlacement(new BlockPlaceContext(player, player.swingingArm, itemStack, (BlockHitResult) player.minecraft.hitResult));
@@ -159,7 +159,7 @@ public class BlockOutlineRenderer {
         var facing = player.getDirection();
         var cameraPos = camera.getPosition();
         var blockHit = (BlockHitResult) player.minecraft.hitResult;
-        var targetPos = Vec3.atLowerCornerOf(blockHit.getBlockPos().offset(blockHit.getDirection().getNormal()));
+        var targetPos = Vec3.atLowerCornerOf(blockHit.getBlockPos().offset(blockHit.getDirection().getUnitVec3i()));
 
         if (isMotor)
             facing = facing.getClockWise();

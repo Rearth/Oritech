@@ -2,22 +2,25 @@ package rearth.oritech.block.blocks.addons;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -44,8 +47,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock implements EntityBlock {
+public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
 
     public static final BooleanProperty ADDON_USED = BooleanProperty.create("addon_used");
@@ -183,10 +187,10 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     }
 
     @Override
-    public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level, BlockPos pos, BlockPos neighborPos) {
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
 
         if (addonSettings.needsSupport) {
-            return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+            return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
         } else {
             return state;
         }
@@ -255,11 +259,10 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
-        if (showExtra) {
+        if (showExtra && dataComponentGetter instanceof ItemStack stack) {
 
             if (addonSettings.speedMultiplier() != 1) {
                 var displayedNumber = Math.round((1 - addonSettings.speedMultiplier()) * 100);
@@ -287,29 +290,29 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
             var item = (BlockItem) stack.getItem();
             var blockType = item.getBlock();
 
-            if (blockType == BlockContent.MACHINE_YIELD_ADDON)
+            if (blockType == BlockContent.MACHINE_YIELD_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_yield_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_FLUID_ADDON)
+            if (blockType == BlockContent.MACHINE_FLUID_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_fluid_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_ACCEPTOR_ADDON)
+            if (blockType == BlockContent.MACHINE_ACCEPTOR_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_acceptor_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.STEAM_BOILER_ADDON)
+            if (blockType == BlockContent.STEAM_BOILER_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_boiler_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.CROP_FILTER_ADDON)
+            if (blockType == BlockContent.CROP_FILTER_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_crop_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_INVENTORY_PROXY_ADDON)
+            if (blockType == BlockContent.MACHINE_INVENTORY_PROXY_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_proxy_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.QUARRY_ADDON)
+            if (blockType == BlockContent.QUARRY_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_quarry_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_HUNTER_ADDON)
+            if (blockType == BlockContent.MACHINE_HUNTER_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_hunter_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_REDSTONE_ADDON)
+            if (blockType == BlockContent.MACHINE_REDSTONE_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_redstone_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_PROCESSING_ADDON)
+            if (blockType == BlockContent.MACHINE_PROCESSING_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
+            if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_BURST_ADDON)
+            if (blockType == BlockContent.MACHINE_BURST_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_burst_desc").withStyle(ChatFormatting.GRAY));
 
             if (addonSettings.extender()) {

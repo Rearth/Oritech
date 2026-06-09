@@ -3,14 +3,15 @@ package rearth.oritech.block.base.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -28,14 +29,13 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.util.MachineAddonController;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-import static rearth.oritech.util.TooltipHelper.addMachineTooltip;
 
-
-public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public static final BooleanProperty HAS_FRAME = BooleanProperty.create("has_frame");
 
@@ -109,7 +109,7 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
             }
 
             if (ownEntity instanceof ItemEnergyFrameInteractionBlockEntity itemContainer) {
-                var stacks = itemContainer.inventory.heldStacks;
+                var stacks = itemContainer.inventory.getStacks();
                 for (var stack : stacks) {
                     if (!stack.isEmpty()) {
                         var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -117,8 +117,8 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
                     }
                 }
 
-                itemContainer.inventory.heldStacks.clear();
-                itemContainer.inventory.setChanged();
+                itemContainer.inventory.getStacks().clear();
+                itemContainer.setChanged();
             }
         }
 
@@ -127,6 +127,6 @@ public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock i
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        addMachineTooltip(tooltip, this, this);
+        TooltipHelper.addMachineTooltip(consumer, this, this);
     }
 }

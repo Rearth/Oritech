@@ -4,13 +4,17 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -32,11 +36,11 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
-public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public EnchantmentCatalystBlock(Properties settings) {
         super(settings);
@@ -49,7 +53,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
 
@@ -71,7 +75,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.MODEL;
     }
 
     @Override
@@ -106,7 +110,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
 
         if (!level.isClientSide()) {
             var entity = (EnchantmentCatalystBlockEntity) level.getBlockEntity(pos);
-            var stacks = entity.inventory.heldStacks;
+            var stacks = entity.inventory.getStacks();
             for (var stack : stacks) {
                 if (!stack.isEmpty()) {
                     var itemEntity = new ItemEntity(level, pos.getX(), pos.getY(), pos.getZ(), stack);
@@ -114,19 +118,21 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
                 }
             }
 
-            entity.inventory.heldStacks.clear();
-            entity.inventory.setChanged();
+            entity.inventory.getStacks().clear();
+            entity.setChanged();
         }
 
         return super.playerWillDestroy(level, pos, state, player);
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
-        var ownState = level.getBlockEntity(pos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY);
+        if (level.isClientSide()) return;
+
+        var ownState = level.getBlockEntity(pos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY.get());
         if (ownState.isEmpty() || ownState.get().collectedSouls <= 0) {
-            super.onExplosionHit(state, level, pos, explosion, dropConsumer);
+            super.onExplosionHit(state, level, pos, explosion, onHit);
             return;
         }
 
@@ -134,19 +140,17 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
         for (var checkPos : BlockPos.withinManhattan(pos, 6, 5, 6)) {
             var checkState = level.getBlockState(checkPos);
             if (checkState.getBlock().equals(BlockContent.REFINERY_BLOCK)) {
-                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.REFINERY_ENTITY);
+                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.REFINERY_ENTITY.get());
                 if (checkEntity.isPresent() && checkState.getBlock() instanceof RefineryBlock refineryBlock)
-                    refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, dropConsumer);
+                    refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, onHit);
             }
         }
 
-
-        super.onExplosionHit(state, level, pos, explosion, dropConsumer);
+        super.onExplosionHit(state, level, pos, explosion, onHit);
     }
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.appendHoverText(stack, context, tooltip, options);
         consumer.accept(Component.translatable("tooltip.oritech.catalyst").withStyle(ChatFormatting.GRAY));
         consumer.accept(Component.translatable("tooltip.oritech.catalyst_warning").withStyle(ChatFormatting.DARK_PURPLE));
     }

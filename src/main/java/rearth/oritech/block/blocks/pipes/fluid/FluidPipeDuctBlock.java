@@ -3,6 +3,7 @@ package rearth.oritech.block.blocks.pipes.fluid;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import rearth.oritech.block.blocks.pipes.GenericPipeDuctBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
@@ -21,12 +22,12 @@ public class FluidPipeDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.FLUID_PIPE_DUCT_BLOCK.defaultBlockState();
+        return BlockContent.FLUID_PIPE_DUCT_BLOCK.get().defaultBlockState();
     }
 
     @Override
-    public String getPipeTypeName() {
-        return "fluid";
+    public SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType() {
+        return GenericPipeInterfaceEntity.PipeNetworkData.FLUID_TYPE;
     }
 
     @Override
@@ -36,6 +37,6 @@ public class FluidPipeDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public GenericPipeInterfaceEntity.PipeNetworkData getNetworkData(Level level) {
-        return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().location(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
+        return FLUID_PIPE_DATA.computeIfAbsent(level.dimension().identifier(), data -> new GenericPipeInterfaceEntity.PipeNetworkData());
     }
 }
