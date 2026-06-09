@@ -228,8 +228,8 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
 
         var area = isAreaEnabled(stack);
 
-        tooltip.add((area ? Component.translatable("tooltip.oritech.tool_mode.area_range.area") : Component.translatable("tooltip.oritech.tool_mode.area_range.single")).withStyle(ChatFormatting.GOLD));
-        tooltip.add(Component.translatable("tooltip.oritech.promethium_pick").withStyle(ChatFormatting.DARK_GRAY));
+        consumer.accept((area ? Component.translatable("tooltip.oritech.tool_mode.area_range.area") : Component.translatable("tooltip.oritech.tool_mode.area_range.single")).withStyle(ChatFormatting.GOLD));
+        consumer.accept(Component.translatable("tooltip.oritech.promethium_pick").withStyle(ChatFormatting.DARK_GRAY));
 
     }
 

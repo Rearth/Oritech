@@ -111,9 +111,9 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (!showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.charger").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.charger").withStyle(ChatFormatting.GRAY));
         }
     }
 }

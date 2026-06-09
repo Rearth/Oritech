@@ -92,11 +92,11 @@ public class ItemFilterBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        tooltip.add(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
 
 
         if (Platform.isModLoaded("ftbfiltersystem")) {
-            tooltip.add(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
         }
 
         super.appendHoverText(stack, context, tooltip, options);

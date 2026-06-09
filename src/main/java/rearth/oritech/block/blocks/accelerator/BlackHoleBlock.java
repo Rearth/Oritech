@@ -74,6 +74,6 @@ public class BlackHoleBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        tooltip.add(Component.translatable("tooltip.oritech.black_hole").withStyle(ChatFormatting.GOLD));
+        consumer.accept(Component.translatable("tooltip.oritech.black_hole").withStyle(ChatFormatting.GOLD));
     }
 }

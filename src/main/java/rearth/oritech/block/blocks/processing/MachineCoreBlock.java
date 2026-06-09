@@ -55,7 +55,7 @@ public class MachineCoreBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        tooltip.add(Component.translatable("tooltip.oritech.machine_core_block").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.machine_core_block").withStyle(ChatFormatting.ITALIC, ChatFormatting.GRAY));
         super.appendHoverText(stack, context, tooltip, options);
     }
 

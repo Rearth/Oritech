@@ -54,9 +54,9 @@ public class CombiAddonBlock extends MachineAddonBlock {
             var data = stack.get(ComponentContent.ADDON_DATA.get());
             var foundTexts = getShrinkTooltip(data);
 
-            tooltip.add(Component.translatable("tooltip.oritech.combi_addon_desc").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.combi_addon_desc").withStyle(ChatFormatting.GRAY));
 
-            tooltip.addAll(foundTexts);
+            consumer.acceptAll(foundTexts);
 
         }
     }

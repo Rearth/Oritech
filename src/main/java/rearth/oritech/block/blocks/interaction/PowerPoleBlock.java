@@ -136,14 +136,14 @@ public class PowerPoleBlock extends Block implements EntityBlock {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (!showExtra)
-            tooltip.add(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.power_pole.short").withStyle(ChatFormatting.GRAY));
 
         addMachineTooltip(tooltip, this, this);
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.power_pole.2").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.power_pole.3", OritechConfig.poleConfig.minRange.get(), OritechConfig.poleConfig.maxRange.get(), TooltipHelper.getEnergyText(OritechConfig.poleConfig.energyCapacity.get())).withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.power_pole.1").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.power_pole.2").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.power_pole.3", OritechConfig.poleConfig.minRange.get(), OritechConfig.poleConfig.maxRange.get(), TooltipHelper.getEnergyText(OritechConfig.poleConfig.energyCapacity.get())).withStyle(ChatFormatting.GRAY));
         }
     }
 }

@@ -75,7 +75,7 @@ public class PipeBoosterBlock extends HorizontalDirectionalBlock implements Enti
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
-        tooltip.add(Component.translatable("tooltip.oritech.pipe_booster").withStyle(ChatFormatting.DARK_GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.pipe_booster").withStyle(ChatFormatting.DARK_GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 }

@@ -47,7 +47,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
 
         if (level.isClientSide()) return;
@@ -108,7 +108,7 @@ public class SpawnerControllerBlock extends HorizontalDirectionalBlock implement
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
-        tooltip.add(Component.translatable("tooltip.oritech.spawner").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.oritech.spawner2").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.spawner").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.spawner2").withStyle(ChatFormatting.GRAY));
     }
 }

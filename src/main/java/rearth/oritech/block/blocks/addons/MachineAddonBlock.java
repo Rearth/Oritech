@@ -263,24 +263,24 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
 
             if (addonSettings.speedMultiplier() != 1) {
                 var displayedNumber = Math.round((1 - addonSettings.speedMultiplier()) * 100);
-                tooltip.add(Component.translatable("tooltip.oritech.addon_speed_desc").withStyle(ChatFormatting.DARK_GRAY)
+                consumer.accept(Component.translatable("tooltip.oritech.addon_speed_desc").withStyle(ChatFormatting.DARK_GRAY)
                         .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
             }
 
             if (addonSettings.efficiencyMultiplier() != 1) {
                 var displayedNumber = Math.round((1 - addonSettings.efficiencyMultiplier()) * 100);
-                tooltip.add(Component.translatable("tooltip.oritech.addon_efficiency_desc").withStyle(ChatFormatting.DARK_GRAY)
+                consumer.accept(Component.translatable("tooltip.oritech.addon_efficiency_desc").withStyle(ChatFormatting.DARK_GRAY)
                         .append(TooltipHelper.getFormattedValueChangeTooltip(displayedNumber)));
             }
 
             if (addonSettings.addedCapacity() != 0) {
-                tooltip.add(
+                consumer.accept(
                         Component.translatable("tooltip.oritech.addon_capacity_desc").withStyle(ChatFormatting.DARK_GRAY)
                                 .append(TooltipHelper.getFormattedEnergyChangeTooltip(addonSettings.addedCapacity(), " RF")));
             }
 
             if (addonSettings.addedInsert() != 0) {
-                tooltip.add(Component.translatable("tooltip.oritech.addon_transfer_desc").withStyle(ChatFormatting.DARK_GRAY)
+                consumer.accept(Component.translatable("tooltip.oritech.addon_transfer_desc").withStyle(ChatFormatting.DARK_GRAY)
                         .append(TooltipHelper.getFormattedEnergyChangeTooltip(addonSettings.addedInsert(), " RF/t")));
             }
 
@@ -288,36 +288,36 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
             var blockType = item.getBlock();
 
             if (blockType == BlockContent.MACHINE_YIELD_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_yield_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_yield_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_FLUID_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_fluid_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_fluid_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_ACCEPTOR_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_acceptor_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_acceptor_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.STEAM_BOILER_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_boiler_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_boiler_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.CROP_FILTER_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_crop_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_crop_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_INVENTORY_PROXY_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_proxy_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_proxy_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.QUARRY_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_quarry_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_quarry_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_HUNTER_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_hunter_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_hunter_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_REDSTONE_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_redstone_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_redstone_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_PROCESSING_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_BURST_ADDON)
-                tooltip.add(Component.translatable("tooltip.oritech.addon_burst_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_burst_desc").withStyle(ChatFormatting.GRAY));
 
             if (addonSettings.extender()) {
-                tooltip.add(Component.translatable("tooltip.oritech.addon_extender_desc").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_extender_desc").withStyle(ChatFormatting.GRAY));
             }
 
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
 
     }

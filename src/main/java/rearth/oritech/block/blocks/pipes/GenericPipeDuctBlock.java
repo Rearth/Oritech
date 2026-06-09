@@ -124,7 +124,7 @@ public abstract class GenericPipeDuctBlock extends AbstractPipeBlock implements 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
-        tooltip.add(Component.translatable("tooltip.oritech.pipe_duct_warning").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        consumer.accept(Component.translatable("tooltip.oritech.pipe_duct_warning").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 
     @Override

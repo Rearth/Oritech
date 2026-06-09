@@ -1,7 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,8 +17,8 @@ import rearth.oritech.block.entity.interaction.DeepDrillEntity;
 import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public class TooltipHelper {
 
@@ -43,8 +43,8 @@ public class TooltipHelper {
         return formatter.format(number);
     }
 
-    public static void addMachineTooltip(List<Component> tooltip, Block block, EntityBlock entityProvider) {
-        var showExtra = Boolean.TRUE.equals(Screen.hasShiftDown());
+    public static void addMachineTooltip(Consumer<Component> consumer, Block block, EntityBlock entityProvider) {
+        var showExtra = Minecraft.getInstance().hasShiftDown();
 
         if (showExtra) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());
@@ -53,43 +53,43 @@ public class TooltipHelper {
 
             if (entity instanceof MultiblockMachineController multiblockController) {
                 var corePositions = multiblockController.getCorePositions();
-                tooltip.add(Component.translatable("tooltip.oritech.core_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(corePositions.size())).withStyle(ChatFormatting.GOLD)));
+                consumer.accept(Component.translatable("tooltip.oritech.core_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(corePositions.size())).withStyle(ChatFormatting.GOLD)));
             }
             if (entity instanceof FrameInteractionBlockEntity) {
-                tooltip.add(Component.translatable("tooltip.oritech.frame_needed").withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.frame_needed").withStyle(ChatFormatting.GRAY));
             }
             if (entity instanceof MachineAddonController addonProvider) {
                 var addonSlots = addonProvider.getAddonSlots();
-                tooltip.add(Component.translatable("tooltip.oritech.addon_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(addonSlots.size())).withStyle(ChatFormatting.GOLD)));
+                consumer.accept(Component.translatable("tooltip.oritech.addon_desc").withStyle(ChatFormatting.GRAY).append(Component.literal(String.valueOf(addonSlots.size())).withStyle(ChatFormatting.GOLD)));
             }
             if (entity instanceof MachineBlockEntity machineEntity && machineEntity.getEnergyPerTick() > 1 && !isAtomicForge) {
                 var energyRate = machineEntity.getEnergyPerTick();
                 if (entity instanceof UpgradableGeneratorBlockEntity) {
-                    tooltip.add(Component.translatable("tooltip.oritech.generator_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
+                    consumer.accept(Component.translatable("tooltip.oritech.generator_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
                 } else if (entity instanceof MachineBlockEntity) {
-                    tooltip.add(Component.translatable("tooltip.oritech.machine_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
+                    consumer.accept(Component.translatable("tooltip.oritech.machine_rate_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", energyRate).withStyle(ChatFormatting.GOLD)));
                 }
             } else if (entity instanceof ExpandableEnergyStorageBlockEntity energyStorage) {
                 var transferRate = energyStorage.getDefaultExtractionRate();
-                tooltip.add(Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", transferRate).withStyle(ChatFormatting.GOLD)));
+                consumer.accept(Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_transfer_rate", transferRate).withStyle(ChatFormatting.GOLD)));
             }
 
 
             if (entity instanceof EnergyProvider energyProvider) {
                 var maxStorage = getEnergyText(energyProvider.getEnergyLookup(null).getCapacityAsLong());
                 if (!isAtomicForge)
-                    tooltip.add(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
+                    consumer.accept(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
 
                 if (isAtomicForge || energyProvider instanceof DeepDrillEntity)
-                    tooltip.add(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
+                    consumer.accept(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
 
                 var id = BuiltInRegistries.BLOCK.getKey(block);
                 if (I18n.exists("tooltip.oritech." + id.getPath() + ".extra")) {
-                    tooltip.add(Component.translatable("tooltip.oritech." + id.getPath() + ".extra").withStyle(ChatFormatting.GRAY));
+                    consumer.accept(Component.translatable("tooltip.oritech." + id.getPath() + ".extra").withStyle(ChatFormatting.GRAY));
                 }
             }
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
 

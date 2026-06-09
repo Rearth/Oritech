@@ -97,6 +97,6 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
         var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        tooltip.add(text.withStyle(ChatFormatting.GOLD));
+        consumer.accept(text.withStyle(ChatFormatting.GOLD));
     }
 }

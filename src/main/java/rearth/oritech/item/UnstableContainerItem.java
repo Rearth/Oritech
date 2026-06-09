@@ -75,24 +75,24 @@ public class UnstableContainerItem extends Item implements GeoItem {
         var ctrlPressed = Minecraft.getInstance().hasControlDown();
 
         if (shiftPressed) {
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.low").withStyle(ChatFormatting.DARK_PURPLE));
-            tooltip.addAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.medium").withStyle(ChatFormatting.DARK_PURPLE));
-            tooltip.addAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.high").withStyle(ChatFormatting.DARK_PURPLE));
-            tooltip.addAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.low").withStyle(ChatFormatting.DARK_PURPLE));
+            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.medium").withStyle(ChatFormatting.DARK_PURPLE));
+            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.high").withStyle(ChatFormatting.DARK_PURPLE));
+            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container_extra_info").withStyle(ChatFormatting.DARK_PURPLE).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container_extra_info").withStyle(ChatFormatting.DARK_PURPLE).withStyle(ChatFormatting.ITALIC));
         }
 
         if (ctrlPressed) {
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.1").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.2").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.3").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.4").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.unstable_container.5").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.1").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.2").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.3").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.4").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.5").withStyle(ChatFormatting.GRAY));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
         super.appendHoverText(stack, context, tooltip, type);
 

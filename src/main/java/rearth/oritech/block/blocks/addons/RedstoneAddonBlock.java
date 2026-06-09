@@ -48,7 +48,7 @@ public class RedstoneAddonBlock extends MachineAddonBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
 
         if (level.isClientSide()) return;

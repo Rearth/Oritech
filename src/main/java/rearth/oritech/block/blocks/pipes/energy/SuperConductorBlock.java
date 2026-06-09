@@ -77,8 +77,8 @@ public class SuperConductorBlock extends GenericPipeBlock {
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var text = Component.translatable("tooltip.oritech.energy_max_transfer").withStyle(ChatFormatting.GRAY)
                 .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.superConductorTransferRate.get()).withStyle(ChatFormatting.GOLD));
-        tooltip.add(text);
-        tooltip.add(Component.translatable("tooltip.oritech.superconductor").withStyle(ChatFormatting.GRAY));
+        consumer.accept(text);
+        consumer.accept(Component.translatable("tooltip.oritech.superconductor").withStyle(ChatFormatting.GRAY));
         super.appendHoverText(stack, context, tooltip, options);
     }
 

@@ -72,6 +72,6 @@ public class SpawnerCageBlock extends Block {
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
-        tooltip.add(Component.translatable("tooltip.oritech.spawner_cage").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.spawner_cage").withStyle(ChatFormatting.GRAY));
     }
 }

@@ -85,7 +85,7 @@ public class HangarDoorBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    public void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
 
         if (level.isClientSide()) return;
@@ -143,8 +143,8 @@ public class HangarDoorBlock extends Block implements EntityBlock {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        tooltip.add(Component.translatable("tooltip.oritech.hangar_door.1").withStyle(ChatFormatting.GRAY));
-        tooltip.add(Component.translatable("tooltip.oritech.hangar_door.2").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.hangar_door.1").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.hangar_door.2").withStyle(ChatFormatting.GRAY));
     }
 
     public static VoxelShape getClosedShape(Direction surface, boolean rotated) {

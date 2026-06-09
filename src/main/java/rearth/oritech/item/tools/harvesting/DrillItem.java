@@ -64,7 +64,7 @@ public class DrillItem extends DiggerItem implements OritechEnergyItem {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         var text = Component.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
-        tooltip.add(text.withStyle(ChatFormatting.GOLD));
+        consumer.accept(text.withStyle(ChatFormatting.GOLD));
     }
 
     @Override

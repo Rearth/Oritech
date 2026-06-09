@@ -201,11 +201,11 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     default void addJetpackTooltip(ItemStack stack, List<Component> tooltip, boolean includeEnergy) {
 
         var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        if (includeEnergy) tooltip.add(text.withStyle(ChatFormatting.GOLD));
+        if (includeEnergy) consumer.accept(text.withStyle(ChatFormatting.GOLD));
 
         var container = getStoredFluid(stack);
         var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidType.BUCKET_VOLUME, getFuelCapacity() * 1000 / FluidType.BUCKET_VOLUME, FluidStackHooks.getName(container).getString());
-        tooltip.add(fluidText);
+        consumer.accept(fluidText);
     }
 
     default int getJetpackBarColor(ItemStack stack) {

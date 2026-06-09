@@ -133,7 +133,7 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.appendHoverText(stack, context, tooltip, options);
-        tooltip.add(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
         addMachineTooltip(tooltip, this, this);
     }
 

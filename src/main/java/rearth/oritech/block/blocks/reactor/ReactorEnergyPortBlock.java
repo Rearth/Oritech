@@ -57,7 +57,7 @@ public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBl
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.reactor_energy_port.rate", OritechConfig.reactorMaxEnergyOutput.get()));
+            consumer.accept(Component.translatable("tooltip.oritech.reactor_energy_port.rate", OritechConfig.reactorMaxEnergyOutput.get()));
         }
 
     }

@@ -24,10 +24,10 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
         var data = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
 
         if (data.isEmpty()) {
-            tooltip.add(Component.translatable("tooltip.oritech.fluid_empty"));
+            consumer.accept(Component.translatable("tooltip.oritech.fluid_empty"));
         } else {
             var amount = data.getAmount() / (float) FluidType.BUCKET_VOLUME;
-            tooltip.add(Component.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.fluid_content_tank_tooltip", amount, FluidStackHooks.getName(data).getString()).withStyle(ChatFormatting.GRAY));
         }
 
         super.appendHoverText(stack, context, tooltip, type);

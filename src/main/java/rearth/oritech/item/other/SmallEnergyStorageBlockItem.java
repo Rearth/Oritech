@@ -25,7 +25,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
 
         if (storedEnergy != 0) {
             var text = Component.translatable("tooltip.oritech.energy_stored", TooltipHelper.getEnergyText(storedEnergy));
-            tooltip.add(text.withStyle(ChatFormatting.GOLD));
+            consumer.accept(text.withStyle(ChatFormatting.GOLD));
         }
 
         super.appendHoverText(stack, context, tooltip, type);

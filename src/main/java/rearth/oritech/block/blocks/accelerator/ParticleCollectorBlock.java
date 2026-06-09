@@ -69,7 +69,7 @@ public class ParticleCollectorBlock extends DirectionalBlock implements EntityBl
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.particle_collector").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.particle_collector").withStyle(ChatFormatting.GRAY));
         }
 
         TooltipHelper.addMachineTooltip(tooltip, this, this);

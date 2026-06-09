@@ -32,7 +32,7 @@ public class CoolerBlock extends MultiblockMachine implements EntityBlock {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.cooler_block").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.cooler_block").withStyle(ChatFormatting.GRAY));
         }
     }
 }

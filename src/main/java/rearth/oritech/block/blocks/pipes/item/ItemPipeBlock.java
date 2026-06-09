@@ -44,10 +44,10 @@ public class ItemPipeBlock extends GenericPipeBlock {
         var showExtra = Minecraft.getInstance().hasControlDown();
         if (showExtra) {
             for (int i = 1; i <= 4; i++) {
-                tooltip.add(Component.translatable("tooltip.oritech.item_pipe." + i).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+                consumer.accept(Component.translatable("tooltip.oritech.item_pipe." + i).withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
             }
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
 
         super.appendHoverText(stack, context, tooltip, options);

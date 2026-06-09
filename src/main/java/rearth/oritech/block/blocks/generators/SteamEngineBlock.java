@@ -46,9 +46,9 @@ public class SteamEngineBlock extends MultiblockMachine {
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
 
         if (Minecraft.getInstance().hasControlDown()) {
-            tooltip.add(Component.translatable("tooltip.oritech.steam_engine").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.steam_engine.1").withStyle(ChatFormatting.GRAY));
-            tooltip.add(Component.translatable("tooltip.oritech.steam_engine.2").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.steam_engine").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.steam_engine.1").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.steam_engine.2").withStyle(ChatFormatting.GRAY));
         }
 
         super.appendHoverText(stack, context, tooltip, options);

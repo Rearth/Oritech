@@ -115,6 +115,6 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
-        tooltip.add(Component.translatable("tooltip.oritech." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()).withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()).withStyle(ChatFormatting.GRAY));
     }
 }

@@ -55,7 +55,7 @@ public class FluidPipeConnectionBlock extends ExtractablePipeConnectionBlock {
 
     // to disconnect when a neighboring block emits a block update (e.g. the centrifuge losing a fluid addon)
     @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
         super.neighborChanged(state, level, pos, sourceBlock, sourcePos, notify);
 
         level.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), level.getBlockState(sourcePos), level, pos, sourcePos), Block.UPDATE_CLIENTS, 0);

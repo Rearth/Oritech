@@ -83,7 +83,7 @@ public class WeedKiller extends Item {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         super.appendHoverText(stack, context, tooltip, type);
-        tooltip.add(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
+        consumer.accept(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
     }
 
     private boolean isWeedBlock(BlockPos pos, Level level) {

@@ -45,7 +45,7 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.refinery_block").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.refinery_block").withStyle(ChatFormatting.GRAY));
         }
     }
 

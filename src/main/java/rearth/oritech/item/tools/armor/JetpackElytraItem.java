@@ -102,9 +102,9 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
         var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        tooltip.add(hint);
+        consumer.accept(hint);
         hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        tooltip.add(hint);
+        consumer.accept(hint);
         addJetpackTooltip(stack, tooltip, true);
     }
 

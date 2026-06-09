@@ -21,7 +21,7 @@ public enum OritechMachineCoreControllerProvider implements IBlockComponentProvi
     @Override
     public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
         if (accessor.getServerData().contains("controller")) {
-            tooltip.add(Component.translatable(accessor.getServerData().getString("controller")).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable(accessor.getServerData().getString("controller")).withStyle(ChatFormatting.WHITE).withStyle(ChatFormatting.ITALIC));
         }
     }
 

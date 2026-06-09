@@ -291,26 +291,26 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
                                              PlayerAugments.AugmentApplicatorOperation operation,
                                              List<Component> missingRequirements) {
         var tooltip = new ArrayList<Component>();
-        tooltip.add(Component.translatable(operationKey(operation))
+        consumer.accept(Component.translatable(operationKey(operation))
                 .append(Component.literal(" "))
                 .append(Component.translatable(augmentKey(augmentId)).withStyle(ChatFormatting.BOLD)));
 
-        tooltip.add(Component.translatable(augmentKey(augmentId) + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        consumer.accept(Component.translatable(augmentKey(augmentId) + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         for (int i = 1; i < 8; i++) {
             var key = augmentKey(augmentId) + ".desc." + i;
             if (I18n.exists(key)) {
-                tooltip.add(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                consumer.accept(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }
 
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            tooltip.add(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
-            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
+            consumer.accept(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
+            consumer.accept(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
         }
 
         if (!missingRequirements.isEmpty()) {
-            tooltip.add(Component.translatable("oritech.text.missing_requirements_title").withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
-            tooltip.addAll(missingRequirements);
+            consumer.accept(Component.translatable("oritech.text.missing_requirements_title").withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
+            consumer.acceptAll(missingRequirements);
         }
 
         return tooltip;
@@ -454,8 +454,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
 
                 var itemWidget = new ItemWidget(itemX, itemY, shownStack).withTooltipFromStack(false);
                 var tooltip = new ArrayList<Component>();
-                tooltip.add(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
-                shownStacks.stream().map(ItemStack::getHoverName).forEach(component -> tooltip.add(component));
+                consumer.accept(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
+                shownStacks.stream().map(ItemStack::getHoverName).forEach(component -> consumer.accept(component));
                 itemWidget.withTooltip(tooltip);
                 dialogChildren.add(itemWidget);
                 itemX += 20;

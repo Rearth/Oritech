@@ -395,21 +395,21 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var storedEnergy = TooltipHelper.getEnergyText(this.getStoredEnergy(stack));
         var capacity = TooltipHelper.getEnergyText(this.getEnergyCapacity(stack));
         var text = Component.translatable("tooltip.oritech.energy_indicator", storedEnergy, capacity);
-        tooltip.add(text.withStyle(ChatFormatting.GOLD));
+        consumer.accept(text.withStyle(ChatFormatting.GOLD));
 
         var miningText = Component.translatable("tooltip.oritech.portable_laser.status.begin").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(String.valueOf(isMiningEnabled(stack))).withStyle(ChatFormatting.GOLD))
                 .append(Component.translatable("tooltip.oritech.portable_laser.status.hint").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        tooltip.add(miningText);
+        consumer.accept(miningText);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             for (int i = 1; i <= 5; i++) {
-                tooltip.add(Component.translatable("tooltip.oritech.portable_laser." + i).withStyle(ChatFormatting.GRAY));
+                consumer.accept(Component.translatable("tooltip.oritech.portable_laser." + i).withStyle(ChatFormatting.GRAY));
             }
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
 

@@ -107,7 +107,7 @@ public class PumpBlock extends Block implements EntityBlock {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.pump_redstone"));
+            consumer.accept(Component.translatable("tooltip.oritech.pump_redstone"));
         }
         addMachineTooltip(tooltip, this, this);
     }

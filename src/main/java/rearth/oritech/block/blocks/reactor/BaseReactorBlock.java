@@ -35,16 +35,16 @@ public abstract class BaseReactorBlock extends Block {
 
         if (showExtra) {
             var machineId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-            tooltip.add(Component.translatable("tooltip.oritech." + machineId));
+            consumer.accept(Component.translatable("tooltip.oritech." + machineId));
 
             for (int i = 0; i < 6; i++) {
                 var key = "tooltip.oritech." + machineId + "." + i;
                 if (I18n.exists(key)) {
-                    tooltip.add(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                    consumer.accept(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
                 }
             }
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
 
     }

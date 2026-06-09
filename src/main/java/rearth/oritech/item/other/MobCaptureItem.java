@@ -58,11 +58,11 @@ public class MobCaptureItem extends Item {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            tooltip.add(Component.translatable("tooltip.oritech.capture_item_desc_1"));
-            tooltip.add(Component.translatable("tooltip.oritech.capture_item_desc_2"));
-            tooltip.add(Component.translatable("tooltip.oritech.capture_item_desc_3"));
+            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_1"));
+            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_2"));
+            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_3"));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
 }

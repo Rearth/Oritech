@@ -93,9 +93,9 @@ public class LaserTargetDesignator extends Item {
 
         if (stack.has(ComponentContent.TARGET_POSITION.get())) {
             var data = stack.get(ComponentContent.TARGET_POSITION.get());
-            tooltip.add(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
+            consumer.accept(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
         } else {
-            tooltip.add(Component.translatable("tooltip.oritech.target_designator.no_target"));
+            consumer.accept(Component.translatable("tooltip.oritech.target_designator.no_target"));
         }
     }
 }
