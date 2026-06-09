@@ -123,8 +123,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         workTick();
     }
 
-    // main work is done here. At this point, we have a valid recipe (items+fluid verified), and could output the results.
-    // we work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
+    // main work is done here. At this point, we have a valid recipe (items+fluid assumed verified), and could output the results.
+    // We work with one big transaction. Everything is taken directly, and if a part doesnt work we just don't commit the transaction
     protected void workTick() {
         try (var transaction = Transaction.openRoot()) {
 
@@ -150,6 +150,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             transaction.commit();
             setChanged();
             onProgressed();
+            lastWorkedAt = level.getGameTime();
         }
     }
 

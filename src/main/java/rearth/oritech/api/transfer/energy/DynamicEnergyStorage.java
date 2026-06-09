@@ -197,6 +197,11 @@ public class DynamicEnergyStorage implements EnergyHandler, ValueIOSerializable,
         }
     }
 
+    public void set(long amount, TransactionContext transaction) {
+        energyJournal.updateSnapshots(transaction);
+        this.energy = amount;
+    }
+
     /**
      * Called after the amount of energy in the handler changed.
      *

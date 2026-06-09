@@ -16,15 +16,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -42,11 +46,14 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
+import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidProvider {
 
@@ -69,105 +76,74 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
 
     @Override
+    protected void workTick() {
+
+        try (var transaction = Transaction.openRoot()) {
+
+            // since we have a matching recipe, enable energy input again
+            energyStorage.setMaxInsert(getDefaultInsertRate());
+            lastTickRFUsed = energyStorage.getAmountAsLong();
+
+            // needs a minimum amount of RF to work
+            if (lastTickRFUsed < OritechConfig.processingMachines.refineryData.energyPerTick.get()) return;
+
+            // use all energy, calculate progression based on amount (and arcane factor)
+            var steps = getAndDrainProgress(transaction);
+
+            progress.set(progress.get() + steps, transaction);
+
+            while (checkCraftingFinished(currentRecipe)) {
+
+                try (var inner = Transaction.open(transaction)) {
+
+                    var crafted = onProgressCompleted(inner);
+
+                    if (!crafted) {
+                        break;
+                    }
+
+                    progress.set(progress.get() - getRecipeDuration(), inner);
+                }
+            }
+
+            transaction.commit();
+            setChanged();
+            onProgressed();
+        }
+
+
+    }
+
+    @Override
+    public float getSpeedMultiplier() {
+        return super.getSpeedMultiplier() * 0.5f;
+    }
+
+    @Override
     public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
 
-        // enabled later in this method if working
+        // enabled later again if working
         energyStorage.setMaxInsert(0);
-
         lastTickRFUsed = 0;
 
-        if (!isAssembled(state) || disabledViaRedstone) return;
-
-        // if a recipe is found, this means the input items are all available
-        var recipeCandidate = getRecipe();
-        if (recipeCandidate.isEmpty())
-            currentRecipe = OritechRecipe.EMPTY;     // reset recipe when invalid or no input is given
-
-
-        if (recipeCandidate.isPresent() && canOutputRecipe(recipeCandidate.get().value()) && canProceed(recipeCandidate.get().value())) {
-
-            // allow more energy in when working
-            energyStorage.setMaxInsert(getDefaultInsertRate());
-            lastTickRFUsed = energyStorage.getAmount();
-
-            // reset when recipe was switched while running
-            if (currentRecipe != recipeCandidate.get().value()) resetProgress();
-
-            // this is separate so that progress is not reset when out of energy
-            if (energyStorage.getAmount() > OritechConfig.processingMachines.refineryData.energyPerTick.get()) {   // needs a min energy amount to work at all
-                var activeRecipe = recipeCandidate.get().value();
-                currentRecipe = activeRecipe;
-                lastWorkedAt = serverLevel.getGameTime();
-
-                // use all energy, calculate progression based on amount (and arcane factor)
-                var steps = getAndDrainProgress();
-
-                // System.out.println(steps);
-
-                // increase progress
-                progress += steps;
-
-                var craftCount = 0;
-
-                var recipeTime = activeRecipe.getTime() * 2;
-                while (progress > recipeTime && canOutputRecipe(activeRecipe) && getRecipe().isPresent() && getRecipe().get().value().equals(activeRecipe)) {
-                    finishCrafting(activeRecipe, getOutputView(), getInputView());
-                    progress -= recipeTime;
-                    craftCount++;
-                }
-
-                // System.out.println("crafted: " + craftCount);
-
-                // if input/output can't catch up / match speed, ensure we don't queue up progress
-                if (progress > recipeTime) {
-                    progress = 0;
-                }
-
-                spawnWorkParticles();
-
-                setChanged();
-            }
-
-        } else {
-            // this happens if either the input slot is empty, or the output slot is blocked
-            if (progress > 0) resetProgress();
-        }
-    }
-
-    public void afterCreation() {
-        if (level == null || !(level instanceof ServerLevel serverLevel)) return;
-
-        for (var targetMachinePosition : getCorePositions()) {
-            var rotatedPos = Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock());
-            var checkPos = worldPosition.offset(rotatedPos);
-            var checkState = level.getBlockState(checkPos);
-
-            if (checkState.hasBlockEntity()) {
-                if (checkState.hasProperty(MachineCoreBlock.USED) && checkState.getValue(MachineCoreBlock.USED)) {
-                    Oritech.LOGGER.warn("Unable to auto-create tainted refinery, blocked by block entity. This should never happen");
-                    continue;
-                }
-            }
-
-            level.setBlockAndUpdate(checkPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
-            OritechPlatform.INSTANCE.resetCapabilities(serverLevel, checkPos);
-
-        }
-
-        initMultiblock(getBlockState());
+        super.serverTick(serverLevel, pos, state, blockEntity);
     }
 
     @Override
-    protected void finishCrafting(OritechRecipe activeRecipe, List<ItemStack> outputInventory, List<ItemStack> inputInventory) {
-        super.createCraftingOutputs(activeRecipe, outputInventory, inputInventory);
-        craftFluids(activeRecipe);
+    protected boolean createCraftingOutputs(Transaction transaction) {
+        return createFluidOutputs(transaction) && super.createCraftingOutputs(transaction);
     }
 
     @Override
-    public List<ItemStack> getCraftingResults(OritechRecipe activeRecipe) {
-        var results = activeRecipe.getResults();
+    protected boolean removeCraftingInputs(Transaction transaction) {
+        return removeFluidInputs(transaction) && super.removeCraftingInputs(transaction);
+    }
+
+    @Override
+    public List<ItemStackTemplate> getCraftingResults(OritechRecipe activeRecipe) {
+        var results = activeRecipe.itemResults();
         if (results.isEmpty()) return List.of();
-        return List.of(results.getFirst().copyWithCount(results.getFirst().getCount() * getOutputMultiplier()));
+        return List.of(results.getFirst().withCount(results.getFirst().count() * getOutputMultiplier()));
     }
 
     public int getOutputMultiplier() {
@@ -180,16 +156,26 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return (arcaneFactor.result * 8) + 1;
     }
 
-    private void craftFluids(OritechRecipe activeRecipe) {
-        // create outputs, remove inputs
-
-        // remove input fluid
-        ownStorage.getInputContainer().extract(ownStorage.getInputContainer().getStack().copyWithAmount(activeRecipe.getFluidInput().amount()), false);
+    private boolean createFluidOutputs(Transaction transaction) {
 
         // create output fluids
-        var fluidOutput = calculateOutputFluid(activeRecipe);
-        ownStorage.getOutputContainer().insert(fluidOutput, false);
+        var fluidOutput = calculateOutputFluid(currentRecipe);
 
+        var inserted = ownStorage.getOutputContainer().insert(FluidResource.of(fluidOutput), fluidOutput.amount(), transaction);
+
+        return inserted == fluidOutput.amount();
+    }
+
+    private boolean removeFluidInputs(Transaction transaction) {
+        var input = currentRecipe.fluidInput();
+        if (input.amount() <= 0) return true;
+
+        var inputTank = ownStorage.getInputContainer();
+        var inputResource = inputTank.getResource(0);
+        if (inputResource.isEmpty()) return false;
+
+        var extracted = inputTank.extract(0, inputResource, input.amount(), transaction);
+        return extracted == input.amount();
     }
 
     @Override
@@ -197,8 +183,10 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
         var fluidOutput = calculateOutputFluid(recipe);
         if (!fluidOutput.isEmpty()) {
-            var inserted = ownStorage.getOutputContainer().insert(fluidOutput, true);
-            if (inserted != fluidOutput.getAmount()) return false;
+            try (var simulated = Transaction.openRoot()) {
+                var inserted = ownStorage.getOutputContainer().insert(FluidResource.of(fluidOutput), fluidOutput.amount(), simulated);
+                if (inserted != fluidOutput.getAmount()) return false;
+            }
         }
 
         return super.canOutputRecipe(recipe);
@@ -207,12 +195,12 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     // includes the sculk yield bonus
     private FluidStack calculateOutputFluid(OritechRecipe recipe) {
 
-        var fluidOutputs = recipe.getFluidOutputs();
+        var fluidOutputs = recipe.fluidOutputs();
         if (fluidOutputs.size() > selectedOutput && !fluidOutputs.isEmpty()) {
             var result = fluidOutputs.get(selectedOutput);
             return result.copyWithAmount(result.getAmount() * getOutputMultiplier());
         }
-        return FluidStack.empty();
+        return FluidStack.EMPTY;
 
     }
 
@@ -221,15 +209,20 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return super.getRecipeDuration() * 2;
     }
 
-    private int getAndDrainProgress() {
-        var availableEnergy = (float) energyStorage.getAmount();
-        energyStorage.setAmount(0);
+    private int getAndDrainProgress(Transaction transaction) {
+        var availableEnergy = (float) energyStorage.getAmountAsLong();
+        energyStorage.set(0, transaction);
 
         // (remapped from 0-1 to 1-8)
         var energyFactor = getArcaneEnergyMultiplier();
         availableEnergy *= energyFactor;
 
         return getEnergyInputMapped((int) availableEnergy);
+    }
+
+    @Override
+    protected OritechRecipeInput getRecipeInput() {
+        return new OritechRecipeInput(getInputView(), ownStorage.getInStack());
     }
 
     public int getEnergyInputMapped(long amount) {
@@ -258,26 +251,27 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         sculkFactor = input.read("sculk_factor", EnvironmentFactor.CODEC).orElse(EnvironmentFactor.DEFAULT);
     }
 
-    @Override
-    protected Optional<RecipeHolder<OritechRecipe>> getRecipe() {
+    public void afterCreation() {
+        if (level == null || !(level instanceof ServerLevel serverLevel)) return;
 
-        if (inputEmpty()) return Optional.empty();
+        for (var targetMachinePosition : getCorePositions()) {
+            var rotatedPos = Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock());
+            var checkPos = worldPosition.offset(rotatedPos);
+            var checkState = level.getBlockState(checkPos);
 
-        // get recipes matching input items
-        var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
+            if (checkState.hasBlockEntity()) {
+                if (checkState.hasProperty(MachineCoreBlock.USED) && checkState.getValue(MachineCoreBlock.USED)) {
+                    Oritech.LOGGER.warn("Unable to auto-create tainted refinery, blocked by block entity. This should never happen");
+                    continue;
+                }
+            }
 
-        // filter out recipes based on input tank. Have the ones with input items first.
-        return candidates
-                .stream()
-                .filter(candidate -> CentrifugeBlockEntity.recipeInputMatchesTank(ownStorage.getInputContainer().getStack(), candidate.value()))
-                .findAny();
+            level.setBlockAndUpdate(checkPos, BlockContent.MACHINE_CORE_HIDDEN.get().defaultBlockState());
+            level.invalidateCapabilities(checkPos);
 
-    }
+        }
 
-    @Override
-    protected boolean inputEmpty() {
-        var fluidEmpty = ownStorage.getInStack().isEmpty();
-        return fluidEmpty && super.inputEmpty();
+        initMultiblock(getBlockState());
     }
 
     @Override
@@ -348,7 +342,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
                 continue;
 
             var checkState = level.getBlockState(checkPos);
-            if (checkState.isSolidRender(level, checkPos) && !(checkState.getBlock() instanceof MachineCoreBlock))
+            if (checkState.isSolidRender() && !(checkState.getBlock() instanceof MachineCoreBlock))
                 return false;
         }
 
@@ -381,9 +375,11 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         return RecipeContent.REFINERY.get();
     }
 
-    private void spawnWorkParticles() {
+    @Override
+    protected void onProgressed() {
+        super.onProgressed();
 
-        if (level.random.nextFloat() > 0.2) return;
+        if (level.getRandom().nextFloat() > 0.2) return;
         // emit particles
         var facing = getFacing();
         var offsetLocal = Geometry.rotatePosition(new Vec3(0.3, 0.5, -0.3), facing);
@@ -397,10 +393,9 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         spawnFromCandidates.addAll(arcaneFactor.sources);
 
         if (!spawnFromCandidates.isEmpty()) {
-            var spawnFrom = spawnFromCandidates.get(level.random.nextInt(spawnFromCandidates.size()));
+            var spawnFrom = spawnFromCandidates.get(level.getRandom().nextInt(spawnFromCandidates.size()));
             ParticleContent.CatalystConnection(level, spawnFrom.getCenter(), emitPosition);
         }
-
     }
 
     @Override
@@ -468,7 +463,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
 
     @Override
-    public FluidApi.FluidStorage getFluidStorage(@Nullable Direction direction) {
+    public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         return ownStorage;
     }
 
@@ -513,7 +508,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
 
     @Override
-    public List<FluidApi.SingleSlotStorage> getInteractableFluidStorages() {
+    public List<ResourceHandler<FluidResource>> getInteractableFluidStorages() {
         return List.of(ownStorage.getInputContainer(), ownStorage.getOutputContainer());
     }
 
