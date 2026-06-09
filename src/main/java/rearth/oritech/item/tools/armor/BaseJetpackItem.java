@@ -104,14 +104,14 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
 
         level.addParticle(ParticleTypes.SMOKE,
-                particlePosA.x + (level.random.nextDouble() - 0.5) * 0.2,
-                particlePosA.y + (level.random.nextDouble() - 0.5) * 0.2,
-                particlePosA.z + (level.random.nextDouble() - 0.5) * 0.2,
+                particlePosA.x + (level.getRandom().nextDouble() - 0.5) * 0.2,
+                particlePosA.y + (level.getRandom().nextDouble() - 0.5) * 0.2,
+                particlePosA.z + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 direction.x, direction.y, direction.z);
         level.addParticle(ParticleTypes.SMOKE,
-                particlePosB.x + (level.random.nextDouble() - 0.5) * 0.2,
-                particlePosB.y + (level.random.nextDouble() - 0.5) * 0.2,
-                particlePosB.z + (level.random.nextDouble() - 0.5) * 0.2,
+                particlePosB.x + (level.getRandom().nextDouble() - 0.5) * 0.2,
+                particlePosB.y + (level.getRandom().nextDouble() - 0.5) * 0.2,
+                particlePosB.z + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 direction.x, direction.y, direction.z);
     }
 

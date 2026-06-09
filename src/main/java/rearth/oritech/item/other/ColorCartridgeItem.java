@@ -78,8 +78,8 @@ public class ColorCartridgeItem extends Item {
             var level = context.getLevel();
             if (context.getLevel() instanceof ServerLevel serverLevel) {
                 for (var pos : targetBlocks) {
-                    var at = pos.getCenter().add(level.random.nextFloat() * 0.1, level.random.nextFloat() * 0.1, level.random.nextFloat() * 0.1);
-                    serverLevel.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1, level.random.nextFloat(), level.random.nextFloat(), level.random.nextFloat(), 0.15f);
+                    var at = pos.getCenter().add(level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1);
+                    serverLevel.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
                 }
             }
 

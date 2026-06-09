@@ -252,7 +252,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
 
         // Sound for the main bolt (only if not a branch or first branch)
         if (currentBranchDepth == 0) {
-            level.playSound(null, endPos.x, endPos.y, endPos.z, SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS, 0.8f, 0.5f + level.random.nextFloat() * 0.8f);
+            level.playSound(null, endPos.x, endPos.y, endPos.z, SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS, 0.8f, 0.5f + level.getRandom().nextFloat() * 0.8f);
         }
 
 

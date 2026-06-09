@@ -3,12 +3,10 @@ package rearth.oritech.block.entity.reactor;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,12 +19,12 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.item.containers.SimpleInventoryStorage;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import rearth.oritech.block.blocks.reactor.NuclearExplosionBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
-import rearth.oritech.util.FakeMachinePlayer;
 
 import java.util.*;
 
@@ -59,7 +57,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
         if (startTime == -1) {
             startTime = level.getGameTime();
             explosionSphere(initialRadius + 7, 200, pos);
-            level.playSound(null, pos, SoundContent.NUKE_EXPLOSION, SoundSource.BLOCKS, 30f, 1f);
+            level.playSound(null, pos, SoundContent.NUKE_EXPLOSION.value(), SoundSource.BLOCKS, 30f, 1f);
         }
 
         var age = level.getGameTime() - startTime;
@@ -85,7 +83,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
         var rayCount = initialRadius / 2 + 3;
         var directions = getRandomRayDirections(rayCount);
         for (var direction : directions) {
-            var data = new DirectionExplosionWave(initialRadius, addRandomOffset(direction, 0.15f), worldPosition.offset(0, level.random.nextIntBetweenInclusive(-initialRadius / 2, initialRadius / 2), 0).immutable());
+            var data = new DirectionExplosionWave(initialRadius, addRandomOffset(direction, 0.15f), worldPosition.offset(0, level.getRandom().nextIntBetweenInclusive(-initialRadius / 2, initialRadius / 2), 0).immutable());
             waves.add(data);
         }
     }
@@ -97,67 +95,68 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var distSq = target.distSqr(worldPosition);
             var targetBlock = level.getBlockState(target);
             var percentageDist = distSq / (maxDist * maxDist) * 8;
-            var percentageVaried = percentageDist * (level.random.nextFloat() * 0.6 - 0.3 + 1);
+            var percentageVaried = percentageDist * (level.getRandom().nextFloat() * 0.6 - 0.3 + 1);
 
-            if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetBlock, getNukePlayerEntity()))
-                return;
+            var event = new BreakBlockEvent(level, target, targetBlock, getNukePlayerEntity());
+            NeoForge.EVENT_BUS.post(event);
+            if (event.isCanceled()) return;
 
             var replaced = false;
             var replacementState = Blocks.AIR.defaultBlockState();
 
             if (targetBlock.is(BlockTags.LOGS)) {
                 replaced = true;
-                replacementState = level.random.nextFloat() < 0.8 ? Blocks.BASALT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                replacementState = level.getRandom().nextFloat() < 0.8 ? Blocks.BASALT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 if (percentageVaried < 0.4f) replacementState = Blocks.AIR.defaultBlockState();
             } else if (targetBlock.is(BlockTags.LEAVES)) {
                 replaced = true;
-                replacementState = level.random.nextFloat() > 0.4 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                replacementState = level.getRandom().nextFloat() > 0.4 ? Blocks.MANGROVE_ROOTS.defaultBlockState() : Blocks.AIR.defaultBlockState();
                 if (percentageVaried < 0.6f) replacementState = Blocks.AIR.defaultBlockState();
             } else if (targetBlock.is(BlockTags.SAPLINGS) || targetBlock.is(Blocks.SHORT_GRASS)) {
                 replaced = true;
-                replacementState = level.random.nextFloat() > 0.4 ? Blocks.DEAD_BUSH.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                replacementState = level.getRandom().nextFloat() > 0.4 ? Blocks.DEAD_BUSH.defaultBlockState() : Blocks.AIR.defaultBlockState();
                 if (percentageVaried < 0.5f) replacementState = Blocks.AIR.defaultBlockState();
             } else if (targetBlock.is(Blocks.GRASS_BLOCK)) {
                 replaced = true;
                 if (percentageVaried < 0.05) {
-                    replacementState = level.random.nextFloat() > 0.5 ? Blocks.TUFF.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.5 ? Blocks.TUFF.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else if (percentageVaried < 0.3) {
-                    replacementState = level.random.nextFloat() > 0.2 ? Blocks.TUFF.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.2 ? Blocks.TUFF.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else if (percentageVaried < 0.55) {
-                    replacementState = level.random.nextFloat() > 0.1 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.1 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else {
                     replacementState = Blocks.DIRT.defaultBlockState();
                 }
 
-                if (level.random.nextFloat() > 0.7) replaced = false;
+                if (level.getRandom().nextFloat() > 0.7) replaced = false;
             } else if (targetBlock.is(Blocks.DIRT)) {
                 replaced = true;
                 if (percentageVaried < 0.15) {
-                    replacementState = level.random.nextFloat() > 0.6 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.6 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else if (percentageVaried < 0.3) {
-                    replacementState = level.random.nextFloat() > 0.3 ? Blocks.TUFF.defaultBlockState() : Blocks.COARSE_DIRT.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.3 ? Blocks.TUFF.defaultBlockState() : Blocks.COARSE_DIRT.defaultBlockState();
                 } else if (percentageVaried < 0.65) {
-                    replacementState = level.random.nextFloat() > 0.2 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.TUFF.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.2 ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.TUFF.defaultBlockState();
                 } else {
                     replaced = false;
                 }
 
-                if (level.random.nextFloat() > 0.1) replaced = false;
+                if (level.getRandom().nextFloat() > 0.1) replaced = false;
             } else if (targetBlock.is(BlockTags.BASE_STONE_OVERWORLD)) {
                 replaced = true;
                 if (percentageVaried < 0.3) {
-                    replacementState = level.random.nextFloat() > 0.5 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.5 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else if (percentageVaried < 0.5) {
-                    replacementState = level.random.nextFloat() > 0.3 ? Blocks.STONE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.3 ? Blocks.STONE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else if (percentageVaried < 0.7) {
-                    replacementState = level.random.nextFloat() > 0.2 ? Blocks.GRANITE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.2 ? Blocks.GRANITE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else {
                     replaced = false;
                 }
             } else if (targetBlock.is(BlockTags.SAND) || targetBlock.is(Blocks.SANDSTONE)) {
                 replaced = true;
                 if (percentageVaried < 0.2) {
-                    replacementState = level.random.nextFloat() > 0.7 ? Blocks.SANDSTONE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
+                    replacementState = level.getRandom().nextFloat() > 0.7 ? Blocks.SANDSTONE.defaultBlockState() : Blocks.MAGMA_BLOCK.defaultBlockState();
                 } else {
                     replacementState = Blocks.GLASS.defaultBlockState();
                 }
@@ -169,7 +168,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 level.setBlock(target, replacementState, Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 1);
 
                 // random fire chance
-                if (level.getBlockState(target.above()).canBeReplaced() && level.random.nextFloat() > 0.97) {
+                if (level.getBlockState(target.above()).canBeReplaced() && level.getRandom().nextFloat() > 0.97) {
                     level.setBlock(target.above(), Blocks.FIRE.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
                 }
             }
@@ -210,7 +209,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
             // if less than half dist, 100%, then slowly ramp up to 0%
             var removalPercentage = (distSq - radiusSq / 2f) / radiusSq;
-            if (level.random.nextFloat() < removalPercentage - 0.2) {
+            if (level.getRandom().nextFloat() < removalPercentage - 0.2) {
                 borderBlocks.add(target.immutable());
                 continue;
             }
@@ -227,8 +226,10 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
 
             usedPower += targetHardness;
 
-            if (!OritechPlatform.INSTANCE.canPlayerBreakBlock(level, target, targetState, getNukePlayerEntity()))
-                return 1000;
+
+            var event = new BreakBlockEvent(level, target, targetState, getNukePlayerEntity());
+            NeoForge.EVENT_BUS.post(event);
+            if (event.isCanceled()) return 1000;
 
             targetBlock.destroy(level, pos, targetState);
             level.setBlock(target, Blocks.AIR.defaultBlockState(), Block.UPDATE_SUPPRESS_DROPS | Block.UPDATE_CLIENTS, 0);
@@ -245,7 +246,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
                 var entityDist = entity.distanceToSqr(pos.getCenter());
                 var distPercentage = entityDist / radiusSq;
                 var damage = radiusSq / distPercentage; // closer entities take much more damage
-                entity.hurt(new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.EXPLOSION)), (float) damage);
+                entity.hurt(level.damageSources().source(DamageTypes.EXPLOSION), (float) damage);
             });
 
         }
@@ -264,7 +265,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var baseAngle = i * angleIncrement;
 
             // Add a small random perturbation to the angle
-            var randomPerturbation = (level.random.nextFloat() - 0.5) * (angleIncrement / 2);
+            var randomPerturbation = (level.getRandom().nextFloat() - 0.5) * (angleIncrement / 2);
 
             // Final angle with randomness
             var angle = baseAngle + randomPerturbation;
@@ -280,13 +281,12 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     }
 
     private Vec3 addRandomOffset(Vec3 direction, float amount) {
-        return direction.add(level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2, level.random.nextFloat() * amount - amount / 2);
+        return direction.add(level.getRandom().nextFloat() * amount - amount / 2, level.getRandom().nextFloat() * amount - amount / 2, level.getRandom().nextFloat() * amount - amount / 2);
     }
 
     private Player getNukePlayerEntity() {
         if (nukePlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            nukePlayerEntity = FakeMachinePlayer.create(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_nuke"), new SimpleInventoryStorage(2, () -> {
-            }));
+            nukePlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_nuke"));
         }
 
         return nukePlayerEntity;

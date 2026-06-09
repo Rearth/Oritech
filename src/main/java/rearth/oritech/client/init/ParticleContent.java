@@ -86,7 +86,7 @@ public class ParticleContent {
             case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos, 1, 5, 3);
             case WEED_KILLER -> {
                 var dist = (int) payload.data2.distanceTo(payload.data1);
-                spawnLine(ParticleTypes.DRAGON_BREATH, level, payload.data1, payload.data2, dist * 4 + level.random.nextInt(3), 0.2f);
+                spawnLine(ParticleTypes.DRAGON_BREATH, level, payload.data1, payload.data2, dist * 4 + level.getRandom().nextInt(3), 0.2f);
             }
             case WANDERING_SOUL -> {
                 var velocity = payload.data1.scale((1f / payload.extraInt) * 1.5f);
@@ -100,7 +100,7 @@ public class ParticleContent {
                     spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
             case BLACK_HOLE_EMISSION -> {
                 var dist = (int) payload.data1.distanceTo(payload.pos);
-                spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.random.nextInt(3), 0.2f);
+                spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.getRandom().nextInt(3), 0.2f);
             }
         }
     }
@@ -147,9 +147,9 @@ public class ParticleContent {
             double t = count > 1 ? (double) i / (count - 1) : 0;
             Vec3 pos = start.add(diff.scale(t));
             level.addParticle(particle,
-                    pos.x + (level.random.nextDouble() - 0.5) * 2 * spread,
-                    pos.y + (level.random.nextDouble() - 0.5) * 2 * spread,
-                    pos.z + (level.random.nextDouble() - 0.5) * 2 * spread,
+                    pos.x + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
+                    pos.y + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
+                    pos.z + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
                     0, 0, 0);
         }
     }
@@ -157,9 +157,9 @@ public class ParticleContent {
     private static void spawnEnchantParticles(Level level, Vec3 source, Vec3 dest, float spread) {
         Vec3 diff = dest.subtract(source);
         level.addParticle(ParticleTypes.ENCHANT,
-                source.x + (level.random.nextDouble() - 0.3) * 2 * spread,
-                source.y + (level.random.nextDouble() - 0.3) * 2 * spread,
-                source.z + (level.random.nextDouble() - 0.3) * 2 * spread,
+                source.x + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
+                source.y + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
+                source.z + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
                 diff.x, diff.y, diff.z);
     }
 

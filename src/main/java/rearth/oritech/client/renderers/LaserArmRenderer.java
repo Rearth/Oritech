@@ -88,7 +88,7 @@ public class LaserArmRenderer<T extends LaserArmBlockEntity & GeoAnimatable> ext
         if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().random.nextFloat() > 0.7) {
             var level = laserEntity.getLevel();
             var p = targetPos.add(0.5, 0, 0.5).subtract(forward.scale(0.6));
-            level.addParticle(ParticleTypes.SMALL_FLAME, p.x + (level.random.nextDouble() - 0.5) * 0.8, p.y + (level.random.nextDouble() - 0.5) * 0.6, p.z + (level.random.nextDouble() - 0.5) * 0.8, 0, 0, 0);
+            level.addParticle(ParticleTypes.SMALL_FLAME, p.x + (level.getRandom().nextDouble() - 0.5) * 0.8, p.y + (level.getRandom().nextDouble() - 0.5) * 0.6, p.z + (level.getRandom().nextDouble() - 0.5) * 0.8, 0, 0, 0);
         }
 
 

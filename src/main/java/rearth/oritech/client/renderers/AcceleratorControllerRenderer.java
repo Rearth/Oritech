@@ -48,7 +48,7 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
             activeLines.put(entity.getBlockPos().asLong(), new RenderedLine(time, displayTrail));
             var level = entity.getLevel();
             var pp = displayTrail.getLast();
-            level.addParticle(ParticleTypes.REVERSE_PORTAL, pp.x + (level.random.nextDouble() - 0.5) * 0.4, pp.y + (level.random.nextDouble() - 0.5) * 0.6, pp.z + (level.random.nextDouble() - 0.5) * 0.4, 0, 0, 0);
+            level.addParticle(ParticleTypes.REVERSE_PORTAL, pp.x + (level.getRandom().nextDouble() - 0.5) * 0.4, pp.y + (level.getRandom().nextDouble() - 0.5) * 0.6, pp.z + (level.getRandom().nextDouble() - 0.5) * 0.4, 0, 0, 0);
         }
 
         var activeLine = activeLines.get(entity.getBlockPos().asLong());

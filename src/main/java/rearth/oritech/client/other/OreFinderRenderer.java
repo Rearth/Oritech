@@ -62,7 +62,7 @@ public class OreFinderRenderer {
             var renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
             var vertexProvider = vertexConsumers.getBuffer(OVERLAY);
 
-            OreFinderRenderer.tesselateWithoutAO(renderer, level, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, level.random, 0, 0);
+            OreFinderRenderer.tesselateWithoutAO(renderer, level, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, level.getRandom(), 0, 0);
 
             matrices.popPose();
         }

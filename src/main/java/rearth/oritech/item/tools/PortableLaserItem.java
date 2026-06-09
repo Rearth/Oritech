@@ -266,7 +266,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
 
         if (blockState.is(TagContent.LASER_ACCELERATED)) {
-            blockState.randomTick((ServerLevel) level, blockPos, level.random);
+            blockState.randomTick((ServerLevel) level, blockPos, level.getRandom());
             ParticleContent.Accelerating(level, Vec3.atLowerCornerOf(blockPos));
             stats = new Tuple<>(blockPos, -1);
         }

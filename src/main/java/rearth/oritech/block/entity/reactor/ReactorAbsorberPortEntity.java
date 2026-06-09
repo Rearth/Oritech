@@ -43,7 +43,7 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements MenuProvid
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 0)) {
         @Override
         public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-            if (!resource.toStack().is(TagContent.REACTOR_COOLANT)) return 0;
+            if (!resource.is(TagContent.REACTOR_COOLANT)) return 0;
             return super.insert(index, resource, amount, transaction);
         }
     };
@@ -123,10 +123,6 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements MenuProvid
         var fieldCount = NetworkManager.encodeFields(this, SyncType.GUI_TICK, usedBuf, level);
         if (fieldCount == 0) return;
         PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), SyncType.GUI_TICK, usedBuf.array()));
-    }
-
-    @Override
-    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
     }
 
     @Override
