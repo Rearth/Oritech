@@ -5,36 +5,37 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
-
-import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.ItemProvider {
+public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyProvider.Item {
 
     public SmallEnergyStorageBlockItem(Block block, Properties settings) {
         super(block, settings);
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var storedEnergy = stack.getOrDefault(ComponentContent.ENERGY, 0L);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+
+        var storedEnergy = itemStack.getOrDefault(ComponentContent.ENERGY, 0);
 
         if (storedEnergy != 0) {
             var text = Component.translatable("tooltip.oritech.energy_stored", TooltipHelper.getEnergyText(storedEnergy));
-            consumer.accept(text.withStyle(ChatFormatting.GOLD));
+            builder.accept(text.withStyle(ChatFormatting.GOLD));
         }
-
-        super.appendHoverText(stack, context, tooltip, type);
 
     }
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        var contentEmpty = stack.getOrDefault(ComponentContent.ENERGY, 0L) <= 0;
+        var contentEmpty = stack.getOrDefault(ComponentContent.ENERGY, 0) <= 0;
         return !contentEmpty;
     }
 
@@ -47,13 +48,23 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     public int getBarWidth(ItemStack stack) {
 
         var capacity = OritechConfig.smallEnergyStorage.energyCapacity.get();
-        var fillAmount = stack.getOrDefault(ComponentContent.ENERGY, 0L);
+        var fillAmount = stack.getOrDefault(ComponentContent.ENERGY, 0);
 
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;
     }
 
     @Override
-    public DynamicEnergyStorage getEnergyStorage(ItemStack stack) {
-        return new SimpleEnergyItemStorage(OritechConfig.smallEnergyStorage.maxEnergyInsertion.get(), OritechConfig.smallEnergyStorage.maxEnergyExtraction.get(), OritechConfig.smallEnergyStorage.energyCapacity.get(), stack);
+    public int getCapacity() {
+        return Math.toIntExact(OritechConfig.smallEnergyStorage.energyCapacity.get());
+    }
+
+    @Override
+    public int getMaxInsert() {
+        return Math.toIntExact(OritechConfig.smallEnergyStorage.maxEnergyInsertion.get());
+    }
+
+    @Override
+    public int getMaxExtract() {
+        return Math.toIntExact(OritechConfig.smallEnergyStorage.maxEnergyExtraction.get());
     }
 }

@@ -1,9 +1,15 @@
 package rearth.oritech.init;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.accelerator.*;
 import rearth.oritech.block.entity.addons.*;
@@ -28,6 +34,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 
 public class BlockEntitiesContent {
@@ -278,4 +285,45 @@ public class BlockEntitiesContent {
     @Target({ElementType.FIELD})
     public @interface AssignSidedFluid {
     }
+
+    public static void registerBlockEntityCapabilities(RegisterCapabilitiesEvent event) {
+
+        for (var field : BlockEntitiesContent.class.getDeclaredFields()) {
+            if (!Modifier.isStatic(field.getModifiers())) continue;
+            if (!Modifier.isPublic(field.getModifiers())) continue;
+            if (!Supplier.class.isAssignableFrom(field.getType())) continue;
+
+            try {
+                field.setAccessible(true);
+                var value = (Supplier<BlockEntityType<? extends BlockEntity>>) field.get(null);
+                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+
+                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedEnergy.class)) {
+                    event.registerBlockEntity(
+                            Capabilities.Energy.BLOCK,
+                            value.get(),
+                            (entity, side) -> ((EnergyProvider) entity).getEnergyLookup(side));
+                }
+
+                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedInventory.class)) {
+                    event.registerBlockEntity(
+                            Capabilities.Item.BLOCK,
+                            value.get(),
+                            (entity, side) -> ((ItemProvider) entity).getItemLookup(side));
+                }
+
+                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedFluid.class)) {
+                    event.registerBlockEntity(
+                            Capabilities.Fluid.BLOCK,
+                            value.get(),
+                            (entity, side) -> ((FluidProvider) entity).getFluidLookup(side));
+                }
+
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Failed to access field: " + field.getName(), e);
+            }
+        }
+
+    }
+
 }

@@ -7,7 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -116,7 +115,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         if (stack == null || stack.isEmpty()) {
             return;
         }
-        this.fluidColor = ColorHelper.makeOpaque(IClientFluidTypeExtensions.of(stack.getFluid()).getTintColor(stack));
+        this.fluidColor = ColorHelper.makeOpaque(ColorHelper.getFluidTint(stack));
     }
 
     @Override
@@ -147,7 +146,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             var resource = itemFluidStorage.getResource(0);
             if (!resource.isEmpty()) {
                 var stack = resource.toStack((int) itemFluidStorage.getAmountAsLong(0));
-                return ColorHelper.makeOpaque(IClientFluidTypeExtensions.of(stack.getFluid()).getTintColor(stack));
+                return ColorHelper.makeOpaque(ColorHelper.getFluidTint(stack));
             }
         }
 

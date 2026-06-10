@@ -8,4 +8,10 @@ public interface EnergyProvider {
 
     EnergyHandler getEnergyLookup(@Nullable Direction direction);
 
+    interface Item {
+        int getCapacity();
+        int getMaxInsert();
+        int getMaxExtract();
+    }
+
 }

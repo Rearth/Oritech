@@ -88,8 +88,8 @@ public class LaserTargetDesignator extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        super.appendHoverText(stack, context, tooltip, type);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
         if (stack.has(ComponentContent.TARGET_POSITION.get())) {
             var data = stack.get(ComponentContent.TARGET_POSITION.get());

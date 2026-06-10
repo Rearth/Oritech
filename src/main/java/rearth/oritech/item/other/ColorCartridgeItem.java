@@ -11,7 +11,9 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -19,7 +21,7 @@ import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class ColorCartridgeItem extends Item {
 
@@ -31,14 +33,13 @@ public class ColorCartridgeItem extends Item {
     }
 
     @Override
-    public void appendHoverText(@NotNull ItemStack stack, @NotNull TooltipContext context, @NotNull List<Component> tooltipComponents, @NotNull TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
 
-        tooltipComponents.add(Component.translatable("tooltip.oritech.paint.1").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        tooltipComponents.add(Component.translatable("tooltip.oritech.paint.2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+        builder.accept(Component.translatable("tooltip.oritech.paint.1").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        builder.accept(Component.translatable("tooltip.oritech.paint.2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
     }
-
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
 
@@ -49,7 +50,7 @@ public class ColorCartridgeItem extends Item {
         var targetEntity = context.getLevel().getBlockEntity(targetBlock);
 
         if (targetEntity instanceof MachineCoreEntity machineCore && machineCore.getCachedController() != null) {
-            targetEntity = (net.minecraft.level.level.block.entity.BlockEntity) machineCore.getCachedController();
+            targetEntity = (BlockEntity) machineCore.getCachedController();
             targetBlock = targetEntity.getBlockPos();
         }
 

@@ -9,4 +9,8 @@ public interface FluidProvider {
 
     ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction);
 
+    interface Item {
+        int getCapacity();
+    }
+
 }

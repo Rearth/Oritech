@@ -15,9 +15,17 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.ItemCapability;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
@@ -158,27 +166,49 @@ public class ToolsContent {
     // TODO: Move equipment-tab population to registry/annotation scanning so these direct registrations show up without manual post-processing.
     // TODO: Revisit energy/fluid item hookup under NeoForge's current capability/data-component APIs instead of relying on the deleted bridge registration.
 
-    public static void registerEventHandlers() {
+    public static void registerItemCapabilities(RegisterCapabilitiesEvent event) {
 
-        BlockEvent.BREAK.register(PromethiumPickaxeItem::preMine);
-        // PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
+        event.registerItem(
+                Capabilities.Energy.ITEM,
+                (stack, itemAccess) -> {
+                    var tool = (EnergyProvider.Item) stack.getItem();
+                    return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getCapacity(), tool.getMaxInsert(), tool.getMaxExtract());
+                },
+                HAND_DRILL
+                );
 
-        TickEvent.SERVER_LEVEL_PRE.register(PromethiumAxeItem::onTick);
-
-        EntityEvent.LIVING_HURT.register((entity, source, amount) -> {
-
-            if (source.typeHolder().is(DamageTypes.FALL) && entity instanceof Player player) {
-                var boots = player.getItemBySlot(EquipmentSlot.FEET);
-
-                if (boots == null) return EventResult.pass();
-                if (!(boots.getItem() instanceof ExoArmorItem)) return EventResult.pass();
-
-                player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO.get(), SoundSource.PLAYERS, 0.2f, 1.0f);
-
-                return EventResult.interruptFalse();
-            }
-            return EventResult.pass();
-        });
+        event.registerItem(
+                Capabilities.Fluid.ITEM,
+                (stack, itemAccess) -> {
+                    var tool = (FluidProvider.Item) stack.getItem();
+                    return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getCapacity());
+                },
+                JETPACK
+                );
 
     }
+
+//    public static void registerEventHandlers() {
+//
+//        BlockEvent.BREAK.register(PromethiumPickaxeItem::preMine);
+//        // PlayerBlockBreakEvents.BEFORE.register(PromethiumPickaxeItem::preMine);
+//
+//        TickEvent.SERVER_LEVEL_PRE.register(PromethiumAxeItem::onTick);
+//
+//        EntityEvent.LIVING_HURT.register((entity, source, amount) -> {
+//
+//            if (source.typeHolder().is(DamageTypes.FALL) && entity instanceof Player player) {
+//                var boots = player.getItemBySlot(EquipmentSlot.FEET);
+//
+//                if (boots == null) return EventResult.pass();
+//                if (!(boots.getItem() instanceof ExoArmorItem)) return EventResult.pass();
+//
+//                player.level().playSound(null, player.blockPosition(), SoundContent.SHORT_SERVO.get(), SoundSource.PLAYERS, 0.2f, 1.0f);
+//
+//                return EventResult.interruptFalse();
+//            }
+//            return EventResult.pass();
+//        });
+//
+//    }
 }

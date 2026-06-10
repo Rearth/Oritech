@@ -1,7 +1,9 @@
 package rearth.oritech.item.other;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -11,9 +13,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import rearth.oritech.init.ItemContent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MobCaptureItem extends Item {
 
@@ -27,7 +31,7 @@ public class MobCaptureItem extends Item {
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand) {
 
-        var resultingItem = ItemContent.UNHOLY_INTELLIGENCE;
+        var resultingItem = ItemContent.UNHOLY_INTELLIGENCE.asItem();
         if (entity.isDeadOrDying()) return InteractionResult.PASS;
 
         for (var target : targets) {
@@ -39,7 +43,7 @@ public class MobCaptureItem extends Item {
                     user.setItemInHand(hand, stack);
                 }
 
-                entity.kill();
+                entity.kill((ServerLevel) user.level());
 
                 user.level().addFreshEntity(new ItemEntity(user.level(), entity.getX(), entity.getY(), entity.getZ(), new ItemStack(resultingItem)));
 
@@ -50,18 +54,19 @@ public class MobCaptureItem extends Item {
         return InteractionResult.PASS;
     }
 
+
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        super.appendHoverText(stack, context, tooltip, type);
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_1"));
-            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_2"));
-            consumer.accept(Component.translatable("tooltip.oritech.capture_item_desc_3"));
+            builder.accept(Component.translatable("tooltip.oritech.capture_item_desc_1"));
+            builder.accept(Component.translatable("tooltip.oritech.capture_item_desc_2"));
+            builder.accept(Component.translatable("tooltip.oritech.capture_item_desc_3"));
         } else {
-            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            builder.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
 }

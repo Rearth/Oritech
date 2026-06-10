@@ -2,28 +2,29 @@ package rearth.oritech.item.tools;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderSet;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.Tool;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
-import org.jetbrains.annotations.NotNull;
 import rearth.oritech.client.cablesurfer.ClientCableFinder;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.SoundContent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class Wrench extends Item {
 
@@ -34,8 +35,9 @@ public class Wrench extends Item {
     }
 
     public static Tool createToolComponent() {
+
         return new Tool(List.of(
-                Tool.Rule.minesAndDrops(List.of(
+                Tool.Rule.minesAndDrops(HolderSet.direct(
                         BlockContent.ENERGY_PIPE,
                         BlockContent.SUPERCONDUCTOR,
                         BlockContent.FLUID_PIPE,
@@ -60,23 +62,23 @@ public class Wrench extends Item {
                         BlockContent.FRAMED_ITEM_PIPE_CONNECTION,
                         BlockContent.MACHINE_FRAME_BLOCK
                 ), 25f)
-        ), 1.f, 1);
+        ), 1.f, 1, true);
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
 
-        var stack = user.getItemInHand(hand);
+        var stack = player.getItemInHand(hand);
 
         if (level.isClientSide()) {
-            var hit = ClientCableFinder.findLookedAtCable(user, 6f);
+            var hit = ClientCableFinder.findLookedAtCable(player, 6f);
             if (hit != null) {
-                ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), hit.parallelStart(), hit.parallelEnd(), user.getSpeed() * 3);
-                return InteractionResultHolder.success(stack);
+                ClientZiplineHandler.start(hit.selectedStart(), hit.selectedEnd(), hit.parallelStart(), hit.parallelEnd(), player.getSpeed() * 3);
+                return InteractionResult.SUCCESS;
             }
         }
 
-        return useWrench(stack, user, hand) ? InteractionResultHolder.success(stack) : InteractionResultHolder.fail(stack);
+        return useWrench(stack, player, hand) ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
 
     /**
@@ -86,8 +88,8 @@ public class Wrench extends Item {
      * @param player The player using the wrench
      */
     protected boolean useWrench(ItemStack item, Player player, InteractionHand hand) {
-        if (player.getCooldowns().isOnCooldown(this)) return false;
-        player.getCooldowns().addCooldown(this, ACTION_COOLDOWN);
+        if (player.getCooldowns().isOnCooldown(item)) return false;
+        player.getCooldowns().addCooldown(item, ACTION_COOLDOWN);
 
         if (!(player instanceof ServerPlayer)) return false;
 
@@ -124,9 +126,9 @@ public class Wrench extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        tooltipComponents.add(Component.translatable("tooltip.oritech.wrench"));
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+        builder.accept(Component.translatable("tooltip.oritech.wrench"));
     }
 
     protected void onUsed(ItemStack item, Player player, InteractionHand hand) {
@@ -134,7 +136,7 @@ public class Wrench extends Item {
     }
 
     protected void playSound(Level level, Player player) {
-        level.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN, SoundSource.PLAYERS, 1.0f, 1.0f);
+        level.playSound(null, player.blockPosition(), SoundContent.WRENCH_TURN.value(), SoundSource.PLAYERS, 1.0f, 1.0f);
     }
 
     /**

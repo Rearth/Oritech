@@ -5,7 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
@@ -21,16 +21,16 @@ public class ComponentContent {
             "is_aoe_active", builder -> builder.persistent(PrimitiveCodec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
     );
 
-    public static final Supplier<DataComponentType<Long>> ENERGY = COMPONENTS.registerComponentType(
-            "energy", builder -> builder.persistent(PrimitiveCodec.LONG).networkSynchronized(ByteBufCodecs.VAR_LONG)
+    public static final Supplier<DataComponentType<Integer>> ENERGY = COMPONENTS.registerComponentType(
+            "energy", builder -> builder.persistent(PrimitiveCodec.INT).networkSynchronized(ByteBufCodecs.VAR_INT)
     );
 
     public static final Supplier<DataComponentType<BlockPos>> TARGET_POSITION = COMPONENTS.registerComponentType(
             "target_position", builder -> builder.persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC)
     );
 
-    public static final Supplier<DataComponentType<FluidStack>> STORED_FLUID = COMPONENTS.registerComponentType(
-            "stored_fluid", builder -> builder.persistent(FluidStack.OPTIONAL_CODEC).networkSynchronized(FluidStack.OPTIONAL_STREAM_CODEC)
+    public static final Supplier<DataComponentType<SimpleFluidContent>> STORED_FLUID = COMPONENTS.registerComponentType(
+            "stored_fluid", builder -> builder.persistent(SimpleFluidContent.CODEC).networkSynchronized(SimpleFluidContent.STREAM_CODEC)
     );
 
     public static final Supplier<DataComponentType<ShrinkerBlockEntity.ShrunkAddonData>> ADDON_DATA = COMPONENTS.registerComponentType(

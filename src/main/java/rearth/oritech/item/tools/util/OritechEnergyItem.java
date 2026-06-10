@@ -8,24 +8,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 
-import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+public interface OritechEnergyItem extends EnergyProvider.Item {
 
-public interface OritechEnergyItem extends EnergyApi.ItemProvider {
-
-    default long getEnergyCapacity(ItemStack stack) {
-        return 10_000;
-    }
-
-    default long getEnergyMaxInput(ItemStack stack) {
-        return 500;
-    }
-
-    default long getEnergyMaxOutput(ItemStack stack) {
-        return 0;
-    }
-
-    default boolean tryUseEnergy(ItemStack stack, long amount, Player player) {
+    default boolean tryUseEnergy(ItemStack stack, int amount, Player player) {
         RandomSource random = RandomSource.create();
 
         int unbreakingLevel = getUnbreakingLevel(stack);
@@ -33,14 +24,12 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
             amount = amount / (random.nextInt(unbreakingLevel) + 1);
         }
 
-        var storage = getEnergyStorage(stack);
-        if (storage instanceof SimpleEnergyItemStorage itemStorage) {
-            var extracted = itemStorage.extractIgnoringLimit(amount, false);
-            if (extracted > 0) {
-                itemStorage.update();
+        var storage = getEnergyStorage(stack, ItemAccess.forStack(stack));
+        if (storage != null) {
+            try (var transaction = Transaction.openRoot()) {
+                var extracted = storage.extract(amount, transaction);
+                return extracted == amount;
             }
-
-            return extracted == amount;
         }
 
         return false;
@@ -58,12 +47,13 @@ public interface OritechEnergyItem extends EnergyApi.ItemProvider {
         return 0;
     }
 
-    default long getStoredEnergy(ItemStack stack) {
-        return getEnergyStorage(stack).getAmount();
+    default long getStoredEnergy(ItemStack stack, ItemAccess itemAccess) {
+        return getEnergyStorage(stack, itemAccess).getAmountAsInt();
     }
 
-    @Override
-    default DynamicEnergyStorage getEnergyStorage(ItemStack stack) {
-        return new SimpleEnergyItemStorage(getEnergyMaxInput(stack), getEnergyMaxOutput(stack), getEnergyCapacity(stack), stack);
+    default EnergyHandler getEnergyStorage(ItemStack stack, ItemAccess itemAccess) {
+        return stack.getCapability(Capabilities.Energy.ITEM, itemAccess);
     }
+
+
 }
