@@ -38,4 +38,12 @@ public class AttachmentContent {
                     .build()
     );
 
+    public static final Supplier<AttachmentType<Boolean>> ZIPLINING_STATE = ATTACHMENT_TYPES.register(
+            "ziplining", () -> AttachmentType.builder(() -> false)
+                    .sync(ByteBufCodecs.BOOL)
+                    .serialize(Codec.BOOL.fieldOf("ziplining"))
+                    .copyOnDeath()
+                    .build()
+    );
+
 }

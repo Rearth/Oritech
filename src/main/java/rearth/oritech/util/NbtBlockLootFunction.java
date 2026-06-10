@@ -26,8 +26,6 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
     @Override
     public @NotNull ItemStack run(@NotNull ItemStack stack, LootContext context) {
 
-        // todo
-
         var blockEntity = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 
         if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.hasStoredFluidForDrops()) {
@@ -35,8 +33,10 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
         } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.energy > 0) {
             stack.set(ComponentContent.ENERGY.get(), storageEntity.energyStorage.energy);
+            stack.set(DataComponents.MAX_STACK_SIZE, 1);
         } else if (blockEntity instanceof CombiAddonEntity combiAddon && combiAddon.storedData != null) {
             stack.set(ComponentContent.ADDON_DATA.get(), combiAddon.storedData);
+            stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
 
         return stack;

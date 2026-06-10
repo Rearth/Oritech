@@ -10,7 +10,7 @@ public interface ComparatorOutputProvider {
     }
 
     static int getFluidStorageComparatorOutput(SimpleFluidStorage storage) {
-        return (int) ((storage.getStack().getAmount() / (float) storage.getCapacity()) * 15);
+        return (int) ((storage.getContent().getAmount() / (float) storage.getCapacity()) * 15);
     }
 
     int getComparatorOutput();

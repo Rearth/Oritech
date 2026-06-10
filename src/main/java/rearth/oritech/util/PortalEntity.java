@@ -2,30 +2,33 @@ package rearth.oritech.util;
 
 import com.geckolib.animatable.GeoEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
+
+import java.util.Set;
 
 public class PortalEntity extends Entity implements GeoEntity {
 
     private final AnimatableInstanceCache instanceCache = GeckoLibUtil.createInstanceCache(this);
-
-    private final int age = 0;
 
     public GlobalPos target;
     protected static final RawAnimation PORTAL = RawAnimation.begin().thenPlay("create").thenLoop("idle");
@@ -37,7 +40,12 @@ public class PortalEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(@Nullable Entity other) {
+        return true;
+    }
+
+    @Override
+    public boolean canCollideWith(Entity entity) {
         return true;
     }
 
@@ -48,7 +56,7 @@ public class PortalEntity extends Entity implements GeoEntity {
         if (target != null) {
             if (!(player instanceof ServerPlayer serverPlayer)) return;
 
-            ServerLevel targetWorld = this.getServer().getLevel(target.dimension());
+            ServerLevel targetWorld = level().getServer().getLevel(target.dimension());
 
             if (targetWorld != null) {
                 BlockPos targetPos = target.pos();
@@ -59,7 +67,9 @@ public class PortalEntity extends Entity implements GeoEntity {
                 serverPlayer.teleportTo(
                         targetWorld,
                         centerPos.x, centerPos.y, centerPos.z,
-                        serverPlayer.getYRot(), serverPlayer.getXRot()
+                        Set.of(),
+                        serverPlayer.getYRot(), serverPlayer.getXRot(),
+                        false
                 );
             } else {
                 Oritech.LOGGER.warn("Attempted to teleport player to non-existent dimension: {}", target.dimension().identifier());
@@ -67,6 +77,21 @@ public class PortalEntity extends Entity implements GeoEntity {
         }
 
         this.remove(RemovalReason.DISCARDED);
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel serverLevel, DamageSource damageSource, float v) {
+        return false;
+    }
+
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+
+    }
+
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+
     }
 
     @Override
@@ -87,18 +112,8 @@ public class PortalEntity extends Entity implements GeoEntity {
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag nbt) {
-
-    }
-
-    @Override
-    protected void addAdditionalSaveData(CompoundTag nbt) {
-
-    }
-
-    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, state -> state.setAndContinue(PORTAL)));
+        controllers.add(new AnimationController<>("portal", state -> state.setAndContinue(PORTAL)));
     }
 
     @Override
