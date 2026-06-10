@@ -98,7 +98,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (fluidInput.amount() > 0) {
             // we assume that the fluid content matches here, as this was checked in earlier steps already
             var extracted = fluidContainer.getInputContainer().extract(FluidResource.of(fluidContainer.getInStack()), fluidInput.amount(), transaction);
-            if(extracted != fluidInput.amount()) return false;
+            if (extracted != fluidInput.amount()) return false;
         }
 
         return super.removeCraftingInputs(transaction);

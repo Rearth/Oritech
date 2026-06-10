@@ -292,7 +292,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         if (fluid.isEmpty()) return true;
         if (!hasFluidAddon) return false;
 
-        try (var transaction = Transaction.openRoot()){
+        try (var transaction = Transaction.openRoot()) {
             return fluidStorage.insert(FluidResource.of(fluid), fluid.amount(), transaction) == fluid.getAmount();
         }
     }

@@ -10,7 +10,6 @@ import com.geckolib.animation.PlayState;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
@@ -50,7 +49,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechPlatform;
-
 import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;

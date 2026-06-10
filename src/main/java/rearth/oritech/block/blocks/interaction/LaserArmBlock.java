@@ -132,7 +132,7 @@ public class LaserArmBlock extends Block implements EntityBlock, TooltipProvider
             }
 
             laserArm.initAddons();
-            ((ServerPlayer) player).openMenu(laserArm, pos);
+            player.openMenu(laserArm, pos);
 
         }
 

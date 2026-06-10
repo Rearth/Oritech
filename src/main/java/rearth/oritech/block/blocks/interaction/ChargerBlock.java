@@ -72,7 +72,7 @@ public class ChargerBlock extends HorizontalDirectionalBlock implements EntityBl
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof ChargerBlockEntity machine) {
-            ((ServerPlayer) player).openMenu(machine, pos);
+            player.openMenu(machine, pos);
         }
 
         return InteractionResult.SUCCESS;

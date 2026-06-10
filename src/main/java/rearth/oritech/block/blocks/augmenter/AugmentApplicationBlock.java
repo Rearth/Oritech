@@ -53,7 +53,6 @@ import java.util.function.Consumer;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
-
 public class AugmentApplicationBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     private final VoxelShape[] HITBOXES = computeShapes();

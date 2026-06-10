@@ -182,8 +182,8 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     /**
      * Describes a machine that can be reached by a pipe network.
      *
-     * @param machinePos    the position of the connected machine block
-     * @param insertedFrom  the side the network inserts into, from the machine's perspective
+     * @param machinePos   the position of the connected machine block
+     * @param insertedFrom the side the network inserts into, from the machine's perspective
      */
     public record PipeNetworkTarget(BlockPos machinePos, Direction insertedFrom) {
 

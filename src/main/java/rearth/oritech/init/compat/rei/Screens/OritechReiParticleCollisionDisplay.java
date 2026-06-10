@@ -57,7 +57,7 @@ public class OritechReiParticleCollisionDisplay implements DisplayCategory<Displ
         // collision speed label
         widgets.add(Widgets.createLabel(
                 new Point(x + 6, y + bounds.height - 12),
-                Component.translatable("emi.title.oritech.collisionspeed", oDisplay.getEntry().value().getTime())
+                Component.translatable("emi.title.oritech.collisionspeed", oDisplay.entry().value().getTime())
         ).leftAligned().color(0xFFFFFF).noShadow());
 
         return widgets;

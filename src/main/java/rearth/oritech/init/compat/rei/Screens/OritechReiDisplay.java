@@ -76,7 +76,7 @@ public class OritechReiDisplay implements DisplayCategory<Display> {
     public List<Widget> setupDisplay(Display display, Rectangle bounds) {
         var widgets = new ArrayList<Widget>();
         var oDisplay = (OritechDisplay) display;
-        var recipe = oDisplay.getEntry().value();
+        var recipe = oDisplay.entry().value();
         var x = bounds.x;
         var y = bounds.y;
 
