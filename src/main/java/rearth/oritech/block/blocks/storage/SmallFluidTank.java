@@ -1,12 +1,13 @@
 package rearth.oritech.block.blocks.storage;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -27,11 +28,13 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 
 import java.util.List;
@@ -66,7 +69,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return ((ComparatorOutputProvider) level.getBlockEntity(pos)).getComparatorOutput();
     }
 
@@ -82,7 +85,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
             var usedStack = stack;
@@ -136,7 +139,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
                     }
                 }
 
-                return ItemInteractionResult.sidedSuccess(true);
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -150,14 +153,14 @@ public class SmallFluidTank extends Block implements EntityBlock {
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
         if (blockEntity instanceof SmallTankEntity tankEntity) {
             droppedStacks.addAll(tankEntity.inventory.getStacks());
-            tankEntity.inventory.clearContent();
+            tankEntity.inventory.getStacks().clear();
         }
 
         return droppedStacks;
     }
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return getStackWithData(level, pos);
     }
 
@@ -167,8 +170,8 @@ public class SmallFluidTank extends Block implements EntityBlock {
         var stack = getBasePickStack(tankEntity.isCreative);
 
         if (tankEntity.fluidStorage.getAmount() > 0) {
-            var fluidStack = tankEntity.fluidStorage.getStack().copy();
-            stack.set(FluidApi.ITEM.getFluidComponent(), fluidStack);
+            var fluidStack = tankEntity.fluidStorage.getContent().copy();
+            stack.set(ComponentContent.STORED_FLUID, fluidStack);
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
 
@@ -183,9 +186,10 @@ public class SmallFluidTank extends Block implements EntityBlock {
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.setPlacedBy(level, pos, state, placer, itemStack);
 
-        if (itemStack.has(FluidApi.ITEM.getFluidComponent())) {
+        if (itemStack.has(ComponentContent.STORED_FLUID)) {
+            var fluidStack = itemStack.get(ComponentContent.STORED_FLUID);
             var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
-            tankEntity.fluidStorage.setStack(itemStack.get(FluidApi.ITEM.getFluidComponent()).copy());
+            tankEntity.fluidStorage.set(0, FluidResource.of(fluidStack), fluidStack.amount());
             tankEntity.setChanged();
         }
     }

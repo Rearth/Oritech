@@ -5,13 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -27,7 +25,7 @@ import java.util.Queue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public class RefineryBlock extends MultiblockMachine implements EntityBlock, TooltipProvider {
+public class RefineryBlock extends MultiblockMachine {
 
     public static Queue<Runnable> DELAYED_TAINT_EVENTS = new ArrayDeque<>();
 
@@ -40,7 +38,6 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock, Too
         return RefineryBlockEntity.class;
     }
 
-    // todo finish this
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter);
@@ -53,18 +50,18 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock, Too
     }
 
     @Override
-    public void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
-        var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY);
+        var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY.get());
 
         if (level.isClientSide() || refineryEntity.isEmpty()) {
-            super.onExplosionHit(state, level, pos, explosion, stackMerger);
+            super.onExplosionHit(state, level, pos, explosion, onHit);
             return;
         }
 
         var crystalCandidate = refineryEntity.get().getNearbyNonEmptyCatalyst();
         if (crystalCandidate.isEmpty()) {
-            super.onExplosionHit(state, level, pos, explosion, stackMerger);
+            super.onExplosionHit(state, level, pos, explosion, onHit);
             return;
         }
 
@@ -84,7 +81,7 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock, Too
         DELAYED_TAINT_EVENTS.add(() -> {
             // create + init refinery
             level.setBlockAndUpdate(targetPos,
-                    BlockContent.TAINTED_REFINERY_BLOCK.defaultBlockState()
+                    BlockContent.TAINTED_REFINERY_BLOCK.get().defaultBlockState()
                             .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
             );
 
@@ -95,7 +92,6 @@ public class RefineryBlock extends MultiblockMachine implements EntityBlock, Too
         });
 
         // idea / potential todo: particles released from catalyst to refinery (along random offset paths?)
-
     }
 
     // todo maybe this can be cleaned up using server.execute or something similar()?

@@ -1,19 +1,21 @@
 package rearth.oritech.block.blocks.reactor;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
-import java.util.List;
+import java.util.function.Consumer;
 
-public abstract class BaseReactorBlock extends Block {
+public abstract class BaseReactorBlock extends Block implements TooltipProvider {
 
     public BaseReactorBlock(Properties settings) {
         super(settings);
@@ -29,11 +31,10 @@ public abstract class BaseReactorBlock extends Block {
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
-        if (showExtra) {
+        if (showExtra && dataComponentGetter instanceof ItemStack stack) {
             var machineId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
             consumer.accept(Component.translatable("tooltip.oritech." + machineId));
 

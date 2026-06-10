@@ -63,7 +63,7 @@ public class ReactorRedstonePortBlock extends BaseReactorBlock {
     }
 
     @Override
-    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
+    protected int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos, Direction direction) {
         return state.getValue(BlockStateProperties.POWER);
     }
 

@@ -52,6 +52,6 @@ public class ReactorRodBlock extends BaseReactorBlock {
 
     @Override
     public Block requiredStackCeiling() {
-        return BlockContent.REACTOR_FUEL_PORT;
+        return BlockContent.REACTOR_FUEL_PORT.get();
     }
 }

@@ -2,6 +2,7 @@ package rearth.oritech.block.blocks.storage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -58,7 +59,7 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
             return;
         }
 
-        var machineCandidate = level.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY);
+        var machineCandidate = level.getBlockEntity(pos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY.get());
         if (machineCandidate.isEmpty()) return;
         var machine = machineCandidate.get();
         var corePositions = machine.getCorePositions();
@@ -71,7 +72,7 @@ public class UnstableContainerBlock extends Block implements EntityBlock {
                 coreState.getBlock().playerWillDestroy(level, coreWorldPos, coreState, breakingPlayer);
                 level.destroyBlock(coreWorldPos, true, placer, 1);
             }
-            level.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.defaultBlockState());
+            level.setBlockAndUpdate(coreWorldPos, BlockContent.MACHINE_CORE_HIDDEN.get().defaultBlockState());
         }
 
         machine.initMultiblock(state);

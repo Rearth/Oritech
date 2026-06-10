@@ -21,7 +21,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var storedEnergy = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L);
+        var storedEnergy = stack.getOrDefault(ComponentContent.ENERGY, 0L);
 
         if (storedEnergy != 0) {
             var text = Component.translatable("tooltip.oritech.energy_stored", TooltipHelper.getEnergyText(storedEnergy));
@@ -34,7 +34,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        var contentEmpty = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L) <= 0;
+        var contentEmpty = stack.getOrDefault(ComponentContent.ENERGY, 0L) <= 0;
         return !contentEmpty;
     }
 
@@ -47,7 +47,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyApi.
     public int getBarWidth(ItemStack stack) {
 
         var capacity = OritechConfig.smallEnergyStorage.energyCapacity.get();
-        var fillAmount = stack.getOrDefault(EnergyApi.ITEM.getEnergyComponent(), 0L);
+        var fillAmount = stack.getOrDefault(ComponentContent.ENERGY, 0L);
 
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;
     }

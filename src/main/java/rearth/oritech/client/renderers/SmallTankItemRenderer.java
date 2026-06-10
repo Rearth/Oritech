@@ -63,7 +63,7 @@ public class SmallTankItemRenderer {
 
         matrices.popPose();
 
-        var storage = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        var storage = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty());
         if (storage.isEmpty()) {
             matrices.popPose();
             return;

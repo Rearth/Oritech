@@ -1,12 +1,13 @@
 package rearth.oritech.block.blocks.reactor;
 
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -18,10 +19,10 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.reactor.ReactorEnergyPortEntity;
 import rearth.oritech.config.OritechConfig;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBlock {
+public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBlock, TooltipProvider {
     public ReactorEnergyPortBlock(Properties settings) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.NORTH));
@@ -52,7 +53,6 @@ public class ReactorEnergyPortBlock extends BaseReactorBlock implements EntityBl
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 

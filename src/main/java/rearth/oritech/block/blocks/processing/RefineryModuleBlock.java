@@ -4,14 +4,13 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,18 +25,17 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.api.fluid.ItemFluidApi;
 import rearth.oritech.block.entity.processing.RefineryModuleBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
 
-import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
-
-public class RefineryModuleBlock extends HorizontalDirectionalBlock implements EntityBlock {
+public class RefineryModuleBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
 
     public RefineryModuleBlock(Properties settings) {
         super(settings);
@@ -101,14 +99,15 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
         return InteractionResult.SUCCESS;
     }
 
-    @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-
-        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand))
-            return ItemInteractionResult.sidedSuccess(true);
-
-        return super.useItemOn(stack, state, level, pos, player, hand, hit);
-    }
+    // todo with new api
+//    @Override
+//    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+//
+//        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand))
+//            return ItemInteractionResult.sidedSuccess(true);
+//
+//        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+//    }
 
     @Override
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
@@ -132,7 +131,6 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
-        super.addToTooltip(tooltipContext, consumer, tooltipFlag, dataComponentGetter)
         consumer.accept(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
         TooltipHelper.addMachineTooltip(consumer, this, this);
     }

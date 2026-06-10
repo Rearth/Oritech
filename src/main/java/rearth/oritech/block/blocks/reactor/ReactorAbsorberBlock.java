@@ -10,6 +10,6 @@ public class ReactorAbsorberBlock extends BaseReactorBlock {
 
     @Override
     public Block requiredStackCeiling() {
-        return BlockContent.REACTOR_ABSORBER_PORT;
+        return BlockContent.REACTOR_ABSORBER_PORT.get();
     }
 }

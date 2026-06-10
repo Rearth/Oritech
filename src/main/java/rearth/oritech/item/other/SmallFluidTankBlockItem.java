@@ -20,7 +20,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var data = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        var data = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty());
 
         if (data.isEmpty()) {
             consumer.accept(Component.translatable("tooltip.oritech.fluid_empty"));
@@ -35,7 +35,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
 
     @Override
     public Component getName(ItemStack stack) {
-        var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        var content = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty());
         if (content.isEmpty()) {
             return super.getName(stack);
         } else {
@@ -50,13 +50,13 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        var contentEmpty = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).isEmpty();
+        var contentEmpty = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty()).isEmpty();
         return !contentEmpty;
     }
 
     @Override
     public int getBarColor(ItemStack stack) {
-        var content = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty());
+        var content = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty());
         if (content.isEmpty())
             return 0x07bdff;
 
@@ -70,7 +70,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidApi.ItemP
     public int getBarWidth(ItemStack stack) {
 
         var capacity = OritechConfig.portableTankCapacityBuckets.get() * FluidType.BUCKET_VOLUME;
-        var fillAmount = stack.getOrDefault(FluidApi.ITEM.getFluidComponent(), FluidStack.empty()).getAmount();
+        var fillAmount = stack.getOrDefault(ComponentContent.STORED_FLUID, FluidStack.empty()).getAmount();
 
         return Math.round((fillAmount * 100f / capacity) * MAX_BAR_WIDTH) / 100;
     }

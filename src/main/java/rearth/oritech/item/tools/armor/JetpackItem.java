@@ -166,7 +166,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
         // to prevent dedicated servers from kicking the player for flying
         serverPlayer.connection.aboveGroundTickCount = 0;
 
-        stack.set(EnergyApi.ITEM.getEnergyComponent(), packet.energyStored);
+        stack.set(ComponentContent.ENERGY, packet.energyStored);
         if (packet.fluidAmount > 0)
             stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(Identifier.parse(packet.fluidType)), packet.fluidAmount));
     }
