@@ -1,66 +1,37 @@
 package rearth.oritech.item;
 
 import com.geckolib.animatable.GeoItem;
-import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
-import com.geckolib.model.DefaultedBlockGeoModel;
-import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.TagContent;
+import rearth.oritech.init.datamap.DataMapContent;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class UnstableContainerItem extends Item implements GeoItem {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
-    private final float scale;
-    private final String name;
 
-    public UnstableContainerItem(Properties settings, float scale, String name) {
+    public UnstableContainerItem(Properties settings) {
         super(settings);
-        this.scale = scale;
-        this.name = name;
-    }
-
-    @Override
-    public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
-
-        consumer.accept(new GeoRenderProvider() {
-            GeoItemRenderer<UnstableContainerItem> renderer = null;
-
-            @Override
-            public @Nullable BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
-                if (this.renderer == null)
-                    this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/" + name)));
-
-                this.renderer.withScale(scale);
-
-                return this.renderer;
-            }
-        });
     }
 
     @Override
@@ -69,18 +40,15 @@ public class UnstableContainerItem extends Item implements GeoItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, consumer, tooltipFlag);
 
-        var shiftPressed = Screen.hasShiftDown();
+        var shiftPressed = Minecraft.getInstance().hasShiftDown();
         var ctrlPressed = Minecraft.getInstance().hasControlDown();
 
         if (shiftPressed) {
-            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.low").withStyle(ChatFormatting.DARK_PURPLE));
-            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW));
-            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.medium").withStyle(ChatFormatting.DARK_PURPLE));
-            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM));
-            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.high").withStyle(ChatFormatting.DARK_PURPLE));
-            consumer.acceptAll(getBlocksFromTag(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH));
+            consumer.accept(Component.translatable("tooltip.oritech.unstable_container.sources").withStyle(ChatFormatting.DARK_PURPLE));
+            getSourceBlocks().forEach(consumer);
         } else {
             consumer.accept(Component.translatable("tooltip.oritech.unstable_container_extra_info").withStyle(ChatFormatting.DARK_PURPLE).withStyle(ChatFormatting.ITALIC));
         }
@@ -94,7 +62,6 @@ public class UnstableContainerItem extends Item implements GeoItem {
         } else {
             consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
-        super.appendHoverText(stack, context, tooltip, type);
 
     }
 
@@ -104,15 +71,8 @@ public class UnstableContainerItem extends Item implements GeoItem {
         var targetBlockPos = context.getClickedPos();
         var targetBlockState = context.getLevel().getBlockState(targetBlockPos);
 
-        // todo move this to neoforge data map
-        var targetMultiplier = -1f;
-        if (targetBlockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW)) {
-            targetMultiplier = 0.3f;
-        } else if (targetBlockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM)) {
-            targetMultiplier = 1f;
-        } else if (targetBlockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)) {
-            targetMultiplier = 5f;
-        }
+        var sourceData = BuiltInRegistries.BLOCK.wrapAsHolder(targetBlockState.getBlock()).getData(DataMapContent.UNSTABLE_CONTAINER_SOURCE);
+        var targetMultiplier = sourceData != null ? sourceData.quality() : -1f;
 
         for (var offset : UnstableContainerBlockEntity.getCoreOffsets()) {
             // the block is symetrical, so directions don't matter here
@@ -126,10 +86,10 @@ public class UnstableContainerItem extends Item implements GeoItem {
         }
 
         if (targetMultiplier > 0) {
-            context.getLevel().setBlockAndUpdate(targetBlockPos, BlockContent.UNSTABLE_CONTAINER.defaultBlockState());
+            context.getLevel().setBlockAndUpdate(targetBlockPos, BlockContent.UNSTABLE_CONTAINER.get().defaultBlockState());
             var createdBlockState = context.getLevel().getBlockState(targetBlockPos);
             createdBlockState.getBlock().setPlacedBy(context.getLevel(), targetBlockPos, createdBlockState, context.getPlayer(), context.getItemInHand());
-            var createdEntity = context.getLevel().getBlockEntity(targetBlockPos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY).get();
+            var createdEntity = context.getLevel().getBlockEntity(targetBlockPos, BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY.get()).get();
             createdEntity.setCapturedBlock(targetBlockState);
             createdEntity.qualityMultiplier = targetMultiplier;
 
@@ -149,12 +109,14 @@ public class UnstableContainerItem extends Item implements GeoItem {
         return geoCache;
     }
 
-    public static List<MutableComponent> getBlocksFromTag(TagKey<Block> tagKey) {
-
-        var candidate = BuiltInRegistries.BLOCK.getTag(tagKey);
-        //noinspection OptionalIsPresent
-        if (candidate.isEmpty()) return new ArrayList<>();
-
-        return candidate.get().stream().map(blockRegistryEntry -> blockRegistryEntry.value().getName().withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC)).toList();
+    public static List<MutableComponent> getSourceBlocks() {
+        var dataMap = DataMapContent.UNSTABLE_CONTAINER_SOURCE;
+        return BuiltInRegistries.BLOCK.listElements()
+                .filter(holder -> holder.getData(dataMap) != null)
+                .sorted(Comparator.comparingDouble(holder -> holder.getData(dataMap).quality()))
+                .map(holder -> holder.value().getName()
+                        .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC)
+                        .append(Component.literal(" (x" + holder.getData(dataMap).quality() + ")").withStyle(ChatFormatting.DARK_GRAY)))
+                .toList();
     }
 }

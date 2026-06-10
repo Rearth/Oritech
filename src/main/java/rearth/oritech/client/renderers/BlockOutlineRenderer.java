@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -30,8 +31,8 @@ import rearth.oritech.block.blocks.storage.SmallStorageBlock;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
 import rearth.oritech.init.ToolsContent;
+import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
@@ -78,7 +79,7 @@ public class BlockOutlineRenderer {
 
         if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER)) {
             var blockState = level.getBlockState(machinePos);
-            var isValid = blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM) || blockState.is(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH);
+            var isValid = BuiltInRegistries.BLOCK.wrapAsHolder(blockState.getBlock()).getData(DataMapContent.UNSTABLE_CONTAINER_SOURCE) != null;
             if (!isValid) return;
         }
 

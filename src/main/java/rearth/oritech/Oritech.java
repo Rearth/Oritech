@@ -31,6 +31,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.*;
+import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.init.datapack.AugmentContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
@@ -63,6 +64,7 @@ public final class Oritech {
         // registration events
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(AugmentContent::registerDataPackRegistries);
+        modEventBus.addListener(DataMapContent::registerDataMapTypes);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
