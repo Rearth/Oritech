@@ -14,12 +14,14 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
+import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
+import rearth.oritech.client.renderers.models.PortableLaserModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
 
-import static rearth.oritech.client.renderers.LaserArmRenderer.BEAM_TEXTURE;
+import static rearth.oritech.client.renderers.blocks.LaserArmRenderer.BEAM_TEXTURE;
 
 public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 

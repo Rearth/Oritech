@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -7,6 +7,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
 import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
+import rearth.oritech.client.renderers.models.MachineModel;
 
 public class HangarDoorRenderer extends GeoBlockRenderer<HangarDoorBlockEntity> {
 

@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.cache.object.BakedGeoModel;
 import com.mojang.blaze3d.vertex.PoseStack;

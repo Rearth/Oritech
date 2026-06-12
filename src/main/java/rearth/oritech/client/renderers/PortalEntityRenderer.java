@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.TheEndPortalRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
+import rearth.oritech.client.renderers.models.PortalEntityModel;
 import rearth.oritech.util.PortalEntity;
 
 public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity> {

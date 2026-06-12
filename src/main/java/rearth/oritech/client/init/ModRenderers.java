@@ -4,7 +4,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.block.Block;
 import rearth.oritech.Oritech;
-import rearth.oritech.client.renderers.*;
+import rearth.oritech.client.renderers.blocks.*;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 

@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.object.BakedGeoModel;
@@ -13,6 +13,7 @@ import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
+import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.util.ColorHelper;
 
 public class TaintedRefineryRenderer<T extends TaintedRefineryBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {

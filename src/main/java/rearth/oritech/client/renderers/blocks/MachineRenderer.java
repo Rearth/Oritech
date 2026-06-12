@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.texture.AutoGlowingTexture;
@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.client.renderers.models.MachineModel;
 
 public class MachineRenderer<T extends BlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
     public MachineRenderer(String modelPath) {

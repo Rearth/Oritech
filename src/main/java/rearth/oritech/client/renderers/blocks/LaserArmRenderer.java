@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.cache.object.BakedGeoModel;
@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.client.renderers.models.LaserArmModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.util.Geometry;
 

@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.cache.object.GeoBone;
 import com.geckolib.cache.object.GeoQuad;
@@ -15,6 +15,7 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
+import rearth.oritech.client.renderers.models.MachineModel;
 
 public class ShrinkerBlockRenderer extends DynamicGeoBlockRenderer<ShrinkerBlockEntity> {
 

@@ -18,7 +18,7 @@ import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
-import rearth.oritech.client.renderers.LaserArmRenderer;
+import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;

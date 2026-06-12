@@ -1,4 +1,4 @@
-package rearth.oritech.client.renderers;
+package rearth.oritech.client.renderers.models;
 
 import com.geckolib.model.DefaultedItemGeoModel;
 import net.minecraft.resources.Identifier;

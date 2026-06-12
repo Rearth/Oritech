@@ -17,6 +17,7 @@ import rearth.oritech.item.tools.util.Helpers;
 
 public final class OritechClient {
 
+    // todo all this (and also calling blockoutlinerenderer)
     public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.oritech.hotkey_category");
 
     public static AugmentSelectionScreen activeScreen = null;
