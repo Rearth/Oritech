@@ -3,7 +3,17 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.InputEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
@@ -12,27 +22,72 @@ import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
-import rearth.oritech.item.tools.util.Helpers;
+import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 
-
+@Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public final class OritechClient {
 
-    // todo all this (and also calling blockoutlinerenderer)
-    public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, "key.oritech.hotkey_category");
+    public static final KeyMapping.Category ORITECH_KEYS_CATEGORY = new KeyMapping.Category(Oritech.id("keys"));
+    public static final KeyMapping AUGMENT_SELECTOR = new KeyMapping("key.oritech.augment_screen", GLFW.GLFW_KEY_G, ORITECH_KEYS_CATEGORY);
 
     public static AugmentSelectionScreen activeScreen = null;
 
     public static boolean laserActive = false;
 
-    public static void initialize() {
-
+    public OritechClient(IEventBus modEventBus, ModContainer container) {
         Oritech.LOGGER.info("Oritech client initialization");
-        ModScreens.registerScreens();
 
-        KeyMappingRegistry.register(AUGMENT_SELECTOR);
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 
-        // used mainly for prometheum pick
-        ClientTickEvent.CLIENT_PRE.register(Helpers::onClientTickEvent);
+        var neoEventBus = NeoForge.EVENT_BUS;
+
+        neoEventBus.addListener(this::onPreClientTick);
+        neoEventBus.addListener(this::onMouseClicked);
+
+        modEventBus.addListener(this::registerBindings);
+        modEventBus.addListener(ModScreens::registerScreens);
+
+        ModScreens.MENUS.register(modEventBus);
+    }
+
+    private void registerBindings(RegisterKeyMappingsEvent event) {
+        event.registerCategory(ORITECH_KEYS_CATEGORY);
+        event.register(AUGMENT_SELECTOR);
+    }
+
+    private void onPreClientTick(ClientTickEvent.Pre event) {
+        var client = Minecraft.getInstance();
+        var player = client.player;
+        if (client.player == null || client.level == null) return;
+
+        // ensure prometheum pick is animated correctly. This is to be in non-pre variant of the event, not sure if this will work
+        var stack = client.player.getMainHandItem();
+        if (stack.getItem() instanceof PromethiumPickaxeItem pickaxeItem) {
+            pickaxeItem.onHeldTick(stack, client.player, client.level);
+        }
+
+        // laser player use event
+        if (player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
+            ClientPacketDistributor.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
+        } else {
+            laserActive = false;
+        }
+
+    }
+
+    private void onMouseClicked(InputEvent.MouseButton.Pre event) {
+
+        var client = Minecraft.getInstance();
+
+        if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && event.getButton() == 0 && client.screen == null) {
+            var wasDown = event.getAction() == 1;
+            laserActive = wasDown; // activate laser on mouse down
+            event.setCanceled(wasDown);
+        }
+    }
+
+    // old, needs to be updated/migrated as we go
+    public static void initialize() {
 
         // used for augment UI
         ClientTickEvent.CLIENT_PRE.register(client -> {
@@ -54,34 +109,12 @@ public final class OritechClient {
             }
         });
 
-        // send mining laser use events to server
-        ClientTickEvent.CLIENT_PRE.register(client -> {
-            if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
-                PacketDistributor.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
-            } else {
-                laserActive = false;
-            }
-        });
-
         ClientTickEvent.CLIENT_POST.register((client) -> {
             ClientZiplineHandler.onClientTick();
             ZiplineFxHandler.tick();
         });
 
-        // interrupt left mouse for portable lasers (only seems to work on fabric)
-        ClientRawInputEvent.MOUSE_CLICKED_PRE.register((client, button, action, mods) ->
-                handleMouseClicked(client, button, action, mods) ? EventResult.interruptTrue() : EventResult.pass());
-
         Oritech.LOGGER.info("Oritech client initialization done");
-    }
-
-    // returns true if the event is cancelled
-    public static boolean handleMouseClicked(Minecraft client, int button, int action, int mods) {
-        if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && button == 0 && client.screen == null) {
-            laserActive = action == 1; // activate laser on mouse down
-            return action == 1;
-        }
-        return false;
     }
 
     public static void registerRenderers() {

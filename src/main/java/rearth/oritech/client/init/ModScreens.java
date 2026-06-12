@@ -57,9 +57,7 @@ public class ModScreens {
     public static final Supplier<MenuType<CentrifugeScreenHandler>> CENTRIFUGE_SCREEN = MENUS.register("centrifuge_screen", () -> IMenuTypeExtension.create(CentrifugeScreenHandler::new));
     public static final Supplier<MenuType<InventoryProxyScreenHandler>> INVENTORY_PROXY_SCREEN = MENUS.register("inventory_proxy_screen", () -> IMenuTypeExtension.create(InventoryProxyScreenHandler::new));
 
-    // todo OritechClient full rewrite + wire this in (similar to how Oritech class does it)
     public static void registerScreens(RegisterMenuScreensEvent event) {
-
 
         event.register(TREEFELLER_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
         event.register(TANK_SCREEN.get(), TankScreen::new);

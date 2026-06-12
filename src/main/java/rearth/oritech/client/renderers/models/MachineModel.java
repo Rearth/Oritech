@@ -2,37 +2,32 @@ package rearth.oritech.client.renderers.models;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.model.DefaultedBlockGeoModel;
+import com.geckolib.renderer.base.GeoRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.blocks.MachineRenderer;
 import rearth.oritech.util.ColorableMachine;
 
 import java.util.Locale;
 
 public class MachineModel<T extends BlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
+
     public MachineModel(String subpath) {
         super(Oritech.id(subpath));
     }
 
     @Override
-    public Identifier getTextureResource(T animatable) {
+    public Identifier getTextureResource(GeoRenderState renderState) {
 
-        if (animatable instanceof ColorableMachine colorableMachine && colorableMachine.supportRecoloring()) {
-            var color = colorableMachine.getCurrentColor();
-            var base = super.getTextureResource(animatable);
+        var base = super.getTextureResource(renderState);
 
-            if (color.equals(ColorableMachine.ColorVariant.ORANGE)) return base;
+        var color = renderState.getOrDefaultGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, ColorableMachine.ColorVariant.ORANGE);
 
-            var colorFileSuffix = color.toString().toLowerCase(Locale.ROOT);
+        if (color.equals(ColorableMachine.ColorVariant.ORANGE)) return base;
 
-            return Identifier.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
-        } else {
-            return super.getTextureResource(animatable);
-        }
-    }
+        var colorFileSuffix = color.toString().toLowerCase(Locale.ROOT);
 
-
-    public Identifier getBaseTexturePath(T animatable) {
-        return super.getTextureResource(animatable);
+        return Identifier.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
     }
 }
