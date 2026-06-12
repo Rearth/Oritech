@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -14,11 +13,10 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.init.BlockContent;
 
 import java.util.ArrayList;
@@ -59,25 +57,20 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
 
             // get model parts
             var model = modelSet.get(pulledState);
-            ExtractStateModels(state.pulledModelParts, model, level, pulledFrom, pulledState);
+            RenderHelpers.ExtractStateModels(state.pulledModelParts, model, level, pulledFrom, pulledState);
         } else {
             state.isPulling = false;
             state.pulledModelParts.clear();
         }
 
         var innerState = BlockContent.BLACK_HOLE_INNER.get().defaultBlockState();
-        ExtractStateModels(state.innerParts, modelSet.get(innerState), level, blockEntity.getBlockPos(), innerState);
+        RenderHelpers.ExtractStateModels(state.innerParts, modelSet.get(innerState), level, blockEntity.getBlockPos(), innerState);
 
         var middleState = BlockContent.BLACK_HOLE_MIDDLE.get().defaultBlockState();
-        ExtractStateModels(state.middleParts, modelSet.get(middleState), level, blockEntity.getBlockPos(), middleState);
+        RenderHelpers.ExtractStateModels(state.middleParts, modelSet.get(middleState), level, blockEntity.getBlockPos(), middleState);
 
         var outerState = BlockContent.BLACK_HOLE_OUTER.get().defaultBlockState();
-        ExtractStateModels(state.outerParts, modelSet.get(outerState), level, blockEntity.getBlockPos(), outerState);
-    }
-
-    private static void ExtractStateModels(List<BlockStateModelPart> list, BlockStateModel modelSet, ClientLevel level, BlockPos blockEntity, BlockState innerState) {
-        list.clear();
-        modelSet.collectParts(level, blockEntity, innerState, level.getRandom(), list);
+        RenderHelpers.ExtractStateModels(state.outerParts, modelSet.get(outerState), level, blockEntity.getBlockPos(), outerState);
     }
 
     @Override
@@ -109,8 +102,8 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         poseStack.mulPose(Axis.XP.rotationDegrees((float) rotationX));
         poseStack.translate(-0.5f, -0.5f, -0.5f);
 
-        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.innerParts, new int[0], 15728880, OverlayTexture.NO_OVERLAY, 0);
-        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.middleParts, new int[0], 15728880, OverlayTexture.NO_OVERLAY, 0);
+        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.innerParts, new int[0], RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.middleParts, new int[0], RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
 
         poseStack.popPose();
 
@@ -126,7 +119,7 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         poseStack.mulPose(Axis.XP.rotationDegrees((float) rotationX));
         poseStack.translate(-0.5f, -0.5f, -0.5f);
 
-        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.outerParts, new int[0], 15728880, OverlayTexture.NO_OVERLAY, 0);
+        collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.outerParts, new int[0], RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
 
         poseStack.popPose();
     }
