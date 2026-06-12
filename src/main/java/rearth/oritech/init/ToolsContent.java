@@ -11,7 +11,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAsset;
@@ -106,8 +105,8 @@ public class ToolsContent {
 
     public static final DeferredItem<Item> JETPACK = EQUIPMENT.registerItem(
             "jetpack",
-            props -> new JetpackItem(JETPACK_MATERIAL, ArmorType.CHESTPLATE,
-                    props.humanoidArmor(JETPACK_MATERIAL, ArmorType.CHESTPLATE)
+            props -> new JetpackItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
+                    props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
                             .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
     );
     public static final DeferredItem<Item> EXO_JETPACK = EQUIPMENT.registerItem(
@@ -118,8 +117,8 @@ public class ToolsContent {
     );
     public static final DeferredItem<Item> JETPACK_ELYTRA = EQUIPMENT.registerItem(
             "jetpack_elytra",
-            props -> new JetpackElytraItem(JETPACK_MATERIAL, ArmorType.CHESTPLATE,
-                    props.humanoidArmor(JETPACK_MATERIAL, ArmorType.CHESTPLATE)
+            props -> new JetpackElytraItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
+                    props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
                             .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
     );
     public static final DeferredItem<Item> JETPACK_EXO_ELYTRA = EQUIPMENT.registerItem(
@@ -180,24 +179,24 @@ public class ToolsContent {
 
     public static void registerItemCapabilities(RegisterCapabilitiesEvent event) {
 
-        // todo
         event.registerItem(
                 Capabilities.Energy.ITEM,
                 (stack, itemAccess) -> {
                     var tool = (EnergyProvider.Item) stack.getItem();
-                    return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getCapacity(), tool.getMaxInsert(), tool.getMaxExtract());
+                    return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getEnergyCapacity(), tool.getMaxRFInputRate(), tool.getMaxRFOutputRate());
                 },
-                HAND_DRILL
-                );
+                HAND_DRILL, CHAINSAW, ELECTRIC_MACE, PORTABLE_LASER, EXO_CHESTPLATE,
+                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA
+        );
 
         event.registerItem(
                 Capabilities.Fluid.ITEM,
                 (stack, itemAccess) -> {
                     var tool = (FluidProvider.Item) stack.getItem();
-                    return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getCapacity());
+                    return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getFluidCapacity());
                 },
-                JETPACK
-                );
+                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA
+        );
 
     }
 }

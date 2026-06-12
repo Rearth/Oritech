@@ -150,7 +150,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
-        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack))), TooltipHelper.getEnergyText(this.getCapacity()));
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack))), TooltipHelper.getEnergyText(this.getEnergyCapacity()));
         builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var showExtra = Minecraft.getInstance().hasControlDown();
@@ -165,7 +165,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * ChainsawItem.BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getEnergyCapacity()) * ChainsawItem.BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -292,17 +292,17 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
 
     @Override
-    public int getCapacity() {
+    public int getEnergyCapacity() {
         return OritechStartupConfig.electricMace.energyCapacity.get();
     }
 
     @Override
-    public int getMaxInsert() {
-        return getCapacity() / 10;
+    public int getMaxRFInputRate() {
+        return getEnergyCapacity() / 10;
     }
 
     @Override
-    public int getMaxExtract() {
-        return getCapacity() / 10;
+    public int getMaxRFOutputRate() {
+        return getEnergyCapacity() / 10;
     }
 }

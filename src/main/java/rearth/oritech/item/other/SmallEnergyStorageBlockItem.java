@@ -54,17 +54,17 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyProv
     }
 
     @Override
-    public int getCapacity() {
+    public int getEnergyCapacity() {
         return Math.toIntExact(OritechConfig.smallEnergyStorage.energyCapacity.get());
     }
 
     @Override
-    public int getMaxInsert() {
+    public int getMaxRFInputRate() {
         return Math.toIntExact(OritechConfig.smallEnergyStorage.maxEnergyInsertion.get());
     }
 
     @Override
-    public int getMaxExtract() {
+    public int getMaxRFOutputRate() {
         return Math.toIntExact(OritechConfig.smallEnergyStorage.maxEnergyExtraction.get());
     }
 }

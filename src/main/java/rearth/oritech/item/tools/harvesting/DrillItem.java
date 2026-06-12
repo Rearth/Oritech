@@ -65,7 +65,7 @@ public class DrillItem extends Item implements OritechEnergyItem {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        var text = Component.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack)), this.getCapacity());
+        var text = Component.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack)), this.getEnergyCapacity());
         builder.accept(text.withStyle(ChatFormatting.GOLD));
     }
 
@@ -78,7 +78,7 @@ public class DrillItem extends Item implements OritechEnergyItem {
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getEnergyCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -92,17 +92,17 @@ public class DrillItem extends Item implements OritechEnergyItem {
     }
 
     @Override
-    public int getCapacity() {
+    public int getEnergyCapacity() {
         return OritechStartupConfig.basicDrill.energyCapacity.get();
     }
 
     @Override
-    public int getMaxInsert() {
+    public int getMaxRFInputRate() {
         return OritechStartupConfig.basicDrill.chargeSpeed.get();
     }
 
     @Override
-    public int getMaxExtract() {
+    public int getMaxRFOutputRate() {
         return OritechStartupConfig.basicDrill.chargeSpeed.get();
     }
 }

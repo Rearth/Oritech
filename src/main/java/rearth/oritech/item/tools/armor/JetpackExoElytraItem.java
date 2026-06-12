@@ -2,7 +2,6 @@ package rearth.oritech.item.tools.armor;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -19,15 +18,13 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class JetpackExoElytraItem extends BackstorageExoArmorItem implements BaseJetpackItem {
-    public JetpackExoElytraItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+    public JetpackExoElytraItem(ArmorMaterial material, ArmorType type, Item.Properties settings) {
         super(material, type, settings);
     }
 
-    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
 
         if (level.isClientSide() && Minecraft.getInstance().player.isFallFlying()) {
@@ -46,7 +43,7 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
         if (!tickElytra) return true;
 
         int nextRoll = entity.getFallFlyingTicks() + 1;
-        if (!entity.level().isClientSide && nextRoll % 10 == 0) {
+        if (!entity.level().isClientSide() && nextRoll % 10 == 0) {
             entity.gameEvent(GameEvent.ELYTRA_GLIDE);
         }
 
@@ -54,12 +51,10 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
 
     // this overrides the IItemExtension methods in neoforge
-    @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
         return useCustomElytra(entity, entity.getItemBySlot(EquipmentSlot.CHEST), true);
     }
 
-    @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
     }
@@ -91,6 +86,21 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     }
 
     @Override
+    public int getEnergyCapacity() {
+        return OritechStartupConfig.exoElytraJetpack.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxRFInputRate() {
+        return OritechStartupConfig.exoElytraJetpack.chargeSpeed.get();
+    }
+
+    @Override
+    public int getMaxRFOutputRate() {
+        return OritechStartupConfig.exoElytraJetpack.energyUsage.get();
+    }
+
+    @Override
     public boolean requireUpward() {
         return true;
     }
@@ -113,15 +123,5 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     @Override
     public long getFuelCapacity() {
         return OritechStartupConfig.exoElytraJetpack.fuelCapacity.get();
-    }
-
-    @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.exoElytraJetpack.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return OritechStartupConfig.exoElytraJetpack.chargeSpeed.get();
     }
 }

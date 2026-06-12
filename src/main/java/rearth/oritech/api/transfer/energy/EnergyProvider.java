@@ -9,9 +9,9 @@ public interface EnergyProvider {
     EnergyHandler getEnergyLookup(@Nullable Direction direction);
 
     interface Item {
-        int getCapacity();
-        int getMaxInsert();
-        int getMaxExtract();
+        int getEnergyCapacity();
+        int getMaxRFInputRate();
+        int getMaxRFOutputRate();
     }
 
 }

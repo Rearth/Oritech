@@ -9,8 +9,6 @@ import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -18,7 +16,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -26,14 +23,15 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ComponentContent;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 // this item can store both energy and fluids
@@ -51,15 +49,12 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
 
     private final ArmorType type;
 
-    public JetpackItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+    public JetpackItem(ArmorMaterial material, ArmorType type, Item.Properties settings) {
         super(settings);
         this.type = type;
     }
 
-    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, level, entity, slot, selected);
-
         if (level.isClientSide())
             tickJetpack(stack, entity, level);
     }
@@ -67,11 +62,6 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
     @Override
     public int getDefaultMaxStackSize() {
         return 1;
-    }
-
-    @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
     }
 
     @Override
@@ -103,13 +93,13 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private GeoArmorRenderer<?> renderer;
+            private ExosuitArmorRenderer renderer;
+
 
             @Override
-            public @Nullable <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable HumanoidModel<T> original) {
-
+            public @NonNull GeoArmorRenderer<?, ?> getGeoArmorRenderer(ItemStack itemStack, EquipmentSlot equipmentSlot) {
                 if (this.renderer == null)
-                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/basic_jetpack"));
+                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/exo_armor"));
 
                 return this.renderer;
             }
@@ -125,6 +115,21 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Override
+    public int getEnergyCapacity() {
+        return OritechStartupConfig.basicJetpack.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxRFInputRate() {
+        return OritechStartupConfig.basicJetpack.chargeSpeed.get();
+    }
+
+    @Override
+    public int getMaxRFOutputRate() {
+        return OritechStartupConfig.basicJetpack.energyUsage.get();
     }
 
     @Override
@@ -152,16 +157,6 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
         return OritechStartupConfig.basicJetpack.fuelCapacity.get();
     }
 
-    @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.basicJetpack.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return OritechStartupConfig.basicJetpack.chargeSpeed.get();
-    }
-
     public static void receiveUsagePacket(JetpackUsageUpdatePacket packet, IPayloadContext context) {
         var player = context.player();
         var stack = player.getItemBySlot(EquipmentSlot.CHEST);
@@ -172,9 +167,11 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
         // to prevent dedicated servers from kicking the player for flying
         serverPlayer.connection.aboveGroundTickCount = 0;
 
-        stack.set(ComponentContent.ENERGY, packet.energyStored);
-        if (packet.fluidAmount > 0)
-            stack.set(ComponentContent.STORED_FLUID.get(), FluidStack.create(BuiltInRegistries.FLUID.get(Identifier.parse(packet.fluidType)), packet.fluidAmount));
+        stack.set(ComponentContent.ENERGY, (int) packet.energyStored);
+        if (packet.fluidAmount > 0) {
+            var fluidHolder = BuiltInRegistries.FLUID.get(Identifier.parse(packet.fluidType));
+            fluidHolder.ifPresent(fluidReference -> stack.set(ComponentContent.STORED_FLUID, SimpleFluidContent.copyOf(new FluidStack(fluidReference, (int) packet.fluidAmount))));
+        }
     }
 
     public record JetpackUsageUpdatePacket(long energyStored, String fluidType,

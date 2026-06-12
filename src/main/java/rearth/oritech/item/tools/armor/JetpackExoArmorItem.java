@@ -1,7 +1,6 @@
 package rearth.oritech.item.tools.armor;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
@@ -15,15 +14,13 @@ import net.minecraft.world.level.Level;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class JetpackExoArmorItem extends BackstorageExoArmorItem implements BaseJetpackItem {
-    public JetpackExoArmorItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+    public JetpackExoArmorItem(ArmorMaterial material, ArmorType type, Item.Properties settings) {
         super(material, type, settings);
     }
 
-    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
 
         if (level.isClientSide()) {
@@ -60,6 +57,21 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     }
 
     @Override
+    public int getEnergyCapacity() {
+        return OritechStartupConfig.exoJetpack.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxRFInputRate() {
+        return OritechStartupConfig.exoJetpack.chargeSpeed.get();
+    }
+
+    @Override
+    public int getMaxRFOutputRate() {
+        return OritechStartupConfig.exoJetpack.energyUsage.get();
+    }
+
+    @Override
     public boolean requireUpward() {
         return false;
     }
@@ -82,15 +94,5 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     @Override
     public long getFuelCapacity() {
         return OritechStartupConfig.exoJetpack.fuelCapacity.get();
-    }
-
-    @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.exoJetpack.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return OritechStartupConfig.exoJetpack.chargeSpeed.get();
     }
 }

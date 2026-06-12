@@ -395,7 +395,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag type) {
         super.appendHoverText(stack, context, display, builder, type);
         var storedEnergy = TooltipHelper.getEnergyText(this.getStoredEnergy(stack, ItemAccess.forStack(stack)));
-        var capacity = TooltipHelper.getEnergyText(this.getCapacity());
+        var capacity = TooltipHelper.getEnergyText(this.getEnergyCapacity());
         var text = Component.translatable("tooltip.oritech.energy_indicator", storedEnergy, capacity);
         builder.accept(text.withStyle(ChatFormatting.GOLD));
 
@@ -425,7 +425,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getEnergyCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -477,17 +477,17 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
 
     @Override
-    public int getCapacity() {
+    public int getEnergyCapacity() {
         return OritechStartupConfig.portableLaserConfig.energyCapacity.get();
     }
 
     @Override
-    public int getMaxInsert() {
+    public int getMaxRFInputRate() {
         return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 20;
     }
 
     @Override
-    public int getMaxExtract() {
+    public int getMaxRFOutputRate() {
         return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 20;
     }
 

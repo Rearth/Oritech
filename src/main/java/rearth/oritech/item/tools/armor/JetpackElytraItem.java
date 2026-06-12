@@ -10,8 +10,6 @@ import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -24,12 +22,11 @@ import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 // this item can store both energy and fluids
@@ -41,7 +38,7 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
 
     private final ArmorType type;
 
-    public JetpackElytraItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+    public JetpackElytraItem(ArmorMaterial material, ArmorType type, Item.Properties settings) {
         super(settings);
         this.type = type;
     }
@@ -56,10 +53,7 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
         return false;
     }
 
-    @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        super.inventoryTick(stack, level, entity, slot, selected);
-
         if (level.isClientSide() && Minecraft.getInstance().player.isFallFlying()) {
             tickJetpack(stack, entity, level);
         }
@@ -69,7 +63,7 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
         if (!tickElytra) return true;
 
         int nextRoll = entity.getFallFlyingTicks() + 1;
-        if (!entity.level().isClientSide && nextRoll % 10 == 0) {
+        if (!entity.level().isClientSide() && nextRoll % 10 == 0) {
             entity.gameEvent(GameEvent.ELYTRA_GLIDE);
         }
 
@@ -77,19 +71,12 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
     }
 
     // this overrides the IItemExtension methods in neoforge
-    @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
         return useCustomElytra(entity, entity.getItemBySlot(EquipmentSlot.CHEST), true);
     }
 
-    @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
-    }
-
-    @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
     }
 
     @Override
@@ -120,13 +107,12 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private GeoArmorRenderer<?> renderer;
+            private ExosuitArmorRenderer renderer;
 
             @Override
-            public @Nullable <T extends LivingEntity> HumanoidModel<?> getGeoArmorRenderer(@Nullable T livingEntity, ItemStack itemStack, @Nullable EquipmentSlot equipmentSlot, @Nullable HumanoidModel<T> original) {
-
+            public @NonNull GeoArmorRenderer<?, ?> getGeoArmorRenderer(ItemStack itemStack, EquipmentSlot equipmentSlot) {
                 if (this.renderer == null)
-                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/basic_jetpack"));
+                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/exo_armor"));
 
                 return this.renderer;
             }
@@ -142,6 +128,21 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return this.cache;
+    }
+
+    @Override
+    public int getEnergyCapacity() {
+        return OritechStartupConfig.elytraJetpack.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxRFInputRate() {
+        return OritechStartupConfig.elytraJetpack.chargeSpeed.get();
+    }
+
+    @Override
+    public int getMaxRFOutputRate() {
+        return OritechStartupConfig.elytraJetpack.energyUsage.get();
     }
 
     @Override
@@ -167,15 +168,5 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
     @Override
     public long getFuelCapacity() {
         return OritechStartupConfig.elytraJetpack.fuelCapacity.get();
-    }
-
-    @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.elytraJetpack.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return OritechStartupConfig.elytraJetpack.chargeSpeed.get();
     }
 }

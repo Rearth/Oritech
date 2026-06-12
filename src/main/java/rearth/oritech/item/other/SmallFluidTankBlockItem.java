@@ -81,7 +81,7 @@ public class SmallFluidTankBlockItem extends BlockItem implements FluidProvider.
     }
 
     @Override
-    public int getCapacity() {
+    public int getFluidCapacity() {
         return OritechConfig.portableTankCapacityBuckets.get() * FluidType.BUCKET_VOLUME;
     }
 }
