@@ -1,4 +1,4 @@
-package rearth.oritech.client.other;
+package rearth.oritech.client.renderers;
 
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;

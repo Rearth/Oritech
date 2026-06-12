@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import rearth.oritech.Oritech;
-import rearth.oritech.client.other.OreFinderRenderer;
+import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.init.AttachmentContent;
 import rearth.oritech.init.EntitiesContent;
 import rearth.oritech.init.TagContent;
