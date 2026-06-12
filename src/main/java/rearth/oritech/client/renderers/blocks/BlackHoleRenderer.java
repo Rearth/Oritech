@@ -6,14 +6,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.BlockModelResolver;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
 import rearth.oritech.client.renderers.util.RenderHelpers;
@@ -23,6 +27,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEntity, BlackHoleRenderer.BlackHoleRenderState> {
+
+    public static final BlockDisplayContext BLOCK_DISPLAY_CONTEXT = BlockDisplayContext.create();
+    private final BlockModelResolver blockModelResolver;
+
+    public BlackHoleRenderer(BlockEntityRendererProvider.Context context) {
+        this.blockModelResolver = context.blockModelResolver();
+    }
 
     @Override
     public BlackHoleRenderState createRenderState() {
@@ -42,25 +53,27 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         if (blockEntity.currentlyPullingFrom != null && blockEntity.currentlyPulling != null
                 && blockEntity.pullingStartedAt + blockEntity.pullTime > time && !blockEntity.currentlyPulling.isAir()) {
 
-            state.isPulling = true;
-            var pulledState = blockEntity.currentlyPulling;
-            var pulledFrom = blockEntity.currentlyPullingFrom;
+            var progress = (float) Math.pow((time + partialTicks - blockEntity.pullingStartedAt) / (float) blockEntity.pullTime, 1.3f);
+            var startPos = Vec3.atLowerCornerOf(blockEntity.currentlyPullingFrom);
+            var endPos = blockEntity.getBlockPos().getCenter();
 
-            // progress math
-            float progress = (float) Math.pow((time + partialTicks - blockEntity.pullingStartedAt) / (float) blockEntity.pullTime, 1.3f);
-            state.pullOffset = blockEntity.getBlockPos().getCenter().subtract(Vec3.atLowerCornerOf(pulledFrom)).scale(1 - progress);
-            state.pullRotationY = progress * blockEntity.pullTime * 3;
-            state.pullScale = 1 - progress;
+            var pullOffset = endPos.subtract(startPos).scale(1 - progress);
+            var pullRotationY = progress * blockEntity.pullTime * 3;
+            var pullScale = 1 - progress;
 
-            // not sure what the proper method here is
-            state.pulledRenderType = Sheets.cutoutBlockSheet();
+            // matrix for pulled block offset
+            var tempStack = new PoseStack();
+            tempStack.translate(0.5, 0.5, 0.5);
+            tempStack.mulPose(Axis.YP.rotationDegrees(pullRotationY));
+            tempStack.translate(-pullOffset.x, -pullOffset.y, -pullOffset.z);
+            tempStack.mulPose(Axis.XP.rotationDegrees(pullRotationY));
+            tempStack.mulPose(Axis.ZP.rotationDegrees(pullRotationY));
+            tempStack.scale(pullScale, pullScale, pullScale);
 
-            // get model parts
-            var model = modelSet.get(pulledState);
-            RenderHelpers.ExtractStateModels(state.pulledModelParts, model, level, pulledFrom, pulledState);
+            state.pullMatrix = new Matrix4f(tempStack.last().pose());
+            blockModelResolver.update(state.pulledState, blockEntity.currentlyPulling, BLOCK_DISPLAY_CONTEXT);
         } else {
-            state.isPulling = false;
-            state.pulledModelParts.clear();
+            state.pullMatrix = null;
         }
 
         var innerState = BlockContent.BLACK_HOLE_INNER.get().defaultBlockState();
@@ -77,16 +90,12 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
     public void submit(BlackHoleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
 
         // block being pulled in
-        if (state.isPulling) {
+        if (state.pullMatrix != null && !state.pulledState.isEmpty()) {
             poseStack.pushPose();
-            poseStack.translate(0.5, 0.5, 0.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees(state.pullRotationY));
-            poseStack.translate(-state.pullOffset.x, -state.pullOffset.y, -state.pullOffset.z);
-            poseStack.mulPose(Axis.XP.rotationDegrees(state.pullRotationY));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(state.pullRotationY));
-            poseStack.scale(state.pullScale, state.pullScale, state.pullScale);
 
-            collector.submitMultiLayerBlockModel(poseStack, state.pulledModelParts, false, new int[0], state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            poseStack.mulPose(state.pullMatrix);
+
+            state.pulledState.submitMultiLayer(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 
             poseStack.popPose();
         }
@@ -130,15 +139,10 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
     }
 
     public static class BlackHoleRenderState extends BlockEntityRenderState {
-        public boolean isPulling;
-        public Vec3 pullOffset;
-        public float pullRotationY;
-        public float pullScale;
-
         public float gameTime;
 
-        public RenderType pulledRenderType;
-        public List<BlockStateModelPart> pulledModelParts = new ArrayList<>();
+        public @Nullable Matrix4f pullMatrix = null;
+        public BlockModelRenderState pulledState = new BlockModelRenderState();
 
         public List<BlockStateModelPart> innerParts = new ArrayList<>();
         public List<BlockStateModelPart> middleParts = new ArrayList<>();

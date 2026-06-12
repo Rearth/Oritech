@@ -20,6 +20,9 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable, R extends Bl
 
     public static final DataTicket<ColorableMachine.ColorVariant> TEXTURE_OVERRIDE_TICKET = DataTicket.create("machine_color", ColorableMachine.ColorVariant.class);
 
+    public MachineRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
+        this(context, modelPath, false);
+    }
     public MachineRenderer(BlockEntityRendererProvider.Context context, String modelPath, boolean glowing) {
         super(context, new MachineModel<>(modelPath));
 
