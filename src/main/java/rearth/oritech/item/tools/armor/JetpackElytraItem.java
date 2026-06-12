@@ -3,9 +3,9 @@ package rearth.oritech.item.tools.armor;
 import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
+import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
@@ -19,6 +19,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jetbrains.annotations.Nullable;
@@ -32,12 +35,15 @@ import java.util.function.Consumer;
 // this item can store both energy and fluids
 // applicable fluids will be consumed first, and then energy
 // the fluid bar is rendered in a different color if a fluid is available
-public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpackItem {
+public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public JetpackElytraItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
-        super(material, type, settings);
+    private final ArmorType type;
+
+    public JetpackElytraItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+        super(settings);
+        this.type = type;
     }
 
     @Override
@@ -71,10 +77,12 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
 
     // this overrides the IItemExtension methods in neoforge
+    @Override
     public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
         return useCustomElytra(entity, entity.getItemBySlot(EquipmentSlot.CHEST), true);
     }
 
+    @Override
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
     }
@@ -100,12 +108,13 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag type) {
+        super.appendHoverText(stack, context, display, builder, type);
         var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
+        builder.accept(hint);
         hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
-        addJetpackTooltip(stack, tooltip, true);
+        builder.accept(hint);
+        addJetpackTooltip(stack, builder, true);
     }
 
     @Override
@@ -127,7 +136,7 @@ public class JetpackElytraItem extends ArmorItem implements GeoItem, BaseJetpack
     // Let's add our animation controller
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, 20, state -> PlayState.STOP));
+        controllers.add(new AnimationController<>("base_controller", 20, state -> PlayState.STOP));
     }
 
     @Override

@@ -6,26 +6,29 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
-
-import rearth.oritech.api.energy.containers.SimpleEnergyItemStorage;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
-import rearth.oritech.util.StackContext;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
 
 public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEnergyItem {
 
-    public BackstorageExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
+    public BackstorageExoArmorItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
         super(material, type, settings);
     }
 
@@ -46,21 +49,29 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
 
     private void distributePower(Player player, ItemStack pack, int slot) {
 
-        var packStorage = new SimpleEnergyItemStorage(getEnergyMaxInput(pack), getEnergyMaxOutput(pack), getEnergyCapacity(pack), pack);
-        if (packStorage.getAmount() < 10) return;
+        var packAccess = ItemAccess.forStack(pack);
+        var packStorage = packAccess.getCapability(Capabilities.Energy.ITEM);
+        if (packStorage == null || packStorage.getAmountAsInt() < 10) return;
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             var stack = player.getInventory().getItem(i);
             if (stack.isEmpty() || stack == pack || slot == i) continue;
 
-            final int finalI = i;
-            var stackRef = new StackContext(stack, updated -> player.getInventory().setItem(finalI, updated));
-            var stackStorage = EnergyApi.ITEM.find(stackRef);
-            if (stackStorage == null || stackStorage.getAmount() >= stackStorage.getCapacity()) continue;
+            var stackAccess = ItemAccess.forPlayerSlot(player, i);
+            var stackStorage = stackAccess.getCapability(Capabilities.Energy.ITEM);
+            if (stackStorage == null || stackStorage.getAmountAsInt() >= stackStorage.getCapacityAsInt()) continue;
 
-            EnergyApi.transfer(packStorage, stackStorage, Long.MAX_VALUE, false);
-
-            // player.getInventory().setStack(i, stackContext.getStack());
+            // transfer power
+            var limit = Math.min(packStorage.getAmountAsInt(), stackStorage.getCapacityAsInt() - stackStorage.getAmountAsInt());
+            if (limit > 0) {
+                try (var transaction = Transaction.openRoot()) {
+                    var extracted = packStorage.extract((int) limit, transaction);
+                    var inserted = stackStorage.insert((int) extracted, transaction);
+                    if (inserted > 0) {
+                        transaction.commit();
+                    }
+                }
+            }
         }
     }
 
@@ -89,14 +100,15 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
         return 0xff7007;
     }
 
+    @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        consumer.accept(text.withStyle(ChatFormatting.GOLD));
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack))), TooltipHelper.getEnergyText(this.getCapacity()));
+        builder.accept(text.withStyle(ChatFormatting.GOLD));
     }
 }

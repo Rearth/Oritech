@@ -149,8 +149,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
 
     private Player getDestroyerPlayerEntity() {
-        if (destroyerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            destroyerPlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_destroyer"));
+        if (destroyerPlayerEntity == null && level instanceof ServerLevel serverLevel) {
+            destroyerPlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), "oritech_destroyer"));
         }
 
         return destroyerPlayerEntity;

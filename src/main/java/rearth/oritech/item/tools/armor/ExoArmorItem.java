@@ -3,9 +3,9 @@ package rearth.oritech.item.tools.armor;
 import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
+import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
@@ -14,6 +14,9 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -22,25 +25,35 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.neoforged.neoforge.common.damagesource.DamageContainer;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
+import rearth.oritech.init.SoundContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 
-import java.util.List;
 import java.util.function.Consumer;
 
-public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandler {
+public class ExoArmorItem extends Item implements GeoItem, ArmorEventHandler {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+    private final ArmorType type;
 
-    public ExoArmorItem(Holder<ArmorMaterial> material, Type type, Properties settings) {
-        super(material, type, settings);
+    public ExoArmorItem(Holder<ArmorMaterial> material, ArmorType type, Properties settings) {
+        super(settings);
+        this.type = type;
+    }
+
+    public EquipmentSlot getEquipmentSlot() {
+        return this.type.getSlot();
     }
 
     @Override
@@ -56,16 +69,6 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     @Override
     public boolean isBarVisible(ItemStack stack) {
         return false;
-    }
-
-    @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers() {
-        var slotType = this.getEquipmentSlot();
-        if (slotType != EquipmentSlot.LEGS) return super.getDefaultAttributeModifiers();
-
-        return super.getDefaultAttributeModifiers()
-                .withModifierAdded(Attributes.MOVEMENT_SPEED, new AttributeModifier(Oritech.id("exo_move_speed"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.LEGS)
-                .withModifierAdded(Attributes.FLYING_SPEED, new AttributeModifier(Oritech.id("exo_fly_speed"), 0.2, AttributeModifier.Operation.ADD_MULTIPLIED_BASE), EquipmentSlotGroup.LEGS);
     }
 
     @Override
@@ -104,7 +107,7 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, 20, state -> PlayState.STOP));
+        controllers.add(new AnimationController<>("base_controller", 20, state -> PlayState.STOP));
     }
 
     @Override
@@ -113,8 +116,17 @@ public class ExoArmorItem extends ArmorItem implements GeoItem, ArmorEventHandle
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        consumer.accept(Component.translatable("tooltip.oritech." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()).withStyle(ChatFormatting.GRAY));
+        builder.accept(Component.translatable("tooltip.oritech." + BuiltInRegistries.ITEM.getKey(itemStack.getItem()).getPath()).withStyle(ChatFormatting.GRAY));
+    }
+
+    public static boolean CancelFallDamage(DamageSource source, DamageContainer container, LivingEntity entity) {
+        if (source.is(DamageTypes.FALL) && entity.getItemBySlot(EquipmentSlot.FEET).is(ToolsContent.EXO_BOOTS)) {
+            entity.level().playSound(null, entity.blockPosition(), SoundContent.SHORT_SERVO.value(), SoundSource.PLAYERS, 0.2f, 1.0f);
+            return true;
+        }
+
+        return false;
     }
 }

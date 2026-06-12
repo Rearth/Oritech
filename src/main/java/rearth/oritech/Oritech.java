@@ -10,6 +10,9 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -35,6 +38,10 @@ import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.init.datapack.AugmentContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
+import rearth.oritech.item.tools.armor.ExoArmorItem;
+import rearth.oritech.item.tools.harvesting.PromethiumAxeItem;
+import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
+import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.util.ServerZiplineHandler;
 
 // todos: compostables
@@ -60,6 +67,9 @@ public final class Oritech {
         neoEventBus.addListener(this::onServerTickPost);
         neoEventBus.addListener(this::onLevelTickPos);
         neoEventBus.addListener(this::onPlayerTickPost);
+        neoEventBus.addListener(this::onPlayerMinedEvent);
+        neoEventBus.addListener(this::onPlayerDamaged);
+        neoEventBus.addListener(this::onEquipmentChanged);
 
         // registration events
         modEventBus.addListener(this::commonSetup);
@@ -117,8 +127,9 @@ public final class Oritech {
     }
 
     private void onLevelTickPos(LevelTickEvent.Post event) {
-        if (event.getLevel().isClientSide()) return;
-        ElectricMaceItem.processLightningEvents(event.getLevel());
+        if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
+        ElectricMaceItem.processLightningEvents(serverLevel);
+        PromethiumAxeItem.onTick(serverLevel);
     }
 
     private void onPlayerTickPost(PlayerTickEvent.Post event) {
@@ -126,6 +137,21 @@ public final class Oritech {
             ServerZiplineHandler.onPlayerTick(serverPlayer);
             PlayerAugments.serverTickAugments(serverPlayer);
         }
+    }
+
+    private void onPlayerDamaged(LivingIncomingDamageEvent event) {
+        if (ExoArmorItem.CancelFallDamage(event.getSource(), event.getContainer(), event.getEntity()))
+            event.setCanceled(true);
+    }
+
+    private void onPlayerMinedEvent(BreakBlockEvent event) {
+        if (event.getPlayer() instanceof ServerPlayer serverPlayer && event.getLevel() instanceof ServerLevel serverLevel) {
+            PromethiumPickaxeItem.preMine(serverLevel, event.getPos(), event.getState(), serverPlayer);
+        }
+    }
+
+    private void onEquipmentChanged(LivingEquipmentChangeEvent event) {
+        ArmorEventHandler.processEvent(event.getEntity(), event.getSlot(), event.getFrom(), event.getTo());
     }
 
     private void onServerStarted(ServerStartedEvent event) {

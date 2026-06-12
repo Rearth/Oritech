@@ -12,8 +12,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.PacketDistributor;
-import rearth.oritech.api.fluid.containers.SimpleItemFluidStorage;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.client.renderers.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
@@ -25,7 +28,7 @@ import java.util.List;
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 
 
-public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvider {
+public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item {
 
     boolean requireUpward();
 
@@ -91,7 +94,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var fluid = BuiltInRegistries.FLUID.getKey(fluidStack.getFluid());
 
         // this will currently only for instances of this class
-        PacketDistributor.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack), fluid.toString(), fluidStack.getAmount()));
+        PacketDistributor.sendToServer(new JetpackItem.JetpackUsageUpdatePacket(getStoredEnergy(stack, ItemAccess.forStack(stack)), fluid.toString(), fluidStack.getAmount()));
 
         var playerForward = player.getForward();
         var playerRight = playerForward.normalize().yRot(-90);
@@ -188,23 +191,23 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
         var fluidStack = getStoredFluid(stack);
         if (fluidStack.getAmount() < getFuelUsage() || !isValidFuel(fluidStack.getFluid()))
             return false;
-        var res = FluidStack.create(fluidStack.getFluid(), fluidStack.getAmount() - getFuelUsage());
+        var res = fluidStack.copyWithAmount(fluidStack.getAmount() - getFuelUsage());
         stack.set(ComponentContent.STORED_FLUID.get(), res);
         return true;
     }
 
     default FluidStack getStoredFluid(ItemStack stack) {
-        return stack.getOrDefault(ComponentContent.STORED_FLUID.get(), FluidStack.empty());
+        return stack.getOrDefault(ComponentContent.STORED_FLUID.get(), FluidStack.EMPTY);
     }
 
-    default void addJetpackTooltip(ItemStack stack, List<Component> tooltip, boolean includeEnergy) {
+    default void addJetpackTooltip(ItemStack stack, Consumer<Component> builder, boolean includeEnergy) {
 
-        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        if (includeEnergy) consumer.accept(text.withStyle(ChatFormatting.GOLD));
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack, ItemAccess.forStack(stack))), TooltipHelper.getEnergyText(this.getCapacity()));
+        if (includeEnergy) builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var container = getStoredFluid(stack);
-        var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidType.BUCKET_VOLUME, getFuelCapacity() * 1000 / FluidType.BUCKET_VOLUME, FluidStackHooks.getName(container).getString());
-        consumer.accept(fluidText);
+        var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidType.BUCKET_VOLUME, getFuelCapacity() * 1000 / FluidType.BUCKET_VOLUME, container.getHoverName().getString());
+        builder.accept(fluidText);
     }
 
     default int getJetpackBarColor(ItemStack stack) {
@@ -225,7 +228,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
             return Math.round(fillPercent * BAR_STEP_COUNT) / 100;
         }
 
-        return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     default boolean isValidFuel(Fluid variant) {
@@ -233,14 +236,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidApi.ItemProvide
     }
 
     @Override
-    default FluidApi.SingleSlotStorage getFluidStorage(ItemStack stack) {
-        return new SimpleItemFluidStorage(getFuelCapacity(), stack) {
-            @Override
-            public long insert(FluidStack toInsert, boolean simulate) {
-                var valid = isValidFuel(toInsert.getFluid());
-                if (!valid) return 0L;
-                return super.insert(toInsert, simulate);
-            }
-        };
+    default int getCapacity() {
+        return (int) getFuelCapacity();
     }
 }

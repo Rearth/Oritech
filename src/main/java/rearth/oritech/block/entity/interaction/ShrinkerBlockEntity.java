@@ -135,10 +135,10 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
 
             level.setBlock(addonPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
 
-            if (level instanceof ServerLevel serverWorld) {
+            if (level instanceof ServerLevel serverLevel) {
                 var spawnAt = addonPos.getCenter();
-                serverWorld.sendParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
-                serverWorld.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
+                serverLevel.sendParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
+                serverLevel.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
             }
         }
 

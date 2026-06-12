@@ -285,8 +285,8 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     }
 
     private Player getNukePlayerEntity() {
-        if (nukePlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            nukePlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_nuke"));
+        if (nukePlayerEntity == null && level instanceof ServerLevel serverLevel) {
+            nukePlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), "oritech_nuke"));
         }
 
         return nukePlayerEntity;

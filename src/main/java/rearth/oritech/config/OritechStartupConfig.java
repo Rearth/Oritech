@@ -1,6 +1,7 @@
 package rearth.oritech.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.fluids.FluidType;
 
 public class OritechStartupConfig {
     // Client config
@@ -64,17 +65,17 @@ public class OritechStartupConfig {
     public static final ModConfigSpec STARTUP_SPEC = OritechStartupConfig.STARTUP.build();
 
     public static class JetpackConfig {
-        public final ModConfigSpec.LongValue energyCapacity;
-        public final ModConfigSpec.LongValue fuelCapacity;
+        public final ModConfigSpec.IntValue energyCapacity;
+        public final ModConfigSpec.IntValue fuelCapacity;
         public final ModConfigSpec.IntValue energyUsage;
         public final ModConfigSpec.IntValue fuelUsage;
         public final ModConfigSpec.IntValue chargeSpeed;
         public final ModConfigSpec.DoubleValue speed;
 
-        JetpackConfig(ModConfigSpec.Builder b, String name, long defCap, long defFuelCap, int defUsage, int defFuelUsage, int defCharge, double defSpeed) {
+        JetpackConfig(ModConfigSpec.Builder b, String name, int defCap, int defFuelCap, int defUsage, int defFuelUsage, int defCharge, double defSpeed) {
             b.push(name);
-            energyCapacity = b.defineInRange("energyCapacity", defCap, 0L, Long.MAX_VALUE);
-            fuelCapacity = b.defineInRange("fuelCapacity", defFuelCap, 0L, Long.MAX_VALUE);
+            energyCapacity = b.defineInRange("energyCapacity", defCap, 0, Integer.MAX_VALUE);
+            fuelCapacity = b.defineInRange("fuelCapacity", defFuelCap, 0, Integer.MAX_VALUE);
             energyUsage = b.defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
             fuelUsage = b.defineInRange("fuelUsage", defFuelUsage, 0, Integer.MAX_VALUE);
             chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
@@ -84,28 +85,28 @@ public class OritechStartupConfig {
     }
 
     public static class ToolConfig {
-        public final ModConfigSpec.LongValue energyCapacity;
-        public final ModConfigSpec.LongValue energyUsage;
+        public final ModConfigSpec.IntValue energyCapacity;
+        public final ModConfigSpec.IntValue energyUsage;
         public final ModConfigSpec.IntValue chargeSpeed;
 
-        ToolConfig(ModConfigSpec.Builder b, String name, long defCap, long defUsage, int defCharge) {
+        ToolConfig(ModConfigSpec.Builder b, String name, int defCap, int defUsage, int defCharge) {
             b.push(name);
-            energyCapacity = b.defineInRange("energyCapacity", defCap, 0L, Long.MAX_VALUE);
-            energyUsage = b.defineInRange("energyUsage", defUsage, 0L, Long.MAX_VALUE);
+            energyCapacity = b.defineInRange("energyCapacity", defCap, 0, Integer.MAX_VALUE);
+            energyUsage = b.defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
             chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
             b.pop();
         }
     }
 
     public static class ElectricMaceConfig {
-        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.IntValue energyCapacity;
         public final ModConfigSpec.IntValue energyUsage;
         public final ModConfigSpec.IntValue chargeSpeed;
         public final ModConfigSpec.IntValue lightningCostMultiplier;
 
         ElectricMaceConfig(ModConfigSpec.Builder b) {
             b.push("electricMace");
-            energyCapacity = b.defineInRange("energyCapacity", 500_000L, 0L, Long.MAX_VALUE);
+            energyCapacity = b.defineInRange("energyCapacity", 500_000, 0, Integer.MAX_VALUE);
             energyUsage = b.comment("RF consumed per hit").worldRestart().defineInRange("energyUsage", 2048, 0, Integer.MAX_VALUE);
             chargeSpeed = b.defineInRange("chargeSpeed", 50_000, 0, Integer.MAX_VALUE);
             lightningCostMultiplier = b.comment("Lightning attack RF usage multiplier").defineInRange("lightningCostMultiplier", 8, 0, Integer.MAX_VALUE);
@@ -114,7 +115,7 @@ public class OritechStartupConfig {
     }
 
     public static class PortableLaserConfig {
-        public final ModConfigSpec.LongValue energyCapacity;
+        public final ModConfigSpec.IntValue energyCapacity;
         public final ModConfigSpec.IntValue energyPerTick;
         public final ModConfigSpec.IntValue energyPerBoom;
         public final ModConfigSpec.DoubleValue blockBreakSpeed;
@@ -123,7 +124,7 @@ public class OritechStartupConfig {
 
         PortableLaserConfig(ModConfigSpec.Builder b) {
             b.push("portableLaserConfig");
-            energyCapacity = b.defineInRange("energyCapacity", 5_000_000L, 0L, Long.MAX_VALUE);
+            energyCapacity = b.defineInRange("energyCapacity", 5_000_000, 0, Integer.MAX_VALUE);
             energyPerTick = b.comment("RF consumed per tick while firing").defineInRange("energyPerTick", 4096, 0, Integer.MAX_VALUE);
             energyPerBoom = b.comment("RF consumed per explosion").defineInRange("energyPerBoom", 100_000, 0, Integer.MAX_VALUE);
             blockBreakSpeed = b.comment("Block breaking speed multiplier").defineInRange("blockBreakSpeed", 0.125, 0.0, 100.0);

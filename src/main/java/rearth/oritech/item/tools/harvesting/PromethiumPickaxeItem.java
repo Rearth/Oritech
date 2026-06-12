@@ -4,79 +4,70 @@ import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.SingletonGeoAnimatable;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
 import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.OritechPlatform;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.ToolsContent;
+import rearth.oritech.util.PermissionHelpers;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
+public class PromethiumPickaxeItem extends Item implements GeoItem {
 
     private static final RawAnimation AREA_ANIM = RawAnimation.begin().thenLoop("area");
     private static final RawAnimation SILK_ANIM = RawAnimation.begin().thenLoop("silk_touch");
-    // Permission checks post another break event; Promethium should ignore that nested probe.
-    private static final ThreadLocal<Boolean> CHECKING_OFFSET_BREAK_PERMISSION = ThreadLocal.withInitial(() -> false);
+
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public PromethiumPickaxeItem(ToolMaterial toolMaterial, TagKey<Block> effectiveBlocks, Properties settings) {
-        super(toolMaterial, effectiveBlocks, settings);
+    public PromethiumPickaxeItem(Properties properties) {
+        super(properties);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
 
     @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miner) {
+
+        // this intangible projectile is used as marker if an artificial silk touch has been applied
         if (!level.isClientSide() && stack.has(DataComponents.INTANGIBLE_PROJECTILE)) {
             var enchantments = stack.getEnchantments();
             var builder = new ItemEnchantments.Mutable(enchantments);
@@ -97,24 +88,24 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
 
-        if (!level.isClientSide() && user.isShiftKeyDown()) {
-            var stack = user.getItemInHand(hand);
+        if (!level.isClientSide() && player.isShiftKeyDown()) {
+            var stack = player.getItemInHand(hand);
 
             var wasArea = isAreaEnabled(stack);
             var isArea = !wasArea;
             setAreaEnabled(stack, isArea);
 
-            user.sendSystemMessage(isArea ? Component.translatable("message.oritech.tool_mode.area_effect") : Component.translatable("message.oritech.tool_mode.silk_touch"));
+            player.sendSystemMessage(isArea ? Component.translatable("message.oritech.tool_mode.area_effect") : Component.translatable("message.oritech.tool_mode.silk_touch"));
         }
 
-        return super.use(level, user, hand);
+        return super.use(level, player, hand);
     }
 
-    public static List<BlockPos> getOffsetBlocks(Level level, Player player, BlockPos pos) {
+    public static List<BlockPos> getOffsetBlocks(LevelAccessor level, Player player, BlockPos pos) {
         var handStack = player.getMainHandItem();
-        if (handStack == null || !handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return List.of();
+        if (!handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return List.of();
 
         if (isAreaEnabled(handStack) && !player.isShiftKeyDown()) {
             var breakBlocks = new ArrayList<BlockPos>();
@@ -150,11 +141,12 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     // called as event in Oritech initializer
     // area mode: breaks 3x3 blocks unless player is sneaking
     // silk touch mode: adds a temporary silk touch, which is then removed in the after break event
-    public static EventResult preMine(Level level, BlockPos pos, BlockState state, ServerPlayer player, @Nullable IntValue xp) {
-        if (CHECKING_OFFSET_BREAK_PERMISSION.get()) return EventResult.pass();
+    // this is separate from mineBlock so that enchantments can be applied beforehand
+    public static void preMine(Level level, BlockPos pos, BlockState state, ServerPlayer player) {
+        if (PermissionHelpers.CHECKING_OFFSET_BREAK_PERMISSION.get()) return;
 
         var handStack = player.getMainHandItem();
-        if (handStack == null || !handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return EventResult.pass();
+        if (!handStack.is(ToolsContent.PROMETHIUM_PICKAXE)) return;
 
         // break additional blocks in preMine (Block.onBreak) instead of postMine (Block.onBroken)
         // so that the block still exists when determining which face of the block the player was looking at
@@ -165,7 +157,7 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
                 // this will ONLY apply item enchantments that affect block drops, and will not apply enchants like vein mining
                 var offsetState = level.getBlockState(offsetPos);
 
-                var canInteract = canBreakOffsetBlock(level, offsetPos, offsetState, player);
+                var canInteract = PermissionHelpers.CanPlayerBreakBlock(level, offsetPos, offsetState, player);
                 if (!canInteract) continue;
 
                 var offsetEntity = level.getBlockEntity(offsetPos);
@@ -175,41 +167,19 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
             }
         } else {
             // do silk touch
-            var hasExistingSilkTouch = EnchantmentHelper.getEnchantmentsForCrafting(handStack).keySet().stream().anyMatch(elem -> elem.is(Enchantments.SILK_TOUCH));
+            var registry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value();
+            var registryEntry = registry.wrapAsHolder(registry.get(Enchantments.SILK_TOUCH).get().value());
+            var hasExistingSilkTouch = handStack.getTagEnchantments().getLevel(registryEntry) > 0;
 
             if (!hasExistingSilkTouch) {
-                var registryEntry = level.registryAccess().registryOrThrow(Registries.ENCHANTMENT).getHolder(Enchantments.SILK_TOUCH).get();
                 handStack.enchant(registryEntry, 1);
                 handStack.set(DataComponents.INTANGIBLE_PROJECTILE, Unit.INSTANCE);
             }
         }
-
-        return EventResult.pass();
     }
 
-    // to avoid recusion on neoforge
-    private static boolean canBreakOffsetBlock(Level level, BlockPos offsetPos, BlockState offsetState, ServerPlayer player) {
-        var wasCheckingOffsetBreakPermission = CHECKING_OFFSET_BREAK_PERMISSION.get();
-        CHECKING_OFFSET_BREAK_PERMISSION.set(true);
-        try {
-            return OritechPlatform.INSTANCE.canPlayerBreakBlock(level, offsetPos, offsetState, player);
-        } finally {
-            CHECKING_OFFSET_BREAK_PERMISSION.set(wasCheckingOffsetBreakPermission);
-        }
-    }
-
-    public static ItemAttributeModifiers createPromethiumAttributes(ToolMaterial toolMaterial, float attackDamage, float attackSpeed, float range) {
+    public static ItemAttributeModifiers getRangeModifier(float range) {
         return ItemAttributeModifiers.builder()
-                .add(
-                        Attributes.ATTACK_DAMAGE,
-                        new AttributeModifier(BASE_ATTACK_DAMAGE_ID, attackDamage + toolMaterial.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
-                        EquipmentSlotGroup.MAINHAND
-                )
-                .add(
-                        Attributes.ATTACK_SPEED,
-                        new AttributeModifier(BASE_ATTACK_SPEED_ID, attackSpeed, AttributeModifier.Operation.ADD_VALUE),
-                        EquipmentSlotGroup.MAINHAND
-                )
                 .add(
                         Attributes.BLOCK_INTERACTION_RANGE,
                         new AttributeModifier(Oritech.id("pick_block_range"), range, AttributeModifier.Operation.ADD_VALUE),
@@ -222,13 +192,13 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
-        var area = isAreaEnabled(stack);
+        var area = isAreaEnabled(itemStack);
 
-        consumer.accept((area ? Component.translatable("tooltip.oritech.tool_mode.area_range.area") : Component.translatable("tooltip.oritech.tool_mode.area_range.single")).withStyle(ChatFormatting.GOLD));
-        consumer.accept(Component.translatable("tooltip.oritech.promethium_pick").withStyle(ChatFormatting.DARK_GRAY));
+        builder.accept((area ? Component.translatable("tooltip.oritech.tool_mode.area_range.area") : Component.translatable("tooltip.oritech.tool_mode.area_range.single")).withStyle(ChatFormatting.GOLD));
+        builder.accept(Component.translatable("tooltip.oritech.promethium_pick").withStyle(ChatFormatting.DARK_GRAY));
 
     }
 
@@ -238,9 +208,9 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
             private PromethiumToolRenderer renderer;
 
             @Override
-            public @Nullable BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+            public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PromethiumToolRenderer("promethium_pickaxe");
+                    this.renderer = new PromethiumToolRenderer("promethium_axe");
                 return renderer;
             }
         });
@@ -248,7 +218,10 @@ public class PromethiumPickaxeItem extends DiggerItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, "Pickaxe", 5, state -> PlayState.CONTINUE).triggerableAnim("silk", SILK_ANIM).triggerableAnim("area", AREA_ANIM));
+        controllers.add(new AnimationController<>("Pickaxe", 5,
+                state -> PlayState.CONTINUE)
+                .triggerableAnim("silk", SILK_ANIM)
+                .triggerableAnim("area", AREA_ANIM));
     }
 
     @Override

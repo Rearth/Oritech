@@ -1,15 +1,13 @@
 package rearth.oritech.item.tools;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +18,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
@@ -33,8 +33,8 @@ import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
 
@@ -62,41 +62,41 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
 
         var usedEnergy = tryUseEnergy(stack, OritechStartupConfig.electricMace.energyUsage.get(), null);
         if (usedEnergy && canSmashAttack(attacker)) {
-            attacker.level().playSound(null, target.blockPosition(), SoundContent.ELECTRIC_SHOCK, SoundSource.PLAYERS);
+            attacker.level().playSound(null, target.blockPosition(), SoundContent.ELECTRIC_SHOCK.value(), SoundSource.PLAYERS);
             attacker.resetFallDistance();
-            bonus = getAttackDamageBonus(target, getAttackDamage(), new DamageSource(attacker.level().registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker));
+            bonus = getAttackDamageBonus(target, getAttackDamage(), attacker.level().damageSources().lightningBolt());
         }
 
 
-        if (attacker instanceof Player player && attacker.level() instanceof ServerLevel serverWorld) {
-            if (player.getCooldowns().isOnCooldown(this))
+        if (attacker instanceof Player player && attacker.level() instanceof ServerLevel serverLevel) {
+            if (player.getCooldowns().isOnCooldown(stack))
                 return;
 
-            player.getCooldowns().addCooldown(this, 40);
-            createLightningAttack(serverWorld, player, target, stack, (int) (getAttackDamage() / 2f + bonus / 2f));
+            player.getCooldowns().addCooldown(stack, 40);
+            createLightningAttack(serverLevel, player, target, stack, (int) (getAttackDamage() / 2f + bonus / 2f));
         }
     }
 
     private void createLightningAttack(ServerLevel level, Player attacker, LivingEntity target, ItemStack stack, int damage) {
 
-        var usedEnergy = tryUseEnergy(stack, (long) OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
-        if (usedEnergy && attacker.level() instanceof ServerLevel serverWorld) {
+        var usedEnergy = tryUseEnergy(stack, (int) OritechStartupConfig.electricMace.energyUsage.get() * OritechStartupConfig.electricMace.lightningCostMultiplier.get(), null);
+        if (usedEnergy && attacker.level() instanceof ServerLevel serverLevel) {
 
             var playerPos = attacker.getEyePosition();
             var targetPos = target.getEyePosition();
             var offset = targetPos.subtract(playerPos);
             var up = new Vec3(0, 1, 0);
             var cross = offset.cross(up).normalize();
-            var pos = targetPos.add(cross.scale(14)).offsetRandom(serverWorld.random, 3).add(0, 7, 0);
+            var pos = targetPos.add(cross.scale(14)).offsetRandom(serverLevel.getRandom(), 3).add(0, 7, 0);
 
-            createLightningBolt(serverWorld, pos, target.getEyePosition().offsetRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
+            createLightningBolt(serverLevel, pos, target.getEyePosition().offsetRandom(serverLevel.getRandom(), 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
 
             for (int i = 1; i <= 5; i++) {
-                final var ownPos = targetPos.add(cross.yRot(i * 90).scale(14)).offsetRandom(serverWorld.random, 5).add(0, 7, 0);
-                PENDING_LIGHTNING_HITS.put(serverWorld.getGameTime() + 10 * i, () -> {
-                    createLightningBolt(serverWorld, ownPos, target.getEyePosition().offsetRandom(serverWorld.random, 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
+                final var ownPos = targetPos.add(cross.yRot(i * 90).scale(14)).offsetRandom(serverLevel.getRandom(), 5).add(0, 7, 0);
+                PENDING_LIGHTNING_HITS.put(serverLevel.getGameTime() + 10 * i, () -> {
+                    createLightningBolt(serverLevel, ownPos, target.getEyePosition().offsetRandom(serverLevel.getRandom(), 0.1f), 10, 0.8f, 4, ParticleTypes.ENCHANTED_HIT, 0.35f, 2, 0);
                     target.hurtTime = 0;
-                    target.hurt(new DamageSource(serverWorld.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), attacker), damage);
+                    target.hurt(level.damageSources().lightningBolt(), damage);
                 });
             }
         }
@@ -124,8 +124,8 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
             if (!canSmashAttack(livingEntity)) {
                 return 0.0F;
             } else {
-                float fallDist = livingEntity.fallDistance;
-                float damage;
+                var fallDist = livingEntity.fallDistance;
+                double damage;
                 if (fallDist <= 3.0F) {
                     damage = getAttackDamage() * fallDist;
                 } else if (fallDist <= 8.0F) {
@@ -135,10 +135,10 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
                 }
 
                 var level = livingEntity.level();
-                if (level instanceof ServerLevel serverWorld) {
-                    return damage + EnchantmentHelper.modifyFallBasedDamage(serverWorld, livingEntity.getWeaponItem(), target, damageSource, 2.0F) * fallDist;
+                if (level instanceof ServerLevel serverLevel) {
+                    return (float) (damage + EnchantmentHelper.modifyFallBasedDamage(serverLevel, livingEntity.getWeaponItem(), target, damageSource, 2.0F) * fallDist);
                 } else {
-                    return damage;
+                    return (float) damage;
                 }
             }
         } else {
@@ -147,33 +147,25 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack)), TooltipHelper.getEnergyText(this.getEnergyCapacity(stack)));
-        consumer.accept(text.withStyle(ChatFormatting.GOLD));
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack))), TooltipHelper.getEnergyText(this.getCapacity()));
+        builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            consumer.accept(Component.translatable("tooltip.oritech.electric_mace").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
-            consumer.accept(Component.translatable("tooltip.oritech.electric_mace.1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            builder.accept(Component.translatable("tooltip.oritech.electric_mace").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            builder.accept(Component.translatable("tooltip.oritech.electric_mace.1").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         } else {
-            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            builder.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
     }
 
     @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * ChainsawItem.BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * ChainsawItem.BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -186,31 +178,24 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         return 0xff7007;
     }
 
-    @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.electricMace.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return getEnergyCapacity(stack) / 10;
-    }
-
-    // this overrides the fabric specific extensions
-    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
-        return false;
-    }
-
-    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
-        return true;
-    }
-
     // this overrides the neoforge specific extensions
+    @Override
     public boolean shouldCauseReequipAnimation(@NotNull ItemStack oldStack, @NotNull ItemStack newStack, boolean slotChanged) {
         return false;
     }
 
+    @Override
     public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
+        return false;
+    }
+
+    @Override
+    public boolean isCombineRepairable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isDamageable(ItemStack stack) {
         return false;
     }
 
@@ -304,5 +289,20 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
             level.sendParticles(particleEffect, particlePos.x, particlePos.y, particlePos.z,
                     1, 0, 0, 0, 0.0D); // count, dx, dy, dz, speed
         }
+    }
+
+    @Override
+    public int getCapacity() {
+        return OritechStartupConfig.electricMace.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxInsert() {
+        return getCapacity() / 10;
+    }
+
+    @Override
+    public int getMaxExtract() {
+        return getCapacity() / 10;
     }
 }

@@ -4,27 +4,28 @@ import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.SingletonGeoAnimatable;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
 import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,6 +36,7 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -43,12 +45,16 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.OritechPlatform;
-import rearth.oritech.api.energy.containers.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
@@ -59,6 +65,7 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.MachineSoundHandler;
+import rearth.oritech.util.PermissionHelpers;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.HashMap;
@@ -90,19 +97,19 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
 
         var stack = player.getItemInHand(hand);
         var energyUsed = OritechStartupConfig.portableLaserConfig.energyPerBoom.get();
 
         if (level.isClientSide()) {
-            if (getStoredEnergy(stack) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
+            if (getStoredEnergy(stack, ItemAccess.forStack(stack)) > energyUsed && !player.isShiftKeyDown() && !isMiningEnabled(stack))
                 lastSingleShot = level.getGameTime();
 
-            return InteractionResultHolder.consume(stack);
+            return InteractionResult.CONSUME;
         }
 
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return InteractionResultHolder.consume(stack);
+        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return InteractionResult.CONSUME;
 
         if (player.isShiftKeyDown()) {
 
@@ -111,20 +118,20 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
             player.sendSystemMessage(Component.translatable("tooltip.oritech.portable_laser.status.begin").append(Component.literal(String.valueOf(!lastMode))));
 
-            return InteractionResultHolder.consume(stack);
+            return InteractionResult.CONSUME;
         }
 
         if (isMiningEnabled(stack)) {
             player.sendSystemMessage(Component.translatable("tooltip.oritech.portable_laser.status.shot_mining_error"));
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
         if (!laserItem.tryUseEnergy(stack, energyUsed, player)) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
-        if (player.getCooldowns().isOnCooldown(this)) return InteractionResultHolder.fail(stack);
-        player.getCooldowns().addCooldown(this, ACTION_COOLDOWN);
+        if (player.getCooldowns().isOnCooldown(stack)) return InteractionResult.FAIL;
+        player.getCooldowns().addCooldown(stack, ACTION_COOLDOWN);
 
         Vec3 endPos;
 
@@ -132,10 +139,10 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
         if (hit != null) {
             var targetBlockPos = BlockPos.containing(hit.getLocation());
-            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(level, targetBlockPos, level.getBlockState(targetBlockPos), player);
+            var canInteract = PermissionHelpers.CanPlayerBreakBlock(level, targetBlockPos, level.getBlockState(targetBlockPos), (ServerPlayer) player);
 
             if (canInteract)
-                level.explode(null, new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
+                level.explode(null, level.damageSources().lightningBolt(),
                         null, hit.getLocation(), OritechStartupConfig.portableLaserConfig.explosionStrength.get(), false, Level.ExplosionInteraction.MOB);
 
             endPos = hit.getLocation();
@@ -147,8 +154,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
         if (hit instanceof EntityHitResult entityHitResult && entityHitResult.getEntity() instanceof LivingEntity livingEntity) {
 
-            var source = new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
-            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(level, livingEntity, 20f, source);
+            var source = level.damageSources().source(DamageTypes.LIGHTNING_BOLT, player);
+            var canInteract = PermissionHelpers.CanPlayerAttackEntity(livingEntity, level, 20, source);
 
             if (canInteract)
                 processEntityTarget(player, livingEntity, 20, stack, level);
@@ -169,14 +176,14 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         if (level instanceof ServerLevel sl)
             sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
 
-        return InteractionResultHolder.consume(stack);
+        return InteractionResult.CONSUME;
     }
 
     public static void onUseTick(Player player) {
         var level = player.level();
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem) || level == null) return;
+        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return;
 
         var rfUsage = OritechStartupConfig.portableLaserConfig.energyPerTick.get();
 
@@ -193,7 +200,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var blockState = level.getBlockState(blockPos);
             if (blockState.isAir() || blockState.is(TagContent.LASER_PASSTHROUGH)) return;
 
-            var canInteract = OritechPlatform.INSTANCE.canPlayerBreakBlock(level, blockPos, blockState, player);
+            var canInteract = player instanceof ServerPlayer serverPlayer && PermissionHelpers.CanPlayerBreakBlock(level, blockPos, blockState, serverPlayer);
 
             if (canInteract)
                 processBlockBreaking(blockPos, blockState, level, player, stack, rfUsage);
@@ -202,8 +209,8 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             var target = entityHitResult.getEntity();
             if (!(target instanceof LivingEntity livingEntity)) return;
 
-            var source = new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player);
-            var canInteract = OritechPlatform.INSTANCE.canAttackBeDone(level, livingEntity, 20f, source);
+            var source = level.damageSources().source(DamageTypes.LIGHTNING_BOLT, player);
+            var canInteract = PermissionHelpers.CanPlayerAttackEntity(livingEntity, level, 20f, source);
 
             if (canInteract)
                 processEntityTarget(player, livingEntity, OritechStartupConfig.portableLaserConfig.damageBase.get(), stack, level);
@@ -273,22 +280,26 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             blockEntity = (BlockEntity) coreBlock.getCachedController();
         }
         if (blockEntity != null) {
-            var storageCandidate = EnergyApi.BLOCK.find(level, blockPos, blockState, null, null);
-            if (storageCandidate == null && blockEntity instanceof EnergyApi.BlockProvider provider) {
-                storageCandidate = provider.getEnergyStorage(null);
+            var storageCandidate = level.getCapability(Capabilities.Energy.BLOCK, blockPos, blockState, blockEntity, null);
+            if (storageCandidate == null && blockEntity instanceof EnergyProvider energyProvider) {
+                storageCandidate = energyProvider.getEnergyLookup(null);
             }
 
             if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
-                var inserted = dynamicStorage.insertIgnoringLimit(energyUsed, false);
-                if (inserted > 0)
-                    dynamicStorage.update();
-
+                try (var transaction = Transaction.openRoot()) {
+                    var inserted = dynamicStorage.internalInsert(energyUsed, transaction);
+                    if (inserted > 0) {
+                        transaction.commit();
+                    }
+                }
                 return;
             } else if (storageCandidate != null) {
-                var inserted = storageCandidate.insert(energyUsed, false);
-                if (inserted > 0)
-                    storageCandidate.update();
-
+                try (var transaction = Transaction.openRoot()) {
+                    var inserted = storageCandidate.insert(energyUsed, transaction);
+                    if (inserted > 0) {
+                        transaction.commit();
+                    }
+                }
                 return;
             }
         }
@@ -316,11 +327,11 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         List<ItemStack> dropped;
         dropped = Block.getDrops(targetBlockState, (ServerLevel) level, targetPos, targetEntity, player, tool);
 
-        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, level);
+        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, (ServerLevel) level);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1;
-            dropped = List.of(new ItemStack(recipe.getResults().get(0).getItem(), farmedCount));
+            dropped = List.of(new ItemStack(recipe.itemResults().get(0).item(), farmedCount));
             if (level instanceof ServerLevel sl)
                 sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
@@ -353,7 +364,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         damage = (int) (damage * Math.sqrt(sharpnessLevel + 1));
 
         target.hurt(
-                new DamageSource(level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(DamageTypes.LIGHTNING_BOLT), player),
+                level.damageSources().source(DamageTypes.LIGHTNING_BOLT, player),
                 damage);
 
     }
@@ -369,55 +380,39 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         return 0;
     }
 
-    // this overrides the fabric specific extensions
-    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
-        return false;
-    }
-
-    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
-        return true;
-    }
-
     // this overrides the neoforge specific extensions
+    @Override
     public boolean shouldCauseReequipAnimation(@NotNull ItemStack oldStack, @NotNull ItemStack newStack, boolean slotChanged) {
         return false;
     }
 
+    @Override
     public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
         return false;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var storedEnergy = TooltipHelper.getEnergyText(this.getStoredEnergy(stack));
-        var capacity = TooltipHelper.getEnergyText(this.getEnergyCapacity(stack));
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag type) {
+        super.appendHoverText(stack, context, display, builder, type);
+        var storedEnergy = TooltipHelper.getEnergyText(this.getStoredEnergy(stack, ItemAccess.forStack(stack)));
+        var capacity = TooltipHelper.getEnergyText(this.getCapacity());
         var text = Component.translatable("tooltip.oritech.energy_indicator", storedEnergy, capacity);
-        consumer.accept(text.withStyle(ChatFormatting.GOLD));
+        builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var miningText = Component.translatable("tooltip.oritech.portable_laser.status.begin").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(String.valueOf(isMiningEnabled(stack))).withStyle(ChatFormatting.GOLD))
                 .append(Component.translatable("tooltip.oritech.portable_laser.status.hint").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
-        consumer.accept(miningText);
+        builder.accept(miningText);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             for (int i = 1; i <= 5; i++) {
-                consumer.accept(Component.translatable("tooltip.oritech.portable_laser." + i).withStyle(ChatFormatting.GRAY));
+                builder.accept(Component.translatable("tooltip.oritech.portable_laser." + i).withStyle(ChatFormatting.GRAY));
             }
         } else {
-            consumer.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
+            builder.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
         }
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    @Override
-    public int getEnchantmentValue() {
-        return 10;
     }
 
     public boolean isMiningEnabled(ItemStack stack) {
@@ -430,7 +425,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -444,28 +439,12 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
 
     @Override
-    public long getEnergyCapacity(ItemStack stack) {
-        return OritechStartupConfig.portableLaserConfig.energyCapacity.get();
-    }
-
-    @Override
-    public long getEnergyMaxInput(ItemStack stack) {
-        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 80;
-    }
-
-    @Override
-    public long getEnergyMaxOutput(ItemStack stack) {
-        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 80;
-    }
-
-    @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>(
-                this,
                 "laser",
                 0,
                 state -> {
-                    if (state.getController().getAnimationState().equals(AnimationController.State.STOPPED))
+                    if (state.controller().getPlayState().equals(PlayState.STOP))
                         return state.setAndContinue(IDLE);
                     return PlayState.CONTINUE;
                 })
@@ -480,7 +459,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             private PortableLaserRenderer renderer;
 
             @Override
-            public @NotNull BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+            public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new PortableLaserRenderer("portable_laser");
                 return renderer;
@@ -495,6 +474,21 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
     public static void receiveUsePacket(LaserPlayerUsePacket packet, IPayloadContext context) {
         PortableLaserItem.onUseTick(context.player());
+    }
+
+    @Override
+    public int getCapacity() {
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get();
+    }
+
+    @Override
+    public int getMaxInsert() {
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 20;
+    }
+
+    @Override
+    public int getMaxExtract() {
+        return OritechStartupConfig.portableLaserConfig.energyCapacity.get() / 20;
     }
 
     public record LaserPlayerUsePacket() implements CustomPacketPayload {

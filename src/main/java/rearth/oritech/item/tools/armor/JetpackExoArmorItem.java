@@ -5,18 +5,21 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class JetpackExoArmorItem extends BackstorageExoArmorItem implements BaseJetpackItem {
-    public JetpackExoArmorItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
+    public JetpackExoArmorItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
         super(material, type, settings);
     }
 
@@ -46,14 +49,14 @@ public class JetpackExoArmorItem extends BackstorageExoArmorItem implements Base
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag type) {
         var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
+        builder.accept(hint);
         hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
+        builder.accept(hint);
 
-        super.appendHoverText(stack, context, tooltip, type);
-        addJetpackTooltip(stack, tooltip, false);
+        super.appendHoverText(stack, context, display, builder, type);
+        addJetpackTooltip(stack, builder, false);
     }
 
     @Override

@@ -3,9 +3,9 @@ package rearth.oritech.item.tools.armor;
 import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.PlayState;
+import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
@@ -22,11 +22,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-
 import rearth.oritech.client.renderers.ExosuitArmorRenderer;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ComponentContent;
@@ -37,7 +39,7 @@ import java.util.function.Consumer;
 // this item can store both energy and fluids
 // applicable fluids will be consumed first, and then energy
 // the fluid bar is rendered in a different color if a fluid is available
-public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
+public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
@@ -47,8 +49,11 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     // set to true if space has been pressed at least once AFTER loosing ground contact (to avoid flying forwards when dropping of a cliff
     public static boolean PRESSED_SPACE = false;
 
-    public JetpackItem(Holder<ArmorMaterial> material, Type type, Item.Properties settings) {
-        super(material, type, settings);
+    private final ArmorType type;
+
+    public JetpackItem(Holder<ArmorMaterial> material, ArmorType type, Item.Properties settings) {
+        super(settings);
+        this.type = type;
     }
 
     @Override
@@ -85,13 +90,14 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag type) {
+        super.appendHoverText(stack, context, display, builder, type);
         var hint = Component.translatable("tooltip.oritech.jetpack_usage").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
+        builder.accept(hint);
         hint = Component.translatable("tooltip.oritech.jetpack_usage2").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);
-        consumer.accept(hint);
+        builder.accept(hint);
 
-        addJetpackTooltip(stack, tooltip, true);
+        addJetpackTooltip(stack, builder, true);
     }
 
     @Override
@@ -113,7 +119,7 @@ public class JetpackItem extends ArmorItem implements GeoItem, BaseJetpackItem {
     // Let's add our animation controller
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>(this, 20, state -> PlayState.STOP));
+        controllers.add(new AnimationController<>("base_controller", 20, state -> PlayState.STOP));
     }
 
     @Override

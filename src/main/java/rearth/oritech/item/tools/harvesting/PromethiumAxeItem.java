@@ -3,12 +3,11 @@ package rearth.oritech.item.tools.harvesting;
 import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
-import com.geckolib.animation.AnimatableManager;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -16,23 +15,18 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.Tool;
-import net.minecraft.world.item.component.Tool.Rule;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class PromethiumAxeItem extends AxeItem implements GeoItem {
@@ -44,18 +38,18 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    public PromethiumAxeItem(ToolMaterial toolMaterial, Properties settings) {
-        super(toolMaterial, settings);
-        // a bit of a hack, but set tool components again after super()
-        // this lets PromethiumAxeItem extend AxeItem (for the right-click actions) and still ignore
-        // the default tool components set up by AxeItem
-        var toolComponent = new Tool(List.of(
-                Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
-                Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
-                Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
-                Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
-                1.0F, 1);
-        this.components = settings.component(DataComponents.TOOL, toolComponent).buildAndValidateComponents();
+    public PromethiumAxeItem(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline, Item.Properties properties) {
+        super(material, attackDamageBaseline, attackSpeedBaseline, properties);
+    }
+
+    @Override
+    public boolean isCombineRepairable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isDamageable(ItemStack stack) {
+        return false;
     }
 
     @Override
@@ -102,22 +96,12 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     }
 
     @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
             private PromethiumToolRenderer renderer;
 
             @Override
-            public @Nullable BlockEntityWithoutLevelRenderer getGeoItemRenderer() {
+            public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
                     this.renderer = new PromethiumToolRenderer("promethium_axe");
                 return renderer;
@@ -135,13 +119,13 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
         return cache;
     }
 
-    public static void onTick(ServerLevel serverWorld) {
-        processPendingBlocks(serverWorld);
+    public static void onTick(ServerLevel serverLevel) {
+        processPendingBlocks(serverLevel);
     }
 
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        consumer.accept(Component.translatable("tooltip.oritech.promethium_axe").withStyle(ChatFormatting.DARK_GRAY));
+        builder.accept(Component.translatable("tooltip.oritech.promethium_axe").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

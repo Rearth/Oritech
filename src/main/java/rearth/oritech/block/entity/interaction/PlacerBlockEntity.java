@@ -159,8 +159,8 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     }
 
     private Player getPlacerPlayerEntity() {
-        if (placerPlayerEntity == null && level instanceof ServerLevel serverWorld) {
-            placerPlayerEntity = new FakePlayer(serverWorld, new GameProfile(UUID.randomUUID(), "oritech_placer"));
+        if (placerPlayerEntity == null && level instanceof ServerLevel serverLevel) {
+            placerPlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), "oritech_placer"));
         }
 
         return placerPlayerEntity;

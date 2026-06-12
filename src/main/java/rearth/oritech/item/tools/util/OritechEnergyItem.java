@@ -1,11 +1,9 @@
 package rearth.oritech.item.tools.util;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -38,8 +36,8 @@ public interface OritechEnergyItem extends EnergyProvider.Item {
 
     // A hack to do this without context of the DRM
     private int getUnbreakingLevel(ItemStack stack) {
-        ItemEnchantments enchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
-        for (Holder<Enchantment> entry : enchantments.keySet()) {
+        var enchantments = stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        for (var entry : enchantments.keySet()) {
             if (entry.unwrapKey().isPresent() && entry.unwrapKey().get().equals(Enchantments.UNBREAKING)) {
                 return enchantments.getLevel(entry);
             }

@@ -2,62 +2,49 @@ package rearth.oritech.item.tools.harvesting;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ToolMaterial;
-import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.Tool;
-import net.minecraft.world.item.component.Tool.Rule;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class ChainsawItem extends AxeItem implements OritechEnergyItem {
 
     public static final int BAR_STEP_COUNT = 13;
 
-    public ChainsawItem(ToolMaterial toolMaterial, Properties settings) {
-        super(toolMaterial, settings);
-        // a bit of a hack, but set tool components again after super()
-        // this lets ChainsawItem extend AxeItem (for the right-click actions) and still ignore
-        // the default tool components set up by AxeItem
-        var toolComponent = new Tool(List.of(
-                Rule.deniesDrops(toolMaterial.incorrectBlocksForDrops()),
-                Rule.minesAndDrops(BlockTags.MINEABLE_WITH_AXE, toolMaterial.speed()),
-                Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
-                Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
-                1.0F, 1);
-        this.components = settings.component(DataComponents.TOOL, toolComponent).buildAndValidateComponents();
-    }
-
-    // this overrides the fabric specific extensions
-    public boolean allowComponentsUpdateAnimation(Player player, InteractionHand hand, ItemStack oldStack, ItemStack newStack) {
-        return false;
-    }
-
-    public boolean allowContinuingBlockBreaking(Player player, ItemStack oldStack, ItemStack newStack) {
-        return true;
+    public ChainsawItem(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline, Item.Properties properties) {
+        super(material, attackDamageBaseline, attackSpeedBaseline, properties);
     }
 
     // this overrides the neoforge specific extensions
+    @Override
     public boolean shouldCauseReequipAnimation(@NotNull ItemStack oldStack, @NotNull ItemStack newStack, boolean slotChanged) {
         return false;
     }
 
+    @Override
     public boolean shouldCauseBlockBreakReset(@NotNull ItemStack oldStack, @NotNull ItemStack newStack) {
+        return false;
+    }
+
+    @Override
+    public boolean isCombineRepairable(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isDamageable(ItemStack stack) {
         return false;
     }
 
@@ -71,9 +58,9 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
         if (!(miner instanceof Player player)) return true;
 
         var amount = state.getBlock().defaultDestroyTime() * getEnergyUsageMultiplier();
-        amount = Math.min(amount, this.getStoredEnergy(stack));
+        amount = Math.min(amount, this.getStoredEnergy(stack, ItemAccess.forStack(stack)));
 
-        var energySuccess = this.tryUseEnergy(stack, (long) amount, player);
+        var energySuccess = this.tryUseEnergy(stack, (int) amount, player);
 
         if (!level.isClientSide() && miner.isShiftKeyDown() && energySuccess && OritechConfig.chainsawTreeCutting.get()) {
             var startPos = pos.above();
@@ -83,7 +70,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
                 PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(level, elem, stack)).toList());
 
                 var extraEnergyUsed = treeBlocks.size() * getEnergyUsageMultiplier() / 2;
-                this.tryUseEnergy(stack, extraEnergyUsed, player);
+                this.tryUseEnergy(stack, (int) extraEnergyUsed, player);
             }
         }
 
@@ -91,34 +78,25 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag type) {
-        var text = Component.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(stack), this.getEnergyCapacity(stack));
-        consumer.accept(text.withStyle(ChatFormatting.GOLD));
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+        var text = Component.translatable("tooltip.oritech.energy_indicator", this.getStoredEnergy(itemStack, ItemAccess.forStack(itemStack)), this.getCapacity());
+        builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         if (OritechConfig.chainsawTreeCutting.get())
-            consumer.accept(Component.translatable("tooltip.oritech.promethium_axe").withStyle(ChatFormatting.DARK_GRAY));
+            builder.accept(Component.translatable("tooltip.oritech.promethium_axe").withStyle(ChatFormatting.DARK_GRAY));
     }
 
     @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
-        var enoughEnergy = getStoredEnergy(stack) >= state.getBlock().defaultDestroyTime() * getEnergyUsageMultiplier();
+        var enoughEnergy = getStoredEnergy(stack, ItemAccess.forStack(stack)) >= state.getBlock().defaultDestroyTime() * getEnergyUsageMultiplier();
         var multiplier = enoughEnergy ? 1 : 0.1f;
         return super.getDestroySpeed(stack, state) * multiplier;
     }
 
     @Override
-    public boolean isValidRepairItem(ItemStack stack, ItemStack ingredient) {
-        return false;
-    }
-
-    @Override
-    public boolean isEnchantable(ItemStack stack) {
-        return true;
-    }
-
-    @Override
     public int getBarWidth(ItemStack stack) {
-        return Math.round((getStoredEnergy(stack) * 100f / this.getEnergyCapacity(stack)) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     @Override
@@ -132,12 +110,17 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
     }
 
     @Override
-    public long getEnergyCapacity(ItemStack stack) {
+    public int getCapacity() {
         return OritechStartupConfig.chainSaw.energyCapacity.get();
     }
 
     @Override
-    public long getEnergyMaxInput(ItemStack stack) {
+    public int getMaxInsert() {
+        return OritechStartupConfig.chainSaw.chargeSpeed.get();
+    }
+
+    @Override
+    public int getMaxExtract() {
         return OritechStartupConfig.chainSaw.chargeSpeed.get();
     }
 }
