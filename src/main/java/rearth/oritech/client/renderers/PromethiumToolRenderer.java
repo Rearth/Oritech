@@ -1,7 +1,7 @@
 package rearth.oritech.client.renderers;
 
 import com.geckolib.renderer.GeoItemRenderer;
-import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.models.PromethiumToolModel;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
@@ -15,7 +15,7 @@ public class PromethiumToolRenderer extends GeoItemRenderer<PromethiumPickaxeIte
         super(new PromethiumToolModel(Oritech.id("models/" + modelName)));
 
         if (glowing) {
-            addRenderLayer(new AutoGlowingGeoLayer<>(this));
+            withRenderLayer(new AutoGlowingGeoLayer<>(this));
         }
     }
 }

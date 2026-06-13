@@ -8,18 +8,23 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
-import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.renderers.BlockOutlineRenderer;
+import rearth.oritech.client.renderers.OreFinderRenderer;
+import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
@@ -43,8 +48,18 @@ public final class OritechClient {
 
         neoEventBus.addListener(this::onPreClientTick);
         neoEventBus.addListener(this::onMouseClicked);
+        neoEventBus.addListener(this::onBlockOutlinesRendered);
+
+        // zipline cable rendering uses the split-phase extraction/submission render flow
+        neoEventBus.addListener(ActiveCableRenderer::onExtractRenderState);
+        neoEventBus.addListener(ActiveCableRenderer::onSubmitGeometry);
+
+        // ore-scanner highlight uses the same split-phase world-render flow
+        neoEventBus.addListener(OreFinderRenderer::onExtractRenderState);
+        neoEventBus.addListener(OreFinderRenderer::onSubmitGeometry);
 
         modEventBus.addListener(this::registerBindings);
+        modEventBus.addListener(this::registerSpecialModelRenderers);
         modEventBus.addListener(ModScreens::registerScreens);
 
         ModScreens.MENUS.register(modEventBus);
@@ -53,6 +68,11 @@ public final class OritechClient {
     private void registerBindings(RegisterKeyMappingsEvent event) {
         event.registerCategory(ORITECH_KEYS_CATEGORY);
         event.register(AUGMENT_SELECTOR);
+    }
+
+    // wires the portable tank item renderer into the 26.1 special-model item pipeline
+    private void registerSpecialModelRenderers(RegisterSpecialModelRendererEvent event) {
+        event.register(SmallTankItemRenderer.ID, SmallTankItemRenderer.Unbaked.MAP_CODEC);
     }
 
     private void onPreClientTick(ClientTickEvent.Pre event) {
@@ -86,6 +106,10 @@ public final class OritechClient {
         }
     }
 
+    private void onBlockOutlinesRendered(ExtractBlockOutlineRenderStateEvent event) {
+        BlockOutlineRenderer.onOutlineExtract(event);
+    }
+
     // old, needs to be updated/migrated as we go
     public static void initialize() {
 
@@ -115,11 +139,5 @@ public final class OritechClient {
         });
 
         Oritech.LOGGER.info("Oritech client initialization done");
-    }
-
-    public static void registerRenderers() {
-
-        Oritech.LOGGER.info("Registering oritech renderers");
-        ModRenderers.registerRenderers();
     }
 }

@@ -1,95 +1,82 @@
 package rearth.oritech.client.renderers;
 
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.context.ContextKey;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 
-import java.util.BitSet;
+import java.util.ArrayList;
 import java.util.List;
 
-import static net.minecraft.client.renderer.LevelRenderer.DIRECTIONS;
-import static net.minecraft.client.renderer.RenderStateShard.*;
-
+/**
+ * Handles block outline highlights for the ore-scanner augment.
+ */
 public class OreFinderRenderer {
 
+    // set by scanner augment
     public static List<BlockPos> renderedBlocks;
     public static long receivedAt;
 
-    private static final RenderType OVERLAY = RenderType.create("overlay",
-            DefaultVertexFormat.BLOCK,
-            VertexFormat.Mode.QUADS,
-            4194304,
-            true,
-            false,
-            RenderType.CompositeState.builder()
-                    .setLightmapState(LIGHTMAP)
-                    .setShaderState(RENDERTYPE_SOLID_SHADER)
-                    .setTextureState(BLOCK_SHEET_MIPPED)
-                    .setCullState(CULL)
-                    .setOutputState(OUTLINE_TARGET)
-                    .createCompositeState(false));
+    // render data context key
+    public static final ContextKey<OreRenderData> ORE_DATA = new ContextKey<>(Oritech.id("ore_finder"));
 
-    public static void doRender(PoseStack matrices, Camera camera, MultiBufferSource vertexConsumers) {
+    // teal outline color (with alpha, directs geometry to outline buffer)
+    private static final int OUTLINE_COLOR = 0xFF8AF2DF;
+    // empty biome/block tinting array
+    private static final int[] NO_TINT = new int[0];
+
+    public record OreRenderData(List<BlockPos> blocks) {}
+
+    // extract highlighted positions and camera offset
+    public static void onExtractRenderState(ExtractLevelRenderStateEvent event) {
         var level = Minecraft.getInstance().level;
-        if (level == null || renderedBlocks == null) return;
-        var age = level.getGameTime() - receivedAt;
+        if (level == null || renderedBlocks == null || renderedBlocks.isEmpty()) return;
 
+        var age = level.getGameTime() - receivedAt;
         if (age > 15) return;
 
-        for (var pos : renderedBlocks) {
-            var state = level.getBlockState(pos);
-
-            matrices.pushPose();
-            //Offset by the camera position so that the render is relative to the camera
-            matrices.translate(pos.getX() - camera.getPosition().x, pos.getY() - camera.getPosition().y, pos.getZ() - camera.getPosition().z);
-
-
-            var renderer = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
-            var vertexProvider = vertexConsumers.getBuffer(OVERLAY);
-
-            OreFinderRenderer.tesselateWithoutAO(renderer, level, Minecraft.getInstance().getBlockRenderer().getBlockModel(state), state, pos, matrices, vertexProvider, false, level.getRandom(), 0, 0);
-
-            matrices.popPose();
-        }
+        var data = new OreRenderData(new ArrayList<>(renderedBlocks));
+        event.getRenderState().setRenderData(ORE_DATA, data);
     }
 
+    // submit highlighted block models to renderer with see-through glow
+    public static void onSubmitGeometry(SubmitCustomGeometryEvent event) {
+        var data = event.getLevelRenderState().getRenderData(ORE_DATA);
+        if (data == null) return;
 
-    public static void tesselateWithoutAO(ModelBlockRenderer renderer, BlockAndTintGetter level, BakedModel model, BlockState state, BlockPos pos, PoseStack poseStack, VertexConsumer consumer, boolean checkSides, RandomSource random, long seed, int packedOverlay) {
-        BitSet bitSet = new BitSet(3);
-        BlockPos.MutableBlockPos mutableBlockPos = pos.mutable();
+        var level = Minecraft.getInstance().level;
+        if (level == null) return;
 
-        for (Direction direction : DIRECTIONS) {
-            random.setSeed(seed);
-            List<BakedQuad> list = model.getQuads(state, direction, random);
-            if (!list.isEmpty()) {
-                mutableBlockPos.setWithOffset(pos, direction);
-                if (!checkSides || Block.shouldRenderFace(state, level, pos, direction, mutableBlockPos)) {
-                    int i = LightTexture.FULL_BRIGHT;
-                    renderer.renderModelFaceFlat(level, state, pos, i, packedOverlay, false, poseStack, consumer, list, bitSet);
-                }
-            }
-        }
+        var modelSet = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
+        var random = level.getRandom();
+        var poseStack = event.getPoseStack();
+        var collector = event.getSubmitNodeCollector();
+        var camPos = event.getLevelRenderState().cameraRenderState.pos;
 
-        random.setSeed(seed);
-        List<BakedQuad> list2 = model.getQuads(state, null, random);
-        if (!list2.isEmpty()) {
-            int i = LightTexture.FULL_BRIGHT;
-            renderer.renderModelFaceFlat(level, state, pos, i, packedOverlay, true, poseStack, consumer, list2, bitSet);
+        for (var pos : data.blocks()) {
+            var state = level.getBlockState(pos);
+            if (state.isAir()) continue;
+
+            var model = modelSet.get(state);
+            var parts = new ArrayList<BlockStateModelPart>();
+            random.setSeed(42L);
+            model.collectParts(random, parts);
+            if (parts.isEmpty()) continue;
+
+            poseStack.pushPose();
+            // align coordinates relative to camera
+            poseStack.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);
+
+            collector.submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, NO_TINT,
+                    RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, OUTLINE_COLOR);
+
+            poseStack.popPose();
         }
 
     }

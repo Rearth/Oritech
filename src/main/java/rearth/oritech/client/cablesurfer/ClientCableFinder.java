@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 
@@ -147,7 +148,7 @@ public class ClientCableFinder {
     private record RayResult(double distSq, Vec3 hitPos) {
     }
 
-    private static RayResult raycastCable(Vec3 p1, Vec3 p2, Vec3 eyePos, Vec3 lookDir, float reach, net.minecraft.level.level.Level level) {
+    private static RayResult raycastCable(Vec3 p1, Vec3 p2, Vec3 eyePos, Vec3 lookDir, float reach, Level level) {
         double cableLength = p1.distanceTo(p2);
         int segments = Mth.clamp((int) (cableLength), 8, 128);
 

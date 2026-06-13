@@ -1,22 +1,23 @@
 package rearth.oritech.client.renderers;
 
-import com.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoItemRenderer;
-import com.geckolib.renderer.layer.AutoGlowingGeoLayer;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.geckolib.renderer.base.GeoRenderState;
+import com.geckolib.renderer.base.RenderPassInfo;
+import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
 import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
 import rearth.oritech.client.renderers.models.PortableLaserModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
@@ -25,36 +26,39 @@ import static rearth.oritech.client.renderers.blocks.LaserArmRenderer.BEAM_TEXTU
 
 public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
+    // captured during extraction, consumed during submission
+    public static final DataTicket<LaserBeamData> BEAM_DATA = DataTicket.create("portable_laser_beam_data", LaserBeamData.class);
+
+    public record LaserBeamData(Vec3 startOffset, Vec3 deltaVec, float thickness) {}
+
     public PortableLaserRenderer(String modelName) {
         super(new PortableLaserModel(Oritech.id("models/" + modelName)));
-        addRenderLayer(new AutoGlowingGeoLayer<>(this));
+        withRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
 
+    // extract beam parameters while tool is fired in first person
     @Override
-    public void postRender(PoseStack matrices, PortableLaserItem animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
-        super.postRender(matrices, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
+    public void addRenderData(PortableLaserItem animatable, @Nullable RenderData relatedObject, GeoRenderState renderState, float partialTick) {
+        super.addRenderData(animatable, relatedObject, renderState, partialTick);
 
+        if (relatedObject == null) return;
+        if (!relatedObject.renderPerspective().firstPerson()) return;
 
         var client = Minecraft.getInstance();
         var player = client.player;
-
-        if (player == null) return;
-
-        var heldStack = client.player.getMainHandItem();
         var level = client.level;
+        if (player == null || level == null) return;
 
-        if (isReRender || !this.renderPerspective.firstPerson()) return;
+        var heldStack = relatedObject.itemStack();
 
         var singleShotAge = level.getGameTime() - PortableLaserItem.lastSingleShot;
-
         if (!OritechClient.laserActive && singleShotAge > 10) return;
 
-        if (!heldStack.getItem().equals(ToolsContent.PORTABLE_LASER)) return;
-        if (animatable.getStoredEnergy(heldStack) < OritechStartupConfig.portableLaserConfig.energyPerTick.get())
+        if (!heldStack.is(ToolsContent.PORTABLE_LASER)) return;
+        if (animatable.getStoredEnergy(heldStack, ItemAccess.forStack(heldStack)) < OritechStartupConfig.portableLaserConfig.energyPerTick.get())
             return;
 
-        // at this point we know a laser is held and fired
-
+        // target calculations
         var startPos = player.getEyePosition();
         var lookVec = player.getViewVector(0F);
         var endPos = startPos.add(lookVec.scale(128));
@@ -65,33 +69,39 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
         var dist = (float) endPos.distanceTo(startPos);
 
-        matrices.pushPose();
-
         var localStart = new Vec3(0, 0.05, 0);
-
         var deltaVec = new Vec3(0, 0, -dist);
-
-        var beamConsumer = bufferSource.getBuffer(RenderType.eyes(BEAM_TEXTURE));
-
         float baseThickness = (float) (0.03f + Math.sin((level.getGameTime() + partialTick) * 1.1f) * 0.01f);
 
-        BeamRenderer.renderStraightBeam(
-                matrices, beamConsumer, localStart, deltaVec,
-                baseThickness * 0.3f,
-                LightTexture.FULL_BRIGHT,
-                LaserArmRenderer.CORE_COLOR_START,
-                LaserArmRenderer.CORE_COLOR_END
-        );
+        renderState.addGeckolibData(BEAM_DATA, new LaserBeamData(localStart, deltaVec, baseThickness));
+    }
 
-        BeamRenderer.renderStraightBeam(
-                matrices, beamConsumer, localStart, deltaVec,
-                baseThickness,
-                LightTexture.FULL_BRIGHT,
-                LaserArmRenderer.GLOW_COLOR_START,
-                LaserArmRenderer.GLOW_COLOR_END
-        );
+    // submit straight beam geometry to renderer
+    @Override
+    public void postRenderPass(RenderPassInfo<GeoRenderState> renderPassInfo, SubmitNodeCollector renderTasks) {
+        super.postRenderPass(renderPassInfo, renderTasks);
 
-        matrices.popPose();
+        var data = renderPassInfo.getGeckolibData(BEAM_DATA);
+        if (data == null) return;
 
+        renderTasks.submitCustomGeometry(renderPassInfo.poseStack(), RenderTypes.eyes(BEAM_TEXTURE), (pose, consumer) -> {
+            // core
+            BeamRenderer.renderStraightBeam(
+                    pose, consumer, data.startOffset(), data.deltaVec(),
+                    data.thickness() * 0.3f,
+                    RenderHelpers.FULL_BRIGHT,
+                    LaserArmRenderer.CORE_COLOR_START,
+                    LaserArmRenderer.CORE_COLOR_END
+            );
+
+            // outer glow
+            BeamRenderer.renderStraightBeam(
+                    pose, consumer, data.startOffset(), data.deltaVec(),
+                    data.thickness(),
+                    RenderHelpers.FULL_BRIGHT,
+                    LaserArmRenderer.GLOW_COLOR_START,
+                    LaserArmRenderer.GLOW_COLOR_END
+            );
+        });
     }
 }

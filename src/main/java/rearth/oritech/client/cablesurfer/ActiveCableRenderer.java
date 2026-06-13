@@ -4,42 +4,64 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.blocks.PowerPoleCableRenderer;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 
 public class ActiveCableRenderer {
 
-    public static void render(PoseStack poseStack, MultiBufferSource bufferSource) {
-        var mc = Minecraft.getInstance();
-        var player = mc.player;
-        if (player != null && !ClientZiplineHandler.isZiplining(player)) return;
+    // similar to geckolibs data tickets
+    public static final ContextKey<CableRenderData> CABLE_DATA = new ContextKey<>(Oritech.id("zipline_cable"));
 
-        Vec3 camPos = mc.gameRenderer.getMainCamera().getPosition();
+    // everything is in world space
+    public record CableRenderData(Vec3 start, Vec3 end, Vec3 parallelStart, Vec3 parallelEnd, Vec3 cameraPos) {}
 
-        Vec3 start = ClientZiplineHandler.getStartPos();
-        Vec3 end = ClientZiplineHandler.getEndPos();
+    // Extraction phase: capture the current zipline state into the level render state.
+    public static void onExtractRenderState(ExtractLevelRenderStateEvent event) {
+        var player = Minecraft.getInstance().player;
+        if (player == null || !ClientZiplineHandler.isZiplining(player)) return;
 
-        // Get Parallel
-        Vec3 parStart = ClientZiplineHandler.getParallelStart();
-        Vec3 parEnd = ClientZiplineHandler.getParallelEnd();
-
+        var start = ClientZiplineHandler.getStartPos();
+        var end = ClientZiplineHandler.getEndPos();
         if (start == null || end == null) return;
 
-        var consumer = bufferSource.getBuffer(RenderType.entitySolid(PowerPoleCableRenderer.CABLE_TEXTURE));
+        var camPos = event.getCamera().position();
+        var data = new CableRenderData(start, end, ClientZiplineHandler.getParallelStart(), ClientZiplineHandler.getParallelEnd(), camPos);
 
-        renderHangingCable(poseStack, consumer, start.subtract(camPos), end.subtract(camPos), 0.048f);
+        event.getRenderState().setRenderData(CABLE_DATA, data);
+    }
 
-        if (parStart != null && parEnd != null) {
-            renderHangingCable(poseStack, consumer, parStart.subtract(camPos), parEnd.subtract(camPos), 0.048f);
-        }
+    // actual rendering submission
+    public static void onSubmitGeometry(SubmitCustomGeometryEvent event) {
+        var data = event.getLevelRenderState().getRenderData(CABLE_DATA);
+        if (data == null) return;
+
+        var camPos = data.cameraPos();
+        var start = data.start().subtract(camPos);
+        var end = data.end().subtract(camPos);
+
+        event.getSubmitNodeCollector().submitCustomGeometry(event.getPoseStack(), RenderTypes.entitySolid(PowerPoleCableRenderer.CABLE_TEXTURE), (pose, buffer) -> {
+
+            var poseStack = new PoseStack();
+            poseStack.last().pose().set(pose.pose());
+            poseStack.last().normal().set(pose.normal());
+
+            renderHangingCable(poseStack, buffer, start, end, 0.048f);
+
+            if (data.parallelStart() != null && data.parallelEnd() != null) {
+                renderHangingCable(poseStack, buffer, data.parallelStart().subtract(camPos), data.parallelEnd().subtract(camPos), 0.048f);
+            }
+        });
     }
 
     private static void renderHangingCable(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 endPos, float thickness) {
@@ -85,7 +107,7 @@ public class ActiveCableRenderer {
         float length = (float) delta.length() * 1.02f; // Slight overlap
         float r = thickness;
 
-        int light = LightTexture.FULL_BRIGHT;
+        int light = RenderHelpers.FULL_BRIGHT;
 
         Matrix4f pose = poseStack.last().pose();
         Matrix3f normal = poseStack.last().normal(); // Critical for rotating lighting

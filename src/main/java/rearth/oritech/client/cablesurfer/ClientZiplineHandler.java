@@ -8,9 +8,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
-import rearth.oritech.api.attachment.AttachmentApi;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.init.AttachmentContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
 
@@ -50,7 +50,7 @@ public class ClientZiplineHandler {
     }
 
     public static boolean isZiplining(Player player) {
-        return AttachmentApi.getAttachmentValue(player, ServerZiplineHandler.ZIPLINING_STATE);
+        return player.getData(AttachmentContent.ZIPLINING_STATE);
     }
 
     public static void start(Vec3 start, Vec3 end, Vec3 parStart, Vec3 parEnd, float initialSpeed) {
@@ -122,16 +122,16 @@ public class ClientZiplineHandler {
             return;
         }
 
-        PacketDistributor.sendToServer(new ServerZiplineHandler.ZiplinePlayerUsePacket());
+        ClientPacketDistributor.sendToServer(new ServerZiplineHandler.ZiplinePlayerUsePacket());
 
         // Shift -> Drop
-        if (player.input.shiftKeyDown) {
+        if (player.isShiftKeyDown()) {
             dismount(false);
             return;
         }
 
         // Space -> Jump Off
-        if (player.input.jumping) {
+        if (player.isJumping()) {
             dismount(true);
             return;
         }
@@ -151,11 +151,11 @@ public class ClientZiplineHandler {
         var acceleration = OritechClientConfig.ziplineAcceleration.get().floatValue();
 
         // W -> Accelerate
-        if (player.input.up) {
+        if (player.input.hasForwardImpulse()) {
             currentSpeed += acceleration * directionMultiplier;
         }
-        // S -> Brake / Reverse
-        else if (player.input.down) {
+        // S -> Reverse
+        else if (player.input.getMoveVector().y < 0.1) {
             currentSpeed -= acceleration * directionMultiplier;
         }
 
@@ -256,7 +256,7 @@ public class ClientZiplineHandler {
             }
 
             var gustPos = player.getPosition(0);
-            var random = player.level().random;
+            var random = player.level().getRandom();
             var gustVel = player.getDeltaMovement();
             player.level().addParticle(
                     ParticleTypes.GUST,

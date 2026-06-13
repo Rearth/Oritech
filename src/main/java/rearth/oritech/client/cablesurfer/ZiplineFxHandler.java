@@ -54,7 +54,7 @@ public class ZiplineFxHandler {
     }
 
     private static void spawnParticles(Player player) {
-        var random = player.level().random;
+        var random = player.level().getRandom();
         var speed = player.getDeltaMovement().length();
 
         if (speed < 0.1) return;
