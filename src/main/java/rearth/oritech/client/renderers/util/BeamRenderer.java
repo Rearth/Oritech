@@ -21,17 +21,26 @@ public class BeamRenderer {
      * The beam is rotated to align with the vector provided.
      * <p>
      * The beam gradient is interpolated along the Y-axis of the model (length).
+     * <p>
+     * Designed for the NeoForge 26.1+ submit pipeline (see {@code SubmitNodeCollector#submitCustomGeometry}):
+     * the deferred {@link com.mojang.blaze3d.vertex.PoseStack.Pose} snapshot and the {@link VertexConsumer} are
+     * provided in a callback. A local {@link PoseStack} is rebuilt from that snapshot so the alignment math can be
+     * done with the usual stack operations.
      *
-     * @param poseStack   The matrix stack used for rendering.
+     * @param snapshot    The pose snapshot captured at submit time (e.g. the block-entity render origin).
      * @param consumer    The vertex consumer (buffer) to draw vertices into.
-     * @param startPos    The starting position of the beam relative to the current PoseStack origin.
+     * @param startPos    The starting position of the beam relative to the snapshot origin.
      * @param delta       The vector defining the direction and length of the beam (EndPos - StartPos).
      * @param thickness   The radius (half-width) of the beam.
      * @param packedLight The light value to render with (usually {@code LightTexture.FULL_BRIGHT} for glowing).
      * @param startColor  The ARGB color integer for the start of the beam (e.g. 0xB4FF0000).
      * @param endColor    The ARGB color integer for the end of the beam.
      */
-    public static void renderStraightBeam(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 delta, float thickness, int packedLight, int startColor, int endColor) {
+    public static void renderStraightBeam(PoseStack.Pose snapshot, VertexConsumer consumer, Vec3 startPos, Vec3 delta, float thickness, int packedLight, int startColor, int endColor) {
+        var poseStack = new PoseStack();
+        poseStack.last().pose().set(snapshot.pose());
+        poseStack.last().normal().set(snapshot.normal());
+
         poseStack.pushPose();
 
         // Translate to the start of the beam

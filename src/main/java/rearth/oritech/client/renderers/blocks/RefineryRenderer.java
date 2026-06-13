@@ -1,64 +1,99 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
-import com.geckolib.cache.object.BakedGeoModel;
+import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.core.Direction;
+import com.geckolib.renderer.base.GeoRenderState;
+import com.geckolib.renderer.base.RenderPassInfo;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
+import rearth.oritech.client.renderers.blocks.SmallTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.models.MachineModel;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> extends GeoBlockRenderer<T> {
+public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<T, R> {
 
+    public static final DataTicket<RefineryFluidData> FLUID_DATA = DataTicket.create("refinery_fluids", RefineryFluidData.class);
+
+    // smoothed fill heights, keyed by block position (per-block-entity animation state)
     private final Map<Long, VisualTankHeights> tankHeights = new HashMap<>();
 
-    public RefineryRenderer(String model) {
-        super(new MachineModel<>(model));
+    public RefineryRenderer(BlockEntityRendererProvider.Context context, String model) {
+        super(context, new MachineModel<>(model));
     }
 
-    // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available in common, we just declare the methode without\
-    // the override annotation
+    // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available
+    // in common, we just declare the method without the override annotation
     public AABB getRenderBoundingBox(T blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 6, 6);
     }
 
+    // extract phase: resolve all fluid cubes and ship them to the render state via the GeckoLib DataTicket
     @Override
-    public void postRender(PoseStack poseStack, T animatable, BakedGeoModel model, MultiBufferSource bufferSource, @Nullable VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, int colour) {
-        super.postRender(poseStack, animatable, model, bufferSource, buffer, isReRender, partialTick, packedLight, packedOverlay, colour);
-
-        var consumer = bufferSource.getBuffer(RenderType.translucent());
-        // consumer = buffer;
+    public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
 
         var lastHeight = tankHeights.computeIfAbsent(animatable.getBlockPos().asLong(), key -> new VisualTankHeights());
+        var cubes = new ArrayList<FluidCube>();
 
         var inputStack = animatable.ownStorage.getInStack();
         if (!inputStack.isEmpty()) {
-            // render in stack
-            renderFluidCube(new Vector3f(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f), inputStack, animatable.ownStorage.getCapacity(), consumer, poseStack, packedLight, packedOverlay, -1, lastHeight);
+            cubes.add(buildCube(new Vector3f(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 25 / 16f, 28 / 16f), inputStack, animatable.ownStorage.getCapacity(), -1, lastHeight));
         }
 
         var moduleCount = animatable.getModuleCount();
         for (int i = 0; i <= moduleCount; i++) {
             var renderedStack = animatable.getOutputFluid(i);
             if (renderedStack.isEmpty()) continue;
-            // render storage
 
             var tankPosition = getTankCoordinates(i);
-            renderFluidCube(tankPosition.getA(), tankPosition.getB(), renderedStack, animatable.getOutputCapacity(i), consumer, poseStack, packedLight, packedOverlay, i, lastHeight);
+            cubes.add(buildCube(tankPosition.getA(), tankPosition.getB(), renderedStack, animatable.getOutputCapacity(i), i, lastHeight));
         }
 
+        if (!cubes.isEmpty()) renderState.addGeckolibData(FLUID_DATA, new RefineryFluidData(cubes));
+    }
+
+    // submit phase: draw the previously resolved fluid cubes through the submit pipeline
+    @Override
+    public void postRenderPass(RenderPassInfo<R> renderPassInfo, SubmitNodeCollector renderTasks) {
+
+        var data = renderPassInfo.getGeckolibData(FLUID_DATA);
+        if (data == null) return;
+
+        SmallTankRenderer.submitFluidCubes(renderTasks, renderPassInfo.poseStack(), data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+    }
+
+    private FluidCube buildCube(Vector3f min, Vector3f size, FluidStack drawnStack, long tankCapacity, int index, VisualTankHeights lastHeight) {
+        var fluid = drawnStack.getFluid();
+        var fill = drawnStack.getAmount() / (float) tankCapacity;
+
+        // smooth the fill change to avoid visual snapping
+        var lastFill = index == -1 ? lastHeight.input : lastHeight.outputs[index];
+        var newFill = Mth.lerp(0.003f, lastFill, fill);
+        if (index == -1) {
+            lastHeight.input = newFill;
+        } else {
+            lastHeight.outputs[index] = newFill;
+        }
+
+        var sprite = RenderHelpers.getFluidSprite(fluid);
+        var color = ColorHelper.makeOpaque(ColorHelper.getFluidTint(drawnStack));
+
+        return new FluidCube(min, size, newFill, sprite, color, null);
     }
 
     private static Tuple<Vector3f, Vector3f> getTankCoordinates(int i) {
@@ -73,35 +108,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         };
     }
 
-    private static void renderFluidCube(Vector3f min, Vector3f size, FluidStack drawnStack, Long tankCapacity, VertexConsumer consumer, PoseStack matrices, int light, int overlay, int index, VisualTankHeights lastHeight) {
-        var fluid = drawnStack.getFluid();
-        var fill = drawnStack.getAmount() / (float) tankCapacity;
-
-        var lastFill = index == -1 ? lastHeight.input : lastHeight.outputs[index];
-        var newFill = Mth.lerp(0.003f, lastFill, fill);
-        if (index == -1) {
-            lastHeight.input = newFill;
-        } else {
-            lastHeight.outputs[index] = newFill;
-        }
-
-        var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
-
-        matrices.pushPose();
-        matrices.translate(min.x + 0.01f, min.y + 0.01f, min.z + 0.01f);
-        matrices.scale(size.x - 0.02f, size.y * newFill - 0.03f, size.z - 0.02f);
-
-        var entry = matrices.last();
-        var modelMatrix = entry.pose();
-
-        // Draw the cube using quads
-        for (var direction : Direction.values()) {
-            if (direction.equals(Direction.DOWN)) continue; // skip bottom, as it's never visible
-            SmallTankRenderer.drawQuad(direction, consumer, modelMatrix, entry, sprite, spriteColor, light, overlay);
-        }
-
-        matrices.popPose();
+    public record RefineryFluidData(List<FluidCube> cubes) {
     }
 
     private static class VisualTankHeights {

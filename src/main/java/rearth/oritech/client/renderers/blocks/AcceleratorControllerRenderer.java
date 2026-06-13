@@ -1,94 +1,108 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
-public class AcceleratorControllerRenderer implements BlockEntityRenderer<AcceleratorControllerBlockEntity> {
+public class AcceleratorControllerRenderer implements BlockEntityRenderer<AcceleratorControllerBlockEntity, AcceleratorControllerRenderer.ParticleRenderState> {
 
-    private record RenderedLine(float startedAt, List<Vec3> positions) {
-    }
-
-    private final Map<Long, RenderedLine> activeLines = new HashMap<>();
-
-    @Override
-    public int getViewDistance() {
-        return 128;
+    public AcceleratorControllerRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public boolean shouldRenderOffScreen(AcceleratorControllerBlockEntity blockEntity) {
+    public ParticleRenderState createRenderState() {
+        return new ParticleRenderState();
+    }
+
+    @Override
+    public void extractRenderState(AcceleratorControllerBlockEntity entity, ParticleRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, partialTicks, cameraPosition, breakProgress);
+
+        var line = entity.displayTrail;
+
+        // nothing to render this frame
+        if (line == null || line.size() < 2) {
+            state.particleLine = List.of();
+            return;
+        }
+
+        // spawn a particle at the head of the trail
+        var level = entity.getLevel();
+        var head = line.getLast();
+        level.addParticle(ParticleTypes.REVERSE_PORTAL,
+                head.x + (level.getRandom().nextDouble() - 0.5) * 0.4,
+                head.y + (level.getRandom().nextDouble() - 0.5) * 0.6,
+                head.z + (level.getRandom().nextDouble() - 0.5) * 0.4,
+                0, 0, 0);
+
+        state.particleLine = new ArrayList<>(line);
+    }
+
+    @Override
+    public void submit(ParticleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
+
+        var line = state.particleLine;
+        if (line == null || line.size() < 2) return;
+
+        // convert world to local space
+        var origin = Vec3.atLowerCornerOf(state.blockPos);
+        var baseThickness = 0.07f;
+        var beamType = RenderTypes.eyes(LaserArmRenderer.BEAM_TEXTURE);
+
+        // submit trail as custom geometry
+        collector.submitCustomGeometry(poseStack, beamType, (pose, consumer) -> {
+            for (int i = 0; i < line.size() - 1; i++) {
+                var startLocal = line.get(i).subtract(origin);
+                var delta = line.get(i + 1).subtract(line.get(i));
+
+                // glowing core
+                BeamRenderer.renderStraightBeam(
+                        pose, consumer, startLocal, delta,
+                        baseThickness * 0.3f,
+                        RenderHelpers.FULL_BRIGHT,
+                        LaserArmRenderer.CORE_COLOR_START,
+                        LaserArmRenderer.CORE_COLOR_START
+                );
+
+                // outer glow
+                BeamRenderer.renderStraightBeam(
+                        pose, consumer, startLocal, delta,
+                        baseThickness,
+                        RenderHelpers.FULL_BRIGHT,
+                        LaserArmRenderer.GLOW_COLOR_START,
+                        LaserArmRenderer.GLOW_COLOR_START
+                );
+            }
+        });
+    }
+
+    @Override
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
     @Override
-    public void render(AcceleratorControllerBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-
-        if (entity.displayTrail == null) {
-            activeLines.remove(entity.getBlockPos().asLong());
-            return;
-        }
-
-        var time = entity.getLevel().getGameTime() + tickDelta;
-
-        // try adding new tail to lines
-        var displayTrail = entity.displayTrail;
-        if (!activeLines.containsKey(entity.getBlockPos().asLong()) || !activeLines.get(entity.getBlockPos().asLong()).positions.equals(displayTrail)) {
-            activeLines.put(entity.getBlockPos().asLong(), new RenderedLine(time, displayTrail));
-            var level = entity.getLevel();
-            var pp = displayTrail.getLast();
-            level.addParticle(ParticleTypes.REVERSE_PORTAL, pp.x + (level.getRandom().nextDouble() - 0.5) * 0.4, pp.y + (level.getRandom().nextDouble() - 0.5) * 0.6, pp.z + (level.getRandom().nextDouble() - 0.5) * 0.4, 0, 0, 0);
-        }
-
-        var activeLine = activeLines.get(entity.getBlockPos().asLong());
-        var line = activeLine.positions;
-        var age = time - activeLine.startedAt;
-        if (age >= 60) {
-            if (entity.displayTrail.equals(activeLine.positions)) entity.displayTrail = null;
-        }
-
-        var bePos = Vec3.atLowerCornerOf(entity.getBlockPos());
-        var baseThickness = 0.07f;
-        var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
-
-        for (int i = 0; i < line.size() - 1; i++) {
-            var pointCurrent = line.get(i);
-            var pointNext = line.get(i + 1);
-
-            // to local space
-            var startLocal = pointCurrent.subtract(bePos);
-            var endLocal = pointNext.subtract(bePos);
-
-            Vec3 delta = endLocal.subtract(startLocal);
-
-            BeamRenderer.renderStraightBeam(
-                    matrices, beamConsumer, startLocal, delta,
-                    baseThickness * 0.3f,
-                    LightTexture.FULL_BRIGHT,
-                    LaserArmRenderer.CORE_COLOR_START,
-                    LaserArmRenderer.CORE_COLOR_START
-            );
-
-            // render glow
-            BeamRenderer.renderStraightBeam(
-                    matrices, beamConsumer, startLocal, delta,
-                    baseThickness,
-                    LightTexture.FULL_BRIGHT,
-                    LaserArmRenderer.GLOW_COLOR_START,
-                    LaserArmRenderer.GLOW_COLOR_START
-            );
-        }
-
+    public int getViewDistance() {
+        return 256;
     }
+
+    public static class ParticleRenderState extends BlockEntityRenderState {
+        public List<Vec3> particleLine = new ArrayList<>();
+    }
+
 }
