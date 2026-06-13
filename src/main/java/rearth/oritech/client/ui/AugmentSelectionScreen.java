@@ -207,7 +207,7 @@ public class AugmentSelectionScreen extends Screen {
     }
 
     private void toggleAugment(Identifier id) {
-        PacketDistributor.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
+        ClientPacketDistributor.sendToServer(new PlayerAugments.AugmentPlayerTogglePacket(id));
     }
 
     @Override

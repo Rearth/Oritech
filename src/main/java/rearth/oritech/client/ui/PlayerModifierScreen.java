@@ -329,11 +329,11 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
             return;
         }
 
-        PacketDistributor.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.menu.blockPos, id, operation.ordinal()));
+        ClientPacketDistributor.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.menu.blockPos, id, operation.ordinal()));
     }
 
     private void onLoadAugmentsClick() {
-        PacketDistributor.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
+        ClientPacketDistributor.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
 
         int loadedAugmentsCount = 0;
         for (var entry : PlayerAugments.getAllAugments(registryAccess()).entrySet()) {
@@ -352,7 +352,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
 
     private void onOpenInvClicked() {
         this.onClose();
-        PacketDistributor.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.menu.blockPos));
+        ClientPacketDistributor.sendToServer(new PlayerAugments.OpenAugmentScreenPacket(this.menu.blockPos));
     }
 
     private void showAugmentDialog(Identifier id, PlayerAugments.AugmentApplicatorOperation operation) {

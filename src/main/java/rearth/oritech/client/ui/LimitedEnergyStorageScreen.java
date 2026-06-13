@@ -43,7 +43,7 @@ public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnerg
     }
 
     private void onSliderDragged(SliderWidget slider, int value) {
-        PacketDistributor.sendToServer(new ExpandableEnergyStorageBlockEntity.StorageLimitPacket(menu.blockPos, value));
+        ClientPacketDistributor.sendToServer(new ExpandableEnergyStorageBlockEntity.StorageLimitPacket(menu.blockPos, value));
     }
 
     // basically generates multiples of 2 and 5 that can be selected from

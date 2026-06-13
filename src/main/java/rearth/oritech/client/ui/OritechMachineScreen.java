@@ -95,7 +95,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         if (menu.screenData.inputOptionsEnabled() && inputSlots > 1) {
             cycleInputButton = ButtonWidget.panel(1, 0, 58, 14,
                             Component.translatable("button.oritech.input_mode_fill_matching_recipe").withColor(LabelWidget.DARK_TEXT),
-                            btn -> PacketDistributor.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos)))
+                            btn -> ClientPacketDistributor.sendToServer(new MachineBlockEntity.InventoryInputModeSelectorPacket(menu.blockPos)))
                     .withTextColor(LabelWidget.DARK_TEXT);
             cycleInputButton.withSurfacePadding(Insets.of(2, 1, 3, 1));
             content.add(cycleInputButton);

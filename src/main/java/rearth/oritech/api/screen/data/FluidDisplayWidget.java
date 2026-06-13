@@ -68,7 +68,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
                                 mouseY
                         );
                     }
-                    PacketDistributor.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
+                    ClientPacketDistributor.sendToServer(new OritechScreenHandler.FluidContainerInteractionPacket(blockPos, tankIndex, extract));
                     return true;
                 }
             }

@@ -106,7 +106,7 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
     }
 
     private void sendUpdateToServer() {
-        PacketDistributor.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(menu.blockPos, menu.blockEntity.getFilterSettings()));
+        ClientPacketDistributor.sendToServer(new ItemFilterBlockEntity.ItemFilterPayload(menu.blockPos, menu.blockEntity.getFilterSettings()));
     }
 
     private void toggleWhitelist() {

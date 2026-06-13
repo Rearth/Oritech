@@ -167,7 +167,6 @@ public class DronePortEntity extends NetworkedBlockEntity
 
         cardInventory.getItems().set(1, source);
         cardInventory.getItems().set(0, ItemStack.EMPTY);
-        card.setChanged();
         this.setChanged();
 
     }

@@ -66,6 +66,6 @@ public class ShrinkerScreen extends UpgradableOritechScreen<UpgradableOritechScr
     }
 
     private void onShrinkPressed() {
-        PacketDistributor.sendToServer(new ShrinkerBlockEntity.ShrinkerPlayerUsePacket(this.menu.blockPos));
+        ClientPacketDistributor.sendToServer(new ShrinkerBlockEntity.ShrinkerPlayerUsePacket(this.menu.blockPos));
     }
 }
