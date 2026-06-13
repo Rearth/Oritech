@@ -3,28 +3,39 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.BlockModelResolver;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.init.BlockContent;
 
-public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity> {
+public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity, MachineGantryRenderer.GantryRenderState> {
 
-    private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.defaultBlockState();
+    private static final BlockState renderedBeam = BlockContent.FRAME_GANTRY_ARM.get().defaultBlockState();
     private static final float BEAM_DEPTH = 3 / 16f;
     private static final RandomSource renderRandom = RandomSource.create(100);
+
+    public MachineGantryRenderer(BlockEntityRendererProvider.Context context) {
+    }
 
     @Override
     public int getViewDistance() {
@@ -32,20 +43,28 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
     }
 
     @Override
-    public boolean shouldRenderOffScreen(FrameInteractionBlockEntity blockEntity) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
     @Override
-    public void render(FrameInteractionBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+    public GantryRenderState createRenderState() {
+        return new GantryRenderState();
+    }
+
+    @Override
+    public void extractRenderState(FrameInteractionBlockEntity entity, GantryRenderState gState, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(entity, gState, partialTick, cameraPosition, breakProgress);
 
         var state = entity.getBlockState();
-        if (!state.getValue(FrameInteractionBlock.HAS_FRAME) || entity.getAreaMin() == null || entity.getLastTarget() == null)
+        if (!state.getValue(FrameInteractionBlock.HAS_FRAME) || entity.getAreaMin() == null || entity.getLastTarget() == null) {
+            gState.hasArea = false;
             return;
+        }
+        gState.hasArea = true;
 
         var currentTarget = entity.getCurrentTarget();
         var renderedPosition = Vec3.atLowerCornerOf(currentTarget);
-
         var movingOffset = new Vec3(0, 0, 0);
 
         if (entity.isMoving()) {
@@ -60,110 +79,132 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             movingOffset = new Vec3(0, offsetY, 0);
         }
 
-
         renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
         entity.lastRenderedPosition = renderedPosition;
-        var targetOffset = renderedPosition.subtract(Vec3.atLowerCornerOf(entity.getBlockPos())).add(movingOffset);
 
-        matrices.pushPose();
-        matrices.translate(targetOffset.x(), targetOffset.y(), targetOffset.z());
+        gState.targetOffset = renderedPosition.subtract(Vec3.atLowerCornerOf(entity.getBlockPos())).add(movingOffset);
+        gState.machineHead = entity.getMachineHead();
 
-        var pos = entity.getCurrentTarget(); // relevant for correct lighting, actual rendered position is determined by matrix
-        int lightAtHead = LevelRenderer.getLightColor(entity.getLevel(), currentTarget);
-        var renderer = Minecraft.getInstance().getBlockRenderer();
+        var mc = Minecraft.getInstance();
+        var resolver = new BlockModelResolver(mc.getModelManager());
 
-        renderer.renderSingleBlock(
-                entity.getMachineHead(),
-                matrices,
-                vertexConsumers,
-                lightAtHead,
-                overlay);
+        // resolve the head block model state
+        resolver.update(gState.headBlockState, gState.machineHead, BlockDisplayContext.create());
 
-        matrices.popPose();
+        gState.armLength = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 2 - BEAM_DEPTH * 2f;
+        gState.armTarget = new Vec3(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
 
-        var length = entity.getAreaMax().getX() - entity.getAreaMin().getX() + 2 - BEAM_DEPTH * 2f;
-        var target = new Vec3(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
-
-
-        matrices.pushPose();
-
-        matrices.translate(target.x(), target.y(), target.z());
-        matrices.scale(length, 1, 1);
-
-        renderer.renderSingleBlock(
-                renderedBeam,
-                matrices,
-                vertexConsumers,
-                lightAtHead,
-                overlay);
-
-        matrices.popPose();
+        // resolve the arm block model state
+        resolver.update(gState.armBlockState, renderedBeam, BlockDisplayContext.create());
 
         var renderedItem = entity.getToolheadAdditionalRender();
         if (renderedItem != null) {
-            matrices.pushPose();
-            matrices.translate(targetOffset.x() + 0.4, targetOffset.y(), targetOffset.z() + 0.4);
-            matrices.mulPose(Axis.YP.rotationDegrees(30));
-            // matrices.scale(0.3f, 0.3f, 0.3f);
-
-            Minecraft.getInstance().getItemRenderer().renderStatic(
-                    renderedItem,
-                    ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
-                    light,
-                    OverlayTexture.NO_OVERLAY,
-                    matrices,
-                    vertexConsumers,
-                    entity.getLevel(),
-                    0
-            );
-
-            matrices.popPose();
+            gState.hasToolhead = true;
+            mc.getItemModelResolver().updateForTopItem(gState.toolheadState, renderedItem, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND, entity.getLevel(), null, 0);
+        } else {
+            gState.hasToolhead = false;
         }
 
         if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1) && !destroyerBlock.quarryTarget.equals(BlockPos.ZERO)) {
+            gState.isDestroyerQuarry = true;
+            var pos = currentTarget;
+            gState.destroyerBeamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
+            gState.destroyerBeamOffset = gState.targetOffset.add(0, -1, 0);
 
-            var beamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
-
-            var beamRing = BlockContent.QUARRY_BEAM_RING.defaultBlockState();
-
-            var offset = targetOffset.add(0, -1, 0);
-
-            var beamConsumer = vertexConsumers.getBuffer(RenderType.eyes(LaserArmRenderer.BEAM_TEXTURE));
             var baseThickness = 0.035f;
-            var thickness = (float) (baseThickness * 2 + Math.sin((entity.getLevel().getGameTime() + tickDelta) * 0.54) * 0.02f);
+            gState.thickness = (float) (baseThickness * 2 + Math.sin((entity.getLevel().getGameTime() + partialTick) * 0.54) * 0.02f);
+            gState.ringHeightSine = (float) Math.sin((entity.getLevel().getGameTime() + partialTick) / 4f);
 
-            BeamRenderer.renderStraightBeam(
-                    matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
-                    baseThickness,
-                    LightTexture.FULL_BRIGHT,
-                    LaserArmRenderer.CORE_COLOR_START,
-                    LaserArmRenderer.CORE_COLOR_END
-            );
+            var beamRing = BlockContent.QUARRY_BEAM_RING.get().defaultBlockState();
+            resolver.update(gState.ringBlockState, beamRing, BlockDisplayContext.create());
+        } else {
+            gState.isDestroyerQuarry = false;
+        }
+    }
 
-            // render glow
-            BeamRenderer.renderStraightBeam(
-                    matrices, beamConsumer, offset.add(0.5, 1, 0.5), new Vec3(0, -beamHeight - 1, 0),
-                    thickness,
-                    LightTexture.FULL_BRIGHT,
-                    LaserArmRenderer.GLOW_COLOR_START,
-                    LaserArmRenderer.GLOW_COLOR_END
-            );
+    @Override
+    public void submit(GantryRenderState state, PoseStack matrices, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
+        if (!state.hasArea) return;
+
+        // 1. Submit Machine Head
+        matrices.pushPose();
+        matrices.translate(state.targetOffset.x(), state.targetOffset.y(), state.targetOffset.z());
+        state.headBlockState.submit(matrices, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        matrices.popPose();
+
+        // 2. Submit Gantry Arm
+        matrices.pushPose();
+        matrices.translate(state.armTarget.x(), state.armTarget.y(), state.armTarget.z());
+        matrices.scale(state.armLength, 1, 1);
+        state.armBlockState.submit(matrices, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        matrices.popPose();
+
+        // 3. Submit Toolhead Item
+        if (state.hasToolhead) {
+            matrices.pushPose();
+            matrices.translate(state.targetOffset.x() + 0.4, state.targetOffset.y(), state.targetOffset.z() + 0.4);
+            matrices.mulPose(Axis.YP.rotationDegrees(30));
+            state.toolheadState.submit(matrices, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            matrices.popPose();
+        }
+
+        // 4. Submit Destroyer Quarry Beam
+        if (state.isDestroyerQuarry) {
+            var offset = state.destroyerBeamOffset;
+            var baseThickness = 0.035f;
+
+            var beamTexture = LaserArmRenderer.BEAM_TEXTURE;
+            var renderType = RenderTypes.eyes(beamTexture);
+
+            collector.submitCustomGeometry(matrices, renderType, (pose, consumer) -> {
+                // inner core
+                BeamRenderer.renderStraightBeam(
+                        pose, consumer, offset.add(0.5, 1, 0.5), new Vec3(0, -state.destroyerBeamHeight - 1, 0),
+                        baseThickness,
+                        RenderHelpers.FULL_BRIGHT,
+                        LaserArmRenderer.CORE_COLOR_START,
+                        LaserArmRenderer.CORE_COLOR_END
+                );
+
+                // render glow overlay
+                BeamRenderer.renderStraightBeam(
+                        pose, consumer, offset.add(0.5, 1, 0.5), new Vec3(0, -state.destroyerBeamHeight - 1, 0),
+                        state.thickness,
+                        RenderHelpers.FULL_BRIGHT,
+                        LaserArmRenderer.GLOW_COLOR_START,
+                        LaserArmRenderer.GLOW_COLOR_END
+                );
+            });
 
             // beam ring
             matrices.pushPose();
-            var ringHeight = Math.sin((entity.getLevel().getGameTime() + tickDelta) / 4f);
-            var heightOffset = beamHeight * 0.5 * ringHeight + beamHeight * 0.5;
+            var ringHeight = Math.sin(Minecraft.getInstance().level.getGameTime() / 4.0);
+            var heightOffset = state.destroyerBeamHeight * 0.5 * ringHeight + state.destroyerBeamHeight * 0.5;
             matrices.translate(offset.x(), offset.y() - heightOffset + 1, offset.z());
-
-            // outer beam
-            renderer.renderSingleBlock(
-                    beamRing,
-                    matrices,
-                    vertexConsumers,
-                    lightAtHead,
-                    overlay);
-
+            state.ringBlockState.submit(matrices, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             matrices.popPose();
         }
+    }
+
+    public static class GantryRenderState extends BlockEntityRenderState {
+        public boolean hasArea;
+        public Vec3 targetOffset;
+        public BlockState machineHead;
+        public float armLength;
+        public Vec3 armTarget;
+        public boolean hasToolhead;
+        public final ItemStackRenderState toolheadState = new ItemStackRenderState();
+
+        // destroyer quarry beam
+        public boolean isDestroyerQuarry;
+        public Vec3 destroyerBeamOffset;
+        public float destroyerBeamHeight;
+        public float thickness;
+        public float ringHeightSine;
+
+        // block render states
+        public final BlockModelRenderState headBlockState = new BlockModelRenderState();
+        public final BlockModelRenderState armBlockState = new BlockModelRenderState();
+        public final BlockModelRenderState ringBlockState = new BlockModelRenderState();
     }
 }

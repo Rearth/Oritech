@@ -3,42 +3,56 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.util.Geometry;
 
-public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEntity> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEntity, PowerPoleCableRenderer.CableRenderState> {
 
     public static final Identifier CABLE_TEXTURE = Identifier.withDefaultNamespace("textures/block/white_concrete.png");
 
     public static final int CABLE_SEGMENT_COUNT = 12;
 
-    @Override
-    public void render(@NotNull PowerPoleEntity blockEntity, float partialTick, @NotNull PoseStack poseStack, @NotNull MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public PowerPoleCableRenderer(BlockEntityRendererProvider.Context context) {
+    }
 
+    @Override
+    public CableRenderState createRenderState() {
+        return new CableRenderState();
+    }
+
+    @Override
+    public void extractRenderState(@NotNull PowerPoleEntity blockEntity, CableRenderState state, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTick, cameraPosition, breakProgress);
+
+        state.cables.clear();
         var connections = blockEntity.getConnections();
         if (connections.isEmpty() || blockEntity.isRemoved()) return;
 
-        var camPos = Minecraft.getInstance().cameraEntity.blockPosition();
+        var camPos = new BlockPos(Mth.floor(cameraPosition.x), Mth.floor(cameraPosition.y), Mth.floor(cameraPosition.z));
         var poleDist = blockEntity.getBlockPos().distSqr(camPos);
-
-        var consumer = bufferSource.getBuffer(RenderType.entitySolid(CABLE_TEXTURE));
         var ownPos = blockEntity.getBlockPos();
 
         var ownFacing = blockEntity.getFacingForMultiblock();
         var ownSideVec = Vec3.atLowerCornerOf(Geometry.getForward(ownFacing));
 
         var centerPos = new Vec3(0.5, 0.5, 0.5);
-
-        poseStack.pushPose();
-        poseStack.translate(0, 0.35f, 0);
 
         for (var target : connections) {
             if (target == null) continue;
@@ -76,9 +90,27 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
 
             float thickness = 0.05f;
 
-            renderHangingCable(poseStack, consumer, localStartA, localTargetA, thickness, packedLight);
-            renderHangingCable(poseStack, consumer, localStartB, localTargetB, thickness, packedLight);
+            state.cables.add(new CableData(localStartA, localTargetA, thickness));
+            state.cables.add(new CableData(localStartB, localTargetB, thickness));
         }
+    }
+
+    @Override
+    public void submit(CableRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
+        if (state.cables.isEmpty()) return;
+
+        poseStack.pushPose();
+        poseStack.translate(0, 0.35f, 0);
+
+        // Defer vertex rendering and grouping under the entity solid cable texture
+        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(CABLE_TEXTURE), (pose, consumer) -> {
+            for (var cable : state.cables) {
+                var localStack = new PoseStack();
+                localStack.last().pose().set(pose.pose());
+                localStack.last().normal().set(pose.normal());
+                renderHangingCable(localStack, consumer, cable.start(), cable.end(), cable.thickness(), state.lightCoords);
+            }
+        });
 
         poseStack.popPose();
     }
@@ -89,7 +121,7 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
      * @param startPos The start position relative to the BlockEntity origin (e.g. 0.5, 0.5, 0.5 is center).
      * @param endPos   The end position relative to the BlockEntity origin.
      */
-    private void renderHangingCable(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 endPos, float thickness, int packedLight) {
+    private static void renderHangingCable(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 endPos, float thickness, int packedLight) {
         poseStack.pushPose();
 
         // Calculate the full vector from start to end
@@ -131,7 +163,7 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
         poseStack.popPose();
     }
 
-    private void drawSegment(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 delta, float thickness, int packedLight) {
+    private static void drawSegment(PoseStack poseStack, VertexConsumer consumer, Vec3 startPos, Vec3 delta, float thickness, int packedLight) {
         poseStack.pushPose();
 
         // Move to start of segment
@@ -179,7 +211,7 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
         poseStack.popPose();
     }
 
-    private void addVertex(VertexConsumer consumer, PoseStack.Pose pose, float x, float y, float z, int r, int g, int b, int a, float u, float v, float nx, float ny, float nz, int packedLight) {
+    private static void addVertex(VertexConsumer consumer, PoseStack.Pose pose, float x, float y, float z, int r, int g, int b, int a, float u, float v, float nx, float ny, float nz, int packedLight) {
         consumer.addVertex(pose.pose(), x, y, z)
                 .setColor(r, g, b, a)
                 .setUv(u, v)
@@ -194,7 +226,13 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
     }
 
     @Override
-    public boolean shouldRenderOffScreen(PowerPoleEntity blockEntity) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
+
+    public static class CableRenderState extends BlockEntityRenderState {
+        public final List<CableData> cables = new ArrayList<>();
+    }
+
+    public record CableData(Vec3 start, Vec3 end, float thickness) {}
 }

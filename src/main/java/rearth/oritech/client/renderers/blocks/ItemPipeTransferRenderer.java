@@ -3,16 +3,26 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemStackRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
-public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity> {
+public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity, ItemPipeTransferRenderer.ItemPipeRenderState> {
+
+    public ItemPipeTransferRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context context) {
+    }
 
     @Override
     public int getViewDistance() {
@@ -20,16 +30,23 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
     }
 
     @Override
-    public boolean shouldRenderOffScreen(ItemPipeInterfaceEntity blockEntity) {
+    public boolean shouldRenderOffScreen() {
         return true;
     }
 
     @Override
-    public void render(ItemPipeInterfaceEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+    public ItemPipeRenderState createRenderState() {
+        return new ItemPipeRenderState();
+    }
 
+    @Override
+    public void extractRenderState(ItemPipeInterfaceEntity entity, ItemPipeRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, partialTicks, cameraPosition, breakProgress);
+
+        state.activeItems.clear();
         if (entity.activeStacks == null || entity.activeStacks.isEmpty()) return;
 
-        var time = entity.getLevel().getGameTime() + tickDelta;
+        var time = entity.getLevel().getGameTime() + partialTicks;
         var removedStacks = new HashSet<ItemPipeInterfaceEntity.RenderStackData>();
 
         for (var renderedStack : entity.activeStacks) {
@@ -66,31 +83,30 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
 
             var offset = targetPos.subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
 
-            matrices.pushPose();
-            matrices.translate(offset.x + 0.5, offset.y + 0.5, offset.z + 0.5);
-            matrices.scale(0.4f, 0.4f, 0.4f);
-            matrices.mulPose(Axis.YP.rotationDegrees(-140));
-            matrices.mulPose(Axis.XP.rotationDegrees(-30));
+            // pre-calculate and cache resolved ItemStackRenderState in extract phase
+            var resolvedState = new ItemStackRenderState();
+            var mc = Minecraft.getInstance();
+            mc.getItemModelResolver().updateForTopItem(resolvedState, renderedStack.rendered(), ItemDisplayContext.GUI, entity.getLevel(), null, 0);
 
-            var renderedItem = renderedStack.rendered();
-
-            Minecraft.getInstance().getItemRenderer().renderStatic(
-                    renderedItem,
-                    ItemDisplayContext.GUI,
-                    light,
-                    OverlayTexture.NO_OVERLAY,
-                    matrices,
-                    vertexConsumers,
-                    entity.getLevel(),
-                    0
-            );
-
-            matrices.popPose();
-
+            state.activeItems.add(new RenderedItem(offset, resolvedState));
         }
 
         entity.activeStacks.removeAll(removedStacks);
+    }
 
+    @Override
+    public void submit(ItemPipeRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
+        for (var item : state.activeItems) {
+            poseStack.pushPose();
+            poseStack.translate(item.offset.x + 0.5, item.offset.y + 0.5, item.offset.z + 0.5);
+            poseStack.scale(0.4f, 0.4f, 0.4f);
+            poseStack.mulPose(Axis.YP.rotationDegrees(-140));
+            poseStack.mulPose(Axis.XP.rotationDegrees(-30));
+
+            item.itemState.submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+
+            poseStack.popPose();
+        }
     }
 
     private static double sigmoidFitted(double x) {
@@ -100,4 +116,10 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
     private static double sigmoid(double x) {
         return x / (1 + Math.abs(x));
     }
+
+    public static class ItemPipeRenderState extends BlockEntityRenderState {
+        public final List<RenderedItem> activeItems = new ArrayList<>();
+    }
+
+    public record RenderedItem(Vec3 offset, ItemStackRenderState itemState) {}
 }

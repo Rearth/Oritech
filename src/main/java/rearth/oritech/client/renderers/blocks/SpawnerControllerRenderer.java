@@ -3,50 +3,83 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.util.ColorHelper;
 
-public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerControllerBlockEntity> {
+public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerControllerBlockEntity, SpawnerControllerRenderer.SpawnerRenderState> {
+
+    public SpawnerControllerRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context context) {
+    }
 
     @Override
-    public void render(SpawnerControllerBlockEntity entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+    public SpawnerRenderState createRenderState() {
+        return new SpawnerRenderState();
+    }
 
+    @Override
+    public void extractRenderState(SpawnerControllerBlockEntity entity, SpawnerRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(entity, state, partialTicks, cameraPosition, breakProgress);
 
-        if (entity.renderedEntity != null && entity.hasCage) {
+        state.renderedEntity = entity.renderedEntity instanceof LivingEntity le ? le : null;
+        state.hasCage = entity.hasCage;
+        state.lightCoords = entity.getLevel() != null ? net.minecraft.client.renderer.LevelRenderer.getLightCoords(entity.getLevel(), entity.getBlockPos()) : 15728880;
 
-            matrices.pushPose();
-            matrices.translate(0, -Math.round(entity.renderedEntity.getBbHeight() + 0.4f), 0);
-            matrices.mulPose(Axis.YP.rotationDegrees(45));
-
-            var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-
-            var renderer = dispatcher.getRenderer(entity.renderedEntity);
-
+        if (state.renderedEntity != null && state.hasCage) {
             var progress = Math.min(1f, entity.collectedSouls / (float) entity.maxSouls);
             if (progress != 0)
                 progress = (float) LaserArmRenderer.lerp(entity.lastProgress, progress, 0.03f);
             entity.lastProgress = progress;
 
-            var color = FastColor.ARGB32.color((int) (75 + 180 * progress), (int) (255 * (1f - progress)), 255, 255);
+            // use ColorHelper to construct package-independent ARGB color
+            state.color = ColorHelper.argb(1f - progress, 1f, 1f, (75f + 180f * progress) / 255f);
+        }
+    }
 
-            if (renderer instanceof LivingEntityRenderer livingEntityRenderer && entity.renderedEntity instanceof LivingEntity) {
+    @SuppressWarnings("rawtypes")
+    @Override
+    public void submit(SpawnerRenderState state, PoseStack matrices, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
+        if (state.renderedEntity != null && state.hasCage) {
 
+            matrices.pushPose();
+            matrices.translate(0, -Math.round(state.renderedEntity.getBbHeight() + 0.4f), 0);
+            matrices.mulPose(Axis.YP.rotationDegrees(45));
+
+            var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+            var renderer = dispatcher.getRenderer(state.renderedEntity);
+
+            if (renderer instanceof LivingEntityRenderer livingEntityRenderer) {
                 matrices.scale(-1.0F, -1.0F, 1.0F);
                 matrices.translate(0.0F, -1.501F, 0.0F);
                 matrices.scale(0.9f, 0.9f, 0.9f);
                 var model = livingEntityRenderer.getModel();
-                var renderLayer = RenderType.beaconBeam(Identifier.withDefaultNamespace("textures/entity/beacon_beam.png"), true);
-                // var renderLayer = RenderLayer.getEndGateway();   // yeah this is fun
-                var vertexConsumer = vertexConsumers.getBuffer(renderLayer);
-                model.renderToBuffer(matrices, vertexConsumer, light, overlay, color);
+                var renderLayer = RenderTypes.beaconBeam(Identifier.withDefaultNamespace("textures/entity/beacon_beam.png"), true);
+
+                // submit the custom geometry with the matrices transformed specifically for the entity model preview
+                collector.submitCustomGeometry(matrices, renderLayer, (pose, consumer) -> {
+                    var localStack = new PoseStack();
+                    localStack.last().pose().set(pose.pose());
+                    localStack.last().normal().set(pose.normal());
+                    model.renderToBuffer(localStack, consumer, state.lightCoords, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.color);
+                });
             }
             matrices.popPose();
         }
+    }
+
+    public static class SpawnerRenderState extends BlockEntityRenderState {
+        public @Nullable LivingEntity renderedEntity;
+        public boolean hasCage;
+        public int color;
     }
 }

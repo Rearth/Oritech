@@ -1,6 +1,5 @@
 package rearth.oritech.client.renderers.blocks;
 
-import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
@@ -24,7 +23,7 @@ import rearth.oritech.util.ColorHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaintedRefineryRenderer<T extends TaintedRefineryBlockEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<T, R> {
+public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<TaintedRefineryBlockEntity, R> {
 
     public static final DataTicket<TaintedRefineryFluidData> FLUID_DATA = DataTicket.create("tainted_refinery_fluids", TaintedRefineryFluidData.class);
 
@@ -32,14 +31,13 @@ public class TaintedRefineryRenderer<T extends TaintedRefineryBlockEntity & GeoA
         super(context, new MachineModel<>(model));
     }
 
-    @Override
-    public AABB getRenderBoundingBox(T blockEntity) {
+    public AABB getRenderBoundingBox(TaintedRefineryBlockEntity blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 6, 6);
     }
 
     // extract phase: resolve all fluid cubes and ship them to the render state via the GeckoLib DataTicket
     @Override
-    public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+    public void addRenderData(TaintedRefineryBlockEntity animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
 
         var cubes = new ArrayList<FluidCube>();
         var capacity = animatable.ownStorage.getCapacity();
