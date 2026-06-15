@@ -314,13 +314,13 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         }
         
         @Override
-        public net.neoforged.neoforge.fluids.@NotNull FluidStack drain(int i, @NotNull FluidAction fluidAction) {
-            var extractedAmount =  container.extract(container.getStack(i).copyWithAmount(i), fluidAction.simulate());
+        public net.neoforged.neoforge.fluids.@NotNull FluidStack drain(int slot, @NotNull FluidAction fluidAction) {
+            var extractedAmount =  container.extract(container.getStack(slot).copy(), fluidAction.simulate());
             
             if (extractedAmount > 0 && fluidAction.execute())
                 container.update();
             
-            return new net.neoforged.neoforge.fluids.FluidStack(container.getStack(i).getFluid(), (int) extractedAmount);
+            return new net.neoforged.neoforge.fluids.FluidStack(container.getStack(slot).getFluid(), (int) extractedAmount);
         }
     }
     

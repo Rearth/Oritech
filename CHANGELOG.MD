@@ -1,4 +1,0 @@
-- Fix enderic laser block destruction in adventure mode
-- Fix edge case crash with enchantment catalyst
-- Add missing recipe input count sorting to tainted refinery
-- Fix neoforge mods dependency manifest client side athena dependency
