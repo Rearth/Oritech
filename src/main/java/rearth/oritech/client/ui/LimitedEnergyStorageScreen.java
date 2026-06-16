@@ -2,7 +2,7 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SliderWidget;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
@@ -14,12 +14,10 @@ import java.util.TreeSet;
 public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnergyStorageScreenHandler> {
 
     public LimitedEnergyStorageScreen(LimitedEnergyStorageScreenHandler handler, Inventory inventory, Component title) {
-        super(handler, inventory, title);
+        super(handler, inventory, title, 187, 186);
         if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) return;
 
         this.backgroundTexture = OritechMachineScreen.BACKGROUND_TALL;
-        this.height = 186;
-        this.setPanelSize(176, 186);
     }
 
     @Override

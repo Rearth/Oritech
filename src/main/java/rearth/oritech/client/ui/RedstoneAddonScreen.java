@@ -26,7 +26,6 @@ public class RedstoneAddonScreen extends OritechWidgetScreen<RedstoneAddonScreen
     @Override
     protected void buildComponents() {
         var activeMode = menu.blockEntity.activeMode;
-        setPanelSize(176, activeMode == RedstoneAddonBlockEntity.RedstoneMode.OUTPUT_SLOT ? 194 : 100);
         slotButtons.clear();
 
         var panel = new SurfaceWidget(0, 0, imageWidth, imageHeight);

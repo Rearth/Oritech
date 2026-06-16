@@ -25,7 +25,7 @@ public class RedstoneAddonScreenHandler extends AbstractContainerMenu {
     }
 
     public RedstoneAddonScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
-        super(ModScreens.REDSTONE_ADDON_SCREEN, syncId);
+        super(ModScreens.REDSTONE_ADDON_SCREEN.get(), syncId);
 
         this.blockPos = blockEntity.getBlockPos();
         this.blockEntity = (RedstoneAddonBlockEntity) blockEntity;

@@ -25,7 +25,7 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
 
     // on server, also called from client constructor
     public ReactorScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
-        super(ModScreens.REACTOR_SCREEN, syncId);
+        super(ModScreens.REACTOR_SCREEN.get(), syncId);
 
         reactorEntity = (ReactorControllerBlockEntity) blockEntity;
         level = blockEntity.getLevel();

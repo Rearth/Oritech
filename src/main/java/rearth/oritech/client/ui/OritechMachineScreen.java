@@ -8,7 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -35,7 +35,11 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
     protected Rect2i equipmentBounds;
 
     public OritechMachineScreen(T handler, Inventory inventory, Component title) {
-        super(handler, inventory, title, 176, 166, BACKGROUND);
+        this(handler, inventory, title, 176, 166);
+    }
+
+    public OritechMachineScreen(T handler, Inventory inventory, Component title, int width, int heigh) {
+        super(handler, inventory, title, width, heigh, BACKGROUND);
     }
 
     @Override

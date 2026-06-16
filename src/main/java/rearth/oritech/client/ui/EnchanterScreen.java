@@ -62,8 +62,8 @@ public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler
             description = selection.value().description();
         }
 
-        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-        var canBeEnchanted = registry.stream().anyMatch(elem -> elem.canEnchant(stack));
+        var registry = menu.enchanter.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        var canBeEnchanted = registry.stream().map(registry::wrapAsHolder).anyMatch(stack::supportsEnchantment);
         chooseButton.setActive(canBeEnchanted);
         chooseButton.setLabel(description);
 
@@ -92,8 +92,8 @@ public class EnchanterScreen extends OritechMachineScreen<EnchanterScreenHandler
     private void openSelectionPanel() {
         closeSelectionOverlay();
 
-        var registry = menu.enchanter.getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-        var all = registry.stream().map(registry::wrapAsHolder).filter(entry -> entry.value().canEnchant(currentItem)).toList();
+        var registry = menu.enchanter.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        var all = registry.stream().map(registry::wrapAsHolder).filter(currentItem::supportsEnchantment).toList();
         if (all.isEmpty()) return;
 
         selectionOverlay = new OverlayWidget(imageWidth, imageHeight);

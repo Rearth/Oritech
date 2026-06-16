@@ -4,8 +4,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
-import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
@@ -47,10 +48,10 @@ public abstract class DisplayDataSource {
     public static class FluidDataSource extends DisplayDataSource {
 
         private final Supplier<FluidStack> fluidSupplier;
-        private final SimpleFluidStorage storage;
+        private final ResourceHandler<FluidResource> storage;
         private int tankIndex;
 
-        private FluidDataSource(SimpleFluidStorage storage, long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
+        private FluidDataSource(ResourceHandler<FluidResource> storage, long capacity, Supplier<FluidStack> fluidSupplier, Supplier<Component> tooltipSupplier, ScreenProvider.BarConfiguration config) {
             super(capacity, () -> (long) fluidSupplier.get().amount(), tooltipSupplier, config);
             this.storage = storage;
             this.fluidSupplier = fluidSupplier;
@@ -60,7 +61,7 @@ public abstract class DisplayDataSource {
             return fluidSupplier;
         }
 
-        public SimpleFluidStorage getStorage() {
+        public ResourceHandler<FluidResource> getStorage() {
             return storage;
         }
 
@@ -73,13 +74,13 @@ public abstract class DisplayDataSource {
         }
     }
 
-    public static FluidDataSource CreateFluid(SimpleFluidStorage storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
+    public static FluidDataSource CreateFluid(ResourceHandler<FluidResource> storage, ScreenProvider.BarConfiguration config, ScreenProvider provider) {
 
         return new FluidDataSource(
                 storage,
-                storage.getCapacity(),
-                storage::getContent,
-                () -> getFluidTooltip(storage.getContent()),
+                storage.getAmountAsLong(0),
+                () -> storage.getResource(0).toStack(storage.getAmountAsInt(0)),
+                () -> getFluidTooltip(storage.getResource(0).toStack(storage.getAmountAsInt(0))),
                 config);
     }
 
@@ -163,7 +164,7 @@ public abstract class DisplayDataSource {
 
     public static Component getProgressTooltip(BlockEntity blockEntity) {
         if (blockEntity instanceof MachineBlockEntity machineEntity
-                && (machineEntity.getRecipeDuration() > 0 || machineEntity.progress > 0)) {
+                && (machineEntity.getRecipeDuration() > 0 || machineEntity.getProgress() > 0)) {
 
             var progressTicks = machineEntity.progress;
             var recipeDurationTicks = machineEntity.getRecipeDuration();

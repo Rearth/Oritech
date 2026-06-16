@@ -3,7 +3,7 @@ package rearth.oritech.client.ui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
@@ -53,7 +53,7 @@ public class ShrinkerScreen extends UpgradableOritechScreen<UpgradableOritechScr
 
         if (this.menu.addonController.getConnectedAddons().isEmpty()) {
             statusLabel.setText(Component.translatable("text.oritech.shrink_no_addon").withStyle(ChatFormatting.RED));
-        } else if (this.menu.addonController instanceof ShrinkerBlockEntity shrinker && shrinker.getEnergyStorage(null).getAmount() < shrinker.getDefaultCapacity()) {
+        } else if (this.menu.addonController instanceof ShrinkerBlockEntity shrinker && shrinker.getEnergyLookup(null).getAmountAsInt() < shrinker.getDefaultCapacity()) {
             statusLabel.setText(Component.translatable("text.oritech.shrink_no_energy").withStyle(ChatFormatting.RED));
         } else {
             statusLabel.setText(Component.translatable("text.oritech.shrink_ready"));

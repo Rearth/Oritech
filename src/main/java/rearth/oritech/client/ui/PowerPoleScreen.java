@@ -28,7 +28,7 @@ public class PowerPoleScreen extends EnergyStorageScreen<UpgradableOritechScreen
         // Note: previously this anonymous BlockWidget subclass overrode appleRotation(PoseStack)
         // to apply a custom -30°/180°/45° XYZ rotation. That hook no longer exists because the
         // BlockWidget itself was rewritten around a PIP renderer (currently stubbed) for 26.1.
-        var connectedIcon = new BlockWidget(24, 3, 50, BlockContent.TECH_LEVER.defaultBlockState().setValue(LeverBlock.POWERED, isConnected));
+        var connectedIcon = new BlockWidget(24, 3, 50, BlockContent.TECH_LEVER.get().defaultBlockState().setValue(LeverBlock.POWERED, isConnected));
         connectedIcon.withTooltip(containedTooltipText);
 
         var connectedLabel = new LabelWidget(7, 53, 84, 18,

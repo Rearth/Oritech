@@ -30,7 +30,7 @@ public class PlayerModifierScreenHandler extends AbstractContainerMenu {
 
     // on server, also called from client constructor
     public PlayerModifierScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
-        super(ModScreens.MODIFIER_SCREEN, syncId);
+        super(ModScreens.MODIFIER_SCREEN.get(), syncId);
 
         if (blockEntity == null) {
             blockPos = BlockPos.ZERO;

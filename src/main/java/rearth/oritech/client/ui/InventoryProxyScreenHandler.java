@@ -47,7 +47,7 @@ public class InventoryProxyScreenHandler extends AbstractContainerMenu {
 
     // on server, also called from client constructor
     public InventoryProxyScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity, @NotNull ScreenProvider controllerScreen, int selectedSlot) {
-        super(ModScreens.INVENTORY_PROXY_SCREEN, syncId);
+        super(ModScreens.INVENTORY_PROXY_SCREEN.get(), syncId);
 
         this.blockPos = blockEntity.getBlockPos();
         this.controllerScreen = controllerScreen;

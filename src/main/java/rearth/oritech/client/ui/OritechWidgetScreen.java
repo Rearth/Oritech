@@ -38,9 +38,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     }
 
     protected OritechWidgetScreen(T handler, Inventory inventory, Component title, int imageWidth, int imageHeight, Identifier backgroundTexture) {
-        super(handler, inventory, title);
-        this.imageWidth = imageWidth;
-        this.imageHeight = imageHeight;
+        super(handler, inventory, title, imageWidth, imageHeight);
         this.backgroundTexture = backgroundTexture;
     }
 
@@ -63,13 +61,6 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             addTitle();
 
         buildComponents();
-    }
-
-    protected void setPanelSize(int imageWidth, int imageHeight) {
-        this.imageWidth = imageWidth;
-        this.imageHeight = imageHeight;
-        this.leftPos = (this.width - this.imageWidth) / 2;
-        this.topPos = (this.height - this.imageHeight) / 2;
     }
 
     @Override

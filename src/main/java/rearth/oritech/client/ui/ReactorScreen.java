@@ -308,7 +308,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
             if (hoveredEntry != null) {
                 renderBlock(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
-                        BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, hoveredEntry.pos(), delta);
+                        BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(), null, hoveredEntry.pos(), delta);
                 renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.level.getBlockState(hoveredEntry.pos())));
             }
         }
@@ -320,12 +320,12 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             }
 
             if (data.storedHeat() > 1000) {
-                return BlockContent.REACTOR_HOT_INDICATOR_BLOCK.defaultBlockState();
+                return BlockContent.REACTOR_HOT_INDICATOR_BLOCK.get().defaultBlockState();
             }
             if (data.storedHeat() > 200) {
-                return BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.defaultBlockState();
+                return BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.get().defaultBlockState();
             }
-            return BlockContent.REACTOR_COLD_INDICATOR_BLOCK.defaultBlockState();
+            return BlockContent.REACTOR_COLD_INDICATOR_BLOCK.get().defaultBlockState();
         }
 
         @Override

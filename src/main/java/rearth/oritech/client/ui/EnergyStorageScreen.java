@@ -35,6 +35,10 @@ public abstract class EnergyStorageScreen<T extends UpgradableOritechScreenHandl
         super(handler, inventory, title);
     }
 
+    public EnergyStorageScreen(T handler, Inventory inventory, Component title, int width, int height) {
+        super(handler, inventory, title, width, height);
+    }
+
     @Override
     protected void addExtraComponents() {
         super.addExtraComponents();
@@ -97,7 +101,7 @@ public abstract class EnergyStorageScreen<T extends UpgradableOritechScreenHandl
     @Override
     public ItemStack getTitleIcon() {
         if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) {
-            return new ItemStack(ItemContent.UNSTABLE_CONTAINER);
+            return new ItemStack(ItemContent.UNSTABLE_CONTAINER.asItem());
         }
         return super.getTitleIcon();
     }

@@ -42,6 +42,10 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         super(handler, inventory, title);
     }
 
+    public UpgradableOritechScreen(T handler, Inventory inventory, Component title, int width, int height) {
+        super(handler, inventory, title, width, height);
+    }
+
     @Override
     protected void addExtensionContent(List<UIComponent> content) {
         super.addExtensionContent(content);
@@ -173,7 +177,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         // Open addon slots (ghost indicator)
         for (var openPos : menu.addonController.getOpenAddonSlots()) {
             var relativePos = MultiblockMachineEntity.worldToRelativePos(menu.blockPos, openPos, facing);
-            preview.addBlock(BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, relativePos);
+            preview.addBlock(BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(), null, relativePos);
         }
 
         // Machine itself at center
@@ -313,7 +317,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
 
         if (steamProductionLabel != null && menu.blockEntity instanceof UpgradableGeneratorBlockEntity generatorBlock) {
             var productionRate = menu.screenData.getDisplayedEnergyUsage() * OritechConfig.generators.steamEngineData.rfToSteamRatio.get();
-            productionRate = Math.min(productionRate, generatorBlock.boilerStorage.getInputContainer().getStack().getAmount());
+            productionRate = Math.min(productionRate, generatorBlock.boilerStorage.getInputContainer().getAmountAsInt(0));
             steamProductionLabel.setText(Component.translatable("title.oritech.steam_production", String.format("%.0f", productionRate)));
         }
     }

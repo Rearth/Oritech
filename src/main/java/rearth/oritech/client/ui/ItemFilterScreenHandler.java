@@ -1,6 +1,6 @@
 package rearth.oritech.client.ui;
 
-import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
@@ -28,7 +28,7 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
     }
 
     public ItemFilterScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
-        super(ModScreens.ITEM_FILTER_SCREEN, syncId);
+        super(ModScreens.ITEM_FILTER_SCREEN.get(), syncId);
 
         this.blockPos = blockEntity.getBlockPos();
         this.blockEntity = (ItemFilterBlockEntity) blockEntity;
@@ -78,7 +78,7 @@ public class ItemFilterScreenHandler extends AbstractContainerMenu {
         var newData = new ItemFilterBlockEntity.FilterData(data.useNbt(), data.useWhitelist(), data.useComponents(), newItems);
         blockEntity.setFilterSettings(newData);
         if (Objects.requireNonNull(blockEntity.getLevel()).isClientSide()) {
-            if (player instanceof LocalPlayer clientPlayer && clientPlayer.minecraft.screen instanceof ItemFilterScreen filterScreen) {
+            if (Minecraft.getInstance().screen instanceof ItemFilterScreen filterScreen) {
                 filterScreen.updateItemFilters();
             }
         }
