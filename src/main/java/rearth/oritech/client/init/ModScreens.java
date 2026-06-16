@@ -59,36 +59,37 @@ public class ModScreens {
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
-        event.register(TREEFELLER_SCREEN.get(), OritechMachineScreen::new);
+        // explicit types are needed here somehow because otherwise the gradle build fails. No idea why.
+        event.<OritechScreenHandler, OritechMachineScreen<OritechScreenHandler>>register(TREEFELLER_SCREEN.get(), OritechMachineScreen::new);
         event.register(TANK_SCREEN.get(), TankScreen::new);
-        event.register(ATOMIC_FORGE_SCREEN.get(), OritechMachineScreen::new);
+        event.<OritechScreenHandler, OritechMachineScreen<OritechScreenHandler>>register(ATOMIC_FORGE_SCREEN.get(), OritechMachineScreen::new);
         event.register(CATALYST_SCREEN.get(), CatalystScreen::new);
         event.register(ENCHANTER_SCREEN.get(), EnchanterScreen::new);
         event.register(ACCELERATOR_SCREEN.get(), AcceleratorScreen::new);
-        event.register(CHARGER_SCREEN.get(), OritechMachineScreen::new);
-        event.register(FUEL_PORT_SCREEN.get(), OritechMachineScreen::new);
-        event.register(AUGMENTER_INV_SCREEN.get(), OritechMachineScreen::new);
+        event.<OritechScreenHandler, OritechMachineScreen<OritechScreenHandler>>register(CHARGER_SCREEN.get(), OritechMachineScreen::new);
+        event.<OritechScreenHandler, OritechMachineScreen<OritechScreenHandler>>register(FUEL_PORT_SCREEN.get(), OritechMachineScreen::new);
+        event.<OritechScreenHandler, OritechMachineScreen<OritechScreenHandler>>register(AUGMENTER_INV_SCREEN.get(), OritechMachineScreen::new);
         event.register(REFINERY_SCREEN.get(), RefineryScreen::new);
         event.register(TAINTED_REFINERY_SCREEN.get(), TaintedRefineryScreen::new);
 
-        event.register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(GRINDER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(FOUNDRY_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(COOLER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(POWERED_FURNACE_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(BIO_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(LAVA_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(FUEL_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(BASIC_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(GRINDER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FOUNDRY_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(COOLER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(POWERED_FURNACE_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(BIO_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(LAVA_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FUEL_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(BASIC_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
         event.register(STORAGE_SCREEN.get(), LimitedEnergyStorageScreen::new);
         event.register(POWER_POLE_SCREEN.get(), PowerPoleScreen::new);
         event.register(UNSTABLE_CONTAINER_SCREEN.get(), UnstableContainerScreen::new);
-        event.register(DESTROYER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(PLACER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(FERTILIZER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(LASER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.register(CENTRIFUGE_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(DESTROYER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(PLACER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FERTILIZER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(LASER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<CentrifugeScreenHandler, UpgradableOritechScreen<CentrifugeScreenHandler>>register(CENTRIFUGE_SCREEN.get(), UpgradableOritechScreen::new);
         event.register(SHRINKER_SCREEN.get(), ShrinkerScreen::new);
 
         event.register(INVENTORY_PROXY_SCREEN.get(), InventoryProxyScreen::new);

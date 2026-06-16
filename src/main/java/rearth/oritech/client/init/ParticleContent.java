@@ -86,7 +86,7 @@ public class ParticleContent {
             case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos, 1, 5, 3);
             case WEED_KILLER -> {
                 var dist = (int) payload.data2.distanceTo(payload.data1);
-                spawnLine(ParticleTypes.DRAGON_BREATH, level, payload.data1, payload.data2, dist * 4 + level.getRandom().nextInt(3), 0.2f);
+                spawnLine(ParticleTypes.GLOW_SQUID_INK, level, payload.data1, payload.data2, dist * 4 + level.getRandom().nextInt(3), 0.2f);
             }
             case WANDERING_SOUL -> {
                 var velocity = payload.data1.scale((1f / payload.extraInt) * 1.5f);
