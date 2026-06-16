@@ -1,35 +1,44 @@
 package rearth.oritech.api.recipe;
 
-import com.google.common.base.Optional;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.util.FluidIngredient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 public abstract class OritechRecipeBuilder {
 
-    protected final RegistrySupplier<RecipeType<OritechRecipe>> type;
+    protected final Supplier<RecipeType<OritechRecipe>> type;
     protected List<Ingredient> inputs;
-    protected List<ItemStack> results;
-    protected FluidIngredient fluidInput;
+    protected List<ItemStackTemplate> results;
+    protected SizedFluidIngredient fluidInput;
     protected List<FluidStack> fluidOutputs;
     protected int time = 200;
     protected float timeMultiplier = 1f;
     protected boolean addToGrinder;
     private final String resourcePath;
 
-    protected OritechRecipeBuilder(RegistrySupplier<RecipeType<OritechRecipe>> type, String resourcePath) {
+    protected OritechRecipeBuilder(Supplier<RecipeType<OritechRecipe>> type, String resourcePath) {
         this.type = type;
         this.resourcePath = resourcePath;
         this.fluidOutputs = new ArrayList<>();
@@ -54,24 +63,24 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder input(TagKey<Item> in) {
-        return input(Ingredient.of(in));
+        return input(Ingredient.of(BuiltInRegistries.ITEM.get(in).orElseThrow()));
     }
 
-    public OritechRecipeBuilder fluidInput(FluidIngredient in) {
+    public OritechRecipeBuilder fluidInput(SizedFluidIngredient in) {
         fluidInput = in;
         return this;
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in, float bucketAmount) {
-        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
+        return fluidInput(SizedFluidIngredient.of(in, (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
-    public OritechRecipeBuilder specificFluidInput(Fluid in, long amountMillis) {
-        return fluidInput(new FluidIngredient().withContent(in).withSpecificAmount(amountMillis));
+    public OritechRecipeBuilder specificFluidInput(Fluid in, int amountMillis) {
+        return fluidInput(SizedFluidIngredient.of(in, amountMillis));
     }
 
-    public OritechRecipeBuilder specificFluidInput(TagKey<Fluid> in, long amountMillis) {
-        return fluidInput(new FluidIngredient().withSpecificAmount(amountMillis).withContent(in));
+    public OritechRecipeBuilder specificFluidInput(TagKey<Fluid> in, int amountMillis) {
+        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(BuiltInRegistries.FLUID.get(in).orElseThrow()), amountMillis));
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in) {
@@ -83,7 +92,7 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidInput(TagKey<Fluid> in, float bucketAmount) {
-        return fluidInput(new FluidIngredient().withContent(in).withAmount(bucketAmount));
+        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(BuiltInRegistries.FLUID.get(in).orElseThrow()), (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
     public OritechRecipeBuilder fluidOutput(FluidStack out) {
@@ -92,30 +101,33 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out, float bucketAmount) {
-        return fluidOutput(FluidStack.create(out, (long) (bucketAmount * FluidType.BUCKET_VOLUME)));
+        return fluidOutput(new FluidStack(out, (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out) {
-        return fluidOutput(FluidStack.create(out, FluidType.BUCKET_VOLUME));
+        return fluidOutput(new FluidStack(out, FluidType.BUCKET_VOLUME));
     }
 
-    public OritechRecipeBuilder result(ItemStack out) {
+    public OritechRecipeBuilder result(ItemStackTemplate out) {
         if (results == null)
             results = new ArrayList<>();
         results.add(out);
         return this;
     }
 
+    public OritechRecipeBuilder result(ItemStack out) {
+        return result(ItemStackTemplate.fromNonEmptyStack(out));
+    }
+
     public OritechRecipeBuilder result(List<ItemStack> out) {
-        if (results == null)
-            results = new ArrayList<>();
-        results.addAll(out);
+        for (var stack : out) {
+            result(stack);
+        }
         return this;
     }
 
     public OritechRecipeBuilder result(Item out, int count) {
-
-        return result(new ItemStack(out, count));
+        return result(new ItemStackTemplate(out, count));
     }
 
     public OritechRecipeBuilder result(Item out) {
@@ -159,11 +171,11 @@ public abstract class OritechRecipeBuilder {
         validate(id);
 
         exporter.accept(
-                id,
+                ResourceKey.create(Registries.RECIPE, id),
                 new OritechRecipe(
                         inputs != null ? inputs : List.of(),
                         results != null ? results : List.of(),
-                        fluidInput != null ? fluidInput : FluidIngredient.EMPTY,
+                        fluidInput != null ? fluidInput : SizedFluidIngredient.of(Fluids.EMPTY, 0),
                         fluidOutputs != null ? fluidOutputs : List.of(),
                         (int) (time * timeMultiplier),
                         type.get()),
