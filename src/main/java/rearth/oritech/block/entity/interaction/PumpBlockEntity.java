@@ -138,7 +138,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
             var targetPos = pos.getCenter().offsetRandom(serverLevel.getRandom(), 0.5f);
             var targetType = targetState.getDripParticle();
 
-            if (targetType != null && serverLevel instanceof ServerLevel serverLevel)
+            if (targetType != null)
                 serverLevel.sendParticles(targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
         }
 

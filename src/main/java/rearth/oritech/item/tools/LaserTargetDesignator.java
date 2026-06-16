@@ -5,6 +5,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.Oritech;
@@ -15,7 +16,7 @@ import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 public class LaserTargetDesignator extends Item {
     public LaserTargetDesignator(Properties settings) {
@@ -91,11 +92,11 @@ public class LaserTargetDesignator extends Item {
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
-        if (stack.has(ComponentContent.TARGET_POSITION.get())) {
-            var data = stack.get(ComponentContent.TARGET_POSITION.get());
-            consumer.accept(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
+        if (itemStack.has(ComponentContent.TARGET_POSITION.get())) {
+            var data = itemStack.get(ComponentContent.TARGET_POSITION.get());
+            builder.accept(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
         } else {
-            consumer.accept(Component.translatable("tooltip.oritech.target_designator.no_target"));
+            builder.accept(Component.translatable("tooltip.oritech.target_designator.no_target"));
         }
     }
 }

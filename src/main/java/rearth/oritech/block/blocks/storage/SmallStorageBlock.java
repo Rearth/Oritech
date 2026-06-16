@@ -146,7 +146,7 @@ public class SmallStorageBlock extends Block implements EntityBlock, TooltipProv
 
         var storageEntity = (SmallStorageBlockEntity) level.getBlockEntity(pos);
         if (storageEntity.energyStorage.energy > 0) {
-            stack.set(ComponentContent.ENERGY, storageEntity.energyStorage.energy);
+            stack.set(ComponentContent.ENERGY.get(), (int) storageEntity.energyStorage.energy);
         }
 
         return stack;
@@ -156,7 +156,7 @@ public class SmallStorageBlock extends Block implements EntityBlock, TooltipProv
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.setPlacedBy(level, pos, state, placer, itemStack);
 
-        var storedEnergyInStack = itemStack.getOrDefault(ComponentContent.ENERGY, 0L);
+        var storedEnergyInStack = itemStack.getOrDefault(ComponentContent.ENERGY, 0);
 
         if (storedEnergyInStack > 0) {
             var storageEntity = (ExpandableEnergyStorageBlockEntity) level.getBlockEntity(pos);
