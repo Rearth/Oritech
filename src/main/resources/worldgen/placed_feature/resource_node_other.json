@@ -1,0 +1,16 @@
+{
+  "feature": "oritech:resource_node_other",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 380
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "minecraft:heightmap",
+      "heightmap": "WORLD_SURFACE_WG"
+    }
+  ]
+}

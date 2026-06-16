@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/machine_plating_block"
+    }
+  },
+
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech:block/machine_plating_block/center",
+    "empty": "oritech:block/machine_plating_block/empty",
+    "horizontal": "oritech:block/machine_plating_block/horizontal",
+    "vertical": "oritech:block/machine_plating_block/vertical",
+    "particle": "oritech:block/machine_plating_block/particle"
+  }
+}

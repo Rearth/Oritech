@@ -1,0 +1,11 @@
+{
+	"parent": "minecraft:item/generated",
+	"textures": {
+		"layer0": "oritech:block/uranium_crystal"
+	},
+	"display": {
+		"head": {
+			"translation": [ 0, 14, -5 ]
+		}
+	}
+}

@@ -1,0 +1,24 @@
+{
+	"credit": "Made with Blockbench",
+	"texture_size": [32, 32],
+	"ambientocclusion": false,
+	"textures": {
+		"1": "oritech:block/frame_gantry_arm",
+		"particle": "oritech:block/frame_gantry_arm"
+	},
+	"elements": [
+		{
+			"name": "frame_side",
+			"from": [5, 5, 0],
+			"to": [11, 11, 16],
+			"faces": {
+				"north": {"uv": [0, 0, 4, 4], "texture": "#1"},
+				"east": {"uv": [0, 4, 16, 8], "texture": "#1"},
+				"south": {"uv": [0, 0, 4, 4], "texture": "#1"},
+				"west": {"uv": [0, 4, 16, 8], "texture": "#1"},
+				"up": {"uv": [16, 8, 0, 4], "rotation": 90, "texture": "#1"},
+				"down": {"uv": [0, 8, 16, 4], "rotation": 90, "texture": "#1"}
+			}
+		}
+	]
+}

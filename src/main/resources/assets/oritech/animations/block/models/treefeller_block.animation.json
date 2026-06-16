@@ -1,0 +1,30 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true
+		},
+		"working": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"blade": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 1080, 0]
+						}
+					}
+				}
+			},
+			"sound_effects": {
+				"0.0": {
+					"effect": "oritech:saw_working|0.2|1"
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

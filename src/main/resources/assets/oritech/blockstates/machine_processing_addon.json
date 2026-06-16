@@ -1,0 +1,114 @@
+{
+  "variants": {
+    "face=wall,facing=north,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=south,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=west,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=east,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 270,
+      "y": 270
+    },
+    "face=floor,facing=north,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "y": 0
+    },
+    "face=floor,facing=south,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "y": 180
+    },
+    "face=floor,facing=west,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "y": 270
+    },
+    "face=floor,facing=east,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "y": 90
+    },
+    "face=ceiling,facing=north,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 180
+    },
+    "face=ceiling,facing=south,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=west,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=east,addon_used=true": {
+      "model": "oritech:block/machine_processing_addon_on",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false": {
+      "model": "oritech:block/machine_processing_addon",
+      "x": 180,
+      "y": 90
+    }
+  }
+}

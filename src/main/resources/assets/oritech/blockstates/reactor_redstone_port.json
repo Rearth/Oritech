@@ -1,0 +1,82 @@
+{
+  "variants": {
+    "facing=south,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature",
+      "x": 90
+    },
+    "facing=west,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature"
+    },
+    "facing=down,port_mode=0": {
+      "model": "oritech:block/reactor_redstone_port_temperature",
+      "x": 180
+    },
+    "facing=south,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill",
+      "x": 90
+    },
+    "facing=west,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill"
+    },
+    "facing=down,port_mode=1": {
+      "model": "oritech:block/reactor_redstone_port_fill",
+      "x": 180
+    },
+    "facing=south,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power",
+      "x": 90
+    },
+    "facing=west,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power"
+    },
+    "facing=down,port_mode=2": {
+      "model": "oritech:block/reactor_redstone_port_power",
+      "x": 180
+    }
+  }
+}

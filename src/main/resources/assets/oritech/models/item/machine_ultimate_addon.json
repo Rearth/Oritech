@@ -1,0 +1,4 @@
+{
+  "parent": "oritech:block/machine_ultimate_addon",
+  "gui_light": "front"
+}

@@ -1,0 +1,12 @@
+{
+  "feature": "oritech:oil_spring",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 350
+    },
+    {
+      "type": "minecraft:in_square"
+    }
+  ]
+}

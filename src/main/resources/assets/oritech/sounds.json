@@ -1,0 +1,137 @@
+{
+  "cable_moving": {
+    "sounds": [
+      "oritech:cable_moving"
+    ]
+  },
+  "mechanical_click": {
+    "sounds": [
+      "oritech:mechanical_click"
+    ]
+  },
+  "servo_noises": {
+    "sounds": [
+      "oritech:servo_noises"
+    ]
+  },
+  "press": {
+    "sounds": [
+      "oritech:press"
+    ]
+  },
+  "welding1": {
+    "sounds": [
+      "oritech:welding1"
+    ]
+  },
+  "welding2": {
+    "sounds": [
+      "oritech:welding2"
+    ]
+  },
+  "dynamo": {
+    "sounds": [
+      "oritech:dynamo"
+    ]
+  },
+  "saw_working": {
+    "sounds": [
+      "oritech:saw_working"
+    ]
+  },
+  "furnace_burn": {
+    "sounds": [
+      "oritech:furnace_burn"
+    ]
+  },
+  "grinder_working": {
+    "sounds": [
+      {
+        "name": "oritech:grinder_working",
+        "volume": 0.3
+      }
+    ]
+  },
+  "lava_bubbles": {
+    "sounds": [
+      "oritech:lava_bubbles"
+    ]
+  },
+  "liquid_flow": {
+    "sounds": [
+      "oritech:liquid_flow"
+    ]
+  },
+  "quadcopter_flying": {
+    "sounds": [
+      "oritech:quadcopter_flying"
+    ]
+  },
+  "quadcopter_takeoff": {
+    "sounds": [
+      "oritech:quadcopter_takeoff"
+    ]
+  },
+  "sizzling_sound": {
+    "sounds": [
+      "oritech:sizzling_sound"
+    ]
+  },
+  "squish": {
+    "sounds": [
+      "oritech:squish"
+    ]
+  },
+  "short_servo": {
+    "sounds": [
+      "oritech:short_servo"
+    ]
+  },
+  "wrench_turn": {
+    "sounds": [
+      "oritech:wrench_turn"
+    ]
+  },
+  "reactor": {
+    "sounds": [
+      "oritech:reactor"
+    ]
+  },
+  "reactor_loading": {
+    "sounds": [
+      "oritech:reactor_loading"
+    ]
+  },
+  "reactor_warning": {
+    "sounds": [
+      "oritech:reactor_warning"
+    ]
+  },
+  "nuke_explosion": {
+    "sounds": [
+      "oritech:nuke_explosion"
+    ]
+  },
+  "electric_shock": {
+    "sounds": [
+      "oritech:electric_shock"
+    ]
+  },
+  "particle_moving": {
+    "sounds": [
+      {
+        "name": "oritech:particle_moving",
+        "volume": 0.1
+      }
+    ]
+  },
+  "bedrock_extractor": {
+    "sounds": [
+      {
+        "name": "oritech:bedrock_extractor",
+        "volume": 3,
+        "pitch": 0.7
+      }
+    ]
+  }
+}

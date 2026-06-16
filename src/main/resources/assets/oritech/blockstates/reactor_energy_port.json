@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "oritech:block/reactor_energy_port",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "oritech:block/reactor_energy_port",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/reactor_energy_port",
+      "x": 90
+    },
+    "facing=west": {
+      "model": "oritech:block/reactor_energy_port",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up": {
+      "model": "oritech:block/reactor_energy_port"
+    },
+    "facing=down": {
+      "model": "oritech:block/reactor_energy_port",
+      "x": 180
+    }
+  }
+}

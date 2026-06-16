@@ -1,0 +1,14 @@
+{
+  "texture": "oritech:textures/gui/bedrock_panel_pressed.png",
+  "texture_width": 16,
+  "texture_height": 16,
+  "repeat": false,
+  "corner_patch_size": {
+    "width": 4,
+    "height": 4
+  },
+  "center_patch_size": {
+    "width": 8,
+    "height": 8
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "variants": {
+    "machine_assembled=false,facing=south": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=north": {
+      "model": "oritech:block/large_storage_block_packaged"
+    },
+    "machine_assembled=false,facing=west": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 90
+    },
+    "machine_assembled=true,facing=south": {
+      "model": "oritech:block/arcane_augment_station",
+      "y": 180,
+      "x": 90
+    },
+    "machine_assembled=true,facing=east": {
+      "model": "oritech:block/arcane_augment_station",
+      "y": 90,
+      "x": 90
+    },
+    "machine_assembled=true,facing=north": {
+      "model": "oritech:block/arcane_augment_station",
+      "x": 90
+    },
+    "machine_assembled=true,facing=west": {
+      "model": "oritech:block/arcane_augment_station",
+      "y": 270,
+      "x": 90
+    },
+    "machine_assembled=false,facing=up": {
+      "model": "oritech:block/large_storage_block_packaged"
+    },
+    "machine_assembled=true,facing=up": {
+      "model": "oritech:block/arcane_augment_station",
+      "y": 270
+    },
+    "machine_assembled=false,facing=down": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "x": 180
+    },
+    "machine_assembled=true,facing=down": {
+      "model": "oritech:block/arcane_augment_station",
+      "x": 180
+    }
+  }
+}

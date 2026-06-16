@@ -1,0 +1,55 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"silk_touch": {
+			"loop": true,
+			"animation_length": 0.5
+		},
+		"area": {
+			"animation_length": 0.5,
+			"bones": {
+				"centerTop2": {
+					"rotation": {
+						"vector": [180, 0, 0]
+					}
+				},
+				"rod2": {
+					"rotation": {
+						"vector": [0, -180, 0]
+					}
+				},
+				"rod3": {
+					"rotation": {
+						"vector": [0, -180, 0]
+					}
+				},
+				"centerTop": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop3": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop4": {
+					"rotation": {
+						"vector": [-180, 0, 0]
+					}
+				},
+				"centerTop5": {
+					"rotation": {
+						"vector": [180, 0, 0]
+					}
+				},
+				"centerTop6": {
+					"rotation": {
+						"vector": [180, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

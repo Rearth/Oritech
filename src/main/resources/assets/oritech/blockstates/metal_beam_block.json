@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "beam=0": {
+      "model": "oritech:block/metal_beam_block"
+    },
+    "beam=1": {
+      "model": "oritech:block/metal_beam_block_inner"
+    },
+    "beam=2": {
+      "model": "oritech:block/metal_beam_block_head"
+    }
+  }
+}

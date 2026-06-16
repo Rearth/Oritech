@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "machine_assembled=false,facing=south": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north": {
+      "model": "oritech:block/large_storage_block_packaged"
+    },
+    "machine_assembled=false,facing=west": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south": {
+      "model": "oritech:block/destroyer_block",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east": {
+      "model": "oritech:block/destroyer_block",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north": {
+      "model": "oritech:block/destroyer_block"
+    },
+    "machine_assembled=true,facing=west": {
+      "model": "oritech:block/destroyer_block",
+      "y": 270
+    }
+  }
+}

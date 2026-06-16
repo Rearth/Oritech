@@ -1,0 +1,105 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "oritech:block/framed_pipe"
+      }
+    },
+    {
+      "when": {
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_inner"
+      }
+    },
+    {
+      "when": {
+        "north": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer"
+      }
+    },
+    {
+      "when": {
+        "south": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "east": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "west": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "down": "1",
+        "straight": "false"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_outer",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "1",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "east": "1",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "1",
+        "straight": "true"
+      },
+      "apply": {
+        "model": "oritech:block/fluid_pipe_straight"
+      }
+    }
+  ]
+}

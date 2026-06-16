@@ -1,0 +1,42 @@
+{
+  "variants": {
+    "machine_assembled=false,target_dir=south": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,target_dir=east": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,target_dir=north": {
+      "model": "oritech:block/large_storage_block_packaged"
+    },
+    "machine_assembled=false,target_dir=west": {
+      "model": "oritech:block/large_storage_block_packaged",
+      "y": 270
+    },
+    "machine_assembled=true,target_dir=south": {
+      "model": "oritech:block/large_storage_block",
+      "y": 180
+    },
+    "machine_assembled=true,target_dir=east": {
+      "model": "oritech:block/large_storage_block",
+      "y": 90
+    },
+    "machine_assembled=true,target_dir=north": {
+      "model": "oritech:block/large_storage_block"
+    },
+    "machine_assembled=true,target_dir=west": {
+      "model": "oritech:block/large_storage_block",
+      "y": 270
+    },
+    "target_dir=up": {
+      "model": "oritech:block/large_storage_block",
+      "x": -90
+    },
+    "target_dir=down": {
+      "model": "oritech:block/large_storage_block",
+      "x": 90
+    }
+  }
+}

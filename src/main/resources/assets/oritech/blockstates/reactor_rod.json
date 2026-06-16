@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=true": {
+      "model": "oritech:block/reactor_rod_on"
+    },
+    "lit=false": {
+      "model": "oritech:block/reactor_rod"
+    }
+  }
+}

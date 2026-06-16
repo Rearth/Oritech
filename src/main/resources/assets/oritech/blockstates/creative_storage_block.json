@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "target_dir=south": {
+      "model": "oritech:block/creative_storage_block",
+      "y": 180
+    },
+    "target_dir=east": {
+      "model": "oritech:block/creative_storage_block",
+      "y": 90
+    },
+    "target_dir=north": {
+      "model": "oritech:block/creative_storage_block"
+    },
+    "target_dir=west": {
+      "model": "oritech:block/creative_storage_block",
+      "y": 270
+    },
+    "target_dir=up": {
+      "model": "oritech:block/creative_storage_block",
+      "x": -90
+    },
+    "target_dir=down": {
+      "model": "oritech:block/creative_storage_block",
+      "x": 90
+    }
+  }
+}

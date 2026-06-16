@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/reactor_wall"
+    }
+  },
+
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech:block/reactor_wall/center",
+    "empty": "oritech:block/reactor_wall/empty",
+    "horizontal": "oritech:block/reactor_wall/horizontal",
+    "vertical": "oritech:block/reactor_wall/vertical",
+    "particle": "oritech:block/reactor_wall/particle"
+  },
+  "connect_to": {
+    "type": "tag",
+    "tag": "oritech:reactor_wall_blocks"
+  }
+}

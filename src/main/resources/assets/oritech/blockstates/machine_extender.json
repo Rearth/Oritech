@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "addon_used=true": {
+      "model": "oritech:block/machine_extender"
+    },
+    "addon_used=false": {
+      "model": "oritech:block/machine_extender_off"
+    }
+  }
+}

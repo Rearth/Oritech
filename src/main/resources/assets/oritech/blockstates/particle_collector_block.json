@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "oritech:block/particle_collector_block",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "oritech:block/particle_collector_block",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/particle_collector_block",
+      "x": 90
+    },
+    "facing=west": {
+      "model": "oritech:block/particle_collector_block",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up": {
+      "model": "oritech:block/particle_collector_block"
+    },
+    "facing=down": {
+      "model": "oritech:block/particle_collector_block",
+      "x": 180
+    }
+  }
+}
