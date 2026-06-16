@@ -1,5 +1,6 @@
 package rearth.oritech.api.recipe.util;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -15,14 +16,15 @@ import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class RecipeHelpers {
 
-    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Item dust, String suffix) {
+    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, ItemLike dust, String suffix) {
         addDustRecipe(exporter, ingot, dust, null, suffix);
     }
 
-    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Item dust, @Nullable Item ingotSmelted, String suffix) {
+    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, ItemLike dust, @Nullable ItemLike ingotSmelted, String suffix) {
         PulverizerRecipeBuilder.build().input(ingot).result(dust).export(exporter, suffix);
         GrinderRecipeBuilder.build().input(ingot).result(dust).export(exporter, suffix);
         if (ingotSmelted != null) {
@@ -31,12 +33,20 @@ public class RecipeHelpers {
         }
     }
 
+    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Supplier<? extends ItemLike> dust, String suffix) {
+        addDustRecipe(exporter, ingot, dust.get(), null, suffix);
+    }
+
+    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Supplier<? extends ItemLike> dust, @Nullable Supplier<? extends ItemLike> ingotSmelted, String suffix) {
+        addDustRecipe(exporter, ingot, dust.get(), ingotSmelted != null ? ingotSmelted.get() : null, suffix);
+    }
+
     public static RecipeBuilder createInsulatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
-        return ShapedRecipeBuilder.shaped(category, output, count).define('c', input).define('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
+        return ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, output, count).define('c', input).define('i', insulation).pattern("iii").pattern("ccc").pattern("iii");
     }
 
     public static RecipeBuilder createRotatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {
-        return ShapedRecipeBuilder.shaped(category, output, count).define('c', input).define('i', insulation)
+        return ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, output, count).define('c', input).define('i', insulation)
                 .pattern("ici")
                 .pattern("ici")
                 .pattern("ici");
@@ -47,6 +57,6 @@ public class RecipeHelpers {
     }
 
     public static Ingredient of(TagKey<Item> item) {
-        return Ingredient.of(item);
+        return Ingredient.of(BuiltInRegistries.ITEM.get(item).orElseThrow());
     }
 }

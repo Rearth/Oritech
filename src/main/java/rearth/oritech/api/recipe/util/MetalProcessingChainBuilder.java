@@ -1,11 +1,11 @@
 package rearth.oritech.api.recipe.util;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -18,6 +18,7 @@ import rearth.oritech.init.FluidContent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class MetalProcessingChainBuilder {
     private final String metalName;
@@ -71,7 +72,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder ore(TagKey<Item> oreTag) {
-        return ore(Ingredient.of(oreTag));
+        return ore(RecipeHelpers.of(oreTag));
     }
 
     public MetalProcessingChainBuilder ore(ItemLike ore) {
@@ -85,7 +86,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder rawOre(TagKey<Item> rawOreTag, Item rawOre) {
-        return rawOre(Ingredient.of(rawOreTag), rawOre);
+        return rawOre(RecipeHelpers.of(rawOreTag), rawOre);
     }
 
     public MetalProcessingChainBuilder rawOre(Item rawOre) {
@@ -104,7 +105,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder ingot(TagKey<Item> ingotTag, Item ingot) {
-        return ingot(Ingredient.of(ingotTag), ingot);
+        return ingot(RecipeHelpers.of(ingotTag), ingot);
     }
 
     public MetalProcessingChainBuilder ingot(Item ingot) {
@@ -118,7 +119,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder nugget(TagKey<Item> nuggetTag, Item nugget) {
-        return nugget(Ingredient.of(nuggetTag), nugget);
+        return nugget(RecipeHelpers.of(nuggetTag), nugget);
     }
 
     public MetalProcessingChainBuilder nugget(Item nugget) {
@@ -132,7 +133,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder clump(TagKey<Item> clumpTag, Item clump) {
-        return clump(Ingredient.of(clumpTag), clump);
+        return clump(RecipeHelpers.of(clumpTag), clump);
     }
 
     public MetalProcessingChainBuilder clump(Item clump) {
@@ -186,7 +187,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder gem(TagKey<Item> gemTag, Item gem) {
-        return gem(Ingredient.of(gemTag), gem);
+        return gem(RecipeHelpers.of(gemTag), gem);
     }
 
     public MetalProcessingChainBuilder gem(Item gem) {
@@ -199,11 +200,104 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder gemCatalyst(TagKey<Item> gemCatalyst) {
-        return gemCatalyst(Ingredient.of(gemCatalyst));
+        return gemCatalyst(RecipeHelpers.of(gemCatalyst));
     }
 
     public MetalProcessingChainBuilder gemCatalyst(Item gemCatalyst) {
         return gemCatalyst(Ingredient.of(gemCatalyst));
+    }
+
+    public MetalProcessingChainBuilder rawOre(Ingredient rawOreIngredient, Supplier<? extends Item> rawOre) {
+        return rawOre(rawOreIngredient, rawOre.get());
+    }
+    public MetalProcessingChainBuilder rawOre(TagKey<Item> rawOreTag, Supplier<? extends Item> rawOre) {
+        return rawOre(RecipeHelpers.of(rawOreTag), rawOre.get());
+    }
+    public MetalProcessingChainBuilder rawOre(Supplier<? extends Item> rawOre) {
+        return rawOre(Ingredient.of(rawOre.get()), rawOre.get());
+    }
+
+    public MetalProcessingChainBuilder rawOreByproduct(Supplier<? extends Item> byproduct) {
+        this.rawOreByproduct = byproduct.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder ingot(Ingredient ingotIngredient, Supplier<? extends Item> ingot) {
+        return ingot(ingotIngredient, ingot.get());
+    }
+    public MetalProcessingChainBuilder ingot(TagKey<Item> ingotTag, Supplier<? extends Item> ingot) {
+        return ingot(RecipeHelpers.of(ingotTag), ingot.get());
+    }
+    public MetalProcessingChainBuilder ingot(Supplier<? extends Item> ingot) {
+        return ingot(Ingredient.of(ingot.get()), ingot.get());
+    }
+
+    public MetalProcessingChainBuilder nugget(Ingredient nuggetIngredient, Supplier<? extends Item> nugget) {
+        return nugget(nuggetIngredient, nugget.get());
+    }
+    public MetalProcessingChainBuilder nugget(TagKey<Item> nuggetTag, Supplier<? extends Item> nugget) {
+        return nugget(RecipeHelpers.of(nuggetTag), nugget.get());
+    }
+    public MetalProcessingChainBuilder nugget(Supplier<? extends Item> nugget) {
+        return nugget(Ingredient.of(nugget.get()), nugget.get());
+    }
+
+    public MetalProcessingChainBuilder clump(Ingredient clumpIngredient, Supplier<? extends Item> clump) {
+        return clump(clumpIngredient, clump.get());
+    }
+    public MetalProcessingChainBuilder clump(TagKey<Item> clumpTag, Supplier<? extends Item> clump) {
+        return clump(RecipeHelpers.of(clumpTag), clump.get());
+    }
+    public MetalProcessingChainBuilder clump(Supplier<? extends Item> clump) {
+        return clump(Ingredient.of(clump.get()), clump.get());
+    }
+
+    public MetalProcessingChainBuilder smallClump(Supplier<? extends Item> smallClump) {
+        this.smallClumpItem = smallClump.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder centrifugeResult(Supplier<? extends Item> result, int amount) {
+        this.centrifugeResult = result.get();
+        this.centrifugeAmount = amount;
+        return this;
+    }
+    public MetalProcessingChainBuilder centrifugeResult(Supplier<? extends Item> result) {
+        return centrifugeResult(result, 1);
+    }
+
+    public MetalProcessingChainBuilder clumpByproduct(Supplier<? extends Item> byproduct) {
+        this.clumpByproduct = byproduct.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder dustByproduct(Supplier<? extends Item> byproduct) {
+        this.dustByproduct = byproduct.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder dust(Supplier<? extends Item> dust) {
+        this.dustItem = dust.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder smallDust(Supplier<? extends Item> smallDust) {
+        this.smallDustItem = smallDust.get();
+        return this;
+    }
+
+    public MetalProcessingChainBuilder gem(Ingredient gemIngredient, Supplier<? extends Item> gem) {
+        return gem(gemIngredient, gem.get());
+    }
+    public MetalProcessingChainBuilder gem(TagKey<Item> gemTag, Supplier<? extends Item> gem) {
+        return gem(RecipeHelpers.of(gemTag), gem.get());
+    }
+    public MetalProcessingChainBuilder gem(Supplier<? extends Item> gem) {
+        return gem(Ingredient.of(gem.get()), gem.get());
+    }
+
+    public MetalProcessingChainBuilder gemCatalyst(Supplier<? extends Item> gemCatalyst) {
+        return gemCatalyst(Ingredient.of(gemCatalyst.get()));
     }
 
     public MetalProcessingChainBuilder timeMultiplier(float timeMultiplier) {
@@ -262,7 +356,7 @@ public class MetalProcessingChainBuilder {
                     .input(rawOreIngredient)
                     .result(firstNonNull(clumpItem, dustItem))
                     .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)
-                    .result(Optional.fromNullable(clumpByproduct), byproductAmount)
+                    .result(Optional.ofNullable(clumpByproduct), byproductAmount)
                     .timeMultiplier(timeMultiplier)
                     .export(exporter, resourcePath + "raw/" + metalName);
         }
@@ -284,7 +378,7 @@ public class MetalProcessingChainBuilder {
             CentrifugeRecipeBuilder.build()
                     .input(clumpIngredient)
                     .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount : 1)
-                    .result(Optional.fromNullable(dustByproduct), byproductAmount)
+                    .result(Optional.ofNullable(dustByproduct), byproductAmount)
                     .timeMultiplier(timeMultiplier)
                     .export(exporter, resourcePath + "clump/" + metalName);
             // water washed
@@ -340,7 +434,11 @@ public class MetalProcessingChainBuilder {
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
             if (nuggetItem != null && !skipCompactingRecipes) {    // to avoid duplicate vanilla nugget -> item recipes
                 OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
-                ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, nuggetItem, 9).requires(ingotItem, 1).unlockedBy(RecipeProvider.getHasName(ingotItem), RecipeProvider.has(nuggetItem)).save(exporter);
+                var inputName = BuiltInRegistries.ITEM.getKey(ingotItem).getPath();
+                ShapelessRecipeBuilder.shapeless(net.minecraft.core.registries.BuiltInRegistries.ITEM, RecipeCategory.MISC, nuggetItem, 9)
+                        .requires(ingotItem, 1)
+                        .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(ingotItem))
+                        .save(exporter);
             }
         }
     }
@@ -350,6 +448,6 @@ public class MetalProcessingChainBuilder {
     }
 
     private Optional<Item> firstNonNullOptional(Item... items) {
-        return Iterables.tryFind(Arrays.asList(items), Predicates.notNull());
+        return Arrays.stream(items).filter(java.util.Objects::nonNull).findFirst();
     }
 }

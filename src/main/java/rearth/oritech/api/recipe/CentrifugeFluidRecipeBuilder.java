@@ -18,7 +18,7 @@ public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
     public void validate(Identifier id) throws IllegalStateException {
         if (inputs != null && inputs.size() > 1)
             throw new IllegalStateException("too many inputs for recipe " + id + " (type " + type + ")");
-        if ((fluidInput == null || fluidInput.isEmpty()) && fluidOutputs.isEmpty())
+        if (fluidInput == null && fluidOutputs.isEmpty())
             throw new IllegalStateException("fluid input or output required for recipe " + id + " (type " + type + ")");
     }
 

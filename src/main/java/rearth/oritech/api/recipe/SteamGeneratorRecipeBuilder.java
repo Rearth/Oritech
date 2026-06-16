@@ -15,7 +15,7 @@ public class SteamGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
     @Override
     public void validate(Identifier id) throws IllegalStateException {
-        if (fluidInput == null || fluidInput.isEmpty())
+        if (fluidInput == null)
             throw new IllegalStateException("fluid input required for recipe " + id + " (type " + type + ")");
     }
 }

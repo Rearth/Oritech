@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
@@ -28,12 +29,13 @@ import static rearth.oritech.util.TagUtils.*;
 
 public class OritechRecipeGenerator extends RecipeProvider {
 
-    public OritechRecipeGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
-        super(output, registriesFuture);
+    public OritechRecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
+        super(registries, output);
     }
 
     @Override
-    public void buildRecipes(RecipeOutput exporter) {
+    protected void buildRecipes() {
+        RecipeOutput exporter = this.output;
 
         addDeepDrillOres(exporter);
         addFuels(exporter);
@@ -86,7 +88,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // centrifuge dirt into clay
         CentrifugeFluidRecipeBuilder.build().input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, Oritech.id("dirt_from_sand_and_biomass"));
+        ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, ResourceKey.create(Registries.RECIPE, Oritech.id("dirt_from_sand_and_biomass")));
         // dripstone from dripstone block
         PulverizerRecipeBuilder.build().input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
@@ -196,7 +198,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // lava
         RefineryRecipeBuilder.build()
                 .fluidInput(Fluids.LAVA)
-                .fluidOutput(FluidStack.create(FluidContent.STILL_STEAM.get(), 4_000))
+                .fluidOutput(new FluidStack(FluidContent.STILL_STEAM.get(), 4_000))
                 .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
                 .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
                 .export(exporter, "lava");
@@ -378,14 +380,14 @@ public class OritechRecipeGenerator extends RecipeProvider {
         // tech door
         offerDoorRecipe(exporter, BlockContent.TECH_DOOR.asItem(), of(TagContent.STEEL_INGOTS), "techdoor");
         // hangar door
-        ShapedRecipeBuilder.shaped(RecipeCategory.REDSTONE, BlockContent.HANGAR_DOOR)
+        ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, RecipeCategory.REDSTONE, BlockContent.HANGAR_DOOR)
                 .define('s', TagContent.STEEL_INGOTS)
                 .define('m', ItemContent.MOTOR)
                 .pattern("sms")
                 .pattern("sss")
                 .pattern("sms")
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
-                .save(exporter, Oritech.id("crafting/hangardoor"));
+                .save(exporter, ResourceKey.create(Registries.RECIPE, Oritech.id("crafting/hangardoor")));
         // metal beam
         offerRotatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
         // metal girder
@@ -622,7 +624,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         AssemblerRecipeBuilder.build().input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
 
         // magnetic coils
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL, 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
+        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL.get(), 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
         AssemblerRecipeBuilder.build().input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.MAGNETIC_COIL, 6).timeMultiplier(0.4f).export(exporter, "magnet");
 
         // motor
@@ -724,18 +726,56 @@ public class OritechRecipeGenerator extends RecipeProvider {
     // offerSmelting, offerBlasting, and offerMultipleOptions copied from RecipeProvider, and altered to force Oritech id onto recipes
     // I don't really like this, but any other way I found to get these recipes to have the oritech namespace in Neoforge wasn't working.
     public static void oreSmelting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
-        oreCooking(exporter, RecipeSerializer.SMELTING_RECIPE, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
+        oreCooking(exporter, SmeltingRecipe.SERIALIZER, SmeltingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_smelting");
     }
 
     public static void oreBlasting(RecipeOutput exporter, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group) {
-        oreCooking(exporter, RecipeSerializer.BLASTING_RECIPE, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
+        oreCooking(exporter, BlastingRecipe.SERIALIZER, BlastingRecipe::new, inputs, category, output, experience, cookingTime, group, "_from_blasting");
     }
 
     public static <T extends AbstractCookingRecipe> void oreCooking(RecipeOutput exporter, RecipeSerializer<T> serializer, AbstractCookingRecipe.Factory<T> recipeFactory, List<ItemLike> inputs, RecipeCategory category, ItemLike output, float experience, int cookingTime, String group, String suffix) {
 
         for (var itemConvertible : inputs) {
-            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, output, experience, cookingTime, serializer, recipeFactory).group(group).unlockedBy(getHasName(itemConvertible), has(itemConvertible)).save(exporter, Oritech.id(getItemName(output) + suffix + "_" + getItemName(itemConvertible)));
+            var inputName = BuiltInRegistries.ITEM.getKey(itemConvertible.asItem()).getPath();
+            var outputName = BuiltInRegistries.ITEM.getKey(output.asItem()).getPath();
+            SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, output, experience, cookingTime, serializer, recipeFactory)
+                .group(group)
+                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
+                .save(exporter, Oritech.id(outputName + suffix + "_" + inputName));
         }
+    }
+
+    public static void threeByThreePacker(RecipeOutput exporter, RecipeCategory category, ItemLike packed, ItemLike unpacked) {
+        var inputName = BuiltInRegistries.ITEM.getKey(unpacked.asItem()).getPath();
+        var outputName = BuiltInRegistries.ITEM.getKey(packed.asItem()).getPath();
+        ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 9)
+                .requires(packed)
+                .unlockedBy("has_" + outputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(packed))
+                .save(exporter, Oritech.id("crafting/" + inputName + "_from_unpacking"));
+
+        ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
+                .define('#', unpacked)
+                .pattern("###")
+                .pattern("###")
+                .pattern("###")
+                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
+                .save(exporter, Oritech.id("crafting/" + outputName + "_from_packing"));
+    }
+
+    public static void twoByTwoPacker(RecipeOutput exporter, RecipeCategory category, ItemLike packed, ItemLike unpacked) {
+        var inputName = BuiltInRegistries.ITEM.getKey(unpacked.asItem()).getPath();
+        var outputName = BuiltInRegistries.ITEM.getKey(packed.asItem()).getPath();
+        ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 4)
+                .requires(packed)
+                .unlockedBy("has_" + outputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(packed))
+                .save(exporter, Oritech.id("crafting/" + inputName + "_from_unpacking"));
+
+        ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
+                .define('#', unpacked)
+                .pattern("##")
+                .pattern("##")
+                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
+                .save(exporter, Oritech.id("crafting/" + outputName + "_from_packing"));
     }
 
     private void addOreChains(RecipeOutput exporter) {

@@ -115,6 +115,13 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
+    public OritechRecipeBuilder resultTemplates(List<ItemStackTemplate> out) {
+        if (results == null)
+            results = new ArrayList<>();
+        results.addAll(out);
+        return this;
+    }
+
     public OritechRecipeBuilder result(ItemStack out) {
         return result(ItemStackTemplate.fromNonEmptyStack(out));
     }
@@ -126,21 +133,29 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
-    public OritechRecipeBuilder result(Item out, int count) {
-        return result(new ItemStackTemplate(out, count));
+    public OritechRecipeBuilder result(ItemLike out, int count) {
+        return result(new ItemStackTemplate(out.asItem(), count));
     }
 
-    public OritechRecipeBuilder result(Item out) {
+    public OritechRecipeBuilder result(ItemLike out) {
         return result(out, 1);
     }
 
-    public OritechRecipeBuilder result(Optional<Item> out, int count) {
+    public OritechRecipeBuilder result(Supplier<? extends ItemLike> out, int count) {
+        return result(new ItemStackTemplate(out.get().asItem(), count));
+    }
+
+    public OritechRecipeBuilder result(Supplier<? extends ItemLike> out) {
+        return result(out, 1);
+    }
+
+    public OritechRecipeBuilder result(Optional<? extends ItemLike> out, int count) {
         if (out.isPresent())
             return result(out.get(), count);
         return this;
     }
 
-    public OritechRecipeBuilder result(Optional<Item> out) {
+    public OritechRecipeBuilder result(Optional<? extends ItemLike> out) {
         return result(out, 1);
     }
 
