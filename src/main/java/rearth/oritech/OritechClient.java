@@ -21,6 +21,7 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
+import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
@@ -61,6 +62,7 @@ public final class OritechClient {
         modEventBus.addListener(this::registerBindings);
         modEventBus.addListener(this::registerSpecialModelRenderers);
         modEventBus.addListener(ModScreens::registerScreens);
+        modEventBus.addListener(ModRenderers::registerRenderers);
 
         ModScreens.MENUS.register(modEventBus);
     }

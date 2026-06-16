@@ -59,36 +59,36 @@ public class ModScreens {
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
-        event.register(TREEFELLER_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
+        event.register(TREEFELLER_SCREEN.get(), OritechMachineScreen::new);
         event.register(TANK_SCREEN.get(), TankScreen::new);
-        event.register(ATOMIC_FORGE_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
+        event.register(ATOMIC_FORGE_SCREEN.get(), OritechMachineScreen::new);
         event.register(CATALYST_SCREEN.get(), CatalystScreen::new);
         event.register(ENCHANTER_SCREEN.get(), EnchanterScreen::new);
         event.register(ACCELERATOR_SCREEN.get(), AcceleratorScreen::new);
-        event.register(CHARGER_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
-        event.register(FUEL_PORT_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
-        event.register(AUGMENTER_INV_SCREEN.get(), OritechMachineScreen<OritechScreenHandler>::new);
+        event.register(CHARGER_SCREEN.get(), OritechMachineScreen::new);
+        event.register(FUEL_PORT_SCREEN.get(), OritechMachineScreen::new);
+        event.register(AUGMENTER_INV_SCREEN.get(), OritechMachineScreen::new);
         event.register(REFINERY_SCREEN.get(), RefineryScreen::new);
         event.register(TAINTED_REFINERY_SCREEN.get(), TaintedRefineryScreen::new);
 
-        event.register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(GRINDER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(FOUNDRY_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(COOLER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(POWERED_FURNACE_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(BIO_GENERATOR_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(LAVA_GENERATOR_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(FUEL_GENERATOR_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(BASIC_GENERATOR_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
+        event.register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(GRINDER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(FOUNDRY_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(COOLER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(POWERED_FURNACE_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(BIO_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(LAVA_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(FUEL_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(BASIC_GENERATOR_SCREEN.get(), UpgradableOritechScreen::new);
         event.register(STORAGE_SCREEN.get(), LimitedEnergyStorageScreen::new);
         event.register(POWER_POLE_SCREEN.get(), PowerPoleScreen::new);
         event.register(UNSTABLE_CONTAINER_SCREEN.get(), UnstableContainerScreen::new);
-        event.register(DESTROYER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(PLACER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(FERTILIZER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(LASER_SCREEN.get(), UpgradableOritechScreen<UpgradableOritechScreenHandler>::new);
-        event.register(CENTRIFUGE_SCREEN.get(), UpgradableOritechScreen<CentrifugeScreenHandler>::new);
+        event.register(DESTROYER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(PLACER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(FERTILIZER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(LASER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(CENTRIFUGE_SCREEN.get(), UpgradableOritechScreen::new);
         event.register(SHRINKER_SCREEN.get(), ShrinkerScreen::new);
 
         event.register(INVENTORY_PROXY_SCREEN.get(), InventoryProxyScreen::new);

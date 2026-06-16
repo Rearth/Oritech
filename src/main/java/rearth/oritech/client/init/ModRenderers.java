@@ -1,20 +1,11 @@
 package rearth.oritech.client.init;
 
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.blocks.*;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ModRenderers {
-
-    public static Map<Block, RenderType> RENDER_LAYERS = new HashMap<>();  // this is used in client-specific parts to set render layers
 
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
 
@@ -50,63 +41,26 @@ public class ModRenderers {
         event.registerBlockEntityRenderer(BlockEntitiesContent.PIPE_BOOSTER_BLOCK_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/pipe_booster_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/enchantment_catalyst_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.PUMP_BLOCK.get(), ctx -> new MachineRenderer<>(ctx, "models/pump_block"));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.PLACER_BLOCK_ENTITY.get(), ctx -> new MachineGantryRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY.get(), ctx -> new MachineGantryRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY.get(), ctx -> new MachineGantryRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.SMALL_TANK_ENTITY.get(), ctx -> new SmallTankRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.CREATIVE_TANK_ENTITY.get(), ctx -> new SmallTankRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get(), ctx -> new ShrinkerBlockRenderer(ctx, "models, /shrinker_block"));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.PLACER_BLOCK_ENTITY.get(), MachineGantryRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY.get(), MachineGantryRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY.get(), MachineGantryRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.SMALL_TANK_ENTITY.get(), SmallTankRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.CREATIVE_TANK_ENTITY.get(), SmallTankRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get(), ctx -> new ShrinkerBlockRenderer<>(ctx, "models, /shrinker_block"));
 
-        event.registerBlockEntityRenderer(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), ctx -> new SpawnerControllerRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY.get(), ctx -> new AcceleratorControllerRenderer(ctx));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), SpawnerControllerRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY.get(), AcceleratorControllerRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitiesContent.BLACK_HOLE_ENTITY.get(), BlackHoleRenderer::new);
-        event.registerBlockEntityRenderer(BlockEntitiesContent.ITEM_PIPE_ENTITY.get(), ctx -> new ItemPipeTransferRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.CHARGER_BLOCK_ENTITY.get(), ctx -> new ChargerBlockRenderer(ctx));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.POWER_POLE_ENTITY.get(), ctx -> new PowerPoleCableRenderer(ctx));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.ITEM_PIPE_ENTITY.get(), ItemPipeTransferRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.CHARGER_BLOCK_ENTITY.get(), ChargerBlockRenderer::new);
+        event.registerBlockEntityRenderer(BlockEntitiesContent.POWER_POLE_ENTITY.get(), PowerPoleCableRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitiesContent.UNSTABLE_CONTAINER_BLOCK_ENTITY.get(), ctx -> new UnstableContainerRenderer<>(ctx, "models/unstable_container"));
 
 
         event.registerBlockEntityRenderer(BlockEntitiesContent.TECH_DOOR_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/tech_door"));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.HANGAR_DOOR_ENTITY.get(), ctx -> new HangarDoorRenderer(ctx, "models/hangar_door"));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.HANGAR_DOOR_ENTITY.get(), ctx -> new HangarDoorRenderer<>(ctx, "models/hangar_door"));
 
-        // cutout renders
-        RENDER_LAYERS.put(BlockContent.MACHINE_FRAME_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.REACTOR_ABSORBER_PORT, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.REACTOR_CONTROLLER, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.FRAME_GANTRY_ARM, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.BLOCK_PLACER_HEAD, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.BLOCK_DESTROYER_HEAD, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.BLOCK_FERTILIZER_HEAD, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.MACHINE_FLUID_ADDON, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.CROP_FILTER_ADDON, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.LARGE_STORAGE_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.FERTILIZER_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.PLACER_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.URANIUM_CRYSTAL, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.DESTROYER_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.SMALL_TANK_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.CREATIVE_TANK_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.INDUSTRIAL_GLASS_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.QUARRY_BEAM_RING, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.WITHER_CROP_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.SPAWNER_CONTROLLER_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.SHRINKER_BLOCK, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.ACCELERATOR_MOTOR, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.ACCELERATOR_RING, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.ACCELERATOR_CONTROLLER, RenderType.cutout());
-        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_BLOCK, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_INNER, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_MIDDLE, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.BLACK_HOLE_OUTER, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.COOLER_BLOCK, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.REACTOR_ROD, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.REACTOR_DOUBLE_ROD, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.REACTOR_QUAD_ROD, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.REACTOR_REDSTONE_PORT, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE, RenderType.translucent());
-        RENDER_LAYERS.put(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION, RenderType.translucent());
-
-        Oritech.LOGGER.info("Registering Entities Renderers for " + Oritech.MOD_ID);
+        Oritech.LOGGER.info("Registered Entities Renderers for " + Oritech.MOD_ID);
 
 
     }
