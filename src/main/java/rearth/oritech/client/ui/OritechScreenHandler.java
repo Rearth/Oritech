@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,6 +20,7 @@ import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
@@ -42,6 +44,11 @@ import java.util.Objects;
  * energy storage reference, fluid storage references, screen data.
  */
 public class OritechScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
+
+    /** Player-inventory armor slots, ordered to match the displayed equipment column (feet, legs, chest, head). */
+    private static final EquipmentSlot[] ARMOR_EQUIPMENT_SLOTS = {
+            EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD
+    };
 
     @NotNull
     public final Inventory playerInventory;
@@ -147,16 +154,18 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         // Armor slots (optional): 4 armor + 1 offhand
         if (screenData.showArmor()) {
             armorSlots = new ArrayList<>(5);
-            for (int i = 0; i < playerInventory.armor.size() + 1; i++) {
+            for (int i = 0; i < ARMOR_EQUIPMENT_SLOTS.length + 1; i++) {
                 final var armorIndex = i;
                 var slot = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19) {
                     @Override
                     public boolean mayPlace(ItemStack stack) {
-                        if (armorIndex == 4) return super.mayPlace(stack); // offhand slot
-                        if (stack.getItem() instanceof ArmorItem armorItem) {
-                            return super.mayPlace(stack) && armorItem.getEquipmentSlot().getIndex() == armorIndex;
-                        }
-                        return false;
+                        if (armorIndex >= ARMOR_EQUIPMENT_SLOTS.length) return super.mayPlace(stack); // offhand slot
+                        return stack.canEquip(ARMOR_EQUIPMENT_SLOTS[armorIndex], playerInventory.player);
+                    }
+
+                    @Override
+                    public int getMaxStackSize() {
+                        return armorIndex >= ARMOR_EQUIPMENT_SLOTS.length ? super.getMaxStackSize() : 1;
                     }
                 });
                 armorSlots.add(slot.index);
@@ -172,7 +181,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
         if (output) {
             this.addSlot(new BasicMachineOutputSlot(inventory, inventorySlot, x, y));
         } else {
-            this.addSlot(new Slot(inventory, inventorySlot, x, y));
+            this.addSlot(new ResourceHandlerSlot(inventory, inventory::set, inventorySlot, x, y));
         }
     }
 
@@ -200,7 +209,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             var originalStack = slot.getItem();
             var newStack = originalStack.copy();
 
-            int machineSize = this.inventory.getContainerSize();
+            int machineSize = this.inventory.size();
             int playerInvStart = getPlayerInvStartSlot(newStack);
             int playerInvEnd = getPlayerInvEndSlot(newStack);
             int totalSize = this.slots.size();
@@ -234,7 +243,7 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     }
 
     public int getPlayerInvStartSlot(ItemStack stack) {
-        return this.inventory.getContainerSize();
+        return this.inventory.size();
     }
 
     public int getPlayerInvEndSlot(ItemStack stack) {
@@ -246,12 +255,13 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
     }
 
     public int getMachineInvEndSlot(ItemStack stack) {
-        return this.inventory.getContainerSize();
+        return this.inventory.size();
     }
 
     @Override
     public boolean stillValid(Player player) {
-        return this.inventory.stillValid(player);
+        if (blockEntity == null || blockEntity.isRemoved()) return false;
+        return player.distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) <= 64.0;
     }
 
     @Override

@@ -44,7 +44,6 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     private LabelWidget sumHeatLabel;
     private LabelWidget statusLabel;
     private TextureWidget energyIndicator;
-    private ReactorPreviewWidget previewWidget;
 
     public ReactorScreen(ReactorScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title, 340, 200);
@@ -57,7 +56,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         panel.withZIndex(-10);
         addComponent(panel);
 
-        previewWidget = new ReactorPreviewWidget(6, 16, 175, 164);
+        var previewWidget = new ReactorPreviewWidget(6, 16, 175, 164);
         addComponent(previewWidget);
         addStatsPanel();
         addStatusPanel();
@@ -168,8 +167,8 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
     private void updateEnergyBar() {
-        long capacity = menu.reactorEntity.energyStorage.getCapacity();
-        long amount = menu.reactorEntity.energyStorage.getAmount();
+        long capacity = menu.reactorEntity.energyStorage.getCapacityAsLong();
+        long amount = menu.reactorEntity.energyStorage.getAmountAsLong();
         float fillAmount = capacity <= 0 ? 0f : (float) amount / capacity;
 
         energyIndicator.withTooltip(Component.translatable("tooltip.oritech.energy_indicator", amount, capacity));
@@ -178,7 +177,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
     private List<Component> getStatsTooltip(BlockPos pos, BlockState state) {
         var tooltip = new ArrayList<Component>();
-        consumer.accept(state.getBlock().getName().copy().withStyle(ChatFormatting.BOLD));
+        tooltip.add(state.getBlock().getName().copy().withStyle(ChatFormatting.BOLD));
 
         var stats = getStatsAtPosition(pos);
         if (stats.storedHeat() == -1) return tooltip;
@@ -198,23 +197,23 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int heat = stats.storedHeat();
 
             if (portEntity instanceof ReactorFuelPortEntity fuelPortEntity) {
-                consumer.accept(Component.translatable("text.oritech.reactor.rod_count", rodCount));
-                consumer.accept(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses));
-                consumer.accept(Component.translatable("text.oritech.reactor.received_pulses", externalPulses));
-                consumer.accept(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat));
-                consumer.accept(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy));
-                consumer.accept(Component.translatable("text.oritech.reactor.heat", heat));
-                consumer.accept(Component.translatable("text.oritech.reactor.fuel", fuelPortEntity.availableFuel, fuelPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.rod_count", rodCount));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses));
+                tooltip.add(Component.translatable("text.oritech.reactor.received_pulses", externalPulses));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat));
+                tooltip.add(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy));
+                tooltip.add(Component.translatable("text.oritech.reactor.heat", heat));
+                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuelPortEntity.availableFuel, fuelPortEntity.currentFuelOriginalCapacity));
             }
         } else if (state.getBlock() instanceof ReactorHeatPipeBlock) {
-            consumer.accept(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()));
-            consumer.accept(Component.translatable("text.oritech.reactor.heat", stats.storedHeat()));
+            tooltip.add(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()));
+            tooltip.add(Component.translatable("text.oritech.reactor.heat", stats.storedHeat()));
         } else if (state.getBlock() instanceof ReactorHeatVentBlock) {
-            consumer.accept(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
+            tooltip.add(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
         } else if (state.getBlock() instanceof ReactorAbsorberBlock) {
             if (portEntity instanceof ReactorAbsorberPortEntity absorberPortEntity) {
-                consumer.accept(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
-                consumer.accept(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
             }
         }
 
@@ -278,7 +277,6 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                     return;
                 }
 
-                var offset = pos.subtract(menu.reactorEntity.areaMin);
                 blockEntries.add(entry);
 
                 var state = menu.level.getBlockState(pos);

@@ -13,8 +13,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
-import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -291,26 +291,26 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
                                              PlayerAugments.AugmentApplicatorOperation operation,
                                              List<Component> missingRequirements) {
         var tooltip = new ArrayList<Component>();
-        consumer.accept(Component.translatable(operationKey(operation))
+        tooltip.add(Component.translatable(operationKey(operation))
                 .append(Component.literal(" "))
                 .append(Component.translatable(augmentKey(augmentId)).withStyle(ChatFormatting.BOLD)));
 
-        consumer.accept(Component.translatable(augmentKey(augmentId) + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        tooltip.add(Component.translatable(augmentKey(augmentId) + ".desc").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         for (int i = 1; i < 8; i++) {
             var key = augmentKey(augmentId) + ".desc." + i;
             if (I18n.exists(key)) {
-                consumer.accept(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                tooltip.add(Component.translatable(key).withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
             }
         }
 
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            consumer.accept(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
-            consumer.accept(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
+            tooltip.add(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
+            tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
         }
 
         if (!missingRequirements.isEmpty()) {
-            consumer.accept(Component.translatable("oritech.text.missing_requirements_title").withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
-            consumer.acceptAll(missingRequirements);
+            tooltip.add(Component.translatable("oritech.text.missing_requirements_title").withStyle(ChatFormatting.BOLD, ChatFormatting.RED));
+            tooltip.addAll(missingRequirements);
         }
 
         return tooltip;
@@ -454,8 +454,8 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
 
                 var itemWidget = new ItemWidget(itemX, itemY, shownStack).withTooltipFromStack(false);
                 var tooltip = new ArrayList<Component>();
-                consumer.accept(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
-                shownStacks.stream().map(ItemStack::getHoverName).forEach(component -> consumer.accept(component));
+                tooltip.add(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
+                shownStacks.stream().map(ItemStack::getHoverName).forEach(tooltip::add);
                 itemWidget.withTooltip(tooltip);
                 dialogChildren.add(itemWidget);
                 itemX += 20;
@@ -548,12 +548,29 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         };
     }
 
-    // Stubbed: the immediate-mode vertex API used to draw arbitrary 2D lines was removed
-    // in 26.1. Diagonal lines between dependency nodes will not render until a custom
-    // GuiRenderState submission is built. Axis-aligned segments could fall back to fill()
-    // but most dependency edges in this tree are diagonal.
-    private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color, float zIndex) {
-        // no-op
+    // Draws an arbitrary (including diagonal) 1px line by rasterizing it into pixel-sized
+    // fill() calls. The immediate-mode vertex API used previously was removed in 26.1, and
+    // fill() is the render-pipeline-agnostic primitive available on the GUI graphics.
+    private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color) {
+        int dx = toX - fromX;
+        int dy = toY - fromY;
+        int steps = Math.max(Math.abs(dx), Math.abs(dy));
+        if (steps == 0) {
+            graphics.fill(fromX, fromY, fromX + 1, fromY + 1, color);
+            return;
+        }
+
+        float xInc = dx / (float) steps;
+        float yInc = dy / (float) steps;
+        float x = fromX;
+        float y = fromY;
+        for (int i = 0; i <= steps; i++) {
+            int px = Math.round(x);
+            int py = Math.round(y);
+            graphics.fill(px, py, px + 1, py + 1, color);
+            x += xInc;
+            y += yInc;
+        }
     }
 
     @Override
@@ -594,7 +611,7 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             for (var dependency : dependencyLines) {
-                drawLine(graphics, dependency.fromX(), dependency.fromY(), dependency.toX(), dependency.toY(), LINE_COLOR, 0f);
+                drawLine(graphics, dependency.fromX(), dependency.fromY(), dependency.toX(), dependency.toY(), LINE_COLOR);
             }
         }
     }

@@ -50,6 +50,18 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
     protected abstract void buildComponents();
 
+    /**
+     * Recenters the component origin for a panel of the given size. Useful for screens whose
+     * size depends on the window (e.g. full-window canvases) and is decided at build time.
+     * Components are rendered relative to {@code leftPos}/{@code topPos}, so passing the full
+     * window size anchors the origin at (0, 0).
+     */
+    protected void setPanelSize(int panelWidth, int panelHeight) {
+        this.leftPos = (this.width - panelWidth) / 2;
+        this.topPos = (this.height - panelHeight) / 2;
+    }
+
+
     protected void rebuildComponents() {
         clearWidgets();
         components.clear();
@@ -65,8 +77,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
     @Override
     public void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
-        var sorted = new ArrayList<>(components);
-        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
+        var sorted = componentsBackToFront();
 
         int relX = mouseX - leftPos;
         int relY = mouseY - topPos;
@@ -185,10 +196,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         int button = event.button();
         interactionTarget = null;
 
-        var sorted = new ArrayList<>(components);
-        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
-
-        for (var c : sorted) {
+        for (var c : componentsFrontToBack()) {
             if (c.isVisible() && (c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleClick(relX, relY, button)) {
                 interactionTarget = c;
                 return true;
@@ -208,10 +216,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
             return true;
         }
 
-        var sorted = new ArrayList<>(components);
-        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
-
-        for (var c : sorted) {
+        for (var c : componentsFrontToBack()) {
             if (c.isVisible() && (c == interactionTarget || c.isMouseOver(relX, relY) || c instanceof OverlayWidget) && c.handleDrag(relX, relY, dragX, dragY, button)) {
                 interactionTarget = c;
                 return true;
@@ -255,6 +260,20 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
     protected void removeComponent(UIComponent component) {
         components.remove(component);
+    }
+
+    /** Components ordered by ascending z-index (back-to-front), for rendering. */
+    private List<UIComponent> componentsBackToFront() {
+        var sorted = new ArrayList<>(components);
+        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
+        return sorted;
+    }
+
+    /** Components ordered by descending z-index (front-to-back), for hit-testing. */
+    private List<UIComponent> componentsFrontToBack() {
+        var sorted = new ArrayList<>(components);
+        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex).reversed());
+        return sorted;
     }
 
     protected Identifier getBackgroundTexture() {

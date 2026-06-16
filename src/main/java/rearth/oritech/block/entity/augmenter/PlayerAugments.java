@@ -12,6 +12,7 @@ import rearth.oritech.init.AttachmentContent;
 import rearth.oritech.init.datapack.AugmentContent;
 import rearth.oritech.init.datapack.AugmentData;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
@@ -36,6 +37,13 @@ public class PlayerAugments {
     public static AugmentData getAugmentData(RegistryAccess registryAccess, Identifier id) {
         var registry = registryAccess.lookupOrThrow(AugmentContent.AUGMENT_REGISTRY_KEY);
         return registry.getValue(id);
+    }
+
+    public static Map<Identifier, AugmentData> getAllAugmentData(RegistryAccess registryAccess) {
+        var registry = registryAccess.lookupOrThrow(AugmentContent.AUGMENT_REGISTRY_KEY);
+        var result = new LinkedHashMap<Identifier, AugmentData>();
+        registry.listElements().forEach(holder -> result.put(holder.key().identifier(), holder.value()));
+        return result;
     }
 
     public static void serverTickAugments(ServerPlayer player) {

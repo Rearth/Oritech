@@ -203,7 +203,7 @@ public abstract class UIComponent {
 
     public UIComponent addTooltipLine(Component line) {
         if (this.tooltip == null) this.tooltip = new ArrayList<>();
-        this.consumer.acceptAll(splitNewlines(List.of(line)));
+        this.tooltip.addAll(splitNewlines(List.of(line)));
         return this;
     }
 
