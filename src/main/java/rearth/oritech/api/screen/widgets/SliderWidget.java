@@ -3,7 +3,6 @@ package rearth.oritech.api.screen.widgets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import rearth.oritech.api.screen.UIComponent;
@@ -250,7 +249,7 @@ public class SliderWidget extends UIComponent {
         }
 
         var direction = scrollDelta > 0 ? 1 : -1;
-        var stepCount = Screen.hasShiftDown() ? 5 : 1;
+        var stepCount = Minecraft.getInstance().hasShiftDown() ? 5 : 1;
         var nextValue = getSteppedSnapValue(direction * stepCount);
         if (nextValue != value) {
             value = nextValue;

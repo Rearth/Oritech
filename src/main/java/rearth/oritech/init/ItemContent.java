@@ -123,7 +123,7 @@ public class ItemContent {
     @Compostable(1.0F)
     public static final DeferredItem<Item> PACKED_WHEAT = ITEMS.registerSimpleItem("packed_wheat");
     public static final DeferredItem<Item> QUARTZ_DUST = ITEMS.registerSimpleItem("quartz_dust");
-    public static final DeferredItem<Item> UNSTABLE_CONTAINER = ITEMS.registerItem("unstable_container", props -> new UnstableContainerItem(props.stacksTo(1), 0.23f, "unstable_container"));
+    public static final DeferredItem<Item> UNSTABLE_CONTAINER = ITEMS.registerItem("unstable_container", props -> new UnstableContainerItem(props.stacksTo(1)));
 
     // bio
     @Compostable(0.3F)

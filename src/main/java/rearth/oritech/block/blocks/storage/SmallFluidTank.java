@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
@@ -171,7 +172,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
 
         if (tankEntity.fluidStorage.getAmount() > 0) {
             var fluidStack = tankEntity.fluidStorage.getContent().copy();
-            stack.set(ComponentContent.STORED_FLUID, fluidStack);
+            stack.set(ComponentContent.STORED_FLUID, SimpleFluidContent.copyOf(fluidStack));
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
 
@@ -189,7 +190,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
         if (itemStack.has(ComponentContent.STORED_FLUID)) {
             var fluidStack = itemStack.get(ComponentContent.STORED_FLUID);
             var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
-            tankEntity.fluidStorage.set(0, FluidResource.of(fluidStack), fluidStack.amount());
+            tankEntity.fluidStorage.set(0, FluidResource.of(fluidStack.getFluid()), fluidStack.getAmount());
             tankEntity.setChanged();
         }
     }

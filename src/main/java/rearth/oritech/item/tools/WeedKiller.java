@@ -8,6 +8,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -15,7 +16,7 @@ import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayDeque;
 import java.util.HashSet;
-import java.util.List;
+import java.util.function.Consumer;
 
 public class WeedKiller extends Item {
     public WeedKiller(Properties settings) {
@@ -83,7 +84,7 @@ public class WeedKiller extends Item {
     @Override
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-        consumer.accept(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
+        builder.accept(Component.translatable("tooltip.oritech.weed_killer").withStyle(ChatFormatting.GRAY));
     }
 
     private boolean isWeedBlock(BlockPos pos, Level level) {

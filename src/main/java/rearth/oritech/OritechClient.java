@@ -21,6 +21,9 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
+import net.minecraft.world.entity.player.Player;
+import rearth.oritech.client.init.ClientGuiRenderers;
+import rearth.oritech.client.init.FluidModelContent;
 import rearth.oritech.client.init.ModRenderers;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
@@ -48,6 +51,7 @@ public final class OritechClient {
         var neoEventBus = NeoForge.EVENT_BUS;
 
         neoEventBus.addListener(this::onPreClientTick);
+        neoEventBus.addListener(this::onPostClientTick);
         neoEventBus.addListener(this::onMouseClicked);
         neoEventBus.addListener(this::onBlockOutlinesRendered);
 
@@ -63,6 +67,8 @@ public final class OritechClient {
         modEventBus.addListener(this::registerSpecialModelRenderers);
         modEventBus.addListener(ModScreens::registerScreens);
         modEventBus.addListener(ModRenderers::registerRenderers);
+        modEventBus.addListener(ClientGuiRenderers::registerPipRenderers);
+        modEventBus.addListener(FluidModelContent::registerFluidModels);
 
         ModScreens.MENUS.register(modEventBus);
     }
@@ -82,7 +88,7 @@ public final class OritechClient {
         var player = client.player;
         if (client.player == null || client.level == null) return;
 
-        // ensure prometheum pick is animated correctly. This is to be in non-pre variant of the event, not sure if this will work
+        // ensure prometheum pick is animated correctly
         var stack = client.player.getMainHandItem();
         if (stack.getItem() instanceof PromethiumPickaxeItem pickaxeItem) {
             pickaxeItem.onHeldTick(stack, client.player, client.level);
@@ -95,6 +101,23 @@ public final class OritechClient {
             laserActive = false;
         }
 
+        // used for augment UI
+        if (AUGMENT_SELECTOR.consumeClick() && activeScreen == null) {
+            activeScreen = new AugmentSelectionScreen();
+            client.setScreen(activeScreen);
+        } else if (activeScreen != null && !InputConstants.isKeyDown(client.getWindow(), AUGMENT_SELECTOR.getKey().getValue())) {
+            activeScreen.onClose();
+        }
+
+        for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
+            if (augment.isEnabled((Player) player))
+                augment.refreshClient(player);
+        }
+    }
+
+    private void onPostClientTick(ClientTickEvent.Post event) {
+        ClientZiplineHandler.onClientTick();
+        ZiplineFxHandler.tick();
     }
 
     private void onMouseClicked(InputEvent.MouseButton.Pre event) {
@@ -110,36 +133,5 @@ public final class OritechClient {
 
     private void onBlockOutlinesRendered(ExtractBlockOutlineRenderStateEvent event) {
         BlockOutlineRenderer.onOutlineExtract(event);
-    }
-
-    // old, needs to be updated/migrated as we go
-    public static void initialize() {
-
-        // used for augment UI
-        ClientTickEvent.CLIENT_PRE.register(client -> {
-            if (AUGMENT_SELECTOR.consumeClick() && activeScreen == null) {
-                activeScreen = new AugmentSelectionScreen();
-                client.setScreen(activeScreen);
-            } else if (activeScreen != null && !InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), AUGMENT_SELECTOR.key.getValue())) {
-                activeScreen.onClose();
-            }
-        });
-
-        ClientTickEvent.CLIENT_PRE.register(client -> {
-            var player = client.player;
-            if (player == null) return;
-
-            for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
-                if (augment.isEnabled(player))
-                    augment.refreshClient(player);
-            }
-        });
-
-        ClientTickEvent.CLIENT_POST.register((client) -> {
-            ClientZiplineHandler.onClientTick();
-            ZiplineFxHandler.tick();
-        });
-
-        Oritech.LOGGER.info("Oritech client initialization done");
     }
 }

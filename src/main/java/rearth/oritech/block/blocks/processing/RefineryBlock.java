@@ -50,7 +50,7 @@ public class RefineryBlock extends MultiblockMachine {
     }
 
     @Override
-    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
+    public void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
         var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY.get());
 

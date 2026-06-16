@@ -1,7 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
@@ -89,7 +89,7 @@ public class ScrollWidget extends UIComponent {
 
     @Override
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
-        return handleMouseScroll(mouseX, mouseY, scrollDelta, Screen.hasShiftDown());
+        return handleMouseScroll(mouseX, mouseY, scrollDelta, Minecraft.getInstance().hasShiftDown());
     }
 
     @Override

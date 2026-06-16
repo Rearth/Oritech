@@ -346,7 +346,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
 
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.STORAGE_SCREEN;
+        return ModScreens.STORAGE_SCREEN.get();
     }
 
     @Override

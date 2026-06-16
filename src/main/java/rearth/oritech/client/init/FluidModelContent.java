@@ -2,16 +2,12 @@ package rearth.oritech.client.init;
 
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.resources.model.sprite.Material;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.util.ColorHelper;
 
-@EventBusSubscriber(modid = Oritech.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public final class FluidModelContent {
 
     private static final Material GAS_DARK = new Material(Oritech.id("block/fluid/fluid_gas_dark"));
@@ -25,7 +21,6 @@ public final class FluidModelContent {
     private FluidModelContent() {
     }
 
-    @SubscribeEvent
     public static void registerFluidModels(RegisterFluidModelsEvent event) {
         event.register(new FluidModel.Unbaked(GAS_DARK, GAS_DARK, null, FluidTintSources.constant(ColorHelper.argb(0.478f, 0.478f, 0.478f))), FluidContent.STILL_OIL, FluidContent.FLOWING_OIL);
         event.register(new FluidModel.Unbaked(STRANGE_PALE, STRANGE_PALE, null, FluidTintSources.constant(ColorHelper.argb(0.176f, 0.239f, 0.282f))), FluidContent.STILL_FUEL, FluidContent.FLOWING_FUEL);

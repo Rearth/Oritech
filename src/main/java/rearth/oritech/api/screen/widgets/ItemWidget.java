@@ -60,7 +60,7 @@ public class ItemWidget extends UIComponent {
             float scale = targetSize / 16f;
             graphics.pose().pushMatrix();
             graphics.pose().translate(cx, cy);
-            graphics.pose().scale(scale, scale, 1f);
+            graphics.pose().scale(scale, scale);
             graphics.item(stack, 0, 0);
             if (showOverlay)
                 graphics.itemDecorations(Minecraft.getInstance().font, stack, 0, 0);
