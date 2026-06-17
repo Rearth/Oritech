@@ -16,7 +16,6 @@ import rearth.oritech.api.recipe.OritechRecipeGenerator;
 import rearth.oritech.api.recipe.PulverizerRecipeBuilder;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public class RecipeHelpers {
 
@@ -31,14 +30,6 @@ public class RecipeHelpers {
             OritechRecipeGenerator.oreSmelting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 200, Oritech.MOD_ID);
             OritechRecipeGenerator.oreBlasting(exporter, List.of(dust), RecipeCategory.MISC, ingotSmelted, 1f, 100, Oritech.MOD_ID);
         }
-    }
-
-    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Supplier<? extends ItemLike> dust, String suffix) {
-        addDustRecipe(exporter, ingot, dust.get(), null, suffix);
-    }
-
-    public static void addDustRecipe(RecipeOutput exporter, Ingredient ingot, Supplier<? extends ItemLike> dust, @Nullable Supplier<? extends ItemLike> ingotSmelted, String suffix) {
-        addDustRecipe(exporter, ingot, dust.get(), ingotSmelted != null ? ingotSmelted.get() : null, suffix);
     }
 
     public static RecipeBuilder createInsulatedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input, Ingredient insulation) {

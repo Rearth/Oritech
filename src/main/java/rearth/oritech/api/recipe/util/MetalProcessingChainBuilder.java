@@ -1,7 +1,6 @@
 package rearth.oritech.api.recipe.util;
 
 import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -19,6 +18,7 @@ import rearth.oritech.init.FluidContent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 public class MetalProcessingChainBuilder {
     private final String metalName;
