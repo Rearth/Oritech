@@ -1,18 +1,18 @@
-package rearth.oritech.datagen.builder;
+package rearth.oritech.datagen.builders;
 
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
-public class LaserRecipeBuilder extends OritechRecipeBuilder {
+public class DeepDrillRecipeBuilder extends OritechRecipeBuilder {
 
-    protected LaserRecipeBuilder() {
-        super(RecipeContent.LASER, "laser");
-        // Set the default time for laser recipes
+    protected DeepDrillRecipeBuilder() {
+        super(RecipeContent.DEEP_DRILL, "deepdrill");
+        // Set the default time for deep drill recipes
         this.time = 1;
     }
 
     public static OritechRecipeBuilder build() {
-        return new LaserRecipeBuilder();
+        return new DeepDrillRecipeBuilder();
     }
 
     @Override

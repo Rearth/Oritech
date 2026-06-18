@@ -1,4 +1,4 @@
-package rearth.oritech.datagen.builder.util;
+package rearth.oritech.datagen.builders.util;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -11,9 +11,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.datagen.builder.GrinderRecipeBuilder;
+import rearth.oritech.datagen.builders.GrinderRecipeBuilder;
 import rearth.oritech.datagen.OritechRecipeGenerator;
-import rearth.oritech.datagen.builder.PulverizerRecipeBuilder;
+import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 
 import java.util.List;
 

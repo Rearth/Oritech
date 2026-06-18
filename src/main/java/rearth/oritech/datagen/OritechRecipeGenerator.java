@@ -2,6 +2,7 @@ package rearth.oritech.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.effect.MobEffects;
@@ -16,17 +17,34 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import rearth.oritech.Oritech;
-import rearth.oritech.datagen.builder.*;
-import rearth.oritech.datagen.builder.util.MetalProcessingChainBuilder;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
+import rearth.oritech.datagen.builders.*;
+import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-import static rearth.oritech.datagen.builder.util.RecipeHelpers.*;
+import static rearth.oritech.datagen.builders.util.RecipeHelpers.*;
 import static rearth.oritech.util.TagUtils.*;
 
 public class OritechRecipeGenerator extends RecipeProvider {
+
+    public static class Runner extends RecipeProvider.Runner {
+        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+            super(packOutput, registries);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
+            return new OritechRecipeGenerator(registries, output);
+        }
+
+        @Override
+        public String getName() {
+            return "Oritech Recipes";
+        }
+    }
 
     public OritechRecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
         super(registries, output);

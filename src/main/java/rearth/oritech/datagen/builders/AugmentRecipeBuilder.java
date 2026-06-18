@@ -1,4 +1,4 @@
-package rearth.oritech.datagen.builder;
+package rearth.oritech.datagen.builders;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +17,7 @@ import rearth.oritech.init.datapack.AugmentData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static rearth.oritech.datagen.builder.util.RecipeHelpers.of;
+import static rearth.oritech.datagen.builders.util.RecipeHelpers.of;
 
 public class AugmentRecipeBuilder {
     private final String resourcePath;

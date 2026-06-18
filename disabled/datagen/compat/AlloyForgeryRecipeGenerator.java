@@ -1,0 +1,45 @@
+package rearth.oritech.generator.compat;
+
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import rearth.oritech.Oritech;
+import rearth.oritech.generator.RecipeGenerator;
+import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
+import wraith.alloyforgery.data.builders.AlloyForgeryRecipeBuilder;
+
+public class AlloyForgeryRecipeGenerator {
+    public static void generateRecipes(RecipeOutput exporter) {
+        offerAFAlloyRecipe(exporter, TagContent.NICKEL_INGOTS, ConventionalItemTags.DIAMOND_GEMS, ItemContent.ADAMANT_INGOT, 1, 1, 10, "adamant");
+        offerAFAlloyRecipe(exporter, ConventionalItemTags.IRON_INGOTS, ItemContent.RAW_BIOPOLYMER.asItem(), ItemContent.BIOSTEEL_INGOT.asItem(), 1, 1, 10, "biosteel");
+        offerAFAlloyRecipe(exporter, TagContent.PLATINUM_INGOTS, ConventionalItemTags.NETHERITE_INGOTS, ItemContent.DURATIUM_INGOT.asItem(), 1, 1, 20, "duratium");
+        offerAFAlloyRecipe(exporter, ConventionalItemTags.GOLD_INGOTS, ConventionalItemTags.REDSTONE_DUSTS, ItemContent.ELECTRUM_INGOT.asItem(), 1, 1, 10, "electrum");
+        offerAFAlloyRecipe(exporter, TagContent.NICKEL_INGOTS, ItemContent.FLUXITE.asItem(), ItemContent.ENERGITE_INGOT.asItem(), 1, 1, 10, "energite");
+        offerAFAlloyRecipe(exporter, ConventionalItemTags.IRON_INGOTS, TagContent.COAL_DUSTS, ItemContent.STEEL_INGOT.asItem(), 1, 1, 5, "steel");
+
+    }
+
+    private static void offerAFAlloyRecipe(RecipeOutput exporter, TagKey<Item> inputA, Item inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
+        AlloyForgeryRecipeBuilder.create(result)
+            .input(inputA, 1)
+            .input(inputB, 1)
+            .setMinimumForgeTier(minForgeTier)
+            .setFuelPerTick(fuelPerTick)
+            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
+            .unlockedBy(RecipeGenerator.getHasName(inputB), RecipeGenerator.has(inputB))
+            .save(exporter, Oritech.id("compat/alloyforgery/") + suffix);
+    }
+
+    private static void offerAFAlloyRecipe(RecipeOutput exporter, TagKey<Item> inputA, TagKey<Item> inputB, Item result, int resultCount, int minForgeTier, int fuelPerTick, String suffix) {
+        AlloyForgeryRecipeBuilder.create(result)
+            .input(inputA, 1)
+            .input(inputB, 1)
+            .setMinimumForgeTier(minForgeTier)
+            .setFuelPerTick(fuelPerTick)
+            .unlockedBy("has_" + inputA.location().toDebugFileName(), RecipeGenerator.has(inputA))
+            .unlockedBy("has_" + inputB.location().toDebugFileName(), RecipeGenerator.has(inputB))
+            .save(exporter, Oritech.id("compat/alloyforgery/") + suffix);
+    }
+}

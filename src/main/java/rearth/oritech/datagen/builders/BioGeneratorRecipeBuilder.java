@@ -1,4 +1,4 @@
-package rearth.oritech.datagen.builder;
+package rearth.oritech.datagen.builders;
 
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;

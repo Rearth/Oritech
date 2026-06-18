@@ -1,15 +1,16 @@
-package rearth.oritech.datagen.builder;
+package rearth.oritech.datagen.builders;
 
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
-public class FuelGeneratorRecipeBuilder extends OritechRecipeBuilder {
-    private FuelGeneratorRecipeBuilder() {
-        super(RecipeContent.FUEL_GENERATOR, "fuelgen");
+public class SteamGeneratorRecipeBuilder extends OritechRecipeBuilder {
+
+    protected SteamGeneratorRecipeBuilder() {
+        super(RecipeContent.STEAM_ENGINE, "steamgen");
     }
 
     public static OritechRecipeBuilder build() {
-        return new FuelGeneratorRecipeBuilder();
+        return new SteamGeneratorRecipeBuilder();
     }
 
     @Override

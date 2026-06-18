@@ -1,4 +1,4 @@
-package rearth.oritech.datagen.builder.util;
+package rearth.oritech.datagen.builders.util;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -13,7 +13,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
 import rearth.oritech.datagen.OritechRecipeGenerator;
-import rearth.oritech.datagen.builder.*;
+import rearth.oritech.datagen.builders.*;
 import rearth.oritech.init.FluidContent;
 
 import java.util.Arrays;
