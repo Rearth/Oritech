@@ -46,7 +46,7 @@ public class ModRenderers {
         event.registerBlockEntityRenderer(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY.get(), MachineGantryRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitiesContent.SMALL_TANK_ENTITY.get(), SmallTankRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitiesContent.CREATIVE_TANK_ENTITY.get(), SmallTankRenderer::new);
-        event.registerBlockEntityRenderer(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get(), ctx -> new ShrinkerBlockRenderer<>(ctx, "models, /shrinker_block"));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.SHRINKER_BLOCK_ENTITY.get(), ctx -> new ShrinkerBlockRenderer<>(ctx, "models/shrinker_block"));
 
         event.registerBlockEntityRenderer(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), SpawnerControllerRenderer::new);
         event.registerBlockEntityRenderer(BlockEntitiesContent.ACCELERATOR_CONTROLLER_BLOCK_ENTITY.get(), AcceleratorControllerRenderer::new);

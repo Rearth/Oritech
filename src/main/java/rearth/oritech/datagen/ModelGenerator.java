@@ -58,19 +58,7 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.MACHINE_PLATING_BLOCK.get(),
             BlockContent.IRON_PLATING_BLOCK.get(),
             BlockContent.CARBON_PLATING_BLOCK.get(),
-            BlockContent.NICKEL_PLATING_BLOCK.get(),
-            FluidContent.STILL_OIL_BLOCK.get(),
-            FluidContent.STILL_FUEL_BLOCK.get(),
-            FluidContent.STILL_BIOFUEL_BLOCK.get(),
-            FluidContent.STILL_STEAM_BLOCK.get(),
-            FluidContent.STILL_HEAVY_OIL_BLOCK.get(),
-            FluidContent.STILL_DIESEL_BLOCK.get(),
-            FluidContent.STILL_NAPHTHA_BLOCK.get(),
-            FluidContent.STILL_SULFURIC_ACID_BLOCK.get(),
-            FluidContent.STILL_SILICON_WASH_BLOCK.get(),
-            FluidContent.STILL_MINERAL_SLURRY_BLOCK.get(),
-            FluidContent.STILL_SHEOL_FIRE_BLOCK.get(),
-            FluidContent.STILL_STRANGE_MATTER_BLOCK.get()
+            BlockContent.NICKEL_PLATING_BLOCK.get()
     );
 
 

@@ -213,3 +213,8 @@ idea {
         downloadJavadoc = true
     }
 }
+
+tasks.withType(ProcessResources).configureEach {
+    // Tells Gradle to ignore duplicate files rather than crashing
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
