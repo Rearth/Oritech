@@ -1,16 +1,16 @@
-package rearth.oritech.api.recipe;
+package rearth.oritech.datagen.builder;
 
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
-public class SteamGeneratorRecipeBuilder extends OritechRecipeBuilder {
+public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    protected SteamGeneratorRecipeBuilder() {
-        super(RecipeContent.STEAM_ENGINE, "steamgen");
+    protected LavaGeneratorRecipeBuilder() {
+        super(RecipeContent.LAVA_GENERATOR, "lavagen");
     }
 
     public static OritechRecipeBuilder build() {
-        return new SteamGeneratorRecipeBuilder();
+        return new LavaGeneratorRecipeBuilder();
     }
 
     @Override

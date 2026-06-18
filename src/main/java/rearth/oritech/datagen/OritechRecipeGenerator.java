@@ -1,4 +1,4 @@
-package rearth.oritech.api.recipe;
+package rearth.oritech.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -16,13 +16,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.recipe.util.MetalProcessingChainBuilder;
+import rearth.oritech.datagen.builder.*;
+import rearth.oritech.datagen.builder.util.MetalProcessingChainBuilder;
 import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
 import rearth.oritech.init.*;
 
 import java.util.List;
 
-import static rearth.oritech.api.recipe.util.RecipeHelpers.*;
+import static rearth.oritech.datagen.builder.util.RecipeHelpers.*;
 import static rearth.oritech.util.TagUtils.*;
 
 public class OritechRecipeGenerator extends RecipeProvider {
