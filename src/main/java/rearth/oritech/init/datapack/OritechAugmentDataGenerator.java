@@ -5,7 +5,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
-import rearth.oritech.datagen.OritechRecipeGenerator;
+import rearth.oritech.datagen.RecipeGenerator;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,7 +23,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
         var augmentData = new LinkedHashMap<Identifier, AugmentData>();
-        OritechRecipeGenerator.addAugmentData((id, data) -> {
+        RecipeGenerator.addAugmentData((id, data) -> {
             var previous = augmentData.put(id, data);
             if (previous != null) {
                 throw new IllegalStateException("Duplicate augment definition for id " + id);

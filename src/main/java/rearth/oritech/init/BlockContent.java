@@ -39,12 +39,12 @@ import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ItemContent.Compostable;
+import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -454,44 +454,41 @@ public class BlockContent {
     @SuppressWarnings("unchecked")
     public static void AddBlockItems() {
 
-        for (var field : BlockContent.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers())) continue;
-            if (!Modifier.isPublic(field.getModifiers())) continue;
-            if (!DeferredBlock.class.isAssignableFrom(field.getType())) continue;
+        RegistryReflectionUtil.ForEachPublicStaticField(
+                BlockContent.class,
+                DeferredBlock.class,
+                (field, identifier, value) -> {
 
-            try {
-                field.setAccessible(true);
-                var value = (DeferredBlock<Block>) field.get(null);
-                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+                    // Cast the raw generic to DeferredBlock<Block>
+                    var deferredBlock = (DeferredBlock<Block>) value;
 
-                if (field.isAnnotationPresent(BlockContent.NoBlockItem.class)) continue;
+                    // Use return instead of continue inside a lambda
+                    if (field.isAnnotationPresent(BlockContent.NoBlockItem.class)) {
+                        return;
+                    }
 
-                var fieldGroup = ItemContent.Groups.MACHINES;
+                    var fieldGroup = ItemContent.Groups.MACHINES;
 
-                if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
-                    fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
-                }
+                    if (field.isAnnotationPresent(ItemContent.ItemGroupTarget.class)) {
+                        fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
+                    }
 
-                DeferredItem<BlockItem> blockItem = BLOCK_ITEMS.registerItem(
-                        value.unwrapKey().orElseThrow().identifier().getPath(),
-                        props -> new BlockItem(value.value(), props) {
-                            @Override
-                            public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
-                                super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+                    DeferredItem<BlockItem> blockItem = BLOCK_ITEMS.registerItem(
+                            deferredBlock.unwrapKey().orElseThrow().identifier().getPath(),
+                            props -> new BlockItem(deferredBlock.value(), props) {
+                                @Override
+                                public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+                                    super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
-                                if (value.get() instanceof TooltipProvider tooltipProvider) {
-                                    tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
+                                    if (deferredBlock.get() instanceof TooltipProvider tooltipProvider) {
+                                        tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
+                                    }
                                 }
                             }
-                        }
-                );
-                BLOCK_GROUPS.add(new Pair<>(blockItem, fieldGroup));
-
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to access field: " + field.getName(), e);
-            }
-        }
-
+                    );
+                    BLOCK_GROUPS.add(new Pair<>(blockItem, fieldGroup));
+                }
+        );
     }
 
     // todo figure this out

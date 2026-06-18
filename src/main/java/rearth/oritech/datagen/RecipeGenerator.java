@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 import static rearth.oritech.datagen.builders.util.RecipeHelpers.*;
 import static rearth.oritech.util.TagUtils.*;
 
-public class OritechRecipeGenerator extends RecipeProvider {
+public class RecipeGenerator extends RecipeProvider {
 
     public static class Runner extends RecipeProvider.Runner {
         public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
@@ -37,7 +37,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
 
         @Override
         protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new OritechRecipeGenerator(registries, output);
+            return new RecipeGenerator(registries, output);
         }
 
         @Override
@@ -46,7 +46,7 @@ public class OritechRecipeGenerator extends RecipeProvider {
         }
     }
 
-    public OritechRecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
+    public RecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
         super(registries, output);
     }
 
@@ -756,9 +756,9 @@ public class OritechRecipeGenerator extends RecipeProvider {
             var inputName = BuiltInRegistries.ITEM.getKey(itemConvertible.asItem()).getPath();
             var outputName = BuiltInRegistries.ITEM.getKey(output.asItem()).getPath();
             SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, CookingBookCategory.MISC, output, experience, cookingTime, recipeFactory)
-                .group(group)
-                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
-                .save(exporter, outputName + suffix + "_" + inputName);
+                    .group(group)
+                    .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
+                    .save(exporter, outputName + suffix + "_" + inputName);
         }
     }
 
@@ -1418,37 +1418,37 @@ public class OritechRecipeGenerator extends RecipeProvider {
     // crafting shapes
     public void offerCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/" + suffix);
+        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
     public void offerInsulatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
-        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/" + suffix);
+        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
     public void offerRotatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.getItem();
-        createRotatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/" + suffix);
+        createRotatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
     public void offerFramedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/frame_" + suffix);
+        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/frame_" + suffix);
     }
 
     public void offerCableFromFrameRecipe(RecipeOutput exporter, ItemStack output, Ingredient frame, String suffix) {
         var item = output.getItem();
-        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/unframe_" + suffix);
+        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unframe_" + suffix);
     }
 
     public void offerCableDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
         var item = output.getItem();
-        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/duct_" + suffix);
+        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/duct_" + suffix);
     }
 
     public void offerCableFromDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient duct, String suffix) {
         var item = output.getItem();
-        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(duct).unlockedBy(getHasName(item), has(item)).save(exporter,"crafting/unduct_" + suffix);
+        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(duct).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unduct_" + suffix);
     }
 
     public RecipeBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {

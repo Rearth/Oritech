@@ -38,7 +38,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.datagen.AdvancementGenerator;
-import rearth.oritech.datagen.OritechRecipeGenerator;
+import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.init.*;
 import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.init.datapack.AugmentContent;
@@ -130,7 +130,7 @@ public final class Oritech {
         var lookupProvider = event.getLookupProvider();
 
         // Register Recipe Generator
-        generator.addProvider(true, new OritechRecipeGenerator.Runner(packOutput, lookupProvider));
+        generator.addProvider(true, new RecipeGenerator.Runner(packOutput, lookupProvider));
 
         // Register Advancement Generator
         generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new AdvancementGenerator())));

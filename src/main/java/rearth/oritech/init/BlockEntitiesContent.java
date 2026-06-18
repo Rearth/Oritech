@@ -29,12 +29,12 @@ import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
+import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.lang.reflect.Modifier;
 import java.util.function.Supplier;
 
 public class BlockEntitiesContent {
@@ -284,44 +284,39 @@ public class BlockEntitiesContent {
     public @interface AssignSidedFluid {
     }
 
+    @SuppressWarnings("unchecked")
     public static void registerBlockEntityCapabilities(RegisterCapabilitiesEvent event) {
 
-        for (var field : BlockEntitiesContent.class.getDeclaredFields()) {
-            if (!Modifier.isStatic(field.getModifiers())) continue;
-            if (!Modifier.isPublic(field.getModifiers())) continue;
-            if (!Supplier.class.isAssignableFrom(field.getType())) continue;
+        RegistryReflectionUtil.ForEachPublicStaticField(
+                BlockEntitiesContent.class,
+                Supplier.class,
+                (field, identifier, value) -> {
 
-            try {
-                field.setAccessible(true);
-                var value = (Supplier<BlockEntityType<? extends BlockEntity>>) field.get(null);
-                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+                    // Cast the raw generic to the exact type expected by the event
+                    var blockEntityTypeSupplier = (Supplier<BlockEntityType<? extends BlockEntity>>) value;
 
-                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedEnergy.class)) {
-                    event.registerBlockEntity(
-                            Capabilities.Energy.BLOCK,
-                            value.get(),
-                            (entity, side) -> ((EnergyProvider) entity).getEnergyLookup(side));
+                    if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedEnergy.class)) {
+                        event.registerBlockEntity(
+                                Capabilities.Energy.BLOCK,
+                                blockEntityTypeSupplier.get(),
+                                (entity, side) -> ((EnergyProvider) entity).getEnergyLookup(side));
+                    }
+
+                    if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedInventory.class)) {
+                        event.registerBlockEntity(
+                                Capabilities.Item.BLOCK,
+                                blockEntityTypeSupplier.get(),
+                                (entity, side) -> ((ItemProvider) entity).getItemLookup(side));
+                    }
+
+                    if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedFluid.class)) {
+                        event.registerBlockEntity(
+                                Capabilities.Fluid.BLOCK,
+                                blockEntityTypeSupplier.get(),
+                                (entity, side) -> ((FluidProvider) entity).getFluidLookup(side));
+                    }
                 }
-
-                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedInventory.class)) {
-                    event.registerBlockEntity(
-                            Capabilities.Item.BLOCK,
-                            value.get(),
-                            (entity, side) -> ((ItemProvider) entity).getItemLookup(side));
-                }
-
-                if (field.isAnnotationPresent(BlockEntitiesContent.AssignSidedFluid.class)) {
-                    event.registerBlockEntity(
-                            Capabilities.Fluid.BLOCK,
-                            value.get(),
-                            (entity, side) -> ((FluidProvider) entity).getFluidLookup(side));
-                }
-
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException("Failed to access field: " + field.getName(), e);
-            }
-        }
-
+        );
     }
 
 }

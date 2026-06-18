@@ -3,25 +3,22 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
-import net.minecraft.world.entity.player.Player;
 import rearth.oritech.client.init.ClientGuiRenderers;
 import rearth.oritech.client.init.FluidModelContent;
 import rearth.oritech.client.init.ModRenderers;
@@ -30,6 +27,7 @@ import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
+import rearth.oritech.datagen.ModelGenerator;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 
@@ -65,10 +63,16 @@ public final class OritechClient {
 
         modEventBus.addListener(this::registerBindings);
         modEventBus.addListener(this::registerSpecialModelRenderers);
+        modEventBus.addListener(this::gatherData);
         modEventBus.addListener(ModScreens::registerScreens);
         modEventBus.addListener(ModRenderers::registerRenderers);
         modEventBus.addListener(ClientGuiRenderers::registerPipRenderers);
         modEventBus.addListener(FluidModelContent::registerFluidModels);
+    }
+
+    // client datagen
+    public void gatherData(GatherDataEvent.Client event) {
+        event.createProvider(ModelGenerator::new);
     }
 
     private void registerBindings(RegisterKeyMappingsEvent event) {

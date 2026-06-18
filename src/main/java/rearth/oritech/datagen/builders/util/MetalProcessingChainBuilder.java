@@ -12,7 +12,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluids;
 import rearth.oritech.Oritech;
-import rearth.oritech.datagen.OritechRecipeGenerator;
+import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.datagen.builders.*;
 import rearth.oritech.init.FluidContent;
 
@@ -419,22 +419,22 @@ public class MetalProcessingChainBuilder {
         // This should be fine, because any mod that adds ores, dusts, etc. will provide their own smelting/blasting recipes
         if (vanillaProcessing) {
             if (dustItem != null) {
-                OritechRecipeGenerator.oreSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                OritechRecipeGenerator.oreBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
-                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
+                RecipeGenerator.oreSmelting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                RecipeGenerator.oreBlasting(exporter, List.of(dustItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                RecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, dustItem, smallDustItem);
             }
             if (smallDustItem != null) {
-                OritechRecipeGenerator.oreSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
-                OritechRecipeGenerator.oreBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
+                RecipeGenerator.oreSmelting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 50, Oritech.MOD_ID);
+                RecipeGenerator.oreBlasting(exporter, List.of(smallDustItem), RecipeCategory.MISC, nuggetItem, 0.5f, 25, Oritech.MOD_ID);
             }
             if (gemItem != null) {
-                OritechRecipeGenerator.oreSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
-                OritechRecipeGenerator.oreBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
+                RecipeGenerator.oreSmelting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 200, Oritech.MOD_ID);
+                RecipeGenerator.oreBlasting(exporter, List.of(gemItem), RecipeCategory.MISC, ingotItem, 1f, 100, Oritech.MOD_ID);
             }
             if (clumpItem != null && smallClumpItem != null)
-                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
+                RecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, clumpItem, smallClumpItem);
             if (nuggetItem != null && !skipCompactingRecipes) {    // to avoid duplicate vanilla nugget -> item recipes
-                OritechRecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
+                RecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
                 var inputName = BuiltInRegistries.ITEM.getKey(ingotItem).getPath();
                 ShapelessRecipeBuilder.shapeless(net.minecraft.core.registries.BuiltInRegistries.ITEM, RecipeCategory.MISC, nuggetItem, 9)
                         .requires(ingotItem, 1)
