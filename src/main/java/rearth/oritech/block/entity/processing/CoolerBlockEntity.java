@@ -94,10 +94,10 @@ public class CoolerBlockEntity extends MultiblockMachineEntity implements FluidP
     protected boolean removeCraftingInputs(Transaction transaction) {
 
         var fluidInput = currentRecipe.fluidInput();
-        if (fluidInput.amount() > 0) {
+        if (fluidInput.isPresent()) {
             // we assume that the fluid content matches here, as this was checked in earlier steps already
-            var extracted = fluidStorage.extract(FluidResource.of(fluidStorage.getInStack()), fluidInput.amount(), transaction);
-            if (extracted != fluidInput.amount()) return false;
+            var extracted = fluidStorage.extract(FluidResource.of(fluidStorage.getInStack()), fluidInput.get().amount(), transaction);
+            if (extracted != fluidInput.get().amount()) return false;
         }
 
         return super.removeCraftingInputs(transaction);

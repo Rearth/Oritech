@@ -95,10 +95,10 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     protected boolean removeCraftingInputs(Transaction transaction) {
 
         var fluidInput = currentRecipe.fluidInput();
-        if (fluidInput.amount() > 0) {
+        if (fluidInput.isPresent()) {
             // we assume that the fluid content matches here, as this was checked in earlier steps already
-            var extracted = fluidContainer.getInputContainer().extract(FluidResource.of(fluidContainer.getInStack()), fluidInput.amount(), transaction);
-            if (extracted != fluidInput.amount()) return false;
+            var extracted = fluidContainer.getInputContainer().extract(FluidResource.of(fluidContainer.getInStack()), fluidInput.get().amount(), transaction);
+            if (extracted != fluidInput.get().amount()) return false;
         }
 
         return super.removeCraftingInputs(transaction);

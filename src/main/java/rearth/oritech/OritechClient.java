@@ -69,8 +69,6 @@ public final class OritechClient {
         modEventBus.addListener(ModRenderers::registerRenderers);
         modEventBus.addListener(ClientGuiRenderers::registerPipRenderers);
         modEventBus.addListener(FluidModelContent::registerFluidModels);
-
-        ModScreens.MENUS.register(modEventBus);
     }
 
     private void registerBindings(RegisterKeyMappingsEvent event) {

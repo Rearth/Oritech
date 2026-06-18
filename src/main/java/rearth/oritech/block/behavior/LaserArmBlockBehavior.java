@@ -96,6 +96,7 @@ public class LaserArmBlockBehavior {
                 return false;
             }
         };
+
         LaserArmBlock.registerBlockBehavior(BlockContent.ATOMIC_FORGE_BLOCK.get(), transferPowerBehavior);
         LaserArmBlock.registerBlockBehavior(BlockContent.DEEP_DRILL_BLOCK.get(), transferPowerBehavior);
         LaserArmBlock.registerBlockBehavior(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get(), transferPowerBehavior);

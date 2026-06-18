@@ -51,8 +51,6 @@ public class LaserArmBlock extends Block implements EntityBlock, TooltipProvider
     public LaserArmBlock(Properties settings) {
         super(settings);
         registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.FACING, Direction.UP));
-        LaserArmBlockBehavior.registerDefaults();
-        LaserArmEntityBehavior.registerDefaults();
     }
 
     public static void registerBlockBehavior(Block targetBlock, LaserArmBlockBehavior behavior) {

@@ -92,7 +92,7 @@ public abstract class FluidMultiblockGeneratorBlockEntity extends MultiblockGene
         if (!itemsTaken) return false;
 
         // we assume the fluid matches the ingredient, so we just remove the needed amount;
-        var fluidInput = currentRecipe.fluidInput();
+        var fluidInput = currentRecipe.fluidInput().get();
         var taken = fluidStorage.extract(0, fluidStorage.getResource(0), fluidInput.amount(), transaction);
         return taken == fluidInput.amount();
     }

@@ -113,7 +113,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var speed = getSteamProcessingSpeed();
         var workerCount = slaves.size() + 1;
 
-        var consumedCount = currentRecipe.fluidInput().amount() * speed * workerCount * STEAM_AMOUNT_MULTIPLIER;
+        var consumedCount = currentRecipe.fluidInput().get().amount() * speed * workerCount * STEAM_AMOUNT_MULTIPLIER;
         consumedCount = Math.max(consumedCount, 1);
 
         try (var transaction = Transaction.openRoot()) {

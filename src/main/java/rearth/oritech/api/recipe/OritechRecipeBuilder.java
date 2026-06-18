@@ -13,7 +13,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
@@ -179,7 +178,7 @@ public abstract class OritechRecipeBuilder {
                 new OritechRecipe(
                         inputs != null ? inputs : List.of(),
                         results != null ? results : List.of(),
-                        fluidInput != null ? fluidInput : SizedFluidIngredient.of(Fluids.EMPTY, 0),
+                        fluidInput != null ? Optional.of(fluidInput) : Optional.empty(),
                         fluidOutputs != null ? fluidOutputs : List.of(),
                         (int) (time * timeMultiplier),
                         type.get()),

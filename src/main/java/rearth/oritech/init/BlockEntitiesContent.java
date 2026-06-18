@@ -247,8 +247,6 @@ public class BlockEntitiesContent {
             BlockContent.MACHINE_CAPACITOR_ADDON.get(),
             BlockContent.CAPACITOR_ADDON_EXTENDER.get(),
             BlockContent.QUARRY_ADDON.get(),
-            BlockContent.MACHINE_HUNTER_ADDON.get(),
-            BlockContent.QUARRY_ADDON.get(),
             BlockContent.MACHINE_SILK_TOUCH_ADDON.get(),
             BlockContent.MACHINE_BURST_ADDON.get()
     ));

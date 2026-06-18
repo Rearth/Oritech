@@ -147,14 +147,14 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
 
     private boolean removeFluidInputs(Transaction transaction) {
         var input = currentRecipe.fluidInput();
-        if (input.amount() <= 0) return true;
+        if (input.isEmpty()) return true;
 
         var inputTank = ownStorage.getInputContainer();
         var inputResource = inputTank.getResource(0);
         if (inputResource.isEmpty()) return false;
 
-        var extracted = inputTank.extract(0, inputResource, input.amount(), transaction);
-        return extracted == input.amount();
+        var extracted = inputTank.extract(0, inputResource, input.get().amount(), transaction);
+        return extracted == input.get().amount();
     }
 
     private List<FluidStack> calculateOutputFluids(OritechRecipe recipe) {

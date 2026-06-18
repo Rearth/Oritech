@@ -8,8 +8,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -20,6 +18,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.List;
+import java.util.Optional;
 
 public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
 
@@ -64,7 +63,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
 
         var furnaceRecipe = recipeCandidate.get().value();
 
-        return new OritechRecipe(List.of(furnaceRecipe.input()), List.of(furnaceRecipe.result), SizedFluidIngredient.of(Fluids.EMPTY, 0), List.of(), furnaceRecipe.cookingTime(), RecipeContent.FURNACE_ADAPTER.get());
+        return new OritechRecipe(List.of(furnaceRecipe.input()), List.of(furnaceRecipe.result), Optional.empty(), List.of(), furnaceRecipe.cookingTime(), RecipeContent.FURNACE_ADAPTER.get());
     }
 
     @Override

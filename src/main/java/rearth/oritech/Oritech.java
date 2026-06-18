@@ -21,6 +21,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.behavior.LaserArmBlockBehavior;
+import rearth.oritech.block.behavior.LaserArmEntityBehavior;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
@@ -118,6 +120,13 @@ public final class Oritech {
     private void commonSetup(FMLCommonSetupEvent event) {
         // Some common setup code
         LOGGER.info("HELLO FROM COMMON SETUP");
+
+        event.enqueueWork(() -> {
+
+            LaserArmBlockBehavior.registerDefaults();
+            LaserArmEntityBehavior.registerDefaults();
+        });
+
 
     }
 

@@ -155,7 +155,7 @@ public class ItemContent {
 
     // tank items (with custom item class)
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
-    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
 
 
     public enum Groups {

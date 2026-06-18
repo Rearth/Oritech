@@ -27,7 +27,7 @@ public class ItemGroups {
                     .build());
 
 
-    public static final Supplier<CreativeModeTab> COMPONENT_GROUP = TABS.register("machine_group", () ->
+    public static final Supplier<CreativeModeTab> COMPONENT_GROUP = TABS.register("component_group", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.oritech.components"))
                     .icon(() -> new ItemStack(ItemContent.SUPER_AI_CHIP.value()))
@@ -36,7 +36,7 @@ public class ItemGroups {
                     })
                     .build());
 
-    public static final Supplier<CreativeModeTab> EQUIPMENT_GROUP = TABS.register("machine_group", () ->
+    public static final Supplier<CreativeModeTab> EQUIPMENT_GROUP = TABS.register("equipment_group", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.oritech.equipment"))
                     .icon(() -> new ItemStack(ToolsContent.CHAINSAW.value()))
@@ -45,7 +45,7 @@ public class ItemGroups {
                     })
                     .build());
 
-    public static final Supplier<CreativeModeTab> DECORATIVE_GROUP = TABS.register("machine_group", () ->
+    public static final Supplier<CreativeModeTab> DECORATIVE_GROUP = TABS.register("decorative_group", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.oritech.decorative"))
                     .icon(() -> new ItemStack(BlockContent.RESOURCE_NODE_PLATINUM.value()))
