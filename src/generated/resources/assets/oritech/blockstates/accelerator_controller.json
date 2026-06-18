@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech:block/accelerator_controller",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/accelerator_controller"
+    },
+    "facing=south": {
+      "model": "oritech:block/accelerator_controller",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech:block/accelerator_controller",
+      "y": 270
+    }
+  }
+}

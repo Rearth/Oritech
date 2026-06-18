@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/reactor_cold_indicator_block"
+    }
+  }
+}

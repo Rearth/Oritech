@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "oritech:block/reactor_hot_indicator_block"
+  }
+}

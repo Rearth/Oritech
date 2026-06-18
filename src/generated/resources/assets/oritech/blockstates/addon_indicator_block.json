@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/addon_indicator_block"
+    }
+  }
+}

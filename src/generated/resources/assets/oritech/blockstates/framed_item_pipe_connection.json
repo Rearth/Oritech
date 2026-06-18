@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/framed_item_pipe_connection"
+    }
+  }
+}

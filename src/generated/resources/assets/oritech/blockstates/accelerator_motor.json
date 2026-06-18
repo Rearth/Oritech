@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech:block/accelerator_motor",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/accelerator_motor"
+    },
+    "facing=south": {
+      "model": "oritech:block/accelerator_motor",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech:block/accelerator_motor",
+      "y": 270
+    }
+  }
+}

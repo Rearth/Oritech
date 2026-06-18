@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "oritech:block/uranium_crystal",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "oritech:block/uranium_crystal",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/uranium_crystal",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "oritech:block/uranium_crystal",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
+      "model": "oritech:block/uranium_crystal"
+    },
+    "facing=west": {
+      "model": "oritech:block/uranium_crystal",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

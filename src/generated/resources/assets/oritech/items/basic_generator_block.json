@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "oritech:block/basic_generator_block"
+  }
+}
