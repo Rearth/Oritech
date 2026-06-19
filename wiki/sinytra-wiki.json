@@ -4,5 +4,6 @@
   "platforms": {
     "curseforge": "oritech",
     "modrinth": "oritech"
-  }
+  },
+  "owners": ["rearth"]
 }
