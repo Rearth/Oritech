@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.Oritech;
@@ -24,7 +25,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
                             Optional<SizedFluidIngredient> fluidInput, List<FluidStack> fluidOutputs,
                             int time, RecipeType<OritechRecipe> recipeType) implements Recipe<OritechRecipeInput> {
 
-    public static final OritechRecipe EMPTY = new OritechRecipe(List.of(), List.of(), Optional.empty(), List.of(), 0, null);
+    public static final Lazy<OritechRecipe> EMPTY = Lazy.of(() -> new OritechRecipe(List.of(), List.of(), Optional.empty(), List.of(), 0, RecipeContent.PULVERIZER.get()));
 
 
     public static final MapCodec<OritechRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -51,7 +52,12 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
 
     @SuppressWarnings("unchecked")
     private static RecipeType<OritechRecipe> recipeTypeFromId(Identifier id) {
-        return (RecipeType<OritechRecipe>) BuiltInRegistries.RECIPE_TYPE.get(id).orElseThrow().value();
+        var candidate = BuiltInRegistries.RECIPE_TYPE.get(id);
+        if (candidate.isEmpty()) {
+            Oritech.LOGGER.error("Recipe not found: {}", id);
+            return RecipeContent.PULVERIZER.get();
+        }
+        return (RecipeType<OritechRecipe>) candidate.get().value();
     }
 
     private static Identifier idFromRecipeType(RecipeType<?> recipeType) {
@@ -154,6 +160,6 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     }
 
     public boolean isEmpty() {
-        return this.equals(EMPTY);
+        return this.equals(EMPTY.get());
     }
 }

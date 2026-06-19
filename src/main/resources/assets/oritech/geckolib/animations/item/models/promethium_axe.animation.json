@@ -1,0 +1,20 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"silk_touch": {
+			"loop": true,
+			"animation_length": 0.5
+		},
+		"area": {
+			"animation_length": 0.5,
+			"bones": {
+				"rod": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}

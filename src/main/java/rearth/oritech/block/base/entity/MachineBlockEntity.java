@@ -72,7 +72,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK})
     public final ProgressStorage progress = new ProgressStorage();
     @SyncField({SyncType.GUI_TICK})
-    protected OritechRecipe currentRecipe = OritechRecipe.EMPTY;
+    protected OritechRecipe currentRecipe = OritechRecipe.EMPTY.get();
     @SyncField({SyncType.GUI_TICK})
     protected InventoryInputMode inventoryInputMode = InventoryInputMode.FILL_LEFT_TO_RIGHT;
     @SyncField({SyncType.GUI_TICK})
@@ -166,7 +166,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var recentlyChanged = (level.getGameTime() - lastChangedAt) <= 1;
 
         // if no active recipe and nothing changed recently, dont do anything
-        if (currentRecipe.isEmpty() && !recentlyChanged) return currentRecipe;
+        if (currentRecipe.isEmpty() && !recentlyChanged && level.getGameTime() % 80 != 0) return currentRecipe;
 
         // at this point: Either machine inputs were changed, or we have a current recipe
 
@@ -176,14 +176,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
 
     protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
-        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY;
+        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY.get();
 
         // existing recipe matches (if non-empty)
         if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
 
         // return a potential match, or empty
         var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(type, recipeInput, level);
-        return recipeCandidate.map(RecipeHolder::value).orElse(OritechRecipe.EMPTY);
+        return recipeCandidate.map(RecipeHolder::value).orElse(OritechRecipe.EMPTY.get());
     }
 
     protected OritechRecipeInput getRecipeInput() {

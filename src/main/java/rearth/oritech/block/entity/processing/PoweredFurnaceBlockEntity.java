@@ -51,7 +51,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     // uses a furnace recipe type adapter to
     @Override
     protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
-        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY;
+        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY.get();
 
         // existing recipe matches (if non-empty)
         if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
@@ -59,7 +59,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
         var input = new SingleRecipeInput(inventory.getItem(0));
 
         var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(RecipeType.SMELTING, input, level);
-        if (recipeCandidate.isEmpty()) return OritechRecipe.EMPTY;
+        if (recipeCandidate.isEmpty()) return OritechRecipe.EMPTY.get();
 
         var furnaceRecipe = recipeCandidate.get().value();
 

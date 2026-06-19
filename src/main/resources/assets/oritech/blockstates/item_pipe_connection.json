@@ -98,8 +98,7 @@
     },
     {
       "when": {
-        "north": "2",
-        "has_motor": "false"
+        "north": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer"
@@ -107,17 +106,7 @@
     },
     {
       "when": {
-        "north": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor"
-      }
-    },
-    {
-      "when": {
-        "south": "2",
-        "has_motor": "false"
+        "south": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -126,18 +115,7 @@
     },
     {
       "when": {
-        "south": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor",
-        "y": 180
-      }
-    },
-    {
-      "when": {
-        "east": "2",
-        "has_motor": "false"
+        "east": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -146,18 +124,7 @@
     },
     {
       "when": {
-        "east": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor",
-        "y": 90
-      }
-    },
-    {
-      "when": {
-        "west": "2",
-        "has_motor": "false"
+        "west": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -166,18 +133,7 @@
     },
     {
       "when": {
-        "west": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor",
-        "y": 270
-      }
-    },
-    {
-      "when": {
-        "up": "2",
-        "has_motor": "false"
+        "up": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -186,31 +142,10 @@
     },
     {
       "when": {
-        "up": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor",
-        "x": -90
-      }
-    },
-    {
-      "when": {
-        "down": "2",
-        "has_motor": "false"
+        "down": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
-        "x": 90
-      }
-    },
-    {
-      "when": {
-        "down": "2",
-        "has_motor": "true"
-      },
-      "apply": {
-        "model": "oritech:block/item_pipe_connection_outer_motor",
         "x": 90
       }
     }
