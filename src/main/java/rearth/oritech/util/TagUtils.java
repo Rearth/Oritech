@@ -19,6 +19,10 @@ public class TagUtils {
         return cBlockTag("storage_blocks/" + path);
     }
 
+    public static TagKey<Block> blockTag(String namespace, String path) {
+        return TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(namespace, path));
+    }
+
     public static TagKey<Item> getIngotTag(String path) {
         return cItemTag("ingots/" + path);
     }

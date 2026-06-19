@@ -1,0 +1,20 @@
+{
+  "values": [
+    "minecraft:spawner",
+    "minecraft:infested_stone",
+    "minecraft:infested_cobblestone",
+    "minecraft:infested_stone_bricks",
+    "minecraft:infested_mossy_stone_bricks",
+    "minecraft:infested_cracked_stone_bricks",
+    "minecraft:infested_chiseled_stone_bricks",
+    "minecraft:infested_deepslate",
+    "minecraft:sculk_catalyst",
+    "minecraft:sculk_sensor",
+    "minecraft:sculk_shrieker",
+    "minecraft:sculk_vein",
+    "minecraft:calibrated_sculk_sensor",
+    "minecraft:sculk",
+    "oritech:spawner_cage_block",
+    "oritech:spawner_controller_block"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "values": [
+    "oritech:reactor_wall",
+    "oritech:reactor_absorber_port",
+    "oritech:reactor_energy_port",
+    "oritech:reactor_fuel_port",
+    "oritech:reactor_redstone_port",
+    "oritech:reactor_controller"
+  ]
+}
