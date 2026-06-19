@@ -1,0 +1,11 @@
+// 26.1.2	2026-06-19T22:14:31.3078814	Tags for minecraft:fluid mod id oritech
+e2dd9bc50a2b6f184853fa2210bd41010b2f380f data/c/tags/fluid/biodiesel.json
+e2dd9bc50a2b6f184853fa2210bd41010b2f380f data/c/tags/fluid/biofuel.json
+90e6e62c494f72f7804930ed00bd1766efe6fa2c data/c/tags/fluid/diesel.json
+db21c26f87fa5705c2b66c5be1d9a84d2a961ad8 data/c/tags/fluid/gaseous.json
+37b977dd4edca27e5dde44e01779239190be8528 data/c/tags/fluid/high_power_biodiesel.json
+238bd08a884a0635ea7d171c262d57f835ac1d62 data/c/tags/fluid/naphtha.json
+c3acbc4eaa0c9f701c5f8f1b2c4eeec4b4789bec data/c/tags/fluid/oil.json
+db21c26f87fa5705c2b66c5be1d9a84d2a961ad8 data/c/tags/fluid/steam.json
+0324ee1e4f93192a460a73507dbab8884e571ff9 data/c/tags/fluid/sulfuric_acid.json
+37b977dd4edca27e5dde44e01779239190be8528 data/c/tags/fluid/turbofuel.json
