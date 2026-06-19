@@ -141,9 +141,9 @@ subprojects {
             from(configurations.commonResources)
             
             // copy wiki folder to assets
-            from("$rootDir/docs") {
+            from("$rootDir/wiki") {
                 into "assets/oracle_index/books/oritech"
-                exclude '.assets/item/**' // items are rendered in-game as actual item components, no need to include them here
+                exclude 'assets/item/**' // items are rendered in-game as actual item components, no need to include them here
             }
         
             inputs.property 'version', project.version
@@ -171,7 +171,7 @@ wiki {
     docs {
         oritech {
             // path to the folder containing metadata file (sinytra-wiki.json)
-            root = file('docs')
+            root = file('wiki')
         }
     }
 }
