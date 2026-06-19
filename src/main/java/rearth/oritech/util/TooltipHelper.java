@@ -44,7 +44,7 @@ public class TooltipHelper {
     }
 
     public static void addMachineTooltip(Consumer<Component> consumer, Block block, EntityBlock entityProvider) {
-        var showExtra = Minecraft.getInstance().hasShiftDown();
+        var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             var entity = entityProvider.newBlockEntity(BlockPos.ZERO, block.defaultBlockState());

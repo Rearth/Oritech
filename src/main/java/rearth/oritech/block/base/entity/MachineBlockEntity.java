@@ -193,7 +193,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     @Override
     public void setChanged() {
         super.setChanged();
-        lastChangedAt = level.getGameTime();
+
+        if (this.level != null)
+            lastChangedAt = level.getGameTime();
     }
 
     protected float calculateEnergyUsage() {

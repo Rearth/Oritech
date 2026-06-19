@@ -42,6 +42,7 @@ import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.init.*;
 import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.init.datapack.AugmentContent;
+import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.init.world.FeatureContent;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.armor.ExoArmorItem;
@@ -109,6 +110,8 @@ public final class Oritech {
         FeatureContent.FEATURES.register(modEventBus);
         ModScreens.MENUS.register(modEventBus);
         AttachmentContent.ATTACHMENT_TYPES.register(modEventBus);
+        RecipeContent.RECIPE_SERIALIZERS.register(modEventBus);
+        RecipeContent.RECIPE_TYPES.register(modEventBus);
 
         FluidContent.FLUID_TYPES.register(modEventBus);
         FluidContent.FLUIDS.register(modEventBus);

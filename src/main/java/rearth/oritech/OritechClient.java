@@ -8,6 +8,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -19,10 +20,7 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
-import rearth.oritech.client.init.ClientGuiRenderers;
-import rearth.oritech.client.init.FluidModelContent;
-import rearth.oritech.client.init.ModRenderers;
-import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.*;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
@@ -45,6 +43,8 @@ public final class OritechClient {
         Oritech.LOGGER.info("Oritech client initialization");
 
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+
+        container.registerConfig(ModConfig.Type.CLIENT, OritechClientConfig.CLIENT_SPEC);
 
         var neoEventBus = NeoForge.EVENT_BUS;
 

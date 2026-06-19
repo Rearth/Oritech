@@ -604,7 +604,7 @@ public class PowerPoleEntity extends NetworkedBlockEntity implements MultiblockM
         ).apply(instance, PoleNetworkData::fromNetworks));
 
         public static final SavedDataType<PoleNetworkData> TYPE = new SavedDataType<>(
-                Oritech.id("poleData"),
+                Oritech.id("pole_data"),
                 PoleNetworkData::new,
                 CODEC,
                 null);
