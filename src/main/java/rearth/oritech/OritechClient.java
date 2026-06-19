@@ -30,6 +30,7 @@ import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.datagen.BlockLootGenerator;
 import rearth.oritech.datagen.ModelGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
+import rearth.oritech.datagen.tags.ItemTagGenerator;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 
@@ -81,6 +82,7 @@ public final class OritechClient {
     public void gatherData(GatherDataEvent.Client event) {
         event.createProvider(ModelGenerator::new);
         event.createProvider(BlockTagGenerator::new);
+        event.createProvider(ItemTagGenerator::new);
 
         // no idea why this is on the client, but oh well
         event.createProvider((output, lookup) -> new LootTableProvider(
