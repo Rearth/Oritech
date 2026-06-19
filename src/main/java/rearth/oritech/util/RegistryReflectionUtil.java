@@ -16,7 +16,7 @@ public final class RegistryReflectionUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> void ForEachPublicStaticField(Class<?> targetClass, Class<T> fieldType, FieldConsumer<T> action) {
+    public static <T> void IterateFields(Class<?> targetClass, Class<T> fieldType, FieldConsumer<T> action) {
         for (var field : targetClass.getDeclaredFields()) {
             int modifiers = field.getModifiers();
 

@@ -287,7 +287,7 @@ public class BlockEntitiesContent {
     @SuppressWarnings("unchecked")
     public static void registerBlockEntityCapabilities(RegisterCapabilitiesEvent event) {
 
-        RegistryReflectionUtil.ForEachPublicStaticField(
+        RegistryReflectionUtil.IterateFields(
                 BlockEntitiesContent.class,
                 Supplier.class,
                 (field, identifier, value) -> {

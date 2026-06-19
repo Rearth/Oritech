@@ -3,7 +3,9 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -25,9 +27,13 @@ import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
+import rearth.oritech.datagen.BlockLootGenerator;
 import rearth.oritech.datagen.ModelGenerator;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
+
+import java.util.List;
+import java.util.Set;
 
 @Mod(value = Oritech.MOD_ID, dist = Dist.CLIENT)
 public final class OritechClient {
@@ -73,6 +79,16 @@ public final class OritechClient {
     // client datagen
     public void gatherData(GatherDataEvent.Client event) {
         event.createProvider(ModelGenerator::new);
+
+        // no idea why this is on the client, but oh well
+        event.createProvider((output, lookup) -> new LootTableProvider(
+                output,
+                Set.of(),
+                List.of(
+                        new LootTableProvider.SubProviderEntry(BlockLootGenerator::new, LootContextParamSets.BLOCK)
+                ),
+                lookup
+        ));
     }
 
     private void registerBindings(RegisterKeyMappingsEvent event) {

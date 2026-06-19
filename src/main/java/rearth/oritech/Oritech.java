@@ -137,6 +137,7 @@ public final class Oritech {
 
         // Register Advancement Generator
         generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new AdvancementGenerator())));
+
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

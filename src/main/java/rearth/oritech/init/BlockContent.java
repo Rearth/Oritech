@@ -221,6 +221,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> ACCELERATOR_CONTROLLER = BLOCKS.registerBlock("accelerator_controller", AcceleratorControllerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> ACCELERATOR_SENSOR = BLOCKS.registerBlock("accelerator_sensor", AcceleratorSensorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @ItemRarity(Rarity.EPIC)
+    @NoAutoDrop
     public static final DeferredBlock<Block> BLACK_HOLE_BLOCK = BLOCKS.registerBlock("black_hole_block", BlackHoleBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.END_PORTAL).lightLevel(item -> 12).noOcclusion().forceSolidOn());
 
     public static final DeferredBlock<Block> PARTICLE_COLLECTOR_BLOCK = BLOCKS.registerBlock("particle_collector_block", ParticleCollectorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).noOcclusion());
@@ -454,7 +455,7 @@ public class BlockContent {
     @SuppressWarnings("unchecked")
     public static void AddBlockItems() {
 
-        RegistryReflectionUtil.ForEachPublicStaticField(
+        RegistryReflectionUtil.IterateFields(
                 BlockContent.class,
                 DeferredBlock.class,
                 (field, identifier, value) -> {

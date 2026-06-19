@@ -186,9 +186,9 @@ public class ModelGenerator extends ModelProvider {
         createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_MEDIUM.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_LARGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
 
-        // todo
-//        for (var fluid : FluidContent.FLUID_ATTRIBUTES)
-//            createNonTemplateModelBlock(fluid.getBlock(), Blocks.WATER, generator);
+        for (var fluid : FluidContent.FLUID_BLOCKS.getEntries()) {
+            createNonTemplateModelBlock(fluid.get(), Blocks.WATER, generator);
+        }
 
         generator.createTrivialCube(BlockContent.MACHINE_CORE_1.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_2.get());
@@ -306,7 +306,7 @@ public class ModelGenerator extends ModelProvider {
         itemModelGenerator.generateFlatItem(ToolsContent.PROMETHIUM_AXE.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.PROMETHIUM_PICKAXE.get(), ModelTemplates.FLAT_ITEM);
 
-        RegistryReflectionUtil.ForEachPublicStaticField(ItemContent.class, DeferredItem.class, (field, id, item) -> {
+        RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {
             itemModelGenerator.generateFlatItem(item.asItem(), ModelTemplates.FLAT_ITEM);
         });
 
