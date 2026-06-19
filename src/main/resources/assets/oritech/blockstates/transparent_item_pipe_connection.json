@@ -98,8 +98,7 @@
     },
     {
       "when": {
-        "north": "2",
-        "has_": "false"
+        "north": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer"
@@ -107,8 +106,7 @@
     },
     {
       "when": {
-        "south": "2",
-        "has_": "false"
+        "south": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -117,8 +115,7 @@
     },
     {
       "when": {
-        "east": "2",
-        "has_": "false"
+        "east": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -127,8 +124,7 @@
     },
     {
       "when": {
-        "west": "2",
-        "has_": "false"
+        "west": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -137,8 +133,7 @@
     },
     {
       "when": {
-        "up": "2",
-        "has_": "false"
+        "up": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
@@ -147,8 +142,7 @@
     },
     {
       "when": {
-        "down": "2",
-        "has_": "false"
+        "down": "2"
       },
       "apply": {
         "model": "oritech:block/item_pipe_connection_outer",
