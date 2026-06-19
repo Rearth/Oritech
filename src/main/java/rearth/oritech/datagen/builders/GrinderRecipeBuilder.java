@@ -1,17 +1,14 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class GrinderRecipeBuilder extends OritechRecipeBuilder {
 
-    protected GrinderRecipeBuilder() {
-        super(RecipeContent.GRINDER, "grinder");
+    public GrinderRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.GRINDER, "grinder", registryAccess);
         this.time = 40;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new GrinderRecipeBuilder();
     }
 
     @Override

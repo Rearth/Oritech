@@ -1,7 +1,6 @@
 package rearth.oritech;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,7 +10,6 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
@@ -37,8 +35,6 @@ import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
-import rearth.oritech.datagen.AdvancementGenerator;
-import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.init.*;
 import rearth.oritech.init.datamap.DataMapContent;
 import rearth.oritech.init.datapack.AugmentContent;
@@ -50,8 +46,6 @@ import rearth.oritech.item.tools.harvesting.PromethiumAxeItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.util.ServerZiplineHandler;
-
-import java.util.List;
 
 // todos: compostables
 
@@ -86,7 +80,6 @@ public final class Oritech {
         modEventBus.addListener(DataMapContent::registerDataMapTypes);
         modEventBus.addListener(BlockEntitiesContent::registerBlockEntityCapabilities);
         modEventBus.addListener(ToolsContent::registerItemCapabilities);
-        modEventBus.addListener(this::gatherData);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);
@@ -125,19 +118,6 @@ public final class Oritech {
         BlockContent.AddBlockItems();
 
         LOGGER.info("All events registered to the event busses");
-    }
-
-    private void gatherData(GatherDataEvent.Server event) {
-        var generator = event.getGenerator();
-        var packOutput = generator.getPackOutput();
-        var lookupProvider = event.getLookupProvider();
-
-        // Register Recipe Generator
-        generator.addProvider(true, new RecipeGenerator.Runner(packOutput, lookupProvider));
-
-        // Register Advancement Generator
-        generator.addProvider(true, new AdvancementProvider(packOutput, lookupProvider, List.of(new AdvancementGenerator())));
-
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

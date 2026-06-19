@@ -1,18 +1,15 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class LaserRecipeBuilder extends OritechRecipeBuilder {
 
-    protected LaserRecipeBuilder() {
-        super(RecipeContent.LASER, "laser");
+    public LaserRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.LASER, "laser", registryAccess);
         // Set the default time for laser recipes
         this.time = 1;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new LaserRecipeBuilder();
     }
 
     @Override

@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class BioGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    protected BioGeneratorRecipeBuilder() {
-        super(RecipeContent.BIO_GENERATOR, "biogen");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new BioGeneratorRecipeBuilder();
+    public BioGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.BIO_GENERATOR, "biogen", registryAccess);
     }
 
     @Override

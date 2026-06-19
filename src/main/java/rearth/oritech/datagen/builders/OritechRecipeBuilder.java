@@ -1,6 +1,6 @@
 package rearth.oritech.datagen.builders;
 
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.Identifier;
@@ -36,10 +36,12 @@ public abstract class OritechRecipeBuilder {
     protected float timeMultiplier = 1f;
     protected boolean addToGrinder;
     private final String resourcePath;
+    protected final HolderLookup.Provider registryAccess;
 
-    protected OritechRecipeBuilder(Supplier<RecipeType<OritechRecipe>> type, String resourcePath) {
+    protected OritechRecipeBuilder(Supplier<RecipeType<OritechRecipe>> type, String resourcePath, HolderLookup.Provider registryAccess) {
         this.type = type;
         this.resourcePath = resourcePath;
+        this.registryAccess = registryAccess;
         this.fluidOutputs = new ArrayList<>();
     }
 
@@ -62,7 +64,12 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder input(TagKey<Item> in) {
-        return input(Ingredient.of(BuiltInRegistries.ITEM.get(in).orElseThrow()));
+        var holderSet = registryAccess.get(in);
+        if (holderSet.isEmpty()) {
+            Oritech.LOGGER.warn("Unable to find item tag holder set: {}", in);
+            return this;
+        }
+        return input(Ingredient.of(holderSet.get()));
     }
 
     public OritechRecipeBuilder fluidInput(SizedFluidIngredient in) {
@@ -79,7 +86,7 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder specificFluidInput(TagKey<Fluid> in, int amountMillis) {
-        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(BuiltInRegistries.FLUID.get(in).orElseThrow()), amountMillis));
+        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(registryAccess.get(in).orElseThrow()), amountMillis));
     }
 
     public OritechRecipeBuilder fluidInput(Fluid in) {
@@ -91,7 +98,7 @@ public abstract class OritechRecipeBuilder {
     }
 
     public OritechRecipeBuilder fluidInput(TagKey<Fluid> in, float bucketAmount) {
-        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(BuiltInRegistries.FLUID.get(in).orElseThrow()), (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
+        return fluidInput(new SizedFluidIngredient(FluidIngredient.of(registryAccess.get(in).orElseThrow()), (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
     public OritechRecipeBuilder fluidOutput(FluidStack out) {

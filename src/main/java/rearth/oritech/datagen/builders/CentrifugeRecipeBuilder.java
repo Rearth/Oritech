@@ -1,17 +1,14 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
 
-    protected CentrifugeRecipeBuilder() {
-        super(RecipeContent.CENTRIFUGE, "centrifuge");
+    public CentrifugeRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.CENTRIFUGE, "centrifuge", registryAccess);
         this.time = 100;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new CentrifugeRecipeBuilder();
     }
 
     @Override

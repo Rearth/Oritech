@@ -14,7 +14,6 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -166,7 +165,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var recentlyChanged = (level.getGameTime() - lastChangedAt) <= 1;
 
         // if no active recipe and nothing changed recently, dont do anything
-        if (currentRecipe.isEmpty() && !recentlyChanged && level.getGameTime() % 80 != 0) return currentRecipe;
+        if (currentRecipe.isEmpty() && !recentlyChanged) return currentRecipe;
 
         // at this point: Either machine inputs were changed, or we have a current recipe
 
@@ -308,7 +307,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
 
-        ContainerHelper.loadAllItems(input, inventory.getStacks());
+        inventory.deserialize(input);
         deserializeColor(input);
 
         progress.deserialize(input);

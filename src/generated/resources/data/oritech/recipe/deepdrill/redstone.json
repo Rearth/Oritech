@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:resource_node_redstone"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:redstone"
+    }
+  ],
+  "recipeType": "oritech:deep_drill",
+  "time": 1
+}

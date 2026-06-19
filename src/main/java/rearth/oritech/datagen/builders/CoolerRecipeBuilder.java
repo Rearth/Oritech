@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class CoolerRecipeBuilder extends OritechRecipeBuilder {
 
-    protected CoolerRecipeBuilder() {
-        super(RecipeContent.COOLER, "cooler");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new CoolerRecipeBuilder();
+    public CoolerRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.COOLER, "cooler", registryAccess);
     }
 
     @Override

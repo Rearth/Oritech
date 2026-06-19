@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class SteamGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    protected SteamGeneratorRecipeBuilder() {
-        super(RecipeContent.STEAM_ENGINE, "steamgen");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new SteamGeneratorRecipeBuilder();
+    public SteamGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.STEAM_ENGINE, "steamgen", registryAccess);
     }
 
     @Override

@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:resource_node_uranium"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:raw_uranium"
+    }
+  ],
+  "recipeType": "oritech:deep_drill",
+  "time": 1
+}

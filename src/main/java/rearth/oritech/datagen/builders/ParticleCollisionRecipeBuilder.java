@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class ParticleCollisionRecipeBuilder extends OritechRecipeBuilder {
 
-    protected ParticleCollisionRecipeBuilder() {
-        super(RecipeContent.PARTICLE_COLLISION, "particle");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new ParticleCollisionRecipeBuilder();
+    public ParticleCollisionRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.PARTICLE_COLLISION, "particle", registryAccess);
     }
 
     @Override

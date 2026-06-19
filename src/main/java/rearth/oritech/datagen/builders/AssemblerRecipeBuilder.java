@@ -1,17 +1,14 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class AssemblerRecipeBuilder extends OritechRecipeBuilder {
 
-    protected AssemblerRecipeBuilder() {
-        super(RecipeContent.ASSEMBLER, "assembler");
+    public AssemblerRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.ASSEMBLER, "assembler", registryAccess);
         this.time = 120;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new AssemblerRecipeBuilder();
     }
 
     @Override

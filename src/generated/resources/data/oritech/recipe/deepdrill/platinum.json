@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:resource_node_platinum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:raw_platinum"
+    }
+  ],
+  "recipeType": "oritech:deep_drill",
+  "time": 1
+}

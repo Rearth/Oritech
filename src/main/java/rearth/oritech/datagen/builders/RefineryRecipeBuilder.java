@@ -1,17 +1,14 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class RefineryRecipeBuilder extends OritechRecipeBuilder {
 
-    protected RefineryRecipeBuilder() {
-        super(RecipeContent.REFINERY, "refinery");
+    public RefineryRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.REFINERY, "refinery", registryAccess);
         this.time = 80;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new RefineryRecipeBuilder();
     }
 
     @Override

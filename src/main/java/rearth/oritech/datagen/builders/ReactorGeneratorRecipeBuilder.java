@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    protected ReactorGeneratorRecipeBuilder() {
-        super(RecipeContent.REACTOR, "reactorgen");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new ReactorGeneratorRecipeBuilder();
+    public ReactorGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.REACTOR, "reactorgen", registryAccess);
     }
 
     @Override

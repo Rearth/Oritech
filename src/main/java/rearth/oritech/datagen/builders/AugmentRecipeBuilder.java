@@ -1,6 +1,7 @@
 package rearth.oritech.datagen.builders;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -17,7 +18,7 @@ import rearth.oritech.init.datapack.AugmentData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static rearth.oritech.datagen.builders.util.RecipeHelpers.of;
+import static rearth.oritech.datagen.RecipeGenerator.of;
 
 public class AugmentRecipeBuilder {
     private final String resourcePath;
@@ -32,15 +33,13 @@ public class AugmentRecipeBuilder {
     private int uiY;
     private int time;
     private long rfCost;
+    private final HolderLookup.Provider registryAccess;
 
     private AugmentData.AugmentDefinition definition;
 
-    private AugmentRecipeBuilder(String resourcePath) {
-        this.resourcePath = resourcePath;
-    }
-
-    public static AugmentRecipeBuilder build() {
-        return new AugmentRecipeBuilder("augment");
+    public AugmentRecipeBuilder(HolderLookup.Provider registryAccess) {
+        this.resourcePath = "augment";
+        this.registryAccess = registryAccess;
     }
 
     @FunctionalInterface
@@ -71,7 +70,7 @@ public class AugmentRecipeBuilder {
     }
 
     public AugmentRecipeBuilder researchCost(TagKey<Item> researchCostTag, int count) {
-        return researchCost(of(researchCostTag), count);
+        return researchCost(Ingredient.of(registryAccess.get(researchCostTag).orElseThrow()), count);
     }
 
     public AugmentRecipeBuilder researchCost(TagKey<Item> researchCostTag) {
@@ -109,7 +108,7 @@ public class AugmentRecipeBuilder {
     }
 
     public AugmentRecipeBuilder applyCost(TagKey<Item> applyCostTag, int count) {
-        return applyCost(of(applyCostTag), count);
+        return applyCost(Ingredient.of(registryAccess.get(applyCostTag).orElseThrow()), count);
     }
 
     public AugmentRecipeBuilder applyCost(TagKey<Item> applyCostTag) {

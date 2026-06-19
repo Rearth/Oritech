@@ -1,18 +1,15 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class DeepDrillRecipeBuilder extends OritechRecipeBuilder {
 
-    protected DeepDrillRecipeBuilder() {
-        super(RecipeContent.DEEP_DRILL, "deepdrill");
+    public DeepDrillRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.DEEP_DRILL, "deepdrill", registryAccess);
         // Set the default time for deep drill recipes
         this.time = 1;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new DeepDrillRecipeBuilder();
     }
 
     @Override

@@ -73,7 +73,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder ore(TagKey<Item> oreTag) {
-        return ore(RecipeHelpers.of(oreTag));
+        return ore(RecipeGenerator.of(oreTag));
     }
 
     public MetalProcessingChainBuilder ore(ItemLike ore) {
@@ -87,7 +87,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder rawOre(TagKey<Item> rawOreTag, Item rawOre) {
-        return rawOre(RecipeHelpers.of(rawOreTag), rawOre);
+        return rawOre(RecipeGenerator.of(rawOreTag), rawOre);
     }
 
     public MetalProcessingChainBuilder rawOre(Item rawOre) {
@@ -106,7 +106,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder ingot(TagKey<Item> ingotTag, Item ingot) {
-        return ingot(RecipeHelpers.of(ingotTag), ingot);
+        return ingot(RecipeGenerator.of(ingotTag), ingot);
     }
 
     public MetalProcessingChainBuilder ingot(Item ingot) {
@@ -120,7 +120,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder nugget(TagKey<Item> nuggetTag, Item nugget) {
-        return nugget(RecipeHelpers.of(nuggetTag), nugget);
+        return nugget(RecipeGenerator.of(nuggetTag), nugget);
     }
 
     public MetalProcessingChainBuilder nugget(Item nugget) {
@@ -134,7 +134,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder clump(TagKey<Item> clumpTag, Item clump) {
-        return clump(RecipeHelpers.of(clumpTag), clump);
+        return clump(RecipeGenerator.of(clumpTag), clump);
     }
 
     public MetalProcessingChainBuilder clump(Item clump) {
@@ -188,7 +188,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder gem(TagKey<Item> gemTag, Item gem) {
-        return gem(RecipeHelpers.of(gemTag), gem);
+        return gem(RecipeGenerator.of(gemTag), gem);
     }
 
     public MetalProcessingChainBuilder gem(Item gem) {
@@ -201,7 +201,7 @@ public class MetalProcessingChainBuilder {
     }
 
     public MetalProcessingChainBuilder gemCatalyst(TagKey<Item> gemCatalyst) {
-        return gemCatalyst(RecipeHelpers.of(gemCatalyst));
+        return gemCatalyst(RecipeGenerator.of(gemCatalyst));
     }
 
     public MetalProcessingChainBuilder gemCatalyst(Item gemCatalyst) {
@@ -212,7 +212,7 @@ public class MetalProcessingChainBuilder {
         return rawOre(rawOreIngredient, rawOre.get());
     }
     public MetalProcessingChainBuilder rawOre(TagKey<Item> rawOreTag, Supplier<? extends Item> rawOre) {
-        return rawOre(RecipeHelpers.of(rawOreTag), rawOre.get());
+        return rawOre(RecipeGenerator.of(rawOreTag), rawOre.get());
     }
     public MetalProcessingChainBuilder rawOre(Supplier<? extends Item> rawOre) {
         return rawOre(Ingredient.of(rawOre.get()), rawOre.get());
@@ -227,7 +227,7 @@ public class MetalProcessingChainBuilder {
         return ingot(ingotIngredient, ingot.get());
     }
     public MetalProcessingChainBuilder ingot(TagKey<Item> ingotTag, Supplier<? extends Item> ingot) {
-        return ingot(RecipeHelpers.of(ingotTag), ingot.get());
+        return ingot(RecipeGenerator.of(ingotTag), ingot.get());
     }
     public MetalProcessingChainBuilder ingot(Supplier<? extends Item> ingot) {
         return ingot(Ingredient.of(ingot.get()), ingot.get());
@@ -237,7 +237,7 @@ public class MetalProcessingChainBuilder {
         return nugget(nuggetIngredient, nugget.get());
     }
     public MetalProcessingChainBuilder nugget(TagKey<Item> nuggetTag, Supplier<? extends Item> nugget) {
-        return nugget(RecipeHelpers.of(nuggetTag), nugget.get());
+        return nugget(RecipeGenerator.of(nuggetTag), nugget.get());
     }
     public MetalProcessingChainBuilder nugget(Supplier<? extends Item> nugget) {
         return nugget(Ingredient.of(nugget.get()), nugget.get());
@@ -247,7 +247,7 @@ public class MetalProcessingChainBuilder {
         return clump(clumpIngredient, clump.get());
     }
     public MetalProcessingChainBuilder clump(TagKey<Item> clumpTag, Supplier<? extends Item> clump) {
-        return clump(RecipeHelpers.of(clumpTag), clump.get());
+        return clump(RecipeGenerator.of(clumpTag), clump.get());
     }
     public MetalProcessingChainBuilder clump(Supplier<? extends Item> clump) {
         return clump(Ingredient.of(clump.get()), clump.get());
@@ -291,7 +291,7 @@ public class MetalProcessingChainBuilder {
         return gem(gemIngredient, gem.get());
     }
     public MetalProcessingChainBuilder gem(TagKey<Item> gemTag, Supplier<? extends Item> gem) {
-        return gem(RecipeHelpers.of(gemTag), gem.get());
+        return gem(RecipeGenerator.of(gemTag), gem.get());
     }
     public MetalProcessingChainBuilder gem(Supplier<? extends Item> gem) {
         return gem(Ingredient.of(gem.get()), gem.get());

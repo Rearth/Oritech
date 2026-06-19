@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:resource_node_iron"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:raw_iron"
+    }
+  ],
+  "recipeType": "oritech:deep_drill",
+  "time": 1
+}

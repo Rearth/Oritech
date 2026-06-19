@@ -3,6 +3,7 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
@@ -27,8 +28,10 @@ import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
+import rearth.oritech.datagen.AdvancementGenerator;
 import rearth.oritech.datagen.BlockLootGenerator;
 import rearth.oritech.datagen.ModelGenerator;
+import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
 import rearth.oritech.datagen.tags.EntityTagGenerator;
 import rearth.oritech.datagen.tags.FluidTagGenerator;
@@ -87,6 +90,16 @@ public final class OritechClient {
         event.createProvider(ItemTagGenerator::new);
         event.createProvider(FluidTagGenerator::new);
         event.createProvider(EntityTagGenerator::new);
+
+        var generator = event.getGenerator();
+        var packOutput = generator.getPackOutput();
+        var lookupProvider = event.getLookupProvider();
+
+        // Register Recipe Generator
+        generator.addProvider(true, new RecipeGenerator.Runner(packOutput, lookupProvider));
+
+        event.createProvider((output, provider) ->
+                new AdvancementProvider(output, provider, List.of(new AdvancementGenerator())));
 
         // no idea why this is on the client, but oh well
         event.createProvider((output, lookup) -> new LootTableProvider(

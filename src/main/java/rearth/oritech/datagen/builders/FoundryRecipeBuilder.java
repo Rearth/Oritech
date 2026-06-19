@@ -1,18 +1,14 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class FoundryRecipeBuilder extends OritechRecipeBuilder {
-    private static final String resourcePath = "foundry/alloy";
 
-    private FoundryRecipeBuilder() {
-        super(RecipeContent.FOUNDRY, resourcePath);
+    public FoundryRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.FOUNDRY, "foundry/alloy", registryAccess);
         this.time = 80;
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new FoundryRecipeBuilder();
     }
 
     @Override

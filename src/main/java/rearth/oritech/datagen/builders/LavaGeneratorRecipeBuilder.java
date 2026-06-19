@@ -1,16 +1,13 @@
 package rearth.oritech.datagen.builders;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
 public class LavaGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    protected LavaGeneratorRecipeBuilder() {
-        super(RecipeContent.LAVA_GENERATOR, "lavagen");
-    }
-
-    public static OritechRecipeBuilder build() {
-        return new LavaGeneratorRecipeBuilder();
+    public LavaGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
+        super(RecipeContent.LAVA_GENERATOR, "lavagen", registryAccess);
     }
 
     @Override
