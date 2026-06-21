@@ -47,10 +47,6 @@ public class EnergizedPowerRecipeGenerator {
                 new IngredientWithCount(of(ConventionalItemTags.NETHERITE_INGOTS), 1)},
             new ItemStack(ItemContent.DURATIUM_INGOT), 1000, "duratium");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
-                new IngredientWithCount(of(ConventionalItemTags.GOLD_INGOTS), 1),
-                new IngredientWithCount(of(ConventionalItemTags.REDSTONE_DUSTS), 1)},
-            new ItemStack(ItemContent.ELECTRUM_INGOT.asItem()), 500, "oritech_electrum");
-        offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
                 new IngredientWithCount(of(ItemContent.FLUXITE.asItem()), 1)},
             new ItemStack(ItemContent.ENERGITE_INGOT.asItem()), 500, "energite");

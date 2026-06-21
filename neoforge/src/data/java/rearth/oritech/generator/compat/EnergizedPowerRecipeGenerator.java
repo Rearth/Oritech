@@ -47,10 +47,6 @@ public class EnergizedPowerRecipeGenerator {
                 new IngredientWithCount(of(Tags.Items.INGOTS_NETHERITE), 1)},
             new ItemStack(ItemContent.DURATIUM_INGOT), 1000, "duratium");
         offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
-                new IngredientWithCount(of(Tags.Items.INGOTS_GOLD), 1),
-                new IngredientWithCount(of(Tags.Items.DUSTS_REDSTONE), 1)},
-            new ItemStack(ItemContent.ELECTRUM_INGOT.asItem()), 500, "oritech_electrum");
-        offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
                 new IngredientWithCount(of(TagContent.NICKEL_INGOTS), 1),
                 new IngredientWithCount(of(ItemContent.FLUXITE.asItem()), 1)},
             new ItemStack(ItemContent.ENERGITE_INGOT.asItem()), 500, "energite");
@@ -70,10 +66,6 @@ public class EnergizedPowerRecipeGenerator {
                 new IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1),
                 new IngredientWithCount(of(ItemContent.PLATINUM_GEM.asItem()), 1)},
             new ItemStack(ItemContent.PLATINUM_INGOT, 3), 800, "platinum_gems");
-        offerEPAlloyFurnaceRecipe(exporter, new IngredientWithCount[]{
-                new IngredientWithCount(of(Tags.Items.INGOTS_IRON), 1),
-                new IngredientWithCount(of(TagContent.COAL_DUSTS), 1)},
-            new ItemStack(ItemContent.STEEL_INGOT), 500, "steel_with_dust");
     }
 
     public static void addEPMetalProcessingRecipes(IConditionBuilder conditionBuilder, RecipeOutput exporter) {
@@ -220,7 +212,7 @@ public class EnergizedPowerRecipeGenerator {
         // Items.EMPTY would be better, but exporter is rejecting that. 0% chance of dropping iron ingot should be fine.
         var secondary = new OutputItemStackWithPercentages(new ItemStack(Items.IRON_INGOT), new double[0]);
         var recipe = new AlloyFurnaceRecipe(output, secondary, inputs, ticks);
-        exporter.accept(Oritech.id("compat/energizedpower/alloyfurance/" + suffix), recipe, null);
+        exporter.accept(Oritech.id("compat/energizedpower/alloyfurnace/" + suffix), recipe, null);
     }
 
     private static void offerEPAssemblingMachineRecipe(RecipeOutput exporter, IngredientWithCount[] inputs, ItemStack output, String suffix) {
