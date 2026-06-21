@@ -89,7 +89,7 @@ dependencies {
     // JEI
     compileOnly("mezz.jei:jei-$minecraft_version-neoforge:$jei_version") { transitive = false }
     // Oracle Index
-    compileOnly "curse.maven:oracle-index-1206582:7590938"
+    compileOnly "curse.maven:oracle-index-1206582:8282071"
     // REI
     compileOnly "me.shedaniel:RoughlyEnoughItems-neoforge:$rei_version"
 
