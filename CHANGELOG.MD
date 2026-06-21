@@ -1,5 +1,0 @@
-- Update wiki to use new V1 layout
-- Fix FluidHandler.Drain implementation on neoforge (should fix some fluid interaction issues)
-- Fix / improve fluid pipe empty target handling
-- Cleanup Energizer Power Compatibility Datagen
-- Fix crash with latest oracle index version
