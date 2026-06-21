@@ -107,7 +107,13 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             if (targetStorage == null || !targetStorage.supportsInsertion()) continue;
             
             var maxInsert = targetStorage.insert(stackToMove, true);
+
+            if (maxInsert <= 0) continue;
+
             var taken = takenFrom.extract(stackToMove.copyWithAmount(maxInsert), false);
+
+            if (taken <= 0) continue;
+
             var inserted = targetStorage.insert(stackToMove.copyWithAmount(taken), false);
             
             stackToMove.shrink(inserted);
