@@ -240,9 +240,10 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             var found = false;
 
             for (int i = 0; i < inputInv.size(); i++) {
-                var inputResource = inputInv.getResource((i + startOffset) % inputInv.size());
+                var index = (i + startOffset) % inputInv.size();
+                var inputResource = inputInv.getResource(index);
                 if (removedIng.test(inputResource.toStack())) {
-                    var taken = inputInv.extract(i, inputResource, 1, transaction);
+                    var taken = inputInv.extract(index, inputResource, 1, transaction);
                     if (taken != 1) return false;
                     startOffset++;
                     found = true;
@@ -284,9 +285,10 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
     public abstract ContainerSlotAssignment getSlotAssignments();
 
+    // gives a mutable copy of the content
     protected List<ItemStack> getInputView() {
         var slots = getSlotAssignments();
-        return this.inventory.getStacks().subList(slots.inputStart(), slots.inputStart() + slots.inputCount());
+        return this.inventory.getStacks().subList(slots.inputStart(), slots.inputStart() + slots.inputCount()).stream().map(ItemStack::copy).toList();
     }
 
     // new:

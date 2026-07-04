@@ -105,7 +105,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 // do the whole thing for each slot in the source container
                 for (int i = 0; i < sourceContainer.size(); i++) {
                     var extractedResource = sourceContainer.getResource(i);
-                    if (extractedResource.isEmpty()) continue;
+                    if (extractedResource.isEmpty() || machineMoveCapacity <= 0) continue;
 
                     // with directly canceled transaction just to figure out how much can be moved / extracted
                     var availableAmount = 0;

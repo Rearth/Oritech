@@ -73,6 +73,7 @@ public class MachineSoundHandler<A extends GeoAnimatable> implements AnimationCo
                 var source = SoundSource.BLOCKS;
 
                 level.playLocalSound(position.x, position.y, position.z, sound.value(), source, volume, pitch, false);
+                lastPlayedAt.put(id, time);
             } else {
                 GeckoLibConstants.LOGGER.warn("Found sound keyframe handler, but AnimationState had no position data for animatable: {}", animatableClass.getName());
             }

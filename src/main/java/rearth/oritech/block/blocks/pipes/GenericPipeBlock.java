@@ -272,7 +272,7 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             // center hit
             diff = hitPos.subtract(center.add(Vec3.atLowerCornerOf(pos)));
 
-        return Direction.getNearest((int) diff.x, (int) diff.y, (int) diff.z, Direction.UP);
+        return Direction.getApproximateNearest(diff);
     }
 
     // only returns the outside shapes
