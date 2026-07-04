@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "minecraft:item/generated",
+    "base": "oritech:item/tech_door",
     "model": {
       "type": "geckolib:geckolib"
     }

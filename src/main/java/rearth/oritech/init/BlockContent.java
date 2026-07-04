@@ -513,11 +513,10 @@ public class BlockContent {
         );
     }
 
-    // todo figure this out
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface UseGeoBlockItem {
-        float scale(); // scale
+        float scale();
     }
 
     @Retention(RetentionPolicy.RUNTIME)

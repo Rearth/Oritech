@@ -32,19 +32,19 @@ public class GeoItemModelGenerator implements DataProvider {
 
             var block = (DeferredBlock<?>) value;
             var itemId = block.unwrapKey().orElseThrow().identifier();
-            futures.add(DataProvider.saveStable(output, createGeckoLibItemModel(), pathProvider.json(itemId)));
+            futures.add(DataProvider.saveStable(output, createGeckoLibItemModel(itemId), pathProvider.json(itemId)));
         });
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
-    private static JsonObject createGeckoLibItemModel() {
+    private JsonObject createGeckoLibItemModel(Identifier itemId) {
         var specialModel = new JsonObject();
         specialModel.addProperty("type", "geckolib:geckolib");
 
         var model = new JsonObject();
         model.addProperty("type", "minecraft:special");
-        model.addProperty("base", "minecraft:item/generated");
+        model.addProperty("base", Identifier.fromNamespaceAndPath(itemId.getNamespace(), "item/" + itemId.getPath()).toString());
         model.add("model", specialModel);
 
         var root = new JsonObject();

@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "minecraft:item/generated",
+    "base": "oritech:item/refinery_block",
     "model": {
       "type": "geckolib:geckolib"
     }

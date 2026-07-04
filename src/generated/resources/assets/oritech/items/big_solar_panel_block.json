@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "minecraft:item/generated",
+    "base": "oritech:item/big_solar_panel_block",
     "model": {
       "type": "geckolib:geckolib"
     }
