@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/steam_boiler_addon"
+    "model": "oritech:item/steam_boiler_addon"
   }
 }

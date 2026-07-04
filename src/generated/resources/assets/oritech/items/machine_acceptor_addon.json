@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/machine_acceptor_addon"
+    "model": "oritech:item/machine_acceptor_addon"
   }
 }

@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/crop_filter_addon"
+    "model": "oritech:item/crop_filter_addon"
   }
 }

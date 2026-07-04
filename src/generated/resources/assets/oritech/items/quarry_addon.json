@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/quarry_addon"
+    "model": "oritech:item/quarry_addon"
   }
 }

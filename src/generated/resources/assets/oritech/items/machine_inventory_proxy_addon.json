@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/machine_inventory_proxy_addon"
+    "model": "oritech:item/machine_inventory_proxy_addon"
   }
 }

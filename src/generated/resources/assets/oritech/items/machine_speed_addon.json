@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/machine_speed_addon"
+    "model": "oritech:item/machine_speed_addon"
   }
 }

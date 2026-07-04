@@ -7,6 +7,7 @@ import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
+import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
@@ -61,6 +62,26 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.IRON_PLATING_BLOCK.get(),
             BlockContent.CARBON_PLATING_BLOCK.get(),
             BlockContent.NICKEL_PLATING_BLOCK.get()
+    );
+
+    private static final Set<Block> HAND_AUTHORED_ITEM_MODEL_BLOCKS = Set.of(
+            BlockContent.MACHINE_SPEED_ADDON.get(),
+            BlockContent.MACHINE_EFFICIENCY_ADDON.get(),
+            BlockContent.MACHINE_ULTIMATE_ADDON.get(),
+            BlockContent.QUARRY_ADDON.get(),
+            BlockContent.MACHINE_PROCESSING_ADDON.get(),
+            BlockContent.MACHINE_FLUID_ADDON.get(),
+            BlockContent.MACHINE_YIELD_ADDON.get(),
+            BlockContent.CROP_FILTER_ADDON.get(),
+            BlockContent.MACHINE_HUNTER_ADDON.get(),
+            BlockContent.MACHINE_CAPACITOR_ADDON.get(),
+            BlockContent.MACHINE_ACCEPTOR_ADDON.get(),
+            BlockContent.MACHINE_INVENTORY_PROXY_ADDON.get(),
+            BlockContent.STEAM_BOILER_ADDON.get(),
+            BlockContent.MACHINE_REDSTONE_ADDON.get(),
+            BlockContent.MACHINE_SILK_TOUCH_ADDON.get(),
+            BlockContent.MACHINE_BURST_ADDON.get(),
+            BlockContent.MACHINE_COMBI_ADDON.get()
     );
 
 
@@ -301,6 +322,11 @@ public class ModelGenerator extends ModelProvider {
     }
 
     private void generateItemModels(ItemModelGenerators itemModelGenerator) {
+        HAND_AUTHORED_ITEM_MODEL_BLOCKS.forEach(block -> itemModelGenerator.itemModelOutput.accept(
+                block.asItem(),
+                ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(block.asItem()))
+        ));
+
         itemModelGenerator.generateFlatItem(ToolsContent.EXO_HELMET.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.EXO_CHESTPLATE.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.EXO_LEGGINGS.get(), ModelTemplates.FLAT_ITEM);

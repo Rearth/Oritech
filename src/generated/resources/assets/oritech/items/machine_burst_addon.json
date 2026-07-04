@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "oritech:block/machine_burst_addon"
+    "model": "oritech:item/machine_burst_addon"
   }
 }
