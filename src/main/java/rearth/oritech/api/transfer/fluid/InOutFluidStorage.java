@@ -7,18 +7,20 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.transfer.DelegatingResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.networking.UpdatableField;
+import rearth.oritech.api.transfer.SlotRangeResourceHandler;
 import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.util.List;
 
-// sub-containers allow direct insert + extract access to each sub-container
+// in / out containers give fully unrestricted direct access to just the input or just the output slots.
+// this is separate from the pipe-facing insert(index, ...)/extract(index, ...) below, which restrict
+// insertion to input slots and extraction to output slots for externally exposed access.
 public class InOutFluidStorage extends FluidStacksResourceHandler implements UpdatableField<Void, List<FluidStack>> {
 
     private final Runnable onUpdate;
@@ -31,45 +33,11 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
         this.onUpdate = onUpdate;
         this.slotAssignment = slotAssignment;
 
-        inputContainer = new DelegatingResourceHandler<>(this) {
-            @Override
-            public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-                if (!slotAssignment.isInput(index)) return 0;
-                return super.insert(index, resource, amount, transaction);
-            }
-
-            @Override
-            public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-                if (!slotAssignment.isInput(index)) return 0;
-                return super.extract(index, resource, amount, transaction);
-            }
-
-            @Override
-            public int size() {
-                return slotAssignment.inputCount();
-            }
-        };
-
-        outputContainer = new DelegatingResourceHandler<>(this) {
-            @Override
-            public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-                if (!slotAssignment.isOutput(index)) return 0;
-                return super.insert(index, resource, amount, transaction);
-            }
-
-            @Override
-            public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
-                if (!slotAssignment.isOutput(index)) return 0;
-                return super.extract(index, resource, amount, transaction);
-            }
-
-            @Override
-            public int size() {
-                return slotAssignment.outputCount();
-            }
-        };
+        inputContainer = new SlotRangeResourceHandler<>(this, slotAssignment.inputStart(), slotAssignment.inputCount(), this::rawInsert, this::rawExtract);
+        outputContainer = new SlotRangeResourceHandler<>(this, slotAssignment.outputStart(), slotAssignment.outputCount(), this::rawInsert, this::rawExtract);
     }
 
+    // externally exposed (e.g. pipe) access: insertion only allowed into input slots, extraction only from output slots
     @Override
     public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
         if (!slotAssignment.isInput(index)) return 0;
@@ -79,6 +47,16 @@ public class InOutFluidStorage extends FluidStacksResourceHandler implements Upd
     @Override
     public int extract(int index, FluidResource resource, int amount, TransactionContext transaction) {
         if (!slotAssignment.isOutput(index)) return 0;
+        return super.extract(index, resource, amount, transaction);
+    }
+
+    // raw, unrestricted index-based insert/extract - bypasses the restriction above.
+    // backs the input/output sub-views used for internal logic (crafting, guis, checks, etc.)
+    private int rawInsert(int index, FluidResource resource, int amount, TransactionContext transaction) {
+        return super.insert(index, resource, amount, transaction);
+    }
+
+    private int rawExtract(int index, FluidResource resource, int amount, TransactionContext transaction) {
         return super.extract(index, resource, amount, transaction);
     }
 

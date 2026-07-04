@@ -43,6 +43,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
 
             // try taking 9 items from slot 1
             var dustResource = outputInventory.getResource(1);
+            if (dustResource.isEmpty()) return;
             var removed = outputInventory.extract(1, dustResource, 9, inner);
             if (removed != 9) return;
 

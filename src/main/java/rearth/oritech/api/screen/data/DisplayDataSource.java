@@ -166,7 +166,7 @@ public abstract class DisplayDataSource {
         if (blockEntity instanceof MachineBlockEntity machineEntity
                 && (machineEntity.getRecipeDuration() > 0 || machineEntity.getProgress() > 0)) {
 
-            var progressTicks = machineEntity.progress;
+            var progressTicks = machineEntity.progress.get();
             var recipeDurationTicks = machineEntity.getRecipeDuration();
             var effectiveDurationTicks = (int) (recipeDurationTicks * machineEntity.getSpeedMultiplier());
 
