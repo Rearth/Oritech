@@ -1,5 +1,6 @@
 package rearth.oritech.datagen;
 
+import com.google.gson.JsonObject;
 import com.mojang.math.Quadrant;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -14,6 +15,7 @@ import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -98,6 +100,14 @@ public class ModelGenerator extends ModelProvider {
         createNonTemplateModelBlock(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.get(), generator);
         createNonTemplateModelBlock(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get(), generator);
         createNonTemplateModelBlock(BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), generator);
+        createModelAlias(BlockContent.FRAMED_FLUID_PIPE.get(), Oritech.id("block/framed_pipe"), generator);
+        createModelAlias(BlockContent.FRAMED_ENERGY_PIPE.get(), Oritech.id("block/framed_pipe"), generator);
+        createModelAlias(BlockContent.FRAMED_SUPERCONDUCTOR.get(), Oritech.id("block/framed_pipe"), generator);
+        createModelAlias(BlockContent.FRAMED_ITEM_PIPE.get(), Oritech.id("block/framed_pipe"), generator);
+        createModelAlias(BlockContent.FRAMED_FLUID_PIPE_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
+        createModelAlias(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
+        createModelAlias(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
+        createModelAlias(BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
         generator.createTrivialCube(BlockContent.FLUID_PIPE_DUCT_BLOCK.get());
         generator.createTrivialCube(BlockContent.ENERGY_PIPE_DUCT_BLOCK.get());
         generator.createTrivialCube(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.get());
@@ -333,6 +343,12 @@ public class ModelGenerator extends ModelProvider {
                         .select(Direction.SOUTH, BlockModelGenerators.Y_ROT_180)
                         .select(Direction.WEST, Y_ROT_270)
                         .select(Direction.NORTH, BlockModelGenerators.NOP)));
+    }
+
+    private void createModelAlias(Block block, Identifier parent, BlockModelGenerators generator) {
+        var model = new JsonObject();
+        model.addProperty("parent", parent.toString());
+        generator.modelOutput.accept(ModelLocationUtils.getModelLocation(block), () -> model);
     }
 
     // no idea what this is. Just tried to update it somehow

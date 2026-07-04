@@ -7,7 +7,12 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.model.DefaultedBlockGeoModel;
 import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
@@ -23,6 +28,15 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
         super(block, settings);
         this.scale = scale;
         this.name = name;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+
+        if (getBlock() instanceof TooltipProvider tooltipProvider) {
+            tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
+        }
     }
 
     @Override

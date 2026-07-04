@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "oritech:block/powered_furnace_block"
+    "type": "minecraft:special",
+    "base": "minecraft:item/generated",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }

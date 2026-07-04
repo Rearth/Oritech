@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "oritech:block/steam_engine_block"
+    "type": "minecraft:special",
+    "base": "minecraft:item/generated",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }

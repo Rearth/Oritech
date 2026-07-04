@@ -1,4 +1,4 @@
-// 26.1.2	2026-06-19T19:01:51.9766502	Model Definitions - oritech
+// 26.1.2	2026-07-04T22:27:37.515174	Model Definitions - oritech
 848ae773b46d96e685f8f3f15717f44fcba78026 assets/oritech/blockstates/accelerator_controller.json
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
@@ -494,6 +494,14 @@ fea1ffc129f81fd2f1ec5e458439f1baa9b48bbc assets/oritech/models/block/deepslate_u
 fb649b7e0a65c26357fc94b60ca199e5ab1da518 assets/oritech/models/block/energy_pipe_duct_block.json
 41c6bc6ab94e53ac7a25a17b37b40eb1a6e0c1c7 assets/oritech/models/block/fluid_pipe_duct_block.json
 c4369c5a0f2eee2101e404c473078366b84fdab7 assets/oritech/models/block/fluxite_block.json
+5d05a250c0ecd02f3cfd35e66b0e7ffcee986bb2 assets/oritech/models/block/framed_energy_pipe.json
+4fd1a1a1ca820ea7d472eae6a05b5658c6d60880 assets/oritech/models/block/framed_energy_pipe_connection.json
+5d05a250c0ecd02f3cfd35e66b0e7ffcee986bb2 assets/oritech/models/block/framed_fluid_pipe.json
+4fd1a1a1ca820ea7d472eae6a05b5658c6d60880 assets/oritech/models/block/framed_fluid_pipe_connection.json
+5d05a250c0ecd02f3cfd35e66b0e7ffcee986bb2 assets/oritech/models/block/framed_item_pipe.json
+4fd1a1a1ca820ea7d472eae6a05b5658c6d60880 assets/oritech/models/block/framed_item_pipe_connection.json
+5d05a250c0ecd02f3cfd35e66b0e7ffcee986bb2 assets/oritech/models/block/framed_superconductor.json
+4fd1a1a1ca820ea7d472eae6a05b5658c6d60880 assets/oritech/models/block/framed_superconductor_connection.json
 a7e3bba4e7d51f74e12699e69f40a25a1eec7040 assets/oritech/models/block/industrial_glass_block.json
 de9d4fc2694b7f7a8ea8a38cc86137cbaa70f15f assets/oritech/models/block/iron_plating_pressure_plate.json
 b88d35a0501faadde7cac29da4436cb9a42ea353 assets/oritech/models/block/iron_plating_pressure_plate_down.json

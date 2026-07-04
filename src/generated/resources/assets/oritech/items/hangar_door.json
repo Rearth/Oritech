@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "oritech:block/hangar_door"
+    "type": "minecraft:special",
+    "base": "minecraft:item/generated",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }

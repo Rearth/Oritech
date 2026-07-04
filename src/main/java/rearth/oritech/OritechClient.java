@@ -30,6 +30,7 @@ import rearth.oritech.client.renderers.SmallTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.datagen.AdvancementGenerator;
 import rearth.oritech.datagen.BlockLootGenerator;
+import rearth.oritech.datagen.GeoItemModelGenerator;
 import rearth.oritech.datagen.ModelGenerator;
 import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.datagen.builders.OritechAugmentDataGenerator;
@@ -87,6 +88,7 @@ public final class OritechClient {
     // client datagen
     public void gatherData(GatherDataEvent.Client event) {
         event.createProvider(ModelGenerator::new);
+        event.createProvider(GeoItemModelGenerator::new);
         event.createProvider(BlockTagGenerator::new);
         event.createProvider(ItemTagGenerator::new);
         event.createProvider(FluidTagGenerator::new);

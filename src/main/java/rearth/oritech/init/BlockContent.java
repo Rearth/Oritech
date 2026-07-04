@@ -39,6 +39,7 @@ import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ItemContent.Compostable;
+import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.lang.annotation.ElementType;
@@ -474,17 +475,37 @@ public class BlockContent {
                         fieldGroup = field.getAnnotation(ItemContent.ItemGroupTarget.class).value();
                     }
 
+                    var itemRarity = field.isAnnotationPresent(BlockContent.ItemRarity.class)
+                            ? field.getAnnotation(BlockContent.ItemRarity.class).value()
+                            : null;
+
                     DeferredItem<BlockItem> blockItem = BLOCK_ITEMS.registerItem(
                             deferredBlock.unwrapKey().orElseThrow().identifier().getPath(),
-                            props -> new BlockItem(deferredBlock.value(), props) {
-                                @Override
-                                public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
-                                    super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
-
-                                    if (deferredBlock.get() instanceof TooltipProvider tooltipProvider) {
-                                        tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
-                                    }
+                            props -> {
+                                if (field.isAnnotationPresent(BlockContent.UseGeoBlockItem.class)) {
+                                    var geoItem = field.getAnnotation(BlockContent.UseGeoBlockItem.class);
+                                    return new OritechGeoItem(deferredBlock.value(), props, geoItem.scale(), deferredBlock.getId().getPath());
                                 }
+
+                                return new BlockItem(deferredBlock.value(), props) {
+                                    @Override
+                                    public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
+                                        super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
+
+                                        if (deferredBlock.get() instanceof TooltipProvider tooltipProvider) {
+                                            tooltipProvider.addToTooltip(context, builder, tooltipFlag, itemStack);
+                                        }
+                                    }
+                                };
+                            },
+                            () -> {
+                                var itemProperties = new BlockItem.Properties().useBlockDescriptionPrefix();
+
+                                if (itemRarity != null) {
+                                    itemProperties = itemProperties.rarity(itemRarity);
+                                }
+
+                                return itemProperties;
                             }
                     );
                     BLOCK_GROUPS.add(new Pair<>(blockItem, fieldGroup));
