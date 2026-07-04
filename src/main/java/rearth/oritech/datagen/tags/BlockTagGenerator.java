@@ -201,20 +201,6 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .add(BlockContent.REACTOR_REDSTONE_PORT.get())
           .add(BlockContent.REACTOR_CONTROLLER.get());
 
-        // todo data map generation for this stuff (or manually create the datamap, probably easier)
-//        this.tag(TagContent.UNSTABLE_CONTAINER_SOURCES_LOW)
-//          .add(Blocks.REDSTONE_BLOCK)
-//          .add(Blocks.TNT)
-//          .add(BlockContent.FLUXITE_BLOCK);
-//
-//        this.tag(TagContent.UNSTABLE_CONTAINER_SOURCES_MEDIUM)
-//          .add(Blocks.DRAGON_EGG)
-//          .add(BlockContent.LOW_YIELD_NUKE)
-//          .add(BlockContent.NUKE);
-//
-//        this.tag(TagContent.UNSTABLE_CONTAINER_SOURCES_HIGH)
-//          .add(BlockContent.BLACK_HOLE_BLOCK);
-
         this.tag(TagContent.MACHINE_FRAME_SUPPORT)
           .add(BlockContent.METAL_BEAM_BLOCK.get());
 
