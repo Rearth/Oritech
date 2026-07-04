@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:clumps/copper"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:copper_gem"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_gold_dust"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 100
+}

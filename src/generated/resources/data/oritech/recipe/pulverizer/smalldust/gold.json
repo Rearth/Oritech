@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:nuggets/gold"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_gold_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

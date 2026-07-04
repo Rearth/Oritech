@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_reactor_controller": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_controller"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/controller"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_reactor_controller"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/controller"
+    ]
+  }
+}

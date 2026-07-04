@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/electrum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:electrum_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

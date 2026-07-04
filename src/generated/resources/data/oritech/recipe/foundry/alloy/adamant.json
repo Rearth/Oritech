@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:gems/diamond",
+    "#c:ingots/nickel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:adamant_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

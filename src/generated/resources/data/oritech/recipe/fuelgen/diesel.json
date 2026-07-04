@@ -1,0 +1,11 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 100,
+    "ingredient": "#c:diesel"
+  },
+  "itemInputs": [],
+  "itemResults": [],
+  "recipeType": "oritech:fuel_generator",
+  "time": 80
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#c:storage_blocks/copper",
+    "c": "#c:ingots/nickel",
+    "f": "minecraft:iron_ingot",
+    "s": "oritech:motor"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:pulverizer_block"
+  }
+}

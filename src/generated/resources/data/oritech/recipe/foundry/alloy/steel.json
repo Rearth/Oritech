@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/iron",
+    "#c:dusts/coal"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:steel_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 26
+}

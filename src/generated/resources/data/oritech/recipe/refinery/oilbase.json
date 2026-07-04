@@ -1,0 +1,25 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "#c:oil"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 500,
+      "id": "oritech:still_heavy_oil"
+    },
+    {
+      "amount": 250,
+      "id": "oritech:still_naphtha"
+    },
+    {
+      "amount": 250,
+      "id": "oritech:still_sulfuric_acid"
+    }
+  ],
+  "itemInputs": [],
+  "itemResults": [],
+  "recipeType": "oritech:refinery",
+  "time": 80
+}

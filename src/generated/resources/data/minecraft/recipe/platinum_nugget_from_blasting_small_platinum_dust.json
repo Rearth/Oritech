@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 25,
+  "experience": 0.5,
+  "group": "oritech",
+  "ingredient": "oritech:small_platinum_dust",
+  "result": {
+    "id": "oritech:platinum_nugget"
+  }
+}

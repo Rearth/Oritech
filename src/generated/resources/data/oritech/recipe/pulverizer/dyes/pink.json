@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/dyes/pink"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:pink_dye"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ores/nickel"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:raw_nickel"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

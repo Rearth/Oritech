@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#oritech:recyclable/small_copper_dust"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_copper_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

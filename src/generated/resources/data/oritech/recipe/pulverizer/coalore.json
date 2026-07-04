@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:coal_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:coal"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

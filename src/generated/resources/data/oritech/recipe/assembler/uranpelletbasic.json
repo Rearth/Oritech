@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:uranium_gem",
+    "oritech:uranium_gem",
+    "#c:plates/plastic",
+    "#c:ingots/nickel"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:uranium_pellet"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

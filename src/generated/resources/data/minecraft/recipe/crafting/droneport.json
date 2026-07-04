@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:superconductor",
+    "f": "oritech:advanced_computing_engine",
+    "m": "oritech:motor",
+    "s": "oritech:unholy_intelligence"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:drone_port_block"
+  }
+}

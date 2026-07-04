@@ -1,0 +1,42 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:adamant_ingot"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 10.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:max_health"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/hpboostultra",
+    "oritech:augment/gravity"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "oritech:adamant_ingot"
+    },
+    {
+      "count": 4,
+      "ingredient": "minecraft:nether_star"
+    },
+    {
+      "count": 64,
+      "ingredient": "oritech:uranium_pellet"
+    },
+    {
+      "count": 64,
+      "ingredient": "oritech:fluxite_block"
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2400,
+  "toggleable": false,
+  "uiX": 205,
+  "uiY": 40
+}

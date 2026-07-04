@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:fluxite",
+    "c": "oritech:large_storage_block",
+    "f": "oritech:super_ai_chip",
+    "m": "oritech:duratium_ingot",
+    "s": "oritech:flux_gate"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:unstable_container"
+  }
+}

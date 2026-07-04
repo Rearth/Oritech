@@ -1,0 +1,33 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:motor"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 0.6,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:step_height"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/superspeedboost"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "oritech:motor"
+    },
+    {
+      "count": 64,
+      "ingredient": "#c:ingots/steel"
+    }
+  ],
+  "rfCost": 75000000,
+  "time": 800,
+  "toggleable": true,
+  "uiX": 80,
+  "uiY": 50
+}

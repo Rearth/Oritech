@@ -197,7 +197,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
         var fluidOutputs = recipe.fluidOutputs();
         if (fluidOutputs.size() > selectedOutput && !fluidOutputs.isEmpty()) {
-            var result = fluidOutputs.get(selectedOutput);
+            var result = fluidOutputs.get(selectedOutput).create();
             return result.copyWithAmount(result.getAmount() * getOutputMultiplier());
         }
         return FluidStack.EMPTY;

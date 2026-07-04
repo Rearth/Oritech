@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "minecraft:diamond_pickaxe",
+    "f": "#c:plates/plastic",
+    "s": "oritech:motor"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:quarry_addon"
+  }
+}

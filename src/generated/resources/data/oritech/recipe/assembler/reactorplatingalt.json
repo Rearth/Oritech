@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#oritech:plating",
+    "#oritech:plating",
+    "#c:ingots/steel",
+    "#c:ingots/nickel"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "oritech:reactor_wall"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

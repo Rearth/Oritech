@@ -13,7 +13,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
@@ -31,7 +31,7 @@ public abstract class OritechRecipeBuilder {
     protected List<Ingredient> inputs;
     protected List<ItemStackTemplate> results;
     protected SizedFluidIngredient fluidInput;
-    protected List<FluidStack> fluidOutputs;
+    protected List<FluidStackTemplate> fluidOutputs;
     protected int time = 200;
     protected float timeMultiplier = 1f;
     protected boolean addToGrinder;
@@ -101,17 +101,17 @@ public abstract class OritechRecipeBuilder {
         return fluidInput(new SizedFluidIngredient(FluidIngredient.of(registryAccess.get(in).orElseThrow()), (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
-    public OritechRecipeBuilder fluidOutput(FluidStack out) {
+    public OritechRecipeBuilder fluidOutput(FluidStackTemplate out) {
         fluidOutputs.add(out);
         return this;
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out, float bucketAmount) {
-        return fluidOutput(new FluidStack(out, (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
+        return fluidOutput(new FluidStackTemplate(out, (int) (bucketAmount * FluidType.BUCKET_VOLUME)));
     }
 
     public OritechRecipeBuilder fluidOutput(Fluid out) {
-        return fluidOutput(new FluidStack(out, FluidType.BUCKET_VOLUME));
+        return fluidOutput(new FluidStackTemplate(out, FluidType.BUCKET_VOLUME));
     }
 
     public OritechRecipeBuilder result(ItemStackTemplate out) {

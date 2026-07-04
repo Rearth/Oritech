@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:enderic_compound",
+    "f": "oritech:flux_gate",
+    "m": "#c:plates/plastic",
+    "s": "oritech:duratium_ingot"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:atomic_forge_block"
+  }
+}

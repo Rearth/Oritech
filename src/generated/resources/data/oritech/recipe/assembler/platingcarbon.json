@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/steel",
+    "#c:ingots/steel",
+    "oritech:reinforced_carbon_sheet",
+    "#c:plates/plastic"
+  ],
+  "itemResults": [
+    {
+      "count": 8,
+      "id": "oritech:carbon_plating_block"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

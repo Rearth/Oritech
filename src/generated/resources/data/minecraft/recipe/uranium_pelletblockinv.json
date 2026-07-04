@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:uranium_pellet"
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:small_uranium_pellet"
+  }
+}

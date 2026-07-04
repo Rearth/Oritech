@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:gunpowder",
+    "minecraft:blaze_powder",
+    "#minecraft:coals",
+    "#minecraft:coals"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:fire_charge"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

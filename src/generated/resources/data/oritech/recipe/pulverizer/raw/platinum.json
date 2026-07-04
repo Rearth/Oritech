@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/platinum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:platinum_dust"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_platinum_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 150
+}

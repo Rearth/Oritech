@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:platinum_gem",
+    "oritech:fluxite",
+    "oritech:fluxite"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:platinum_dust"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge",
+  "time": 20
+}

@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:glowstone"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:glowstone_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

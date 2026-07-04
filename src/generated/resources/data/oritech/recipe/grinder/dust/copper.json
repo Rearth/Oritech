@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/copper"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:copper_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

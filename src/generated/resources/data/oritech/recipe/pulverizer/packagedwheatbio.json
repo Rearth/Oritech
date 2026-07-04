@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:packed_wheat"
+  ],
+  "itemResults": [
+    {
+      "count": 16,
+      "id": "oritech:biomass"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

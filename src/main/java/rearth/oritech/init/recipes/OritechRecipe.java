@@ -13,7 +13,7 @@ import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.Lazy;
-import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.Oritech;
 
@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate> itemResults,
-                            Optional<SizedFluidIngredient> fluidInput, List<FluidStack> fluidOutputs,
+                            Optional<SizedFluidIngredient> fluidInput, List<FluidStackTemplate> fluidOutputs,
                             int time, RecipeType<OritechRecipe> recipeType) implements Recipe<OritechRecipeInput> {
 
     public static final Lazy<OritechRecipe> EMPTY = Lazy.of(() -> new OritechRecipe(List.of(), List.of(), Optional.empty(), List.of(), 0, RecipeContent.PULVERIZER.get()));
@@ -32,7 +32,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
             Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
             ItemStackTemplate.CODEC.listOf().fieldOf("itemResults").forGetter(OritechRecipe::itemResults),
             SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(OritechRecipe::fluidInput),
-            FluidStack.OPTIONAL_CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
+            FluidStackTemplate.CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
             Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::time),
             Identifier.CODEC.xmap(OritechRecipe::recipeTypeFromId, OritechRecipe::idFromRecipeType).fieldOf("recipeType").forGetter(OritechRecipe::recipeType)
     ).apply(instance, OritechRecipe::new));
@@ -41,7 +41,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
             Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemInputs,
             ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemResults,
             ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC), OritechRecipe::fluidInput,
-            FluidStack.OPTIONAL_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
+            FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
             ByteBufCodecs.INT, OritechRecipe::time,
             StreamCodec.of(
                     (buf, recipeType) -> Identifier.STREAM_CODEC.encode(buf, idFromRecipeType(recipeType)),

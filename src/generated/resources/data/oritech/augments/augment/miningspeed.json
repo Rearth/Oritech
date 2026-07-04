@@ -1,0 +1,38 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:magnetic_coil"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 1.0,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:block_break_speed"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/attackdamage",
+    "oritech:augment/speedboost"
+  ],
+  "researchCost": [
+    {
+      "count": 48,
+      "ingredient": "oritech:magnetic_coil"
+    },
+    {
+      "count": 64,
+      "ingredient": "minecraft:quartz"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:basic_battery"
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 1200,
+  "toggleable": false,
+  "uiX": 30,
+  "uiY": 10
+}

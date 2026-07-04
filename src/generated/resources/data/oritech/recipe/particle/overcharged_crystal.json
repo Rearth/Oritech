@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:fluxite",
+    "oritech:energite_dust"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:overcharged_crystal"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 5000
+}

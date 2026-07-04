@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:redstone_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 8,
+      "id": "minecraft:redstone"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "#c:ingots/steel",
+    "f": "minecraft:glass_bottle",
+    "m": "oritech:motor",
+    "s": "oritech:processing_unit"
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:centrifuge_block"
+  }
+}

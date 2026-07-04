@@ -1,0 +1,15 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/platinum",
+    "oritech:reinforced_carbon_sheet",
+    "oritech:reinforced_carbon_sheet"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:duratium_ingot"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge",
+  "time": 200
+}

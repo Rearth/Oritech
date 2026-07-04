@@ -1,0 +1,34 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:biosteel_ingot"
+    }
+  ],
+  "effect": {
+    "type": "effect",
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:water_breathing"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 8,
+      "ingredient": "minecraft:prismarine_crystals"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:biosteel_ingot"
+    },
+    {
+      "count": 1,
+      "ingredient": "minecraft:heart_of_the_sea"
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 800,
+  "toggleable": false,
+  "uiX": 5,
+  "uiY": 90
+}

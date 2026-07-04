@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:diamond_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:diamond"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

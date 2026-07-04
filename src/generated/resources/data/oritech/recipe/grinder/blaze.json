@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:blaze_rod"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:blaze_powder"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

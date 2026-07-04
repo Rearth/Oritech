@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/nickel",
+    "#c:ingots/steel",
+    "oritech:magnetic_coil",
+    "oritech:magnetic_coil"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:motor"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 48
+}

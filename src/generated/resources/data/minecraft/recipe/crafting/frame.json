@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:ingots/nickel",
+    "s": "minecraft:iron_bars"
+  },
+  "pattern": [
+    " s ",
+    "csc",
+    " s "
+  ],
+  "result": {
+    "count": 16,
+    "id": "oritech:machine_frame_block"
+  }
+}

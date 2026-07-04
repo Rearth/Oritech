@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:raw_biopolymer",
+    "e": "minecraft:glass_bottle",
+    "m": "#c:foods/food_poisoning",
+    "s": "#c:foods/food_poisoning"
+  },
+  "pattern": [
+    " a ",
+    "aea",
+    "mss"
+  ],
+  "result": {
+    "id": "oritech:weed_killer"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:gold_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_gold"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/gold",
+    "#c:dusts/redstone"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:electrum_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

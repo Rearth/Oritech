@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_small_uranium_dust": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:small_uranium_dust"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:uranium_dustblock"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_small_uranium_dust"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:uranium_dustblock"
+    ]
+  }
+}

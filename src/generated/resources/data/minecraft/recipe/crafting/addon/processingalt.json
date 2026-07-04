@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "minecraft:comparator",
+    "f": "oritech:motor",
+    "m": "oritech:unholy_intelligence",
+    "s": "#c:ingots/electrum"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:machine_processing_addon"
+  }
+}

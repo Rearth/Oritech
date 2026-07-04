@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:platinum_ingot"
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:platinum_nugget"
+  }
+}

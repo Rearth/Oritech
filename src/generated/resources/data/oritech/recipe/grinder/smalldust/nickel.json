@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:nuggets/nickel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_nickel_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

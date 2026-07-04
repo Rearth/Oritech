@@ -1,0 +1,39 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:duratium_ingot"
+    },
+    {
+      "count": 32,
+      "ingredient": "#c:ingots/iron"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 4.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:armor"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "#c:ingots/steel"
+    },
+    {
+      "count": 8,
+      "ingredient": "oritech:duratium_ingot"
+    },
+    {
+      "count": 16,
+      "ingredient": "minecraft:diamond"
+    }
+  ],
+  "rfCost": 80000000,
+  "time": 800,
+  "toggleable": false,
+  "uiX": 30,
+  "uiY": 50
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:adamant_dust",
+    "p": "#c:plates/plastic",
+    "s": "minecraft:cyan_dye"
+  },
+  "pattern": [
+    " s ",
+    "pbp",
+    " s "
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:diamond_paint"
+  }
+}

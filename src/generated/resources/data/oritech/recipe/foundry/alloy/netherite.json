@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/gold",
+    "minecraft:netherite_scrap"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:netherite_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

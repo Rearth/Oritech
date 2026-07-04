@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "minecraft:ice",
+    "f": "#c:glass_blocks",
+    "t": "#c:ingots/steel"
+  },
+  "pattern": [
+    " t ",
+    "fcf",
+    "fcf"
+  ],
+  "result": {
+    "id": "oritech:reactor_condenser"
+  }
+}

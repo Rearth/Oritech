@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:uranium_crystal"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "oritech:raw_uranium"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

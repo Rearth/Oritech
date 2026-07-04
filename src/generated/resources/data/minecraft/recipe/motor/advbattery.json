@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:energite_ingot",
+    "s": "#c:ingots/electrum",
+    "w": "#c:ingots/steel"
+  },
+  "pattern": [
+    " s ",
+    "wcw",
+    "wcw"
+  ],
+  "result": {
+    "id": "oritech:advanced_battery"
+  }
+}

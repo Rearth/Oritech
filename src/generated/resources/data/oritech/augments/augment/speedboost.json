@@ -1,0 +1,35 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:motor"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 0.25,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:movement_speed"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 16,
+      "ingredient": "oritech:motor"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:biosteel_ingot"
+    },
+    {
+      "count": 64,
+      "ingredient": "minecraft:redstone"
+    }
+  ],
+  "rfCost": 30000000,
+  "time": 600,
+  "toggleable": false,
+  "uiX": 5,
+  "uiY": 30
+}

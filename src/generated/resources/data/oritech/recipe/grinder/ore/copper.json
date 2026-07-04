@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:copper_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_copper"
+    },
+    {
+      "id": "minecraft:raw_gold"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

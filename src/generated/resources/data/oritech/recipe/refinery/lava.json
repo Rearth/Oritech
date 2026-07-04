@@ -1,0 +1,25 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:lava"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 4000000,
+      "id": "oritech:still_steam"
+    },
+    {
+      "amount": 100,
+      "id": "oritech:still_sulfuric_acid"
+    },
+    {
+      "amount": 200,
+      "id": "oritech:still_sheol_fire"
+    }
+  ],
+  "itemInputs": [],
+  "itemResults": [],
+  "recipeType": "oritech:refinery",
+  "time": 80
+}

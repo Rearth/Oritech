@@ -1,0 +1,34 @@
+{
+  "applyCost": [
+    {
+      "count": 8,
+      "ingredient": "oritech:raw_biopolymer"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 1.0,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:scale"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/dwarf",
+    "oritech:augment/armor"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "oritech:raw_biopolymer"
+    },
+    {
+      "count": 4,
+      "ingredient": "#c:dusts/uranium"
+    }
+  ],
+  "rfCost": 40000000,
+  "time": 1600,
+  "toggleable": true,
+  "uiX": 55,
+  "uiY": 90
+}

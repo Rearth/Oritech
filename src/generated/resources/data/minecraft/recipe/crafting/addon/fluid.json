@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#c:silicon",
+    "c": "oritech:fluid_pipe",
+    "f": "#c:carbon_fibre",
+    "s": "#c:ingots/electrum"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:machine_fluid_addon"
+  }
+}

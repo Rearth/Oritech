@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:lava"
+  },
+  "itemInputs": [],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:obsidian"
+    }
+  ],
+  "recipeType": "oritech:cooler",
+  "time": 200
+}

@@ -32,6 +32,7 @@ import rearth.oritech.datagen.AdvancementGenerator;
 import rearth.oritech.datagen.BlockLootGenerator;
 import rearth.oritech.datagen.ModelGenerator;
 import rearth.oritech.datagen.RecipeGenerator;
+import rearth.oritech.datagen.builders.OritechAugmentDataGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
 import rearth.oritech.datagen.tags.EntityTagGenerator;
 import rearth.oritech.datagen.tags.FluidTagGenerator;
@@ -97,6 +98,8 @@ public final class OritechClient {
 
         // Register Recipe Generator
         generator.addProvider(true, new RecipeGenerator.Runner(packOutput, lookupProvider));
+
+        generator.addProvider(true, new OritechAugmentDataGenerator(packOutput, lookupProvider));
 
         event.createProvider((output, provider) ->
                 new AdvancementProvider(output, provider, List.of(new AdvancementGenerator())));

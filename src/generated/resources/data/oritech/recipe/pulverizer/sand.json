@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:gravel"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:sand"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

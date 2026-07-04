@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:wool"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:string"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

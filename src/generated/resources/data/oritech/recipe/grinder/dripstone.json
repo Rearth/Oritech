@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:dripstone_block"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:pointed_dripstone"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 120
+}

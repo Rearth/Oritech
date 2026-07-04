@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:gems/quartz"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:quartz_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

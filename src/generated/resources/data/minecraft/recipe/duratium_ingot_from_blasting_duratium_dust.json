@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": "oritech:duratium_dust",
+  "result": {
+    "id": "oritech:duratium_ingot"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:platinum_dust"
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:small_platinum_dust"
+  }
+}

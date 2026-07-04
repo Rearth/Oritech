@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "minecraft:respawn_anchor",
+    "p": "oritech:spawner_cage_block",
+    "s": "oritech:enchantment_catalyst_block"
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "id": "oritech:spawner_controller_block"
+  }
+}

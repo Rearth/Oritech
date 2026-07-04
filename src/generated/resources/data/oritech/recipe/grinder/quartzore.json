@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:nether_quartz_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:quartz"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

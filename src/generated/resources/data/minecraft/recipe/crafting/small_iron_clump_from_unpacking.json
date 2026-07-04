@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:iron_clump"
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:small_iron_clump"
+  }
+}

@@ -18,6 +18,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -164,15 +165,15 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // if the recipe also only less than 2 fluid outputs, output normal
 
         if (recipe.fluidOutputs().isEmpty()) return List.of();
-        var outA = recipe.fluidOutputs().getFirst();
+        var outA = recipe.fluidOutputs().getFirst().create();
 
         if (recipe.fluidOutputs().size() == 1) return List.of(outA);
-        var outB = recipe.fluidOutputs().get(1);
+        var outB = recipe.fluidOutputs().get(1).create();
 
         return switch (moduleCount) {
             case 0 -> List.of(outA.copyWithAmount(outA.getAmount() * 2));
             case 1 -> List.of(outA, outB.copyWithAmount(outB.getAmount() * 2));
-            case 2 -> recipe.fluidOutputs();
+            case 2 -> recipe.fluidOutputs().stream().map(FluidStackTemplate::create).toList();
             default -> throw new IllegalStateException("more than 2 modules is not supported/allowed");
         };
     }

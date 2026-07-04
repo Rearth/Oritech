@@ -1,0 +1,41 @@
+{
+  "applyCost": [
+    {
+      "count": 1,
+      "ingredient": "oritech:heisenberg_compensator"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 8.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:armor"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/betterarmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:fluxite"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:heisenberg_compensator"
+    },
+    {
+      "count": 64,
+      "ingredient": "oritech:plutonium_pellet"
+    },
+    {
+      "count": 4,
+      "ingredient": "minecraft:nether_star"
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2400,
+  "toggleable": false,
+  "uiX": 155,
+  "uiY": 50
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:basic_battery",
+    "c": "oritech:magnetic_coil",
+    "f": "#c:ingots/nickel",
+    "m": "#c:silicon",
+    "s": "#c:ingots/nickel"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:small_storage_block"
+  }
+}

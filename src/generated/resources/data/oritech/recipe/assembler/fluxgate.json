@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:processing_unit",
+    "oritech:fluxite",
+    "oritech:fluxite",
+    "#c:ingots/platinum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:flux_gate"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 144
+}

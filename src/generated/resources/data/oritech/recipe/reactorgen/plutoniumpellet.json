@@ -1,0 +1,9 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:plutonium_pellet"
+  ],
+  "itemResults": [],
+  "recipeType": "oritech:reactor",
+  "time": 40000
+}

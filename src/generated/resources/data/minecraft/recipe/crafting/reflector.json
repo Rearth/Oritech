@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": "oritech:reactor_wall",
+    "c": "oritech:duratium_ingot",
+    "e": "oritech:adamant_ingot"
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "id": "oritech:reactor_reflector"
+  }
+}

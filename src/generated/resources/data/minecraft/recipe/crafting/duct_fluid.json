@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:fluid_pipe",
+    "p": "#oritech:plating",
+    "s": "minecraft:stone"
+  },
+  "pattern": [
+    "csc",
+    "sps",
+    "csc"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:fluid_pipe_duct_block"
+  }
+}

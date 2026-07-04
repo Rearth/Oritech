@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:raw_biopolymer",
+    "#c:ingots/iron"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:biosteel_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

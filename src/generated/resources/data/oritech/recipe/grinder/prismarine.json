@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:prismarine_shard"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:prismarine_crystals"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 120
+}

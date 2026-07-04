@@ -32,8 +32,6 @@ public class CustomAugmentsCollection {
         return CUSTOM_AUGMENTS.get(id);
     }
 
-    // todo add fly as normal modifier attribute (see net.neoforged.neoforge.common.NeoForgeMod.CREATIVE_FLIGHT)
-
     public static final Augment feeder = new Augment(Oritech.id("augment/autofeeder"), true) {
         @Override
         public void activate(Player player) {

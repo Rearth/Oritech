@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:superconductor",
+    "p": "#oritech:plating"
+  },
+  "pattern": [
+    "ccc",
+    "cpc",
+    "ccc"
+  ],
+  "result": {
+    "count": 8,
+    "id": "oritech:framed_superconductor"
+  }
+}

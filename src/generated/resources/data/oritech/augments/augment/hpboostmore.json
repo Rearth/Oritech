@@ -1,0 +1,37 @@
+{
+  "applyCost": [
+    {
+      "count": 8,
+      "ingredient": "#c:carbon_fibre"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 4.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:max_health"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/armor"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "#c:carbon_fibre"
+    },
+    {
+      "count": 16,
+      "ingredient": "oritech:biosteel_ingot"
+    },
+    {
+      "count": 4,
+      "ingredient": "minecraft:diamond"
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 800,
+  "toggleable": false,
+  "uiX": 80,
+  "uiY": 70
+}

@@ -1,0 +1,37 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:energite_ingot"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 10.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:max_health"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/ultimatearmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:energite_ingot"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:reinforced_carbon_sheet"
+    },
+    {
+      "count": 1,
+      "ingredient": "minecraft:nether_star"
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 1600,
+  "toggleable": false,
+  "uiX": 165,
+  "uiY": 70
+}

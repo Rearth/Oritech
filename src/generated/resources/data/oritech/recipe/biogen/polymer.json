@@ -1,0 +1,9 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:raw_biopolymer"
+  ],
+  "itemResults": [],
+  "recipeType": "oritech:bio_generator",
+  "time": 6000
+}

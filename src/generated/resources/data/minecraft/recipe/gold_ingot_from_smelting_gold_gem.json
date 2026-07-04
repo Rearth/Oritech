@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": "oritech:gold_gem",
+  "result": {
+    "id": "minecraft:gold_ingot"
+  }
+}

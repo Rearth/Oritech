@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:wool"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:string"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

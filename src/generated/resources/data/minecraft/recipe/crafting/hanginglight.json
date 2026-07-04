@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "#c:chains",
+    "b": "oritech:ceiling_light"
+  },
+  "pattern": [
+    "ab "
+  ],
+  "result": {
+    "id": "oritech:ceiling_light_hanging"
+  }
+}

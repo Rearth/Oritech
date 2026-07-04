@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:plates/plastic",
+    "#c:ingots/electrum",
+    "#c:ingots/electrum",
+    "#c:ingots/steel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:basic_battery"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 48
+}

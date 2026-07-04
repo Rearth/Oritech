@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:framed_superconductor"
+  ],
+  "result": {
+    "id": "oritech:superconductor"
+  }
+}

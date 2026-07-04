@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:motor",
+    "p": "oritech:item_pipe",
+    "s": "oritech:fluid_pipe"
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "id": "oritech:pipe_booster_block"
+  }
+}

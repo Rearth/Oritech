@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:advanced_battery",
+    "p": "#oritech:plating"
+  },
+  "pattern": [
+    "p p",
+    "ppp",
+    "pcp"
+  ],
+  "result": {
+    "id": "oritech:exo_chestplate"
+  }
+}

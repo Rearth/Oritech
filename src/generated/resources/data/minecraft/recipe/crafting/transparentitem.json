@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:ingots/nickel",
+    "p": "#minecraft:planks",
+    "s": "#c:glass_blocks"
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "count": 6,
+    "id": "oritech:transparent_item_pipe"
+  }
+}

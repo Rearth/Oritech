@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/iron"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:iron_dust"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_iron_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

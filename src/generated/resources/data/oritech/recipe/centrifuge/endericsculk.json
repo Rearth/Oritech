@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:sculk"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 400
+}

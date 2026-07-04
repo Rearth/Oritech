@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_plutonium_pellet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:plutonium_pellet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:plutonium_pelletblockinv"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_plutonium_pellet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:plutonium_pelletblockinv"
+    ]
+  }
+}

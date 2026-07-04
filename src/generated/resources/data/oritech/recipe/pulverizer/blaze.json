@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:blaze_rod"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:blaze_powder"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "#c:ingots/electrum",
+    "f": "#c:plates/plastic",
+    "s": "#c:carbon_fibre"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:machine_efficiency_addon"
+  }
+}

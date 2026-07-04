@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:duratium_ingot",
+    "c": "oritech:enchantment_catalyst_block",
+    "f": "minecraft:book",
+    "s": "oritech:energite_ingot"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:enchanter_block"
+  }
+}

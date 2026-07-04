@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:adamant_ingot",
+    "e": "minecraft:heavy_core",
+    "m": "oritech:carbon_fibre_strands",
+    "s": "oritech:advanced_battery"
+  },
+  "pattern": [
+    " a ",
+    "aea",
+    "mss"
+  ],
+  "result": {
+    "id": "oritech:electric_mace"
+  }
+}

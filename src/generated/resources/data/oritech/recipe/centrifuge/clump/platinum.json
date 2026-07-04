@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:clumps/platinum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:platinum_gem"
+    },
+    {
+      "id": "oritech:fluxite"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 150
+}

@@ -1,0 +1,33 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:enderic_lens"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 1.0,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:block_interaction_range"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/blockreach"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:enderic_lens"
+    },
+    {
+      "count": 16,
+      "ingredient": "minecraft:ender_pearl"
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 800,
+  "toggleable": true,
+  "uiX": 140,
+  "uiY": 90
+}

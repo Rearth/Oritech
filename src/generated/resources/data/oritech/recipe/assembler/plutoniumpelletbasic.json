@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:plutonium_dust",
+    "oritech:plutonium_dust",
+    "#c:plates/plastic",
+    "#c:ingots/nickel"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:plutonium_pellet"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

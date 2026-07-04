@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": "#oritech:plating",
+    "c": "#c:ingots/nickel",
+    "e": "#c:ingots/steel"
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech:reactor_wall"
+  }
+}

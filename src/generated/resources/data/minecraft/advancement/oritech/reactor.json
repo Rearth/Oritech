@@ -1,0 +1,33 @@
+{
+  "parent": "minecraft:oritech/laser",
+  "criteria": {
+    "got_reactor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:reactor_controller"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "description": {
+      "translate": "advancements.oritech.reactor.description"
+    },
+    "icon": {
+      "id": "oritech:reactor_controller"
+    },
+    "title": {
+      "translate": "advancements.oritech.reactor"
+    }
+  },
+  "requirements": [
+    [
+      "got_reactor"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

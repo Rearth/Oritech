@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "m": "oritech:motor",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    "sms",
+    "sss",
+    "sms"
+  ],
+  "result": {
+    "id": "oritech:hangar_door"
+  }
+}

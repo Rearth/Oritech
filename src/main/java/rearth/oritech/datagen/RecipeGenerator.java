@@ -6,19 +6,13 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.fluids.FluidStack;
-import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.augmenter.api.CustomAugmentsCollection;
 import rearth.oritech.datagen.builders.*;
 import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.*;
@@ -216,7 +210,7 @@ public class RecipeGenerator extends RecipeProvider {
         // lava
         new RefineryRecipeBuilder(this.registries)
                 .fluidInput(Fluids.LAVA)
-                .fluidOutput(new FluidStack(FluidContent.STILL_STEAM.get(), 4_000))
+                .fluidOutput(FluidContent.STILL_STEAM.get(), 4_000)
                 .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
                 .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
                 .export(exporter, "lava");
@@ -386,7 +380,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addDecorative(RecipeOutput exporter) {
         // ceiling light
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.CEILING_LIGHT.asItem(), 6), of(Items.GLOWSTONE_DUST), of(TagContent.STEEL_INGOTS), "ceilightlight");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.CEILING_LIGHT.asItem(), 6), of(Items.GLOWSTONE_DUST), of(TagContent.STEEL_INGOTS), "ceilightlight");
         // hanging light
         offerTwoComponentRecipe(exporter, BlockContent.CEILING_LIGHT_HANGING.asItem(), of(cItemTag("chains")), of(BlockContent.CEILING_LIGHT.asItem()), "hanginglight");
         // tech button
@@ -405,9 +399,9 @@ public class RecipeGenerator extends RecipeProvider {
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
                 .save(exporter, "crafting/hangardoor");
         // metal beam
-        offerRotatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
+        offerRotatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.METAL_BEAM_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
         // metal girder
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.METAL_GIRDER_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalgirder");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.METAL_GIRDER_BLOCK.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalgirder");
         // tech glass
         offerMachinePlatingRecipe(exporter, BlockContent.INDUSTRIAL_GLASS_BLOCK.asItem(), of(TagContent.STEEL_INGOTS), of(cItemTag("glass_blocks")), of(TagContent.MACHINE_PLATING), 4, "industrialglass");
         // machine plated stairs, slabs, pressure plates
@@ -499,26 +493,26 @@ public class RecipeGenerator extends RecipeProvider {
         // machine frame
         offerMachineFrameRecipe(exporter, BlockContent.MACHINE_FRAME_BLOCK.asItem(), of(Items.IRON_BARS), of(TagContent.NICKEL_INGOTS), 16, "frame");
         // energy pipe
-        offerCableRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), "energy");
+        offerCableRecipe(exporter, new ItemStackTemplate(BlockContent.ENERGY_PIPE.asItem(), 6), of(TagContent.ELECTRUM_INGOTS), "energy");
         // item pipe
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE.asItem(), 6), of(TagContent.NICKEL_INGOTS), of(ItemTags.PLANKS), "item");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.ITEM_PIPE.asItem(), 6), of(TagContent.NICKEL_INGOTS), of(ItemTags.PLANKS), "item");
         // item filter
         offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemTags.PLANKS), of(ItemContent.PROCESSING_UNIT), of(ItemTags.PLANKS), "itemfilter");
         // fluid pipe
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE.asItem(), 6), of(TagContent.SILICON), of(cItemTag("ingots/copper")), "fluidpipe");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FLUID_PIPE.asItem(), 6), of(TagContent.SILICON), of(cItemTag("ingots/copper")), "fluidpipe");
 
         // framed energy pipe
-        offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_ENERGY_PIPE, 8), of(BlockContent.ENERGY_PIPE), "energy");
-        offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE, 1), of(BlockContent.FRAMED_ENERGY_PIPE), "energy");
+        offerFramedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FRAMED_ENERGY_PIPE.asItem(), 8), of(BlockContent.ENERGY_PIPE), "energy");
+        offerCableFromFrameRecipe(exporter, new ItemStackTemplate(BlockContent.ENERGY_PIPE.asItem(), 1), of(BlockContent.FRAMED_ENERGY_PIPE), "energy");
         // framed superconductor
-        offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_SUPERCONDUCTOR, 8), of(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
-        offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.SUPERCONDUCTOR.asItem(), 1), of(BlockContent.FRAMED_SUPERCONDUCTOR), "superconductor");
+        offerFramedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FRAMED_SUPERCONDUCTOR.asItem(), 8), of(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
+        offerCableFromFrameRecipe(exporter, new ItemStackTemplate(BlockContent.SUPERCONDUCTOR.asItem(), 1), of(BlockContent.FRAMED_SUPERCONDUCTOR), "superconductor");
         // framed fluid pipe
-        offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_FLUID_PIPE, 8), of(BlockContent.FLUID_PIPE), "fluid");
-        offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE, 1), of(BlockContent.FRAMED_FLUID_PIPE), "fluid");
+        offerFramedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FRAMED_FLUID_PIPE.asItem(), 8), of(BlockContent.FLUID_PIPE), "fluid");
+        offerCableFromFrameRecipe(exporter, new ItemStackTemplate(BlockContent.FLUID_PIPE.asItem(), 1), of(BlockContent.FRAMED_FLUID_PIPE), "fluid");
         // framed item pipe
-        offerFramedCableRecipe(exporter, new ItemStack(BlockContent.FRAMED_ITEM_PIPE, 8), of(BlockContent.ITEM_PIPE), "item");
-        offerCableFromFrameRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE, 1), of(BlockContent.FRAMED_ITEM_PIPE), "item");
+        offerFramedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FRAMED_ITEM_PIPE.asItem(), 8), of(BlockContent.ITEM_PIPE), "item");
+        offerCableFromFrameRecipe(exporter, new ItemStackTemplate(BlockContent.ITEM_PIPE.asItem(), 1), of(BlockContent.FRAMED_ITEM_PIPE), "item");
 
         // transparent pipe
         offerTankRecipe(exporter, BlockContent.TRANSPARENT_ITEM_PIPE.asItem(), 6, of(ItemTags.PLANKS), of(TagContent.NICKEL_INGOTS), of(cItemTag("glass_blocks")), "transparentitem");
@@ -526,17 +520,17 @@ public class RecipeGenerator extends RecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.ITEM_PIPE.asItem(), 8, of(BlockContent.TRANSPARENT_ITEM_PIPE), of(ItemTags.PLANKS), "fromtransparent");
 
         // energy pipe duct
-        offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE_DUCT_BLOCK, 4), of(BlockContent.ENERGY_PIPE), "energy");
-        offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.ENERGY_PIPE, 1), of(BlockContent.ENERGY_PIPE_DUCT_BLOCK), "energy");
+        offerCableDuctRecipe(exporter, new ItemStackTemplate(BlockContent.ENERGY_PIPE_DUCT_BLOCK.asItem(), 4), of(BlockContent.ENERGY_PIPE), "energy");
+        offerCableFromDuctRecipe(exporter, new ItemStackTemplate(BlockContent.ENERGY_PIPE.asItem(), 1), of(BlockContent.ENERGY_PIPE_DUCT_BLOCK), "energy");
         // superconductor duct
-        offerCableDuctRecipe(exporter, new ItemStack(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK, 4), of(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
-        offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.SUPERCONDUCTOR.asItem(), 1), of(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK), "superconductor");
+        offerCableDuctRecipe(exporter, new ItemStackTemplate(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.asItem(), 4), of(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
+        offerCableFromDuctRecipe(exporter, new ItemStackTemplate(BlockContent.SUPERCONDUCTOR.asItem(), 1), of(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK), "superconductor");
         // fluid pipe duct
-        offerCableDuctRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE_DUCT_BLOCK, 4), of(BlockContent.FLUID_PIPE), "fluid");
-        offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.FLUID_PIPE, 1), of(BlockContent.FLUID_PIPE_DUCT_BLOCK), "fluid");
+        offerCableDuctRecipe(exporter, new ItemStackTemplate(BlockContent.FLUID_PIPE_DUCT_BLOCK.asItem(), 4), of(BlockContent.FLUID_PIPE), "fluid");
+        offerCableFromDuctRecipe(exporter, new ItemStackTemplate(BlockContent.FLUID_PIPE.asItem(), 1), of(BlockContent.FLUID_PIPE_DUCT_BLOCK), "fluid");
         // item pipe duct
-        offerCableDuctRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE_DUCT_BLOCK, 4), of(BlockContent.ITEM_PIPE), "item");
-        offerCableFromDuctRecipe(exporter, new ItemStack(BlockContent.ITEM_PIPE, 1), of(BlockContent.ITEM_PIPE_DUCT_BLOCK), "item");
+        offerCableDuctRecipe(exporter, new ItemStackTemplate(BlockContent.ITEM_PIPE_DUCT_BLOCK.asItem(), 4), of(BlockContent.ITEM_PIPE), "item");
+        offerCableFromDuctRecipe(exporter, new ItemStackTemplate(BlockContent.ITEM_PIPE.asItem(), 1), of(BlockContent.ITEM_PIPE_DUCT_BLOCK), "item");
 
         // deep drill
         offerAtomicForgeRecipe(exporter, BlockContent.DEEP_DRILL_BLOCK.asItem(), of(TagContent.MACHINE_PLATING), of(ItemContent.MOTOR), of(ItemContent.HEISENBERG_COMPENSATOR), of(ItemContent.OVERCHARGED_CRYSTAL), of(ItemContent.DURATIUM_INGOT), "deepdrill");
@@ -552,7 +546,7 @@ public class RecipeGenerator extends RecipeProvider {
         // spawner
         offerTankRecipe(exporter, BlockContent.SPAWNER_CONTROLLER_BLOCK.asItem(), of(BlockContent.SPAWNER_CAGE_BLOCK), of(Blocks.RESPAWN_ANCHOR), of(BlockContent.ENCHANTMENT_CATALYST_BLOCK), "spawner");
         // spawner cage
-        offerInsulatedCableRecipe(exporter, new ItemStack(BlockContent.SPAWNER_CAGE_BLOCK, 2), of(TagContent.PLASTIC_PLATES), of(Items.IRON_BARS), "cage");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.SPAWNER_CAGE_BLOCK.asItem(), 2), of(TagContent.PLASTIC_PLATES), of(Items.IRON_BARS), "cage");
         // withered rose
         offerMachineFrameRecipe(exporter, BlockContent.WITHER_CROP_BLOCK.asItem(), of(Items.WITHER_ROSE), of(ItemTags.FLOWERS), 1, "witherrose");
 
@@ -640,7 +634,7 @@ public class RecipeGenerator extends RecipeProvider {
         new AssemblerRecipeBuilder(this.registries).input(Items.CLAY_BALL).input(Items.CLAY_BALL).input(ItemTags.SAND).input(Items.REDSTONE).result(ItemContent.CLAY_CATALYST_BEADS, 32).timeMultiplier(1f).export(exporter, "claybeads");
 
         // magnetic coils
-        offerInsulatedCableRecipe(exporter, new ItemStack(ItemContent.MAGNETIC_COIL.get(), 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
+        offerInsulatedCableRecipe(exporter, new ItemStackTemplate(ItemContent.MAGNETIC_COIL.get(), 4), of(TagContent.STEEL_INGOTS), of(TagContent.NICKEL_INGOTS), "magnet");
         new AssemblerRecipeBuilder(this.registries).input(TagContent.STEEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(TagContent.NICKEL_INGOTS).input(cItemTag("ingots/copper")).result(ItemContent.MAGNETIC_COIL, 6).timeMultiplier(0.4f).export(exporter, "magnet");
 
         // motor
@@ -803,7 +797,7 @@ public class RecipeGenerator extends RecipeProvider {
         oreBlasting(exporter, List.of(ItemContent.RAW_PLATINUM), RecipeCategory.MISC, ItemContent.PLATINUM_INGOT, 1f, 100, "platinumblasting");
 
         // iron chain
-        MetalProcessingChainBuilder.build("iron")
+        new MetalProcessingChainBuilder("iron", registries)
                 .ore(ItemTags.IRON_ORES)
                 .rawOre(cItemTag("raw_materials/iron"), Items.RAW_IRON)
                 .rawOreByproduct(ItemContent.RAW_NICKEL)
@@ -815,7 +809,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .skipCompacting()
                 .export(exporter);
         // copper chain
-        MetalProcessingChainBuilder.build("copper")
+        new MetalProcessingChainBuilder("copper", registries)
                 .ore(ItemTags.COPPER_ORES)
                 .rawOre(cItemTag("raw_materials/copper"), Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
                 .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
@@ -826,7 +820,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .skipCompacting()
                 .export(exporter);
         // gold chain
-        MetalProcessingChainBuilder.build("gold")
+        new MetalProcessingChainBuilder("gold", registries)
                 .ore(ItemTags.GOLD_ORES)
                 .rawOre(cItemTag("raw_materials/gold"), Items.RAW_GOLD).rawOreByproduct(Items.RAW_COPPER)
                 .ingot(cItemTag("ingots/gold"), Items.GOLD_INGOT).nugget(cItemTag("nuggets/gold"), Items.GOLD_NUGGET)
@@ -837,7 +831,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .skipCompacting()
                 .export(exporter);
         // nickel chain
-        MetalProcessingChainBuilder.build("nickel")
+        new MetalProcessingChainBuilder("nickel", registries)
                 .ore(TagContent.NICKEL_ORES)
                 .rawOre(TagContent.NICKEL_RAW_MATERIALS, ItemContent.RAW_NICKEL).rawOreByproduct(ItemContent.RAW_PLATINUM)
                 .ingot(TagContent.NICKEL_INGOTS, ItemContent.NICKEL_INGOT).nugget(TagContent.NICKEL_NUGGETS, ItemContent.NICKEL_NUGGET)
@@ -848,7 +842,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .vanillaProcessing()
                 .export(exporter);
         // platinum chain
-        MetalProcessingChainBuilder.build("platinum")
+        new MetalProcessingChainBuilder("platinum", registries)
                 .ore(TagContent.PLATINUM_ORES)
                 .rawOre(TagContent.PLATINUM_RAW_MATERIALS, ItemContent.RAW_PLATINUM).rawOreByproduct(ItemContent.FLUXITE)
                 .ingot(TagContent.PLATINUM_INGOTS, ItemContent.PLATINUM_INGOT).nugget(TagContent.PLATINUM_NUGGETS, ItemContent.PLATINUM_NUGGET)
@@ -895,14 +889,14 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addDusts(RecipeOutput exporter) {
-        addDustRecipe(exporter, of(ItemContent.BIOSTEEL_INGOT), ItemContent.BIOSTEEL_DUST, ItemContent.BIOSTEEL_INGOT, "biosteel");
-        addDustRecipe(exporter, of(ItemContent.DURATIUM_INGOT), ItemContent.DURATIUM_DUST, ItemContent.DURATIUM_INGOT, "duratium");
-        addDustRecipe(exporter, of(TagContent.ELECTRUM_INGOTS), ItemContent.ELECTRUM_DUST, ItemContent.ELECTRUM_INGOT, "electrum");
-        addDustRecipe(exporter, of(ItemContent.ADAMANT_INGOT), ItemContent.ADAMANT_DUST, ItemContent.ADAMANT_INGOT, "adamant");
-        addDustRecipe(exporter, of(ItemContent.ENERGITE_INGOT), ItemContent.ENERGITE_DUST, ItemContent.ENERGITE_INGOT, "energite");
-        addDustRecipe(exporter, of(TagContent.STEEL_INGOTS), ItemContent.STEEL_DUST, ItemContent.STEEL_INGOT, "steel");
-        addDustRecipe(exporter, of(ItemTags.COALS), ItemContent.COAL_DUST, "coal");
-        addDustRecipe(exporter, of(cItemTag("gems/quartz")), ItemContent.QUARTZ_DUST, "quartz");
+        addDustRecipe(exporter, of(ItemContent.BIOSTEEL_INGOT), ItemContent.BIOSTEEL_DUST, ItemContent.BIOSTEEL_INGOT, "biosteel", registries);
+        addDustRecipe(exporter, of(ItemContent.DURATIUM_INGOT), ItemContent.DURATIUM_DUST, ItemContent.DURATIUM_INGOT, "duratium", registries);
+        addDustRecipe(exporter, of(TagContent.ELECTRUM_INGOTS), ItemContent.ELECTRUM_DUST, ItemContent.ELECTRUM_INGOT, "electrum", registries);
+        addDustRecipe(exporter, of(ItemContent.ADAMANT_INGOT), ItemContent.ADAMANT_DUST, ItemContent.ADAMANT_INGOT, "adamant", registries);
+        addDustRecipe(exporter, of(ItemContent.ENERGITE_INGOT), ItemContent.ENERGITE_DUST, ItemContent.ENERGITE_INGOT, "energite", registries);
+        addDustRecipe(exporter, of(TagContent.STEEL_INGOTS), ItemContent.STEEL_DUST, ItemContent.STEEL_INGOT, "steel", registries);
+        addDustRecipe(exporter, of(ItemTags.COALS), ItemContent.COAL_DUST, "coal", registries);
+        addDustRecipe(exporter, of(cItemTag("gems/quartz")), ItemContent.QUARTZ_DUST, "quartz", registries);
 
         // raw ores without processing chains
         // coal
@@ -998,349 +992,6 @@ public class RecipeGenerator extends RecipeProvider {
 
     }
 
-    public void addAugmentData(AugmentRecipeBuilder.Output exporter) {
-
-        var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION.get());
-        var ADVANCED_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ADVANCED_AUGMENT_STATION.get());
-        var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION.get());
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(TagContent.MACHINE_PLATING, 64)
-                .researchCost(TagContent.COAL_DUSTS, 32)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
-                .applyCost(TagContent.MACHINE_PLATING, 8)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(5).uiY(70).time(400).rfCost(10_000_000)
-                .modifierDefinition(Attributes.MAX_HEALTH, 6, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "hpboost");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(TagContent.CARBON_FIBRE, 32)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 16)
-                .researchCost(Items.DIAMOND, 4)
-                .applyCost(TagContent.CARBON_FIBRE, 8)
-                .requirement(Oritech.id("augment/armor"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(80).uiY(70).time(800).rfCost(50_000_000)
-                .modifierDefinition(Attributes.MAX_HEALTH, 4, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "hpboostmore");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENERGITE_INGOT, 64)
-                .researchCost(ItemContent.REINFORCED_CARBON_SHEET, 32)
-                .researchCost(Items.NETHER_STAR)
-                .applyCost(ItemContent.ENERGITE_INGOT, 4)
-                .requirement(Oritech.id("augment/ultimatearmor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(165).uiY(70).time(1600).rfCost(200_000_000)
-                .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "hpboostultra");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ADAMANT_INGOT, 32)
-                .researchCost(Items.NETHER_STAR, 4)
-                .researchCost(ItemContent.URANIUM_PELLET, 64)
-                .researchCost(BlockContent.FLUXITE_BLOCK, 64)
-                .applyCost(ItemContent.ADAMANT_INGOT, 4)
-                .requirement(Oritech.id("augment/hpboostultra"))
-                .requirement(Oritech.id("augment/gravity"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(205).uiY(40).time(2400).rfCost(500_000_000)
-                .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "hpboostultimate");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MOTOR, 16)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
-                .researchCost(Items.REDSTONE, 64)
-                .applyCost(ItemContent.MOTOR, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(5).uiY(30).time(600).rfCost(30_000_000)
-                .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .export(exporter, "speedboost");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENERGITE_INGOT, 32)
-                .researchCost(ItemContent.ION_THRUSTER, 16)
-                .researchCost(ItemContent.FLUX_GATE, 16)
-                .applyCost(ItemContent.ENERGITE_INGOT, 4)
-                .requirement(Oritech.id("augment/speedboost"))
-                .requirement(Oritech.id("augment/armor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(55).uiY(50).time(1800).rfCost(150_000_000)
-                .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_VALUE)
-                .toggleable(true)
-                .export(exporter, "superspeedboost");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MOTOR, 32)
-                .researchCost(TagContent.STEEL_INGOTS, 64)
-                .applyCost(ItemContent.MOTOR, 4)
-                .requirement(Oritech.id("augment/superspeedboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(80).uiY(50).time(800).rfCost(75_000_000)
-                .modifierDefinition(Attributes.STEP_HEIGHT, 0.6f, AttributeModifier.Operation.ADD_VALUE)
-                .toggleable()
-                .export(exporter, "stepassist");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(Items.COPPER_INGOT, 64)
-                .researchCost(ItemContent.PROCESSING_UNIT, 8)
-                .researchCost(Items.GOLD_INGOT, 32)
-                .applyCost(TagContent.SILICON, 4)
-                .requirement(Oritech.id("augment/hpboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(30).uiY(90).time(400).rfCost(20_000_000)
-                .modifierDefinition(Attributes.SCALE, -0.5f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .toggleable()
-                .export(exporter, "dwarf");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.RAW_BIOPOLYMER, 32)
-                .researchCost(TagContent.URANIUM_DUSTS, 4)
-                .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
-                .requirement(Oritech.id("augment/dwarf"))
-                .requirement(Oritech.id("augment/armor"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(55).uiY(90).time(1600).rfCost(40_000_000)
-                .modifierDefinition(Attributes.SCALE, 1f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .toggleable()
-                .export(exporter, "giant");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(TagContent.STEEL_INGOTS, 64)
-                .researchCost(ItemContent.DURATIUM_INGOT, 8)
-                .researchCost(Items.DIAMOND, 16)
-                .applyCost(ItemContent.DURATIUM_INGOT, 4)
-                .applyCost(cItemTag("ingots/iron"), 32)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(30).uiY(50).time(800).rfCost(80_000_000)
-                .modifierDefinition(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "armor");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENERGITE_INGOT, 64)
-                .researchCost(ItemContent.MAGNETIC_COIL, 32)
-                .researchCost(Items.DIAMOND, 8)
-                .applyCost(ItemContent.MAGNETIC_COIL, 4)
-                .requirement(Oritech.id("augment/autofeeder"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(105).uiY(50).time(1600).rfCost(180_000_000)
-                .modifierDefinition(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "betterarmor");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.FLUXITE, 64)
-                .researchCost(ItemContent.HEISENBERG_COMPENSATOR, 32)
-                .researchCost(ItemContent.PLUTONIUM_PELLET, 64)
-                .researchCost(Items.NETHER_STAR, 4)
-                .applyCost(ItemContent.HEISENBERG_COMPENSATOR, 1)
-                .requirement(Oritech.id("augment/betterarmor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
-                .modifierDefinition(Attributes.ARMOR, 8, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "ultimatearmor");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MAGNETIC_COIL, 32)
-                .researchCost(TagContent.ELECTRUM_INGOTS, 48)
-                .researchCost(Items.ENDER_PEARL, 4)
-                .applyCost(ItemContent.MAGNETIC_COIL, 4)
-                .requirement(Oritech.id("augment/blockreach"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(140).uiY(70).time(1600).rfCost(150_000_000)
-                .modifierDefinition(Attributes.ENTITY_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .export(exporter, "weaponreach");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MOTOR, 64)
-                .researchCost(TagContent.STEEL_INGOTS, 48)
-                .researchCost(Items.ENDER_PEARL, 4)
-                .applyCost(ItemContent.MOTOR, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(115).uiY(90).time(900).rfCost(100_000_000)
-                .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .export(exporter, "blockreach");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENDERIC_LENS, 64)
-                .researchCost(Items.ENDER_PEARL, 16)
-                .applyCost(ItemContent.ENDERIC_LENS, 4)
-                .requirement(Oritech.id("augment/blockreach"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(140).uiY(90).time(800).rfCost(200_000_000)
-                .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-                .toggleable()
-                .export(exporter, "farblockreach");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MAGNETIC_COIL, 48)
-                .researchCost(Items.QUARTZ, 64)
-                .researchCost(ItemContent.BASIC_BATTERY, 32)
-                .applyCost(ItemContent.MAGNETIC_COIL, 4)
-                .requirement(Oritech.id("augment/attackdamage"))
-                .requirement(Oritech.id("augment/speedboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(30).uiY(10).time(1200).rfCost(50_000_000)
-                .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-                .export(exporter, "miningspeed");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENERGITE_INGOT, 64)
-                .researchCost(ItemContent.FLUX_GATE, 48)
-                .researchCost(ItemContent.DURATIUM_INGOT, 8)
-                .applyCost(ItemContent.ENERGITE_INGOT, 4)
-                .requirement(Oritech.id("augment/miningspeed"))
-                .requirement(Oritech.id("augment/superspeedboost"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(80).uiY(10).time(2400).rfCost(250_000_000)
-                .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
-                .toggleable()
-                .export(exporter, "superminingspeed");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(TagContent.STEEL_INGOTS, 32)
-                .researchCost(Items.DIAMOND, 8)
-                .researchCost(ItemContent.FLUXITE, 64)
-                .applyCost(TagContent.STEEL_INGOTS, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(5).uiY(10).time(1600).rfCost(150_000_000)
-                .modifierDefinition(Attributes.ATTACK_DAMAGE, 4, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "attackdamage");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENDERIC_COMPOUND, 64)
-                .researchCost(ItemContent.FLUXITE, 64)
-                .applyCost(ItemContent.ENDERIC_COMPOUND, 4)
-                .requirement(Oritech.id("augment/hpboostultra"))
-                .requirement(Oritech.id("augment/ultimatearmor"))
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(180).uiY(50).time(2800).rfCost(500_000_000)
-                .modifierDefinition(Attributes.ATTACK_DAMAGE, 6, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "superattackdamage");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(TagContent.ELECTRUM_INGOTS, 64)
-                .researchCost(cItemTag("storage_blocks/lapis"), 32)
-                .researchCost(cItemTag("storage_blocks/gold"), 24)
-                .applyCost(Items.LAPIS_LAZULI, 16)
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(55).uiY(30).time(1800).rfCost(200_000_000)
-                .modifierDefinition(Attributes.LUCK, 5, AttributeModifier.Operation.ADD_VALUE)
-                .export(exporter, "luck");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MAGNETIC_COIL, 64)
-                .researchCost(ItemContent.FLUXITE, 48)
-                .researchCost(Items.PHANTOM_MEMBRANE, 8)
-                .applyCost(ItemContent.MAGNETIC_COIL, 4)
-                .requirement(Oritech.id("augment/flight"))
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(180).uiY(10).time(2200).rfCost(300_000_000)
-                .modifierDefinition(Attributes.GRAVITY, -0.5f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
-                .toggleable()
-                .export(exporter, "gravity");
-
-        // todo
-//        new AugmentRecipeBuilder(this.registries)
-//          .researchCost(ItemContent.ION_THRUSTER, 64)
-//          .researchCost(Items.WIND_CHARGE, 16)
-//          .researchCost(ItemContent.PROMETHEUM_INGOT, 16)
-//          .researchCost(ItemContent.PLUTONIUM_PELLET, 32)
-//          .applyCost(ItemContent.ION_THRUSTER, 4)
-//          .requirement(Oritech.id("augment/betterarmor"))
-//          .requirement(Oritech.id("augment/portal"))
-//          .requiredStation(ARCANE_AUGMENT_STATION_ID)
-//          .uiX(155).uiY(30).time(3600).rfCost(500_000_000)
-//          .customAugmentDefinition(CustomAugmentsCollection.flight.id)
-//          .toggleable()
-//          .export(exporter, "flight");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(Items.ENDER_EYE, 8)
-                .researchCost(ItemContent.ENDERIC_LENS, 16)
-                .researchCost(Items.DIAMOND, 8)
-                .applyCost(ItemContent.ENDERIC_LENS, 4)
-                .requirement(Oritech.id("augment/orefinder"))
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(155).uiY(10).time(3200).rfCost(100_000_000)
-                .effectDefinition(MobEffects.INVISIBILITY, 0)
-                .toggleable()
-                .export(exporter, "cloak");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(cItemTag("ender_pearls"), 16)
-                .researchCost(Items.OBSIDIAN, 64)
-                .researchCost(ItemContent.UNHOLY_INTELLIGENCE)
-                .researchCost(ItemContent.ADAMANT_INGOT, 32)
-                .applyCost(cItemTag("ender_pearls"), 4)
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(130).uiY(30).time(3000).rfCost(250_000_000)
-                .customAugmentDefinition(CustomAugmentsCollection.portal.id)
-                .toggleable()
-                .export(exporter, "portal");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(Items.GOLD_INGOT, 64)
-                .researchCost(ItemContent.ENDERIC_LENS, 48)
-                .researchCost(Items.GLOWSTONE_DUST, 64)
-                .applyCost(Items.GLOWSTONE_DUST, 8)
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
-                .uiX(105).uiY(30).time(2400).rfCost(50_000_000)
-                .effectDefinition(MobEffects.NIGHT_VISION, 0)
-                .toggleable()
-                .export(exporter, "nightvision");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(Items.PRISMARINE_CRYSTALS, 8)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
-                .researchCost(Items.HEART_OF_THE_SEA)
-                .applyCost(ItemContent.BIOSTEEL_INGOT, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(5).uiY(90).time(800).rfCost(50_000_000)
-                .effectDefinition(MobEffects.WATER_BREATHING, 0)
-                .export(exporter, "waterbreath");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.PROCESSING_UNIT, 16)
-                .researchCost(TagContent.BIOMATTER, 64)
-                .researchCost(Items.GOLDEN_CARROT, 64)
-                .applyCost(TagContent.BIOMATTER, 4)
-                .requirement(Oritech.id("augment/armor"))
-                .requirement(Oritech.id("augment/hpboostmore"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(90).uiY(90).time(500).rfCost(30_000_000)
-                .customAugmentDefinition(CustomAugmentsCollection.feeder.id)
-                .toggleable()
-                .export(exporter, "autofeeder");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.MAGNETIC_COIL, 32)
-                .researchCost(ItemContent.ENERGITE_INGOT, 32)
-                .researchCost(Items.LODESTONE, 2)
-                .applyCost(ItemContent.MAGNETIC_COIL, 4)
-                .requirement(Oritech.id("augment/superminingspeed"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
-                .uiX(105).uiY(10).time(2400).rfCost(300_000_000)
-                .customAugmentDefinition(CustomAugmentsCollection.magnet.id)
-                .toggleable()
-                .export(exporter, "magnet");
-
-        new AugmentRecipeBuilder(this.registries)
-                .researchCost(ItemContent.ENDERIC_LENS, 32)
-                .researchCost(Items.SPYGLASS, 1)
-                .researchCost(ItemContent.PROMETHEUM_INGOT, 1)
-                .researchCost(Items.SCULK_SENSOR, 1)
-                .applyCost(ItemContent.ENDERIC_LENS, 4)
-                .requirement(Oritech.id("augment/nightvision"))
-                .requirement(Oritech.id("augment/magnet"))
-                .requiredStation(ARCANE_AUGMENT_STATION_ID)
-                .uiX(130).uiY(10).time(3200).rfCost(200_000_000)
-                .customAugmentDefinition(CustomAugmentsCollection.oreFinder.id)
-                .toggleable()
-                .export(exporter, "orefinder");
-    }
-
     private void addReactorBlocks(RecipeOutput exporter) {
 
         // single rod
@@ -1415,39 +1066,39 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     // crafting shapes
-    public void offerCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
-        var item = output.getItem();
-        createCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+    public void offerCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
+        var item = output.item().value();
+        createCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
-    public void offerInsulatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
-        var item = output.getItem();
-        createInsulatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+    public void offerInsulatedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, Ingredient insulation, String suffix) {
+        var item = output.item().value();
+        createInsulatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
-    public void offerRotatedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, Ingredient insulation, String suffix) {
-        var item = output.getItem();
-        createRotatedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+    public void offerRotatedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, Ingredient insulation, String suffix) {
+        var item = output.item().value();
+        createRotatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
     }
 
-    public void offerFramedCableRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
-        var item = output.getItem();
-        createFramedCableRecipe(RecipeCategory.MISC, output.getItem(), output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/frame_" + suffix);
+    public void offerFramedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
+        var item = output.item().value();
+        createFramedCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/frame_" + suffix);
     }
 
-    public void offerCableFromFrameRecipe(RecipeOutput exporter, ItemStack output, Ingredient frame, String suffix) {
-        var item = output.getItem();
-        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unframe_" + suffix);
+    public void offerCableFromFrameRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient frame, String suffix) {
+        var item = output.item().value();
+        this.shapeless(RecipeCategory.MISC, item, output.count()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unframe_" + suffix);
     }
 
-    public void offerCableDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient input, String suffix) {
-        var item = output.getItem();
-        createCableDuctRecipe(RecipeCategory.MISC, item, output.getCount(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/duct_" + suffix);
+    public void offerCableDuctRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
+        var item = output.item().value();
+        createCableDuctRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/duct_" + suffix);
     }
 
-    public void offerCableFromDuctRecipe(RecipeOutput exporter, ItemStack output, Ingredient duct, String suffix) {
-        var item = output.getItem();
-        this.shapeless(RecipeCategory.MISC, item, output.getCount()).requires(duct).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unduct_" + suffix);
+    public void offerCableFromDuctRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient duct, String suffix) {
+        var item = output.item().value();
+        this.shapeless(RecipeCategory.MISC, output).requires(duct).unlockedBy("has_" + suffix, this.has(item)).save(exporter, "crafting/unduct_" + suffix);
     }
 
     public RecipeBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
@@ -1455,11 +1106,11 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     public RecipeBuilder createFramedCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
-        return this.shaped(category, output, count).define('c', input).define('p', Ingredient.of(BuiltInRegistries.ITEM.get(TagContent.MACHINE_PLATING).orElseThrow())).pattern("ccc").pattern("cpc").pattern("ccc");
+        return this.shaped(category, output, count).define('c', input).define('p', Ingredient.of(registries.get(TagContent.MACHINE_PLATING).orElseThrow())).pattern("ccc").pattern("cpc").pattern("ccc");
     }
 
     public RecipeBuilder createCableDuctRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
-        return this.shaped(category, output, count).define('c', input).define('p', Ingredient.of(BuiltInRegistries.ITEM.get(TagContent.MACHINE_PLATING).orElseThrow())).define('s', of(Blocks.STONE)).pattern("csc").pattern("sps").pattern("csc");
+        return this.shaped(category, output, count).define('c', input).define('p', Ingredient.of(registries.get(TagContent.MACHINE_PLATING).orElseThrow())).define('s', of(Blocks.STONE)).pattern("csc").pattern("sps").pattern("csc");
     }
 
     public void offerMotorRecipe(RecipeOutput exporter, Item output, Ingredient shaft, Ingredient core, Ingredient wall, String suffix) {

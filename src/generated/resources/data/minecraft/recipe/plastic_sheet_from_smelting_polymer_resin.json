@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 10,
+  "experience": 0.5,
+  "group": "plastic_manual",
+  "ingredient": "oritech:polymer_resin",
+  "result": {
+    "id": "oritech:plastic_sheet"
+  }
+}

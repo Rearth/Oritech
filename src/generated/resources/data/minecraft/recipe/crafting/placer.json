@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:machine_frame_block",
+    "f": "#c:ingots/copper",
+    "m": "oritech:processing_unit",
+    "s": "oritech:motor"
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:placer_block"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:glass_blocks",
+    "s": "oritech:item_pipe"
+  },
+  "pattern": [
+    "sss",
+    "scs",
+    "sss"
+  ],
+  "result": {
+    "count": 8,
+    "id": "oritech:transparent_item_pipe"
+  }
+}

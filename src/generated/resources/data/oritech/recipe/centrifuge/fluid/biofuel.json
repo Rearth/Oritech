@@ -1,0 +1,19 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "minecraft:water"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "id": "oritech:still_biofuel"
+    }
+  ],
+  "itemInputs": [
+    "#c:fuels/bio"
+  ],
+  "itemResults": [],
+  "recipeType": "oritech:centrifuge_fluid",
+  "time": 20
+}

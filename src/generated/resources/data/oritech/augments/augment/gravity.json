@@ -1,0 +1,37 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:magnetic_coil"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": -0.5,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:gravity"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:augment/flight"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:magnetic_coil"
+    },
+    {
+      "count": 48,
+      "ingredient": "oritech:fluxite"
+    },
+    {
+      "count": 8,
+      "ingredient": "minecraft:phantom_membrane"
+    }
+  ],
+  "rfCost": 300000000,
+  "time": 2200,
+  "toggleable": true,
+  "uiX": 180,
+  "uiY": 10
+}

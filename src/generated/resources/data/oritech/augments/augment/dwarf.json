@@ -1,0 +1,37 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "#c:silicon"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": -0.5,
+    "attributeOperationType": 1,
+    "entityAttributeId": "minecraft:scale"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/hpboost"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "minecraft:copper_ingot"
+    },
+    {
+      "count": 8,
+      "ingredient": "oritech:processing_unit"
+    },
+    {
+      "count": 32,
+      "ingredient": "minecraft:gold_ingot"
+    }
+  ],
+  "rfCost": 20000000,
+  "time": 400,
+  "toggleable": true,
+  "uiX": 30,
+  "uiY": 90
+}

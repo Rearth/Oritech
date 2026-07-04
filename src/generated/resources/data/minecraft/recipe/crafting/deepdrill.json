@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:heisenberg_compensator",
+    "f": "oritech:duratium_ingot",
+    "m": "oritech:motor",
+    "s": "oritech:overcharged_crystal"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:deep_drill_block"
+  }
+}

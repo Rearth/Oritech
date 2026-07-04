@@ -1,0 +1,15 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:processing_unit",
+    "oritech:silicon_wafer",
+    "oritech:silicon_wafer"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:advanced_computing_engine"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge",
+  "time": 5
+}

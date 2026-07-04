@@ -1,0 +1,19 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "#c:diesel"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 1000,
+      "id": "oritech:still_fuel"
+    }
+  ],
+  "itemInputs": [
+    "oritech:fluxite"
+  ],
+  "itemResults": [],
+  "recipeType": "oritech:centrifuge_fluid",
+  "time": 100
+}

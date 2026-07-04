@@ -1,0 +1,37 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "#c:ender_pearls"
+    }
+  ],
+  "effect": {
+    "type": "custom",
+    "customAugmentId": "oritech:augment/portal"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 16,
+      "ingredient": "#c:ender_pearls"
+    },
+    {
+      "count": 64,
+      "ingredient": "minecraft:obsidian"
+    },
+    {
+      "count": 1,
+      "ingredient": "oritech:unholy_intelligence"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:adamant_ingot"
+    }
+  ],
+  "rfCost": 250000000,
+  "time": 3000,
+  "toggleable": true,
+  "uiX": 130,
+  "uiY": 30
+}

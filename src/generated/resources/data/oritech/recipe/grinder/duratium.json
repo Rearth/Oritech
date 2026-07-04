@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:duratium_ingot"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:duratium_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

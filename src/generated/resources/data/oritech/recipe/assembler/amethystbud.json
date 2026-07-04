@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:gems/amethyst",
+    "#c:gems/amethyst",
+    "oritech:enderic_compound",
+    "oritech:overcharged_crystal"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:budding_amethyst"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 160
+}

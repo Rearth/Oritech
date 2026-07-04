@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:dusts/electrum",
+    "#c:dusts/redstone"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:fluxite"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 1000
+}

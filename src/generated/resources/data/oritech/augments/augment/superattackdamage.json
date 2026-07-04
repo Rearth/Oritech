@@ -1,0 +1,34 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:enderic_compound"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 6.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "minecraft:attack_damage"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:augment/hpboostultra",
+    "oritech:augment/ultimatearmor"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:enderic_compound"
+    },
+    {
+      "count": 64,
+      "ingredient": "oritech:fluxite"
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 2800,
+  "toggleable": false,
+  "uiX": 180,
+  "uiY": 50
+}

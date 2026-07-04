@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:bone"
+  ],
+  "itemResults": [
+    {
+      "count": 8,
+      "id": "minecraft:bone_meal"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

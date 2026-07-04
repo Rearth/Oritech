@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "minecraft:enchanting_table",
+    "c": "oritech:unholy_intelligence",
+    "f": "oritech:fluxite",
+    "m": "#c:obsidians/normal",
+    "s": "oritech:adamant_ingot"
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:enchantment_catalyst_block"
+  }
+}

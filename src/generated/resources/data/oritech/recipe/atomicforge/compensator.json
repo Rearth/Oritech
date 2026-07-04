@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:super_ai_chip",
+    "oritech:adamant_ingot",
+    "oritech:adamant_ingot"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:heisenberg_compensator"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge"
+}

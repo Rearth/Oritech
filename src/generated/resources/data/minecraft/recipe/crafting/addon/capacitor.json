@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:magnetic_coil",
+    "f": "#c:plates/plastic",
+    "s": "oritech:energite_ingot"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:machine_capacitor_addon"
+  }
+}

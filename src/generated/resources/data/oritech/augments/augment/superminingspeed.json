@@ -1,0 +1,38 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:energite_ingot"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 1.0,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:block_break_speed"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [
+    "oritech:augment/miningspeed",
+    "oritech:augment/superspeedboost"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:energite_ingot"
+    },
+    {
+      "count": 48,
+      "ingredient": "oritech:flux_gate"
+    },
+    {
+      "count": 8,
+      "ingredient": "oritech:duratium_ingot"
+    }
+  ],
+  "rfCost": 250000000,
+  "time": 2400,
+  "toggleable": true,
+  "uiX": 80,
+  "uiY": 10
+}

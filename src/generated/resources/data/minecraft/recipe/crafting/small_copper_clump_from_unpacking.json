@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "oritech:copper_clump"
+  ],
+  "result": {
+    "count": 9,
+    "id": "oritech:small_copper_clump"
+  }
+}

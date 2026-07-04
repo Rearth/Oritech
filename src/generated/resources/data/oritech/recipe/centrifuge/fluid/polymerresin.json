@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 100,
+    "ingredient": "#c:biodiesel"
+  },
+  "itemInputs": [
+    "#minecraft:sand"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:polymer_resin"
+    }
+  ],
+  "recipeType": "oritech:centrifuge_fluid",
+  "time": 100
+}

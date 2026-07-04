@@ -1,0 +1,15 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:gold_gem",
+    "oritech:gold_gem"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:gold_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

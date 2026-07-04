@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "#c:ingots/steel",
+    "b": "#c:ingots/nickel"
+  },
+  "pattern": [
+    " a ",
+    " ba",
+    "a  "
+  ],
+  "result": {
+    "id": "oritech:wrench"
+  }
+}

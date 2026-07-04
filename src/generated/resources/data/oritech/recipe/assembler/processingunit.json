@@ -1,0 +1,16 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:plates/plastic",
+    "#c:carbon_fibre",
+    "#c:ingots/electrum",
+    "#c:dusts/redstone"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:processing_unit"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

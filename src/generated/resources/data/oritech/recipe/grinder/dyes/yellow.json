@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/dyes/yellow"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:yellow_dye"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 120
+}

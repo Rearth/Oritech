@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:enderic_compound",
+    "e": "oritech:adamant_ingot",
+    "m": "oritech:motor",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    "aa ",
+    "ae ",
+    "mss"
+  ],
+  "result": {
+    "id": "oritech:chainsaw"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:advanced_battery",
+    "s": "minecraft:amethyst_block",
+    "w": "oritech:superconductor"
+  },
+  "pattern": [
+    " s ",
+    "wcw",
+    "wcw"
+  ],
+  "result": {
+    "id": "oritech:overcharged_crystal"
+  }
+}

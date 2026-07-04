@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:metal_girder_block",
+    "f": "minecraft:redstone",
+    "m": "#c:ingots/electrum",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:machine_burst_addon"
+  }
+}

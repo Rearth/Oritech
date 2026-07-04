@@ -1,0 +1,15 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:carbon_fibre",
+    "#c:silicon",
+    "#c:silicon"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:silicon_wafer"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge",
+  "time": 5
+}

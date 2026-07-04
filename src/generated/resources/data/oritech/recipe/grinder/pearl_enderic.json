@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ender_pearls"
+  ],
+  "itemResults": [
+    {
+      "count": 12,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

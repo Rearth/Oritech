@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:processing_unit",
+    "f": "#c:ingots/copper",
+    "m": "#c:silicon",
+    "s": "oritech:motor"
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:fertilizer_block"
+  }
+}

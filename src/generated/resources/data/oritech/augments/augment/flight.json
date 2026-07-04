@@ -1,0 +1,42 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:ion_thruster"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": 1.0,
+    "attributeOperationType": 0,
+    "entityAttributeId": "neoforge:creative_flight"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:augment/betterarmor",
+    "oritech:augment/portal"
+  ],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "oritech:ion_thruster"
+    },
+    {
+      "count": 16,
+      "ingredient": "minecraft:wind_charge"
+    },
+    {
+      "count": 16,
+      "ingredient": "oritech:prometheum_ingot"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:plutonium_pellet"
+    }
+  ],
+  "rfCost": 500000000,
+  "time": 3600,
+  "toggleable": true,
+  "uiX": 155,
+  "uiY": 30
+}

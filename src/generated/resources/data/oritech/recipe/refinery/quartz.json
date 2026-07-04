@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "oritech:still_mineral_slurry"
+  },
+  "itemInputs": [
+    "oritech:clay_catalyst_beads"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:quartz"
+    }
+  ],
+  "recipeType": "oritech:refinery",
+  "time": 160
+}

@@ -1,0 +1,36 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "#oritech:biomatter"
+    }
+  ],
+  "effect": {
+    "type": "custom",
+    "customAugmentId": "oritech:augment/autofeeder"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/armor",
+    "oritech:augment/hpboostmore"
+  ],
+  "researchCost": [
+    {
+      "count": 16,
+      "ingredient": "oritech:processing_unit"
+    },
+    {
+      "count": 64,
+      "ingredient": "#oritech:biomatter"
+    },
+    {
+      "count": 64,
+      "ingredient": "minecraft:golden_carrot"
+    }
+  ],
+  "rfCost": 30000000,
+  "time": 500,
+  "toggleable": true,
+  "uiX": 90,
+  "uiY": 90
+}

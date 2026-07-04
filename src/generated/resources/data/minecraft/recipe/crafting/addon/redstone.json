@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "minecraft:comparator",
+    "f": "#c:dusts/redstone",
+    "s": "minecraft:repeater"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:machine_redstone_addon"
+  }
+}

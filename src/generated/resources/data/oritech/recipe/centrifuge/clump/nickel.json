@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:clumps/nickel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:nickel_gem"
+    },
+    {
+      "count": 2,
+      "id": "oritech:small_platinum_dust"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 100
+}

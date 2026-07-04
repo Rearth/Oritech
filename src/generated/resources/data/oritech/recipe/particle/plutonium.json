@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:dusts/uranium",
+    "oritech:fluxite"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:plutonium_dust"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 2500
+}

@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:deepslate_uranium_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "oritech:raw_uranium"
+    },
+    {
+      "id": "oritech:small_plutonium_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

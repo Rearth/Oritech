@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:machine_extender",
+    "b": "oritech:machine_capacitor_addon"
+  },
+  "pattern": [
+    "ab "
+  ],
+  "result": {
+    "id": "oritech:capacitor_addon_extender"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:machine_speed_addon",
+    "f": "oritech:overcharged_crystal",
+    "m": "oritech:heisenberg_compensator",
+    "s": "oritech:machine_efficiency_addon"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:machine_ultimate_addon"
+  }
+}

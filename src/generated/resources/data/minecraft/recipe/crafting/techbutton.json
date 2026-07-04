@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "#c:ingots/copper",
+    "b": "#c:ingots/steel"
+  },
+  "pattern": [
+    "a  ",
+    "b  "
+  ],
+  "result": {
+    "id": "oritech:tech_button"
+  }
+}

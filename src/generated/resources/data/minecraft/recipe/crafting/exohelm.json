@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:enderic_lens",
+    "p": "#oritech:plating"
+  },
+  "pattern": [
+    "ppp",
+    "pcp",
+    "   "
+  ],
+  "result": {
+    "id": "oritech:exo_helmet"
+  }
+}

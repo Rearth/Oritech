@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:centrifuge_block",
+    "c": "oritech:flux_gate",
+    "f": "oritech:duratium_ingot",
+    "s": "#oritech:plating"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:advanced_augment_station"
+  }
+}

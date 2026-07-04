@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": "minecraft:redstone_block",
+    "o": "minecraft:blaze_powder",
+    "r": "#c:ingots/steel",
+    "t": "#c:leathers"
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "id": "oritech:jetpack"
+  }
+}

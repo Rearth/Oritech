@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "oritech:basic_generator_block",
+    "c": "oritech:flux_gate",
+    "f": "oritech:biosteel_ingot",
+    "s": "oritech:magnetic_coil"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:bio_generator_block"
+  }
+}

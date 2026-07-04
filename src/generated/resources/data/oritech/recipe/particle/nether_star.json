@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:overcharged_crystal",
+    "#c:ingots/netherite"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:nether_star"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 15000
+}

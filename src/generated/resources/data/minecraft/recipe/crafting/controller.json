@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:reactor_wall",
+    "r": "oritech:processing_unit"
+  },
+  "pattern": [
+    "   ",
+    "rcr",
+    "   "
+  ],
+  "result": {
+    "id": "oritech:reactor_controller"
+  }
+}

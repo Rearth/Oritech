@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_exo_helmet": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:exo_helmet"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/exohelm"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_exo_helmet"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/exohelm"
+    ]
+  }
+}

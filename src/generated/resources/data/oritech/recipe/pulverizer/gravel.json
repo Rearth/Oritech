@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:cobblestones"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:gravel"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

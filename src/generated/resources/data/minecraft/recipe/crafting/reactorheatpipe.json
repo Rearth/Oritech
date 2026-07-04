@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:ingots/electrum",
+    "o": "#c:ingots/gold"
+  },
+  "pattern": [
+    " o ",
+    "oco",
+    " o "
+  ],
+  "result": {
+    "id": "oritech:reactor_heat_pipe"
+  }
+}

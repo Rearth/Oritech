@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": "oritech:reactor_wall",
+    "o": "#c:chests",
+    "r": "oritech:item_pipe",
+    "t": "minecraft:hopper"
+  },
+  "pattern": [
+    " t ",
+    "rrr",
+    "oio"
+  ],
+  "result": {
+    "id": "oritech:reactor_fuel_port"
+  }
+}

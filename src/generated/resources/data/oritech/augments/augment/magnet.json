@@ -1,0 +1,35 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:magnetic_coil"
+    }
+  ],
+  "effect": {
+    "type": "custom",
+    "customAugmentId": "oritech:augment/magnet"
+  },
+  "requiredStation": "oritech:simple_augment_station",
+  "requirements": [
+    "oritech:augment/superminingspeed"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "oritech:magnetic_coil"
+    },
+    {
+      "count": 32,
+      "ingredient": "oritech:energite_ingot"
+    },
+    {
+      "count": 2,
+      "ingredient": "minecraft:lodestone"
+    }
+  ],
+  "rfCost": 300000000,
+  "time": 2400,
+  "toggleable": true,
+  "uiX": 105,
+  "uiY": 10
+}

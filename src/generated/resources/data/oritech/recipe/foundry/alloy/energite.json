@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/nickel",
+    "oritech:fluxite"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:energite_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

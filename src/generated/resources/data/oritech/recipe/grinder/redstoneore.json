@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:redstone_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 12,
+      "id": "minecraft:redstone"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

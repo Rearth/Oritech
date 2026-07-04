@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:copper_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_copper"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

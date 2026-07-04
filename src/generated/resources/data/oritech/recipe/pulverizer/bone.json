@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:bone"
+  ],
+  "itemResults": [
+    {
+      "count": 6,
+      "id": "minecraft:bone_meal"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

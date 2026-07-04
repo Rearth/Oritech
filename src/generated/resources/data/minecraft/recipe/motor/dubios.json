@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:adamant_ingot",
+    "s": "#c:plates/plastic",
+    "w": "oritech:enderic_compound"
+  },
+  "pattern": [
+    " s ",
+    "wcw",
+    "wcw"
+  ],
+  "result": {
+    "id": "oritech:dubios_container"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "applyCost": [
+    {
+      "count": 4,
+      "ingredient": "oritech:enderic_lens"
+    }
+  ],
+  "effect": {
+    "type": "custom",
+    "customAugmentId": "oritech:augment/orefinder"
+  },
+  "requiredStation": "oritech:arcane_augment_station",
+  "requirements": [
+    "oritech:augment/nightvision",
+    "oritech:augment/magnet"
+  ],
+  "researchCost": [
+    {
+      "count": 32,
+      "ingredient": "oritech:enderic_lens"
+    },
+    {
+      "count": 1,
+      "ingredient": "minecraft:spyglass"
+    },
+    {
+      "count": 1,
+      "ingredient": "oritech:prometheum_ingot"
+    },
+    {
+      "count": 1,
+      "ingredient": "minecraft:sculk_sensor"
+    }
+  ],
+  "rfCost": 200000000,
+  "time": 3200,
+  "toggleable": true,
+  "uiX": 130,
+  "uiY": 10
+}

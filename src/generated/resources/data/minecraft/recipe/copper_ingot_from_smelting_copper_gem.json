@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 1.0,
+  "group": "oritech",
+  "ingredient": "oritech:copper_gem",
+  "result": {
+    "id": "minecraft:copper_ingot"
+  }
+}

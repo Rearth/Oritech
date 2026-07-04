@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:destroyer_block",
+    "p": "oritech:prometheum_ingot"
+  },
+  "pattern": [
+    "ppp",
+    " c ",
+    " c "
+  ],
+  "result": {
+    "id": "oritech:promethium_pickaxe"
+  }
+}

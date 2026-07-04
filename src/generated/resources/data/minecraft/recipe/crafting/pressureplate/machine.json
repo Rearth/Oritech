@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": "oritech:machine_plating_block"
+  },
+  "pattern": [
+    "aa"
+  ],
+  "result": {
+    "id": "oritech:machine_plating_pressure_plate"
+  }
+}

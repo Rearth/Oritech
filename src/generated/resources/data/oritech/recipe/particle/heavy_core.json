@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:reinforced_deepslate",
+    "oritech:duratium_dust"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:heavy_core"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 8000
+}

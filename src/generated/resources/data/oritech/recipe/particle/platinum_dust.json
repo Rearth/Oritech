@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:dusts/gold",
+    "#c:dusts/gold"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:platinum_dust"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 500
+}

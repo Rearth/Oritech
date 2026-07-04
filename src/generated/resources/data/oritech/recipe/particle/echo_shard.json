@@ -1,0 +1,14 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ender_pearls",
+    "#c:gems/amethyst"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:echo_shard"
+    }
+  ],
+  "recipeType": "oritech:particle_collision",
+  "time": 1000
+}

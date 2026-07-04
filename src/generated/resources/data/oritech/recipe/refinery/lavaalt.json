@@ -1,0 +1,27 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:lava"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 1000,
+      "id": "oritech:still_sulfuric_acid"
+    },
+    {
+      "amount": 250,
+      "id": "oritech:still_sheol_fire"
+    },
+    {
+      "amount": 100,
+      "id": "oritech:still_strange_matter"
+    }
+  ],
+  "itemInputs": [
+    "oritech:enderic_compound"
+  ],
+  "itemResults": [],
+  "recipeType": "oritech:refinery",
+  "time": 128
+}

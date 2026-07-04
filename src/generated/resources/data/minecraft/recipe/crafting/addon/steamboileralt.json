@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#c:silicon",
+    "c": "oritech:fluid_pipe",
+    "f": "#c:dusts/coal",
+    "s": "oritech:adamant_ingot"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:steam_boiler_addon"
+  }
+}

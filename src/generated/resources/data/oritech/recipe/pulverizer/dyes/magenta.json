@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/dyes/magenta"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:magenta_dye"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

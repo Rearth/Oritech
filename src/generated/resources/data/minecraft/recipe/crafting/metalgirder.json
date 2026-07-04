@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:carbon_fibre",
+    "i": "#c:ingots/steel"
+  },
+  "pattern": [
+    "iii",
+    "ccc",
+    "iii"
+  ],
+  "result": {
+    "count": 6,
+    "id": "oritech:metal_girder_block"
+  }
+}

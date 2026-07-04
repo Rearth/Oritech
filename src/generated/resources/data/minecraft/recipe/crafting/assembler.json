@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "minecraft:blast_furnace",
+    "c": "oritech:adamant_ingot",
+    "f": "#c:ingots/copper",
+    "m": "minecraft:crafter",
+    "s": "oritech:motor"
+  },
+  "pattern": [
+    "fff",
+    "mcm",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:assembler_block"
+  }
+}

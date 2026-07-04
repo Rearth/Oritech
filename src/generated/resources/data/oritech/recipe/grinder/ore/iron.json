@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#minecraft:iron_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_iron"
+    },
+    {
+      "id": "oritech:raw_nickel"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

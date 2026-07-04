@@ -1,0 +1,13 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:sandstone/red_blocks"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:red_sand"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

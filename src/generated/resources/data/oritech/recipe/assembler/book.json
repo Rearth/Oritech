@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:paper",
+    "minecraft:paper",
+    "minecraft:paper",
+    "#c:leathers"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:book"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 96
+}

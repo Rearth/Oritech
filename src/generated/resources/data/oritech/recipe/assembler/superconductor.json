@@ -1,0 +1,17 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:flux_gate",
+    "#c:ingots/electrum",
+    "oritech:dubios_container",
+    "oritech:energite_ingot"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "oritech:superconductor"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 192
+}

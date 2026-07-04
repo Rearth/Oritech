@@ -1,0 +1,15 @@
+{
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "minecraft:deepslate",
+    "oritech:duratium_ingot",
+    "oritech:duratium_ingot"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:reinforced_deepslate"
+    }
+  ],
+  "recipeType": "oritech:atomic_forge",
+  "time": 100
+}

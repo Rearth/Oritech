@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_power_pole_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:power_pole_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/_pole"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_power_pole_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/_pole"
+    ]
+  }
+}

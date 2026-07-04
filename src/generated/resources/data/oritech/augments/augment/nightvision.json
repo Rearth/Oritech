@@ -1,0 +1,34 @@
+{
+  "applyCost": [
+    {
+      "count": 8,
+      "ingredient": "minecraft:glowstone_dust"
+    }
+  ],
+  "effect": {
+    "type": "effect",
+    "effectStrength": 0,
+    "potionEffectId": "minecraft:night_vision"
+  },
+  "requiredStation": "oritech:advanced_augment_station",
+  "requirements": [],
+  "researchCost": [
+    {
+      "count": 64,
+      "ingredient": "minecraft:gold_ingot"
+    },
+    {
+      "count": 48,
+      "ingredient": "oritech:enderic_lens"
+    },
+    {
+      "count": 64,
+      "ingredient": "minecraft:glowstone_dust"
+    }
+  ],
+  "rfCost": 50000000,
+  "time": 2400,
+  "toggleable": true,
+  "uiX": 105,
+  "uiY": 30
+}

@@ -1,0 +1,24 @@
+{
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "id": "minecraft:lava"
+    }
+  ],
+  "itemInputs": [
+    "#c:raw_materials/gold"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:gold_clump"
+    }
+  ],
+  "recipeType": "oritech:refinery",
+  "time": 80
+}
