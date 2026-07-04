@@ -321,7 +321,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>("machine", this::onAnimationUpdate)
+        controllers.add(new AnimationController<>("machine", 5, this::onAnimationUpdate)
                 .triggerableAnim("setup", SETUP)
                 .setSoundKeyframeHandler(new MachineSoundHandler<>(this::getAnimationSpeed)));
     }

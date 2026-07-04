@@ -46,7 +46,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ITEM_PIPE_ENTITY.get(), pos, state);
-        this.renderItems = state.getBlock().equals(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION);
+        this.renderItems = state.getBlock().equals(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get());
 
     }
 
@@ -135,6 +135,9 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                         if (inserted > 0) {
                             onItemMoved(worldPosition, sourcePos, cachedTarget.pos(), data.getNetworkNodes(worldPosition), level, extractedResource.getItem(), inserted);
                             machineMoveCapacity -= inserted;
+
+                            // System.out.println("Moved: " + sourceBlock + " to " + cachedTarget.pos() + extractedResource.getItem());
+
                         }
 
                         // this slot's extracted amount is fully distributed, no point probing the remaining (farther) targets

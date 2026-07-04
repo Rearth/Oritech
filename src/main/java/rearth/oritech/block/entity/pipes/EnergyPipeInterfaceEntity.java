@@ -92,11 +92,13 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         var totalMoved = 0;
         try (var transaction = Transaction.openRoot()) {
 
-            for (int i = 0; i < this.cachedTargets.size(); i++) {
+            var targetCount = this.cachedTargets.size();
+            for (int i = 0; i < targetCount; i++) {
                 if (energyStorage.getAmountAsLong() <= 0) break;
 
                 // offset for round-robin (offset by world-time + blockpos to avoid all pipes starting at the same spot)
-                var cachedTarget = this.cachedTargets.get((int) ((level.getGameTime() + getBlockPos().asLong() + i) % this.cachedTargets.size()));
+                var targetIndex = Math.floorMod(level.getGameTime() + getBlockPos().asLong() + i, targetCount);
+                var cachedTarget = this.cachedTargets.get(targetIndex);
 
                 var targetStorage = cachedTarget.getCapability();
                 if (targetStorage == null) continue;
