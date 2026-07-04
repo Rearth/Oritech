@@ -134,7 +134,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
                         if (inserted > 0) {
                             onItemMoved(worldPosition, sourcePos, cachedTarget.pos(), data.getNetworkNodes(worldPosition), level, extractedResource.getItem(), inserted);
-                            machineMoveCapacity -= moved;
+                            machineMoveCapacity -= inserted;
                         }
 
                         // this slot's extracted amount is fully distributed, no point probing the remaining (farther) targets
