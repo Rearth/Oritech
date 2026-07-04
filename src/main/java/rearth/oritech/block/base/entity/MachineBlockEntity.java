@@ -533,20 +533,21 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         if (inventoryInputMode.equals(InventoryInputMode.SIDED)) {
             return sidedInventories.computeIfAbsent(direction, this::getDirectedStorage);
         }
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     // needed for sided inventory mode
     public ResourceHandler<ItemResource> getDirectedStorage(Direction direction) {
 
         var slots = getSlotAssignments();
-        if (slots.inputCount() <= 1) return inventory;
+        var externalAccess = inventory.getExternalAccess();
+        if (slots.inputCount() <= 1) return externalAccess;
 
-        if (direction == null) return inventory;
+        if (direction == null) return externalAccess;
 
         if (direction.equals(Direction.UP)) {
             // input only, disable output
-            return new DelegatingResourceHandler<>(inventory) {
+            return new DelegatingResourceHandler<>(externalAccess) {
                 @Override
                 public int extract(int index, ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;
@@ -560,7 +561,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
         } else if (direction.equals(Direction.DOWN)) {
             // output only, disable input
-            return new DelegatingResourceHandler<>(inventory) {
+            return new DelegatingResourceHandler<>(externalAccess) {
                 @Override
                 public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
                     return 0;

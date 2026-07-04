@@ -189,6 +189,6 @@ public class ReactorFuelPortEntity extends BlockEntity implements MenuProvider, 
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 }

@@ -318,7 +318,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
 
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
-        return ownStorage;
+        return ownStorage.getExternalAccess();
     }
 
     public SimpleFluidStorage getFluidStorageForModule(BlockPos modulePos) {

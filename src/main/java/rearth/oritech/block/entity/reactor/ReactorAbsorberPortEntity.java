@@ -188,6 +188,6 @@ public class ReactorAbsorberPortEntity extends BlockEntity implements MenuProvid
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 }

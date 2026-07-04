@@ -337,7 +337,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, IPayloadContext context) {

@@ -408,7 +408,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     @Override

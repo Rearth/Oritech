@@ -55,6 +55,7 @@ public interface ScreenProvider {
 
     StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory();
 
+
     MenuType<?> getScreenHandlerType();
 
     default boolean inputOptionsEnabled() {

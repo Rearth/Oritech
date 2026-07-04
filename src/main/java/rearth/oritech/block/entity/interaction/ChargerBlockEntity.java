@@ -175,7 +175,7 @@ public class ChargerBlockEntity extends NetworkedBlockEntity implements FluidPro
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     @Override

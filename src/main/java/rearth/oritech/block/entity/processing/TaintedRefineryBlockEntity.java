@@ -464,7 +464,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
-        return ownStorage;
+        return ownStorage.getExternalAccess();
     }
 
     @Override

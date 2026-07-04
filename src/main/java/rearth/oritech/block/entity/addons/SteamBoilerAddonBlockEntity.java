@@ -42,6 +42,6 @@ public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements Flu
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         if (!isConnected()) return null;
-        return cachedController.boilerStorage;
+        return cachedController.boilerStorage.getExternalAccess();
     }
 }

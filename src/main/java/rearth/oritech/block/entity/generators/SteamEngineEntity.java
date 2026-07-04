@@ -336,8 +336,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
 
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
-        if (inSlaveMode()) return master.boilerStorage;
-        return boilerStorage;
+        if (inSlaveMode()) return master.boilerStorage.getExternalAccess();
+        return boilerStorage.getExternalAccess();
     }
 
     public record SteamEngineSyncPacket(BlockPos position, float speed, float efficiency, long energyProduced,
