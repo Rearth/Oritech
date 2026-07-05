@@ -92,13 +92,17 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, 
             return;
         }
 
-        if (up) {
+        var elytraBoostingForward = player.isFallFlying() && forward;
+
+        if (elytraBoostingForward) {
+            processElytraRocketMotion(player, powerMultiplier);
+        } else if (up) {
             processUpwardsMotion(player, powerMultiplier, upOnly);
         } else {
             powerMultiplier *= 0.7f;    // slower forward while not going up
         }
 
-        if (forward || backward)
+        if (!elytraBoostingForward && (forward || backward))
             processForwardMotion(player, forward, powerMultiplier);
 
         if (left || right)
@@ -181,6 +185,14 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, 
         horizontalMovement = horizontalMovement.add(playerRight.scale(modifier * power));
 
         player.setDeltaMovement(horizontalMovement.x, movement.y, horizontalMovement.z);
+    }
+
+    private static void processElytraRocketMotion(Player player, float powerMultiplier) {
+        var movement = player.getKnownMovement();
+        var lookDirection = player.getLookAngle().normalize();
+        var power = 0.075f * powerMultiplier;
+
+        player.setDeltaMovement(movement.add(lookDirection.scale(power)));
     }
 
     private static void processForwardMotion(Player player, boolean forward, float powerMultiplier) {

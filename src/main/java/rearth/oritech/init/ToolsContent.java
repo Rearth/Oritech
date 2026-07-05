@@ -2,9 +2,11 @@ package rearth.oritech.init;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Unit;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -13,6 +15,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -119,15 +122,24 @@ public class ToolsContent {
     public static final DeferredItem<Item> JETPACK_ELYTRA = EQUIPMENT.registerItem(
             "jetpack_elytra",
             props -> new JetpackElytraItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
-                    props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
-                            .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
+                    elytraJetpackProperties(props))
     );
     public static final DeferredItem<Item> JETPACK_EXO_ELYTRA = EQUIPMENT.registerItem(
             "jetpack_exo_elytra",
             props -> new JetpackExoElytraItem(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE,
-                    props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
-                            .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
+                    elytraJetpackProperties(props))
     );
+
+    private static Item.Properties elytraJetpackProperties(Item.Properties props) {
+        return props.humanoidArmor(EXOSUIT_MATERIAL, ArmorType.CHESTPLATE)
+                .component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.CHEST)
+                        .setEquipSound(SoundEvents.ARMOR_EQUIP_ELYTRA)
+                        .setAsset(EquipmentAssets.ELYTRA)
+                        .setDamageOnHurt(false)
+                        .build())
+                .component(DataComponents.GLIDER, Unit.INSTANCE)
+                .component(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+    }
 
     public static final DeferredItem<Item> PORTABLE_LASER = EQUIPMENT.registerItem(
             "portable_laser",

@@ -3,16 +3,12 @@ package rearth.oritech.item.tools.armor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.level.gameevent.GameEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
 
@@ -26,31 +22,6 @@ public class JetpackExoElytraItem extends BackstorageExoArmorItem implements Bas
     @Override
     public boolean requireTakeoff() {
         return false;
-    }
-
-    public boolean useCustomElytra(LivingEntity entity, ItemStack chestStack, boolean tickElytra) {
-        if (!tickElytra) return true;
-
-        int nextRoll = entity.getFallFlyingTicks() + 1;
-        if (!entity.level().isClientSide() && nextRoll % 10 == 0) {
-            entity.gameEvent(GameEvent.ELYTRA_GLIDE);
-        }
-
-        return true;
-    }
-
-    // this overrides the IItemExtension methods in neoforge
-    public boolean canElytraFly(ItemStack stack, LivingEntity entity) {
-        return useCustomElytra(entity, entity.getItemBySlot(EquipmentSlot.CHEST), true);
-    }
-
-    public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
-        return true;
-    }
-
-    @Override
-    public boolean canUseJetpack(Player player) {
-        return player.isFallFlying();
     }
 
     @Override
