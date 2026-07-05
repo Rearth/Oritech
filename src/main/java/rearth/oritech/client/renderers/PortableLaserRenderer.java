@@ -42,7 +42,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         super.addRenderData(animatable, relatedObject, renderState, partialTick);
 
         if (relatedObject == null) return;
-        if (!relatedObject.renderPerspective().firstPerson()) return;
+        // if (!relatedObject.renderPerspective().firstPerson()) return;
 
         var client = Minecraft.getInstance();
         var player = client.player;
@@ -69,9 +69,9 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
         var dist = (float) endPos.distanceTo(startPos);
 
-        var localStart = new Vec3(0, 0.05, 0);
+        var localStart = new Vec3(0.5, 0.60, 0);
         var deltaVec = new Vec3(0, 0, -dist);
-        float baseThickness = (float) (0.03f + Math.sin((level.getGameTime() + partialTick) * 1.1f) * 0.01f);
+        float baseThickness = (float) (0.03f + Math.sin((level.getGameTime() + partialTick) * 0.6f) * 0.01f);
 
         renderState.addGeckolibData(BEAM_DATA, new LaserBeamData(localStart, deltaVec, baseThickness));
     }
