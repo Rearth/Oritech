@@ -9,8 +9,6 @@ import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.blocks.MachineRenderer;
 import rearth.oritech.util.ColorableMachine;
 
-import java.util.Locale;
-
 public class MachineModel<T extends BlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
 
     public MachineModel(String subpath) {
@@ -24,10 +22,6 @@ public class MachineModel<T extends BlockEntity & GeoAnimatable> extends Default
 
         var color = renderState.getOrDefaultGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, ColorableMachine.ColorVariant.ORANGE);
 
-        if (color.equals(ColorableMachine.ColorVariant.ORANGE)) return base;
-
-        var colorFileSuffix = color.toString().toLowerCase(Locale.ROOT);
-
-        return Identifier.fromNamespaceAndPath(base.getNamespace(), base.getPath().replace("models", "models/colored").replace(".png", "_" + colorFileSuffix + ".png"));
+        return ColorableMachine.getTextureForColor(base, color);
     }
 }

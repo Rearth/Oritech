@@ -6,8 +6,10 @@ import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.model.DefaultedBlockGeoModel;
 import com.geckolib.renderer.GeoItemRenderer;
+import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -16,6 +18,7 @@ import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.util.ColorableMachine;
 
 import java.util.function.Consumer;
 
@@ -23,11 +26,13 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
     private final AnimatableInstanceCache geoCache = GeckoLibUtil.createInstanceCache(this);
     private final float scale;
     private final String name;
+    private final ColorableMachine.ColorVariant defaultColor;
 
-    public OritechGeoItem(Block block, Properties settings, float scale, String name) {
+    public OritechGeoItem(Block block, Properties settings, float scale, String name, ColorableMachine.ColorVariant defaultColor) {
         super(block, settings);
         this.scale = scale;
         this.name = name;
+        this.defaultColor = defaultColor;
     }
 
     @Override
@@ -48,7 +53,7 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
             @Override
             public @Nullable GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/" + name)));
+                    this.renderer = new GeoItemRenderer<>(new DefaultColoredBlockItemGeoModel(Oritech.id("models/" + name), defaultColor));
 
                 this.renderer.withScale(scale);
 
@@ -65,5 +70,19 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return geoCache;
+    }
+
+    private static class DefaultColoredBlockItemGeoModel extends DefaultedBlockGeoModel<OritechGeoItem> {
+        private final ColorableMachine.ColorVariant defaultColor;
+
+        private DefaultColoredBlockItemGeoModel(Identifier assetSubpath, ColorableMachine.ColorVariant defaultColor) {
+            super(assetSubpath);
+            this.defaultColor = defaultColor;
+        }
+
+        @Override
+        public Identifier getTextureResource(GeoRenderState renderState) {
+            return ColorableMachine.getTextureForColor(super.getTextureResource(renderState), defaultColor);
+        }
     }
 }

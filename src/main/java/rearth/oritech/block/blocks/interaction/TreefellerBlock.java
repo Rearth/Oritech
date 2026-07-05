@@ -58,7 +58,7 @@ public class TreefellerBlock extends HorizontalDirectionalBlock implements Entit
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Nullable

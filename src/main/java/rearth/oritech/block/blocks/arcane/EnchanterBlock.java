@@ -57,7 +57,7 @@ public class EnchanterBlock extends HorizontalDirectionalBlock implements Entity
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Override

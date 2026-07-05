@@ -54,7 +54,7 @@ public class PipeBoosterBlock extends HorizontalDirectionalBlock implements Enti
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Nullable

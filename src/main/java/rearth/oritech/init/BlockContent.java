@@ -40,6 +40,7 @@ import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
+import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.lang.annotation.ElementType;
@@ -139,15 +140,15 @@ public class BlockContent {
     public static final DeferredBlock<Block> COOLER_BLOCK = BLOCKS.registerBlock("cooler_block", CoolerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> CENTRIFUGE_BLOCK = BLOCKS.registerBlock("centrifuge_block", CentrifugeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    @UseGeoBlockItem(scale = 0.3f)
+    @UseGeoBlockItem(scale = 0.3f, defaultColor = ColorableMachine.ColorVariant.INDUSTRIAL)
     @ItemRarity(Rarity.RARE)
     public static final DeferredBlock<Block> ATOMIC_FORGE_BLOCK = BLOCKS.registerBlock("atomic_forge_block", AtomicForgeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    @UseGeoBlockItem(scale = 0.3f)
+    @UseGeoBlockItem(scale = 0.3f, defaultColor = ColorableMachine.ColorVariant.FLUXITE)
     public static final DeferredBlock<Block> REFINERY_BLOCK = BLOCKS.registerBlock("refinery_block", RefineryBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.3f)
     @NoAutoDrop
     public static final DeferredBlock<Block> TAINTED_REFINERY_BLOCK = BLOCKS.registerBlock("tainted_refinery_block", TaintedRefineryBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(7f, 2000f).noOcclusion());
-    @UseGeoBlockItem(scale = 0.3f)
+    @UseGeoBlockItem(scale = 0.3f, defaultColor = ColorableMachine.ColorVariant.FLUXITE)
     public static final DeferredBlock<Block> REFINERY_MODULE_BLOCK = BLOCKS.registerBlock("refinery_module_block", RefineryModuleBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @UseGeoBlockItem(scale = 0.7f)
     public static final DeferredBlock<Block> BIO_GENERATOR_BLOCK = BLOCKS.registerBlock("bio_generator_block", BioGeneratorBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
@@ -484,7 +485,7 @@ public class BlockContent {
                             props -> {
                                 if (field.isAnnotationPresent(BlockContent.UseGeoBlockItem.class)) {
                                     var geoItem = field.getAnnotation(BlockContent.UseGeoBlockItem.class);
-                                    return new OritechGeoItem(deferredBlock.value(), props, geoItem.scale(), deferredBlock.getId().getPath());
+                                    return new OritechGeoItem(deferredBlock.value(), props, geoItem.scale(), deferredBlock.getId().getPath(), geoItem.defaultColor());
                                 }
 
                                 return new BlockItem(deferredBlock.value(), props) {
@@ -517,6 +518,8 @@ public class BlockContent {
     @Target({ElementType.FIELD})
     public @interface UseGeoBlockItem {
         float scale();
+
+        ColorableMachine.ColorVariant defaultColor() default ColorableMachine.ColorVariant.ORANGE;
     }
 
     @Retention(RetentionPolicy.RUNTIME)

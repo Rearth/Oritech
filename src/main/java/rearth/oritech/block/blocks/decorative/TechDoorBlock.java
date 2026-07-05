@@ -144,6 +144,6 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 }

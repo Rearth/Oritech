@@ -20,14 +20,11 @@ import rearth.oritech.client.renderers.blocks.SmallTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
-import rearth.oritech.util.ColorableMachine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static rearth.oritech.client.renderers.blocks.MachineRenderer.TEXTURE_OVERRIDE_TICKET;
 
 public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<T, R> {
 
@@ -51,12 +48,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R e
     public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
 
         // add machine color to state (can be empty, meaning default orange)
-        if (animatable instanceof ColorableMachine colorableMachine && colorableMachine.supportRecoloring()) {
-            var color = colorableMachine.getCurrentColor();
-
-            if (color.equals(ColorableMachine.ColorVariant.ORANGE)) return;
-            renderState.addGeckolibData(TEXTURE_OVERRIDE_TICKET, color);
-        }
+        MachineRenderer.addColorRenderData(animatable, renderState);
 
         var lastHeight = tankHeights.computeIfAbsent(animatable.getBlockPos().asLong(), key -> new VisualTankHeights());
         var cubes = new ArrayList<FluidCube>();

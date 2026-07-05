@@ -38,6 +38,7 @@ public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRende
     // extract phase: resolve all fluid cubes and ship them to the render state via the GeckoLib DataTicket
     @Override
     public void addRenderData(TaintedRefineryBlockEntity animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+        MachineRenderer.addColorRenderData(animatable, renderState);
 
         var cubes = new ArrayList<FluidCube>();
         var capacity = animatable.ownStorage.getCapacity();

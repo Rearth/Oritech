@@ -140,7 +140,7 @@ public class HangarDoorBlock extends Block implements EntityBlock, TooltipProvid
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Override

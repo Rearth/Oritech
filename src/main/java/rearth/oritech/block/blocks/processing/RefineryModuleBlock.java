@@ -61,7 +61,7 @@ public class RefineryModuleBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Override

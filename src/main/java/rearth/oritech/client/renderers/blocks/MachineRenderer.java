@@ -39,7 +39,10 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable, R extends Bl
     // add machine color to state (can be empty, meaning default orange)
     @Override
     public void addRenderData(T animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+        addColorRenderData(animatable, renderState);
+    }
 
+    public static void addColorRenderData(Object animatable, GeoRenderState renderState) {
         if (animatable instanceof ColorableMachine colorableMachine && colorableMachine.supportRecoloring()) {
             var color = colorableMachine.getCurrentColor();
 

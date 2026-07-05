@@ -127,7 +127,7 @@ public class DronePortBlock extends Block implements EntityBlock, TooltipProvide
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Nullable

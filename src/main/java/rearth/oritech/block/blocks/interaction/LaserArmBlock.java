@@ -170,7 +170,7 @@ public class LaserArmBlock extends Block implements EntityBlock, TooltipProvider
 
     @Override
     public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @Nullable
