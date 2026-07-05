@@ -162,6 +162,10 @@ dependencies {
     // athena (CTM)
     runtimeOnly "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
 
+    // runtime testing mode
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    localRuntime "curse.maven:jade-324717:8326300"  // jade
+
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
