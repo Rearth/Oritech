@@ -132,7 +132,7 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
         return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
 
-    // todo
+    // todo fix this next
     //    @Override
 //    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 //

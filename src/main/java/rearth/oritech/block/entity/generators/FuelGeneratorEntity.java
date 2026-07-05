@@ -25,6 +25,7 @@ public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
         super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
     }
 
+    // todo make this output on all neighboring blocks, as this is now cached
     @Override
     protected Set<Tuple<BlockPos, Direction>> getOutputTargets(BlockPos pos, Level level) {
 

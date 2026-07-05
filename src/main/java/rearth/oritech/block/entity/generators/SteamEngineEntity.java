@@ -123,7 +123,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             var producedCount = steamTaken * WATER_RATIO;
             producedCount = Math.max(producedCount, 1);
 
-            var waterInserted = waterTank.insert(FluidResource.of(Fluids.WATER), (int) producedCount, transaction);
+            var waterInserted = waterTank.insert(0, FluidResource.of(Fluids.WATER), (int) producedCount, transaction);
 
             // produce energy
             var energyEfficiency = getSteamEnergyEfficiency(speed);
@@ -133,7 +133,8 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             if (steamTaken <= 0) return;
 
             transaction.commit();
-            clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+            // clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
+            clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) consumedCount, slaves.size());
         }
 
         spawnParticles();

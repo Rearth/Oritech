@@ -43,7 +43,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
 
         @Override
         public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            if (!boilerAcceptsInput(resource)) return 0;
+            if (index == 0 && !boilerAcceptsInput(resource)) return 0;
             return super.insert(index, resource, amount, transaction);
         }
     };
