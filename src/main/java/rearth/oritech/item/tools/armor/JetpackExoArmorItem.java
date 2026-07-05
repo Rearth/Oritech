@@ -3,14 +3,12 @@ package rearth.oritech.item.tools.armor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.level.Level;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechStartupConfig;
 
@@ -19,15 +17,6 @@ import java.util.function.Consumer;
 public class JetpackExoArmorItem extends BackstorageExoArmorItem implements BaseJetpackItem {
     public JetpackExoArmorItem(ArmorMaterial material, ArmorType type, Item.Properties settings) {
         super(material, type, settings);
-    }
-
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-
-        if (level.isClientSide()) {
-            tickJetpack(stack, entity, level);
-        } else {
-            super.inventoryTick(stack, level, entity, slot, selected);
-        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package rearth.oritech.item.tools.armor;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
@@ -11,10 +12,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
@@ -30,21 +31,20 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
         super(material, type, settings);
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (level.isClientSide()) return;
-
+    @Override
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
         var tickPeriod = 10;
         if (level.getGameTime() % tickPeriod != 0) return;
 
-        var isPlayer = entity instanceof Player;
-        var isEquipped = ((Player) entity).getItemBySlot(EquipmentSlot.CHEST).equals(stack);
+        if (!(entity instanceof Player player)) return;
 
-        if (isPlayer && isEquipped) {
-            distributePower((Player) entity, stack, slot);
+        var isEquipped = player.getItemBySlot(EquipmentSlot.CHEST).equals(stack);
+        if (isEquipped) {
+            distributePower(player, stack);
         }
     }
 
-    private void distributePower(Player player, ItemStack pack, int slot) {
+    private void distributePower(Player player, ItemStack pack) {
 
         var packAccess = ItemAccess.forStack(pack);
         var packStorage = packAccess.getCapability(Capabilities.Energy.ITEM);
@@ -52,7 +52,7 @@ public class BackstorageExoArmorItem extends ExoArmorItem implements OritechEner
 
         for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
             var stack = player.getInventory().getItem(i);
-            if (stack.isEmpty() || stack == pack || slot == i) continue;
+            if (stack.isEmpty() || stack == pack) continue;
 
             var stackAccess = ItemAccess.forPlayerSlot(player, i);
             var stackStorage = stackAccess.getCapability(Capabilities.Energy.ITEM);

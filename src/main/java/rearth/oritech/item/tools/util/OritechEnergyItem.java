@@ -2,6 +2,7 @@ package rearth.oritech.item.tools.util;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -15,18 +16,21 @@ import rearth.oritech.api.transfer.energy.EnergyProvider;
 public interface OritechEnergyItem extends EnergyProvider.Item {
 
     default boolean tryUseEnergy(ItemStack stack, int amount, Player player) {
-        RandomSource random = RandomSource.create();
+        var random = RandomSource.create();
 
         int unbreakingLevel = getUnbreakingLevel(stack);
         if (unbreakingLevel > 0) {
             amount = amount / (random.nextInt(unbreakingLevel) + 1);
         }
 
-        var storage = getEnergyStorage(stack, ItemAccess.forStack(stack));
+        var storage = getEnergyStorage(stack, getItemAccess(stack, player));
         if (storage != null) {
             try (var transaction = Transaction.openRoot()) {
                 var extracted = storage.extract(amount, transaction);
-                return extracted == amount;
+                if (extracted == amount) {
+                    transaction.commit();
+                    return true;
+                }
             }
         }
 
@@ -53,5 +57,17 @@ public interface OritechEnergyItem extends EnergyProvider.Item {
         return stack.getCapability(Capabilities.Energy.ITEM, itemAccess);
     }
 
+    private static ItemAccess getItemAccess(ItemStack stack, Player player) {
+        if (player != null) {
+            var inventory = player.getInventory();
+            for (int i = 0; i < Inventory.SLOT_BODY_ARMOR; i++) {
+                if (inventory.getItem(i) == stack) {
+                    return ItemAccess.forPlayerSlot(player, i);
+                }
+            }
+        }
+
+        return ItemAccess.forStack(stack);
+    }
 
 }

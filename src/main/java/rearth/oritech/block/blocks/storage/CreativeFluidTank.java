@@ -5,19 +5,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.util.TooltipHelper;
@@ -44,25 +45,26 @@ public class CreativeFluidTank extends SmallFluidTank implements TooltipProvider
     }
 
     @Override
-    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (!stack.isEmpty() && level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity) {
+            var itemAccess = ItemAccess.forPlayerInteraction(player, hand).oneByOne();
+            var candidate = itemAccess.getCapability(Capabilities.Fluid.ITEM);
 
-        if (level.isClientSide() || !(level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity))
-            return super.useWithoutItem(state, level, pos, player, hit);
+            if (candidate != null) {
+                var resource = candidate.getResource(0);
 
-        // todo use proper api here
-        var mainHandStack = player.getMainHandItem();
-        if (mainHandStack.is(Items.BUCKET)) {
-            blockEntity.fluidStorage.set(0, FluidResource.EMPTY, 0);
-            blockEntity.setChanged();
-            return InteractionResult.SUCCESS;
-        } else if (!mainHandStack.isEmpty() && mainHandStack.getItem() instanceof BucketItem bucketItem) {
-            blockEntity.fluidStorage.set(0, FluidResource.of(bucketItem.content), FluidType.BUCKET_VOLUME);
-            blockEntity.setChanged();
-            return InteractionResult.SUCCESS;
+                // allow setting fluid content of creative tanks
+                if (!resource.isEmpty()) {
+                    if (!level.isClientSide()) {
+                        blockEntity.fluidStorage.set(0, resource, FluidType.BUCKET_VOLUME);
+                        blockEntity.setChanged();
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+            }
         }
 
-        return super.useWithoutItem(state, level, pos, player, hit);
-
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
 }

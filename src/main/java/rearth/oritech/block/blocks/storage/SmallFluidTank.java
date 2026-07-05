@@ -88,13 +88,9 @@ public class SmallFluidTank extends Block implements EntityBlock {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof SmallTankEntity tankEntity) {
-            var usedStack = stack;
-            if (stack.getCount() > 1) {
-                usedStack = stack.copyWithCount(1);
-            }
-
-            var candidate = usedStack.getCapability(Capabilities.Fluid.ITEM, ItemAccess.forStack(usedStack));
+        if (blockEntity instanceof SmallTankEntity tankEntity && !stack.isEmpty()) {
+            var itemAccess = ItemAccess.forPlayerInteraction(player, hand).oneByOne();
+            var candidate = itemAccess.getCapability(Capabilities.Fluid.ITEM);
             if (candidate != null) {
                 if (!level.isClientSide()) {
                     int moved = 0;
@@ -127,15 +123,6 @@ public class SmallFluidTank extends Block implements EntityBlock {
                     }
 
                     if (moved > 0) {
-                        if (stack.getCount() > 1) {
-                            stack.shrink(1);
-                            if (!player.getInventory().add(usedStack)) {
-                                player.drop(usedStack, true);
-                            }
-                        } else {
-                            player.setItemInHand(hand, usedStack);
-                        }
-
                         level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f);
                     }
                 }

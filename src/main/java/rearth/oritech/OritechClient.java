@@ -5,7 +5,10 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -18,6 +21,7 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
@@ -40,6 +44,7 @@ import rearth.oritech.datagen.tags.FluidTagGenerator;
 import rearth.oritech.datagen.tags.ItemTagGenerator;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
+import rearth.oritech.item.tools.util.ClientTickableItem;
 
 import java.util.List;
 import java.util.Set;
@@ -132,6 +137,8 @@ public final class OritechClient {
         var player = client.player;
         if (client.player == null || client.level == null) return;
 
+        tickClientItems(client);
+
         // ensure prometheum pick is animated correctly
         var stack = client.player.getMainHandItem();
         if (stack.getItem() instanceof PromethiumPickaxeItem pickaxeItem) {
@@ -156,6 +163,32 @@ public final class OritechClient {
         for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
             if (augment.isEnabled((Player) player))
                 augment.refreshClient(player);
+        }
+    }
+
+    private static void tickClientItems(Minecraft client) {
+        var player = client.player;
+        var level = client.level;
+        var inventory = player.getInventory();
+        var selectedSlot = inventory.getSelectedSlot();
+        var mainItems = inventory.getNonEquipmentItems();
+
+        for (int i = 0; i < mainItems.size(); i++) {
+            var slot = i == selectedSlot ? EquipmentSlot.MAINHAND : null;
+            tickClientItem(mainItems.get(i), level, player, slot);
+        }
+
+        for (var slot : EquipmentSlot.VALUES) {
+            if (slot == EquipmentSlot.MAINHAND) continue;
+            tickClientItem(player.getItemBySlot(slot), level, player, slot);
+        }
+    }
+
+    private static void tickClientItem(ItemStack stack, Level level, Player player, @Nullable EquipmentSlot slot) {
+        if (stack.isEmpty()) return;
+
+        if (stack.getItem() instanceof ClientTickableItem item) {
+            item.clientInventoryTick(stack, level, player, slot);
         }
     }
 

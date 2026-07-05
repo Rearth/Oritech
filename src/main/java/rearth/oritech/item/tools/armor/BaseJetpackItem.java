@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
@@ -21,6 +22,7 @@ import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.item.tools.util.ClientTickableItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
 
@@ -29,7 +31,7 @@ import java.util.function.Consumer;
 import static rearth.oritech.item.tools.harvesting.ChainsawItem.BAR_STEP_COUNT;
 
 
-public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item {
+public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, ClientTickableItem {
 
     boolean requireUpward();
 
@@ -43,6 +45,17 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item {
 
     default boolean requireTakeoff() {
         return true;
+    }
+
+    default boolean canUseJetpack(Player player) {
+        return true;
+    }
+
+    @Override
+    default void clientInventoryTick(ItemStack stack, Level level, Entity owner, @Nullable EquipmentSlot slot) {
+        if (slot != EquipmentSlot.CHEST || !(owner instanceof Player player) || !canUseJetpack(player)) return;
+
+        tickJetpack(stack, owner, level);
     }
 
     default void tickJetpack(ItemStack stack, Entity entity, Level level) {
@@ -203,7 +216,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item {
 
     default void addJetpackTooltip(ItemStack stack, Consumer<Component> builder, boolean includeEnergy) {
 
-        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack, ItemAccess.forStack(stack))), TooltipHelper.getEnergyText(this.getFluidCapacity()));
+        var text = Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(this.getStoredEnergy(stack, ItemAccess.forStack(stack))), TooltipHelper.getEnergyText(this.getEnergyCapacity()));
         if (includeEnergy) builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var container = getStoredFluid(stack);
@@ -229,7 +242,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item {
             return Math.round(fillPercent * BAR_STEP_COUNT) / 100;
         }
 
-        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getFluidCapacity()) * BAR_STEP_COUNT) / 100;
+        return Math.round((getStoredEnergy(stack, ItemAccess.forStack(stack)) * 100f / this.getEnergyCapacity()) * BAR_STEP_COUNT) / 100;
     }
 
     default boolean isValidFuel(Fluid variant) {

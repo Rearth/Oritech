@@ -9,18 +9,16 @@ import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import org.jspecify.annotations.NonNull;
 import rearth.oritech.Oritech;
@@ -53,12 +51,6 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
         return false;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (level.isClientSide() && Minecraft.getInstance().player.isFallFlying()) {
-            tickJetpack(stack, entity, level);
-        }
-    }
-
     public boolean useCustomElytra(LivingEntity entity, ItemStack chestStack, boolean tickElytra) {
         if (!tickElytra) return true;
 
@@ -77,6 +69,11 @@ public class JetpackElytraItem extends Item implements GeoItem, BaseJetpackItem 
 
     public boolean elytraFlightTick(ItemStack stack, LivingEntity entity, int flightTicks) {
         return true;
+    }
+
+    @Override
+    public boolean canUseJetpack(Player player) {
+        return player.isFallFlying();
     }
 
     @Override
