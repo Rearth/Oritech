@@ -153,4 +153,9 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     public float getDisplayedEnergyUsage() {
         return energyStorage.getCapacityAsLong();
     }
+
+    @Override
+    public ColorVariant getDefaultColor() {
+        return ColorVariant.INDUSTRIAL;
+    }
 }
