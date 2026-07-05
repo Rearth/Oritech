@@ -6,14 +6,23 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.DeferredBlock;
+import net.neoforged.neoforge.registries.DeferredItem;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class GeoItemModelGenerator implements DataProvider {
+
+    private static final List<DeferredItem<?>> GEO_ITEMS = List.of(
+            ToolsContent.PORTABLE_LASER,
+            ToolsContent.PROMETHIUM_AXE,
+            ToolsContent.PROMETHIUM_PICKAXE
+    );
 
     private final PackOutput.PathProvider pathProvider;
 
@@ -32,6 +41,11 @@ public class GeoItemModelGenerator implements DataProvider {
 
             var block = (DeferredBlock<?>) value;
             var itemId = block.unwrapKey().orElseThrow().identifier();
+            futures.add(DataProvider.saveStable(output, createGeckoLibItemModel(itemId), pathProvider.json(itemId)));
+        });
+
+        GEO_ITEMS.forEach(item -> {
+            var itemId = item.getId();
             futures.add(DataProvider.saveStable(output, createGeckoLibItemModel(itemId), pathProvider.json(itemId)));
         });
 

@@ -17,6 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -84,6 +85,12 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.MACHINE_COMBI_ADDON.get()
     );
 
+    private static final Set<Item> GECKOLIB_ITEM_MODELS = Set.of(
+            ToolsContent.PORTABLE_LASER.get(),
+            ToolsContent.PROMETHIUM_AXE.get(),
+            ToolsContent.PROMETHIUM_PICKAXE.get()
+    );
+
 
     public ModelGenerator(PackOutput output) {
         super(output, Oritech.MOD_ID);
@@ -98,6 +105,11 @@ public class ModelGenerator extends ModelProvider {
     @Override
     protected Stream<? extends Holder<Block>> getKnownBlocks() {
         return super.getKnownBlocks().filter(h -> !HAND_AUTHORED_BLOCKS.contains(h.value()));
+    }
+
+    @Override
+    protected Stream<? extends Holder<Item>> getKnownItems() {
+        return super.getKnownItems().filter(h -> !GECKOLIB_ITEM_MODELS.contains(h.value()));
     }
 
     private void generateBlockStateModels(BlockModelGenerators generator) {
@@ -338,9 +350,6 @@ public class ModelGenerator extends ModelProvider {
         itemModelGenerator.generateFlatItem(ToolsContent.EXO_JETPACK.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_EXO_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
-        itemModelGenerator.generateFlatItem(ToolsContent.PORTABLE_LASER.get(), ModelTemplates.FLAT_ITEM);
-        itemModelGenerator.generateFlatItem(ToolsContent.PROMETHIUM_AXE.get(), ModelTemplates.FLAT_ITEM);
-        itemModelGenerator.generateFlatItem(ToolsContent.PROMETHIUM_PICKAXE.get(), ModelTemplates.FLAT_ITEM);
 
         RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {
             itemModelGenerator.generateFlatItem(item.asItem(), ModelTemplates.FLAT_ITEM);

@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-04T22:57:42.5493649	Model Definitions - oritech
+// 26.1.2	2026-07-05T19:03:42.2753147	Model Definitions - oritech
 848ae773b46d96e685f8f3f15717f44fcba78026 assets/oritech/blockstates/accelerator_controller.json
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
@@ -359,13 +359,10 @@ b55046afc3df9b0882ed37e99918aed7e44867e4 assets/oritech/items/platinum_nugget.js
 b61dd71af86fccedc74db89dcae81e7fbaef9521 assets/oritech/items/plutonium_dust.json
 ad1ac96b754c986960648bdec66f63734dcc0e47 assets/oritech/items/plutonium_pellet.json
 bf57412e23e77fad922b27157e094c6ddfea505a assets/oritech/items/polymer_resin.json
-8b0c4b1d6bb55317eb42a9ea73df3555ce001043 assets/oritech/items/portable_laser.json
 419e06b2f74aec41c06e338202f46905bd9f5686 assets/oritech/items/powered_furnace_block.json
 e7634f275fc9c2c654668477a7b8e4f47edcc35a assets/oritech/items/power_pole_block.json
 ccc0fc88525f106ff2bc5ec0c271a790d81b54d5 assets/oritech/items/processing_unit.json
 171e51c88c9f44c6538162c5abb7955d548302d1 assets/oritech/items/prometheum_ingot.json
-f81db7bd20acbd21da1d4be47cee261606ebedaa assets/oritech/items/promethium_axe.json
-e36270ba75be2834f3eb3ed6b504652edc548c52 assets/oritech/items/promethium_pickaxe.json
 28243c18af4577153570cb2dc4bbdf85d1486fb1 assets/oritech/items/pulverizer_block.json
 f60717af8552e42ec651faeb0f910583d520a072 assets/oritech/items/pump_block.json
 e4c6a7d00db56b7ae15fced722cbb166fb141f20 assets/oritech/items/quarry_addon.json
@@ -643,11 +640,8 @@ cec240e34fa9649256c19fccb4bbe8a4e708cc1d assets/oritech/models/item/platinum_nug
 3bf963a577a4e1e31ad87d9ac0826120373cbc00 assets/oritech/models/item/plutonium_dust.json
 492103cbf2eb6a437e22dc37f7bba715181a6bd0 assets/oritech/models/item/plutonium_pellet.json
 6bef52fac87d1aa123f63bd88ce709707fda84b1 assets/oritech/models/item/polymer_resin.json
-e69494ccd46e36b2e6fd0e9e26d08c488ac0e754 assets/oritech/models/item/portable_laser.json
 b4ceb9480bcbb6a9a97df60aa6c8a74023f89202 assets/oritech/models/item/processing_unit.json
 f91b43b62b76500ec341a894f6377e3c9eaa1a2e assets/oritech/models/item/prometheum_ingot.json
-c976ab4d17f97288f0e856d04ff9e2d3685293f9 assets/oritech/models/item/promethium_axe.json
-4ad1b353ab869eba3078720285dac4e6fd15d273 assets/oritech/models/item/promethium_pickaxe.json
 59d3a5f2ea7f9e945cf71810407216ced5ce533c assets/oritech/models/item/quartz_dust.json
 c562ecd5b85d5978c7ff2b8dea32ae37cf346c4d assets/oritech/models/item/raw_biopolymer.json
 f388ae2d88402443c2d3002fccc75ffef585998d assets/oritech/models/item/raw_nickel.json

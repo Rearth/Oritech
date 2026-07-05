@@ -98,12 +98,12 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private PromethiumToolRenderer renderer;
+            private PromethiumToolRenderer<PromethiumAxeItem> renderer;
 
             @Override
             public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PromethiumToolRenderer("promethium_axe");
+                    this.renderer = new PromethiumToolRenderer<>("promethium_axe");
                 return renderer;
             }
         });

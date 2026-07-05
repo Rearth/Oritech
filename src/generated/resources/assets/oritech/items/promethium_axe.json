@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "oritech:item/promethium_axe"
+    "type": "minecraft:special",
+    "base": "oritech:item/promethium_axe",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }

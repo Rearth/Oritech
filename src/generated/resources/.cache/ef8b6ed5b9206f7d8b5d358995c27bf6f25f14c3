@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-04T22:37:10.8500196	oritech geckolib item models
+// 26.1.2	2026-07-05T19:03:42.2838307	oritech geckolib item models
 ebe6cc3089b2fb38c5228c4662a558eda31fb2b9 assets/oritech/items/assembler_block.json
 7880620321f60a6d87a5714f6e9565b8d52b6daa assets/oritech/items/atomic_forge_block.json
 18b83e6288a84ae5bc6c4b368a7dbd7497128bf4 assets/oritech/items/augment_application_block.json
@@ -18,7 +18,10 @@ ac0a6dfd694609fefcf7a760c7a80aec954e6f4c assets/oritech/items/hangar_door.json
 c8b22e5d3dd47bdb030bc78d327da66db354a00a assets/oritech/items/laser_arm_block.json
 45a527e9895b20cca9f8ad893a70784ad12ab308 assets/oritech/items/lava_generator_block.json
 dfc377c277976dc4e37988c43a4c2b3138c4f7ee assets/oritech/items/pipe_booster_block.json
+460b58de0534a3725d3a8a6f9be4f560fb040f8a assets/oritech/items/portable_laser.json
 bbed7bb9627db81937940c3c0e6d15ba5062708c assets/oritech/items/powered_furnace_block.json
+420520ed4575b5cc0e62a19d336006629b634d33 assets/oritech/items/promethium_axe.json
+815e2b866fcb42746cc18d0c59c89bb8621458fe assets/oritech/items/promethium_pickaxe.json
 b95d29dd6b5e9df1ecfd7b29576fabc7fd9787cf assets/oritech/items/pulverizer_block.json
 b5bc21e79b4e1b6ed4f04e74f1bcdeef758fd720 assets/oritech/items/pump_block.json
 032b4fa17e305b39c4f569177c38dbee20f8e98e assets/oritech/items/refinery_block.json

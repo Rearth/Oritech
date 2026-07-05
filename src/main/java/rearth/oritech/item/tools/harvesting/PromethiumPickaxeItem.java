@@ -205,12 +205,12 @@ public class PromethiumPickaxeItem extends Item implements GeoItem {
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private PromethiumToolRenderer renderer;
+            private PromethiumToolRenderer<PromethiumPickaxeItem> renderer;
 
             @Override
             public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PromethiumToolRenderer("promethium_axe");
+                    this.renderer = new PromethiumToolRenderer<>("promethium_pickaxe");
                 return renderer;
             }
         });
