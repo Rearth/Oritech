@@ -117,7 +117,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }
