@@ -17,6 +17,7 @@ import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
@@ -162,7 +163,6 @@ public class ToolsContent {
             props -> new PromethiumAxeItem(PROMETHIUM_MATERIAL,12f, -2.1f,
                     props
                             .rarity(Rarity.EPIC)
-                            .attributes(PromethiumPickaxeItem.getRangeModifier(2))
                             .component(DataComponents.UNBREAKABLE, Unit.INSTANCE)
                             .enchantable(20)
             )
@@ -172,10 +172,19 @@ public class ToolsContent {
             "promethium_pickaxe",
             props -> new PromethiumPickaxeItem(
                     props.pickaxe(PROMETHIUM_MATERIAL, 3f, -2.4f)
-                            .attributes(PromethiumPickaxeItem.getRangeModifier(2))
+                            .attributes(PromethiumPickaxeItem.getToolAttributesWithRange(PROMETHIUM_MATERIAL, 3f, -2.4f, 2, "pick"))
                             .rarity(Rarity.EPIC)
                             .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
     );
+
+    public static void modifyDefaultComponents(ModifyDefaultComponentsEvent event) {
+        // AxeItem applies its own attack attributes in the constructor, replacing any range attributes
+        // passed in through Item.Properties. Patch the final default components after construction instead.
+        event.modify(PROMETHIUM_AXE.get(), (components, context, item) -> components.set(
+                DataComponents.ATTRIBUTE_MODIFIERS,
+                PromethiumPickaxeItem.getToolAttributesWithRange(PROMETHIUM_MATERIAL, 12f, -2.1f, 2, "axe")
+        ));
+    }
 
     public static void registerItemCapabilities(RegisterCapabilitiesEvent event) {
 

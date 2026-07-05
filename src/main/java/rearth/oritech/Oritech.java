@@ -80,6 +80,7 @@ public final class Oritech {
         modEventBus.addListener(DataMapContent::registerDataMapTypes);
         modEventBus.addListener(BlockEntitiesContent::registerBlockEntityCapabilities);
         modEventBus.addListener(ToolsContent::registerItemCapabilities);
+        modEventBus.addListener(ToolsContent::modifyDefaultComponents);
 
         // Register our mod's ModConfigSpec so that FML can create and load the config file for us
         modContainer.registerConfig(ModConfig.Type.COMMON, OritechConfig.COMMON_SPEC);

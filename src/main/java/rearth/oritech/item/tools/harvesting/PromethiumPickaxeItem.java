@@ -30,6 +30,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ToolMaterial;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -167,8 +168,8 @@ public class PromethiumPickaxeItem extends Item implements GeoItem {
             }
         } else {
             // do silk touch
-            var registry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value();
-            var registryEntry = registry.wrapAsHolder(registry.get(Enchantments.SILK_TOUCH).get().value());
+            var registry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            var registryEntry = registry.getOrThrow(Enchantments.SILK_TOUCH);
             var hasExistingSilkTouch = handStack.getTagEnchantments().getLevel(registryEntry) > 0;
 
             if (!hasExistingSilkTouch) {
@@ -178,15 +179,23 @@ public class PromethiumPickaxeItem extends Item implements GeoItem {
         }
     }
 
-    public static ItemAttributeModifiers getRangeModifier(float range) {
+    public static ItemAttributeModifiers getToolAttributesWithRange(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline, float range, String idPrefix) {
         return ItemAttributeModifiers.builder()
                 .add(
+                        Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, attackDamageBaseline + material.attackDamageBonus(), AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(
+                        Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, attackSpeedBaseline, AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(
                         Attributes.BLOCK_INTERACTION_RANGE,
-                        new AttributeModifier(Oritech.id("pick_block_range"), range, AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Oritech.id(idPrefix + "_block_range"), range, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .add(
                         Attributes.ENTITY_INTERACTION_RANGE,
-                        new AttributeModifier(Oritech.id("pick_entity_range"), range, AttributeModifier.Operation.ADD_VALUE),
+                        new AttributeModifier(Oritech.id(idPrefix + "_entity_range"), range, AttributeModifier.Operation.ADD_VALUE),
                         EquipmentSlotGroup.MAINHAND)
                 .build();
     }
