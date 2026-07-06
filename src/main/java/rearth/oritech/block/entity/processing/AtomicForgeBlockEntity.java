@@ -49,6 +49,11 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
+    public boolean showEnergy() {
+        return false;
+    }
+
+    @Override
     public void updateEnergyContainer() {
     } // energy storage is updated by this class (based on the recipe amount), not the usual methods
 

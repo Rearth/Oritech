@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.blocks.interaction.LaserArmBlock;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
@@ -83,7 +84,12 @@ public class LaserArmBlockBehavior {
                 var transferCapacity = (int) Math.min(insertAmount, laserEntity.energyRequiredToFire());
 
                 try (var transaction = Transaction.openRoot()) {
-                    var inserted = storageCandidate.insert(transferCapacity, transaction);
+                    long inserted;
+                    if (storageCandidate instanceof DynamicEnergyStorage dynamicStorage) {
+                        inserted = dynamicStorage.internalInsert(transferCapacity, transaction);
+                    } else {
+                        inserted = storageCandidate.insert(transferCapacity, transaction);
+                    }
                     if (inserted > 0) {
                         transaction.commit();
 

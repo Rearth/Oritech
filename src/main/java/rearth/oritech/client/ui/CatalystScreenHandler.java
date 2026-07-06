@@ -34,7 +34,7 @@ public class CatalystScreenHandler extends OritechScreenHandler {
         // override to remove internal laser energy container and just add soul container
         if (this.blockEntity instanceof EnchantmentCatalystBlockEntity catalystEntity) {
             getDataDisplays().add(DisplayDataSource.CreateSoul(
-                    catalystEntity.maxSouls,
+                    () -> (long) catalystEntity.maxSouls,
                     () -> (long) catalystEntity.collectedSouls,
                     screenData.getEnergyConfiguration()));
         }

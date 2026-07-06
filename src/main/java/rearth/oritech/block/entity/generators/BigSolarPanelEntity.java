@@ -73,14 +73,14 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     public int getProductionRate() {
         var baseRate = OritechConfig.generators.solarGeneratorData.energyPerTick.get();
         var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
-        isFolded = level.isBrightOutside() && skyLightLevel < 12;
+        isFolded = !level.isBrightOutside() && skyLightLevel < 12;
         return (int) (coreQuality * baseRate);
     }
 
     @Override
     public boolean isProducing() {
         var skyLightLevel = level.getBrightness(LightLayer.SKY, this.getBlockPos());
-        return !level.isBrightOutside() && skyLightLevel >= 12 && isActive(getBlockState());
+        return level.isBrightOutside() && skyLightLevel >= 12 && isActive(getBlockState());
     }
 
     public void sendInfoMessageToPlayer(Player player) {

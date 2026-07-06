@@ -38,4 +38,9 @@ public class EnergyDisplayWidget extends AbstractDataDisplayWidget {
         // foreground
         graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, drawY, 0, srcY, cw, filledHeight, REGION_WIDTH, srcHeight, 98, 96);
     }
+
+    @Override
+    protected boolean applySmoothing() {
+        return false;
+    }
 }

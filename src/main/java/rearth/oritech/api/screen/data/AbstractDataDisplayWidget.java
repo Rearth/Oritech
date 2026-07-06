@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 public abstract class AbstractDataDisplayWidget extends UIComponent {
 
-    protected final long capacity;
+    protected final Supplier<Long> capacity;
     protected final Supplier<Long> amountSupplier;
     protected final Supplier<Component> tooltipSupplier;
     protected long currentAmount;
@@ -17,10 +17,10 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
 
     protected AbstractDataDisplayWidget(DisplayDataSource source) {
         super(source.config().x(), source.config().y(), source.config().width(), source.config().height());
-        this.capacity = source.capacity();
+        this.capacity = source.capacitySupplier();
         this.amountSupplier = source.amountSupplier();
         this.tooltipSupplier = source.getTooltipSupplier();
-        this.currentAmount = Mth.clamp(source.amountSupplier().get(), 0L, capacity);
+        this.currentAmount = Mth.clamp(source.amountSupplier().get(), 0L, capacity.get());
         this.displayedAmount = currentAmount;
     }
 
@@ -32,7 +32,7 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
         if (!applySmoothing()) {
             displayedAmount = currentAmount;
         } else {
-            displayedAmount += (currentAmount - displayedAmount) * 0.15f;
+            displayedAmount += (currentAmount - displayedAmount) * 0.35f;
 
             if (Math.abs(currentAmount - displayedAmount) < 0.3f) {
                 displayedAmount = currentAmount;
@@ -49,7 +49,7 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
     }
 
     protected long getCapacity() {
-        return capacity;
+        return capacity.get();
     }
 
     protected long getCurrentAmount() {
@@ -57,14 +57,14 @@ public abstract class AbstractDataDisplayWidget extends UIComponent {
     }
 
     protected long getTargetAmount() {
-        return Mth.clamp(amountSupplier.get(), 0L, capacity);
+        return Mth.clamp(amountSupplier.get(), 0L, capacity.get());
     }
 
     protected float getFillRatio() {
-        if (capacity <= 0) {
+        if (capacity.get() <= 0) {
             return 0f;
         }
 
-        return Mth.clamp((float) (displayedAmount / capacity), 0f, 1f);
+        return Mth.clamp((float) (displayedAmount / capacity.get()), 0f, 1f);
     }
 }
