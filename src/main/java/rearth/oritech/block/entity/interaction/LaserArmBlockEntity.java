@@ -492,15 +492,15 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
         MachineAddonController.super.getAdditionalStatFromAddon(addonBlock);
 
-        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON.get()))
             areaSize++;
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_HUNTER_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_HUNTER_ADDON.get()))
             hunterAddons++;
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()))
             yieldAddons++;
-        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON.get()))
             hasCropFilterAddon = true;
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get()))
             hasSilkTouchAddon = true;
 
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi) {
@@ -818,19 +818,19 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     public boolean isTargetingAtomicForge(Block block) {
-        return block.equals(BlockContent.ATOMIC_FORGE_BLOCK);
+        return block.equals(BlockContent.ATOMIC_FORGE_BLOCK.get());
     }
 
     public boolean isTargetingDeepdrill(Block block) {
-        return block.equals(BlockContent.DEEP_DRILL_BLOCK);
+        return block.equals(BlockContent.DEEP_DRILL_BLOCK.get());
     }
 
     public boolean isTargetingCatalyst(Block block) {
-        return block.equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK);
+        return block.equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get());
     }
 
     public boolean isTargetingUnstableContainer(Block block) {
-        return block.equals(BlockContent.UNSTABLE_CONTAINER);
+        return block.equals(BlockContent.UNSTABLE_CONTAINER.get());
     }
 
     public boolean isTargetingEnergyContainer() {

@@ -56,7 +56,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
             hasByproductAddon = true;
         }
     }

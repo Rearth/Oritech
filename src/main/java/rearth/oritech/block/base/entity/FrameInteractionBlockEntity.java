@@ -172,7 +172,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     @SuppressWarnings("DataFlowIssue")
     private boolean testForFrame(BlockPos pos) {
         var found = level.getBlockState(pos).getBlock();
-        return found.equals(BlockContent.MACHINE_FRAME_BLOCK);
+        return found.equals(BlockContent.MACHINE_FRAME_BLOCK.get());
     }
 
     @Override

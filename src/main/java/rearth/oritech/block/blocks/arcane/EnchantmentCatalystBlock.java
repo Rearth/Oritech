@@ -139,7 +139,7 @@ public class EnchantmentCatalystBlock extends HorizontalDirectionalBlock impleme
         // find nearby refinery, trigger it first
         for (var checkPos : BlockPos.withinManhattan(pos, 6, 5, 6)) {
             var checkState = level.getBlockState(checkPos);
-            if (checkState.getBlock().equals(BlockContent.REFINERY_BLOCK)) {
+            if (checkState.getBlock().equals(BlockContent.REFINERY_BLOCK.get())) {
                 var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.REFINERY_ENTITY.get());
                 if (checkEntity.isPresent() && checkState.getBlock() instanceof RefineryBlock refineryBlock)
                     refineryBlock.onExplosionHit(checkState, level, checkPos, explosion, onHit);

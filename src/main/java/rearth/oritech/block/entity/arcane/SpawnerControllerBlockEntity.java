@@ -284,7 +284,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     var candidate = worldPosition.offset(-offset + x, -y - 1, -offset + z);
 
                     // block type is a placeholder
-                    if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK)) {
+                    if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK.get())) {
                         hasCage = false;
                         ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(candidate));
                     }

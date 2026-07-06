@@ -75,10 +75,10 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasCropFilter())
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasCropFilter())
             hasCropFilterAddon = true;
 
-        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON.get()))
             range *= 8;
 
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getQuarryCount() > 0) {
@@ -87,14 +87,14 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             }
         }
 
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON))
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()))
             yieldAddons++;
 
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
             yieldAddons += combi.getYieldCount();
         }
 
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasSilk())
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasSilk())
             hasSilkTouchAddon = true;
 
 

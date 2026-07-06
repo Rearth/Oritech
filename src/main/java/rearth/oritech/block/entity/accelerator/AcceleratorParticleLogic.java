@@ -122,9 +122,9 @@ public class AcceleratorParticleLogic {
 
                 // handle gate interaction (e.g. motor or sensor)
                 var gateBlock = level.getBlockState(reachedGate).getBlock();
-                if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR)) {
+                if (gateBlock.equals(BlockContent.ACCELERATOR_MOTOR.get())) {
                     entity.handleParticleMotorInteraction(reachedGate);
-                } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR) && level.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
+                } else if (gateBlock.equals(BlockContent.ACCELERATOR_SENSOR.get()) && level.getBlockEntity(reachedGate) instanceof AcceleratorSensorBlockEntity sensorEntity) {
                     sensorEntity.measureParticle(particle);
                 }
 
@@ -253,11 +253,11 @@ public class AcceleratorParticleLogic {
         var targetBlock = targetState.getBlock();
 
         // go straight through motors and sensors
-        if (targetBlock.equals(BlockContent.ACCELERATOR_MOTOR) || targetBlock.equals(BlockContent.ACCELERATOR_SENSOR))
+        if (targetBlock.equals(BlockContent.ACCELERATOR_MOTOR.get()) || targetBlock.equals(BlockContent.ACCELERATOR_SENSOR.get()))
             return incomingDir;
 
         // if the target gate has just been destroyed
-        if (!targetBlock.equals(BlockContent.ACCELERATOR_RING)) return incomingDir;
+        if (!targetBlock.equals(BlockContent.ACCELERATOR_RING.get())) return incomingDir;
 
         var targetFacing = targetState.getValue(BlockStateProperties.HORIZONTAL_FACING);
         var targetBent = targetState.getValue(AcceleratorRingBlock.BENT);
@@ -333,10 +333,10 @@ public class AcceleratorParticleLogic {
             var candidateState = level.getBlockState(candidatePos);
             if (candidateState.isAir()) continue;
 
-            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR))
+            if (candidateState.getBlock().equals(BlockContent.ACCELERATOR_MOTOR.get()) || candidateState.getBlock().equals(BlockContent.ACCELERATOR_SENSOR.get()))
                 return candidatePos;
 
-            if (!candidateState.getBlock().equals(BlockContent.ACCELERATOR_RING)) return null;
+            if (!candidateState.getBlock().equals(BlockContent.ACCELERATOR_RING.get())) return null;
 
             // check if ring is facing source pos (from)
             var candidateBent = candidateState.getValue(AcceleratorRingBlock.BENT);

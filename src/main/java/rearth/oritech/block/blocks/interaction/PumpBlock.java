@@ -94,7 +94,7 @@ public class PumpBlock extends Block implements EntityBlock, TooltipProvider {
         if (!level.isClientSide()) {
             // break all trunk blocks below
             var checkPos = pos.below();
-            while (level.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK)) {
+            while (level.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK.get())) {
                 level.destroyBlock(checkPos, false);
                 checkPos = checkPos.below();
             }

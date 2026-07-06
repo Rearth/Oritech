@@ -75,7 +75,7 @@ public class TechDoorBlock extends HorizontalDirectionalBlock implements EntityB
 
         var aboveState = level.getBlockState(pos.above());
 
-        if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE)) return;
+        if (!aboveState.getBlock().equals(BlockContent.TECH_DOOR_HINGE.get())) return;
 
         var entity = (TechDoorBlockEntity) level.getBlockEntity(pos);
 

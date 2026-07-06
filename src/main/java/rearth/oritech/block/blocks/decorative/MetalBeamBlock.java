@@ -63,9 +63,9 @@ public class MetalBeamBlock extends Block {
     private BlockState getTargetState(LevelReader level, BlockPos pos) {
         var isFrameSupport = level.getBlockState(pos).is(TagContent.MACHINE_FRAME_SUPPORT);
         var blockBelow = level.getBlockState(pos.below()).getBlock();
-        var beamBelow = blockBelow.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME_BLOCK));
+        var beamBelow = blockBelow.equals(BlockContent.METAL_BEAM_BLOCK.get()) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME_BLOCK.get()));
         var blockAbove = level.getBlockState(pos.above()).getBlock();
-        var beamAbove = blockAbove.equals(BlockContent.METAL_BEAM_BLOCK) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME_BLOCK));
+        var beamAbove = blockAbove.equals(BlockContent.METAL_BEAM_BLOCK.get()) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME_BLOCK.get()));
 
         var state = defaultBlockState();
 

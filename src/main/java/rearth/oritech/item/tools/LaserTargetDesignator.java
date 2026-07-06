@@ -41,7 +41,7 @@ public class LaserTargetDesignator extends Item {
             }
         }
 
-        if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK)
+        if (targetBlockState.getBlock().equals(BlockContent.LASER_ARM_BLOCK.get())
                 && context.getLevel().getBlockEntity(targetPos) instanceof LaserArmBlockEntity laserEntity) {
 
             if (laserEntity.hunterAddons > 0) {
@@ -56,7 +56,7 @@ public class LaserTargetDesignator extends Item {
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
-        } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK)
+        } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT_BLOCK.get())
                 && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
                 && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
             var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
