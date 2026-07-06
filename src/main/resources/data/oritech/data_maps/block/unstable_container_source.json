@@ -1,22 +1,22 @@
 {
   "values": {
     "minecraft:redstone_block": {
-      "quality": 0.3
+      "quality": 0.2
     },
     "minecraft:tnt": {
       "quality": 0.3
     },
     "oritech:fluxite_block": {
-      "quality": 0.3
+      "quality": 0.5
     },
     "minecraft:dragon_egg": {
-      "quality": 1.0
+      "quality": 3.0
     },
     "oritech:low_yield_nuke": {
       "quality": 1.0
     },
     "oritech:nuke": {
-      "quality": 1.0
+      "quality": 2.0
     },
     "oritech:black_hole_block": {
       "quality": 5.0

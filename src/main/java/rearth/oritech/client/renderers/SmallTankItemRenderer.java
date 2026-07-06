@@ -32,20 +32,21 @@ import java.util.function.Consumer;
  * during ({@link #submit}). Register the {@link Unbaked#MAP_CODEC} through {@code RegisterSpecialModelRendererEvent}
  * (see {@link rearth.oritech.OritechClient}).
  * <p>
- * <b>Required item model json</b> (e.g. {@code assets/oritech/items/small_tank.json}): the item must use a
+ * <b>Required item model json</b> (e.g. {@code assets/oritech/items/small_tank_block.json}): the item must use a
  * vanilla {@code minecraft:special} item model that points at this special renderer. The {@code base} field is a
- * plain item/block model that is only used to supply the GUI/hand transforms and lighting (it is <i>not</i> drawn as
+ * plain block model that is only used to supply the GUI/hand transforms and lighting (it is <i>not</i> drawn as
  * geometry - this renderer draws everything). The nested {@code model} block selects this renderer by its registered
  * id ({@link #ID}, {@code "oritech:small_tank"}) and carries the {@code "model"} field consumed by
- * {@link Unbaked#MAP_CODEC}, which is the standalone model this renderer resolves and draws as the tank body:
+ * {@link Unbaked#MAP_CODEC}, which is the standalone item-model definition this renderer resolves and draws as the
+ * tank body:
  * <pre>{@code
  * {
  *   "model": {
  *     "type": "minecraft:special",
- *     "base": "oritech:item/small_tank",
+ *     "base": "oritech:block/small_tank_block",
  *     "model": {
  *       "type": "oritech:small_tank",
- *       "model": "oritech:item/small_tank"
+ *       "model": "oritech:small_tank_block_body"
  *     }
  *   }
  * }
@@ -91,8 +92,6 @@ public class SmallTankItemRenderer implements SpecialModelRenderer<SmallTankItem
         if (argument == null) return;
 
         matrices.pushPose();
-        matrices.translate(0, 0.25, 0);
-        matrices.scale(0.84f, 0.84f, 0.84f);
 
         // raw model
         matrices.pushPose();

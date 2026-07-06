@@ -88,7 +88,13 @@ public class ModelGenerator extends ModelProvider {
     private static final Set<Item> GECKOLIB_ITEM_MODELS = Set.of(
             ToolsContent.PORTABLE_LASER.get(),
             ToolsContent.PROMETHIUM_AXE.get(),
-            ToolsContent.PROMETHIUM_PICKAXE.get()
+            ToolsContent.PROMETHIUM_PICKAXE.get(),
+            ItemContent.UNSTABLE_CONTAINER.get()
+    );
+
+    private static final Set<Item> HAND_AUTHORED_ITEM_DEFINITIONS = Set.of(
+            ItemContent.SMALL_TANK_ITEM.get(),
+            ItemContent.CREATIVE_TANK_ITEM.get()
     );
 
 
@@ -109,7 +115,8 @@ public class ModelGenerator extends ModelProvider {
 
     @Override
     protected Stream<? extends Holder<Item>> getKnownItems() {
-        return super.getKnownItems().filter(h -> !GECKOLIB_ITEM_MODELS.contains(h.value()));
+        return super.getKnownItems()
+                .filter(h -> !GECKOLIB_ITEM_MODELS.contains(h.value()) && !HAND_AUTHORED_ITEM_DEFINITIONS.contains(h.value()));
     }
 
     private void generateBlockStateModels(BlockModelGenerators generator) {
@@ -352,6 +359,9 @@ public class ModelGenerator extends ModelProvider {
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_EXO_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
 
         RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {
+            if (HAND_AUTHORED_ITEM_DEFINITIONS.contains(item.asItem()) || GECKOLIB_ITEM_MODELS.contains(item.asItem()))
+                return;
+
             itemModelGenerator.generateFlatItem(item.asItem(), ModelTemplates.FLAT_ITEM);
         });
 

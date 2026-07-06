@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 import rearth.oritech.Oritech;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.RegistryReflectionUtil;
 
@@ -21,7 +22,8 @@ public class GeoItemModelGenerator implements DataProvider {
     private static final List<DeferredItem<?>> GEO_ITEMS = List.of(
             ToolsContent.PORTABLE_LASER,
             ToolsContent.PROMETHIUM_AXE,
-            ToolsContent.PROMETHIUM_PICKAXE
+            ToolsContent.PROMETHIUM_PICKAXE,
+            ItemContent.UNSTABLE_CONTAINER
     );
 
     private final PackOutput.PathProvider pathProvider;
