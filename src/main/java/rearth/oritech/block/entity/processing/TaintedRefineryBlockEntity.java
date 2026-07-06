@@ -103,6 +103,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
                     }
 
                     progress.set(progress.get() - getRecipeDuration(), inner);
+                    inner.commit();
                 }
             }
 
