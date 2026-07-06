@@ -32,6 +32,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.processing.PulverizerBlockEntity;
 import rearth.oritech.util.TooltipHelper;
@@ -129,17 +130,12 @@ public abstract class MachineBlock extends HorizontalDirectionalBlock implements
 
     @Override
     public InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (FluidContainerInteraction.tryFluidBlockItemInteraction(level, pos, player, hand)) {
+            return InteractionResult.SUCCESS;
+        }
+
         return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
     }
-
-    // todo fix this next
-    //    @Override
-//    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-//
-//        if (ItemFluidApi.tryFluidBlockItemInteraction(stack, level, pos, player, hand)) return ItemInteractionResult.sidedSuccess(true);
-//
-//        return super.useItemOn(stack, state, level, pos, player, hand, hit);
-//    }
 
 
     @Override

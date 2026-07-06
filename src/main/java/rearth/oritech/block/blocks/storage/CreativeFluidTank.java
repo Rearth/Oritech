@@ -20,6 +20,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.util.TooltipHelper;
 

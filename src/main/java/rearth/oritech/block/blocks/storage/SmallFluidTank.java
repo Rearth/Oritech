@@ -3,8 +3,6 @@ package rearth.oritech.block.blocks.storage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -26,13 +24,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
-import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.entity.storage.SmallTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
@@ -87,48 +83,8 @@ public class SmallFluidTank extends Block implements EntityBlock {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        var blockEntity = level.getBlockEntity(pos);
-        if (blockEntity instanceof SmallTankEntity tankEntity && !stack.isEmpty()) {
-            var itemAccess = ItemAccess.forPlayerInteraction(player, hand).oneByOne();
-            var candidate = itemAccess.getCapability(Capabilities.Fluid.ITEM);
-            if (candidate != null) {
-                if (!level.isClientSide()) {
-                    int moved = 0;
-
-                    try (var transaction = Transaction.openRoot()) {
-                        var itemResource = candidate.getResource(0);
-                        if (itemResource.isEmpty()) { // from tank to item
-                            var tankResource = tankEntity.fluidStorage.getResource(0);
-                            if (!tankResource.isEmpty()) {
-                                var inserted = candidate.insert(tankResource, tankEntity.fluidStorage.getAmount(), transaction);
-                                if (inserted > 0) {
-                                    var extracted = tankEntity.fluidStorage.extract(0, tankResource, inserted, transaction);
-                                    if (extracted == inserted) {
-                                        transaction.commit();
-                                        moved = inserted;
-                                    }
-                                }
-                            }
-                        } else {    // from item to tank
-                            var maxTaken = Math.min(candidate.getAmountAsLong(0), tankEntity.fluidStorage.getCapacity() - tankEntity.fluidStorage.getAmount());
-                            var taken = candidate.extract(0, itemResource, (int) maxTaken, transaction);
-                            if (taken > 0) {
-                                var inserted = tankEntity.fluidStorage.insert(itemResource, taken, transaction);
-                                if (inserted == taken) {
-                                    transaction.commit();
-                                    moved = taken;
-                                }
-                            }
-                        }
-                    }
-
-                    if (moved > 0) {
-                        level.playSound(null, pos, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 0.8f, 1.4f);
-                    }
-                }
-
-                return InteractionResult.SUCCESS;
-            }
+        if (FluidContainerInteraction.tryFluidBlockItemInteraction(level, pos, player, hand)) {
+            return InteractionResult.SUCCESS;
         }
 
         return super.useItemOn(stack, state, level, pos, player, hand, hit);

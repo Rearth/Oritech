@@ -25,6 +25,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.DeepDrillEntity;
@@ -142,15 +143,22 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
 
-        if (!state.getValue(USED)) super.useItemOn(stack, state, level, pos, player, hand, hit);
+        if (!state.getValue(USED)) return super.useItemOn(stack, state, level, pos, player, hand, hit);
+
+        var controllerPos = getControllerPos(level, pos);
+        var controllerEntity = level.getBlockEntity(controllerPos);
+        if (FluidContainerInteraction.tryFluidBlockItemInteraction(level, controllerPos, controllerEntity, player, hand)) {
+            return InteractionResult.SUCCESS;
+        }
 
         if (!level.isClientSide()) {
-            var controllerPos = getControllerPos(level, pos);
-            var controllerBlock = level.getBlockState(controllerPos);
-            if (controllerBlock.getBlock() instanceof MachineBlock machineBlock) {
-                return machineBlock.useItemOn(stack, state, level, pos, player, hand, hit);
-            } else if (controllerBlock.getBlock() instanceof RefineryModuleBlock machineBlock) {
-                return InteractionResult.TRY_WITH_EMPTY_HAND;
+            var controllerState = level.getBlockState(controllerPos);
+            var forwardedHit = new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside());
+
+            if (controllerState.getBlock() instanceof MachineBlock machineBlock) {
+                return machineBlock.useItemOn(stack, controllerState, level, controllerPos, player, hand, forwardedHit);
+            } else if (controllerState.getBlock() instanceof RefineryModuleBlock machineBlock) {
+                return machineBlock.useItemOn(stack, controllerState, level, controllerPos, player, hand, forwardedHit);
             }
         }
 
