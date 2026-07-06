@@ -25,14 +25,13 @@ import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
 import rearth.oritech.api.transfer.item.ItemProvider;
-import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -60,14 +59,9 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
     // config
 
     // storage
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.deepDrillConfig.energyCapacity.get(), getMaxRfInput(), 0, 0, this::setChanged, false);
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.deepDrillConfig.energyCapacity.get(), OritechConfig.deepDrillConfig.energyCapacity.get(), 0, 0, this::setChanged, false);
 
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(1, this::setChanged) {
-        @Override
-        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-            return 0;
-        }
-    };
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(1, this::setChanged, new ContainerSlotAssignment(0, 0, 0, 1));
 
     // multiblock
     private final ArrayList<BlockPos> coreBlocksConnected = new ArrayList<>();
@@ -124,6 +118,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
 
             while (progress.get() >= OritechConfig.deepDrillConfig.stepsPerOre.get()) {
                 craftResult(transaction, serverLevel);
+                progress.reset(transaction);
             }
 
             if (usedEnergy > 0) {
@@ -173,7 +168,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
             return;
 
         var output = recipeCandidate.get().value().itemResults().getFirst().create();
-        var inserted = inventory.insert(ItemResource.of(output), output.getCount(), transaction);
+        var inserted = inventory.getOutputContainer().insert(ItemResource.of(output), output.getCount(), transaction);
     }
 
     @Override
@@ -209,7 +204,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     @Override
@@ -298,10 +293,6 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
     @Override
     public AnimatableInstanceCache getAnimatableInstanceCache() {
         return animatableInstanceCache;
-    }
-
-    public int getMaxRfInput() {
-        return 0;
     }
 
     public int getRfPerStep() {

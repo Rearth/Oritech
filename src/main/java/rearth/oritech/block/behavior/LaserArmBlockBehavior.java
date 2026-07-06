@@ -80,7 +80,7 @@ public class LaserArmBlockBehavior {
                 if (insertAmount <= 0 || storageCandidate.getCapacityAsLong() <= 1)
                     return false;
 
-                var transferCapacity = (int) Math.min(Integer.MAX_VALUE, Math.min(insertAmount, laserEntity.energyRequiredToFire()));
+                var transferCapacity = (int) Math.min(insertAmount, laserEntity.energyRequiredToFire());
 
                 try (var transaction = Transaction.openRoot()) {
                     var inserted = storageCandidate.insert(transferCapacity, transaction);
