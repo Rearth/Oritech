@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
+import rearth.oritech.block.entity.interaction.DronePortEntity;
 import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.util.ColorableMachine;
 
@@ -67,6 +68,10 @@ public class MachineRenderer<T extends BlockEntity & GeoAnimatable, R extends Bl
 
     @Override
     public AABB getRenderBoundingBox(BlockEntity blockEntity) {
+
+        if (blockEntity instanceof DronePortEntity)
+            return AABB.INFINITE;
+
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
     }
 }

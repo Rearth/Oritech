@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
@@ -75,6 +76,11 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
             }
             matrices.popPose();
         }
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(SpawnerControllerBlockEntity blockEntity) {
+        return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 8, 6);
     }
 
     public static class SpawnerRenderState extends BlockEntityRenderState {
