@@ -2,7 +2,8 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [32, 32],
 	"textures": {
-		"3": "oritech:item/electric_mace"
+		"3": "oritech:item/electric_mace",
+		"particle": "oritech:block/machine_particle_texture"
 	},
 	"elements": [
 		{
