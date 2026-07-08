@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-05T19:03:42.2753147	Model Definitions - oritech
+// 26.1.2	2026-07-08T20:07:32.8708543	Model Definitions - oritech
 848ae773b46d96e685f8f3f15717f44fcba78026 assets/oritech/blockstates/accelerator_controller.json
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
@@ -226,7 +226,6 @@ b263eec2d7dc1722018047e724424dfa2a84a504 assets/oritech/items/copper_dust.json
 1cb1e9da2d2eaf7d5b2cc0523d9062cc3e2c690d assets/oritech/items/copper_gem.json
 61ce18f8eae95f0c74818a0b7a03a9349c780bf7 assets/oritech/items/copper_nugget.json
 ab3261d581f2ffc916769589006c434240174957 assets/oritech/items/creative_storage_block.json
-b9078808d0e5769611afcee3c1bf060c281102bc assets/oritech/items/creative_tank_block.json
 70a7d97e4c87ff4867ef560b1cf7f1bfa0605538 assets/oritech/items/crop_filter_addon.json
 afc51dfd28d5b74181482718418000daf30a8651 assets/oritech/items/deepslate_nickel_ore.json
 cbdf3a2866b0d736b890691b0b113406587bd373 assets/oritech/items/deepslate_platinum_ore.json
@@ -422,7 +421,6 @@ d02b3d438f82742dd023cd20eb58df609ffbcbb1 assets/oritech/items/small_platinum_dus
 b675ef6f37e4f5f3673e6a173e83876dc30405a1 assets/oritech/items/small_plutonium_dust.json
 97a62d9b3cdaf4dbf429dfcf069c34d794b5ea6f assets/oritech/items/small_plutonium_pellet.json
 768b5e5a2565912bc5a3b8d7b8235b414ee0a765 assets/oritech/items/small_storage_block.json
-eebc7172fe82cdb2d8b12dc134810bc3b4194b36 assets/oritech/items/small_tank_block.json
 9cbc3a0ef2281cddb75370a42ebdd0a5069d9cce assets/oritech/items/small_uranium_dust.json
 abb8970bf238d3052724fcfec2ad0aa858aed84d assets/oritech/items/small_uranium_pellet.json
 6e6cd77fe9e5db771629b47fd3b92f3e3778af01 assets/oritech/items/solid_biofuel.json
@@ -456,7 +454,6 @@ e9c29418c47a618faef0447205a0d65f67c2c301 assets/oritech/items/tech_button.json
 41bb3bd670d66d0eb9f1b4b78119ba84e27ce422 assets/oritech/items/transparent_item_pipe.json
 da5c342270682c6a543887f862fa27118d9f64fb assets/oritech/items/treefeller_block.json
 bf3ea2ce13949aab93b7a05e1abaa57565011326 assets/oritech/items/unholy_intelligence.json
-79715d4e91953d1a5f5392ea50057ad8e2de132e assets/oritech/items/unstable_container.json
 bee1253461cca88e8223935fe03f0d2f411dcbd7 assets/oritech/items/uranium_crystal.json
 786132c5fda641a6daf9092f0707a9977c8d30e9 assets/oritech/items/uranium_dust.json
 dfa79888e02c905e14580382746916c446fb127c assets/oritech/items/uranium_dust_block.json
@@ -587,7 +584,6 @@ f8de6b758be35393ad3b7498d87dcf647eb83ae0 assets/oritech/models/item/copper_clump
 fec5280fe44efeefb44946be9ac4d9626b060ce6 assets/oritech/models/item/copper_dust.json
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets/oritech/models/item/copper_gem.json
 84bc2922b2e7b64a95ec3160df10688923726be8 assets/oritech/models/item/copper_nugget.json
-ccff9a35932f1c6b4834a40783305d5f8ed567a9 assets/oritech/models/item/creative_tank_block.json
 b2128098777a7b793a8c83d3f5f3fdb1a93116c9 assets/oritech/models/item/diamond_paint.json
 d7223c34ce81a014f8cda158d07979f4adb4a597 assets/oritech/models/item/dubios_container.json
 1a1a2b1ff79d6a7d432f6842f63c36ec04632223 assets/oritech/models/item/duratium_dust.json
@@ -665,7 +661,6 @@ f4f2c78bc448794239f53404b7844b156fa1980e assets/oritech/models/item/small_platin
 5b3c0f49f58a304d1f2896780217f298d2ae2a42 assets/oritech/models/item/small_platinum_dust.json
 5bd7935568fd5dfaaad5fb23e366e0eee3011d84 assets/oritech/models/item/small_plutonium_dust.json
 aa1309c9db0109d7414b8ce44682dcc860cb5e3b assets/oritech/models/item/small_plutonium_pellet.json
-81970f4627d7ff333f5a1387cf85a18364807a23 assets/oritech/models/item/small_tank_block.json
 849b807c33d305c3d1afb00ab7fc13362b762855 assets/oritech/models/item/small_uranium_dust.json
 2d3f111ef21809cfe38e0eb116c819148c7d0b7e assets/oritech/models/item/small_uranium_pellet.json
 4ab32015d12275ff794940102643c59902202180 assets/oritech/models/item/solid_biofuel.json
@@ -687,7 +682,6 @@ d4a5c1925098af237db4b3c7876002401f06de33 assets/oritech/models/item/super_ai_chi
 e6f197ee5ac22cd68bc502a86d40b65bfe40884a assets/oritech/models/item/target_designator.json
 49521256eef822b6931b2e4f7603d8032cbbca76 assets/oritech/models/item/tech_lever.json
 4516c012b579252d997760735fbc7c64d4d9c88e assets/oritech/models/item/unholy_intelligence.json
-03843475dbbacb8d5eb7a409a3d63cef0f1d2f04 assets/oritech/models/item/unstable_container.json
 f0e16b428d59a0aec647772e22b80fe5b211821f assets/oritech/models/item/uranium_dust.json
 406278538fc2a351f9377e7a4481b90f289120e4 assets/oritech/models/item/uranium_gem.json
 6146f0ff4bf5a3be7f658f23f46ba0d97512b63f assets/oritech/models/item/uranium_pellet.json

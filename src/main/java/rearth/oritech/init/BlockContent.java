@@ -175,6 +175,7 @@ public class BlockContent {
 
     @NoAutoDrop
     @DispenserPlace
+    @NoBlockItem
     public static final DeferredBlock<Block> SMALL_STORAGE_BLOCK = BLOCKS.registerBlock("small_storage_block", SmallStorageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().pushReaction(PushReaction.DESTROY));
     public static final DeferredBlock<Block> LARGE_STORAGE_BLOCK = BLOCKS.registerBlock("large_storage_block", LargeStorageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @DispenserPlace

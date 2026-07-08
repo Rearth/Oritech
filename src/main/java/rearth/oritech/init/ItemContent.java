@@ -9,10 +9,7 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 import rearth.oritech.item.UnstableContainerItem;
-import rearth.oritech.item.other.ColorCartridgeItem;
-import rearth.oritech.item.other.CustomTooltipItem;
-import rearth.oritech.item.other.MobCaptureItem;
-import rearth.oritech.item.other.SmallFluidTankBlockItem;
+import rearth.oritech.item.other.*;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
@@ -154,8 +151,14 @@ public class ItemContent {
     public static final DeferredItem<Item> SCULK_PAINT = ITEMS.registerItem("sculk_paint", props -> new ColorCartridgeItem(props, ColorableMachine.ColorVariant.SCULK));
 
     // tank items (with custom item class)
+    @ItemGroupTarget(Groups.MACHINES)
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
-    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+
+    @ItemGroupTarget(Groups.MACHINES)public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+
+    // portable energy storage
+    @ItemGroupTarget(Groups.MACHINES)
+    public static final DeferredItem<Item> SMALL_STORAGE_ITEM = ITEMS.registerItem("small_storage_block", props -> new SmallEnergyStorageBlockItem(BlockContent.SMALL_STORAGE_BLOCK.value(), props.useBlockDescriptionPrefix()));
 
 
     public enum Groups {

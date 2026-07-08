@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-05T19:03:42.2838307	oritech geckolib item models
+// 26.1.2	2026-07-08T19:58:41.4680908	oritech geckolib item models
 ebe6cc3089b2fb38c5228c4662a558eda31fb2b9 assets/oritech/items/assembler_block.json
 7880620321f60a6d87a5714f6e9565b8d52b6daa assets/oritech/items/atomic_forge_block.json
 18b83e6288a84ae5bc6c4b368a7dbd7497128bf4 assets/oritech/items/augment_application_block.json
@@ -31,3 +31,4 @@ b3cd82ae3928773c918a3b0b360f28f33ce239a3 assets/oritech/items/steam_engine_block
 16929253b2cc2c22bab19299b4054c9a8420ae2d assets/oritech/items/tainted_refinery_block.json
 982c425df4c36e6f36a64a7651d72292819c4776 assets/oritech/items/tech_door.json
 d602fb9f77fa1f08215b46f1991713abef4245ed assets/oritech/items/treefeller_block.json
+075cd6387f2307712b320a004e41f8b45c24d3f8 assets/oritech/items/unstable_container.json

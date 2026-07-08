@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -93,6 +94,7 @@ public class ModelGenerator extends ModelProvider {
     );
 
     private static final Set<Item> HAND_AUTHORED_ITEM_DEFINITIONS = Set.of(
+            ItemContent.SMALL_STORAGE_ITEM.get(),
             ItemContent.SMALL_TANK_ITEM.get(),
             ItemContent.CREATIVE_TANK_ITEM.get()
     );
@@ -358,6 +360,11 @@ public class ModelGenerator extends ModelProvider {
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_EXO_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
 
+        itemModelGenerator.itemModelOutput.accept(
+                ItemContent.SMALL_STORAGE_ITEM.get(),
+                ItemModelUtils.plainModel(getBlockModelLocation(ItemContent.SMALL_STORAGE_ITEM.asItem()))
+        );
+
         RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {
             if (HAND_AUTHORED_ITEM_DEFINITIONS.contains(item.asItem()) || GECKOLIB_ITEM_MODELS.contains(item.asItem()))
                 return;
@@ -424,6 +431,11 @@ public class ModelGenerator extends ModelProvider {
 
         var inventory = ModelTemplates.BUTTON_INVENTORY.create(button, mapping, generator.modelOutput);
         generator.registerSimpleItemModel(button, inventory);
+    }
+
+    public static Identifier getBlockModelLocation(Item item) {
+        Identifier key = BuiltInRegistries.ITEM.getKey(item);
+        return key.withPrefix("block/");
     }
 
     // copy of net.minecraft.client.data.models.BlockModelGenerators.createLever
