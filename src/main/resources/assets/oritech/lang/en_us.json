@@ -338,7 +338,7 @@
   "tooltip.oritech.redstone_input_control": "Enables the machine to be disabled via a redstone signal to this addon",
   "title.oritech.redstone_input_control": "Control Input",
   "title.oritech.inventory_proxy": "Machine Inventory Access",
-  "tooltip.oritech.energy_stored": "Stored: %d RF",
+  "tooltip.oritech.energy_stored": "Stored: %d/%d RF",
   "tooltip.oritech.energy_indicator": "%d/%d RF",
   "tooltip.oritech.energy_max_transfer": "Max Transfer Rate: ",
   "tooltip.oritech.energy_transfer_rate": "%d RF/t",

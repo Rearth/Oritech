@@ -33,6 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.ComparatorOutputProvider;
@@ -145,8 +146,10 @@ public class SmallStorageBlock extends Block implements EntityBlock, TooltipProv
         var stack = new ItemStack(BlockContent.SMALL_STORAGE_BLOCK.asItem());
 
         var storageEntity = (SmallStorageBlockEntity) level.getBlockEntity(pos);
+        var capacity = OritechConfig.smallEnergyStorage.energyCapacity.get();
         if (storageEntity.energyStorage.energy > 0) {
-            stack.set(ComponentContent.ENERGY.get(), (int) storageEntity.energyStorage.energy);
+            var itemEnergy = (int) Math.min(storageEntity.energyStorage.energy, capacity) ;
+            stack.set(ComponentContent.ENERGY.get(), itemEnergy);
         }
 
         return stack;
