@@ -3,6 +3,7 @@ package rearth.oritech.api.screen.data;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
@@ -14,6 +15,7 @@ import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.util.ColorHelper;
 
@@ -35,6 +37,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
     private final Supplier<FluidStack> fluidStackSupplier;
     private final List<FluidBurstDroplet> activeDroplets = new ArrayList<>();
     private final Random random = new Random();
+    private TextureAtlasSprite fluidSprite;
     private int fluidColor = 0xFFFFFFFF;
     @Nullable
     private final BlockPos blockPos;
@@ -85,10 +88,8 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
 
         graphics.fill(cx, cy, cx + cw, cy + ch, FLUID_BACKGROUND);
 
-        if (getFillRatio() > 0) {
-            int filledHeight = (int) (ch * getFillRatio());
-            int drawY = cy + (ch - filledHeight);
-            graphics.fill(cx, drawY, cx + cw, cy + ch, fluidColor);
+        if (fluidSprite != null && getFillRatio() > 0) {
+            renderFluidSprite(graphics, cx, cy, cw, ch);
         }
 
         int overlayHeight = (int) (ch * (1f - getFillRatio()) * 0.98f);
@@ -115,6 +116,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         if (stack == null || stack.isEmpty()) {
             return;
         }
+        this.fluidSprite = RenderHelpers.getFluidSprite(stack.getFluid());
         this.fluidColor = ColorHelper.makeOpaque(ColorHelper.getFluidTint(stack));
     }
 
@@ -218,7 +220,45 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
             int minY = Math.max(drawY, y);
             int maxX = Math.min(drawX + drawSize, x + w);
             int maxY = Math.min(drawY + drawSize, y + h);
-            graphics.fill(minX, minY, maxX, maxY, droplet.colorWithAlpha());
+            if (fluidSprite != null) {
+                graphics.blitSprite(
+                        RenderPipelines.GUI_TEXTURED,
+                        fluidSprite,
+                        minX,
+                        minY,
+                        maxX - minX,
+                        maxY - minY,
+                        droplet.colorWithAlpha()
+                );
+            } else {
+                graphics.fill(minX, minY, maxX, maxY, droplet.colorWithAlpha());
+            }
+        }
+    }
+
+    private void renderFluidSprite(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
+        int spriteWidth = Math.max(fluidSprite.contents().width(), 16);
+        int spriteHeight = Math.max(fluidSprite.contents().height(), 16);
+
+        // Draw complete tiles and let the extractor's scissor stack crop the edge tiles. This keeps
+        // their texel scale intact instead of stretching the last row or column to fit the widget.
+        graphics.enableScissor(x, y, x + width, y + height);
+        try {
+            for (int tileY = 0; tileY < height; tileY += spriteHeight) {
+                for (int tileX = 0; tileX < width; tileX += spriteWidth) {
+                    graphics.blitSprite(
+                            RenderPipelines.GUI_TEXTURED,
+                            fluidSprite,
+                            x + tileX,
+                            y + tileY,
+                            spriteWidth,
+                            spriteHeight,
+                            fluidColor
+                    );
+                }
+            }
+        } finally {
+            graphics.disableScissor();
         }
     }
 

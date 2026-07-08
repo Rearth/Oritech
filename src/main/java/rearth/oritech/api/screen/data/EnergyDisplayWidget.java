@@ -31,16 +31,18 @@ public class EnergyDisplayWidget extends AbstractDataDisplayWidget {
             return;
         }
 
-        int drawY = cy + ch - filledHeight;
-        int srcY = REGION_HEIGHT - (int) (REGION_HEIGHT * fillRatio);
-        int srcHeight = REGION_HEIGHT - srcY;
-
-        // foreground
-        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, drawY, 0, srcY, cw, filledHeight, REGION_WIDTH, srcHeight, 98, 96);
+        // Draw the foreground at a stable position and crop the visible part with scissoring.
+        // Changing the source region while the value updates makes the texture appear to crawl.
+        graphics.enableScissor(cx, cy + ch - filledHeight, cx + cw, cy + ch);
+        try {
+            graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, cy, 0, 0, cw, ch, REGION_WIDTH, REGION_HEIGHT, 98, 96);
+        } finally {
+            graphics.disableScissor();
+        }
     }
 
     @Override
     protected boolean applySmoothing() {
-        return false;
+        return this.getCapacity() > 900_000;
     }
 }
