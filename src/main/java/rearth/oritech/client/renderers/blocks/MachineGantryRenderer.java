@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.base.block.FrameInteractionBlock;
@@ -45,6 +46,11 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
     @Override
     public boolean shouldRenderOffScreen() {
         return true;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(FrameInteractionBlockEntity blockEntity) {
+        return AABB.INFINITE;
     }
 
     @Override
@@ -178,7 +184,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
 
             // beam ring
             matrices.pushPose();
-            var ringHeight = Math.sin(Minecraft.getInstance().level.getGameTime() / 4.0);
+            var ringHeight = state.ringHeightSine;
             var heightOffset = state.destroyerBeamHeight * 0.5 * ringHeight + state.destroyerBeamHeight * 0.5;
             matrices.translate(offset.x(), offset.y() - heightOffset + 1, offset.z());
             state.ringBlockState.submit(matrices, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
