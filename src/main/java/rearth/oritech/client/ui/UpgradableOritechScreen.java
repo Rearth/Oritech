@@ -253,7 +253,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         }
 
         if (addonBlocks.isEmpty()) {
-            scroll.addChild(new LabelWidget(12, 0, 190, 10,
+            scroll.addChild(new LabelWidget(12, 3, 190, 10,
                     Component.translatable("title.oritech.machine.no_addons")));
             yOffset = 15;
         }

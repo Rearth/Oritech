@@ -3,6 +3,8 @@ package rearth.oritech.client.init;
 import net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent;
 import rearth.oritech.client.ui.render.BlockPreviewPipRenderer;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
+import rearth.oritech.client.ui.render.LargeItemPipRenderer;
+import rearth.oritech.client.ui.render.LargeItemRenderState;
 
 public final class ClientGuiRenderers {
 
@@ -11,5 +13,6 @@ public final class ClientGuiRenderers {
 
     public static void registerPipRenderers(RegisterPictureInPictureRenderersEvent event) {
         event.register(BlockPreviewRenderState.class, BlockPreviewPipRenderer::new);
+        event.register(LargeItemRenderState.class, LargeItemPipRenderer::new);
     }
 }

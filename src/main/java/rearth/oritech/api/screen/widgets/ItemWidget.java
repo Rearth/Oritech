@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.client.ui.render.LargeItemRenderState;
 
 import java.util.List;
 
@@ -57,11 +58,23 @@ public class ItemWidget extends UIComponent {
 
         int targetSize = Math.min(cw, ch);
         if (targetSize != 16 && targetSize > 0) {
+            int itemX = cx + (cw - targetSize) / 2;
+            int itemY = cy + (ch - targetSize) / 2;
+            graphics.submitPictureInPictureRenderState(new LargeItemRenderState(
+                    stack.copy(),
+                    itemX,
+                    itemY,
+                    itemX + targetSize,
+                    itemY + targetSize,
+                    targetSize,
+                    graphics.pose(),
+                    graphics.peekScissorStack()
+            ));
+
             float scale = targetSize / 16f;
             graphics.pose().pushMatrix();
-            graphics.pose().translate(cx, cy);
+            graphics.pose().translate(itemX, itemY);
             graphics.pose().scale(scale, scale);
-            graphics.item(stack, 0, 0);
             if (showOverlay)
                 graphics.itemDecorations(Minecraft.getInstance().font, stack, 0, 0);
             graphics.pose().popMatrix();

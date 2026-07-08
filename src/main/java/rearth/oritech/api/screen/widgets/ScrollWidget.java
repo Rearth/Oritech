@@ -155,11 +155,10 @@ public class ScrollWidget extends UIComponent {
         int cw = width - innerMargin * 2;
         int ch = height - innerMargin * 2;
 
-        // enableScissor uses GUI coords, not transformed coords — offset by current 2D pose translation
+        // enableScissor already applies the current GUI pose transform. Passing pose-adjusted
+        // coordinates double-offsets nested scroll widgets, which clips their children out.
         var pose = graphics.pose();
-        int offsetX = (int) pose.m20();
-        int offsetY = (int) pose.m21();
-        graphics.enableScissor(cx + offsetX, cy + offsetY, cx + cw + offsetX, cy + ch + offsetY);
+        graphics.enableScissor(cx, cy, cx + cw, cy + ch);
 
         var sorted = new ArrayList<>(children);
         sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));

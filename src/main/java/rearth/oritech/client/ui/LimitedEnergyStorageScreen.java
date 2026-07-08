@@ -14,7 +14,7 @@ import java.util.TreeSet;
 public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnergyStorageScreenHandler> {
 
     public LimitedEnergyStorageScreen(LimitedEnergyStorageScreenHandler handler, Inventory inventory, Component title) {
-        super(handler, inventory, title, 187, 186);
+        super(handler, inventory, title, 176, 186);
         if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) return;
 
         this.backgroundTexture = OritechMachineScreen.BACKGROUND_TALL;
