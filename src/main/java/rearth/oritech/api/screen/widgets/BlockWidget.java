@@ -68,7 +68,8 @@ public class BlockWidget extends UIComponent {
                 delta,
                 cx, cy, cx + cw, cy + ch,
                 scale,
-                null
+                graphics.pose(),
+                graphics.peekScissorStack()
         );
         graphics.submitPictureInPictureRenderState(renderState);
     }
