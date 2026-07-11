@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
@@ -228,6 +229,11 @@ public class PowerPoleCableRenderer implements BlockEntityRenderer<PowerPoleEnti
     @Override
     public boolean shouldRenderOffScreen() {
         return true;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(PowerPoleEntity blockEntity) {
+        return AABB.INFINITE;
     }
 
     public static class CableRenderState extends BlockEntityRenderState {

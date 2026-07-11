@@ -1,8 +1,13 @@
 {
   "required": true,
-  "package": "rearth_neosample.oritech.mixin",
+  "package": "rearth.oritech.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [],
+  "client": [
+    "client.AvatarRenderStateMixin",
+    "client.AvatarRendererMixin",
+    "client.HumanoidModelMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   },

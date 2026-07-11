@@ -64,7 +64,7 @@ public class ZiplineFxHandler {
 
             double wireY = player.getY() + ClientZiplineHandler.HANG_OFFSET + 0.38;
 
-            var vel = player.getDeltaMovement().scale(2.0);
+            var vel = player.getDeltaMovement().scale(1.0);
 
             player.level().addParticle(
                     ParticleTypes.ELECTRIC_SPARK,

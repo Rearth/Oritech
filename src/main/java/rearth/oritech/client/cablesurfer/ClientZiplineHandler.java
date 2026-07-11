@@ -150,12 +150,14 @@ public class ClientZiplineHandler {
         var maxSpeed = OritechClientConfig.maxZiplineSpeed.get().floatValue();
         var acceleration = OritechClientConfig.ziplineAcceleration.get().floatValue();
 
+        var forwardInput = player.input.getMoveVector().y;
+
         // W -> Accelerate
-        if (player.input.hasForwardImpulse()) {
+        if (forwardInput > 0.1) {
             currentSpeed += acceleration * directionMultiplier;
         }
         // S -> Reverse
-        else if (player.input.getMoveVector().y < 0.1) {
+        else if (forwardInput < -0.1) {
             currentSpeed -= acceleration * directionMultiplier;
         }
 
