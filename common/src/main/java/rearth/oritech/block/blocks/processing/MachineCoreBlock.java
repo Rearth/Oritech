@@ -86,10 +86,12 @@ public class MachineCoreBlock extends Block implements EntityBlock {
     @Override
     protected void onExplosionHit(BlockState state, Level world, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> stackMerger) {
         
-        // forward explosion to refinery
         if (state.getValue(USED)) {
             var controller = getControllerPos(world, pos);
             var controllerState = world.getBlockState(controller);
+            onBlockRemoved(state, world, pos);
+            
+            // forward explosion to refinery
             if (controllerState.getBlock() instanceof RefineryBlock refineryBlock) {
                 refineryBlock.onExplosionHit(controllerState, world, controller, explosion, stackMerger);
                 return;
