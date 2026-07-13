@@ -1,0 +1,4 @@
+- Add warning slider to reactor UI
+- Improve auto-feeder augment behaviour (ignores bad food, improves bad food pick order)
+- Fix fluid extraction inconsistencies / issues on neoforge
+- Fix machine cores not handling explosions correctly
