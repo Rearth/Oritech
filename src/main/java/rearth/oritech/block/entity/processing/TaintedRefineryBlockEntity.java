@@ -78,6 +78,8 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     @Override
     protected void workTick() {
 
+        if (!canOutputRecipe(currentRecipe)) return;
+
         try (var transaction = Transaction.openRoot()) {
 
             // since we have a matching recipe, enable energy input again
@@ -92,17 +94,20 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
             progress.set(progress.get() + steps, transaction);
 
-            while (checkCraftingFinished(currentRecipe)) {
+            var effectiveRecipeDuration = Math.round(getRecipeDuration() * getSpeedMultiplier());
+            while (progress.get() >= effectiveRecipeDuration) {
 
                 try (var inner = Transaction.open(transaction)) {
 
                     var crafted = onProgressCompleted(inner);
 
                     if (!crafted) {
+                        // Do not queue work that could not be applied to the current inputs/outputs.
+                        progress.reset(transaction);
                         break;
                     }
 
-                    progress.set(progress.get() - getRecipeDuration(), inner);
+                    progress.set(progress.get() - effectiveRecipeDuration, inner);
                     inner.commit();
                 }
             }

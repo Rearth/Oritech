@@ -89,14 +89,6 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
             }
             return super.extract(amount, transaction);
         }
-
-        @Override
-        public long getMaxExtract() {
-            if (rfOutputOverride > 0) {
-                return rfOutputOverride;
-            }
-            return super.getMaxExtract();
-        }
     };
 
     private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
@@ -140,6 +132,9 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
         }
 
         var available = Math.min(energyStorage.getAmountAsLong(), energyStorage.getMaxExtract());
+        if (rfOutputOverride > 0) {
+            available = Math.min(available, rfOutputOverride);
+        }
 
         try (var transaction = Transaction.openRoot()) {
             var candidate = cachedOutputTarget.getCapability();

@@ -25,11 +25,9 @@ public class PowerPoleScreen extends EnergyStorageScreen<UpgradableOritechScreen
         var isConnected = connectionCount > 0;
         var containedTooltipText = Component.translatable("tooltip.oritech.power_pole_connection_" + (isConnected ? "enabled" : "disabled"));
 
-        // Note: previously this anonymous BlockWidget subclass overrode appleRotation(PoseStack)
-        // to apply a custom -30°/180°/45° XYZ rotation. That hook no longer exists because the
-        // BlockWidget itself was rewritten around a PIP renderer (currently stubbed) for 26.1.
-        var connectedIcon = new BlockWidget(24, 3, 50, BlockContent.TECH_LEVER.get().defaultBlockState().setValue(LeverBlock.POWERED, isConnected));
+        var connectedIcon = new BlockWidget(28, 3, 50, BlockContent.TECH_LEVER.get().defaultBlockState().setValue(LeverBlock.POWERED, isConnected));
         connectedIcon.withTooltip(containedTooltipText);
+        connectedIcon.withRotation(30 - 45, 225 - 45 + 20);
 
         var connectedLabel = new LabelWidget(7, 53, 84, 18,
                 Component.translatable("title.oritech.power_pole_connection_" + (isConnected ? "enabled" : "disabled"), connectionCount))
