@@ -26,10 +26,12 @@ import java.util.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.player.Inventory;
@@ -50,6 +52,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     public static final int VENT_RELATIVE_RATE = OritechConfig.ventRelativeRate.get();
     public static final int MAX_HEAT = OritechConfig.maxHeat.get();
     public static final int MAX_UNSTABLE_TICKS = OritechConfig.maxUnstableTicks.get();
+    public static final int DEFAULT_WARNING_HEAT_THRESHOLD = (int) (MAX_HEAT * 0.8f);
     
     private final HashMap<Vector2i, BaseReactorBlock> activeComponents = new HashMap<>();   // 2d local position on the first layer containing the reactor blocks
     private final HashMap<Vector2i, ReactorFuelPortEntity> fuelPorts = new HashMap<>();     // same grid, but contains a reference to the port at the ceiling
@@ -63,6 +66,9 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     
     @SyncField(SyncType.GUI_TICK)
     public SimpleEnergyStorage energyStorage = new SimpleEnergyStorage(0, OritechConfig.reactorMaxEnergyStored.get(), OritechConfig.reactorMaxEnergyStored.get(), this::setChanged);
+
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    public int warningHeatThreshold = DEFAULT_WARNING_HEAT_THRESHOLD;
     
     public boolean active = false;
     
@@ -236,7 +242,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         if (activeRods > 0)
             playAmbientSound();
         
-        if (activeRods > 0 && hottestHeat > MAX_HEAT * 0.8f) {
+        if (activeRods > 0 && hottestHeat > warningHeatThreshold) {
             playWarningSound();
         }
         
@@ -270,6 +276,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         nbt.putLong("energy_stored", energyStorage.getAmount());
         nbt.putBoolean("was_active", active);
         nbt.putBoolean("redstone_disabled", disabledViaRedstone);
+        nbt.putInt("warning_heat_threshold", warningHeatThreshold);
         
     }
     
@@ -280,6 +287,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
         energyStorage.setAmount(nbt.getLong("energy_stored"));
         doAutoInit = nbt.getBoolean("was_active");
         disabledViaRedstone = nbt.getBoolean("redstone_disabled");
+        warningHeatThreshold = nbt.contains("warning_heat_threshold") ? nbt.getInt("warning_heat_threshold") : DEFAULT_WARNING_HEAT_THRESHOLD;
     }
     
     private void playMeltdownAnimation(BlockPos port) {
@@ -594,5 +602,24 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     
     public record ComponentStatistics(short receivedPulses, int storedHeat, short heatChanged) {
         public static final ComponentStatistics EMPTY = new ComponentStatistics((short) 0, -1, (short) 0);
+    }
+
+    public static void handleWarningThresholdPacket(WarningThresholdPacket payload, Player user, RegistryAccess registryAccess) {
+        var level = user.level();
+        if (level == null) return;
+        var blockEntity = level.getBlockEntity(payload.position());
+        if (!(blockEntity instanceof ReactorControllerBlockEntity reactorEntity)) return;
+
+        reactorEntity.warningHeatThreshold = Math.max(0, payload.threshold());
+        reactorEntity.setChanged();
+    }
+
+    public record WarningThresholdPacket(BlockPos position, int threshold) implements CustomPacketPayload {
+        public static final CustomPacketPayload.Type<WarningThresholdPacket> PACKET_ID = new CustomPacketPayload.Type<>(Oritech.id("reactor_warning_threshold"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
     }
 }
