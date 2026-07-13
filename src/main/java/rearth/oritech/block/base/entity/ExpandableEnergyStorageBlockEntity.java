@@ -89,6 +89,14 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
             }
             return super.extract(amount, transaction);
         }
+
+        @Override
+        public long getMaxExtract() {
+            if (rfOutputOverride > 0) {
+                return rfOutputOverride;
+            }
+            return super.getMaxExtract();
+        }
     };
 
     private BlockCapabilityCache<EnergyHandler, Direction> cachedOutputTarget;
@@ -139,7 +147,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
                 var inserted = candidate.insert((int) available, transaction);
                 if (inserted <= 0) return;
 
-                energyStorage.internalExtract(inserted, transaction);
+                energyStorage.extract(inserted, transaction);
                 transaction.commit();
             }
         }
