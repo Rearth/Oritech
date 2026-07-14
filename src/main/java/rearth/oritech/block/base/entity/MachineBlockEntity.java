@@ -87,6 +87,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     protected int energyPerTick;
 
     private long lastChangedAt = 0;  // used to check if anything happened in the last tick, to avoid unneeded calculations and updates
+    private boolean initialRecipeLookup = true;
 
     // cache for sided inventory access
     private final Map<Direction, ResourceHandler<ItemResource>> sidedInventories = new HashMap<>(); // only for sided input mode
@@ -111,6 +112,14 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
         if (!isAssembled(state) || disabledViaRedstone) return;
 
+        var preserveLoadedProgress = initialRecipeLookup;
+        if (initialRecipeLookup) {
+            // Block entities are deserialized before their level is assigned, so setChanged() cannot update
+            // lastChangedAt while loading. Force one lookup after the machine becomes active again.
+            lastChangedAt = serverLevel.getGameTime();
+            initialRecipeLookup = false;
+        }
+
         var lastRecipe = currentRecipe;
         currentRecipe = findActiveRecipe();
         if (currentRecipe.isEmpty()) {
@@ -123,8 +132,13 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             return;
         }
 
-        if (lastRecipe != currentRecipe)
+        if (lastRecipe != currentRecipe) {
+            var loadedProgress = progress.get();
             resetProgress();
+            if (preserveLoadedProgress && lastRecipe.isEmpty()) {
+                progress.set(loadedProgress);
+            }
+        }
 
         workTick();
     }
@@ -185,7 +199,8 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         if (recipeInput.isEmpty()) return OritechRecipe.EMPTY.get();
 
         // existing recipe matches (if non-empty)
-        if (!currentRecipe.isEmpty() && currentRecipe.matches(recipeInput, level)) return currentRecipe;
+        if (!currentRecipe.isEmpty() && currentRecipe.recipeType() == type && currentRecipe.matches(recipeInput, level))
+            return currentRecipe;
 
         // return a potential match, or empty
         var recipeCandidate = serverLevel.recipeAccess().getRecipeFor(type, recipeInput, level);
@@ -279,7 +294,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var outputInventory = inventory.getOutputContainer();
 
         try (var simulated = Transaction.openRoot()) {
-            for (var result : recipe.itemResults()) {
+            for (var result : getCraftingResults(recipe)) {
                 var inserted = outputInventory.insert(ItemResource.of(result), result.count(), simulated);
                 if (inserted != result.count()) return false;
             }
@@ -635,14 +650,17 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         public int insert(ItemResource resource, int amount, TransactionContext transaction) {
 
             if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+                var slots = getSlotAssignments();
+                if (amount <= 0 || slots.inputCount() <= 0) return 0;
+
                 var remaining = amount;
-                var amountPerSlot = amount / getSlotAssignments().inputCount();
+                var amountPerSlot = amount / slots.inputCount();
                 amountPerSlot = Math.clamp(amountPerSlot, 1, remaining);
 
                 // start at slot with fewest items
-                var lowestSlot = 0;
+                var lowestSlot = slots.inputStart();
                 var lowestSlotCount = Integer.MAX_VALUE;
-                for (int i = getSlotAssignments().inputStart(); i < getSlotAssignments().inputStart() + getSlotAssignments().inputCount(); i++) {
+                for (int i = slots.inputStart(); i < slots.inputStart() + slots.inputCount(); i++) {
                     var content = stacks.get(i);
                     if (!content.isEmpty() && !resource.is(content.getItem()))
                         continue;    // skip slots containing other items
@@ -653,8 +671,10 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
                 }
 
                 // actually fill slots, starting with most empty one
-                for (var slot = 0; slot < this.size() && remaining > 0; slot++) {
-                    remaining -= super.insert((slot + lowestSlot) % this.size(), resource, amountPerSlot, transaction);
+                var lowestInputOffset = lowestSlot - slots.inputStart();
+                for (var slot = 0; slot < slots.inputCount() && remaining > 0; slot++) {
+                    var inputSlot = slots.inputStart() + (slot + lowestInputOffset) % slots.inputCount();
+                    remaining -= super.insert(inputSlot, resource, amountPerSlot, transaction);
                 }
 
                 return amount - remaining;
@@ -667,7 +687,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         @Override
         public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
 
-            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY)) {
+            if (inventoryInputMode.equals(InventoryInputMode.FILL_EVENLY) && getSlotAssignments().isInput(index)) {
                 return insert(resource, amount, transaction);
             }
 

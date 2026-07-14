@@ -210,7 +210,7 @@ public class RecipeGenerator extends RecipeProvider {
         // lava
         new RefineryRecipeBuilder(this.registries)
                 .fluidInput(Fluids.LAVA)
-                .fluidOutput(FluidContent.STILL_STEAM.get(), 4_000)
+                .fluidOutput(FluidContent.STILL_STEAM.get(), 4f)
                 .fluidOutput(FluidContent.STILL_SULFURIC_ACID.get(), 0.1f)
                 .fluidOutput(FluidContent.STILL_SHEOL_FIRE.get(), 0.2f)
                 .export(exporter, "lava");

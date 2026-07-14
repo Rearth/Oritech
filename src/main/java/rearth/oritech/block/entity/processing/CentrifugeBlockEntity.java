@@ -231,7 +231,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     @Override
     public ResourceHandler<FluidResource> getFluidLookup(@Nullable Direction direction) {
         if (!hasFluidAddon) return null;
-        return fluidContainer.getInputContainer();
+        return fluidContainer.getExternalAccess();
     }
 
     @Override

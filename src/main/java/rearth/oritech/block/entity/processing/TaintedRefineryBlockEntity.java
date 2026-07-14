@@ -115,6 +115,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
             transaction.commit();
             setChanged();
             onProgressed();
+            lastWorkedAt = level.getGameTime();
         }
 
 

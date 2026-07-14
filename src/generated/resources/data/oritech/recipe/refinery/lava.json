@@ -6,7 +6,7 @@
   },
   "fluidOutputs": [
     {
-      "amount": 4000000,
+      "amount": 4000,
       "id": "oritech:still_steam"
     },
     {
