@@ -77,7 +77,11 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R e
         var data = renderPassInfo.getGeckolibData(FLUID_DATA);
         if (data == null) return;
 
-        SmallTankRenderer.submitFluidCubes(renderTasks, renderPassInfo.poseStack(), data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        var poseStack = renderPassInfo.poseStack();
+        poseStack.pushPose();
+        poseStack.last().set(renderPassInfo.getModelRenderMatrixPose());
+        SmallTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
     }
 
     private FluidCube buildCube(Vector3f min, Vector3f size, FluidStack drawnStack, long tankCapacity, int index, VisualTankHeights lastHeight) {

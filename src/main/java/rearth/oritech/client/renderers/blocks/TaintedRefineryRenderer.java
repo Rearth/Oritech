@@ -66,7 +66,11 @@ public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRende
         var data = renderPassInfo.getGeckolibData(FLUID_DATA);
         if (data == null) return;
 
-        SmallTankRenderer.submitFluidCubes(renderTasks, renderPassInfo.poseStack(), data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        var poseStack = renderPassInfo.poseStack();
+        poseStack.pushPose();
+        poseStack.last().set(renderPassInfo.getModelRenderMatrixPose());
+        SmallTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
     }
 
     private static FluidCube buildCube(Vector3f min, Vector3f size, FluidStack drawnStack, long tankCapacity, @Nullable Quaternionf rotation) {

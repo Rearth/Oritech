@@ -57,7 +57,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final SimpleFluidStorage nodeB = new SimpleFluidStorage(4 * FluidType.BUCKET_VOLUME, this::setChanged);
 
-    @SyncField(SyncType.GUI_OPEN)
+    @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN, SyncType.SPARSE_TICK, SyncType.INITIAL})
     private int moduleCount;    // range 0-2
 
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
