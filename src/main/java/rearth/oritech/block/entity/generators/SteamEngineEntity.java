@@ -134,7 +134,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
 
             transaction.commit();
             // clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
-            clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) consumedCount, slaves.size());
+            clientStats = new SteamEngineSyncPacket(worldPosition, speed, energyEfficiency, (long) energyProduced, (long) (consumedCount / STEAM_AMOUNT_MULTIPLIER), slaves.size());
         }
 
         spawnParticles();
