@@ -190,7 +190,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         float thickness = (float) (0.03f + Math.sin((laserEntity.getLevel().getGameTime() + partialTick) * 0.3) * 0.015f);
         var facing = laserEntity.getBlockState().getValue(BlockStateProperties.FACING);
         var beamStart = Vec3.atCenterOf(laserEntity.getBlockPos())
-                .add(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(BEAM_START_DISTANCE));
+                .add(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(1.15));
         var blockOrigin = Vec3.atLowerCornerOf(laserEntity.getBlockPos());
         var localStart = beamStart.subtract(blockOrigin);
         var deltaVec = targetPos.subtract(beamStart);
