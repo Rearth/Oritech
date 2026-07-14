@@ -282,7 +282,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("base_controller", "setup");
+        triggerAnim("machine", "setup");
     }
 
     @Override
@@ -340,6 +340,7 @@ public class DeepDrillEntity extends NetworkedBlockEntity implements EnergyProvi
         });
         controller.setSoundKeyframeHandler(new MachineSoundHandler<>());
         controller.triggerableAnim("setup", SETUP);
+        controller.receiveTriggeredAnimations();
         return controller;
     }
 

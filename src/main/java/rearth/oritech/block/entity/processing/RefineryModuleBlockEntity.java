@@ -156,7 +156,7 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("base_controller", "setup");
+        triggerAnim("machine", "setup");
     }
 
     @Override
@@ -185,7 +185,9 @@ public class RefineryModuleBlockEntity extends NetworkedBlockEntity implements M
             } else {
                 return state.setAndContinue(PACKAGED);
             }
-        }).setSoundKeyframeHandler(new MachineSoundHandler<RefineryModuleBlockEntity>()).triggerableAnim("setup", SETUP);
+        }).setSoundKeyframeHandler(new MachineSoundHandler<RefineryModuleBlockEntity>())
+                .triggerableAnim("setup", SETUP)
+                .receiveTriggeredAnimations();
     }
 
     public boolean isActive(BlockState state) {

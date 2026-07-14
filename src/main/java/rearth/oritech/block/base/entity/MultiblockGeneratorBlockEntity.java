@@ -88,6 +88,6 @@ public abstract class MultiblockGeneratorBlockEntity extends UpgradableGenerator
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("base_controller", "setup");
+        triggerAnim("machine", "setup");
     }
 }

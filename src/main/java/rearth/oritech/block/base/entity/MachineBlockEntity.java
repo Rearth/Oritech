@@ -323,14 +323,19 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>("machine", 5, this::onAnimationUpdate)
                 .triggerableAnim("setup", SETUP)
+                .receiveTriggeredAnimations()
                 .setSoundKeyframeHandler(new MachineSoundHandler<>(this::getAnimationSpeed)));
     }
 
     public PlayState onAnimationUpdate(AnimationTest<MachineBlockEntity> state) {
 
-        state.setControllerSpeed(getAnimationSpeed());
+        if (state.isCurrentAnimation(SETUP)) {
+            state.setControllerSpeed(1);
+            if (!state.controller().hasAnimationFinished()) return PlayState.CONTINUE;
+            state.controller().stopTriggeredAnimation();
+        }
 
-        if (state.controller().isPlayingTriggeredAnimation()) return PlayState.CONTINUE;
+        state.setControllerSpeed(getAnimationSpeed());
 
         if (isAssembled(getBlockState())) {
             if (isActivelyWorking()) {
@@ -348,9 +353,9 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
 
     protected float getAnimationSpeed() {
-        if (getRecipeDuration() < 0) return 1;
+        if (getRecipeDuration() <= 0) return 1;
         var recipeTicks = getRecipeDuration() * getSpeedMultiplier();
-        return (getAnimationDuration() / recipeTicks) * 0.99f;
+        return (getAnimationDuration() / recipeTicks);
     }
 
     public int getAnimationDuration() {

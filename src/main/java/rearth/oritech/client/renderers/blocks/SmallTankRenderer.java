@@ -74,25 +74,23 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity, S
         collector.submitCustomGeometry(poseStack, Sheets.translucentBlockSheet(), (pose, consumer) -> {
             for (var direction : Direction.values()) {
                 if (direction.equals(Direction.DOWN)) continue; // skip bottom, as it's never visible
-                drawQuad(direction, consumer, pose.pose(), pose, sprite, color, light, overlay);
+                drawQuad(direction, consumer, pose.pose(), pose, sprite, color, light, overlay, fill);
             }
         });
 
         poseStack.popPose();
     }
 
-    public static void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, PoseStack.Pose normalMatrix, TextureAtlasSprite sprite, int color, int light, int overlay) {
-        // Define the vertices of the quad based on the direction it's facing
-
+    public static void drawQuad(Direction direction, VertexConsumer consumer, Matrix4f modelMatrix, PoseStack.Pose normalMatrix,
+                                TextureAtlasSprite sprite, int color, int light, int overlay, float fill) {
         var normal = direction.step();
-
         var positions = getQuadVerticesByDirection(direction);
+        var verticalSpan = direction.getAxis() == Direction.Axis.Y ? 1 : fill;
 
         for (int i = positions.length - 1; i >= 0; i--) {
-
             var pos = positions[i];
-            var u = sprite.getU(getFrameU()[i]);
-            var v = sprite.getV(getFrameV()[i]);
+            var u = sprite.getU(i == 1 || i == 2 ? 1 : 0);
+            var v = sprite.getV(i >= 2 ? verticalSpan : 0);
 
             consumer.addVertex(modelMatrix, pos[0], pos[1], pos[2])
                     .setColor(color)
@@ -102,14 +100,6 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity, S
                     .setNormal(normalMatrix, normal.x, normal.y, normal.z);
         }
 
-    }
-
-    private static float[] getFrameU() {
-        return new float[]{0, 1, 1, 0};
-    }
-
-    private static float[] getFrameV() {
-        return new float[]{0, 0, 1, 1};
     }
 
     private static float[][] getQuadVerticesByDirection(Direction direction) {
@@ -194,7 +184,7 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity, S
             collector.submitCustomGeometry(poseStack, Sheets.translucentBlockSheet(), (pose, consumer) -> {
                 for (Direction direction : Direction.values()) {
                     if (direction.equals(Direction.DOWN)) continue; // skip bottom, as it's never visible
-                    drawQuad(direction, consumer, pose.pose(), pose, sprite, color, light, overlay);
+                    drawQuad(direction, consumer, pose.pose(), pose, sprite, color, light, overlay, cube.fill());
                 }
             });
 

@@ -90,6 +90,7 @@ public abstract class UpgradableGeneratorBlockEntity extends UpgradableMachineBl
             }
 
             transaction.commit();
+            lastWorkedAt = level.getGameTime();
             setChanged();
 
         }

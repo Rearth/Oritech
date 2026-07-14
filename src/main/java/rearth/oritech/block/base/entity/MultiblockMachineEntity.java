@@ -94,6 +94,6 @@ public abstract class MultiblockMachineEntity extends UpgradableMachineBlockEnti
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("base_controller", "setup");
+        triggerAnim("machine", "setup");
     }
 }
