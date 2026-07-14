@@ -15,7 +15,7 @@ public class ModRenderers {
         event.registerBlockEntityRenderer(BlockEntitiesContent.ASSEMBLER_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/assembler_block", false));
         event.registerBlockEntityRenderer(BlockEntitiesContent.FOUNDRY_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/foundry_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.COOLER_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/cooler_block"));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.CENTRIFUGE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/centrifuge_block"));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.CENTRIFUGE_ENTITY.get(), ctx -> new CentrifugeRenderer<>(ctx, "models/centrifuge_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.ATOMIC_FORGE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/atomic_forge_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.POWERED_FURNACE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/powered_furnace_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY_ENTITY.get(), ctx -> new RefineryRenderer<>(ctx, "models/refinery_block"));

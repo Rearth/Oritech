@@ -37,7 +37,7 @@ import java.util.List;
 
 public class CentrifugeBlockEntity extends MultiblockMachineEntity implements FluidProvider {
 
-    @SyncField({SyncType.GUI_TICK, SyncType.INITIAL, SyncType.GUI_OPEN})
+    @SyncField({SyncType.TICK, SyncType.GUI_TICK, SyncType.INITIAL, SyncType.GUI_OPEN})
     public final InOutFluidStorage fluidContainer = new InOutFluidStorage((int) (OritechConfig.processingMachines.centrifugeData.tankSizeInBuckets.get() * FluidType.BUCKET_VOLUME), this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
 
     @SyncField({SyncType.GUI_OPEN, SyncType.INITIAL})
