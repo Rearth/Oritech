@@ -4,6 +4,8 @@ import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.state.AnimationTest;
 import com.geckolib.util.GeckoLibUtil;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
@@ -135,7 +137,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     // working data
     private BlockPos targetDirection;
 
-    @SyncField
+    @SyncField({SyncType.INITIAL, SyncType.TICK})
     private BlockPos currentTarget = BlockPos.ZERO;
     @SyncField
     public HunterTargetMode hunterTargetMode = HunterTargetMode.HOSTILE_ONLY;
@@ -152,6 +154,8 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
 
     // needed only on client
     public Vec3 lastRenderPosition;
+    public float lastLaserRotX;
+    public float lastLaserRotY;
     private Player laserPlayerEntity = null;
 
     public LaserArmBlockEntity(BlockPos pos, BlockState state) {
@@ -740,33 +744,39 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
     }
 
     private AnimationController<LaserArmBlockEntity> getAnimationController() {
-        return new AnimationController<LaserArmBlockEntity>("machine", state -> {
-
-            if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
-                if (state.controller().hasAnimationFinished()) {
-                    state.setAndContinue(MachineBlockEntity.IDLE);
-                } else {
-                    return state.setAndContinue(MachineBlockEntity.SETUP);
-                }
-            }
-
-            if (isActive(getBlockState())) {
-                if (isFiring()) {
-                    return state.setAndContinue(MachineBlockEntity.WORKING);
-                } else {
-                    return state.setAndContinue(MachineBlockEntity.IDLE);
-                }
-            } else {
-                return state.setAndContinue(MachineBlockEntity.PACKAGED);
-            }
-        }).triggerableAnim("setup", MachineBlockEntity.SETUP)
-                .receiveTriggeredAnimations()
+        return new AnimationController<>("machine", this::onAnimationUpdate)
                 .setSoundKeyframeHandler(new MachineSoundHandler<>());
+    }
+
+    private PlayState onAnimationUpdate(AnimationTest<LaserArmBlockEntity> state) {
+        var controller = state.controller();
+        var active = isActive(getBlockState());
+
+        if (!active) {
+            return state.setAndContinue(MachineBlockEntity.PACKAGED);
+        }
+
+        // An in-world assembly changes the existing entity from packaged to active. A loaded
+        // assembled entity has no current animation yet and therefore starts directly in idle.
+        if (state.isCurrentAnimation(MachineBlockEntity.PACKAGED)) {
+            return state.setAndContinue(MachineBlockEntity.SETUP);
+        }
+
+        if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
+            state.setControllerSpeed(1);
+            if (controller.isAnimatingBones()) return PlayState.CONTINUE;
+        }
+
+        if (isFiring()) {
+            return state.setAndContinue(MachineBlockEntity.WORKING);
+        }
+
+        return state.setAndContinue(MachineBlockEntity.IDLE);
     }
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("machine", "setup");
+        // The laser setup animation is driven by the synced ASSEMBLED blockstate transition.
     }
 
     @Override

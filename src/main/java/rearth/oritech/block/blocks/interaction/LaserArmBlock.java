@@ -119,7 +119,6 @@ public class LaserArmBlock extends Block implements EntityBlock, TooltipProvider
 
             // first time created
             if (isAssembled && !wasAssembled) {
-                laserArm.triggerSetupAnimation();
                 laserArm.initAddons();
                 return InteractionResult.SUCCESS;
             }

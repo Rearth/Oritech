@@ -2,9 +2,9 @@ package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoBlockRenderer;
+import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
-import com.geckolib.renderer.base.BoneSnapshots;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -18,6 +18,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
@@ -29,14 +30,16 @@ import rearth.oritech.util.Geometry;
 import java.util.HashMap;
 import java.util.Objects;
 
-import static net.minecraft.core.Direction.*;
-
 public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<LaserArmBlockEntity, R> {
 
     private Vec3 lastActivePlayerPos = Vec3.ZERO;
     private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
 
     public static final DataTicket<org.joml.Vector2f> LASER_ANGLES = DataTicket.create("laser_angles", org.joml.Vector2f.class);
+
+    public AABB getRenderBoundingBox(LaserArmBlockEntity blockEntity) {
+        return AABB.INFINITE;
+    }
 
     private Vec3 getOffsetByDrillId(long id, LaserArmBlockEntity laserEntity) {
         return drillOffsets.computeIfAbsent(id, s -> {
@@ -68,7 +71,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
     }
 
     public static final Identifier BEAM_TEXTURE = Identifier.withDefaultNamespace("textures/block/white_concrete.png");
-    private static final Vec3 BEAM_START_OFFSET = new Vec3(0, 1.65, 0);
+    private static final double BEAM_START_DISTANCE = 1.65;
 
     public static final int GLOW_COLOR_START = 0x998AF2DF;
     public static final int GLOW_COLOR_END = 0x99135B50;
@@ -151,14 +154,14 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
 
             angleX -= 47.5 * Geometry.DEG_TO_RAD; //to offset for parent bone rotations
 
-            renderState.addGeckolibData(LASER_ANGLES, new org.joml.Vector2f((float) angleX, angleY));
+            laserEntity.lastLaserRotX = LaserArmModel.lerp(laserEntity.lastLaserRotX, (float) angleX, 0.06f);
+            laserEntity.lastLaserRotY = LaserArmModel.lerp(laserEntity.lastLaserRotY, angleY, 0.06f);
+            renderState.addGeckolibData(LASER_ANGLES, new org.joml.Vector2f(laserEntity.lastLaserRotX, laserEntity.lastLaserRotY));
         }
 
         if (laserEntity.getCurrentTarget() == null || !laserEntity.isFiring()) return;
 
-        var facing = laserEntity.getBlockState().getValue(BlockStateProperties.FACING);
         var startPos = laserEntity.laserHead;
-        var startOffset = new Vec3(0, 1.65f, 0);
 
         var targetPos = laserEntity.getVisualTarget();
         var targetBlock = laserEntity.getLevel().getBlockState(laserEntity.getCurrentTarget()).getBlock();
@@ -177,8 +180,6 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         targetPos = lerp(laserEntity.lastRenderPosition, targetPos, 0.06f);
         laserEntity.lastRenderPosition = targetPos;
 
-        var targetPosOffset = worldToOffsetPosition(facing, targetPos, startPos).add(startOffset);
-
         var forward = targetPos.subtract(startPos).normalize();
         if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().getRandom().nextFloat() > 0.7) {
             var level = laserEntity.getLevel();
@@ -187,9 +188,16 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         }
 
         float thickness = (float) (0.03f + Math.sin((laserEntity.getLevel().getGameTime() + partialTick) * 0.3) * 0.015f);
-        var deltaVec = targetPosOffset.subtract(startOffset);
+        var facing = laserEntity.getBlockState().getValue(BlockStateProperties.FACING);
+        var beamStart = Vec3.atCenterOf(laserEntity.getBlockPos())
+                .add(Vec3.atLowerCornerOf(facing.getUnitVec3i()).scale(BEAM_START_DISTANCE));
+        var blockOrigin = Vec3.atLowerCornerOf(laserEntity.getBlockPos());
+        var localStart = beamStart.subtract(blockOrigin);
+        var deltaVec = targetPos.subtract(beamStart);
 
-        renderState.addGeckolibData(BEAM_DATA, new LaserBeamData(BEAM_START_OFFSET, deltaVec, thickness));
+        // postRenderPass runs after GeckoLib has popped the model-facing transform. Store the
+        // beam in block-local world axes so wall and ceiling mounted lasers still point correctly.
+        renderState.addGeckolibData(BEAM_DATA, new LaserBeamData(localStart, deltaVec, thickness));
     }
 
     @Override
@@ -265,30 +273,6 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         return a + f * (b - a);
     }
 
-    private static Vec3 worldToOffsetPosition(Direction facing, Vec3 worldTarget, Vec3 ownPos) {
-        Vec3 relativeWorld = worldTarget.subtract(ownPos);
-
-        double relX = relativeWorld.x();
-        double relY = relativeWorld.y();
-        double relZ = relativeWorld.z();
-
-        if (Objects.requireNonNull(facing) == NORTH) {
-            return new Vec3(relX, -relZ, relY);
-        } else if (facing == SOUTH) {
-            return new Vec3(relX, relZ, -relY);
-        } else if (facing == WEST) {
-            return new Vec3(relY, -relX, relZ);
-        } else if (facing == EAST) {
-            return new Vec3(-relY, relX, relZ);
-        } else if (facing == UP) {
-            return new Vec3(relX, relY, relZ);
-        } else if (facing == DOWN) {
-            return new Vec3(relX, -relY, -relZ);
-        }
-        throw new IllegalArgumentException();
-
-    }
-
     @Override
     public void adjustModelBonesForRender(RenderPassInfo<R> renderPassInfo, BoneSnapshots boneSnapshots) {
         super.adjustModelBonesForRender(renderPassInfo, boneSnapshots);
@@ -299,17 +283,8 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         var targetAngleX = angles.x();
         var targetAngleY = angles.y();
 
-        boneSnapshots.ifPresent("pivotX", snapshot -> {
-            var lastRotX = snapshot.getRotX();
-            var newRotX = LaserArmModel.lerp(lastRotX, targetAngleX, 0.06f);
-            snapshot.setRotX(newRotX);
-        });
-
-        boneSnapshots.ifPresent("pivotY", snapshot -> {
-            var lastRotY = snapshot.getRotY();
-            var newRotY = LaserArmModel.lerp(lastRotY, targetAngleY, 0.06f);
-            snapshot.setRotY(newRotY);
-        });
+        boneSnapshots.ifPresent("pivotX", snapshot -> snapshot.setRotX(targetAngleX));
+        boneSnapshots.ifPresent("pivotY", snapshot -> snapshot.setRotY(targetAngleY));
     }
 
     public static class LaserBeamData {
