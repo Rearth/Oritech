@@ -66,6 +66,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
 
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+    private boolean initialAnimation = true;
 
     // synced data
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK})
@@ -117,7 +118,13 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
             return;
         }
 
-        if (lastRecipe != currentRecipe || !canOutputRecipe(currentRecipe)) resetProgress();
+        if(!canOutputRecipe(currentRecipe)) {
+            resetProgress();
+            return;
+        }
+
+        if (lastRecipe != currentRecipe)
+            resetProgress();
 
         workTick();
     }
@@ -321,23 +328,37 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-        controllers.add(new AnimationController<>("machine", 5, this::onAnimationUpdate)
+        controllers.add(new AnimationController<>("machine", 0, this::onAnimationUpdate)
                 .triggerableAnim("setup", SETUP)
                 .receiveTriggeredAnimations()
                 .setSoundKeyframeHandler(new MachineSoundHandler<>(this::getAnimationSpeed)));
     }
 
     public PlayState onAnimationUpdate(AnimationTest<MachineBlockEntity> state) {
+        var controller = state.controller();
+        var assembled = isAssembled(getBlockState());
+
+        // Start directly in the correct pose, then blend all subsequent animation changes.
+        if (initialAnimation) {
+            initialAnimation = false;
+        } else {
+            controller.setTransitionTicks(5);
+        }
 
         if (state.isCurrentAnimation(SETUP)) {
+            if (!assembled) {
+                controller.stopTriggeredAnimation();
+                return state.setAndContinue(PACKAGED);
+            }
+
             state.setControllerSpeed(1);
-            if (!state.controller().hasAnimationFinished()) return PlayState.CONTINUE;
-            state.controller().stopTriggeredAnimation();
+            if (!controller.hasAnimationFinished()) return PlayState.CONTINUE;
+            controller.stopTriggeredAnimation();
         }
 
         state.setControllerSpeed(getAnimationSpeed());
 
-        if (isAssembled(getBlockState())) {
+        if (assembled) {
             if (isActivelyWorking()) {
                 return state.setAndContinue(WORKING);
             } else {

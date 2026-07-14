@@ -33,8 +33,12 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
 
     @Override
     protected boolean createCraftingOutputs(Transaction transaction) {
+        var initialSuccess = super.createCraftingOutputs(transaction);
+        if (!initialSuccess) return false;
+
         PulverizerBlockEntity.CombineSmallDusts(transaction, level, inventory.getOutputContainer());
-        return super.createCraftingOutputs(transaction);
+
+        return true;
     }
 
     public static void CombineSmallDusts(Transaction transaction, Level level, ResourceHandler<ItemResource> outputInventory) {
