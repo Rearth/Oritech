@@ -259,9 +259,14 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
 
         // yes, this will discard items that wont fit anymore
         try (var transaction = Transaction.openRoot()) {
+
+            var inserted = 0;
+
             for (var stack : dropped) {
-                this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
+                inserted += this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
             }
+
+            if (inserted > 0) transaction.commit();
         }
 
         try {
