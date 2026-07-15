@@ -255,8 +255,11 @@ public class DronePortEntity extends NetworkedBlockEntity
                 var inserted = fluidStorage.insertFromDrone(FluidResource.of(incomingPacket.movedFluid), incomingPacket.movedFluid.amount(), transaction);
                 if (inserted != incomingPacket.movedFluid().amount()) {
                     Oritech.LOGGER.warn("Drone failed to insert correct fluid amount. This should never happen! At: {}", worldPosition.toShortString());
+                    return;
                 }
             }
+
+            transaction.commit();
 
             receivingPackage = false;
             incomingPacket = null;
