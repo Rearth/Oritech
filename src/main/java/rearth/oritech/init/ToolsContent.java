@@ -28,6 +28,8 @@ import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
+import rearth.oritech.item.other.PortableTankFluidHandler;
+import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.item.tools.ElectricMaceItem;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.armor.*;
@@ -214,6 +216,9 @@ public class ToolsContent {
                 Capabilities.Fluid.ITEM,
                 (stack, itemAccess) -> {
                     var tool = (FluidProvider.Item) stack.getItem();
+                    if (stack.getItem() instanceof SmallFluidTankBlockItem) {
+                        return new PortableTankFluidHandler(itemAccess, tool.getFluidCapacity());
+                    }
                     return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getFluidCapacity());
                 },
                 JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.SMALL_TANK_ITEM, ItemContent.CREATIVE_TANK_ITEM
