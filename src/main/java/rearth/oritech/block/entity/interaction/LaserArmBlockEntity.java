@@ -46,7 +46,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
@@ -293,7 +292,7 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             return null;
 
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME));
+            laserPlayerEntity = new LaserMachinePlayer(serverLevel, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
             laserPlayerEntity.setPos(Vec3.atLowerCornerOf(getBlockPos()));
         }
 

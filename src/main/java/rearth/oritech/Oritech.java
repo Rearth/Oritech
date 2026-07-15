@@ -45,6 +45,7 @@ import rearth.oritech.item.tools.armor.ExoArmorItem;
 import rearth.oritech.item.tools.harvesting.PromethiumAxeItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
+import rearth.oritech.util.LaserMachinePlayer;
 import rearth.oritech.util.ServerZiplineHandler;
 
 // todos: compostables
@@ -73,6 +74,8 @@ public final class Oritech {
         neoEventBus.addListener(this::onPlayerMinedEvent);
         neoEventBus.addListener(this::onPlayerDamaged);
         neoEventBus.addListener(this::onEquipmentChanged);
+        neoEventBus.addListener(LaserMachinePlayer::collectDrops);
+        neoEventBus.addListener(LaserMachinePlayer::suppressExperienceDrops);
 
         // registration events
         modEventBus.addListener(this::commonSetup);

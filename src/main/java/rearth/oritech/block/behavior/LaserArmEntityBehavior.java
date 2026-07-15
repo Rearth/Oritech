@@ -31,7 +31,7 @@ public class LaserArmEntityBehavior {
         if (level.getGameTime() % 10 != 0) return true; // entities can only be damaged twice per second?
 
         entity.hurt(
-                level.damageSources().source(DamageTypes.LIGHTNING_BOLT),
+                level.damageSources().source(DamageTypes.LIGHTNING_BOLT, laserEntity.getLaserPlayerEntity()),
                 laserEntity.getDamageTick());
 
 
