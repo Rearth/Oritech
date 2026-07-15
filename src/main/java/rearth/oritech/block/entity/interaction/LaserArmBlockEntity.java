@@ -512,10 +512,11 @@ public class LaserArmBlockEntity extends NetworkedBlockEntity implements
             hasSilkTouchAddon = true;
 
         if (addonBlock.addonEntity() instanceof CombiAddonEntity combi) {
-            areaSize = combi.getQuarryCount();
-            yieldAddons = combi.getYieldCount();
-            hasCropFilterAddon = combi.hasCropFilter();
-            hasSilkTouchAddon = combi.hasSilk();
+            areaSize += combi.getQuarryCount();
+            hunterAddons += combi.getHunterCount();
+            yieldAddons += combi.getYieldCount();
+            hasCropFilterAddon |= combi.hasCropFilter();
+            hasSilkTouchAddon |= combi.hasSilk();
         }
 
     }

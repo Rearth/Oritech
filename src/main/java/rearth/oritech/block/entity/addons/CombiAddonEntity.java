@@ -58,6 +58,11 @@ public class CombiAddonEntity extends AddonBlockEntity {
         return storedData.quarryCount();
     }
 
+    public int getHunterCount() {
+        if (storedData == null) return 0;
+        return storedData.hunterCount();
+    }
+
     public int getYieldCount() {
         if (storedData == null) return 0;
         return storedData.yieldCount();

@@ -94,7 +94,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
     private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
 
     @SyncField(SyncType.GUI_OPEN)
-    public ShrunkAddonData currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);
+    public ShrunkAddonData currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, 0, false, false);
 
     private boolean wasRedstoneActive = false;
 
@@ -153,7 +153,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
         MachineAddonController.super.gatherAddonStats(addons);
 
         if (addons.isEmpty()) {
-            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, false, false);
+            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, 0, false, false);
             return;
         }
 
@@ -161,6 +161,7 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
         var data = getBaseAddonData();
         var fluid = false;
         var quarryCount = 0;
+        var hunterCount = 0;
         var yieldCount = 0;
         var cropFilter = false;
         var silk = false;
@@ -168,12 +169,13 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
         for (var addon : addons) {
             if (addon.addonBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get())) fluid = true;
             if (addon.addonBlock().equals(BlockContent.QUARRY_ADDON.get())) quarryCount++;
+            if (addon.addonBlock().equals(BlockContent.MACHINE_HUNTER_ADDON.get())) hunterCount++;
             if (addon.addonBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get())) yieldCount++;
             if (addon.addonBlock().equals(BlockContent.CROP_FILTER_ADDON.get())) cropFilter = true;
             if (addon.addonBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get())) silk = true;
         }
 
-        currentCandidate = new ShrunkAddonData(data, fluid, quarryCount, yieldCount, cropFilter, silk);
+        currentCandidate = new ShrunkAddonData(data, fluid, quarryCount, hunterCount, yieldCount, cropFilter, silk);
     }
 
     @Override
@@ -448,13 +450,14 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
         return true;
     }
 
-    public record ShrunkAddonData(BaseAddonData data, boolean fluid, int quarryCount, int yieldCount,
+    public record ShrunkAddonData(BaseAddonData data, boolean fluid, int quarryCount, int hunterCount, int yieldCount,
                                   boolean cropFilter, boolean silk) {
 
         public static final Codec<ShrunkAddonData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BaseAddonData.CODEC.fieldOf("data").forGetter(ShrunkAddonData::data),
                 Codec.BOOL.fieldOf("fluid").forGetter(ShrunkAddonData::fluid),
                 Codec.INT.fieldOf("quarry_count").forGetter(ShrunkAddonData::quarryCount),
+                Codec.INT.optionalFieldOf("hunter_count", 0).forGetter(ShrunkAddonData::hunterCount),
                 Codec.INT.fieldOf("yield_count").forGetter(ShrunkAddonData::yieldCount),
                 Codec.BOOL.fieldOf("crop_filter").forGetter(ShrunkAddonData::cropFilter),
                 Codec.BOOL.fieldOf("silk").forGetter(ShrunkAddonData::silk)
@@ -468,8 +471,10 @@ public class ShrinkerBlockEntity extends NetworkedBlockEntity implements ItemPro
                     "data=" + data +
                     ", fluid=" + fluid +
                     ", quarryCount=" + quarryCount +
+                    ", hunterCount=" + hunterCount +
                     ", yieldCount=" + yieldCount +
                     ", cropFilter=" + cropFilter +
+                    ", silk=" + silk +
                     '}';
         }
     }

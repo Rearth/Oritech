@@ -93,6 +93,10 @@ public class CombiAddonBlock extends MachineAddonBlock {
             foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_burst", usedSettings.maxBurstTicks()).withStyle(ChatFormatting.GRAY));
         }
 
+        if (usedSettings.extraChambers() > 0) {
+            foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_chambers", usedSettings.extraChambers()).withStyle(ChatFormatting.GRAY));
+        }
+
         if (data.cropFilter()) {
             foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_crop").withStyle(ChatFormatting.GRAY));
         }
@@ -103,6 +107,9 @@ public class CombiAddonBlock extends MachineAddonBlock {
 
         if (data.quarryCount() > 0) {
             foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_quarry", data.quarryCount()).withStyle(ChatFormatting.GRAY));
+        }
+        if (data.hunterCount() > 0) {
+            foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_hunter", data.hunterCount()).withStyle(ChatFormatting.GRAY));
         }
         if (data.yieldCount() > 0) {
             foundTexts.add(Component.translatable("tooltip.oritech.addon_combi_yield", data.yieldCount()).withStyle(ChatFormatting.GRAY));
