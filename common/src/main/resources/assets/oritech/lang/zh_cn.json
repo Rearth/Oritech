@@ -534,7 +534,7 @@
   "tooltip.oritech.creative_tank": "使用任意流体桶右键以设置液体，空桶右键以清空。",
   "tooltip.oritech.fuel_generator_block.extra": "仅在可视连接端口输出能量。",
   "block.oritech.banana_block": "香蕉块",
-  "block.oritech.power_pole_block": "能量传输杆",
+  "block.oritech.power_pole_block": "输能杆",
   "block.oritech.machine_burst_addon": "脉冲超频插件",
   "block.oritech.machine_combi_addon": "机器之心（插件）",
   "block.oritech.shrinker_block": "插件绞接器",
