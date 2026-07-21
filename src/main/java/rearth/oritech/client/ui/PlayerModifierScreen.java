@@ -1,9 +1,14 @@
 package rearth.oritech.client.ui;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -15,6 +20,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -548,31 +555,6 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
         };
     }
 
-    // Draws an arbitrary (including diagonal) 1px line by rasterizing it into pixel-sized
-    // fill() calls. The immediate-mode vertex API used previously was removed in 26.1, and
-    // fill() is the render-pipeline-agnostic primitive available on the GUI graphics.
-    private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color) {
-        int dx = toX - fromX;
-        int dy = toY - fromY;
-        int steps = Math.max(Math.abs(dx), Math.abs(dy));
-        if (steps == 0) {
-            graphics.fill(fromX, fromY, fromX + 1, fromY + 1, color);
-            return;
-        }
-
-        float xInc = dx / (float) steps;
-        float yInc = dy / (float) steps;
-        float x = fromX;
-        float y = fromY;
-        for (int i = 0; i <= steps; i++) {
-            int px = Math.round(x);
-            int py = Math.round(y);
-            graphics.fill(px, py, px + 1, py + 1, color);
-            x += xInc;
-            y += yInc;
-        }
-    }
-
     @Override
     public boolean shouldCreateTitle() {
         return false;
@@ -602,6 +584,39 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
     private record DependencyLine(int fromX, int fromY, int toX, int toY) {
     }
 
+    private record DependencyLinesRenderState(List<DependencyLine> lines, Matrix3x2f pose, int color,
+                                              @Nullable ScreenRectangle scissorArea,
+                                              @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+
+        @Override
+        public void buildVertices(VertexConsumer vertices) {
+            for (var line : lines) {
+                float dx = line.toX() - line.fromX();
+                float dy = line.toY() - line.fromY();
+                float length = (float) Math.sqrt(dx * dx + dy * dy);
+                if (length == 0) continue;
+
+                float normalX = -dy / length * 0.5f;
+                float normalY = dx / length * 0.5f;
+
+                vertices.addVertexWith2DPose(pose, line.fromX() - normalX, line.fromY() - normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, line.fromX() + normalX, line.fromY() + normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, line.toX() + normalX, line.toY() + normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, line.toX() - normalX, line.toY() - normalY).setColor(color);
+            }
+        }
+
+        @Override
+        public RenderPipeline pipeline() {
+            return RenderPipelines.GUI;
+        }
+
+        @Override
+        public TextureSetup textureSetup() {
+            return TextureSetup.noTexture();
+        }
+    }
+
     private final class DependencyLineWidget extends UIComponent {
 
         private DependencyLineWidget(int x, int y, int width, int height) {
@@ -610,9 +625,15 @@ public class PlayerModifierScreen extends OritechWidgetScreen<PlayerModifierScre
 
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-            for (var dependency : dependencyLines) {
-                drawLine(graphics, dependency.fromX(), dependency.fromY(), dependency.toX(), dependency.toY(), LINE_COLOR);
-            }
+            if (dependencyLines.isEmpty()) return;
+
+            var pose = new Matrix3x2f(graphics.pose());
+            var scissor = graphics.peekScissorStack();
+            var widgetBounds = new ScreenRectangle(x, y, width, height).transformMaxBounds(pose);
+            var clippedBounds = scissor == null ? widgetBounds : scissor.intersection(widgetBounds);
+
+            graphics.submitGuiElementRenderState(new DependencyLinesRenderState(
+                    List.copyOf(dependencyLines), pose, LINE_COLOR, scissor, clippedBounds));
         }
     }
 

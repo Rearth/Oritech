@@ -87,7 +87,7 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
     public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(5, this::setChanged);
 
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(maxEnergyStored, maxEnergyTransfer, maxEnergyStored, maxEnergyStored, this::setChanged, false);
+    private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(maxEnergyStored, maxEnergyTransfer, maxEnergyStored, 0, this::setChanged, false);
 
 
     public AugmentApplicationEntity(BlockPos pos, BlockState state) {

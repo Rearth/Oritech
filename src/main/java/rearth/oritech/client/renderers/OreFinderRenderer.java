@@ -1,12 +1,21 @@
 package rearth.oritech.client.renderers;
 
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.CompareOp;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.context.ContextKey;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
+import net.neoforged.neoforge.client.event.FrameGraphSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.util.RenderHelpers;
@@ -28,18 +37,37 @@ public class OreFinderRenderer {
 
     // teal outline color (with alpha, directs geometry to outline buffer)
     private static final int OUTLINE_COLOR = 0xFF8AF2DF;
+    // Preserve the normal block shader, but only draw model fragments hidden
+    // behind existing world geometry. Based on Just Dire Things' 26.1 ore X-ray.
+    private static final RenderPipeline ORE_XRAY_PIPELINE = RenderPipelines.SOLID_BLOCK.toBuilder()
+            .withLocation(Oritech.id("pipeline/ore_xray"))
+            .withDepthStencilState(new DepthStencilState(CompareOp.GREATER_THAN, false))
+            .build();
+    private static final RenderType ORE_XRAY = RenderType.create(
+            "oritech_ore_finder_fill",
+            RenderSetup.builder(ORE_XRAY_PIPELINE)
+                    .withTexture("Sampler0", TextureAtlas.LOCATION_BLOCKS)
+                    .useLightmap()
+                    .useOverlay()
+                    .createRenderSetup());
     // empty biome/block tinting array
     private static final int[] NO_TINT = new int[0];
 
     public record OreRenderData(List<BlockPos> blocks) {}
 
+    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
+        event.registerPipeline(ORE_XRAY_PIPELINE);
+    }
+
+    public static void onFrameGraphSetup(FrameGraphSetupEvent event) {
+        if (hasActiveHighlights()) {
+            event.enableOutlineProcessing();
+        }
+    }
+
     // extract highlighted positions and camera offset
     public static void onExtractRenderState(ExtractLevelRenderStateEvent event) {
-        var level = Minecraft.getInstance().level;
-        if (level == null || renderedBlocks == null || renderedBlocks.isEmpty()) return;
-
-        var age = level.getGameTime() - receivedAt;
-        if (age > 15) return;
+        if (!hasActiveHighlights()) return;
 
         var data = new OreRenderData(new ArrayList<>(renderedBlocks));
         event.getRenderState().setRenderData(ORE_DATA, data);
@@ -71,13 +99,25 @@ public class OreFinderRenderer {
 
             poseStack.pushPose();
             // align coordinates relative to camera
-            poseStack.translate(pos.getX() - camPos.x, pos.getY() - camPos.y, pos.getZ() - camPos.z);
+            poseStack.translate(pos.getX() - camPos.x - 0.01, pos.getY() - camPos.y - 0.01, pos.getZ() - camPos.z - 0.01);
 
-            collector.submitBlockModel(poseStack, RenderTypes.cutoutMovingBlock(), parts, NO_TINT,
+            // Draw the occluded ore surfaces with the normal block shader, then
+            // add the outline in a separate target for a readable silhouette.
+            collector.submitBlockModel(poseStack, ORE_XRAY, parts, NO_TINT,
+                    RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            collector.submitBlockModel(poseStack, RenderTypes.outline(TextureAtlas.LOCATION_BLOCKS), parts, NO_TINT,
                     RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, OUTLINE_COLOR);
 
             poseStack.popPose();
         }
 
+    }
+
+    private static boolean hasActiveHighlights() {
+        var level = Minecraft.getInstance().level;
+        return level != null
+                && renderedBlocks != null
+                && !renderedBlocks.isEmpty()
+                && level.getGameTime() - receivedAt <= 15;
     }
 }

@@ -1,12 +1,18 @@
 package rearth.oritech.client.ui;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import org.joml.Matrix3x2f;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
@@ -81,8 +87,10 @@ public class AugmentSelectionScreen extends Screen {
         var focused = findFocused(mouseX, mouseY);
         lastFocused = focused;
 
-        drawBackdrop(graphics, focused);
-        drawFocusLines(graphics, focused, mouseX, mouseY);
+        var geometry = new ArrayList<ColoredQuad>();
+        drawBackdrop(geometry, focused);
+        drawFocusLines(geometry, focused, mouseX, mouseY);
+        submitGeometry(graphics, geometry);
         drawAugmentIcons(graphics, focused);
         drawLabels(graphics, focused);
     }
@@ -107,7 +115,7 @@ public class AugmentSelectionScreen extends Screen {
         return focused;
     }
 
-    private void drawBackdrop(GuiGraphicsExtractor graphics, SelectionEntry focused) {
+    private void drawBackdrop(List<ColoredQuad> geometry, SelectionEntry focused) {
         var player = minecraft != null ? minecraft.player : null;
         if (player == null) return;
 
@@ -139,16 +147,16 @@ public class AugmentSelectionScreen extends Screen {
 
             double activeInnerRadius = innerRadius / usedSize;
             double activeOuterRadius = outerRadius * usedSize;
-            drawPieSegmented(graphics, angle, segmentSize, centerEntry.centerX(), centerEntry.centerY(), activeInnerRadius, activeOuterRadius, screenSize, color, 16);
+            drawPieSegmented(geometry, angle, segmentSize, centerEntry.centerX(), centerEntry.centerY(), activeInnerRadius, activeOuterRadius, screenSize, color, 16);
         }
 
         int centerColor = focused == centerEntry ? EXIT_HOVER_COLOR : EXIT_COLOR;
-        drawPieSegmented(graphics, 0, Math.toRadians(360), centerEntry.centerX(), centerEntry.centerY(), 0, innerRadius * 0.6, screenSize, centerColor, 32);
+        drawPieSegmented(geometry, 0, Math.toRadians(360), centerEntry.centerX(), centerEntry.centerY(), 0, innerRadius * 0.6, screenSize, centerColor, 32);
     }
 
-    private void drawFocusLines(GuiGraphicsExtractor graphics, SelectionEntry focused, int mouseX, int mouseY) {
-        drawLine(graphics, centerEntry.centerX(), centerEntry.centerY(), focused.centerX(), focused.centerY(), LINE_COLOR, 0);
-        drawLine(graphics, focused.centerX(), focused.centerY(), mouseX, mouseY, LINE_COLOR, 0);
+    private void drawFocusLines(List<ColoredQuad> geometry, SelectionEntry focused, int mouseX, int mouseY) {
+        drawLine(geometry, centerEntry.centerX(), centerEntry.centerY(), focused.centerX(), focused.centerY(), LINE_COLOR);
+        drawLine(geometry, focused.centerX(), focused.centerY(), mouseX, mouseY, LINE_COLOR);
     }
 
     private void drawAugmentIcons(GuiGraphicsExtractor graphics, SelectionEntry focused) {
@@ -159,10 +167,6 @@ public class AugmentSelectionScreen extends Screen {
             int drawX = entry.centerX() - size / 2;
             int drawY = entry.centerY() - size / 2;
             if (entry.texture() == null) continue;
-
-            if (active) {
-                graphics.fill(drawX - 2, drawY - 2, drawX + size + 2, drawY + size + 2, ColorHelper.argb(0.8f, 0.85f, 0.9f, 0.35f));
-            }
 
             graphics.blit(RenderPipelines.GUI_TEXTURED, entry.texture(), drawX, drawY, 0f, 0f, size, size, 24, 24, 24, 24);
         }
@@ -182,22 +186,52 @@ public class AugmentSelectionScreen extends Screen {
         graphics.text(minecraft.font, Component.translatable("oritech.text.augment_toggle_title"), 5, 5, 0xFFE7EEF5, true);
     }
 
-    // Stubbed: the immediate-mode vertex API (RenderSystem.setShader / bufferSource / addVertex)
-    // used to draw arbitrary 2D pies, lines and quads no longer exists in 26.1. Reimplementing
-    // arbitrary-rotation 2D shapes requires custom GuiRenderState submission, which is out of
-    // scope for the initial migration. The radial selector will be visually plain until then.
-    private static void drawPieSegmented(GuiGraphicsExtractor graphics, double centerAngle, double angleSize,
+    private static void drawPieSegmented(List<ColoredQuad> geometry, double centerAngle, double angleSize,
                                          int centerX, int centerY, double innerRadius, double outerRadius,
                                          double screenSize, int color, int segments) {
-        // no-op
+        double segmentSize = angleSize / segments;
+        double begin = centerAngle - angleSize * 0.5;
+
+        for (int i = 0; i < segments; i++) {
+            double fromAngle = begin + segmentSize * i;
+            double toAngle = fromAngle + segmentSize;
+
+            float ax = centerX + (float) (innerRadius * Math.cos(fromAngle) * screenSize);
+            float ay = centerY + (float) (innerRadius * Math.sin(fromAngle) * screenSize);
+            float bx = centerX + (float) (outerRadius * Math.cos(fromAngle) * screenSize);
+            float by = centerY + (float) (outerRadius * Math.sin(fromAngle) * screenSize);
+            float cx = centerX + (float) (innerRadius * Math.cos(toAngle) * screenSize);
+            float cy = centerY + (float) (innerRadius * Math.sin(toAngle) * screenSize);
+            float dx = centerX + (float) (outerRadius * Math.cos(toAngle) * screenSize);
+            float dy = centerY + (float) (outerRadius * Math.sin(toAngle) * screenSize);
+
+            geometry.add(new ColoredQuad(dx, dy, bx, by, ax, ay, cx, cy, color));
+        }
     }
 
-    private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color, float zIndex) {
-        // no-op (see drawPieSegmented note)
+    private static void drawLine(List<ColoredQuad> geometry, int fromX, int fromY, int toX, int toY, int color) {
+        float dx = toX - fromX;
+        float dy = toY - fromY;
+        float length = (float) Math.sqrt(dx * dx + dy * dy);
+        if (length == 0) return;
+
+        float normalX = -dy / length;
+        float normalY = dx / length;
+        geometry.add(new ColoredQuad(
+                fromX - normalX, fromY - normalY,
+                fromX + normalX, fromY + normalY,
+                toX + normalX, toY + normalY,
+                toX - normalX, toY - normalY,
+                color));
     }
 
-    private static void drawRect(GuiGraphicsExtractor graphics, int ax, int ay, int bx, int by, int cx, int cy, int dx, int dy, int color) {
-        // no-op (see drawPieSegmented note)
+    private void submitGeometry(GuiGraphicsExtractor graphics, List<ColoredQuad> geometry) {
+        if (geometry.isEmpty()) return;
+
+        var pose = new Matrix3x2f(graphics.pose());
+        var bounds = new ScreenRectangle(0, 0, width, height).transformMaxBounds(pose);
+        graphics.submitGuiElementRenderState(new RadialMenuRenderState(
+                geometry, pose, graphics.peekScissorStack(), bounds));
     }
 
     private static int squaredDistance(int x1, int y1, int x2, int y2) {
@@ -227,5 +261,34 @@ public class AugmentSelectionScreen extends Screen {
 
     private record SelectionEntry(@Nullable Identifier id, @Nullable Identifier texture, int centerX,
                                   int centerY, int size) {
+    }
+
+    private record ColoredQuad(float ax, float ay, float bx, float by, float cx, float cy,
+                               float dx, float dy, int color) {
+    }
+
+    private record RadialMenuRenderState(List<ColoredQuad> geometry, Matrix3x2f pose,
+                                         @Nullable ScreenRectangle scissorArea,
+                                         @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+
+        @Override
+        public void buildVertices(VertexConsumer vertices) {
+            for (var quad : geometry) {
+                vertices.addVertexWith2DPose(pose, quad.ax(), quad.ay()).setColor(quad.color());
+                vertices.addVertexWith2DPose(pose, quad.bx(), quad.by()).setColor(quad.color());
+                vertices.addVertexWith2DPose(pose, quad.cx(), quad.cy()).setColor(quad.color());
+                vertices.addVertexWith2DPose(pose, quad.dx(), quad.dy()).setColor(quad.color());
+            }
+        }
+
+        @Override
+        public RenderPipeline pipeline() {
+            return RenderPipelines.GUI;
+        }
+
+        @Override
+        public TextureSetup textureSetup() {
+            return TextureSetup.noTexture();
+        }
     }
 }

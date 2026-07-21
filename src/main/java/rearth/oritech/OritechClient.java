@@ -78,6 +78,7 @@ public final class OritechClient {
         neoEventBus.addListener(ActiveCableRenderer::onSubmitGeometry);
 
         // ore-scanner highlight uses the same split-phase world-render flow
+        neoEventBus.addListener(OreFinderRenderer::onFrameGraphSetup);
         neoEventBus.addListener(OreFinderRenderer::onExtractRenderState);
         neoEventBus.addListener(OreFinderRenderer::onSubmitGeometry);
 
@@ -88,6 +89,7 @@ public final class OritechClient {
         modEventBus.addListener(ModRenderers::registerRenderers);
         modEventBus.addListener(ClientGuiRenderers::registerPipRenderers);
         modEventBus.addListener(FluidModelContent::registerFluidModels);
+        modEventBus.addListener(OreFinderRenderer::registerPipelines);
     }
 
     // client datagen

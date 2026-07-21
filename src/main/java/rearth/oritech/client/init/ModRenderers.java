@@ -2,12 +2,16 @@ package rearth.oritech.client.init;
 
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.PortalEntityRenderer;
 import rearth.oritech.client.renderers.blocks.*;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.EntitiesContent;
 
 public class ModRenderers {
 
     public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+
+        event.registerEntityRenderer(EntitiesContent.PORTAL_ENTITY.get(), PortalEntityRenderer::new);
 
         // processing
         event.registerBlockEntityRenderer(BlockEntitiesContent.PULVERIZER_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/pulverizer_block"));

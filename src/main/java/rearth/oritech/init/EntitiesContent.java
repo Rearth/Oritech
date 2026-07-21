@@ -14,7 +14,7 @@ public class EntitiesContent {
 
     public static final DeferredRegister.Entities ENTITY_TYPES = DeferredRegister.createEntities(Oritech.MOD_ID);
 
-    public static final Supplier<EntityType<?>> PORTAL_ENTITY = ENTITY_TYPES.register("portal_entity", () -> EntityType.Builder.of(PortalEntity::new, MobCategory.MISC)
+    public static final Supplier<EntityType<PortalEntity>> PORTAL_ENTITY = ENTITY_TYPES.register("portal_entity", () -> EntityType.Builder.of(PortalEntity::new, MobCategory.MISC)
             .sized(1, 2)
             .noSave()
             .noSummon()

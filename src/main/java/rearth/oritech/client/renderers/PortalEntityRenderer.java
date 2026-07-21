@@ -1,9 +1,10 @@
 package rearth.oritech.client.renderers;
 
 import com.geckolib.cache.model.GeoBone;
+import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.GeoEntityRenderer;
-import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.GeoRenderer;
+import com.geckolib.renderer.base.PerBoneRender;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.geckolib.renderer.layer.GeoRenderLayer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -14,7 +15,11 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import rearth.oritech.client.renderers.models.PortalEntityModel;
 import rearth.oritech.util.PortalEntity;
 
-public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity, PortalEntityRenderer.PortalEntityState> {
+import java.util.function.BiConsumer;
+
+public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity, EntityRenderState> {
+
+    private static final DataTicket<Float> Y_ROTATION = DataTicket.create("oritech_portal_y_rotation", Float.class);
 
     public PortalEntityRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new PortalEntityModel());
@@ -22,35 +27,25 @@ public class PortalEntityRenderer extends GeoEntityRenderer<PortalEntity, Portal
     }
 
     @Override
-    public void extractRenderState(PortalEntity animatable, PortalEntityState state, float partialTick) {
-        super.extractRenderState(animatable, state, partialTick);
-        state.yRot = animatable.getYRot();
+    public void addRenderData(PortalEntity animatable, Void relatedObject, EntityRenderState renderState, float partialTick) {
+        renderState.addGeckolibData(Y_ROTATION, animatable.getYRot());
     }
 
     @Override
-    protected void applyRotations(RenderPassInfo<PortalEntityState> renderPassInfo, PoseStack poseStack, float rotationYaw) {
+    protected void applyRotations(RenderPassInfo<EntityRenderState> renderPassInfo, PoseStack poseStack, float rotationYaw) {
         super.applyRotations(renderPassInfo, poseStack, rotationYaw);
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderPassInfo.renderState().yRot));
+        var yRotation = renderPassInfo.renderState().getOrDefaultGeckolibData(Y_ROTATION, 0f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(yRotation));
     }
 
-    public static class PortalEntityState extends EntityRenderState implements GeoRenderState {
-        public float yRot;
-        private final java.util.Map<com.geckolib.constant.dataticket.DataTicket<?>, java.lang.Object> dataMap = new java.util.HashMap<>();
+    public static class PortalRenderLayer extends GeoRenderLayer<PortalEntity, Void, EntityRenderState> {
 
-        @Override
-        public java.util.Map<com.geckolib.constant.dataticket.DataTicket<?>, java.lang.Object> getDataMap() {
-            return dataMap;
-        }
-    }
-
-    public static class PortalRenderLayer extends GeoRenderLayer<PortalEntity, java.lang.Void, PortalEntityState> {
-
-        public PortalRenderLayer(GeoRenderer<PortalEntity, java.lang.Void, PortalEntityState> entityRendererIn) {
+        public PortalRenderLayer(GeoRenderer<PortalEntity, Void, EntityRenderState> entityRendererIn) {
             super(entityRendererIn);
         }
 
         @Override
-        public void addPerBoneRender(RenderPassInfo<PortalEntityState> info, java.util.function.BiConsumer<GeoBone, com.geckolib.renderer.base.PerBoneRender<PortalEntityState>> perBoneRenders) {
+        public void addPerBoneRender(RenderPassInfo<EntityRenderState> info, BiConsumer<GeoBone, PerBoneRender<EntityRenderState>> perBoneRenders) {
             info.model().getBone("portal").ifPresent(bone -> {
                 perBoneRenders.accept(bone, (passInfo, b, collector) -> {
                     collector.submitCustomGeometry(passInfo.poseStack(), RenderTypes.endGateway(), (pose, consumer) -> {

@@ -46,6 +46,9 @@ public class LaserArmEntityBehavior {
                     return false;
 
                 var stack = player.getItemBySlot(EquipmentSlot.CHEST);
+
+                if (stack.isEmpty()) return false;
+
                 var candidate = stack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forStack(stack));
                 if (candidate != null) {
                     int amount;
