@@ -3,6 +3,7 @@ package rearth.oritech.datagen.builders;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -18,6 +19,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.datapack.AugmentData;
+import rearth.oritech.init.datapack.AugmentContent;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -32,7 +34,8 @@ public class OritechAugmentDataGenerator implements DataProvider {
     
 
     public OritechAugmentDataGenerator(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK, "augments");
+        this.pathProvider = output.createPathProvider(PackOutput.Target.DATA_PACK,
+                Registries.elementsDirPath(AugmentContent.AUGMENT_REGISTRY_KEY));
         registriesHolder = registries;
     }
 

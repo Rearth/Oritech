@@ -3,6 +3,7 @@ package rearth.oritech.block.entity.augmenter;
 import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,6 +45,7 @@ import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.block.MultiblockMachine;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
@@ -54,6 +56,7 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.init.datapack.AugmentData;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
 
@@ -368,11 +371,26 @@ public class AugmentApplicationEntity extends NetworkedBlockEntity implements Mu
 
     @Override
     public void triggerSetupAnimation() {
-        triggerAnim("machine", "setup");
+        triggerAnim("machine", "deploy");
     }
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>("machine", 0, state -> {
+            if (state.isCurrentAnimation(MachineBlockEntity.SETUP)) {
+                if (state.controller().hasAnimationFinished()) {
+                    state.setAndContinue(MachineBlockEntity.IDLE);
+                } else {
+                    return state.setAndContinue(MachineBlockEntity.SETUP);
+                }
+            }
+
+            return state.setAndContinue(getBlockState().getValue(MultiblockMachine.ASSEMBLED)
+                    ? MachineBlockEntity.IDLE
+                    : MachineBlockEntity.PACKAGED);
+        })
+                .triggerableAnim("deploy", MachineBlockEntity.SETUP)
+                .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
 
     @Override
