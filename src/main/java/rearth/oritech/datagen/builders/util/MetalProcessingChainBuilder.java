@@ -2,6 +2,7 @@ package rearth.oritech.datagen.builders.util;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -19,6 +20,7 @@ import rearth.oritech.init.FluidContent;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -435,9 +437,9 @@ public class MetalProcessingChainBuilder {
             if (nuggetItem != null && !skipCompactingRecipes) {    // to avoid duplicate vanilla nugget -> item recipes
                 RecipeGenerator.threeByThreePacker(exporter, RecipeCategory.MISC, ingotItem, nuggetItem);
                 var inputName = BuiltInRegistries.ITEM.getKey(ingotItem).getPath();
-                ShapelessRecipeBuilder.shapeless(net.minecraft.core.registries.BuiltInRegistries.ITEM, RecipeCategory.MISC, nuggetItem, 9)
+                ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, RecipeCategory.MISC, nuggetItem, 9)
                         .requires(ingotItem, 1)
-                        .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(ingotItem))
+                        .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(ingotItem))
                         .save(exporter);
             }
         }
@@ -448,7 +450,7 @@ public class MetalProcessingChainBuilder {
     }
 
     private Optional<Item> firstNonNullOptional(Item... items) {
-        return Arrays.stream(items).filter(java.util.Objects::nonNull).findFirst();
+        return Arrays.stream(items).filter(Objects::nonNull).findFirst();
     }
 
     private Ingredient of(TagKey<Item> item) {

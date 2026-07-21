@@ -1,5 +1,6 @@
 package rearth.oritech.client.ui;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -7,12 +8,14 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ItemSlotWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandler> {
 
@@ -138,7 +141,7 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
         return menu.blockEntity.getBlockState();
     }
 
-    private final class FilterSlotWidget extends rearth.oritech.api.screen.UIComponent {
+    private final class FilterSlotWidget extends UIComponent {
 
         private final int index;
 
@@ -154,7 +157,7 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
             if (stack.isEmpty()) return;
 
             graphics.item(stack, x + 1, y + 1);
-            graphics.itemDecorations(net.minecraft.client.Minecraft.getInstance().font, stack, x + 1, y + 1);
+            graphics.itemDecorations(Minecraft.getInstance().font, stack, x + 1, y + 1);
         }
 
         @Override
@@ -168,12 +171,12 @@ public class ItemFilterScreen extends OritechWidgetScreen<ItemFilterScreenHandle
         }
 
         @Override
-        public java.util.List<Component> getTooltip() {
+        public List<Component> getTooltip() {
             var stack = getDisplayedStack(index);
             if (stack.isEmpty()) {
                 return super.getTooltip();
             }
-            return Screen.getTooltipFromItem(net.minecraft.client.Minecraft.getInstance(), stack);
+            return Screen.getTooltipFromItem(Minecraft.getInstance(), stack);
         }
     }
 

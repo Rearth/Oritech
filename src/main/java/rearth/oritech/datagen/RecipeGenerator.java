@@ -1,5 +1,6 @@
 package rearth.oritech.datagen;
 
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -750,7 +751,7 @@ public class RecipeGenerator extends RecipeProvider {
             var outputName = BuiltInRegistries.ITEM.getKey(output.asItem()).getPath();
             SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, CookingBookCategory.MISC, output, experience, cookingTime, recipeFactory)
                     .group(group)
-                    .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
+                    .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
                     .save(exporter, outputName + suffix + "_" + inputName);
         }
     }
@@ -760,7 +761,7 @@ public class RecipeGenerator extends RecipeProvider {
         var outputName = BuiltInRegistries.ITEM.getKey(packed.asItem()).getPath();
         ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 9)
                 .requires(packed)
-                .unlockedBy("has_" + outputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(packed))
+                .unlockedBy("has_" + outputName, InventoryChangeTrigger.TriggerInstance.hasItems(packed))
                 .save(exporter, "crafting/" + inputName + "_from_unpacking");
 
         ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
@@ -768,7 +769,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("###")
                 .pattern("###")
                 .pattern("###")
-                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
+                .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
                 .save(exporter, "crafting/" + outputName + "_from_packing");
     }
 
@@ -777,14 +778,14 @@ public class RecipeGenerator extends RecipeProvider {
         var outputName = BuiltInRegistries.ITEM.getKey(packed.asItem()).getPath();
         ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 4)
                 .requires(packed)
-                .unlockedBy("has_" + outputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(packed))
+                .unlockedBy("has_" + outputName, InventoryChangeTrigger.TriggerInstance.hasItems(packed))
                 .save(exporter, "crafting/" + inputName + "_from_unpacking");
 
         ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
                 .define('#', unpacked)
                 .pattern("##")
                 .pattern("##")
-                .unlockedBy("has_" + inputName, net.minecraft.advancements.criterion.InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
+                .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
                 .save(exporter, "crafting/" + outputName + "_from_packing");
     }
 

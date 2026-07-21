@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInterfaceEntity, ItemPipeTransferRenderer.ItemPipeRenderState> {
 
-    public ItemPipeTransferRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context context) {
+    public ItemPipeTransferRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override

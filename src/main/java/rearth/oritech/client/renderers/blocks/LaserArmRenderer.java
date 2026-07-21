@@ -7,6 +7,7 @@ import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -21,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2f;
 import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
 import rearth.oritech.client.renderers.models.LaserArmModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
@@ -35,7 +37,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
     private Vec3 lastActivePlayerPos = Vec3.ZERO;
     private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
 
-    public static final DataTicket<org.joml.Vector2f> LASER_ANGLES = DataTicket.create("laser_angles", org.joml.Vector2f.class);
+    public static final DataTicket<Vector2f> LASER_ANGLES = DataTicket.create("laser_angles", Vector2f.class);
 
     public AABB getRenderBoundingBox(LaserArmBlockEntity blockEntity) {
         return AABB.INFINITE;
@@ -54,7 +56,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         var offsetB = new Vec3(Math.pow(Math.sin(entity.getLevel().getGameTime() / 40f + 1.3f), 3), 0, 0);
 
         if (entity.getLevel().getRandom().nextFloat() > 0.9f) {
-            var player = net.minecraft.client.Minecraft.getInstance().player;
+            var player = Minecraft.getInstance().player;
             if (player != null) {
                 lastActivePlayerPos = player.getEyePosition();
             }
@@ -66,7 +68,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
         return lastActivePlayerPos.add(offsetA).add(offsetB);
     }
 
-    public static float determinant(org.joml.Vector2f a, org.joml.Vector2f b) {
+    public static float determinant(Vector2f a, Vector2f b) {
         return a.x * b.y - a.y * b.x;
     }
 
@@ -132,22 +134,22 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
             var offset = Geometry.worldToOffsetPosition(facing, target, ownPos);
 
             // thanks to: https://math.stackexchange.com/questions/878785/how-to-find-an-angle-in-range0-360-between-2-vectors
-            var offsetY = new org.joml.Vector2f((float) offset.x(), (float) offset.y());
-            var forwardY = new org.joml.Vector2f(0, -1);
+            var offsetY = new Vector2f((float) offset.x(), (float) offset.y());
+            var forwardY = new Vector2f(0, -1);
             if (facing == Direction.NORTH)
-                forwardY = new org.joml.Vector2f(0, 1);
+                forwardY = new Vector2f(0, 1);
             if (facing == Direction.WEST)
-                forwardY = new org.joml.Vector2f(1, 0);
+                forwardY = new Vector2f(1, 0);
             if (facing == Direction.EAST)
-                forwardY = new org.joml.Vector2f(-1, 0);
+                forwardY = new Vector2f(-1, 0);
             var angleY = -offsetY.angle(forwardY);
 
             // to create a 2d vector in a plane based on normal angleY
             var lengthY = offsetY.length();
             var heightDiff = offset.z();
 
-            var offsetX = new org.joml.Vector2f(lengthY, (float) heightDiff);
-            var forwardX = new org.joml.Vector2f(0, 1);
+            var offsetX = new Vector2f(lengthY, (float) heightDiff);
+            var forwardX = new Vector2f(0, 1);
             var detX = determinant(offsetX, forwardX);
             var dotX = offsetX.dot(forwardX);
             var angleX = Math.atan2(detX, dotX);
@@ -156,7 +158,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
 
             laserEntity.lastLaserRotX = LaserArmModel.lerp(laserEntity.lastLaserRotX, (float) angleX, 0.06f);
             laserEntity.lastLaserRotY = LaserArmModel.lerp(laserEntity.lastLaserRotY, angleY, 0.06f);
-            renderState.addGeckolibData(LASER_ANGLES, new org.joml.Vector2f(laserEntity.lastLaserRotX, laserEntity.lastLaserRotY));
+            renderState.addGeckolibData(LASER_ANGLES, new Vector2f(laserEntity.lastLaserRotX, laserEntity.lastLaserRotY));
         }
 
         if (laserEntity.getCurrentTarget() == null || !laserEntity.isFiring()) return;

@@ -16,6 +16,8 @@ import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.OritechClient;
 import rearth.oritech.client.renderers.blocks.SmallTankRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.config.OritechConfig;
@@ -30,7 +32,7 @@ import java.util.function.Consumer;
  * Wired into the NeoForge 26.1 item-rendering pipeline as a {@link SpecialModelRenderer}. The fluid content is pulled
  * out of the stack during extraction ({@link #extractArgument}) and the geometry is emitted into the submit pipeline
  * during ({@link #submit}). Register the {@link Unbaked#MAP_CODEC} through {@code RegisterSpecialModelRendererEvent}
- * (see {@link rearth.oritech.OritechClient}).
+ * (see {@link OritechClient}).
  * <p>
  * <b>Required item model json</b> (e.g. {@code assets/oritech/items/small_tank_block.json}): the item must use a
  * vanilla {@code minecraft:special} item model that points at this special renderer. The {@code base} field is a
@@ -56,7 +58,7 @@ import java.util.function.Consumer;
  */
 public class SmallTankItemRenderer implements SpecialModelRenderer<SmallTankItemRenderer.TankContents> {
 
-    public static final Identifier ID = rearth.oritech.Oritech.id("small_tank");
+    public static final Identifier ID = Oritech.id("small_tank");
 
     private final Identifier tankVisualModelId;
 

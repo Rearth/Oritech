@@ -23,7 +23,7 @@ public class BeamRenderer {
      * The beam gradient is interpolated along the Y-axis of the model (length).
      * <p>
      * Designed for the NeoForge 26.1+ submit pipeline (see {@code SubmitNodeCollector#submitCustomGeometry}):
-     * the deferred {@link com.mojang.blaze3d.vertex.PoseStack.Pose} snapshot and the {@link VertexConsumer} are
+     * the deferred {@link PoseStack.Pose} snapshot and the {@link VertexConsumer} are
      * provided in a callback. A local {@link PoseStack} is rebuilt from that snapshot so the alignment math can be
      * done with the usual stack operations.
      *

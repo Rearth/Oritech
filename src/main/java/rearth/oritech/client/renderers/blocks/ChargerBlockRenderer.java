@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
@@ -16,7 +17,7 @@ import rearth.oritech.block.entity.interaction.ChargerBlockEntity;
 
 public class ChargerBlockRenderer implements BlockEntityRenderer<ChargerBlockEntity, ChargerBlockRenderer.ChargerRenderState> {
 
-    public ChargerBlockRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context context) {
+    public ChargerBlockRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override

@@ -10,6 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
 
 import java.lang.reflect.Modifier;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 @SuppressWarnings("NullableProblems")
@@ -66,7 +67,7 @@ public class ItemGroups {
             try {
                 field.setAccessible(true);
                 var value = (DeferredItem<Item>) field.get(null);
-                var identifier = field.getName().toLowerCase(java.util.Locale.ROOT);
+                var identifier = field.getName().toLowerCase(Locale.ROOT);
 
                 var fieldGroup = ItemContent.Groups.COMPONENTS;
 

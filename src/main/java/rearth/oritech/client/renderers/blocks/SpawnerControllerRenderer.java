@@ -3,13 +3,16 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
@@ -20,7 +23,7 @@ import rearth.oritech.util.ColorHelper;
 
 public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerControllerBlockEntity, SpawnerControllerRenderer.SpawnerRenderState> {
 
-    public SpawnerControllerRenderer(net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider.Context context) {
+    public SpawnerControllerRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
@@ -34,7 +37,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
 
         state.renderedEntity = entity.renderedEntity instanceof LivingEntity le ? le : null;
         state.hasCage = entity.hasCage;
-        state.lightCoords = entity.getLevel() != null ? net.minecraft.client.renderer.LevelRenderer.getLightCoords(entity.getLevel(), entity.getBlockPos()) : 15728880;
+        state.lightCoords = entity.getLevel() != null ? LevelRenderer.getLightCoords(entity.getLevel(), entity.getBlockPos()) : 15728880;
 
         if (state.renderedEntity != null && state.hasCage) {
             var progress = Math.min(1f, entity.collectedSouls / (float) entity.maxSouls);
@@ -47,7 +50,6 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
         }
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     public void submit(SpawnerRenderState state, PoseStack matrices, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
         if (state.renderedEntity != null && state.hasCage) {
@@ -59,7 +61,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
             var dispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
             var renderer = dispatcher.getRenderer(state.renderedEntity);
 
-            if (renderer instanceof LivingEntityRenderer livingEntityRenderer) {
+            if (renderer instanceof LivingEntityRenderer<?, ?, ?> livingEntityRenderer) {
                 matrices.scale(-1.0F, -1.0F, 1.0F);
                 matrices.translate(0.0F, -1.501F, 0.0F);
                 matrices.scale(0.9f, 0.9f, 0.9f);
@@ -71,7 +73,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
                     var localStack = new PoseStack();
                     localStack.last().pose().set(pose.pose());
                     localStack.last().normal().set(pose.normal());
-                    model.renderToBuffer(localStack, consumer, state.lightCoords, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, state.color);
+                    model.renderToBuffer(localStack, consumer, state.lightCoords, OverlayTexture.NO_OVERLAY, state.color);
                 });
             }
             matrices.popPose();
