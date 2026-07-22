@@ -23,7 +23,7 @@
                   }
                 }
               ],
-              "name": "minecraft:twisting_vines"
+              "name": "oritech:wither_crop_block"
             },
             {
               "type": "minecraft:item",

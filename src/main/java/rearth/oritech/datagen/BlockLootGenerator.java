@@ -6,7 +6,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -119,7 +118,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
         add(BlockContent.IRON_PLATING_SLAB.get(), createSlabItemTable(BlockContent.IRON_PLATING_SLAB.get()));
 
         LootItemCondition.Builder cropDropBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(BlockContent.WITHER_CROP_BLOCK.get()).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CropBlock.AGE, 7));
-        add(BlockContent.WITHER_CROP_BLOCK.get(), createCropDrops(BlockContent.WITHER_CROP_BLOCK.get(), Items.TWISTING_VINES, BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
+        add(BlockContent.WITHER_CROP_BLOCK.get(), createCropDrops(BlockContent.WITHER_CROP_BLOCK.get(), BlockContent.WITHER_CROP_BLOCK.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
 //
         var impl = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
         // similar to BlockLootTableGenerator.oakLeavesDrops()

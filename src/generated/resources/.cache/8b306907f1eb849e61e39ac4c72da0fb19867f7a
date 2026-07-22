@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-04T12:33:43.5559541	Oritech Recipes
+// 26.1.2	2026-07-22T22:34:17.6828073	Oritech Recipes
 675ff3438e3ef4e8471dfcc1de05b63280f48670 data/minecraft/advancement/recipes/building_blocks/crafting/slab/carbon.json
 e69f3317222224dc3cdc5e0be581ad161ec80903 data/minecraft/advancement/recipes/building_blocks/crafting/slab/iron.json
 5a5f44ca7feb964786bf155f9ca05f52913c506a data/minecraft/advancement/recipes/building_blocks/crafting/slab/machine.json
@@ -889,7 +889,7 @@ a392e305cdded54ef52b93d19fdea354129f836b data/oritech/recipe/reactorgen/smallplu
 233cddd90099f5661e487835132a0d790fca06cc data/oritech/recipe/refinery/biodiesel.json
 bd1c77c6a78b1fc4227dfdd566710edea128264c data/oritech/recipe/refinery/carbonsheet.json
 ac5833d09914a88e54a8d0bdb564e88ce0c69d18 data/oritech/recipe/refinery/heavyoil.json
-1d1b0377356b5d152d415046941842ab58ffcf4c data/oritech/recipe/refinery/lava.json
+ba2f5f34eb2ab8504aad0daf65b7f857e395b6f5 data/oritech/recipe/refinery/lava.json
 20a9bb0177e5976549e8ea3017b15b341fec5c1e data/oritech/recipe/refinery/lavaalt.json
 31051dfcd20d222bad38e1f29af241d1d21d8fb6 data/oritech/recipe/refinery/oilalt.json
 a611cfce5eede5956fce81473e75dd627dac1e04 data/oritech/recipe/refinery/oilbase.json

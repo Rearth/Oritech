@@ -1,4 +1,4 @@
-// 26.1.2	2026-06-19T19:28:40.3903452	Loot Tables
+// 26.1.2	2026-07-22T22:34:17.6913406	Loot Tables
 2deb5f4438cc29f103dceec24d82ce621d2d9a97 data/minecraft/loot_table/blocks/jungle_leaves.json
 13245af548ffe065ab9c9bfa67d13c4ce6e026a1 data/oritech/loot_table/blocks/accelerator_controller.json
 0f38535e0b2d03d37b02448fb3d0d370aced84ae data/oritech/loot_table/blocks/accelerator_motor.json
@@ -159,4 +159,4 @@ b72fe5bccd0481722a7f48e3dde8c38e493fcc56 data/oritech/loot_table/blocks/tech_lev
 16454bc7584dc3ff3dd2df9c09a46f1d06f65052 data/oritech/loot_table/blocks/treefeller_block.json
 33c2cadec5745a160fac62a4209d8cf91d98da43 data/oritech/loot_table/blocks/uranium_crystal.json
 7b6b76c7ea9a4383bbdc631d772c823f1a3d7cff data/oritech/loot_table/blocks/uranium_dust_block.json
-4219b0060ae962bfee7523b70dc2f844d12acb38 data/oritech/loot_table/blocks/wither_crop_block.json
+200483fdc4bafb221da030da02bc0272736ca2c9 data/oritech/loot_table/blocks/wither_crop_block.json

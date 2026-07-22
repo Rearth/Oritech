@@ -109,7 +109,6 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
 
         if (content.isEmpty()
                 || !inventory.getResource(1).isEmpty()
-                || !content.isEnchantable()
                 || selectedEnchantment.equals(NONE_SELECTED)
                 || !getSelectedEnchantment().isBound()
                 || !content.supportsEnchantment(getSelectedEnchantment())) {
@@ -156,7 +155,7 @@ public class EnchanterBlockEntity extends NetworkedBlockEntity
 
     public Holder<Enchantment> getSelectedEnchantment() {
         if (selectedEnchantment.equals(NONE_SELECTED)) return null;
-        var registry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value();
+        var registry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
         return registry.wrapAsHolder(registry.get(selectedEnchantment).orElseThrow().value());
     }
 
