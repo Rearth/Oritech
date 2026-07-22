@@ -32,13 +32,13 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
 import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
@@ -64,13 +64,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, 0, this::setChanged, false);
 
-    public final SimpleInventoryStorage inventory = new SimpleInventoryStorage(6, this::setChanged) {
-
-        @Override
-        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
-            return 0;
-        }
-    };
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(6, this::setChanged, new ContainerSlotAssignment(0, 0, 0, 1));
 
     @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
     public ColorVariant currentColor = getDefaultColor();
@@ -130,7 +124,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
 
         dropped.forEach(stack -> {
             try (var transaction = Transaction.openRoot()) {
-                var inserted = inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
+                var inserted = inventory.getOutputContainer().insert(ItemResource.of(stack), stack.getCount(), transaction);
                 if (inserted == stack.getCount()) {
                     transaction.commit();
                 }
@@ -277,7 +271,7 @@ public class TreefellerBlockEntity extends NetworkedBlockEntity implements
 
     @Override
     public ResourceHandler<ItemResource> getItemLookup(Direction direction) {
-        return inventory;
+        return inventory.getExternalAccess();
     }
 
     @Override

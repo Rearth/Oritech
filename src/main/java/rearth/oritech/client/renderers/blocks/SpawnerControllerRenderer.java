@@ -66,7 +66,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
                 matrices.translate(0.0F, -1.501F, 0.0F);
                 matrices.scale(0.9f, 0.9f, 0.9f);
                 var model = livingEntityRenderer.getModel();
-                var renderLayer = RenderTypes.beaconBeam(Identifier.withDefaultNamespace("textures/entity/beacon_beam.png"), true);
+                var renderLayer = RenderTypes.beaconBeam(Identifier.withDefaultNamespace("textures/entity/beacon/beacon_beam.png"), true);
 
                 // submit the custom geometry with the matrices transformed specifically for the entity model preview
                 collector.submitCustomGeometry(matrices, renderLayer, (pose, consumer) -> {

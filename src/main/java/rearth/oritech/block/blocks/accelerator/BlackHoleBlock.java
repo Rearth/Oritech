@@ -47,7 +47,7 @@ public class BlackHoleBlock extends Block implements EntityBlock, TooltipProvide
 
     @Override
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
+        return RenderShape.INVISIBLE;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

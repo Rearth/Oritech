@@ -48,14 +48,19 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     public void tick(Level level, BlockPos pos, BlockState state, PipeBoosterBlockEntity blockEntity) {
         if (level.isClientSide()) return;
 
-        if (!setPipe && (level.getGameTime() & 25) == 0) {
-            // try find pipe entity behind
+        if ((level.getGameTime() & 25) == 0) {
+            // Find or validate the pipe entity behind the booster.
             var targetPos = pos.offset(Geometry.getBackward(state.getValue(BlockStateProperties.HORIZONTAL_FACING)));
             var candidate = level.getBlockEntity(targetPos);
             if (candidate instanceof GenericPipeInterfaceEntity pipe) {
                 pipe.connectedBooster = pos;
-                setPipe = true;
-                triggerAnim("machine", "expand");
+                if (!setPipe) {
+                    setPipe = true;
+                    triggerAnim("machine", "expand");
+                }
+            } else if (setPipe) {
+                setPipe = false;
+                triggerAnim("machine", "retract");
             }
         }
 

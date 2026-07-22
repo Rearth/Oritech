@@ -70,6 +70,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         range = 1;
         yieldAddons = 0;
         hasSilkTouchAddon = false;
+        hasCropFilterAddon = false;
         super.gatherAddonStats(addons);
     }
 
@@ -236,8 +237,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
                 for (var stack : dropped) {
                     if (this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction) != stack.getCount())
                         return;
-                    transaction.commit();
                 }
+                transaction.commit();
             }
 
             targetState.getBlock().playerWillDestroy(level, targetPosition, targetState, getDestroyerPlayerEntity());
@@ -289,7 +290,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         } else if (hasWorkAvailable(getCurrentTarget())) {
             var bp = getCurrentTarget().below();
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0);
         }
     }
 
