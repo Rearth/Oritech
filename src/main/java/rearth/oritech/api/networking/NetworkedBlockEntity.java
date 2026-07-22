@@ -93,13 +93,16 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             return;
         }
 
+        var chunkPos = ChunkPos.containing(worldPosition);
+        if (serverLevel.getChunkSource().chunkMap.getChunkToSend(chunkPos.pack()) == null) return;
+
         preNetworkUpdate(type);
 
         var usedBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
         var fieldCount = NetworkManager.encodeFields(this, type, usedBuf, level);
         if (fieldCount == 0) return;
 
-        PacketDistributor.sendToPlayersTrackingChunk(serverLevel, ChunkPos.containing(worldPosition), new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
+        PacketDistributor.sendToPlayersTrackingChunk(serverLevel, chunkPos, new NetworkManager.MessagePayload(worldPosition, BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(getType()), type, usedBuf.array()));
     }
 
     public void sendUpdate(SyncType type, ServerPlayer player) {
@@ -107,6 +110,8 @@ public abstract class NetworkedBlockEntity extends BlockEntity implements BlockE
             Oritech.LOGGER.warn("unable to send player update: Level is null.");
             return;
         }
+
+        if (player.level() != level) return;
 
         preNetworkUpdate(type);
 

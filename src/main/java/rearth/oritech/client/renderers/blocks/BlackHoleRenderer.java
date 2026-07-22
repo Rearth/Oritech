@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
@@ -29,6 +30,7 @@ import java.util.List;
 public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEntity, BlackHoleRenderer.BlackHoleRenderState> {
 
     public static final BlockDisplayContext BLOCK_DISPLAY_CONTEXT = BlockDisplayContext.create();
+    private static final float OUTER_RING_BASE_SPEED = 1.1f;
     private final BlockModelResolver blockModelResolver;
 
     public BlackHoleRenderer(BlockEntityRendererProvider.Context context) {
@@ -46,35 +48,42 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
 
         var level = (ClientLevel) blockEntity.getLevel();
         var time = level.getGameTime();
-        state.gameTime = time + partialTicks;
+        var renderTime = time + (double) partialTicks;
+        state.gameTime = (float) renderTime;
+        state.updateOuterRotation(renderTime);
 
         var modelSet = Minecraft.getInstance().getModelManager().getBlockStateModelSet();
 
-        if (blockEntity.currentlyPullingFrom != null && blockEntity.currentlyPulling != null
-                && blockEntity.pullingStartedAt + blockEntity.pullTime > time && !blockEntity.currentlyPulling.isAir()) {
+        state.pulledBlocks.clear();
+        for (var pulledBlock : blockEntity.currentlyPulling) {
+            if (pulledBlock.startedAt() + pulledBlock.pullTime() <= time || pulledBlock.state().isAir()) continue;
 
-            var progress = (float) Math.pow((time + partialTicks - blockEntity.pullingStartedAt) / (float) blockEntity.pullTime, 1.3f);
-            var startPos = Vec3.atLowerCornerOf(blockEntity.currentlyPullingFrom);
+            var progress = (float) Math.pow((time + partialTicks - pulledBlock.startedAt()) / (float) pulledBlock.pullTime(), 1.3f);
+            var startPos = Vec3.atLowerCornerOf(pulledBlock.from());
             var endPos = blockEntity.getBlockPos().getCenter();
 
             var pullOffset = endPos.subtract(startPos).scale(1 - progress);
-            var pullRotationY = progress * blockEntity.pullTime * 3;
+            var pullRotation = progress * pulledBlock.pullTime() * 3;
+            var orbitProgress = Math.clamp(progress, 0, 1);
+            orbitProgress *= orbitProgress;
+            var orbitRotation = orbitProgress * pulledBlock.pullTime() * 3;
             var pullScale = 1 - progress;
 
             // matrix for pulled block offset
             var tempStack = new PoseStack();
             tempStack.translate(0.5, 0.5, 0.5);
-            tempStack.mulPose(Axis.YP.rotationDegrees(pullRotationY));
+            tempStack.mulPose(Axis.YP.rotationDegrees(orbitRotation));
             tempStack.translate(-pullOffset.x, -pullOffset.y, -pullOffset.z);
-            tempStack.mulPose(Axis.XP.rotationDegrees(pullRotationY));
-            tempStack.mulPose(Axis.ZP.rotationDegrees(pullRotationY));
+            tempStack.mulPose(Axis.XP.rotationDegrees(pullRotation));
+            tempStack.mulPose(Axis.ZP.rotationDegrees(pullRotation));
             tempStack.scale(pullScale, pullScale, pullScale);
 
-            state.pullMatrix = new Matrix4f(tempStack.last().pose());
-            blockModelResolver.update(state.pulledState, blockEntity.currentlyPulling, BLOCK_DISPLAY_CONTEXT);
-        } else {
-            state.pullMatrix = null;
+            var pulledState = new BlockModelRenderState();
+            blockModelResolver.update(pulledState, pulledBlock.state(), BLOCK_DISPLAY_CONTEXT);
+            state.pulledBlocks.add(new PulledBlockRenderState(new Matrix4f(tempStack.last().pose()), pulledState));
         }
+
+        state.growthScale = blockEntity.getGrowthScale();
 
         var innerState = BlockContent.BLACK_HOLE_INNER.get().defaultBlockState();
         RenderHelpers.ExtractStateModels(state.innerParts, modelSet.get(innerState), level, blockEntity.getBlockPos(), innerState);
@@ -90,12 +99,14 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
     public void submit(BlackHoleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraState) {
 
         // block being pulled in
-        if (state.pullMatrix != null && !state.pulledState.isEmpty()) {
+        for (var pulledBlock : state.pulledBlocks) {
+            if (pulledBlock.state().isEmpty()) continue;
+
             poseStack.pushPose();
 
-            poseStack.mulPose(state.pullMatrix);
+            poseStack.mulPose(pulledBlock.matrix());
 
-            state.pulledState.submitMultiLayer(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+            pulledBlock.state().submitMultiLayer(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
 
             poseStack.popPose();
         }
@@ -109,6 +120,7 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         poseStack.translate(0.5f, 0.5f, 0.5f);
         poseStack.mulPose(Axis.YP.rotationDegrees(rotationY));
         poseStack.mulPose(Axis.XP.rotationDegrees((float) rotationX));
+        poseStack.scale(state.growthScale, state.growthScale, state.growthScale);
         poseStack.translate(-0.5f, -0.5f, -0.5f);
 
         collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.innerParts, new int[0], RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
@@ -117,15 +129,13 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
         poseStack.popPose();
 
 
-        // outer hold has extra rotations
+        // outer ring has extra rotations
         poseStack.pushPose();
         poseStack.translate(0.5f, 0.5f, 0.5f);
 
-        // Recalculate rotationY at the 1.1f speed factor from your original code
-        rotationY = (timeDelta * 1.1f) % 360;
-
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotationY));
+        poseStack.mulPose(Axis.YP.rotationDegrees(state.outerRotationY));
         poseStack.mulPose(Axis.XP.rotationDegrees((float) rotationX));
+        poseStack.scale(state.growthScale, state.growthScale, state.growthScale);
         poseStack.translate(-0.5f, -0.5f, -0.5f);
 
         collector.submitBlockModel(poseStack, Sheets.cutoutBlockSheet(), state.outerParts, new int[0], RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
@@ -140,12 +150,33 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
 
     public static class BlackHoleRenderState extends BlockEntityRenderState {
         public float gameTime;
+        public float growthScale = 1;
+        public float outerRotationY;
+        private double previousGameTime = Double.NaN;
 
-        public @Nullable Matrix4f pullMatrix = null;
-        public BlockModelRenderState pulledState = new BlockModelRenderState();
+        public List<PulledBlockRenderState> pulledBlocks = new ArrayList<>();
 
         public List<BlockStateModelPart> innerParts = new ArrayList<>();
         public List<BlockStateModelPart> middleParts = new ArrayList<>();
         public List<BlockStateModelPart> outerParts = new ArrayList<>();
+
+        private void updateOuterRotation(double gameTime) {
+            if (Double.isNaN(previousGameTime)) {
+                outerRotationY = (float) ((gameTime * OUTER_RING_BASE_SPEED) % 360);
+            } else {
+                var elapsed = Math.max(0, gameTime - previousGameTime);
+                outerRotationY = (float) ((outerRotationY + elapsed * OUTER_RING_BASE_SPEED * growthScale) % 360);
+            }
+
+            previousGameTime = gameTime;
+        }
+    }
+
+    public record PulledBlockRenderState(Matrix4f matrix, BlockModelRenderState state) {
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(BlackHoleBlockEntity blockEntity) {
+        return AABB.INFINITE;
     }
 }
