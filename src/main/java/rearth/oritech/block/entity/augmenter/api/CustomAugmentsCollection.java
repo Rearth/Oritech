@@ -158,7 +158,8 @@ public class CustomAugmentsCollection {
 
             if (spawnedEntity instanceof PortalEntity portalEntity) {
                 spawnedEntity.setPos(spawnPos);
-                spawnedEntity.setYRot(-player.getYRot() + 90);
+                var portalDirection = spawnPos.subtract(player.position());
+                spawnedEntity.setYRot(180 + (float) Math.toDegrees(Math.atan2(portalDirection.z, portalDirection.x)));
                 level.addFreshEntity(spawnedEntity);
                 portalEntity.target = targetPos;
                 level.playSound(null, BlockPos.containing(spawnPos), SoundEvents.AMBIENT_CAVE.value(), SoundSource.BLOCKS, 2, 1.2f);
