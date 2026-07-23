@@ -73,6 +73,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
 
     // client data
     public List<Vec3> displayTrail;
+    private int displayTrailTicksRemaining;
     public LastEventPacket lastEvent = new LastEventPacket(worldPosition, ParticleEvent.IDLE, 0, worldPosition, 1, ItemStack.EMPTY);
 
     public AcceleratorControllerBlockEntity(BlockPos pos, BlockState state) {
@@ -81,7 +82,11 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
 
     @Override
     public void tick(Level level, BlockPos pos, BlockState state, AcceleratorControllerBlockEntity blockEntity) {
-        if (level.isClientSide()) return;
+        if (level.isClientSide()) {
+            if (displayTrailTicksRemaining > 0 && --displayTrailTicksRemaining == 0)
+                displayTrail = null;
+            return;
+        }
         initParticleLogic();
 
         // try insert item as particle
@@ -477,6 +482,7 @@ public class AcceleratorControllerBlockEntity extends BlockEntity implements Blo
         if (level.getBlockEntity(packet.position) instanceof AcceleratorControllerBlockEntity acceleratorBlock) {
             var displayTrail = packet.particleTrail;
             acceleratorBlock.displayTrail = displayTrail;
+            acceleratorBlock.displayTrailTicksRemaining = 20;
             if (displayTrail.size() < 2) return;
 
             var playerPos = Minecraft.getInstance().player.position();

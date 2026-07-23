@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
@@ -30,6 +31,11 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
     }
 
     @Override
+    public AABB getRenderBoundingBox(AcceleratorControllerBlockEntity blockEntity) {
+        return AABB.INFINITE;
+    }
+
+    @Override
     public void extractRenderState(AcceleratorControllerBlockEntity entity, ParticleRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(entity, state, partialTicks, cameraPosition, breakProgress);
 
@@ -44,11 +50,13 @@ public class AcceleratorControllerRenderer implements BlockEntityRenderer<Accele
         // spawn a particle at the head of the trail
         var level = entity.getLevel();
         var head = line.getLast();
-        level.addParticle(ParticleTypes.REVERSE_PORTAL,
-                head.x + (level.getRandom().nextDouble() - 0.5) * 0.4,
-                head.y + (level.getRandom().nextDouble() - 0.5) * 0.6,
-                head.z + (level.getRandom().nextDouble() - 0.5) * 0.4,
-                0, 0, 0);
+
+        if (level.getRandom().nextFloat() > 0.7f)
+            level.addParticle(ParticleTypes.REVERSE_PORTAL,
+                    head.x + (level.getRandom().nextDouble() - 0.5) * 0.4,
+                    head.y + (level.getRandom().nextDouble() - 0.5) * 0.6,
+                    head.z + (level.getRandom().nextDouble() - 0.5) * 0.4,
+                    0, 0, 0);
 
         state.particleLine = new ArrayList<>(line);
     }
