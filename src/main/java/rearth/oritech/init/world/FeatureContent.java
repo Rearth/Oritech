@@ -21,6 +21,4 @@ public class FeatureContent {
     public static final Supplier<Feature<?>> RESOURCE_NODE = FEATURES.register("resource_node", () -> new ResourceNodeFeature(ResourceNodeFeatureConfig.CODEC));
     public static final Supplier<Feature<?>> URANIUM_PATCH = FEATURES.register("uranium_patch", () -> new UraniumPatchFeature(UraniumPatchFeatureConfig.CODEC));
 
-    // todo check / validate biome modifier jsons
-
 }
