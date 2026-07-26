@@ -162,8 +162,11 @@ dependencies {
     // athena (CTM)
     runtimeOnly "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
 
-    // runtime testing mode
+    // recipe viewer
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
     localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+
+    // runtime testing mode
     localRuntime "curse.maven:jade-324717:8326300"  // jade
 
 }
