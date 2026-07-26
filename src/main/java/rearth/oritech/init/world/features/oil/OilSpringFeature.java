@@ -16,8 +16,8 @@ import rearth.oritech.config.OritechConfig;
 public class OilSpringFeature extends Feature<OilSpringFeatureConfig> {
     private static final int MIN_SURFACE_PATCHES = 3;
     private static final int MAX_SURFACE_PATCHES = 5;
-    private static final int MIN_PATCH_DISTANCE = 3;
-    private static final int MAX_PATCH_DISTANCE = 6;
+    private static final int MIN_PATCH_DISTANCE = 2;
+    private static final int MAX_PATCH_DISTANCE = 4;
 
     public OilSpringFeature(Codec<OilSpringFeatureConfig> configCodec) {
         super(configCodec);
