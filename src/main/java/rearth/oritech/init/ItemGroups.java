@@ -79,12 +79,12 @@ public class ItemGroups {
 
                 if (fieldGroup.equals(targetGroup)) {
                     output.accept(value.value());
-                }
 
-                if (value.equals(ItemContent.SMALL_STORAGE_ITEM)) {
-                    var stack = new ItemStack(value.value());
-                    stack.set(ComponentContent.ENERGY, ((SmallEnergyStorageBlockItem) value.value()).getEnergyCapacity());
-                    output.accept(stack);
+                    if (value.equals(ItemContent.SMALL_STORAGE_ITEM)) {
+                        var stack = new ItemStack(value.value());
+                        stack.set(ComponentContent.ENERGY, ((SmallEnergyStorageBlockItem) value.value()).getEnergyCapacity());
+                        output.accept(stack);
+                    }
                 }
 
             } catch (IllegalAccessException e) {

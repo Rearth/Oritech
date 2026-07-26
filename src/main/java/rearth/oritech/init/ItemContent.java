@@ -120,6 +120,8 @@ public class ItemContent {
     @Compostable(1.0F)
     public static final DeferredItem<Item> PACKED_WHEAT = ITEMS.registerSimpleItem("packed_wheat");
     public static final DeferredItem<Item> QUARTZ_DUST = ITEMS.registerSimpleItem("quartz_dust");
+
+    @ItemGroupTarget(Groups.MACHINES)
     public static final DeferredItem<Item> UNSTABLE_CONTAINER = ITEMS.registerItem("unstable_container", props -> new UnstableContainerItem(props.stacksTo(1)));
 
     // bio
@@ -154,7 +156,8 @@ public class ItemContent {
     @ItemGroupTarget(Groups.MACHINES)
     public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
 
-    @ItemGroupTarget(Groups.MACHINES)public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    @ItemGroupTarget(Groups.MACHINES)
+    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
 
     // portable energy storage
     @ItemGroupTarget(Groups.MACHINES)
