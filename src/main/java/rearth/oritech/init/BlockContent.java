@@ -404,7 +404,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> NICKEL_PLATING_PRESSURE_PLATE = BLOCKS.registerBlock("nickel_plating_pressure_plate", props -> new PressurePlateBlock(BlockSetType.IRON, props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BUTTON));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> METAL_BEAM_BLOCK = BLOCKS.registerBlock("metal_beam_block", MetalBeamBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().forceSolidOn());
-    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE) // todo recipe
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> METAL_GIRDER_BLOCK = BLOCKS.registerBlock("metal_girder_block", MetalGirderBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion().forceSolidOn());
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> INDUSTRIAL_GLASS_BLOCK = BLOCKS.registerSimpleBlock("industrial_glass_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).requiresCorrectToolForDrops().strength(7.0F, 8.0F).noOcclusion());

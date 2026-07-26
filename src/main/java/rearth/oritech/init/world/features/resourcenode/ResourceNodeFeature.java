@@ -35,7 +35,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         var deepNodePos = testPos;
         var boulderPos = testPos;
 
-        for (int y = origin.getY(); y > level.getMinY(); y--) { // todo validate that minY is actually bedrock start
+        for (int y = origin.getY(); y > level.getMinY(); y--) {
             var downPos = testPos.below();
             var testState = level.getBlockState(downPos);
             if (testState.is(Blocks.BEDROCK)) {

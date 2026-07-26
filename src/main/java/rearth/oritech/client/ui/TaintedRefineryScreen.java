@@ -75,7 +75,6 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
 
         addComponent(BoxWidget.filled(87, 6, 1, 73, LabelWidget.DARK_TEXT));
 
-        // todo tooltip
         var currentActiveTank = refinery.selectedOutput;
         var cycleSlotButton = ButtonWidget.darkPanel(26, 54, 40, 20, Component.translatable("label.oritech.tainted_refinery.output_slot", currentActiveTank + 1), widget -> {
             var tankIndex = refinery.selectedOutput;

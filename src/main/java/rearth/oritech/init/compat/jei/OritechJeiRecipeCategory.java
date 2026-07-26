@@ -130,8 +130,8 @@ final class OritechJeiRecipeCategory extends AbstractRecipeCategory<RecipeHolder
         recipe.fluidInput().ifPresent(fluidInput -> {
             var amount = fluidInput.amount();
             var slot = builder.addInputSlot(10, 6)
-                    .setBackground(fluidBackground, -2, -2)
-                    .setFluidRenderer(amount, false, 10, 46);
+                    .setBackground(fluidBackground, -1, -1)
+                    .setFluidRenderer(amount, false, 12, 48);
             fluidInput.ingredient().fluids().forEach(fluid -> slot.add(fluid.value(), amount));
         });
 
@@ -153,8 +153,8 @@ final class OritechJeiRecipeCategory extends AbstractRecipeCategory<RecipeHolder
             var output = recipe.fluidOutputs().get(i);
             builder.addOutputSlot(tankX + i * 20, 6)
                     .add(output.fluid().value(), output.amount(), output.components())
-                    .setBackground(fluidBackground, -2, -2)
-                    .setFluidRenderer(output.amount(), false, 10, 46);
+                    .setBackground(fluidBackground, -1, -1)
+                    .setFluidRenderer(output.amount(), false, 12, 48);
         }
 
         builder.addInvisibleIngredients(RecipeIngredientRole.CRAFTING_STATION).add(machine);

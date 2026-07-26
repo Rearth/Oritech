@@ -7,7 +7,6 @@ import rearth.oritech.util.ColorHelper;
 
 /**
  * Renders a tinted color fill in place of a TextureAtlasSprite.
- * TODO 26.1: tile the actual sprite once a GuiGraphicsExtractor-compatible atlas blit path is wired up
  * (current 2D pose stack has no easy textured-quad path for atlas UV ranges).
  */
 public class SpriteWidget extends UIComponent {

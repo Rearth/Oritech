@@ -22,7 +22,6 @@ public class TaintedRefineryScreenHandler extends OritechScreenHandler {
     @Override
     protected void addEnergyDisplay() {
         // super.addEnergyDisplay();
-        // todo
     }
 
     @Override

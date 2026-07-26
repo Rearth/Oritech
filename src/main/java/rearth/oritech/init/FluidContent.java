@@ -55,7 +55,7 @@ public class FluidContent {
     - sheol fire:
       - burns in lava generator for a very long time
       - used in refinery with raw ores to process into very high yielded clumps
-      - used in item creation? todo
+      - used in item creation?
     - strange matter:
       - used to "fill" dubious containers in centrifuge
 

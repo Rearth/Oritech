@@ -23,7 +23,7 @@ public class ModRenderers {
         event.registerBlockEntityRenderer(BlockEntitiesContent.ATOMIC_FORGE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/atomic_forge_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.POWERED_FURNACE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/powered_furnace_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY_ENTITY.get(), ctx -> new RefineryRenderer<>(ctx, "models/refinery_block"));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get(), ctx -> new TaintedRefineryRenderer<>(ctx, "models/tainted_refinery_block")); // todo
+        event.registerBlockEntityRenderer(BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get(), ctx -> new TaintedRefineryRenderer<>(ctx, "models/tainted_refinery_block"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY_MODULE_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/refinery_module_block"));
 
         event.registerBlockEntityRenderer(BlockEntitiesContent.PLAYER_MODIFIER_BLOCK_ENTITY.get(), ctx -> new MachineRenderer<>(ctx, "models/augment_application_block"));
