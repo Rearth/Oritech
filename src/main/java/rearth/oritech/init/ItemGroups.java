@@ -8,6 +8,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
+import rearth.oritech.item.other.SmallEnergyStorageBlockItem;
+import rearth.oritech.item.tools.util.OritechEnergyItem;
 
 import java.lang.reflect.Modifier;
 import java.util.Locale;
@@ -79,6 +81,12 @@ public class ItemGroups {
                     output.accept(value.value());
                 }
 
+                if (value.equals(ItemContent.SMALL_STORAGE_ITEM)) {
+                    var stack = new ItemStack(value.value());
+                    stack.set(ComponentContent.ENERGY, ((SmallEnergyStorageBlockItem) value.value()).getEnergyCapacity());
+                    output.accept(stack);
+                }
+
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Failed to access field: " + field.getName(), e);
             }
@@ -98,8 +106,16 @@ public class ItemGroups {
 
         // add tools
         for (var tool : ToolsContent.EQUIPMENT.getEntries()) {
-            if (targetGroup.equals(ItemContent.Groups.EQUIPMENT))
+            if (targetGroup.equals(ItemContent.Groups.EQUIPMENT)) {
                 output.accept(tool.value());
+
+                if (tool.value() instanceof OritechEnergyItem energyItem) {
+                    var stack = new ItemStack(tool.value());
+                    stack.set(ComponentContent.ENERGY, energyItem.getEnergyCapacity());
+                    output.accept(stack);
+                }
+
+            }
         }
     }
 }
