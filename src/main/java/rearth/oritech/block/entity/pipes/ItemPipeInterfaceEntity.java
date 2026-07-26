@@ -32,8 +32,11 @@ import java.util.*;
 public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private static final int TRANSFER_AMOUNT = OritechConfig.itemPipeTransferAmount.get();
     private static final int TRANSFER_PERIOD = OritechConfig.itemPipeIntervalDuration.get();
+    private static final int EXTRACTION_WINDOW_THRESHOLD = 16;
+    private static final int EXTRACTION_WINDOW_SIZE = 8;
 
     private List<BlockCapabilityCache<ResourceHandler<ItemResource>, Direction>> filteredItemTargetsCached;
+    private final EnumMap<Direction, Integer> extractionWindowStarts = new EnumMap<>(Direction.class);
 
     // item path cache (invalidated on network update)
     private final HashMap<BlockPos, Tuple<ArrayList<BlockPos>, Integer>> cachedTransferPaths = new HashMap<>();
@@ -99,11 +102,23 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             var sourceContainer = level.getCapability(Capabilities.Item.BLOCK, sourcePos, sourceBlock, null, accessDirection);
             if (sourceContainer == null) continue;
 
+            var sourceSlotCount = sourceContainer.size();
+            var windowedExtraction = sourceSlotCount > EXTRACTION_WINDOW_THRESHOLD;
+            var firstSlot = 0;
+            var lastSlot = sourceSlotCount;
+            if (windowedExtraction) {
+                firstSlot = extractionWindowStarts.getOrDefault(machineDirection, 0);
+                if (firstSlot >= sourceSlotCount) firstSlot = 0;
+                lastSlot = Math.min(firstSlot + EXTRACTION_WINDOW_SIZE, sourceSlotCount);
+            } else {
+                extractionWindowStarts.remove(machineDirection);
+            }
+
             // one transaction per machine that is being extracted from
             try (var transaction = Transaction.openRoot()) {
                 var moved = 0;
                 // do the whole thing for each slot in the source container
-                for (int i = 0; i < sourceContainer.size(); i++) {
+                for (int i = firstSlot; i < lastSlot; i++) {
                     var extractedResource = sourceContainer.getResource(i);
                     if (extractedResource.isEmpty() || machineMoveCapacity <= 0) continue;
 
@@ -148,6 +163,8 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 if (moved > 0) {
                     transaction.commit();
                     onBoostUsed();
+                } else if (windowedExtraction) {
+                    extractionWindowStarts.put(machineDirection, lastSlot >= sourceSlotCount ? 0 : lastSlot);
                 }
 
             }
