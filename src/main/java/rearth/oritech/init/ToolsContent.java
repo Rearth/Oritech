@@ -11,8 +11,10 @@ import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.MaceItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.component.Weapon;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.Equippable;
@@ -157,6 +159,8 @@ public class ToolsContent {
                     .stacksTo(1)
                     .attributes(ElectricMaceItem.createAttributes())
                     .rarity(Rarity.EPIC)
+                    .component(DataComponents.TOOL, MaceItem.createToolProperties())
+                    .component(DataComponents.WEAPON, new Weapon(1))
                     .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
     );
 
