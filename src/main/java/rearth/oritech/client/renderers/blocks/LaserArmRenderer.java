@@ -102,6 +102,7 @@ public class LaserArmRenderer<R extends BlockEntityRenderState & GeoRenderState>
     @Override
     public void addRenderData(LaserArmBlockEntity laserEntity, @Nullable Void relatedObject, R renderState, float partialTick) {
         super.addRenderData(laserEntity, relatedObject, renderState, partialTick);
+        MachineRenderer.addColorRenderData(laserEntity, renderState);
 
         // calculate custom angles first!
         Vec3 target;

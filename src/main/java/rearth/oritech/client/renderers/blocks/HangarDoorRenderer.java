@@ -27,6 +27,7 @@ public class HangarDoorRenderer<R extends BlockEntityRenderState & GeoRenderStat
     @Override
     public void addRenderData(HangarDoorBlockEntity animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
         super.addRenderData(animatable, relatedObject, renderState, partialTick);
+        MachineRenderer.addColorRenderData(animatable, renderState);
         var state = animatable.getBlockState();
         var surface = state.getValue(HangarDoorBlock.SURFACE);
         var rotated = state.getValue(HangarDoorBlock.ROTATED);

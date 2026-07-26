@@ -28,6 +28,7 @@ public class UnstableContainerRenderer<R extends BlockEntityRenderState & GeoRen
 
     @Override
     public void addRenderData(UnstableContainerBlockEntity animatable, @org.jspecify.annotations.Nullable Void relatedObject, R renderState, float partialTick) {
+        super.addRenderData(animatable, relatedObject, renderState, partialTick);
 
         if (animatable.capturedBlock == null) return;
 
@@ -37,7 +38,7 @@ public class UnstableContainerRenderer<R extends BlockEntityRenderState & GeoRen
         var itemState = new ItemStackRenderState();
         itemModelResolver.updateForTopItem(itemState, new ItemStack(animatable.capturedBlock.getBlock().asItem()), ItemDisplayContext.FIXED, animatable.getLevel(), null, 0);
 
-        renderState.getOrDefaultGeckolibData(CONTAINMENT_DATA, new ContainerBlockData(itemState, rotationY));
+        renderState.addGeckolibData(CONTAINMENT_DATA, new ContainerBlockData(itemState, rotationY));
     }
 
     @Override
@@ -51,9 +52,9 @@ public class UnstableContainerRenderer<R extends BlockEntityRenderState & GeoRen
         var itemModel = data.item();
 
         poseStack.pushPose();
-        poseStack.scale(0.6f, 0.6f, 0.6f);
+        poseStack.translate(0.5, 0.35,  0.5);
+        poseStack.scale(0.8f, 0.8f, 0.8f);
         poseStack.mulPose(Axis.YP.rotationDegrees(rotationY));
-        poseStack.translate(-0.5, 0, -0.5);
 
         itemModel.submit(poseStack, renderTasks, RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
 

@@ -14,6 +14,7 @@ import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
 import rearth.oritech.client.renderers.models.MachineModel;
@@ -32,6 +33,12 @@ public class ShrinkerBlockRenderer<R extends BlockEntityRenderState & GeoRenderS
     @Override
     public AABB getRenderBoundingBox(ShrinkerBlockEntity blockEntity) {
         return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
+    }
+
+    @Override
+    public void addRenderData(ShrinkerBlockEntity animatable, @Nullable Void relatedObject, R renderState, float partialTick) {
+        super.addRenderData(animatable, relatedObject, renderState, partialTick);
+        MachineRenderer.addColorRenderData(animatable, renderState);
     }
 
     private static class FullbrightFluidBoneLayer<R extends GeoRenderState> extends CustomBoneTextureGeoLayer<ShrinkerBlockEntity, Void, R> {
