@@ -285,7 +285,7 @@ public class BlockContent {
 
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
-    public static final DeferredBlock<Block> URANIUM_CRYSTAL = BLOCKS.registerBlock("uranium_crystal", props -> new AmethystClusterBlock(7, 3, props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.AMETHYST_CLUSTER).lightLevel(state -> 5));
+    public static final DeferredBlock<Block> URANIUM_CRYSTAL = BLOCKS.registerBlock("uranium_crystal", props -> new AmethystClusterBlock(11, 6, props), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.AMETHYST_CLUSTER).lightLevel(state -> 5));
 
     @NoBlockItem
     public static final DeferredBlock<Block> REACTOR_EXPLOSION_SMALL = BLOCKS.registerBlock("reactor_explosion_small", props -> new NuclearExplosionBlock(props, 9), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));

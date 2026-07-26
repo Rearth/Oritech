@@ -7,7 +7,7 @@
 <h3 align="center">Oritech</h3>
 
 <div align="center">
-  A minecraft fabric / neoforge tech mod, currently in beta.
+  A minecraft fabric / neoforge tech mod.
   <br/>
   <br/>
   <a href="https://moddedmc.org/en/mod/oritech/docs"><strong>Explore the docs»</strong></a>
@@ -86,8 +86,6 @@ The following translations are available:
 
 ## Built With
 
-- Fabric API (or FFAPI)
-- Owo lib (for all the GUIs, config, and much more)
 - Geckolib (for the animations)
 - Blockbench (to create and animate the models)
 
@@ -198,6 +196,8 @@ In detail, these are the following items that are from the above-mentioned sourc
 
 ## Acknowledgements
 
+* Arky the PizzaRaccoon, for creating most of the metal ingot textures
+* Ridanisaurus Rid, for creating almost all the non-metal component textures
 * Kekie6, for creating the energy pipe and big solar panel models
 * glisco, the creator of owo-lib, for creating this awesome library and supporting in its usage
 * unilock, for providing most of the work on the EMI integration

@@ -97,7 +97,7 @@ public class ItemContent {
     public static final DeferredItem<Item> ENDERIC_COMPOUND = ITEMS.registerSimpleItem("enderic_compound");
     public static final DeferredItem<Item> MAGNETIC_COIL = ITEMS.registerSimpleItem("magnetic_coil");
     public static final DeferredItem<Item> CLAY_CATALYST_BEADS = ITEMS.registerSimpleItem("clay_catalyst_beads");
-    public static final DeferredItem<Item> MOTOR = ITEMS.registerItem("motor", props -> new CustomTooltipItem(props, "tooltip.oritech.motor"));
+    public static final DeferredItem<Item> MOTOR = ITEMS.registerSimpleItem("motor");
     public static final DeferredItem<Item> BASIC_BATTERY = ITEMS.registerSimpleItem("basic_battery");
     public static final DeferredItem<Item> RAW_SILICON = ITEMS.registerSimpleItem("raw_silicon");
     public static final DeferredItem<Item> SILICON = ITEMS.registerSimpleItem("silicon");
