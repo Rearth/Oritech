@@ -7,12 +7,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
-import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.api.screen.widgets.TextureWidget;
@@ -23,21 +21,14 @@ import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
 import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
+import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
-
-    private static final float PREVIEW_DRAW_WIDTH = 170f;
-    private static final float PREVIEW_HORIZONTAL_MARGIN = 10f;
-    private static final float PREVIEW_BASELINE_Y = 100f;
-    private static final float PREVIEW_ISO_X = 0.43f;
-    private static final float PREVIEW_ISO_Y = 0.224f;
-    private static final float PREVIEW_ISO_HEIGHT = 0.5f;
 
     private LabelWidget productionLabel;
     private LabelWidget hottestLabel;
@@ -171,7 +162,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         long amount = menu.reactorEntity.energyStorage.getAmountAsLong();
         float fillAmount = capacity <= 0 ? 0f : (float) amount / capacity;
 
-        energyIndicator.withTooltip(Component.translatable("tooltip.oritech.energy_indicator", amount, capacity));
+        energyIndicator.withTooltip(Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(amount), TooltipHelper.getEnergyText(capacity)));
         energyIndicator.setVisibleArea(0, 108 - (int) (108 * fillAmount), 36, (int) (108 * fillAmount));
     }
 
@@ -246,68 +237,61 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
 
-    private final class ReactorPreviewWidget extends UIComponent {
-        private static final Comparator<PreviewEntry> PREVIEW_RENDER_ORDER = Comparator
-                .comparingDouble(PreviewEntry::zIndex)
-                .thenComparingInt(PreviewEntry::drawY)
-                .thenComparingInt(PreviewEntry::drawX);
-
-        private final List<PreviewEntry> blockEntries = new ArrayList<>();
-        private final List<PreviewEntry> heatEntries = new ArrayList<>();
-        private @Nullable PreviewEntry hoveredEntry;
-        private final int blockSize;
+    private final class ReactorPreviewWidget extends BlockPreviewWidget {
+        private static final float HEAT_OVERLAY_SCALE = 1.01f;
+        private static final float HOVER_OVERLAY_SCALE = 1.015f;
+        private final List<BlockPos> heatPositions = new ArrayList<>();
 
         private ReactorPreviewWidget(int x, int y, int width, int height) {
             super(x, y, width, height);
             this.surface = OritechSurface.PANEL_INSET;
 
             var previewMax = menu.reactorEntity.areaMax.atY(menu.reactorEntity.areaMin.getY() + 1);
-            var totalSize = previewMax.subtract(menu.reactorEntity.areaMin);
-            int leftCount = totalSize.getZ();
-            int rightCount = totalSize.getX();
-            int totalWidth = leftCount + rightCount + 3;
-            float middlePercentage = leftCount / (float) totalWidth;
-            float xOffset = middlePercentage * PREVIEW_DRAW_WIDTH + PREVIEW_HORIZONTAL_MARGIN;
-
-            this.blockSize = Math.max(1, Math.round(PREVIEW_DRAW_WIDTH / totalWidth * 2.2f));
-
             BlockPos.betweenClosedStream(menu.reactorEntity.areaMin, previewMax).forEach(pos -> {
-                var entry = createPreviewEntry(pos, xOffset);
-                if (entry == null) {
+                var state = menu.level.getBlockState(pos);
+                if (state.isAir()) {
                     return;
                 }
 
-                blockEntries.add(entry);
+                var offset = pos.subtract(menu.reactorEntity.areaMin);
+                addBlock(state, menu.level.getBlockEntity(pos), offset);
 
-                var state = menu.level.getBlockState(pos);
                 if (state.getBlock() instanceof ReactorRodBlock || state.getBlock() instanceof ReactorHeatPipeBlock) {
-                    heatEntries.add(new PreviewEntry(pos.immutable(), null, entry.zIndex() + 0.5f, entry.drawX(), entry.drawY()));
+                    heatPositions.add(pos.immutable());
                 }
             });
-
-            blockEntries.sort(PREVIEW_RENDER_ORDER);
-            heatEntries.sort(PREVIEW_RENDER_ORDER);
         }
 
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-            hoveredEntry = findHoveredEntry(mouseX, mouseY);
+            super.renderContent(graphics, mouseX, mouseY, delta);
 
-            for (var entry : blockEntries) {
-                renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), null, entry.blockEntity(), entry.pos(), delta);
+            var hovered = getHoveredBlock();
+            if (hovered != null && hovered.offset().getY() == 1) {
+                var worldPos = menu.reactorEntity.areaMin.offset(hovered.offset());
+                renderTooltipPanel(graphics, mouseX - x, mouseY - y,
+                        getStatsTooltip(worldPos, hovered.state()));
             }
+        }
 
-            for (var entry : heatEntries) {
-                var state = resolveHeatState(entry.pos());
+        @Override
+        protected void appendRenderEntries(List<BlockPreviewRenderState.Entry> entries) {
+            for (var pos : heatPositions) {
+                var state = resolveHeatState(pos);
                 if (!state.isAir()) {
-                    renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), state, null, entry.pos(), delta);
+                    entries.add(new BlockPreviewRenderState.Entry(
+                            state, null, pos.subtract(menu.reactorEntity.areaMin), HEAT_OVERLAY_SCALE));
                 }
             }
 
-            if (hoveredEntry != null) {
-                renderBlock(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
-                        BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(), null, hoveredEntry.pos(), delta);
-                renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.level.getBlockState(hoveredEntry.pos())));
+            var hovered = getHoveredBlock();
+            if (hovered != null && hovered.offset().getY() == 1) {
+                entries.add(new BlockPreviewRenderState.Entry(
+                        BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(),
+                        null,
+                        hovered.offset(),
+                        HOVER_OVERLAY_SCALE
+                ));
             }
         }
 
@@ -324,51 +308,6 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
                 return BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.get().defaultBlockState();
             }
             return BlockContent.REACTOR_COLD_INDICATOR_BLOCK.get().defaultBlockState();
-        }
-
-        @Override
-        public boolean hasTooltip() {
-            return false;
-        }
-
-        private @Nullable PreviewEntry createPreviewEntry(BlockPos pos, float xOffset) {
-            var state = menu.level.getBlockState(pos);
-            if (state.isAir()) {
-                return null;
-            }
-
-            var offset = pos.subtract(menu.reactorEntity.areaMin);
-            float projectedPosX = offset.getX() * PREVIEW_ISO_X - offset.getZ() * PREVIEW_ISO_X;
-            float projectedPosY = offset.getX() * PREVIEW_ISO_Y + offset.getZ() * PREVIEW_ISO_Y + offset.getY() * PREVIEW_ISO_HEIGHT;
-            float zIndex = offset.getY() - offset.getX() - offset.getZ();
-            int drawX = Math.round(projectedPosX * blockSize + xOffset);
-            int drawY = Math.round(PREVIEW_BASELINE_Y - projectedPosY * blockSize);
-
-            return new PreviewEntry(
-                    pos.immutable(),
-                    menu.level.getBlockEntity(pos),
-                    zIndex,
-                    drawX,
-                    drawY
-            );
-        }
-
-        private @Nullable PreviewEntry findHoveredEntry(int mouseX, int mouseY) {
-            if (!isMouseOver(mouseX, mouseY)) {
-                return null;
-            }
-
-            float localMouseX = (float) mouseX - x;
-            float localMouseY = (float) mouseY - y;
-            for (int i = blockEntries.size() - 1; i >= 0; i--) {
-                var entry = blockEntries.get(i);
-                var yLevel = entry.pos.getY() - menu.reactorEntity.areaMin.getY();
-                if (yLevel == 1 && localMouseX >= entry.drawX() && localMouseX <= entry.drawX() + blockSize &&
-                        localMouseY >= entry.drawY() && localMouseY <= entry.drawY() + blockSize) {
-                    return entry;
-                }
-            }
-            return null;
         }
 
         private void renderTooltipPanel(GuiGraphicsExtractor graphics, int blockX, int blockY, List<Component> tooltip) {
@@ -397,18 +336,5 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             }
         }
 
-        // Stubbed: 3D block rendering in a 2D UI no longer has a one-liner equivalent in 26.1.
-        // The previous Minecraft.getInstance().getBlockRenderer().renderSingleBlock(...) call
-        // and LightTexture.FULL_BRIGHT are gone; the new pipeline uses ModelBlockRenderer +
-        // SubmitNodeStorage and requires a dedicated PIP renderer to draw a block into a GUI.
-        // Leaving as a no-op until a proper grid PIP renderer is built.
-        private void renderBlock(GuiGraphicsExtractor graphics, int drawX, int drawY, int size, float zIndex,
-                                 @Nullable BlockState overrideState, @Nullable BlockEntity overrideEntity,
-                                 BlockPos worldPos, float delta) {
-            // no-op
-        }
-    }
-
-    private record PreviewEntry(BlockPos pos, @Nullable BlockEntity blockEntity, float zIndex, int drawX, int drawY) {
     }
 }

@@ -51,6 +51,9 @@ public record BlockPreviewRenderState(
         return scissorArea != null ? scissorArea.intersection(bounds) : bounds;
     }
 
-    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
+    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale) {
+        public Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
+            this(state, entity, offset, 1f);
+        }
     }
 }

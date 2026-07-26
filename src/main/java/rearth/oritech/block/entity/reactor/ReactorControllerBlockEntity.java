@@ -57,7 +57,7 @@ public class ReactorControllerBlockEntity extends NetworkedBlockEntity implement
     private final HashSet<BlockPos> redstonePorts = new HashSet<>();   // list of all redstone ports
 
     @SyncField(SyncType.GUI_TICK)
-    public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
+    public HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
 
     @SyncField(SyncType.GUI_TICK)
     public DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.reactorMaxEnergyStored.get(), OritechConfig.reactorMaxEnergyStored.get(), 0, 0, this::setChanged, false);

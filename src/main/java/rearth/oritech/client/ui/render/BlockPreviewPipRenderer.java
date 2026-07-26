@@ -49,6 +49,11 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
                     entry.offset().getY() - 0.5f,
                     entry.offset().getZ() - 0.5f
             );
+            if (entry.scale() != 1f) {
+                poseStack.translate(0.5f, 0.5f, 0.5f);
+                poseStack.scale(entry.scale(), entry.scale(), entry.scale());
+                poseStack.translate(-0.5f, -0.5f, -0.5f);
+            }
 
             minecraft.getBlockModelResolver().update(modelState, entry.state(), DISPLAY_CONTEXT);
             modelState.submit(poseStack, submitNodes, RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);

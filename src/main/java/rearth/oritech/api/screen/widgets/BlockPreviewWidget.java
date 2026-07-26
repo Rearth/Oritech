@@ -147,6 +147,7 @@ public class BlockPreviewWidget extends UIComponent {
         for (var entry : blocks) {
             entries.add(new BlockPreviewRenderState.Entry(entry.state(), entry.entity(), entry.offset()));
         }
+        appendRenderEntries(entries);
 
         graphics.submitPictureInPictureRenderState(new BlockPreviewRenderState(
                 List.copyOf(entries),
@@ -159,6 +160,13 @@ public class BlockPreviewWidget extends UIComponent {
                 graphics.pose(),
                 graphics.peekScissorStack()
         ));
+    }
+
+    /**
+     * Allows specialized previews to add transient overlays without affecting
+     * fitting or mouse picking.
+     */
+    protected void appendRenderEntries(List<BlockPreviewRenderState.Entry> entries) {
     }
 
     private float getScale(float availableWidth, float availableHeight) {
