@@ -1,7 +1,9 @@
 {
   "id": "oritech",
+  "schema": "1",
   "platforms": {
     "curseforge": "oritech",
     "modrinth": "oritech"
-  }
+  },
+  "owners": ["rearth"]
 }

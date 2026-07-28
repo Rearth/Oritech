@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
+    id 'org.moddedmc.wiki.toolkit' version '0.4.1'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -205,6 +206,24 @@ publishing {
         maven {
             url "file://${project.projectDir}/repo"
         }
+    }
+}
+
+// sinytra wiki
+wiki {
+    docs {
+        oritech {
+            // path to the folder containing metadata file (sinytra-wiki.json)
+            root = file('wiki')
+        }
+    }
+}
+
+tasks.processResources {
+    // copy wiki folder to assets
+    from("$rootDir/wiki") {
+        into "assets/oracle_index/books/oritech"
+        exclude 'assets/item/**' // items are rendered in-game as actual item components, no need to include them here
     }
 }
 
