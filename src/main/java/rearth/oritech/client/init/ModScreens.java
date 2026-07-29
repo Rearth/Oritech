@@ -18,7 +18,7 @@ public class ModScreens {
 
     public static final Supplier<MenuType<OritechScreenHandler>> ATOMIC_FORGE_SCREEN = MENUS.register("atomic_forge_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> TANK_SCREEN = MENUS.register("tank_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
-    public static final Supplier<MenuType<OritechScreenHandler>> EQUIPMENT_CHARGER_SCREEN = MENUS.register("equipmentCharger_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
+    public static final Supplier<MenuType<OritechScreenHandler>> EQUIPMENT_CHARGER_SCREEN = MENUS.register("equipmentcharger_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> FUEL_PORT_SCREEN = MENUS.register("fuel_port_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
     public static final Supplier<MenuType<OritechScreenHandler>> AUGMENTER_INV_SCREEN = MENUS.register("augmenter_inv_screen", () -> IMenuTypeExtension.create(OritechScreenHandler::new));
 
