@@ -94,6 +94,7 @@ public final class OritechJeiPlugin implements IModPlugin {
         ));
         registration.addRecipeCategories(new OritechJeiParticleCollisionRecipe(guiHelper));
         registration.addRecipeCategories(new OritechJeiLaserRecipe(guiHelper));
+        registration.addRecipeCategories(new OritechJeiBedrockExtractorRecipe(guiHelper));
         registration.addRecipeCategories(new OritechJeiTaintedRefineryCreation(guiHelper));
         registration.addRecipeCategories(new OritechJeiTaintedRefineryBonuses(guiHelper));
     }
@@ -129,6 +130,7 @@ public final class OritechJeiPlugin implements IModPlugin {
 
         registerRecipes(registration, OritechJeiRecipeTypes.PARTICLE_COLLISION, RecipeContent.PARTICLE_COLLISION);
         registerRecipes(registration, OritechJeiRecipeTypes.LASER, RecipeContent.LASER);
+        registerRecipes(registration, OritechJeiRecipeTypes.BEDROCK_EXTRACTOR, RecipeContent.BEDROCK_EXTRACTOR);
         registerRecipes(registration, OritechJeiRecipeTypes.REACTOR, RecipeContent.REACTOR);
 
         registration.addRecipes(OritechJeiRecipeTypes.TAINTED_REFINERY_CREATION,
@@ -202,6 +204,8 @@ public final class OritechJeiPlugin implements IModPlugin {
         registerCraftingStations(registration, OritechJeiRecipeTypes.PARTICLE_COLLISION,
                 BlockContent.PARTICLE_ACCELERATOR.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.LASER, BlockContent.ENDERIC_LASER.get());
+        registerCraftingStations(registration, OritechJeiRecipeTypes.BEDROCK_EXTRACTOR,
+                BlockContent.BEDROCK_EXTRACTOR.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.REACTOR, BlockContent.NUCLEAR_REACTOR_CONTROLLER.get());
 
         registration.addCraftingStation(OritechJeiRecipeTypes.TAINTED_REFINERY_CREATION,

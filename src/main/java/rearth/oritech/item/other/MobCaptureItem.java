@@ -32,7 +32,7 @@ public class MobCaptureItem extends Item {
     public InteractionResult interactLivingEntity(ItemStack stack, Player user, LivingEntity entity, InteractionHand hand) {
 
         var resultingItem = ItemContent.UNHOLY_INTELLIGENCE.asItem();
-        if (entity.isDeadOrDying()) return InteractionResult.PASS;
+        if (entity.isDeadOrDying() || user.level().isClientSide()) return InteractionResult.PASS;
 
         for (var target : targets) {
             if (entity.getType().equals(target)) {

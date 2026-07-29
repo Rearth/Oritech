@@ -19,6 +19,7 @@ final class OritechJeiRecipeTypes {
     static final IRecipeHolderType<OritechRecipe> FUEL_GENERATOR = create("fuel_generator");
     static final IRecipeHolderType<OritechRecipe> LAVA_GENERATOR = create("lava_generator");
     static final IRecipeHolderType<OritechRecipe> STEAM_ENGINE = create("steam_engine");
+    static final IRecipeHolderType<OritechRecipe> BEDROCK_EXTRACTOR = create("bedrock_extractor");
     static final IRecipeHolderType<OritechRecipe> PARTICLE_COLLISION = create("particle_collision");
     static final IRecipeHolderType<OritechRecipe> INDUSTRIAL_CHILLER = create("industrial_chiller");
     static final IRecipeHolderType<OritechRecipe> REACTOR = create("reactor");
