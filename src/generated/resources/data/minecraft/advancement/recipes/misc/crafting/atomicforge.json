@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_atomic_forge_block": {
+    "has_atomic_forge": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:atomic_forge_block"
+            "items": "oritech:atomic_forge"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_atomic_forge_block"
+      "has_atomic_forge"
     ]
   ],
   "rewards": {

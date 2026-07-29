@@ -36,7 +36,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
     private ServerPlayer placerPlayerEntity = null;
 
     public PlacerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PLACER_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.PLACER.get(), pos, state);
     }
 
     @Override

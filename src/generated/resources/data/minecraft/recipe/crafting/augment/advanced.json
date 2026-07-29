@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": "oritech:centrifuge_block",
+    "b": "oritech:centrifuge",
     "c": "oritech:flux_gate",
     "f": "oritech:duratium_ingot",
     "s": "#oritech:plating"
@@ -13,6 +13,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:advanced_augment_station"
+    "id": "oritech:quantum_research_station"
   }
 }

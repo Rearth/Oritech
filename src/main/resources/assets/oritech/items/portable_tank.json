@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:block/portable_tank",
+    "model": {
+      "type": "oritech:portable_tank",
+      "model": "oritech:portable_tank_body"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:still_strange_matter_bucket",
+    "p": "oritech:dubios_container",
+    "s": "oritech:superconductor"
+  },
+  "pattern": [
+    "ppp",
+    "scs",
+    "ppp"
+  ],
+  "result": {
+    "id": "oritech:addon_splicer"
+  }
+}

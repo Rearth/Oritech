@@ -83,7 +83,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemP
     }
 
     public ItemFilterBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ITEM_FILTER_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ITEM_FILTER.get(), pos, state);
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemP
     }
 
     public static void handleClientUpdate(ItemFilterPayload message, IPayloadContext context) {
-        var blockEntity = context.player().level().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER_ENTITY.get());
+        var blockEntity = context.player().level().getBlockEntity(message.pos(), BlockEntitiesContent.ITEM_FILTER.get());
         if (blockEntity.isPresent()) {
             blockEntity.get().setFilterSettings(message.data);
         }

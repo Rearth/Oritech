@@ -69,16 +69,16 @@ public class OritechAugmentDataGenerator implements DataProvider {
 
     public void addAugmentData(HolderLookup.Provider registries, AugmentRecipeBuilder.Output exporter) {
         
-        var SIMPLE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.SIMPLE_AUGMENT_STATION.get());
-        var ADVANCED_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ADVANCED_AUGMENT_STATION.get());
+        var CYBERNETIC_RESEARCH_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.CYBERNETIC_RESEARCH_STATION.get());
+        var QUANTUM_RESEARCH_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.QUANTUM_RESEARCH_STATION.get());
         var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION.get());
 
         new AugmentRecipeBuilder(registries)
-                .researchCost(TagContent.MACHINE_PLATING, 64)
+                .researchCost(TagContent.PLATING_BLOCKS, 64)
                 .researchCost(TagContent.COAL_DUSTS, 32)
                 .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
-                .applyCost(TagContent.MACHINE_PLATING, 8)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .applyCost(TagContent.PLATING_BLOCKS, 8)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(5).uiY(70).time(400).rfCost(10_000_000)
                 .modifierDefinition(Attributes.MAX_HEALTH, 6, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "hpboost");
@@ -89,7 +89,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.DIAMOND, 4)
                 .applyCost(TagContent.CARBON_FIBRE, 8)
                 .requirement(Oritech.id("augment/armor"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(80).uiY(70).time(800).rfCost(50_000_000)
                 .modifierDefinition(Attributes.MAX_HEALTH, 4, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "hpboostmore");
@@ -100,7 +100,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.NETHER_STAR)
                 .applyCost(ItemContent.ENERGITE_INGOT, 4)
                 .requirement(Oritech.id("augment/ultimatearmor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(165).uiY(70).time(1600).rfCost(200_000_000)
                 .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "hpboostultra");
@@ -109,11 +109,11 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(ItemContent.ADAMANT_INGOT, 32)
                 .researchCost(Items.NETHER_STAR, 4)
                 .researchCost(ItemContent.URANIUM_PELLET, 64)
-                .researchCost(BlockContent.FLUXITE_BLOCK, 64)
+                .researchCost(BlockContent.FLUXITE, 64)
                 .applyCost(ItemContent.ADAMANT_INGOT, 4)
                 .requirement(Oritech.id("augment/hpboostultra"))
                 .requirement(Oritech.id("augment/gravity"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(205).uiY(40).time(2400).rfCost(500_000_000)
                 .modifierDefinition(Attributes.MAX_HEALTH, 10, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "hpboostultimate");
@@ -123,7 +123,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
                 .researchCost(Items.REDSTONE, 64)
                 .applyCost(ItemContent.MOTOR, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(5).uiY(30).time(600).rfCost(30_000_000)
                 .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .export(exporter, "speedboost");
@@ -135,7 +135,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .applyCost(ItemContent.ENERGITE_INGOT, 4)
                 .requirement(Oritech.id("augment/speedboost"))
                 .requirement(Oritech.id("augment/armor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(55).uiY(50).time(1800).rfCost(150_000_000)
                 .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_VALUE)
                 .toggleable(true)
@@ -146,7 +146,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(TagContent.STEEL_INGOTS, 64)
                 .applyCost(ItemContent.MOTOR, 4)
                 .requirement(Oritech.id("augment/superspeedboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(80).uiY(50).time(800).rfCost(75_000_000)
                 .modifierDefinition(Attributes.STEP_HEIGHT, 0.6f, AttributeModifier.Operation.ADD_VALUE)
                 .toggleable()
@@ -158,7 +158,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.GOLD_INGOT, 32)
                 .applyCost(TagContent.SILICON, 4)
                 .requirement(Oritech.id("augment/hpboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(30).uiY(90).time(400).rfCost(20_000_000)
                 .modifierDefinition(Attributes.SCALE, -0.5f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .toggleable()
@@ -170,7 +170,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
                 .requirement(Oritech.id("augment/dwarf"))
                 .requirement(Oritech.id("augment/armor"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(55).uiY(90).time(1600).rfCost(40_000_000)
                 .modifierDefinition(Attributes.SCALE, 1f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .toggleable()
@@ -182,7 +182,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.DIAMOND, 16)
                 .applyCost(ItemContent.DURATIUM_INGOT, 4)
                 .applyCost(cItemTag("ingots/iron"), 32)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(30).uiY(50).time(800).rfCost(80_000_000)
                 .modifierDefinition(Attributes.ARMOR, 4, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "armor");
@@ -193,7 +193,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.DIAMOND, 8)
                 .applyCost(ItemContent.MAGNETIC_COIL, 4)
                 .requirement(Oritech.id("augment/autofeeder"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(105).uiY(50).time(1600).rfCost(180_000_000)
                 .modifierDefinition(Attributes.ARMOR, 6, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "betterarmor");
@@ -205,7 +205,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.NETHER_STAR, 4)
                 .applyCost(ItemContent.HEISENBERG_COMPENSATOR, 1)
                 .requirement(Oritech.id("augment/betterarmor"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(155).uiY(50).time(2400).rfCost(500_000_000)
                 .modifierDefinition(Attributes.ARMOR, 8, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "ultimatearmor");
@@ -216,7 +216,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.ENDER_PEARL, 4)
                 .applyCost(ItemContent.MAGNETIC_COIL, 4)
                 .requirement(Oritech.id("augment/blockreach"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(140).uiY(70).time(1600).rfCost(150_000_000)
                 .modifierDefinition(Attributes.ENTITY_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .export(exporter, "weaponreach");
@@ -226,7 +226,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(TagContent.STEEL_INGOTS, 48)
                 .researchCost(Items.ENDER_PEARL, 4)
                 .applyCost(ItemContent.MOTOR, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(115).uiY(90).time(900).rfCost(100_000_000)
                 .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .export(exporter, "blockreach");
@@ -236,7 +236,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.ENDER_PEARL, 16)
                 .applyCost(ItemContent.ENDERIC_LENS, 4)
                 .requirement(Oritech.id("augment/blockreach"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(140).uiY(90).time(800).rfCost(200_000_000)
                 .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                 .toggleable()
@@ -249,7 +249,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .applyCost(ItemContent.MAGNETIC_COIL, 4)
                 .requirement(Oritech.id("augment/attackdamage"))
                 .requirement(Oritech.id("augment/speedboost"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(30).uiY(10).time(1200).rfCost(50_000_000)
                 .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                 .export(exporter, "miningspeed");
@@ -261,7 +261,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .applyCost(ItemContent.ENERGITE_INGOT, 4)
                 .requirement(Oritech.id("augment/miningspeed"))
                 .requirement(Oritech.id("augment/superspeedboost"))
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(80).uiY(10).time(2400).rfCost(250_000_000)
                 .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                 .toggleable()
@@ -272,7 +272,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.DIAMOND, 8)
                 .researchCost(ItemContent.FLUXITE, 64)
                 .applyCost(TagContent.STEEL_INGOTS, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(5).uiY(10).time(1600).rfCost(150_000_000)
                 .modifierDefinition(Attributes.ATTACK_DAMAGE, 4, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "attackdamage");
@@ -353,7 +353,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(ItemContent.ENDERIC_LENS, 48)
                 .researchCost(Items.GLOWSTONE_DUST, 64)
                 .applyCost(Items.GLOWSTONE_DUST, 8)
-                .requiredStation(ADVANCED_AUGMENT_STATION_ID)
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
                 .uiX(105).uiY(30).time(2400).rfCost(50_000_000)
                 .effectDefinition(MobEffects.NIGHT_VISION, 0)
                 .toggleable()
@@ -364,7 +364,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
                 .researchCost(Items.HEART_OF_THE_SEA)
                 .applyCost(ItemContent.BIOSTEEL_INGOT, 4)
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(5).uiY(90).time(800).rfCost(50_000_000)
                 .effectDefinition(MobEffects.WATER_BREATHING, 0)
                 .export(exporter, "waterbreath");
@@ -376,7 +376,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .applyCost(TagContent.BIOMATTER, 4)
                 .requirement(Oritech.id("augment/armor"))
                 .requirement(Oritech.id("augment/hpboostmore"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(90).uiY(90).time(500).rfCost(30_000_000)
                 .customAugmentDefinition(CustomAugmentsCollection.feeder.id)
                 .toggleable()
@@ -388,7 +388,7 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .researchCost(Items.LODESTONE, 2)
                 .applyCost(ItemContent.MAGNETIC_COIL, 4)
                 .requirement(Oritech.id("augment/superminingspeed"))
-                .requiredStation(SIMPLE_AUGMENT_STATION_ID)
+                .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
                 .uiX(105).uiY(10).time(2400).rfCost(300_000_000)
                 .customAugmentDefinition(CustomAugmentsCollection.magnet.id)
                 .toggleable()

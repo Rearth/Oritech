@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": "oritech:basic_generator_block",
+    "b": "oritech:basic_generator",
     "c": "oritech:advanced_battery",
     "f": "oritech:fluxite",
     "s": "oritech:flux_gate"
@@ -13,6 +13,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:big_solar_panel_block"
+    "id": "oritech:big_solar_panel"
   }
 }

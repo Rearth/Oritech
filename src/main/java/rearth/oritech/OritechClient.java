@@ -30,7 +30,7 @@ import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
 import rearth.oritech.client.init.*;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
-import rearth.oritech.client.renderers.SmallTankItemRenderer;
+import rearth.oritech.client.renderers.PortableTankItemRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
 import rearth.oritech.datagen.AdvancementGenerator;
 import rearth.oritech.datagen.BlockLootGenerator;
@@ -131,7 +131,7 @@ public final class OritechClient {
 
     // wires the portable tank item renderer into the 26.1 special-model item pipeline
     private void registerSpecialModelRenderers(RegisterSpecialModelRendererEvent event) {
-        event.register(SmallTankItemRenderer.ID, SmallTankItemRenderer.Unbaked.MAP_CODEC);
+        event.register(PortableTankItemRenderer.ID, PortableTankItemRenderer.Unbaked.MAP_CODEC);
     }
 
     private void onPreClientTick(ClientTickEvent.Pre event) {

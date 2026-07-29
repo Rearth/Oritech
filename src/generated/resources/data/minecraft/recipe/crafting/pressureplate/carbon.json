@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "a": "oritech:carbon_plating_block"
+    "a": "oritech:carbon_plating"
   },
   "pattern": [
     "aa"

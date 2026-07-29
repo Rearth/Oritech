@@ -34,7 +34,7 @@ public class RedstoneAddonBlockEntity extends AddonBlockEntity implements BlockE
     public int currentOutput;
 
     public RedstoneAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REDSTONE_ADDON_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.REDSTONE_ADDON.get(), pos, state);
     }
 
     @Override

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_particle_collector_block": {
+    "has_tachyon_absorber": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:particle_collector_block"
+            "items": "oritech:tachyon_absorber"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_particle_collector_block"
+      "has_tachyon_absorber"
     ]
   ],
   "rewards": {

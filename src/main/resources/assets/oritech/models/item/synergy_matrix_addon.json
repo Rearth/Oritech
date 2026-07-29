@@ -1,0 +1,4 @@
+{
+  "parent": "oritech:block/synergy_matrix_addon",
+  "gui_light": "front"
+}

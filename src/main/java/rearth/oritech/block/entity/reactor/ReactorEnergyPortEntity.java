@@ -15,7 +15,7 @@ public class ReactorEnergyPortEntity extends BlockEntity implements EnergyProvid
     private final DynamicEnergyStorage dummyStorage = new DynamicEnergyStorage(0, 0, 0, 0);
 
     public ReactorEnergyPortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_ENERGY_PORT_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.REACTOR_ENERGY_PORT_BLOCK.get(), pos, state);
     }
 
     @Override

@@ -15,7 +15,7 @@ import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import rearth.oritech.Oritech;
-import rearth.oritech.client.renderers.blocks.PowerPoleCableRenderer;
+import rearth.oritech.client.renderers.blocks.EnergyTransmissionPoleCableRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 
 public class ActiveCableRenderer {
@@ -50,7 +50,7 @@ public class ActiveCableRenderer {
         var start = data.start().subtract(camPos);
         var end = data.end().subtract(camPos);
 
-        event.getSubmitNodeCollector().submitCustomGeometry(event.getPoseStack(), RenderTypes.entitySolid(PowerPoleCableRenderer.CABLE_TEXTURE), (pose, buffer) -> {
+        event.getSubmitNodeCollector().submitCustomGeometry(event.getPoseStack(), RenderTypes.entitySolid(EnergyTransmissionPoleCableRenderer.CABLE_TEXTURE), (pose, buffer) -> {
 
             var poseStack = new PoseStack();
             poseStack.last().pose().set(pose.pose());

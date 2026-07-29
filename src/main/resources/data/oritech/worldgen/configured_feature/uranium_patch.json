@@ -3,6 +3,6 @@
   "config": {
     "number": 5,
     "blockId": "oritech:deepslate_uranium_ore",
-    "crystalId": "oritech:uranium_crystal"
+    "crystalId": "oritech:uranite_crystal"
   }
 }

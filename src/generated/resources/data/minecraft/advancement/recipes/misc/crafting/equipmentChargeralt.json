@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_equipment_charger": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:equipment_charger"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:crafting/equipmentChargeralt"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_equipment_charger"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:crafting/equipmentChargeralt"
+    ]
+  }
+}

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tech_door": {
+    "has_industrial_door": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:tech_door"
+            "items": "oritech:industrial_door"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tech_door"
+      "has_industrial_door"
     ]
   ],
   "rewards": {

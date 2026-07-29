@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_nickel_plating_block": {
+    "has_nickel_plating": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:nickel_plating_block"
+            "items": "oritech:nickel_plating"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_nickel_plating_block"
+      "has_nickel_plating"
     ]
   ],
   "rewards": {

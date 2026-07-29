@@ -33,7 +33,7 @@ public class SoundContent {
     public static final Holder<SoundEvent> REACTOR = SOUND_EVENTS.register("reactor", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> REACTOR_LOADING = SOUND_EVENTS.register("reactor_loading", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> REACTOR_WARNING = SOUND_EVENTS.register("reactor_warning", SoundEvent::createVariableRangeEvent);
-    public static final Holder<SoundEvent> NUKE_EXPLOSION = SOUND_EVENTS.register("nuke_explosion", SoundEvent::createVariableRangeEvent);
+    public static final Holder<SoundEvent> MANHATTAN_MODULE_EXPLOSION = SOUND_EVENTS.register("manhattan_module_explosion", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> ELECTRIC_SHOCK = SOUND_EVENTS.register("electric_shock", SoundEvent::createVariableRangeEvent);
     public static final Holder<SoundEvent> BEDROCK_EXTRACTOR = SOUND_EVENTS.register("bedrock_extractor", SoundEvent::createVariableRangeEvent);
 

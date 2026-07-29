@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_plating_stairs": {
+    "has_copper_reinforced_plating_stairs": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_plating_stairs"
+            "items": "oritech:copper_reinforced_plating_stairs"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_plating_stairs"
+      "has_copper_reinforced_plating_stairs"
     ]
   ],
   "rewards": {

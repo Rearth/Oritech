@@ -27,7 +27,7 @@ final class OritechJeiLaserRecipe extends AbstractRecipeCategory<RecipeHolder<Or
         super(
                 OritechJeiRecipeTypes.LASER,
                 Component.translatable("emi.category.oritech.laser"),
-                guiHelper.createDrawableItemLike(BlockContent.LASER_ARM_BLOCK.get()),
+                guiHelper.createDrawableItemLike(BlockContent.ENDERIC_LASER.get()),
                 WIDTH,
                 HEIGHT
         );
@@ -53,6 +53,6 @@ final class OritechJeiLaserRecipe extends AbstractRecipeCategory<RecipeHolder<Or
                 .add(recipe.itemResults().getFirst())
                 .setOutputSlotBackground();
         builder.addInvisibleIngredients(RecipeIngredientRole.CRAFTING_STATION)
-                .add(BlockContent.LASER_ARM_BLOCK.get());
+                .add(BlockContent.ENDERIC_LASER.get());
     }
 }

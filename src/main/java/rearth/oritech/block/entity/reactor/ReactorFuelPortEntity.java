@@ -62,7 +62,7 @@ public class ReactorFuelPortEntity extends BlockEntity implements MenuProvider, 
     public int currentFuelOriginalCapacity;
 
     public ReactorFuelPortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_FUEL_PORT_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.REACTOR_FUEL_PORT_BLOCK.get(), pos, state);
     }
 
     @Override

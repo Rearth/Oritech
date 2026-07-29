@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "oritech:block/nuclear_reactor_controller"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/powered_furnace",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

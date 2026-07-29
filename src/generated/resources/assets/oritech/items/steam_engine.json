@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/steam_engine",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

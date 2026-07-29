@@ -85,7 +85,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             movingOffset = new Vec3(0, offsetY, 0);
         }
 
-        renderedPosition = LaserArmRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
+        renderedPosition = EndericLaserRenderer.lerp(entity.lastRenderedPosition, renderedPosition, 0.1f);
         entity.lastRenderedPosition = renderedPosition;
 
         gState.targetOffset = renderedPosition.subtract(Vec3.atLowerCornerOf(entity.getBlockPos())).add(movingOffset);
@@ -111,10 +111,10 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             gState.hasToolhead = false;
         }
 
-        if (entity instanceof DestroyerBlockEntity destroyerBlock && (!destroyerBlock.isMoving() || destroyerBlock.range > 1) && !destroyerBlock.quarryTarget.equals(BlockPos.ZERO)) {
+        if (entity instanceof DestroyerBlockEntity destroyer && (!destroyer.isMoving() || destroyer.range > 1) && !destroyer.quarryTarget.equals(BlockPos.ZERO)) {
             gState.isDestroyerQuarry = true;
             var pos = currentTarget;
-            gState.destroyerBeamHeight = pos.getY() - destroyerBlock.quarryTarget.getY() - 1.3f;
+            gState.destroyerBeamHeight = pos.getY() - destroyer.quarryTarget.getY() - 1.3f;
             gState.destroyerBeamOffset = gState.targetOffset.add(0, -1, 0);
 
             var baseThickness = 0.035f;
@@ -159,7 +159,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
             var offset = state.destroyerBeamOffset;
             var baseThickness = 0.035f;
 
-            var beamTexture = LaserArmRenderer.BEAM_TEXTURE;
+            var beamTexture = EndericLaserRenderer.BEAM_TEXTURE;
             var renderType = RenderTypes.eyes(beamTexture);
 
             collector.submitCustomGeometry(matrices, renderType, (pose, consumer) -> {
@@ -168,8 +168,8 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
                         pose, consumer, offset.add(0.5, 1, 0.5), new Vec3(0, -state.destroyerBeamHeight - 1, 0),
                         baseThickness,
                         RenderHelpers.FULL_BRIGHT,
-                        LaserArmRenderer.CORE_COLOR_START,
-                        LaserArmRenderer.CORE_COLOR_END
+                        EndericLaserRenderer.CORE_COLOR_START,
+                        EndericLaserRenderer.CORE_COLOR_END
                 );
 
                 // render glow overlay
@@ -177,8 +177,8 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
                         pose, consumer, offset.add(0.5, 1, 0.5), new Vec3(0, -state.destroyerBeamHeight - 1, 0),
                         state.thickness,
                         RenderHelpers.FULL_BRIGHT,
-                        LaserArmRenderer.GLOW_COLOR_START,
-                        LaserArmRenderer.GLOW_COLOR_END
+                        EndericLaserRenderer.GLOW_COLOR_START,
+                        EndericLaserRenderer.GLOW_COLOR_END
                 );
             });
 

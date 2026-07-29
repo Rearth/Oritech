@@ -23,7 +23,7 @@ public class GeoItemModelGenerator implements DataProvider {
             ToolsContent.PORTABLE_LASER,
             ToolsContent.PROMETHIUM_AXE,
             ToolsContent.PROMETHIUM_PICKAXE,
-            ItemContent.UNSTABLE_CONTAINER
+            ItemContent.SCHRODINGERS_SAFE
     );
 
     private final PackOutput.PathProvider pathProvider;

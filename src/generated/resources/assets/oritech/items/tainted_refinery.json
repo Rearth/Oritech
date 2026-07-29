@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/tainted_refinery",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

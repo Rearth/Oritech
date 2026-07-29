@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_fuel_generator_block": {
+    "has_fuel_generator": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:fuel_generator_block"
+            "items": "oritech:fuel_generator"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_fuel_generator_block"
+      "has_fuel_generator"
     ]
   ],
   "rewards": {

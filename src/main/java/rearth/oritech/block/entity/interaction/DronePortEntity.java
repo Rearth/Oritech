@@ -48,7 +48,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.blocks.interaction.DronePortBlock;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.DroneScreenHandler;
@@ -136,7 +136,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     private String statusMessage = "";
 
     public DronePortEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.DRONE_PORT_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.DRONE_PORT.get(), pos, state);
     }
 
     @Override
@@ -218,7 +218,7 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get()) || addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }

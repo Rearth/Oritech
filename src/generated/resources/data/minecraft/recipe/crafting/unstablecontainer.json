@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": "oritech:fluxite",
-    "c": "oritech:large_storage_block",
+    "c": "oritech:large_storage",
     "f": "oritech:super_ai_chip",
     "m": "oritech:duratium_ingot",
     "s": "oritech:flux_gate"
@@ -14,6 +14,6 @@
     "bbb"
   ],
   "result": {
-    "id": "oritech:unstable_container"
+    "id": "oritech:schrodingers_safe"
   }
 }

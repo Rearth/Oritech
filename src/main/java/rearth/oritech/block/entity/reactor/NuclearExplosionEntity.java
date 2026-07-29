@@ -36,15 +36,15 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
     private final Set<DirectionExplosionWave> waves = new HashSet<>();
     private final int size;
 
-    private ServerPlayer nukePlayerEntity = null;
+    private ServerPlayer manhattan_modulePlayerEntity = null;
 
     public NuclearExplosionEntity(BlockPos pos, BlockState state, int size) {
-        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.REACTOR_EXPLOSION.get(), pos, state);
         this.size = size;
     }
 
     public NuclearExplosionEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REACTOR_EXPLOSION_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.REACTOR_EXPLOSION.get(), pos, state);
         this.size = 9;
     }
 
@@ -57,7 +57,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
         if (startTime == -1) {
             startTime = level.getGameTime();
             explosionSphere(initialRadius + 7, 200, pos);
-            level.playSound(null, pos, SoundContent.NUKE_EXPLOSION.value(), SoundSource.BLOCKS, 30f, 1f);
+            level.playSound(null, pos, SoundContent.MANHATTAN_MODULE_EXPLOSION.value(), SoundSource.BLOCKS, 30f, 1f);
         }
 
         var age = level.getGameTime() - startTime;
@@ -97,7 +97,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             var percentageDist = distSq / (maxDist * maxDist) * 8;
             var percentageVaried = percentageDist * (level.getRandom().nextFloat() * 0.6 - 0.3 + 1);
 
-            var event = new BreakBlockEvent(level, target, targetBlock, getNukePlayerEntity());
+            var event = new BreakBlockEvent(level, target, targetBlock, getManhattanModulePlayerEntity());
             NeoForge.EVENT_BUS.post(event);
             if (event.isCanceled()) return;
 
@@ -227,7 +227,7 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
             usedPower += targetHardness;
 
 
-            var event = new BreakBlockEvent(level, target, targetState, getNukePlayerEntity());
+            var event = new BreakBlockEvent(level, target, targetState, getManhattanModulePlayerEntity());
             NeoForge.EVENT_BUS.post(event);
             if (event.isCanceled()) return 1000;
 
@@ -284,12 +284,12 @@ public class NuclearExplosionEntity extends BlockEntity implements BlockEntityTi
         return direction.add(level.getRandom().nextFloat() * amount - amount / 2, level.getRandom().nextFloat() * amount - amount / 2, level.getRandom().nextFloat() * amount - amount / 2);
     }
 
-    private Player getNukePlayerEntity() {
-        if (nukePlayerEntity == null && level instanceof ServerLevel serverLevel) {
-            nukePlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), "oritech_nuke"));
+    private Player getManhattanModulePlayerEntity() {
+        if (manhattan_modulePlayerEntity == null && level instanceof ServerLevel serverLevel) {
+            manhattan_modulePlayerEntity = new FakePlayer(serverLevel, new GameProfile(UUID.randomUUID(), "oritech_manhattan_module"));
         }
 
-        return nukePlayerEntity;
+        return manhattan_modulePlayerEntity;
     }
 
     private class DirectionExplosionWave {

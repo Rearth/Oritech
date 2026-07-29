@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/uranium_resource_node"
+    }
+  }
+}

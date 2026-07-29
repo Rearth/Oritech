@@ -19,7 +19,7 @@ import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
-import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
+import rearth.oritech.client.renderers.blocks.EndericLaserRenderer;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.ClientTickableItem;
@@ -156,7 +156,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, 
     private static void processUpwardsMotion(Player player, float powerMultiplier, boolean upOnly) {
         var velocity = player.getKnownMovement();
 
-        var verticalMultiplier = LaserArmRenderer.lerp(powerMultiplier, 1, 0.6f);
+        var verticalMultiplier = EndericLaserRenderer.lerp(powerMultiplier, 1, 0.6f);
         var power = 0.13f * verticalMultiplier;
         var dampeningFactor = 1.7f;
 

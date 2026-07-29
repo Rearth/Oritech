@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
+import rearth.oritech.block.entity.interaction.TreeCutterBlockEntity;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
@@ -66,7 +66,7 @@ public class ChainsawItem extends AxeItem implements OritechEnergyItem {
             var startPos = pos.above();
             var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
-                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, level);
+                var treeBlocks = TreeCutterBlockEntity.getTreeBlocks(startPos, level);
                 PromethiumAxeItem.pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PromethiumAxeItem.PendingBlock(level, elem, stack)).toList());
 
                 var extraEnergyUsed = treeBlocks.size() * getEnergyUsageMultiplier() / 2;

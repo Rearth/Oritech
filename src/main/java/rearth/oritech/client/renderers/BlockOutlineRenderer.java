@@ -25,9 +25,9 @@ import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
-import rearth.oritech.block.blocks.processing.RefineryModuleBlock;
+import rearth.oritech.block.blocks.processing.RefineryChamberModuleBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
-import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.block.blocks.storage.PortableEnergyStorageBlock;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
@@ -103,17 +103,17 @@ public class BlockOutlineRenderer {
 
     private static void addBlockPreviewOutlines(ClientLevel level, LocalPlayer player, ItemStack itemStack, BlockPos blockPos, BlockHitResult hitResult, HashSet<OutlineData> targetOutlines) {
 
-        var hasBlockItem = itemStack.getItem() instanceof BlockItem || itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER.get());
+        var hasBlockItem = itemStack.getItem() instanceof BlockItem || itemStack.getItem().equals(ItemContent.SCHRODINGERS_SAFE.get());
 
         if (!hasBlockItem) return;
 
-        var block = itemStack.getItem() instanceof BlockItem ? ((BlockItem) itemStack.getItem()).getBlock() : BlockContent.UNSTABLE_CONTAINER.get();
+        var block = itemStack.getItem() instanceof BlockItem ? ((BlockItem) itemStack.getItem()).getBlock() : BlockContent.SCHRODINGERS_SAFE.get();
 
         if (!(block instanceof EntityBlock entityProvider) || !block.defaultBlockState().hasProperty(MultiblockMachine.ASSEMBLED))
             return;
 
         var machinePos = blockPos.offset(hitResult.getDirection().getUnitVec3i());
-        if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER.get()))
+        if (itemStack.getItem().equals(ItemContent.SCHRODINGERS_SAFE.get()))
             machinePos = blockPos;
 
         var placementState = block.getStateForPlacement(new BlockPlaceContext(player, player.swingingArm, itemStack, hitResult));
@@ -121,9 +121,9 @@ public class BlockOutlineRenderer {
 
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;
 
-        if (itemStack.getItem().equals(ItemContent.UNSTABLE_CONTAINER.get())) {
+        if (itemStack.getItem().equals(ItemContent.SCHRODINGERS_SAFE.get())) {
             var blockState = level.getBlockState(machinePos);
-            var isValid = BuiltInRegistries.BLOCK.wrapAsHolder(blockState.getBlock()).getData(DataMapContent.UNSTABLE_CONTAINER_SOURCE) != null;
+            var isValid = BuiltInRegistries.BLOCK.wrapAsHolder(blockState.getBlock()).getData(DataMapContent.SCHRODINGERS_SAFE_SOURCE) != null;
             if (!isValid) return;
         }
 
@@ -134,7 +134,7 @@ public class BlockOutlineRenderer {
             machineFacing = player.getDirection().getOpposite();
         } else if (block instanceof AugmentResearchStationBlock) {
             machineFacing = player.getNearestViewDirection();
-        } else if (!(block instanceof MultiblockMachine || block instanceof RefineryModuleBlock)) {
+        } else if (!(block instanceof MultiblockMachine || block instanceof RefineryChamberModuleBlock)) {
             machineFacing = machineFacing.getOpposite();
         }
 
@@ -156,8 +156,8 @@ public class BlockOutlineRenderer {
             return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
         } else if (state.hasProperty(BlockStateProperties.FACING)) {
             return state.getValue(BlockStateProperties.FACING);
-        } else if (state.hasProperty(SmallStorageBlock.TARGET_DIR)) {
-            return state.getValue(SmallStorageBlock.TARGET_DIR);
+        } else if (state.hasProperty(PortableEnergyStorageBlock.TARGET_DIR)) {
+            return state.getValue(PortableEnergyStorageBlock.TARGET_DIR);
         }
 
         return Direction.NORTH;

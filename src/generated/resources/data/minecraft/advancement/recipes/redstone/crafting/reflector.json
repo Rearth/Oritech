@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_reactor_reflector": {
+    "has_reactor_neutron_reflector": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:reactor_reflector"
+            "items": "oritech:reactor_neutron_reflector"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_reactor_reflector"
+      "has_reactor_neutron_reflector"
     ]
   ],
   "rewards": {

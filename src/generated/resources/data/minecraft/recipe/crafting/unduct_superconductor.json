@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "oritech:superconductor_duct_block"
+    "oritech:superconductor_duct"
   ],
   "result": {
     "id": "oritech:superconductor"

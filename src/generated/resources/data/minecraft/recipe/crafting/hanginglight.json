@@ -3,12 +3,12 @@
   "category": "misc",
   "key": {
     "a": "#c:chains",
-    "b": "oritech:ceiling_light"
+    "b": "oritech:industrial_light"
   },
   "pattern": [
     "ab "
   ],
   "result": {
-    "id": "oritech:ceiling_light_hanging"
+    "id": "oritech:industrial_light_hanging"
   }
 }

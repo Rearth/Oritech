@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "oritech:block/item_filter",
+      "x": 90
+    },
+    "facing=west": {
+      "model": "oritech:block/item_filter",
+      "y": 90,
+      "x": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/item_filter",
+      "y": 180,
+      "x": 90
+    },
+    "facing=east": {
+      "model": "oritech:block/item_filter",
+      "y": 270,
+      "x": 90
+    },
+    "facing=down": {
+      "model": "oritech:block/item_filter"
+    },
+    "facing=up": {
+      "model": "oritech:block/item_filter",
+      "x": 180
+    }
+  }
+}

@@ -16,7 +16,7 @@
     "minecraft:crying_obsidian",
     "minecraft:respawn_anchor",
     "oritech:arcane_augment_station",
-    "oritech:enchanter_block",
-    "oritech:enchantment_catalyst_block"
+    "oritech:stabilized_enchanter",
+    "oritech:arcane_catalyst"
   ]
 }

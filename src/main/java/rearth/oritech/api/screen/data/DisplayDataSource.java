@@ -9,7 +9,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
+import rearth.oritech.block.entity.arcane.StabilizedEnchanterBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
@@ -181,9 +181,9 @@ public abstract class DisplayDataSource {
 
 
             return Component.translatable("tooltip.oritech.progress_indicator", progressTicks, effectiveDurationTicks, recipeDurationTicks);
-        } else if (blockEntity instanceof EnchanterBlockEntity enchanterBlock && enchanterBlock.progress > 0) {
-            var maxTicks = enchanterBlock.maxProgress * 5;
-            var progress = enchanterBlock.progress * 5;
+        } else if (blockEntity instanceof StabilizedEnchanterBlockEntity stabilized_enchanterBlock && stabilized_enchanterBlock.progress > 0) {
+            var maxTicks = stabilized_enchanterBlock.maxProgress * 5;
+            var progress = stabilized_enchanterBlock.progress * 5;
             return Component.translatable("tooltip.oritech.progress_indicator", progress, maxTicks, maxTicks);
         }
 

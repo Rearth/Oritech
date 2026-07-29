@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    "oritech:fluid_pipe_duct_block"
+    "oritech:fluid_pipe_duct"
   ],
   "result": {
     "id": "oritech:fluid_pipe"

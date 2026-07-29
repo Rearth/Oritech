@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/big_solar_panel",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

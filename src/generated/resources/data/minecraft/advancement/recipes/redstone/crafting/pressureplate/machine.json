@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_plating_pressure_plate": {
+    "has_copper_reinforced_plating_pressure_plate": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_plating_pressure_plate"
+            "items": "oritech:copper_reinforced_plating_pressure_plate"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_plating_pressure_plate"
+      "has_copper_reinforced_plating_pressure_plate"
     ]
   ],
   "rewards": {

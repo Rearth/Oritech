@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
-import rearth.oritech.block.entity.interaction.DeepDrillEntity;
+import rearth.oritech.block.entity.interaction.BedrockExtractorEntity;
 import rearth.oritech.util.MultiblockMachineController;
 
 import java.util.Objects;
@@ -91,8 +91,8 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
         if (state.getValue(USED)) {
             var controller = getControllerPos(level, pos);
             var controllerState = level.getBlockState(controller);
-            if (controllerState.getBlock() instanceof RefineryBlock refineryBlock) {
-                refineryBlock.onExplosionHit(controllerState, level, controller, explosion, onHit);
+            if (controllerState.getBlock() instanceof RefineryBlock refinery) {
+                refinery.onExplosionHit(controllerState, level, controller, explosion, onHit);
                 return;
             }
         }
@@ -128,8 +128,8 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
             var controllerPos = getControllerPos(level, pos);
             var controllerBlock = level.getBlockState(controllerPos);
             var controllerEntity = level.getBlockEntity(controllerPos);
-            if (controllerEntity instanceof DeepDrillEntity deepDrill && !deepDrill.init(true)) {
-                player.sendSystemMessage(Component.translatable("message.oritech.deep_drill.ore_placement"));
+            if (controllerEntity instanceof BedrockExtractorEntity bedrockExtractor && !bedrockExtractor.init(true)) {
+                player.sendSystemMessage(Component.translatable("message.oritech.bedrock_extractor.ore_placement"));
                 return InteractionResult.SUCCESS;
             } else {
                 return controllerBlock.useWithoutItem(level, player, new BlockHitResult(hit.getLocation(), hit.getDirection(), controllerPos, hit.isInside()));
@@ -157,7 +157,7 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
 
             if (controllerState.getBlock() instanceof MachineBlock machineBlock) {
                 return machineBlock.useItemOn(stack, controllerState, level, controllerPos, player, hand, forwardedHit);
-            } else if (controllerState.getBlock() instanceof RefineryModuleBlock machineBlock) {
+            } else if (controllerState.getBlock() instanceof RefineryChamberModuleBlock machineBlock) {
                 return machineBlock.useItemOn(stack, controllerState, level, controllerPos, player, hand, forwardedHit);
             }
         }

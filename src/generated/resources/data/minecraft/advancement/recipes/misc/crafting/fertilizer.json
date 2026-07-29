@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_fertilizer_block": {
+    "has_fertilizer": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:fertilizer_block"
+            "items": "oritech:fertilizer"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_fertilizer_block"
+      "has_fertilizer"
     ]
   ],
   "rewards": {

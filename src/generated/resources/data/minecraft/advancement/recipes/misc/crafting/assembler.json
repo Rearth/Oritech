@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_assembler_block": {
+    "has_assembler": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:assembler_block"
+            "items": "oritech:assembler"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_assembler_block"
+      "has_assembler"
     ]
   ],
   "rewards": {

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_big_solar_panel_block": {
+    "has_big_solar_panel": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:big_solar_panel_block"
+            "items": "oritech:big_solar_panel"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_big_solar_panel_block"
+      "has_big_solar_panel"
     ]
   ],
   "rewards": {

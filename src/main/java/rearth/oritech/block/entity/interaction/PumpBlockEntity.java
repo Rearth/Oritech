@@ -65,7 +65,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
     public ColorVariant currentColor = getDefaultColor();
 
     public PumpBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PUMP_BLOCK.get(), pos, state);
+        super(BlockEntitiesContent.PUMP.get(), pos, state);
     }
 
     @Override
@@ -234,7 +234,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
         }
 
         toolheadPosition = toolheadPosition.below();
-        level.setBlockAndUpdate(toolheadPosition, BlockContent.PUMP_TRUNK_BLOCK.get().defaultBlockState());
+        level.setBlockAndUpdate(toolheadPosition, BlockContent.PUMP_TRUNK.get().defaultBlockState());
     }
 
     private boolean checkToolheadEnd(BlockPos newPosition) {
@@ -243,7 +243,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
         var stateBelow = level.getBlockState(posBelow);
         var blockBelow = stateBelow.getBlock();
 
-        var isAirOrTrunk = stateBelow.canBeReplaced() || blockBelow.equals(BlockContent.PUMP_TRUNK_BLOCK.get());
+        var isAirOrTrunk = stateBelow.canBeReplaced() || blockBelow.equals(BlockContent.PUMP_TRUNK.get());
         var isFluid = !stateBelow.getFluidState().isEmpty();
 
         return isFluid || !isAirOrTrunk;

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#c:chests/wooden",
+    "c": "oritech:processing_unit",
+    "f": "#c:ingots/steel",
+    "m": "oritech:energy_pipe",
+    "s": "minecraft:dispenser"
+  },
+  "pattern": [
+    "fsf",
+    "mcm",
+    "bbb"
+  ],
+  "result": {
+    "id": "oritech:equipment_charger"
+  }
+}

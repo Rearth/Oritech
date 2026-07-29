@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_large_storage_block": {
+    "has_large_storage": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:large_storage_block"
+            "items": "oritech:large_storage"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_large_storage_block"
+      "has_large_storage"
     ]
   ],
   "rewards": {

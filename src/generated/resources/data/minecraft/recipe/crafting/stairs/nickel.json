@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "a": "oritech:nickel_plating_block"
+    "a": "oritech:nickel_plating"
   },
   "pattern": [
     "a  ",

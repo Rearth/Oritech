@@ -5,7 +5,7 @@
     "b": "oritech:exo_chestplate",
     "c": "oritech:jetpack_elytra",
     "f": "oritech:ion_thruster",
-    "s": "oritech:small_tank_block"
+    "s": "oritech:portable_tank"
   },
   "pattern": [
     "fff",

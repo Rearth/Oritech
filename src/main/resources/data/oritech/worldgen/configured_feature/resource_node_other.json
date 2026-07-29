@@ -5,13 +5,13 @@
     "nodeOreChance": 0.3,
     "boulderRadius": 3,
     "nodeOres": [
-      "oritech:resource_node_gold",
-      "oritech:resource_node_nickel",
+      "oritech:gold_resource_node",
+      "oritech:nickel_resource_node",
       "oritech:resource_node_lapis",
       "oritech:resource_node_lapis",
-      "oritech:resource_node_redstone",
-      "oritech:resource_node_redstone",
-      "oritech:resource_node_redstone"
+      "oritech:redstone_resource_node",
+      "oritech:redstone_resource_node",
+      "oritech:redstone_resource_node"
     ],
     "boulderOres": [
       "minecraft:deepslate_gold_ore",

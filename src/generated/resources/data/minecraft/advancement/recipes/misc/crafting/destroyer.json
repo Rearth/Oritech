@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_destroyer_block": {
+    "has_destroyer": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:destroyer_block"
+            "items": "oritech:destroyer"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_destroyer_block"
+      "has_destroyer"
     ]
   ],
   "rewards": {

@@ -32,7 +32,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private List<BlockCapabilityCache<ResourceHandler<FluidResource>, Direction>> filteredFluidTargetsCached;
 
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FLUID_PIPE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.FLUID_PIPE.get(), pos, state);
     }
 
     @Override

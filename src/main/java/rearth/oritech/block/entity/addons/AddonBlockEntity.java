@@ -15,7 +15,7 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     private BlockPos controllerPos = BlockPos.ZERO;
 
     public AddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ADDON_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ADDON.get(), pos, state);
     }
 
     public AddonBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

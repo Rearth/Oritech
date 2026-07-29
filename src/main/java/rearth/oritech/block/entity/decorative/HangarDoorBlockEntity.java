@@ -30,7 +30,7 @@ public class HangarDoorBlockEntity extends BlockEntity implements GeoBlockEntity
     private long lastSoundEventAt = 0;
 
     public HangarDoorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.HANGAR_DOOR_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.HANGAR_DOOR.get(), pos, state);
     }
 
     public boolean shouldPlaySoundAgain() {

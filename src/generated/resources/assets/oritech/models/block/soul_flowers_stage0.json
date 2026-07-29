@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/crop",
+  "textures": {
+    "crop": "oritech:block/soul_flowers_stage0"
+  }
+}

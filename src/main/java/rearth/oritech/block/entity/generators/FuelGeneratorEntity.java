@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class FuelGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public FuelGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FUEL_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.FUEL_GENERATOR.get(), pos, state, OritechConfig.generators.fuelGeneratorData.energyPerTick.get());
     }
 
     // todo make this output on all neighboring blocks, as this is now cached

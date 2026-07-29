@@ -177,7 +177,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         // Open addon slots (ghost indicator)
         for (var openPos : menu.addonController.getOpenAddonSlots()) {
             var relativePos = MultiblockMachineEntity.worldToRelativePos(menu.blockPos, openPos, facing);
-            preview.addBlock(BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(), null, relativePos);
+            preview.addBlock(BlockContent.ADDON_INDICATOR.get().defaultBlockState(), null, relativePos);
         }
 
         // Machine itself at center

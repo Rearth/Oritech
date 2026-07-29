@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_advanced_augment_station": {
+    "has_quantum_research_station": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:advanced_augment_station"
+            "items": "oritech:quantum_research_station"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_advanced_augment_station"
+      "has_quantum_research_station"
     ]
   ],
   "rewards": {

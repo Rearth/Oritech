@@ -8,14 +8,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.api.networking.SyncType;
-import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
+import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 
 import java.util.Objects;
 
 public class ReactorScreenHandler extends AbstractContainerMenu {
 
-    public final ReactorControllerBlockEntity reactorEntity;
+    public final NuclearReactorControllerBlockEntity reactorEntity;
     public final Level level;
 
     // this calls the second version
@@ -27,7 +27,7 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
     public ReactorScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(ModScreens.REACTOR_SCREEN.get(), syncId);
 
-        reactorEntity = (ReactorControllerBlockEntity) blockEntity;
+        reactorEntity = (NuclearReactorControllerBlockEntity) blockEntity;
         level = blockEntity.getLevel();
     }
 

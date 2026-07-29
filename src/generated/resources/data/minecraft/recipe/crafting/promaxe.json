@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": "oritech:destroyer_block",
+    "c": "oritech:destroyer",
     "p": "oritech:prometheum_ingot"
   },
   "pattern": [

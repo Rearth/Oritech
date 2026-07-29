@@ -5,15 +5,15 @@
     "nodeOreChance": 0.4,
     "boulderRadius": 3,
     "nodeOres": [
-      "oritech:resource_node_copper",
-      "oritech:resource_node_copper",
-      "oritech:resource_node_copper",
-      "oritech:resource_node_iron",
-      "oritech:resource_node_iron",
-      "oritech:resource_node_nickel",
-      "oritech:resource_node_nickel",
-      "oritech:resource_node_coal",
-      "oritech:resource_node_coal"
+      "oritech:copper_resource_node",
+      "oritech:copper_resource_node",
+      "oritech:copper_resource_node",
+      "oritech:iron_resource_node",
+      "oritech:iron_resource_node",
+      "oritech:nickel_resource_node",
+      "oritech:nickel_resource_node",
+      "oritech:coal_resource_node",
+      "oritech:coal_resource_node"
     ],
     "boulderOres": [
       "minecraft:deepslate_iron_ore",

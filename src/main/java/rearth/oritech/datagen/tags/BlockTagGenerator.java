@@ -43,25 +43,25 @@ public class BlockTagGenerator extends BlockTagsProvider {
         pickaxeBuilder.add(BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get());
         pickaxeBuilder.add(BlockContent.TRANSPARENT_ITEM_PIPE.get());
         pickaxeBuilder.add(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get());
-        pickaxeBuilder.add(BlockContent.SMALL_TANK_BLOCK.get());
-        pickaxeBuilder.add(BlockContent.SMALL_STORAGE_BLOCK.get());
-        pickaxeBuilder.add(BlockContent.MACHINE_COMBI_ADDON.get());
-        pickaxeBuilder.add(BlockContent.PUMP_TRUNK_BLOCK.get());
-        pickaxeBuilder.add(BlockContent.MACHINE_CORE_HIDDEN.get());
+        pickaxeBuilder.add(BlockContent.PORTABLE_TANK.get());
+        pickaxeBuilder.add(BlockContent.PORTABLE_ENERGY_STORAGE.get());
+        pickaxeBuilder.add(BlockContent.HEART_OF_THE_MACHINE_ADDON.get());
+        pickaxeBuilder.add(BlockContent.PUMP_TRUNK.get());
+        pickaxeBuilder.add(BlockContent.COMPLEX_PLATING.get());
         pickaxeBuilder.add(BlockContent.CARBON_PLATING_SLAB.get());
         pickaxeBuilder.add(BlockContent.IRON_PLATING_SLAB.get());
-        pickaxeBuilder.add(BlockContent.MACHINE_PLATING_SLAB.get());
+        pickaxeBuilder.add(BlockContent.COPPER_REINFORCED_PLATING_SLAB.get());
         pickaxeBuilder.add(BlockContent.NICKEL_PLATING_SLAB.get());
-        pickaxeBuilder.add(BlockContent.TECH_DOOR_HINGE.get());
+        pickaxeBuilder.add(BlockContent.INDUSTRIAL_DOOR_HINGE.get());
         pickaxeBuilder.add(BlockContent.HANGAR_DOOR_HELPER.get());
-        pickaxeBuilder.add(BlockContent.TAINTED_REFINERY_BLOCK.get());
+        pickaxeBuilder.add(BlockContent.TAINTED_REFINERY.get());
         
         pickaxeBuilder
           .add(BlockContent.NICKEL_ORE.get())
           .add(BlockContent.DEEPSLATE_NICKEL_ORE.get())
           .add(BlockContent.DEEPSLATE_PLATINUM_ORE.get())
           .add(BlockContent.DEEPSLATE_URANIUM_ORE.get())
-          .add(BlockContent.URANIUM_CRYSTAL.get())
+          .add(BlockContent.URANITE_CRYSTAL.get())
           .add(BlockContent.ENDSTONE_PLATINUM_ORE.get());
         
         this.tag(BlockTags.MINEABLE_WITH_AXE)
@@ -71,10 +71,10 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .add(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get());
 
         this.tag(BlockTags.CROPS)
-          .add(BlockContent.WITHER_CROP_BLOCK.get());
+          .add(BlockContent.SOUL_FLOWERS.get());
 
         this.tag(BlockTags.MAINTAINS_FARMLAND)
-          .add(BlockContent.WITHER_CROP_BLOCK.get());
+          .add(BlockContent.SOUL_FLOWERS.get());
         
         this.tag(Tags.Blocks.ORES)
           .add(BlockContent.NICKEL_ORE.get())
@@ -115,17 +115,17 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .addOptionalTag(BlockTags.MINEABLE_WITH_SHOVEL);
         
         this.tag(TagContent.RESOURCE_NODES)
-          .add(BlockContent.RESOURCE_NODE_COPPER.get())
-          .add(BlockContent.RESOURCE_NODE_IRON.get())
-          .add(BlockContent.RESOURCE_NODE_NICKEL.get())
-          .add(BlockContent.RESOURCE_NODE_GOLD.get())
-          .add(BlockContent.RESOURCE_NODE_REDSTONE.get())
+          .add(BlockContent.COPPER_RESOURCE_NODE.get())
+          .add(BlockContent.IRON_RESOURCE_NODE.get())
+          .add(BlockContent.NICKEL_RESOURCE_NODE.get())
+          .add(BlockContent.GOLD_RESOURCE_NODE.get())
+          .add(BlockContent.REDSTONE_RESOURCE_NODE.get())
           .add(BlockContent.RESOURCE_NODE_LAPIS.get())
-          .add(BlockContent.RESOURCE_NODE_EMERALD.get())
-          .add(BlockContent.RESOURCE_NODE_DIAMOND.get())
-          .add(BlockContent.RESOURCE_NODE_COAL.get())
-          .add(BlockContent.RESOURCE_NODE_URANIUM.get())
-          .add(BlockContent.RESOURCE_NODE_PLATINUM.get());
+          .add(BlockContent.EMERALD_RESOURCE_NODE.get())
+          .add(BlockContent.DIAMOND_RESOURCE_NODE.get())
+          .add(BlockContent.COAL_RESOURCE_NODE.get())
+          .add(BlockContent.URANIUM_RESOURCE_NODE.get())
+          .add(BlockContent.PLATINUM_RESOURCE_NODE.get());
         
         this.tag(TagContent.LASER_PASSTHROUGH)
                 .addTag(Tags.Blocks.GLASS_BLOCKS)
@@ -165,8 +165,8 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .add(Blocks.CRYING_OBSIDIAN)
           .add(Blocks.RESPAWN_ANCHOR)
           .add(BlockContent.ARCANE_AUGMENT_STATION.get())
-          .add(BlockContent.ENCHANTER_BLOCK.get())
-          .add(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get());
+          .add(BlockContent.STABILIZED_ENCHANTER.get())
+          .add(BlockContent.ARCANE_CATALYST.get());
         
         this.tag(TagContent.REFINERY_SCULK_BLOCKS)
           .add(Blocks.SPAWNER)
@@ -183,8 +183,8 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .add(Blocks.SCULK_VEIN)
           .add(Blocks.CALIBRATED_SCULK_SENSOR)
           .add(Blocks.SCULK)
-          .add(BlockContent.SPAWNER_CAGE_BLOCK.get())
-          .add(BlockContent.SPAWNER_CONTROLLER_BLOCK.get());
+          .add(BlockContent.SPAWNER_CAGE.get())
+          .add(BlockContent.SPAWNER_CONTROLLER.get());
         
         this.tag(TagContent.CUTTER_LEAVES_MINEABLE)
           .addTag(BlockTags.LEAVES)
@@ -195,65 +195,65 @@ public class BlockTagGenerator extends BlockTagsProvider {
         
         this.tag(TagContent.REACTOR_WALL_BLOCKS)
           .add(BlockContent.REACTOR_WALL.get())
-          .add(BlockContent.REACTOR_ABSORBER_PORT.get())
+          .add(BlockContent.REACTOR_COOLANT_ABSORBER_PORT.get())
           .add(BlockContent.REACTOR_ENERGY_PORT.get())
           .add(BlockContent.REACTOR_FUEL_PORT.get())
           .add(BlockContent.REACTOR_REDSTONE_PORT.get())
-          .add(BlockContent.REACTOR_CONTROLLER.get());
+          .add(BlockContent.NUCLEAR_REACTOR_CONTROLLER.get());
 
         this.tag(TagContent.MACHINE_FRAME_SUPPORT)
-          .add(BlockContent.METAL_BEAM_BLOCK.get());
+          .add(BlockContent.INDUSTRIAL_SUPPORT_BEAM.get());
 
         this.tag(TagContent.BLACK_HOLE_BLACKLIST)
           .add(BlockContent.BLOCK_PLACER_HEAD.get()); // just a dummy so packdevs can find the tag easier
         
         // storage block tags
         this.tag(getStorageBlockyTag("steel"))
-          .add(BlockContent.STEEL_BLOCK.get());
+          .add(BlockContent.STEEL.get());
         
         this.tag(getStorageBlockyTag("energite"))
-          .add(BlockContent.ENERGITE_BLOCK.get());
+          .add(BlockContent.ENERGITE.get());
         
         this.tag(getStorageBlockyTag("nickel"))
-          .add(BlockContent.NICKEL_BLOCK.get());
+          .add(BlockContent.NICKEL.get());
         
         this.tag(getStorageBlockyTag("biosteel"))
-          .add(BlockContent.BIOSTEEL_BLOCK.get());
+          .add(BlockContent.BIOSTEEL.get());
         
         this.tag(getStorageBlockyTag("platinum"))
-          .add(BlockContent.PLATINUM_BLOCK.get());
+          .add(BlockContent.PLATINUM.get());
         
         this.tag(getStorageBlockyTag("adamant"))
-          .add(BlockContent.ADAMANT_BLOCK.get());
+          .add(BlockContent.ADAMANT.get());
         
         this.tag(getStorageBlockyTag("electrum"))
-          .add(BlockContent.ELECTRUM_BLOCK.get());
+          .add(BlockContent.ELECTRUM.get());
         
         this.tag(getStorageBlockyTag("duratium"))
-          .add(BlockContent.DURATIUM_BLOCK.get());
+          .add(BlockContent.DURATIUM.get());
         
         this.tag(getStorageBlockyTag("biomass"))
-          .add(BlockContent.BIOMASS_BLOCK.get());
+          .add(BlockContent.BIOMASS.get());
         
         this.tag(getStorageBlockyTag("plastic"))
-          .add(BlockContent.PLASTIC_BLOCK.get());
+          .add(BlockContent.PLASTIC.get());
         
         this.tag(getStorageBlockyTag("fluxite"))
-          .add(BlockContent.FLUXITE_BLOCK.get());
+          .add(BlockContent.FLUXITE.get());
         
         this.tag(getStorageBlockyTag("silicon"))
-          .add(BlockContent.SILICON_BLOCK.get());
+          .add(BlockContent.SILICON.get());
         
         this.tag(getStorageBlockyTag("raw_nickel"))
-          .add(BlockContent.RAW_NICKEL_BLOCK.get());
+          .add(BlockContent.RAW_NICKEL.get());
         
         this.tag(getStorageBlockyTag("raw_platinum"))
-          .add(BlockContent.RAW_PLATINUM_BLOCK.get());
+          .add(BlockContent.RAW_PLATINUM.get());
         
         this.tag(getStorageBlockyTag("raw_uranium"))
-          .add(BlockContent.RAW_URANIUM_BLOCK.get());
+          .add(BlockContent.RAW_URANIUM.get());
         
         this.tag(getStorageBlockyTag("uranium_dust"))
-          .add(BlockContent.URANIUM_DUST_BLOCK.get());
+          .add(BlockContent.URANIUM.get());
     }
 }

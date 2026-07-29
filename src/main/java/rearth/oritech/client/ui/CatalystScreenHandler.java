@@ -6,13 +6,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import rearth.oritech.api.screen.data.DisplayDataSource;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.ArcaneCatalystBlockEntity;
 
 import java.util.Objects;
 
 public class CatalystScreenHandler extends OritechScreenHandler {
 
-    public final EnchantmentCatalystBlockEntity catalyst;
+    public final ArcaneCatalystBlockEntity catalyst;
 
     public CatalystScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
@@ -21,7 +21,7 @@ public class CatalystScreenHandler extends OritechScreenHandler {
     public CatalystScreenHandler(int syncId, Inventory playerInventory, BlockEntity blockEntity) {
         super(syncId, playerInventory, blockEntity);
 
-        if (this.blockEntity instanceof EnchantmentCatalystBlockEntity catalystEntity) {
+        if (this.blockEntity instanceof ArcaneCatalystBlockEntity catalystEntity) {
             this.catalyst = catalystEntity;
         } else {
             this.catalyst = null;
@@ -32,7 +32,7 @@ public class CatalystScreenHandler extends OritechScreenHandler {
     @Override
     protected void addEnergyDisplay() {
         // override to remove internal laser energy container and just add soul container
-        if (this.blockEntity instanceof EnchantmentCatalystBlockEntity catalystEntity) {
+        if (this.blockEntity instanceof ArcaneCatalystBlockEntity catalystEntity) {
             getDataDisplays().add(DisplayDataSource.CreateSoul(
                     () -> (long) catalystEntity.maxSouls,
                     () -> (long) catalystEntity.collectedSouls,

@@ -14,7 +14,7 @@ import java.util.List;
 public class CreativeStorageBlockEntity extends ExpandableEnergyStorageBlockEntity implements ComparatorOutputProvider {
 
     public CreativeStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CREATIVE_STORAGE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.CREATIVE_STORAGE.get(), pos, state);
     }
 
     @Override

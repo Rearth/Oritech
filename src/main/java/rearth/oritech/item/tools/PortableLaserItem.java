@@ -56,7 +56,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.entity.MachineCoreEntity;
-import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
+import rearth.oritech.block.entity.interaction.EndericLaserBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.renderers.PortableLaserRenderer;
 import rearth.oritech.config.OritechConfig;
@@ -305,7 +305,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         }
 
         var currentInvestedEnergy = stats.getB();
-        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(level, blockPos)) * OritechConfig.laserArmConfig.blockBreakEnergyBase.get() / OritechStartupConfig.portableLaserConfig.blockBreakSpeed.get());
+        var requiredBreakingEnergy = (int) (Math.sqrt(blockState.getDestroySpeed(level, blockPos)) * OritechConfig.endericLaserConfig.blockBreakEnergyBase.get() / OritechStartupConfig.portableLaserConfig.blockBreakSpeed.get());
         var efficiencyLevel = getEnchantmentLevel(tool, Enchantments.EFFICIENCY);
         if (efficiencyLevel > 0) requiredBreakingEnergy = requiredBreakingEnergy / (efficiencyLevel + 1);
 
@@ -327,7 +327,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         List<ItemStack> dropped;
         dropped = Block.getDrops(targetBlockState, (ServerLevel) level, targetPos, targetEntity, player, tool);
 
-        var blockRecipe = LaserArmBlockEntity.tryGetRecipeOfBlock(targetBlockState, (ServerLevel) level);
+        var blockRecipe = EndericLaserBlockEntity.tryGetRecipeOfBlock(targetBlockState, (ServerLevel) level);
         if (blockRecipe != null) {
             var recipe = blockRecipe.value();
             var farmedCount = 1;

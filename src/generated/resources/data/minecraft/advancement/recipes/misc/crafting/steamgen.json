@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_steam_engine_block": {
+    "has_steam_engine": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:steam_engine_block"
+            "items": "oritech:steam_engine"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_steam_engine_block"
+      "has_steam_engine"
     ]
   ],
   "rewards": {

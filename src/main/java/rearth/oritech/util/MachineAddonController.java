@@ -15,7 +15,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
 import rearth.oritech.block.entity.addons.AddonBlockEntity;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
@@ -191,7 +191,7 @@ public interface MachineAddonController {
                     }
                 }
 
-                if (entry.addonEntity() instanceof CombiAddonEntity) {
+                if (entry.addonEntity() instanceof HeartOfTheMachineAddonEntity) {
                     toAdd.clear();
                     maxIterationCount = 0;
                     break;
@@ -211,9 +211,9 @@ public interface MachineAddonController {
     // can be overridden to allow custom addon loading (e.g. custom stat, or check for specific addon existence)
     default void gatherAddonStats(List<AddonBlock> addons) {
 
-        if (addons.size() == 1 && addons.getFirst().addonEntity() instanceof CombiAddonEntity combiAddonEntity) {
+        if (addons.size() == 1 && addons.getFirst().addonEntity() instanceof HeartOfTheMachineAddonEntity heartOfTheMachineAddonEntity) {
             getAdditionalStatFromAddon(addons.getFirst());
-            setBaseAddonData(combiAddonEntity.getBaseData());
+            setBaseAddonData(heartOfTheMachineAddonEntity.getBaseData());
             return;
         }
 

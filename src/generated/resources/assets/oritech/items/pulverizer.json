@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/pulverizer",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

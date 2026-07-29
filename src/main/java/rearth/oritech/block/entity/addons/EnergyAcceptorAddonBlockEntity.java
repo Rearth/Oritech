@@ -20,7 +20,7 @@ public class EnergyAcceptorAddonBlockEntity extends AddonBlockEntity implements 
     private MachineAddonController cachedController;
 
     public EnergyAcceptorAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ENERGY_ACCEPTOR_ADDON.get(), pos, state);
     }
 
     private boolean isConnected() {

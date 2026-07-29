@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_reactor_condenser": {
+    "has_reactor_heat_absorber": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:reactor_condenser"
+            "items": "oritech:reactor_heat_absorber"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_reactor_condenser"
+      "has_reactor_heat_absorber"
     ]
   ],
   "rewards": {

@@ -2,13 +2,13 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "a": "oritech:machine_plating_block"
+    "a": "oritech:copper_reinforced_plating"
   },
   "pattern": [
     "aaa"
   ],
   "result": {
     "count": 6,
-    "id": "oritech:machine_plating_slab"
+    "id": "oritech:copper_reinforced_plating_slab"
   }
 }

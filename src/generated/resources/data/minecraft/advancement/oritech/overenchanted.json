@@ -27,7 +27,7 @@
     },
     "frame": "challenge",
     "icon": {
-      "id": "oritech:enchanter_block"
+      "id": "oritech:stabilized_enchanter"
     },
     "title": {
       "translate": "advancements.oritech.overenchanted"

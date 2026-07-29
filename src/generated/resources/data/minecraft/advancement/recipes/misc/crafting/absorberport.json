@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_reactor_absorber_port": {
+    "has_reactor_coolant_absorber_port": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:reactor_absorber_port"
+            "items": "oritech:reactor_coolant_absorber_port"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_reactor_absorber_port"
+      "has_reactor_coolant_absorber_port"
     ]
   ],
   "rewards": {

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_accelerator_controller": {
+    "has_particle_accelerator": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:accelerator_controller"
+            "items": "oritech:particle_accelerator"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_accelerator_controller"
+      "has_particle_accelerator"
     ]
   ],
   "rewards": {

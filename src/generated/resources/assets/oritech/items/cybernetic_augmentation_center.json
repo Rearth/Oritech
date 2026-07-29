@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/cybernetic_augmentation_center",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

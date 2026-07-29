@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_powered_furnace_block": {
+    "has_powered_furnace": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:powered_furnace_block"
+            "items": "oritech:powered_furnace"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_powered_furnace_block"
+      "has_powered_furnace"
     ]
   ],
   "rewards": {

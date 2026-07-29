@@ -22,7 +22,7 @@ import java.util.List;
 public class AssemblerBlockEntity extends MultiblockMachineEntity {
 
     public AssemblerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ASSEMBLER_ENTITY.get(), pos, state, OritechConfig.processingMachines.assemblerData.energyPerTick.get());
+        super(BlockEntitiesContent.ASSEMBLER.get(), pos, state, OritechConfig.processingMachines.assemblerData.energyPerTick.get());
     }
 
     @Override

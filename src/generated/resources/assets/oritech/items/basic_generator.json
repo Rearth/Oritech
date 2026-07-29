@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/basic_generator",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

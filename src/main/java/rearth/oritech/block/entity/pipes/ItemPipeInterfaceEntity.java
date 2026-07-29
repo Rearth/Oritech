@@ -48,7 +48,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     public Set<RenderStackData> activeStacks = new HashSet<>();
 
     public ItemPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ITEM_PIPE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ITEM_PIPE.get(), pos, state);
         this.renderItems = state.getBlock().equals(BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get());
 
     }
@@ -325,7 +325,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
     public static void receiveVisualItemsPacket(RenderStackData message, IPayloadContext context) {
         var level = context.player().level();
-        var blockEntity = level.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE_ENTITY.get());
+        var blockEntity = level.getBlockEntity(message.self, BlockEntitiesContent.ITEM_PIPE.get());
         if (blockEntity.isPresent()) {
             var pipeEntity = blockEntity.get();
             // use local time for moved item to avoid rendering issues caused by lag

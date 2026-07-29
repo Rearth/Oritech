@@ -11,7 +11,7 @@
     "attributeOperationType": 0,
     "entityAttributeId": "minecraft:step_height"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
     "oritech:augment/superspeedboost"
   ],

@@ -59,7 +59,7 @@ public class SteamEngineBlock extends MultiblockMachine {
 
         if (!level.isClientSide()) {
 
-            var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
+            var entity = level.getBlockEntity(pos, BlockEntitiesContent.STEAM_ENGINE.get());
             if (entity.isPresent() && entity.get().inSlaveMode()) {
                 // working in slave mode. Don't open UI, just highlight controller
                 player.sendSystemMessage(Component.translatable("message.oritech.steamengine.controller_link"));

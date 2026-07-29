@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "key": {
+    "a": "oritech:dubios_container",
+    "c": "minecraft:tnt",
+    "e": "oritech:uranium_pellet"
+  },
+  "pattern": [
+    "eae",
+    "aca",
+    "eae"
+  ],
+  "result": {
+    "id": "oritech:low_yield_nuclear_explosion_device"
+  }
+}

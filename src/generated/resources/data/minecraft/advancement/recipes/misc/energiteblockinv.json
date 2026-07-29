@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_energite": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:energite"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "minecraft:energiteblockinv"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_energite"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:energiteblockinv"
+    ]
+  }
+}

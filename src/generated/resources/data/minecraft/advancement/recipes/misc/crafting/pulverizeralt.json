@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_pulverizer_block": {
+    "has_pulverizer": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:pulverizer_block"
+            "items": "oritech:pulverizer"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_pulverizer_block"
+      "has_pulverizer"
     ]
   ],
   "rewards": {

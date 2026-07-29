@@ -1,0 +1,150 @@
+package rearth.oritech.block.blocks.processing;
+
+import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentGetter;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipProvider;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
+import rearth.oritech.block.entity.processing.RefineryChamberModuleBlockEntity;
+import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.TooltipHelper;
+
+import java.util.Objects;
+import java.util.function.Consumer;
+
+import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
+
+
+public class RefineryChamberModuleBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
+
+    public RefineryChamberModuleBlock(Properties settings) {
+        super(settings);
+        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(ASSEMBLED, false));
+    }
+
+    @Override
+    protected MapCodec<? extends HorizontalDirectionalBlock> codec() {
+        return null;
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        super.createBlockStateDefinition(builder);
+        builder.add(BlockStateProperties.HORIZONTAL_FACING, ASSEMBLED);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return Objects.requireNonNull(super.getStateForPlacement(ctx)).setValue(BlockStateProperties.HORIZONTAL_FACING, ctx.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
+    }
+
+    @Override
+    public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+
+        if (!level.isClientSide()) {
+
+            var entity = level.getBlockEntity(pos);
+            if (!(entity instanceof MultiblockMachineController machineEntity)) {
+                return InteractionResult.SUCCESS;
+            }
+
+            var wasAssembled = state.getValue(ASSEMBLED);
+
+            if (!wasAssembled) {
+                var corePlaced = machineEntity.tryPlaceNextCore(player);
+                if (corePlaced) return InteractionResult.SUCCESS;
+            }
+
+            var isAssembled = machineEntity.initMultiblock(state);
+
+            // first time created
+            if (isAssembled && !wasAssembled) {
+                machineEntity.triggerSetupAnimation();
+                return InteractionResult.SUCCESS;
+            }
+
+            if (!isAssembled) {
+                player.sendSystemMessage(Component.translatable("message.oritech.machine.missing_core"));
+                return InteractionResult.SUCCESS;
+            }
+
+        }
+
+        return InteractionResult.SUCCESS;
+    }
+
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (FluidContainerInteraction.tryFluidBlockItemInteraction(level, pos, player, hand)) {
+            return InteractionResult.SUCCESS;
+        }
+
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
+    @Override
+    public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+
+        if (!level.isClientSide() && state.getValue(ASSEMBLED)) {
+
+            var entity = level.getBlockEntity(pos);
+            if (entity instanceof MultiblockMachineController machineEntity) {
+                machineEntity.onControllerBroken();
+            }
+        }
+
+        return super.playerWillDestroy(level, pos, state, player);
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new RefineryChamberModuleBlockEntity(pos, state);
+    }
+
+    @Override
+    public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
+        consumer.accept(Component.translatable("tooltip.oritech.refinery_module").withStyle(ChatFormatting.GRAY));
+        TooltipHelper.addMachineTooltip(consumer, this, this);
+    }
+
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> {
+            if (blockEntity instanceof BlockEntityTicker ticker)
+                ticker.tick(world1, pos, state1, blockEntity);
+        };
+    }
+}

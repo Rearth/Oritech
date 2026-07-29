@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/refinery_chamber_module",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

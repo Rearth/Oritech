@@ -2,8 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": "oritech:small_tank_block",
-    "c": "oritech:metal_beam_block",
+    "b": "oritech:portable_tank",
+    "c": "oritech:industrial_support_beam",
     "f": "#c:ingots/copper",
     "s": "#c:silicon"
   },
@@ -13,6 +13,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:refinery_module_block"
+    "id": "oritech:refinery_chamber_module"
   }
 }

@@ -33,7 +33,7 @@ public final class OritechJeiRecipeServerSync {
                 RecipeContent.LAVA_GENERATOR.get(),
                 RecipeContent.STEAM_ENGINE.get(),
                 RecipeContent.PARTICLE_COLLISION.get(),
-                RecipeContent.COOLER.get(),
+                RecipeContent.INDUSTRIAL_CHILLER.get(),
                 RecipeContent.REACTOR.get(),
                 RecipeContent.LASER.get()
         ));

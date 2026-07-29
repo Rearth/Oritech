@@ -40,21 +40,21 @@ public class BlockLootGenerator extends BlockLootSubProvider {
                 BlockContent.BLACK_HOLE_OUTER.get(),
                 BlockContent.BLACK_HOLE_MIDDLE.get(),
                 BlockContent.BLACK_HOLE_INNER.get(),
-                BlockContent.PUMP_TRUNK_BLOCK.get(),
+                BlockContent.PUMP_TRUNK.get(),
                 BlockContent.QUARRY_BEAM_RING.get(),
-                BlockContent.ADDON_INDICATOR_BLOCK.get(),
-                BlockContent.REACTOR_COLD_INDICATOR_BLOCK.get(),
-                BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.get(),
-                BlockContent.REACTOR_HOT_INDICATOR_BLOCK.get(),
+                BlockContent.ADDON_INDICATOR.get(),
+                BlockContent.REACTOR_COLD_INDICATOR.get(),
+                BlockContent.REACTOR_MEDIUM_INDICATOR.get(),
+                BlockContent.REACTOR_HOT_INDICATOR.get(),
                 BlockContent.REACTOR_EXPLOSION_SMALL.get(),
                 BlockContent.REACTOR_EXPLOSION_MEDIUM.get(),
                 BlockContent.REACTOR_EXPLOSION_LARGE.get(),
-                BlockContent.MACHINE_CORE_HIDDEN.get(),
-                BlockContent.UNSTABLE_CONTAINER.get(),
+                BlockContent.COMPLEX_PLATING.get(),
+                BlockContent.SCHRODINGERS_SAFE.get(),
                 BlockContent.BLOCK_DESTROYER_HEAD.get(),
                 BlockContent.BLOCK_FERTILIZER_HEAD.get(),
                 BlockContent.BLOCK_PLACER_HEAD.get(),
-                BlockContent.TECH_DOOR_HINGE.get(),
+                BlockContent.INDUSTRIAL_DOOR_HINGE.get(),
                 BlockContent.HANGAR_DOOR_HELPER.get(),
                 BlockContent.FRAME_GANTRY_ARM.get()
         );
@@ -80,7 +80,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
         addOreDrop(BlockContent.DEEPSLATE_PLATINUM_ORE.get(), ItemContent.RAW_PLATINUM.get());
         addOreDrop(BlockContent.ENDSTONE_PLATINUM_ORE.get(), ItemContent.RAW_PLATINUM.get());
         addOreDrop(BlockContent.DEEPSLATE_URANIUM_ORE.get(), ItemContent.RAW_URANIUM.get());
-        addOreDrop(BlockContent.URANIUM_CRYSTAL.get(), ItemContent.RAW_URANIUM.get());
+        addOreDrop(BlockContent.URANITE_CRYSTAL.get(), ItemContent.RAW_URANIUM.get());
 
         RegistryReflectionUtil.IterateFields(BlockContent.class, DeferredBlock.class, ((field, identifier, value) -> {
             if (field.isAnnotationPresent(BlockContent.NoAutoDrop.class) || field.isAnnotationPresent(BlockContent.NoBlockItem.class))
@@ -99,26 +99,26 @@ public class BlockLootGenerator extends BlockLootSubProvider {
         dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION.get(), BlockContent.SUPERCONDUCTOR);
         dropOther(BlockContent.SUPERCONDUCTOR_CONNECTION.get(), BlockContent.SUPERCONDUCTOR);
 
-        dropOther(BlockContent.TAINTED_REFINERY_BLOCK.get(), BlockContent.REFINERY_BLOCK);
+        dropOther(BlockContent.TAINTED_REFINERY.get(), BlockContent.REFINERY);
 
         dropOther(BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), BlockContent.FRAMED_ITEM_PIPE);
         dropOther(BlockContent.FRAMED_FLUID_PIPE_CONNECTION.get(), BlockContent.FRAMED_FLUID_PIPE);
         dropOther(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.get(), BlockContent.FRAMED_ENERGY_PIPE);
         dropOther(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get(), BlockContent.FRAMED_SUPERCONDUCTOR);
 
-        addCustomDataDrop(BlockContent.SMALL_TANK_BLOCK.get());
-        addCustomDataDrop(BlockContent.CREATIVE_TANK_BLOCK.get());
-        addCustomDataDrop(BlockContent.SMALL_STORAGE_BLOCK.get());
-        addCustomDataDrop(BlockContent.CREATIVE_STORAGE_BLOCK.get());
-        addCustomDataDrop(BlockContent.MACHINE_COMBI_ADDON.get());
+        addCustomDataDrop(BlockContent.PORTABLE_TANK.get());
+        addCustomDataDrop(BlockContent.CREATIVE_TANK.get());
+        addCustomDataDrop(BlockContent.PORTABLE_ENERGY_STORAGE.get());
+        addCustomDataDrop(BlockContent.CREATIVE_STORAGE.get());
+        addCustomDataDrop(BlockContent.HEART_OF_THE_MACHINE_ADDON.get());
 
         add(BlockContent.CARBON_PLATING_SLAB.get(), createSlabItemTable(BlockContent.CARBON_PLATING_SLAB.get()));
         add(BlockContent.NICKEL_PLATING_SLAB.get(), createSlabItemTable(BlockContent.NICKEL_PLATING_SLAB.get()));
-        add(BlockContent.MACHINE_PLATING_SLAB.get(), createSlabItemTable(BlockContent.MACHINE_PLATING_SLAB.get()));
+        add(BlockContent.COPPER_REINFORCED_PLATING_SLAB.get(), createSlabItemTable(BlockContent.COPPER_REINFORCED_PLATING_SLAB.get()));
         add(BlockContent.IRON_PLATING_SLAB.get(), createSlabItemTable(BlockContent.IRON_PLATING_SLAB.get()));
 
-        LootItemCondition.Builder cropDropBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(BlockContent.WITHER_CROP_BLOCK.get()).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CropBlock.AGE, 7));
-        add(BlockContent.WITHER_CROP_BLOCK.get(), createCropDrops(BlockContent.WITHER_CROP_BLOCK.get(), BlockContent.WITHER_CROP_BLOCK.asItem(), BlockContent.WITHER_CROP_BLOCK.asItem(), cropDropBuilder));
+        LootItemCondition.Builder cropDropBuilder = LootItemBlockStatePropertyCondition.hasBlockStateProperties(BlockContent.SOUL_FLOWERS.get()).setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(CropBlock.AGE, 7));
+        add(BlockContent.SOUL_FLOWERS.get(), createCropDrops(BlockContent.SOUL_FLOWERS.get(), BlockContent.SOUL_FLOWERS.asItem(), BlockContent.SOUL_FLOWERS.asItem(), cropDropBuilder));
 //
         var impl = this.registries.lookupOrThrow(Registries.ENCHANTMENT);
         // similar to BlockLootTableGenerator.oakLeavesDrops()

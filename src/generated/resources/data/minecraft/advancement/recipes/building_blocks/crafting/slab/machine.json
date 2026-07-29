@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_plating_slab": {
+    "has_copper_reinforced_plating_slab": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_plating_slab"
+            "items": "oritech:copper_reinforced_plating_slab"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_plating_slab"
+      "has_copper_reinforced_plating_slab"
     ]
   ],
   "rewards": {

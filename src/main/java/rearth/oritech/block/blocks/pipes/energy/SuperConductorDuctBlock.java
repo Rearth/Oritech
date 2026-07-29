@@ -20,7 +20,7 @@ public class SuperConductorDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.get().defaultBlockState();
+        return BlockContent.SUPERCONDUCTOR_DUCT.get().defaultBlockState();
     }
 
     @Override

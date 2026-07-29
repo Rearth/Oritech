@@ -24,7 +24,7 @@ import java.util.Objects;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
-public class LargeStorageBlock extends SmallStorageBlock {
+public class LargeStorageBlock extends PortableEnergyStorageBlock {
 
     public LargeStorageBlock(Properties settings) {
         super(settings.lightLevel(value -> 2));

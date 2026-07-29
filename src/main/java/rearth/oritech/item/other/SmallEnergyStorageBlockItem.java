@@ -8,7 +8,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
-import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.block.blocks.storage.PortableEnergyStorageBlock;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
@@ -33,7 +33,7 @@ public class SmallEnergyStorageBlockItem extends BlockItem implements EnergyProv
             var text = Component.translatable("tooltip.oritech.energy_stored", TooltipHelper.getEnergyText(storedEnergy), TooltipHelper.getEnergyText(capacity));
             builder.accept(text.withStyle(ChatFormatting.GOLD));
         }
-        TooltipHelper.addMachineTooltip(builder, BlockContent.SMALL_STORAGE_BLOCK.get(), (SmallStorageBlock) BlockContent.SMALL_STORAGE_BLOCK.get());
+        TooltipHelper.addMachineTooltip(builder, BlockContent.PORTABLE_ENERGY_STORAGE.get(), (PortableEnergyStorageBlock) BlockContent.PORTABLE_ENERGY_STORAGE.get());
 
     }
 

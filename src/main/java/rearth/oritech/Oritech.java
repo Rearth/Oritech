@@ -21,8 +21,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
-import rearth.oritech.block.behavior.LaserArmBlockBehavior;
-import rearth.oritech.block.behavior.LaserArmEntityBehavior;
+import rearth.oritech.block.behavior.EndericLaserBlockBehavior;
+import rearth.oritech.block.behavior.EndericLaserEntityBehavior;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
@@ -30,7 +30,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.processing.RefineryBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.interaction.PowerPoleEntity;
+import rearth.oritech.block.entity.interaction.EnergyTransmissionPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
@@ -130,8 +130,8 @@ public final class Oritech {
 
         event.enqueueWork(() -> {
 
-            LaserArmBlockBehavior.registerDefaults();
-            LaserArmEntityBehavior.registerDefaults();
+            EndericLaserBlockBehavior.registerDefaults();
+            EndericLaserEntityBehavior.registerDefaults();
         });
 
 
@@ -196,7 +196,7 @@ public final class Oritech {
         var superConductorResult = level.getDataStorage().computeIfAbsent(GenericPipeInterfaceEntity.PipeNetworkData.SUPERCONDUCTOR_TYPE);
         SuperConductorBlock.SUPERCONDUCTOR_DATA.put(dimId, superConductorResult);
 
-        var powerPoleResult = level.getDataStorage().computeIfAbsent(PowerPoleEntity.PoleNetworkData.TYPE);
-        PowerPoleEntity.POLE_NETWORK_DATA.put(dimId, powerPoleResult);
+        var energyTransmissionPoleResult = level.getDataStorage().computeIfAbsent(EnergyTransmissionPoleEntity.PoleNetworkData.TYPE);
+        EnergyTransmissionPoleEntity.POLE_NETWORK_DATA.put(dimId, energyTransmissionPoleResult);
     }
 }

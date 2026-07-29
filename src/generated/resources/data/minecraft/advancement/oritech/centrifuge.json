@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "oritech:centrifuge_block"
+            "items": "oritech:centrifuge"
           }
         ]
       },
@@ -18,7 +18,7 @@
       "translate": "advancements.oritech.centrifuge.description"
     },
     "icon": {
-      "id": "oritech:centrifuge_block"
+      "id": "oritech:centrifuge"
     },
     "title": {
       "translate": "advancements.oritech.centrifuge"

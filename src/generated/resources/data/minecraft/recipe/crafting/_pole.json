@@ -4,7 +4,7 @@
   "key": {
     "b": "oritech:carbon_fibre_strands",
     "c": "oritech:magnetic_coil",
-    "i": "oritech:small_storage_block",
+    "i": "oritech:portable_energy_storage",
     "s": "#c:ingots/electrum"
   },
   "pattern": [
@@ -13,6 +13,6 @@
     "bbb"
   ],
   "result": {
-    "id": "oritech:power_pole_block"
+    "id": "oritech:energy_transmission_pole"
   }
 }

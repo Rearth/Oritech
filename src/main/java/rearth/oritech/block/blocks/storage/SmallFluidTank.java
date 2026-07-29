@@ -29,7 +29,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
+import rearth.oritech.block.entity.storage.PortableTankEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.ComparatorOutputProvider;
@@ -57,7 +57,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallTankEntity(pos, state, false);
+        return new PortableTankEntity(pos, state, false);
     }
 
     @Override
@@ -95,7 +95,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
         var droppedStacks = super.getDrops(state, builder);
 
         var blockEntity = builder.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
-        if (blockEntity instanceof SmallTankEntity tankEntity) {
+        if (blockEntity instanceof PortableTankEntity tankEntity) {
             droppedStacks.addAll(tankEntity.inventory.getStacks());
             tankEntity.inventory.getStacks().clear();
         }
@@ -110,7 +110,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
 
     @NotNull
     private static ItemStack getStackWithData(LevelReader level, BlockPos pos) {
-        var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
+        var tankEntity = (PortableTankEntity) level.getBlockEntity(pos);
         var stack = getBasePickStack(tankEntity.isCreative);
 
         if (tankEntity.fluidStorage.getAmount() > 0) {
@@ -123,7 +123,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
     }
 
     public static ItemStack getBasePickStack(boolean creative) {
-        return new ItemStack(creative ? BlockContent.CREATIVE_TANK_BLOCK.asItem() : BlockContent.SMALL_TANK_BLOCK.asItem());
+        return new ItemStack(creative ? BlockContent.CREATIVE_TANK.asItem() : BlockContent.PORTABLE_TANK.asItem());
     }
 
     @Override
@@ -132,7 +132,7 @@ public class SmallFluidTank extends Block implements EntityBlock {
 
         if (itemStack.has(ComponentContent.STORED_FLUID)) {
             var fluidStack = itemStack.get(ComponentContent.STORED_FLUID);
-            var tankEntity = (SmallTankEntity) level.getBlockEntity(pos);
+            var tankEntity = (PortableTankEntity) level.getBlockEntity(pos);
             tankEntity.fluidStorage.set(0, FluidResource.of(fluidStack.getFluid()), fluidStack.getAmount());
             tankEntity.setChanged();
         }

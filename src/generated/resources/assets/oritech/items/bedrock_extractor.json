@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/bedrock_extractor",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

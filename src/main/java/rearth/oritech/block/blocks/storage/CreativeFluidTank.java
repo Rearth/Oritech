@@ -21,7 +21,7 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
+import rearth.oritech.block.entity.storage.PortableTankEntity;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.function.Consumer;
@@ -42,12 +42,12 @@ public class CreativeFluidTank extends SmallFluidTank implements TooltipProvider
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new SmallTankEntity(pos, state, true);
+        return new PortableTankEntity(pos, state, true);
     }
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
-        if (!stack.isEmpty() && level.getBlockEntity(pos) instanceof SmallTankEntity blockEntity) {
+        if (!stack.isEmpty() && level.getBlockEntity(pos) instanceof PortableTankEntity blockEntity) {
             var itemAccess = ItemAccess.forPlayerInteraction(player, hand).oneByOne();
             var candidate = itemAccess.getCapability(Capabilities.Fluid.ITEM);
 

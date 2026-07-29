@@ -9,7 +9,7 @@
     "type": "custom",
     "customAugmentId": "oritech:augment/magnet"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
     "oritech:augment/superminingspeed"
   ],

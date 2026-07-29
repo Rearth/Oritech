@@ -177,7 +177,7 @@ public class AugmentSelectionScreen extends Screen {
 
         var centerLabel = Component.literal("Exit");
         if (focused.id() != null) {
-            centerLabel = Component.translatable(PlayerModifierScreen.augmentKey(focused.id()));
+            centerLabel = Component.translatable(CyberneticAugmentationCenterScreen.augmentKey(focused.id()));
         }
 
         int labelWidth = minecraft.font.width(centerLabel);

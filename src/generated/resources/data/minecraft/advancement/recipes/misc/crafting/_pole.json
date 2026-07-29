@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_power_pole_block": {
+    "has_energy_transmission_pole": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:power_pole_block"
+            "items": "oritech:energy_transmission_pole"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_power_pole_block"
+      "has_energy_transmission_pole"
     ]
   ],
   "rewards": {

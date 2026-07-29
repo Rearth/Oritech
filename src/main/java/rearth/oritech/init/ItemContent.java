@@ -8,7 +8,7 @@ import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
-import rearth.oritech.item.UnstableContainerItem;
+import rearth.oritech.item.SchrodingersSafeItem;
 import rearth.oritech.item.other.*;
 import rearth.oritech.item.tools.LaserTargetDesignator;
 import rearth.oritech.item.tools.WeedKiller;
@@ -122,7 +122,7 @@ public class ItemContent {
     public static final DeferredItem<Item> QUARTZ_DUST = ITEMS.registerSimpleItem("quartz_dust");
 
     @ItemGroupTarget(Groups.MACHINES)
-    public static final DeferredItem<Item> UNSTABLE_CONTAINER = ITEMS.registerItem("unstable_container", props -> new UnstableContainerItem(props.stacksTo(1)));
+    public static final DeferredItem<Item> SCHRODINGERS_SAFE = ITEMS.registerItem("schrodingers_safe", props -> new SchrodingersSafeItem(props.stacksTo(1)));
 
     // bio
     @Compostable(0.3F)
@@ -154,14 +154,14 @@ public class ItemContent {
 
     // tank items (with custom item class)
     @ItemGroupTarget(Groups.MACHINES)
-    public static final DeferredItem<Item> SMALL_TANK_ITEM = ITEMS.registerItem("small_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.SMALL_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<Item> PORTABLE_TANK_ITEM = ITEMS.registerItem("portable_tank", props -> new SmallFluidTankBlockItem(BlockContent.PORTABLE_TANK.value(), props.useBlockDescriptionPrefix()));
 
     @ItemGroupTarget(Groups.MACHINES)
-    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank_block", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<Item> CREATIVE_TANK_ITEM = ITEMS.registerItem("creative_tank", props -> new SmallFluidTankBlockItem(BlockContent.CREATIVE_TANK.value(), props.useBlockDescriptionPrefix()));
 
     // portable energy storage
     @ItemGroupTarget(Groups.MACHINES)
-    public static final DeferredItem<Item> SMALL_STORAGE_ITEM = ITEMS.registerItem("small_storage_block", props -> new SmallEnergyStorageBlockItem(BlockContent.SMALL_STORAGE_BLOCK.value(), props.useBlockDescriptionPrefix()));
+    public static final DeferredItem<Item> PORTABLE_ENERGY_STORAGE_ITEM = ITEMS.registerItem("portable_energy_storage", props -> new SmallEnergyStorageBlockItem(BlockContent.PORTABLE_ENERGY_STORAGE.value(), props.useBlockDescriptionPrefix()));
 
 
     public enum Groups {

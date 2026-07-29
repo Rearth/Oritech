@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_spawner_cage_block": {
+    "has_spawner_cage": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:spawner_cage_block"
+            "items": "oritech:spawner_cage"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_spawner_cage_block"
+      "has_spawner_cage"
     ]
   ],
   "rewards": {

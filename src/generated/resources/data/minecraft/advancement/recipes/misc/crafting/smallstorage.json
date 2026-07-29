@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_small_storage_block": {
+    "has_portable_energy_storage": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:small_storage_block"
+            "items": "oritech:portable_energy_storage"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_small_storage_block"
+      "has_portable_energy_storage"
     ]
   ],
   "rewards": {

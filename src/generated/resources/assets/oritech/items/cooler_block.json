@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/cooler_block",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

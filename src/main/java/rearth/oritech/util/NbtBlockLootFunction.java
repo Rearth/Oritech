@@ -10,9 +10,9 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
-import rearth.oritech.block.entity.storage.SmallStorageBlockEntity;
-import rearth.oritech.block.entity.storage.SmallTankEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
+import rearth.oritech.block.entity.storage.PortableEnergyStorageBlockEntity;
+import rearth.oritech.block.entity.storage.PortableTankEntity;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.ComponentContent;
 
@@ -30,16 +30,16 @@ public class NbtBlockLootFunction extends LootItemConditionalFunction {
 
         var blockEntity = context.getOptionalParameter(LootContextParams.BLOCK_ENTITY);
 
-        if (blockEntity instanceof SmallTankEntity tankEntity && tankEntity.hasStoredFluidForDrops()) {
+        if (blockEntity instanceof PortableTankEntity tankEntity && tankEntity.hasStoredFluidForDrops()) {
             stack.set(ComponentContent.STORED_FLUID.get(), SimpleFluidContent.copyOf(tankEntity.getStoredFluidForDrops()));
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
-        } else if (blockEntity instanceof SmallStorageBlockEntity storageEntity && storageEntity.energyStorage.energy > 0) {
+        } else if (blockEntity instanceof PortableEnergyStorageBlockEntity storageEntity && storageEntity.energyStorage.energy > 0) {
             var capacity = OritechConfig.smallEnergyStorage.energyCapacity.get();
             var itemEnergy = (int) Math.min(storageEntity.energyStorage.energy, capacity) ;
             stack.set(ComponentContent.ENERGY.get(), itemEnergy);
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
-        } else if (blockEntity instanceof CombiAddonEntity combiAddon && combiAddon.storedData != null) {
-            stack.set(ComponentContent.ADDON_DATA.get(), combiAddon.storedData);
+        } else if (blockEntity instanceof HeartOfTheMachineAddonEntity heartOfTheMachineAddon && heartOfTheMachineAddon.storedData != null) {
+            stack.set(ComponentContent.ADDON_DATA.get(), heartOfTheMachineAddon.storedData);
             stack.set(DataComponents.MAX_STACK_SIZE, 1);
         }
 

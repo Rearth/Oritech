@@ -27,7 +27,7 @@ import java.util.Set;
 public class BasicGeneratorEntity extends UpgradableGeneratorBlockEntity {
 
     public BasicGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BASIC_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.basicGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.BASIC_GENERATOR.get(), pos, state, OritechConfig.generators.basicGeneratorData.energyPerTick.get());
     }
 
     @Override

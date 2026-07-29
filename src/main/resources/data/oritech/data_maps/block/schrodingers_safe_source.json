@@ -1,0 +1,25 @@
+{
+  "values": {
+    "minecraft:redstone_block": {
+      "quality": 0.2
+    },
+    "minecraft:tnt": {
+      "quality": 0.3
+    },
+    "oritech:fluxite": {
+      "quality": 0.5
+    },
+    "minecraft:dragon_egg": {
+      "quality": 3.0
+    },
+    "oritech:low_yield_nuclear_explosion_device": {
+      "quality": 1.0
+    },
+    "oritech:manhattan_module": {
+      "quality": 2.0
+    },
+    "oritech:black_hole": {
+      "quality": 5.0
+    }
+  }
+}

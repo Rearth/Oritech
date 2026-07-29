@@ -1,13 +1,13 @@
 {
   "type": "oritech:machine_recipe",
   "itemInputs": [
-    "oritech:resource_node_platinum"
+    "oritech:platinum_resource_node"
   ],
   "itemResults": [
     {
       "id": "oritech:raw_platinum"
     }
   ],
-  "recipeType": "oritech:deep_drill",
+  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

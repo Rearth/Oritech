@@ -11,7 +11,7 @@
     "attributeOperationType": 1,
     "entityAttributeId": "minecraft:entity_interaction_range"
   },
-  "requiredStation": "oritech:advanced_augment_station",
+  "requiredStation": "oritech:quantum_research_station",
   "requirements": [
     "oritech:augment/blockreach"
   ],

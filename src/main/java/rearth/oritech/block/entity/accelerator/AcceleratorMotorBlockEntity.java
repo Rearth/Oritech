@@ -18,7 +18,7 @@ public class AcceleratorMotorBlockEntity extends BlockEntity implements EnergyPr
     private final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), OritechConfig.acceleratorMotorRFCapacity.get(), 0, this::setChanged, false);
 
     public AcceleratorMotorBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ACCELERATOR_MOTOR_BLOCK.get(), pos, state);
     }
 
     @Override

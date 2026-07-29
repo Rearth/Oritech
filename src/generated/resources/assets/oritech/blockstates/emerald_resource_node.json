@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/emerald_resource_node"
+    }
+  }
+}

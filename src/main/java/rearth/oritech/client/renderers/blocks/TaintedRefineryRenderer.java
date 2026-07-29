@@ -15,7 +15,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
-import rearth.oritech.client.renderers.blocks.SmallTankRenderer.FluidCube;
+import rearth.oritech.client.renderers.blocks.PortableTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
@@ -48,12 +48,12 @@ public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRende
             cubes.add(buildCube(new Vector3f(-24 / 16f, 3 / 16f, 11 / 16f), new Vector3f(12 / 16f, 24.5f / 16f, 28 / 16f), bigTank, capacity, null));
         }
 
-        var smallTank = animatable.ownStorage.getOutStack();
-        if (!smallTank.isEmpty()) {
+        var portableTank = animatable.ownStorage.getOutStack();
+        if (!portableTank.isEmpty()) {
             // bottom half of twisted tank
-            cubes.add(buildCube(new Vector3f(-23.5f / 16f, 7 / 16f, -5 / 16f), new Vector3f(7 / 16f, 8 / 16f, 10 / 16f), smallTank, capacity, Axis.ZN.rotationDegrees(10)));
+            cubes.add(buildCube(new Vector3f(-23.5f / 16f, 7 / 16f, -5 / 16f), new Vector3f(7 / 16f, 8 / 16f, 10 / 16f), portableTank, capacity, Axis.ZN.rotationDegrees(10)));
             // top half
-            cubes.add(buildCube(new Vector3f(-18.25f / 16f, 19 / 16f, -5 / 16f), new Vector3f(7 / 16f, 8 / 16f, 10 / 16f), smallTank, capacity, Axis.ZP.rotationDegrees(7.5f)));
+            cubes.add(buildCube(new Vector3f(-18.25f / 16f, 19 / 16f, -5 / 16f), new Vector3f(7 / 16f, 8 / 16f, 10 / 16f), portableTank, capacity, Axis.ZP.rotationDegrees(7.5f)));
         }
 
         if (!cubes.isEmpty()) renderState.addGeckolibData(FLUID_DATA, new TaintedRefineryFluidData(cubes));
@@ -69,7 +69,7 @@ public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRende
         var poseStack = renderPassInfo.poseStack();
         poseStack.pushPose();
         poseStack.last().set(renderPassInfo.getModelRenderMatrixPose());
-        SmallTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        PortableTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

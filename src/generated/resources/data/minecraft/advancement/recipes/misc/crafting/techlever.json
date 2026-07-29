@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tech_lever": {
+    "has_industrial_lever": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:tech_lever"
+            "items": "oritech:industrial_lever"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tech_lever"
+      "has_industrial_lever"
     ]
   ],
   "rewards": {

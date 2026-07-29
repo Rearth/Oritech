@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": "oritech:big_solar_panel_block",
+    "c": "oritech:big_solar_panel",
     "p": "oritech:superconductor",
     "s": "oritech:heisenberg_compensator"
   },
@@ -12,6 +12,6 @@
     "ppp"
   ],
   "result": {
-    "id": "oritech:particle_collector_block"
+    "id": "oritech:tachyon_absorber"
   }
 }

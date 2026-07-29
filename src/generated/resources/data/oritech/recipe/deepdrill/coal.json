@@ -1,13 +1,13 @@
 {
   "type": "oritech:machine_recipe",
   "itemInputs": [
-    "oritech:resource_node_coal"
+    "oritech:coal_resource_node"
   ],
   "itemResults": [
     {
       "id": "minecraft:coal"
     }
   ],
-  "recipeType": "oritech:deep_drill",
+  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

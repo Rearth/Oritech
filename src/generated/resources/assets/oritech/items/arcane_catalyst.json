@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/arcane_catalyst",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

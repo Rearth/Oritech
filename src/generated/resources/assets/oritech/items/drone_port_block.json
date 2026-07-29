@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/drone_port_block",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

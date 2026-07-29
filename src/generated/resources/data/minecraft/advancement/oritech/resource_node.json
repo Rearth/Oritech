@@ -11,16 +11,16 @@
               "stepping_on": {
                 "block": {
                   "blocks": [
-                    "oritech:resource_node_coal",
-                    "oritech:resource_node_copper",
-                    "oritech:resource_node_diamond",
-                    "oritech:resource_node_emerald",
-                    "oritech:resource_node_gold",
-                    "oritech:resource_node_iron",
+                    "oritech:coal_resource_node",
+                    "oritech:copper_resource_node",
+                    "oritech:diamond_resource_node",
+                    "oritech:emerald_resource_node",
+                    "oritech:gold_resource_node",
+                    "oritech:iron_resource_node",
                     "oritech:resource_node_lapis",
-                    "oritech:resource_node_nickel",
-                    "oritech:resource_node_platinum",
-                    "oritech:resource_node_redstone"
+                    "oritech:nickel_resource_node",
+                    "oritech:platinum_resource_node",
+                    "oritech:redstone_resource_node"
                   ]
                 }
               }
@@ -38,7 +38,7 @@
     },
     "frame": "challenge",
     "icon": {
-      "id": "oritech:resource_node_diamond"
+      "id": "oritech:diamond_resource_node"
     },
     "title": {
       "translate": "advancements.oritech.resource_node"

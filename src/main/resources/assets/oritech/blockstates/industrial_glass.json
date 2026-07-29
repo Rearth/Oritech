@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/industrial_glass"
+    }
+  },
+
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech:block/industrial_glass/center",
+    "empty": "oritech:block/industrial_glass/empty",
+    "horizontal": "oritech:block/industrial_glass/horizontal",
+    "vertical": "oritech:block/industrial_glass/vertical",
+    "particle": "oritech:block/industrial_glass/particle"
+  }
+}

@@ -48,10 +48,10 @@ public class Wrench extends Item {
                         BlockContent.FLUID_PIPE_CONNECTION,
                         BlockContent.ITEM_PIPE_CONNECTION,
                         BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION,
-                        BlockContent.ENERGY_PIPE_DUCT_BLOCK,
-                        BlockContent.SUPERCONDUCTOR_DUCT_BLOCK,
-                        BlockContent.FLUID_PIPE_DUCT_BLOCK,
-                        BlockContent.ITEM_PIPE_DUCT_BLOCK,
+                        BlockContent.ENERGY_PIPE_DUCT,
+                        BlockContent.SUPERCONDUCTOR_DUCT,
+                        BlockContent.FLUID_PIPE_DUCT,
+                        BlockContent.ITEM_PIPE_DUCT,
                         BlockContent.FRAMED_ENERGY_PIPE,
                         BlockContent.FRAMED_SUPERCONDUCTOR,
                         BlockContent.FRAMED_FLUID_PIPE,
@@ -60,7 +60,7 @@ public class Wrench extends Item {
                         BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION,
                         BlockContent.FRAMED_FLUID_PIPE_CONNECTION,
                         BlockContent.FRAMED_ITEM_PIPE_CONNECTION,
-                        BlockContent.MACHINE_FRAME_BLOCK
+                        BlockContent.MACHINE_FRAME
                 ), 25f)
         ), 1.f, 1, true);
     }

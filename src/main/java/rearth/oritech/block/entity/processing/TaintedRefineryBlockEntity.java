@@ -72,7 +72,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public long lastTickRFUsed = 0; // needed mainly for client UI
 
     public TaintedRefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
+        super(BlockEntitiesContent.TAINTED_REFINERY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
 
     @Override
@@ -273,7 +273,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
                 }
             }
 
-            level.setBlockAndUpdate(checkPos, BlockContent.MACHINE_CORE_HIDDEN.get().defaultBlockState());
+            level.setBlockAndUpdate(checkPos, BlockContent.COMPLEX_PLATING.get().defaultBlockState());
             level.invalidateCapabilities(checkPos);
 
         }
@@ -508,7 +508,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
 
         if (!eventSource.equals(worldPosition)) {
             var spawnAt = this.worldPosition.getCenter().add(0, 1, 0);
-            level.addFreshEntity(new ItemEntity(level, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(BlockContent.REFINERY_BLOCK)));
+            level.addFreshEntity(new ItemEntity(level, spawnAt.x, spawnAt.y, spawnAt.z, new ItemStack(BlockContent.REFINERY)));
             level.removeBlock(worldPosition, false);
         }
 
@@ -522,7 +522,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     public static void handleTankPacket(RefineryTankSelectorPacket payload, IPayloadContext context) {
         var level = context.player().level();
         if (level == null) return;
-        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY_ENTITY.get());
+        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY.get());
         if (refineryCandidate.isEmpty()) return;
 
         var refinery = refineryCandidate.get();

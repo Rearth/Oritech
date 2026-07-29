@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_bio_generator_block": {
+    "has_bio_generator": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:bio_generator_block"
+            "items": "oritech:bio_generator"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_bio_generator_block"
+      "has_bio_generator"
     ]
   ],
   "rewards": {

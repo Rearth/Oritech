@@ -22,7 +22,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.blocks.augmenter.AugmentApplicationBlock;
+import rearth.oritech.block.blocks.augmenter.CyberneticAugmentationCenterBlock;
 
 import java.util.Set;
 
@@ -62,7 +62,7 @@ public class PortalEntity extends Entity implements GeoEntity {
                 BlockPos targetPos = target.pos();
                 Vec3 centerPos = targetPos.getCenter();
 
-                AugmentApplicationBlock.lastTeleportedPlayer = new Tuple<>(targetWorld.getGameTime(), serverPlayer);
+                CyberneticAugmentationCenterBlock.lastTeleportedPlayer = new Tuple<>(targetWorld.getGameTime(), serverPlayer);
 
                 serverPlayer.teleportTo(
                         targetWorld,

@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 
 /**
  * UIComponent-based clickable button with nine-patch styling.
- * Replaces the vanilla AbstractButton-based OritechButton.
+ * Replaces the vanilla AbstractButton-based OriindustrialButton.
  */
 public class ButtonWidget extends UIComponent {
 

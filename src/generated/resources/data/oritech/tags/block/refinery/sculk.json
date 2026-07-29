@@ -14,7 +14,7 @@
     "minecraft:sculk_vein",
     "minecraft:calibrated_sculk_sensor",
     "minecraft:sculk",
-    "oritech:spawner_cage_block",
-    "oritech:spawner_controller_block"
+    "oritech:spawner_cage",
+    "oritech:spawner_controller"
   ]
 }

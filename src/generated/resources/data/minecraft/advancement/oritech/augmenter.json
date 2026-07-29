@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "oritech:augment_application_block"
+            "items": "oritech:cybernetic_augmentation_center"
           }
         ]
       },
@@ -19,7 +19,7 @@
     },
     "frame": "goal",
     "icon": {
-      "id": "oritech:augment_application_block"
+      "id": "oritech:cybernetic_augmentation_center"
     },
     "title": {
       "translate": "advancements.oritech.augmenter"

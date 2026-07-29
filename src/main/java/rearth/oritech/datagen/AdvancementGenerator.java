@@ -49,7 +49,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
         
         var generatorAdvancement = Advancement.Builder.advancement().parent(rootAdvancement)
                                 .display(
-                                  BlockContent.BASIC_GENERATOR_BLOCK, // The display icon
+                                  BlockContent.BASIC_GENERATOR, // The display icon
                                   Component.translatable("advancements.oritech.generator"), // The title
                                   Component.translatable("advancements.oritech.generator.description"), // The description
                                   background, // Background image used
@@ -59,12 +59,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_generator", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.BASIC_GENERATOR_BLOCK))
+                                .addCriterion("got_generator", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.BASIC_GENERATOR))
                                 .save(consumer, Oritech.MOD_ID + "/generator");
         
         var furnaceAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
-                                  BlockContent.POWERED_FURNACE_BLOCK, // The display icon
+                                  BlockContent.POWERED_FURNACE, // The display icon
                                   Component.translatable("advancements.oritech.furnace"), // The title
                                   Component.translatable("advancements.oritech.furnace.description"), // The description
                                   background, // Background image used
@@ -74,12 +74,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_furnace", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.POWERED_FURNACE_BLOCK))
+                                .addCriterion("got_furnace", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.POWERED_FURNACE))
                                 .save(consumer, Oritech.MOD_ID + "/furnace");
 
         var steamAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
-                                  BlockContent.STEAM_ENGINE_BLOCK, // The display icon
+                                  BlockContent.STEAM_ENGINE, // The display icon
                                   Component.translatable("advancements.oritech.steam_engine"), // The title
                                   Component.translatable("advancements.oritech.steam_engine.description"), // The description
                                   background, // Background image used
@@ -89,12 +89,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_steam_engine", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.STEAM_ENGINE_BLOCK))
+                                .addCriterion("got_steam_engine", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.STEAM_ENGINE))
                                 .save(consumer, Oritech.MOD_ID + "/steam_engine");
         
         var pulverizerAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
-                                  BlockContent.PULVERIZER_BLOCK, // The display icon
+                                  BlockContent.PULVERIZER, // The display icon
                                   Component.translatable("advancements.oritech.pulverizer"), // The title
                                   Component.translatable("advancements.oritech.pulverizer.description"), // The description
                                   background, // Background image used
@@ -104,13 +104,13 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_pulverizer", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.PULVERIZER_BLOCK))
+                                .addCriterion("got_pulverizer", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.PULVERIZER))
                                 .save(consumer, Oritech.MOD_ID + "/pulverizer");
         
         
         var foundryAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
-                                  BlockContent.FOUNDRY_BLOCK, // The display icon
+                                  BlockContent.FOUNDRY, // The display icon
                                   Component.translatable("advancements.oritech.foundry"), // The title
                                   Component.translatable("advancements.oritech.foundry.description"), // The description
                                   background, // Background image used
@@ -120,13 +120,13 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_foundry", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.FOUNDRY_BLOCK))
+                                .addCriterion("got_foundry", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.FOUNDRY))
                                 .save(consumer, Oritech.MOD_ID + "/foundry");
         
         
         var assemblerAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
-                                  BlockContent.ASSEMBLER_BLOCK, // The display icon
+                                  BlockContent.ASSEMBLER, // The display icon
                                   Component.translatable("advancements.oritech.assembler"), // The title
                                   Component.translatable("advancements.oritech.assembler.description"), // The description
                                   background, // Background image used
@@ -136,7 +136,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_assembler", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ASSEMBLER_BLOCK))
+                                .addCriterion("got_assembler", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ASSEMBLER))
                                 .save(consumer, Oritech.MOD_ID + "/assembler");
         
         var exoBootsAdvancement = Advancement.Builder.advancement().parent(assemblerAdvancement)
@@ -216,7 +216,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
 
         var resourceNodeAdvancement = Advancement.Builder.advancement().parent(drillAdvancement)
                                    .display(
-                                     BlockContent.RESOURCE_NODE_DIAMOND, // The display icon
+                                     BlockContent.DIAMOND_RESOURCE_NODE, // The display icon
                                      Component.translatable("advancements.oritech.resource_node"), // The title
                                      Component.translatable("advancements.oritech.resource_node.description"), // The description
                                      background, // Background image used
@@ -226,12 +226,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                      false // Hidden in the advancement tab
                                    )
                                    // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                    .addCriterion("found_resource_node", PlayerTrigger.TriggerInstance.located(EntityPredicate.Builder.entity().steppingOn(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(blocks, BlockContent.RESOURCE_NODE_COAL.get(), BlockContent.RESOURCE_NODE_COPPER.get(), BlockContent.RESOURCE_NODE_DIAMOND.get(), BlockContent.RESOURCE_NODE_EMERALD.get(), BlockContent.RESOURCE_NODE_GOLD.get(), BlockContent.RESOURCE_NODE_IRON.get(), BlockContent.RESOURCE_NODE_LAPIS.get(), BlockContent.RESOURCE_NODE_NICKEL.get(), BlockContent.RESOURCE_NODE_PLATINUM.get(), BlockContent.RESOURCE_NODE_REDSTONE.get())))))
+                                    .addCriterion("found_resource_node", PlayerTrigger.TriggerInstance.located(EntityPredicate.Builder.entity().steppingOn(LocationPredicate.Builder.location().setBlock(BlockPredicate.Builder.block().of(blocks, BlockContent.COAL_RESOURCE_NODE.get(), BlockContent.COPPER_RESOURCE_NODE.get(), BlockContent.DIAMOND_RESOURCE_NODE.get(), BlockContent.EMERALD_RESOURCE_NODE.get(), BlockContent.GOLD_RESOURCE_NODE.get(), BlockContent.IRON_RESOURCE_NODE.get(), BlockContent.RESOURCE_NODE_LAPIS.get(), BlockContent.NICKEL_RESOURCE_NODE.get(), BlockContent.PLATINUM_RESOURCE_NODE.get(), BlockContent.REDSTONE_RESOURCE_NODE.get())))))
                                    .save(consumer, Oritech.MOD_ID + "/resource_node");        
         
         var centrifugeAdvancement = Advancement.Builder.advancement().parent(assemblerAdvancement)
                                 .display(
-                                  BlockContent.CENTRIFUGE_BLOCK, // The display icon
+                                  BlockContent.CENTRIFUGE, // The display icon
                                   Component.translatable("advancements.oritech.centrifuge"), // The title
                                   Component.translatable("advancements.oritech.centrifuge.description"), // The description
                                   background, // Background image used
@@ -241,7 +241,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_centrifuge", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.CENTRIFUGE_BLOCK))
+                                .addCriterion("got_centrifuge", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.CENTRIFUGE))
                                 .save(consumer, Oritech.MOD_ID + "/centrifuge");
         
         
@@ -263,7 +263,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
         
         var augmenterAdvancement = Advancement.Builder.advancement().parent(centrifugeAdvancement)
                                 .display(
-                                  BlockContent.AUGMENT_APPLICATION_BLOCK, // The display icon
+                                  BlockContent.CYBERNETIC_AUGMENTATION_CENTER, // The display icon
                                   Component.translatable("advancements.oritech.augmenter"), // The title
                                   Component.translatable("advancements.oritech.augmenter.description"), // The description
                                   background, // Background image used
@@ -273,13 +273,13 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_augmenter", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.AUGMENT_APPLICATION_BLOCK))
+                                .addCriterion("got_augmenter", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.CYBERNETIC_AUGMENTATION_CENTER))
                                 .save(consumer, Oritech.MOD_ID + "/augmenter");
         
         
         var arcaneAdvancement = Advancement.Builder.advancement().parent(plasticAdvancement)
                                 .display(
-                                  BlockContent.ENCHANTMENT_CATALYST_BLOCK, // The display icon
+                                  BlockContent.ARCANE_CATALYST, // The display icon
                                   Component.translatable("advancements.oritech.catalyst"), // The title
                                   Component.translatable("advancements.oritech.catalyst.description"), // The description
                                   background, // Background image used
@@ -289,12 +289,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_catalyst", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ENCHANTMENT_CATALYST_BLOCK))
+                                .addCriterion("got_catalyst", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ARCANE_CATALYST))
                                 .save(consumer, Oritech.MOD_ID + "/catalyst");
 
         var overEnchanted = Advancement.Builder.advancement().parent(arcaneAdvancement)
                                 .display(
-                                  BlockContent.ENCHANTER_BLOCK.asItem(), // The display icon
+                                  BlockContent.STABILIZED_ENCHANTER.asItem(), // The display icon
                                   Component.translatable("advancements.oritech.overenchanted"), // The title
                                   Component.translatable("advancements.oritech.overenchanted.description"), // The description
                                   background, // Background image used
@@ -310,7 +310,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
         
         var laserAdvancement = Advancement.Builder.advancement().parent(centrifugeAdvancement)
                                 .display(
-                                  BlockContent.LASER_ARM_BLOCK, // The display icon
+                                  BlockContent.ENDERIC_LASER, // The display icon
                                   Component.translatable("advancements.oritech.laser"), // The title
                                   Component.translatable("advancements.oritech.laser.description"), // The description
                                   background, // Background image used
@@ -320,12 +320,12 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_laser", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.LASER_ARM_BLOCK))
+                                .addCriterion("got_laser", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ENDERIC_LASER))
                                 .save(consumer, Oritech.MOD_ID + "/laser");
         
         var reactorAdvancement = Advancement.Builder.advancement().parent(laserAdvancement)
                                 .display(
-                                  BlockContent.REACTOR_CONTROLLER, // The display icon
+                                  BlockContent.NUCLEAR_REACTOR_CONTROLLER, // The display icon
                                   Component.translatable("advancements.oritech.reactor"), // The title
                                   Component.translatable("advancements.oritech.reactor.description"), // The description
                                   background, // Background image used
@@ -335,7 +335,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                   false // Hidden in the advancement tab
                                 )
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                .addCriterion("got_reactor", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.REACTOR_CONTROLLER))
+                                .addCriterion("got_reactor", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.NUCLEAR_REACTOR_CONTROLLER))
                                 .save(consumer, Oritech.MOD_ID + "/reactor");
         
         
@@ -357,7 +357,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
         
         var atomicForgeAdvancement = Advancement.Builder.advancement().parent(fluxiteAdvancement)
                                  .display(
-                                   BlockContent.ATOMIC_FORGE_BLOCK, // The display icon
+                                   BlockContent.ATOMIC_FORGE, // The display icon
                                    Component.translatable("advancements.oritech.atomicforge"), // The title
                                    Component.translatable("advancements.oritech.atomicforge.description"), // The description
                                    background, // Background image used
@@ -367,7 +367,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                    false // Hidden in the advancement tab
                                  )
                                  // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
-                                 .addCriterion("got_atomic_forge", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ATOMIC_FORGE_BLOCK))
+                                 .addCriterion("got_atomic_forge", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.ATOMIC_FORGE))
                                  .save(consumer, Oritech.MOD_ID + "/atomicforge");
         
         

@@ -5,7 +5,7 @@
     "b": "#oritech:plating",
     "c": "oritech:enderic_lens",
     "f": "#c:ingots/steel",
-    "s": "oritech:basic_generator_block"
+    "s": "oritech:basic_generator"
   },
   "pattern": [
     "fff",
@@ -13,6 +13,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:fuel_generator_block"
+    "id": "oritech:fuel_generator"
   }
 }

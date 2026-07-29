@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_drone_port_block": {
+    "has_drone_port": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:drone_port_block"
+            "items": "oritech:drone_port"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_drone_port_block"
+      "has_drone_port"
     ]
   ],
   "rewards": {

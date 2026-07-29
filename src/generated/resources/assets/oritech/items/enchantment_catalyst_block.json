@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/enchantment_catalyst_block",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

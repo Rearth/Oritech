@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_reactor_controller": {
+    "has_nuclear_reactor_controller": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:reactor_controller"
+            "items": "oritech:nuclear_reactor_controller"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_reactor_controller"
+      "has_nuclear_reactor_controller"
     ]
   ],
   "rewards": {

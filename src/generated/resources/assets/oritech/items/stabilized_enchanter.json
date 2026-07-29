@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/stabilized_enchanter",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

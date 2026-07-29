@@ -10,7 +10,7 @@
     "effectStrength": 0,
     "potionEffectId": "minecraft:water_breathing"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [],
   "researchCost": [
     {

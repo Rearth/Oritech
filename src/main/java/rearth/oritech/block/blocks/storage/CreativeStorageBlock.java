@@ -28,7 +28,7 @@ import rearth.oritech.util.TooltipHelper;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import static rearth.oritech.block.blocks.storage.SmallStorageBlock.TARGET_DIR;
+import static rearth.oritech.block.blocks.storage.PortableEnergyStorageBlock.TARGET_DIR;
 
 
 public class CreativeStorageBlock extends Block implements EntityBlock, TooltipProvider {

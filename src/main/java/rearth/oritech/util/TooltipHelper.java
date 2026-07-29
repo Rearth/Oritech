@@ -13,7 +13,7 @@ import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
-import rearth.oritech.block.entity.interaction.DeepDrillEntity;
+import rearth.oritech.block.entity.interaction.BedrockExtractorEntity;
 import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 
 import java.text.NumberFormat;
@@ -80,7 +80,7 @@ public class TooltipHelper {
                 if (!isAtomicForge)
                     consumer.accept(Component.translatable("tooltip.oritech.machine_capacity_desc").withStyle(ChatFormatting.GRAY).append(Component.translatable("tooltip.oritech.energy_capacity", maxStorage).withStyle(ChatFormatting.GOLD)));
 
-                if (isAtomicForge || energyProvider instanceof DeepDrillEntity)
+                if (isAtomicForge || energyProvider instanceof BedrockExtractorEntity)
                     consumer.accept(Component.translatable("tooltip.oritech.needs_laser_power").withStyle(ChatFormatting.BOLD));
 
                 var id = BuiltInRegistries.BLOCK.getKey(block);

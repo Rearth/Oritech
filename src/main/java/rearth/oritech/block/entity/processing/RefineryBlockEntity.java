@@ -32,7 +32,7 @@ import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.ArcaneCatalystBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.RefineryScreenHandler;
 import rearth.oritech.config.OritechConfig;
@@ -61,7 +61,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     private int moduleCount;    // range 0-2
 
     public RefineryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.REFINERY_ENTITY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
+        super(BlockEntitiesContent.REFINERY.get(), pos, state, OritechConfig.processingMachines.refineryData.energyPerTick.get());
     }
 
     @Override
@@ -96,7 +96,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
 
         for (int i = 0; i <= 1; i++) {
             var candidatePos = startPos.offset(0, i, 0);
-            var candidate = level.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY.get());
+            var candidate = level.getBlockEntity(candidatePos, BlockEntitiesContent.REFINERY_CHAMBER_MODULE.get());
             if (candidate.isEmpty() || !candidate.get().isActive(candidate.get().getBlockState())) break;
 
             moduleCount++;
@@ -365,13 +365,13 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
     }
 
     // checks if there is an arcane catalyst nearby with at least 1 soul in it
-    public Optional<EnchantmentCatalystBlockEntity> getNearbyNonEmptyCatalyst() {
+    public Optional<ArcaneCatalystBlockEntity> getNearbyNonEmptyCatalyst() {
         if (level == null) return Optional.empty();
 
         for (var checkPos : BlockPos.withinManhattan(worldPosition, 6, 5, 6)) {
             var checkState = level.getBlockState(checkPos);
-            if (checkState.getBlock().equals(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get())) {
-                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.ENCHANTMENT_CATALYST_BLOCK_ENTITY.get());
+            if (checkState.getBlock().equals(BlockContent.ARCANE_CATALYST.get())) {
+                var checkEntity = level.getBlockEntity(checkPos, BlockEntitiesContent.ARCANE_CATALYST_BLOCK.get());
                 if (checkEntity.isPresent() && checkEntity.get().collectedSouls > 0) return checkEntity;
             }
         }
@@ -390,7 +390,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         // remove tanks (indexed 1 + 2)
         for (int i = 1; i <= moduleCount; i++) {
             var tankCandidatePos = worldPosition.above(1 + i);
-            var tankEntityCandidate = level.getBlockEntity(tankCandidatePos, BlockEntitiesContent.REFINERY_MODULE_ENTITY.get());
+            var tankEntityCandidate = level.getBlockEntity(tankCandidatePos, BlockEntitiesContent.REFINERY_CHAMBER_MODULE.get());
             if (tankEntityCandidate.isPresent()) {
                 var tankEntity = tankEntityCandidate.get();
                 for (var coreBlock : tankEntity.getConnectedCores())

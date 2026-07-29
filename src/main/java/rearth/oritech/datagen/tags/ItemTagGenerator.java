@@ -147,8 +147,8 @@ public class ItemTagGenerator extends ItemTagsProvider {
         
         tag(cItemTag("bananas")).add(ItemContent.BANANA.get());
         tag(cItemTag("foods/fruit")).add(ItemContent.BANANA.get());
-        tag(Tags.Items.CROPS).add(BlockContent.WITHER_CROP_BLOCK.asItem());
-        tag(cItemTag("crops/soul_flower")).add(BlockContent.WITHER_CROP_BLOCK.asItem());
+        tag(Tags.Items.CROPS).add(BlockContent.SOUL_FLOWERS.asItem());
+        tag(cItemTag("crops/soul_flower")).add(BlockContent.SOUL_FLOWERS.asItem());
         
         // biomass
         tag(TagContent.BIOMATTER)
@@ -161,7 +161,7 @@ public class ItemTagGenerator extends ItemTagsProvider {
           .addOptionalTag(itemTag("createaddition", "plant_foods"))
           .addOptionalTag(itemTag("enderio", "plant_matter_green"))
           .addOptionalTag(itemTag("enderio", "plant_matter_brown"))
-          .add(BlockContent.WITHER_CROP_BLOCK.asItem())
+          .add(BlockContent.SOUL_FLOWERS.asItem())
           .add(ItemContent.BANANA.get().asItem())
           .add(Items.WHEAT)
           .add(Items.DRIED_KELP)
@@ -202,8 +202,8 @@ public class ItemTagGenerator extends ItemTagsProvider {
         tag(TagContent.BIOMASS)
           .add(ItemContent.BIOMASS.get())
           .addOptionalTag(itemTag("techreborn", "plantball"));
-        tag(TagContent.BIOMASS_BLOCK)
-          .add(BlockContent.BIOMASS_BLOCK.asItem());
+        tag(TagContent.BIOMASS)
+          .add(BlockContent.BIOMASS.asItem());
         
         // dyes
         tag(TagContent.RAW_WHITE_DYE)
@@ -239,11 +239,11 @@ public class ItemTagGenerator extends ItemTagsProvider {
           .add(Items.PINK_PETALS);
         
         // plating variants
-        tag(TagContent.MACHINE_PLATING)
-          .add(BlockContent.MACHINE_PLATING_BLOCK.asItem())
-          .add(BlockContent.IRON_PLATING_BLOCK.asItem())
-          .add(BlockContent.CARBON_PLATING_BLOCK.asItem())
-          .add(BlockContent.NICKEL_PLATING_BLOCK.asItem());
+        tag(TagContent.PLATING_BLOCKS)
+          .add(BlockContent.COPPER_REINFORCED_PLATING.asItem())
+          .add(BlockContent.IRON_PLATING.asItem())
+          .add(BlockContent.CARBON_PLATING.asItem())
+          .add(BlockContent.NICKEL_PLATING.asItem());
         
         // silicon
         tag(TagContent.SILICON)
@@ -320,70 +320,70 @@ public class ItemTagGenerator extends ItemTagsProvider {
         
         // storage blocks
         tag(Tags.Items.STORAGE_BLOCKS)
-          .add(BlockContent.STEEL_BLOCK.asItem())
-          .add(BlockContent.ENERGITE_BLOCK.asItem())
-          .add(BlockContent.NICKEL_BLOCK.asItem())
-          .add(BlockContent.BIOSTEEL_BLOCK.asItem())
-          .add(BlockContent.PLATINUM_BLOCK.asItem())
-          .add(BlockContent.ADAMANT_BLOCK.asItem())
-          .add(BlockContent.ELECTRUM_BLOCK.asItem())
-          .add(BlockContent.DURATIUM_BLOCK.asItem())
-          .add(BlockContent.BIOMASS_BLOCK.asItem())
-          .add(BlockContent.PLASTIC_BLOCK.asItem())
-          .add(BlockContent.FLUXITE_BLOCK.asItem())
-          .add(BlockContent.SILICON_BLOCK.asItem())
-          .add(BlockContent.RAW_NICKEL_BLOCK.asItem())
-          .add(BlockContent.RAW_URANIUM_BLOCK.asItem())
-          .add(BlockContent.URANIUM_DUST_BLOCK.asItem())
-          .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
+          .add(BlockContent.STEEL.asItem())
+          .add(BlockContent.ENERGITE.asItem())
+          .add(BlockContent.NICKEL.asItem())
+          .add(BlockContent.BIOSTEEL.asItem())
+          .add(BlockContent.PLATINUM.asItem())
+          .add(BlockContent.ADAMANT.asItem())
+          .add(BlockContent.ELECTRUM.asItem())
+          .add(BlockContent.DURATIUM.asItem())
+          .add(BlockContent.BIOMASS.asItem())
+          .add(BlockContent.PLASTIC.asItem())
+          .add(BlockContent.FLUXITE.asItem())
+          .add(BlockContent.SILICON.asItem())
+          .add(BlockContent.RAW_NICKEL.asItem())
+          .add(BlockContent.RAW_URANIUM.asItem())
+          .add(BlockContent.URANIUM.asItem())
+          .add(BlockContent.RAW_PLATINUM.asItem());
         
         tag(getStorageBlockTag("steel"))
-          .add(BlockContent.STEEL_BLOCK.asItem());
+          .add(BlockContent.STEEL.asItem());
         
         tag(getStorageBlockTag("energite"))
-          .add(BlockContent.ENERGITE_BLOCK.asItem());
+          .add(BlockContent.ENERGITE.asItem());
         
         tag(getStorageBlockTag("nickel"))
-          .add(BlockContent.NICKEL_BLOCK.asItem());
+          .add(BlockContent.NICKEL.asItem());
         
         tag(getStorageBlockTag("biosteel"))
-          .add(BlockContent.BIOSTEEL_BLOCK.asItem());
+          .add(BlockContent.BIOSTEEL.asItem());
         
         tag(getStorageBlockTag("platinum"))
-          .add(BlockContent.PLATINUM_BLOCK.asItem());
+          .add(BlockContent.PLATINUM.asItem());
         
         tag(getStorageBlockTag("adamant"))
-          .add(BlockContent.ADAMANT_BLOCK.asItem());
+          .add(BlockContent.ADAMANT.asItem());
         
         tag(getStorageBlockTag("electrum"))
-          .add(BlockContent.ELECTRUM_BLOCK.asItem());
+          .add(BlockContent.ELECTRUM.asItem());
         
         tag(getStorageBlockTag("duratium"))
-          .add(BlockContent.DURATIUM_BLOCK.asItem());
+          .add(BlockContent.DURATIUM.asItem());
         
         tag(getStorageBlockTag("biomass"))
-          .add(BlockContent.BIOMASS_BLOCK.asItem());
+          .add(BlockContent.BIOMASS.asItem());
         
         tag(getStorageBlockTag("plastic"))
-          .add(BlockContent.PLASTIC_BLOCK.asItem());
+          .add(BlockContent.PLASTIC.asItem());
         
         tag(getStorageBlockTag("fluxite"))
-          .add(BlockContent.FLUXITE_BLOCK.asItem());
+          .add(BlockContent.FLUXITE.asItem());
         
         tag(getStorageBlockTag("silicon"))
-          .add(BlockContent.SILICON_BLOCK.asItem());
+          .add(BlockContent.SILICON.asItem());
         
         tag(getStorageBlockTag("raw_nickel"))
-          .add(BlockContent.RAW_NICKEL_BLOCK.asItem());
+          .add(BlockContent.RAW_NICKEL.asItem());
         
         tag(getStorageBlockTag("raw_platinum"))
-          .add(BlockContent.RAW_PLATINUM_BLOCK.asItem());
+          .add(BlockContent.RAW_PLATINUM.asItem());
         
         tag(getStorageBlockTag("raw_uranium"))
-          .add(BlockContent.RAW_URANIUM_BLOCK.asItem());
+          .add(BlockContent.RAW_URANIUM.asItem());
         
         tag(getStorageBlockTag("uranium_dust"))
-          .add(BlockContent.URANIUM_DUST_BLOCK.asItem());
+          .add(BlockContent.URANIUM.asItem());
         
         tag(itemTag("industrialforegoing", "bioreactor"))
           .addTag(TagContent.BIOMASS);

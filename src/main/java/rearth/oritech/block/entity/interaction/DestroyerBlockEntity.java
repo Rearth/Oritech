@@ -33,7 +33,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
@@ -62,7 +62,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     private ServerPlayer destroyerPlayerEntity = null;
 
     public DestroyerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.DESTROYER_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.DESTROYER.get(), pos, state);
     }
 
     @Override
@@ -76,13 +76,13 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasCropFilter())
+        if (addonBlock.state().getBlock().equals(BlockContent.CROP_FILTER_ADDON.get()) || addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.hasCropFilter())
             hasCropFilterAddon = true;
 
         if (addonBlock.state().getBlock().equals(BlockContent.QUARRY_ADDON.get()))
             range *= 8;
 
-        if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getQuarryCount() > 0) {
+        if (addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.getQuarryCount() > 0) {
             for (int i = 0; i < combi.getQuarryCount(); i++) {
                 range *= 8;
             }
@@ -91,11 +91,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()))
             yieldAddons++;
 
-        if (addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
+        if (addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.getYieldCount() > 0) {
             yieldAddons += combi.getYieldCount();
         }
 
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasSilk())
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get()) || addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.hasSilk())
             hasSilkTouchAddon = true;
 
 

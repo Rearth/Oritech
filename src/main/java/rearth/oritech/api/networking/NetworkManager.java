@@ -27,16 +27,16 @@ import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.accelerator.ParticleAcceleratorBlockEntity;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchanterBlockEntity;
-import rearth.oritech.block.entity.arcane.EnchantmentCatalystBlockEntity;
+import rearth.oritech.block.entity.arcane.StabilizedEnchanterBlockEntity;
+import rearth.oritech.block.entity.arcane.ArcaneCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
-import rearth.oritech.block.entity.augmenter.AugmentApplicationEntity;
+import rearth.oritech.block.entity.augmenter.CyberneticAugmentationCenterEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
-import rearth.oritech.block.entity.interaction.LaserArmBlockEntity;
-import rearth.oritech.block.entity.interaction.ShrinkerBlockEntity;
+import rearth.oritech.block.entity.interaction.EndericLaserBlockEntity;
+import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
@@ -80,8 +80,8 @@ public class NetworkManager {
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
-        registerCodec(LaserArmBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
-        registerCodec(AugmentApplicationEntity.ResearchState.PACKET_CODEC, AugmentApplicationEntity.ResearchState.class);
+        registerCodec(EndericLaserBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
+        registerCodec(CyberneticAugmentationCenterEntity.ResearchState.PACKET_CODEC, CyberneticAugmentationCenterEntity.ResearchState.class);
 
     }
 
@@ -92,7 +92,7 @@ public class NetworkManager {
 
     public static void initServerBound(PayloadRegistrar registrar) {
         registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
-        registrar.playToServer(EnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(EnchanterBlockEntity.SelectEnchantingPacket.class), EnchanterBlockEntity::receiveEnchantmentSelection);
+        registrar.playToServer(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.class), StabilizedEnchanterBlockEntity::receiveEnchantmentSelection);
         registrar.playToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
         registrar.playToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
         registrar.playToServer(ServerZiplineHandler.ZiplinePlayerUsePacket.PACKET_ID, getAutoCodec(ServerZiplineHandler.ZiplinePlayerUsePacket.class), ServerZiplineHandler::onZipLineTickUseEvent);
@@ -103,7 +103,7 @@ public class NetworkManager {
         registrar.playToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
         registrar.playToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
         registrar.playToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
-        registrar.playToServer(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.PACKET_ID, getAutoCodec(ShrinkerBlockEntity.ShrinkerPlayerUsePacket.class), ShrinkerBlockEntity::onPlayerUse);
+        registrar.playToServer(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.PACKET_ID, getAutoCodec(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.class), AddonSplicerBlockEntity::onPlayerUse);
         registrar.playToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
         registrar.playToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
         registrar.playToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
@@ -114,11 +114,11 @@ public class NetworkManager {
         registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
         registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
         registrar.playToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
-        registrar.playToClient(EnchantmentCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(EnchantmentCatalystBlockEntity.CatalystSyncPacket.class), EnchantmentCatalystBlockEntity::receiveUpdatePacket);
+        registrar.playToClient(ArcaneCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(ArcaneCatalystBlockEntity.CatalystSyncPacket.class), ArcaneCatalystBlockEntity::receiveUpdatePacket);
         registrar.playToClient(SpawnerControllerBlockEntity.SpawnerSyncPacket.PACKET_ID, getAutoCodec(SpawnerControllerBlockEntity.SpawnerSyncPacket.class), SpawnerControllerBlockEntity::receiveUpdatePacket);
         registrar.playToClient(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonClientUpdate.class), RedstoneAddonBlockEntity::receiveOnClient);
-        registrar.playToClient(AcceleratorControllerBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.ParticleRenderTrail.class), AcceleratorControllerBlockEntity::receiveTrail);
-        registrar.playToClient(AcceleratorControllerBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(AcceleratorControllerBlockEntity.LastEventPacket.class), AcceleratorControllerBlockEntity::receiveEvent);
+        registrar.playToClient(ParticleAcceleratorBlockEntity.ParticleRenderTrail.PACKET_ID, getAutoCodec(ParticleAcceleratorBlockEntity.ParticleRenderTrail.class), ParticleAcceleratorBlockEntity::receiveTrail);
+        registrar.playToClient(ParticleAcceleratorBlockEntity.LastEventPacket.PACKET_ID, getAutoCodec(ParticleAcceleratorBlockEntity.LastEventPacket.class), ParticleAcceleratorBlockEntity::receiveEvent);
     }
 
     public static void receiveMessage(MessagePayload message, IPayloadContext context) {

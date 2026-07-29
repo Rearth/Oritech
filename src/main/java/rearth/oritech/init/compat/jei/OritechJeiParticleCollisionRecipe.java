@@ -20,7 +20,7 @@ final class OritechJeiParticleCollisionRecipe extends AbstractRecipeCategory<Rec
         super(
                 OritechJeiRecipeTypes.PARTICLE_COLLISION,
                 Component.translatable("emi.category.oritech.particle_collision"),
-                guiHelper.createDrawableItemLike(BlockContent.ACCELERATOR_CONTROLLER.get()),
+                guiHelper.createDrawableItemLike(BlockContent.PARTICLE_ACCELERATOR.get()),
                 WIDTH,
                 HEIGHT
         );
@@ -50,6 +50,6 @@ final class OritechJeiParticleCollisionRecipe extends AbstractRecipeCategory<Rec
                 .add(recipe.itemResults().getFirst())
                 .setOutputSlotBackground();
         builder.addInvisibleIngredients(RecipeIngredientRole.CRAFTING_STATION)
-                .add(BlockContent.ACCELERATOR_CONTROLLER.get());
+                .add(BlockContent.PARTICLE_ACCELERATOR.get());
     }
 }

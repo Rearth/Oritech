@@ -1,0 +1,33 @@
+{
+  "variants": {
+    "heading=true,facing=north": {
+      "model": "oritech:block/industrial_support_girder",
+      "y": 90
+    },
+    "heading=true,facing=east": {
+      "model": "oritech:block/industrial_support_girder",
+      "y": 180
+    },
+    "heading=true,facing=south": {
+      "model": "oritech:block/industrial_support_girder",
+      "y": 270
+    },
+    "heading=true,facing=west": {
+      "model": "oritech:block/industrial_support_girder"
+    },
+    "heading=false,facing=north": {
+      "model": "oritech:block/industrial_support_girder_straight",
+      "y": 90
+    },
+    "heading=false,facing=east": {
+      "model": "oritech:block/industrial_support_girder_straight"
+    },
+    "heading=false,facing=south": {
+      "model": "oritech:block/industrial_support_girder_straight",
+      "y": 90
+    },
+    "heading=false,facing=west": {
+      "model": "oritech:block/industrial_support_girder_straight"
+    }
+  }
+}

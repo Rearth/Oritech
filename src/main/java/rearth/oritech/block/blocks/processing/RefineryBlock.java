@@ -45,14 +45,14 @@ public class RefineryBlock extends MultiblockMachine {
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
-            consumer.accept(Component.translatable("tooltip.oritech.refinery_block").withStyle(ChatFormatting.GRAY));
+            consumer.accept(Component.translatable("tooltip.oritech.refinery").withStyle(ChatFormatting.GRAY));
         }
     }
 
     @Override
     public void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
-        var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY_ENTITY.get());
+        var refineryEntity = level.getBlockEntity(pos, BlockEntitiesContent.REFINERY.get());
 
         if (level.isClientSide() || refineryEntity.isEmpty()) {
             super.onExplosionHit(state, level, pos, explosion, onHit);
@@ -81,7 +81,7 @@ public class RefineryBlock extends MultiblockMachine {
         DELAYED_TAINT_EVENTS.add(() -> {
             // create + init refinery
             level.setBlockAndUpdate(targetPos,
-                    BlockContent.TAINTED_REFINERY_BLOCK.get().defaultBlockState()
+                    BlockContent.TAINTED_REFINERY.get().defaultBlockState()
                             .setValue(BlockStateProperties.HORIZONTAL_FACING, state.getValue(BlockStateProperties.HORIZONTAL_FACING))
             );
 

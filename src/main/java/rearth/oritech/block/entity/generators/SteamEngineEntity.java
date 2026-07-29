@@ -71,7 +71,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
     public SteamEngineSyncPacket clientStats;
 
     public SteamEngineEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_ENGINE_ENTITY.get(), pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
+        super(BlockEntitiesContent.STEAM_ENGINE.get(), pos, state, OritechConfig.generators.steamEngineData.steamToRfRatio.get());
         clientStats = new SteamEngineSyncPacket(pos, 1f, 1f, 0, 0, 0);
     }
 
@@ -170,11 +170,11 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             for (int i = 1; i <= MAX_CHAIN_SIZE; i++) {
                 var checkPos = new BlockPos(Geometry.offsetToWorldPosition(getFacing(), new Vec3i(i * direction, 0, 0), worldPosition));
 
-                var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
+                var coreCandidate = level.getBlockEntity(checkPos, BlockEntitiesContent.MACHINE_CORE.get());
                 if (coreCandidate.isPresent() && coreCandidate.get().getCachedController() != null)
                     checkPos = coreCandidate.get().getControllerPos();
 
-                var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE_ENTITY.get());
+                var candidate = level.getBlockEntity(checkPos, BlockEntitiesContent.STEAM_ENGINE.get());
                 if (candidate.isEmpty() || !candidate.get().isAssembled(candidate.get().getBlockState())) {
                     break;
                 } else if (!candidate.get().boilerStorage.getInStack().isEmpty()) {

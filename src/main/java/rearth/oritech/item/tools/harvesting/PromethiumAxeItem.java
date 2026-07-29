@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
-import rearth.oritech.block.entity.interaction.TreefellerBlockEntity;
+import rearth.oritech.block.entity.interaction.TreeCutterBlockEntity;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
 
 import java.util.ArrayDeque;
@@ -59,7 +59,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             var startPos = pos.above();
             var startState = level.getBlockState(startPos);
             if (startState.is(BlockTags.LOGS)) {
-                var treeBlocks = TreefellerBlockEntity.getTreeBlocks(startPos, level);
+                var treeBlocks = TreeCutterBlockEntity.getTreeBlocks(startPos, level);
                 pendingBlocks.addAll(treeBlocks.stream().map(elem -> new PendingBlock(level, elem, stack)).toList());
             }
         }

@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": "oritech:basic_generator_block",
+    "b": "oritech:basic_generator",
     "c": "oritech:magnetic_coil",
     "f": "#c:ingots/electrum",
     "s": "#oritech:plating"
@@ -13,6 +13,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:lava_generator_block"
+    "id": "oritech:lava_generator"
   }
 }

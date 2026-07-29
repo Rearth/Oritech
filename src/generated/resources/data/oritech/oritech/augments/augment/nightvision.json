@@ -10,7 +10,7 @@
     "effectStrength": 0,
     "potionEffectId": "minecraft:night_vision"
   },
-  "requiredStation": "oritech:advanced_augment_station",
+  "requiredStation": "oritech:quantum_research_station",
   "requirements": [],
   "researchCost": [
     {

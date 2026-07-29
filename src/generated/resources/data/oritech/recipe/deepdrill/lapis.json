@@ -8,6 +8,6 @@
       "id": "minecraft:lapis_lazuli"
     }
   ],
-  "recipeType": "oritech:deep_drill",
+  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/copper_reinforced_plating"
+    }
+  },
+
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech:block/copper_reinforced_plating/center",
+    "empty": "oritech:block/copper_reinforced_plating/empty",
+    "horizontal": "oritech:block/copper_reinforced_plating/horizontal",
+    "vertical": "oritech:block/copper_reinforced_plating/vertical",
+    "particle": "oritech:block/copper_reinforced_plating/particle"
+  }
+}

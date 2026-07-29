@@ -6,7 +6,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SliderWidget;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
-import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
+import rearth.oritech.block.entity.storage.SchrodingersSafeBlockEntity;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.TreeSet;
@@ -15,7 +15,7 @@ public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnerg
 
     public LimitedEnergyStorageScreen(LimitedEnergyStorageScreenHandler handler, Inventory inventory, Component title) {
         super(handler, inventory, title, 176, 186);
-        if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) return;
+        if (this.menu.blockEntity instanceof SchrodingersSafeBlockEntity) return;
 
         this.backgroundTexture = OritechMachineScreen.BACKGROUND_TALL;
     }
@@ -24,7 +24,7 @@ public class LimitedEnergyStorageScreen extends EnergyStorageScreen<LimitedEnerg
     protected void addExtraComponents() {
         super.addExtraComponents();
 
-        if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) return;
+        if (this.menu.blockEntity instanceof SchrodingersSafeBlockEntity) return;
 
         var storage = (ExpandableEnergyStorageBlockEntity) menu.blockEntity;
         var initialAmount = (int) (storage.rfOutputOverride > 0 ? storage.rfOutputOverride : storage.energyStorage.maxExtract);

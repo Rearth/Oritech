@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench",
 	"texture_size": [64, 64],
 	"textures": {
-		"0": "oritech:block/black_hole_block",
+		"0": "oritech:block/black_hole",
 		"particle": "oritech:block/machine_particle_texture"
 	},
 	"elements": [

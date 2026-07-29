@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_ceiling_light_hanging": {
+    "has_industrial_light_hanging": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:ceiling_light_hanging"
+            "items": "oritech:industrial_light_hanging"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_ceiling_light_hanging"
+      "has_industrial_light_hanging"
     ]
   ],
   "rewards": {

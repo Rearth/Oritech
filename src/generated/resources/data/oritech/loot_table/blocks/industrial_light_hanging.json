@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "oritech:industrial_light_hanging"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "oritech:blocks/industrial_light_hanging"
+}

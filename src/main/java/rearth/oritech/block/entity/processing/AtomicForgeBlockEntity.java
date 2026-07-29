@@ -23,7 +23,7 @@ import java.util.List;
 public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
 
     public AtomicForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ATOMIC_FORGE_ENTITY.get(), pos, state, OritechConfig.processingMachines.atomicForgeData.energyPerTick.get());
+        super(BlockEntitiesContent.ATOMIC_FORGE.get(), pos, state, OritechConfig.processingMachines.atomicForgeData.energyPerTick.get());
     }
 
     @Override

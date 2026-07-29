@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_enchantment_catalyst_block": {
+    "has_arcane_catalyst": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:enchantment_catalyst_block"
+            "items": "oritech:arcane_catalyst"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_enchantment_catalyst_block"
+      "has_arcane_catalyst"
     ]
   ],
   "rewards": {

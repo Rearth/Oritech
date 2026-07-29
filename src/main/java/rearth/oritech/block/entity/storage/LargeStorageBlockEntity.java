@@ -13,7 +13,7 @@ import java.util.List;
 public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity implements RedstoneAddonBlockEntity.RedstoneControllable {
 
     public LargeStorageBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LARGE_STORAGE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.LARGE_STORAGE.get(), pos, state);
     }
 
     @Override

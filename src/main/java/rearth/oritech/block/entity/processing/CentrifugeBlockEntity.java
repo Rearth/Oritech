@@ -22,7 +22,7 @@ import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.CentrifugeScreenHandler;
 import rearth.oritech.config.OritechConfig;
@@ -44,7 +44,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
     public boolean hasFluidAddon = false;
 
     public CentrifugeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.CENTRIFUGE_ENTITY.get(), pos, state, OritechConfig.processingMachines.centrifugeData.energyPerTick.get());
+        super(BlockEntitiesContent.CENTRIFUGE.get(), pos, state, OritechConfig.processingMachines.centrifugeData.energyPerTick.get());
     }
 
     @Override
@@ -117,7 +117,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.hasFluid()) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get()) || addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.hasFluid()) {
             hasFluidAddon = true;
         }
     }
@@ -138,7 +138,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (hasFluidAddon != hadAddon && level instanceof ServerLevel serverLevel) {
 
             // reset cache of core above
-            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE_ENTITY.get());
+            var coreCandidate = level.getBlockEntity(worldPosition.above(), BlockEntitiesContent.MACHINE_CORE.get());
             if (coreCandidate.isPresent()) {
                 var core = coreCandidate.get();
                 core.resetCaches();

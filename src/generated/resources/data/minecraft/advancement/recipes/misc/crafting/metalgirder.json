@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_metal_girder_block": {
+    "has_industrial_support_girder": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:metal_girder_block"
+            "items": "oritech:industrial_support_girder"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_metal_girder_block"
+      "has_industrial_support_girder"
     ]
   ],
   "rewards": {

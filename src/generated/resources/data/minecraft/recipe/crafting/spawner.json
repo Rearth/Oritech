@@ -3,8 +3,8 @@
   "category": "misc",
   "key": {
     "c": "minecraft:respawn_anchor",
-    "p": "oritech:spawner_cage_block",
-    "s": "oritech:enchantment_catalyst_block"
+    "p": "oritech:spawner_cage",
+    "s": "oritech:arcane_catalyst"
   },
   "pattern": [
     "ppp",
@@ -12,6 +12,6 @@
     "ppp"
   ],
   "result": {
-    "id": "oritech:spawner_controller_block"
+    "id": "oritech:spawner_controller"
   }
 }

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_fragment_forge_block": {
+    "has_fragment_forge": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:fragment_forge_block"
+            "items": "oritech:fragment_forge"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_fragment_forge_block"
+      "has_fragment_forge"
     ]
   ],
   "rewards": {

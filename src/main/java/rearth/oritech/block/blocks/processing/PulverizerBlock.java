@@ -30,7 +30,7 @@ public class PulverizerBlock extends UpgradableMachineBlock implements EntityBlo
             var targetPos = pos.getCenter().add(0, 0.5f, 0);
             var entityDist = entity.distanceToSqr(targetPos);
             if (entityDist > 0.7) return;
-            var isWorking = level.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER_ENTITY.get()).get().progress.get() > 0;
+            var isWorking = level.getBlockEntity(pos, BlockEntitiesContent.PULVERIZER.get()).get().progress.get() > 0;
             if (isWorking)
                 livingEntity.hurt(level.damageSources().cramming(), 1f);
         }

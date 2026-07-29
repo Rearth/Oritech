@@ -72,7 +72,7 @@ public class PlayerAugments {
         var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
 
-        if (entity instanceof AugmentApplicationEntity modifierEntity) {
+        if (entity instanceof CyberneticAugmentationCenterEntity modifierEntity) {
             var operation = AugmentApplicatorOperation.values()[packet.operationId];
             switch (operation) {
                 case RESEARCH -> modifierEntity.researchAugment(packet.id, player.isCreative(), player);
@@ -86,7 +86,7 @@ public class PlayerAugments {
         var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
 
-        if (entity instanceof AugmentApplicationEntity modifierEntity) {
+        if (entity instanceof CyberneticAugmentationCenterEntity modifierEntity) {
             modifierEntity.loadResearchesFromPlayer(player);
         }
     }
@@ -95,14 +95,14 @@ public class PlayerAugments {
         var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
 
-        if (entity instanceof AugmentApplicationEntity modifierEntity && player instanceof ServerPlayer serverPlayer) {
+        if (entity instanceof CyberneticAugmentationCenterEntity modifierEntity && player instanceof ServerPlayer serverPlayer) {
             modifierEntity.screenInvOverride = true;
             serverPlayer.openMenu(modifierEntity, modifierEntity.getPosForMultiblock());
         }
     }
 
     public static void receiveToggleAugment(AugmentPlayerTogglePacket packet, IPayloadContext context) {
-        AugmentApplicationEntity.toggleAugmentForPlayer(packet.id, context.player());
+        CyberneticAugmentationCenterEntity.toggleAugmentForPlayer(packet.id, context.player());
     }
 
     public enum AugmentApplicatorOperation {

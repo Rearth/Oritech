@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "up": "oritech:block/plastic_top",
+    "down": "oritech:block/plastic_top",
+    "north": "oritech:block/plastic_side",
+    "south": "oritech:block/plastic_side",
+    "west": "oritech:block/plastic_side",
+    "east": "oritech:block/plastic_side",
+    "particle": "oritech:block/plastic_side"
+  }
+}

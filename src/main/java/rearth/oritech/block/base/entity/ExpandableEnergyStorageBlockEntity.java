@@ -40,7 +40,7 @@ import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
-import rearth.oritech.block.blocks.storage.SmallStorageBlock;
+import rearth.oritech.block.blocks.storage.PortableEnergyStorageBlock;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
@@ -210,7 +210,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
     }
 
     public Direction getFacing() {
-        return getBlockState().getValue(SmallStorageBlock.TARGET_DIR);
+        return getBlockState().getValue(PortableEnergyStorageBlock.TARGET_DIR);
     }
 
     @Override
@@ -242,7 +242,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
 
     @Override
     public Direction getFacingForAddon() {
-        var facing = Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(SmallStorageBlock.TARGET_DIR);
+        var facing = Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(PortableEnergyStorageBlock.TARGET_DIR);
 
         if (facing.equals(Direction.UP) || facing.equals(Direction.DOWN))
             return Direction.NORTH;
@@ -359,7 +359,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
 
     @Override
     public Property<Direction> getBlockFacingProperty() {
-        return SmallStorageBlock.TARGET_DIR;
+        return PortableEnergyStorageBlock.TARGET_DIR;
     }
 
     public void setRedstonePowered(boolean isPowered) {

@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "oritech:block/tachyon_absorber",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "oritech:block/tachyon_absorber",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/tachyon_absorber",
+      "x": 90
+    },
+    "facing=west": {
+      "model": "oritech:block/tachyon_absorber",
+      "x": 90,
+      "y": 270
+    },
+    "facing=up": {
+      "model": "oritech:block/tachyon_absorber"
+    },
+    "facing=down": {
+      "model": "oritech:block/tachyon_absorber",
+      "x": 180
+    }
+  }
+}

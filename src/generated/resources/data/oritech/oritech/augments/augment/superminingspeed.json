@@ -11,7 +11,7 @@
     "attributeOperationType": 2,
     "entityAttributeId": "minecraft:block_break_speed"
   },
-  "requiredStation": "oritech:advanced_augment_station",
+  "requiredStation": "oritech:quantum_research_station",
   "requirements": [
     "oritech:augment/miningspeed",
     "oritech:augment/superspeedboost"

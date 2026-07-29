@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/bio_generator_block",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

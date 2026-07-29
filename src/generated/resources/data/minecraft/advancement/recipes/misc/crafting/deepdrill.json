@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_deep_drill_block": {
+    "has_bedrock_extractor": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:deep_drill_block"
+            "items": "oritech:bedrock_extractor"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_deep_drill_block"
+      "has_bedrock_extractor"
     ]
   ],
   "rewards": {

@@ -11,7 +11,7 @@ import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage.EnergyStatistics;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
-import rearth.oritech.block.entity.storage.UnstableContainerBlockEntity;
+import rearth.oritech.block.entity.storage.SchrodingersSafeBlockEntity;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.TooltipHelper;
 
@@ -95,13 +95,13 @@ public abstract class EnergyStorageScreen<T extends UpgradableOritechScreenHandl
     }
 
     protected EnergyStatistics getStatistics(BlockEntity entity) {
-        return (entity instanceof ExpandableEnergyStorageBlockEntity) ? ((ExpandableEnergyStorageBlockEntity) entity).currentStats : ((UnstableContainerBlockEntity) entity).currentStats;
+        return (entity instanceof ExpandableEnergyStorageBlockEntity) ? ((ExpandableEnergyStorageBlockEntity) entity).currentStats : ((SchrodingersSafeBlockEntity) entity).currentStats;
     }
 
     @Override
     public ItemStack getTitleIcon() {
-        if (this.menu.blockEntity instanceof UnstableContainerBlockEntity) {
-            return new ItemStack(ItemContent.UNSTABLE_CONTAINER.asItem());
+        if (this.menu.blockEntity instanceof SchrodingersSafeBlockEntity) {
+            return new ItemStack(ItemContent.SCHRODINGERS_SAFE.asItem());
         }
         return super.getTitleIcon();
     }

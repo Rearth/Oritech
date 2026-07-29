@@ -26,7 +26,7 @@ public class AugmentResearchStationBlockEntity extends BlockEntity implements Mu
     private float coreQuality = 1f;
 
     public AugmentResearchStationBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.AUGMENTER_RESEARCH_STATION.get(), pos, state);
     }
 
     @Override

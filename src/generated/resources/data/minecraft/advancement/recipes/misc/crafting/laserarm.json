@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_laser_arm_block": {
+    "has_enderic_laser": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:laser_arm_block"
+            "items": "oritech:enderic_laser"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_laser_arm_block"
+      "has_enderic_laser"
     ]
   ],
   "rewards": {

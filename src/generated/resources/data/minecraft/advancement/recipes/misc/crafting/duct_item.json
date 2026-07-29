@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_item_pipe_duct_block": {
+    "has_item_pipe_duct": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:item_pipe_duct_block"
+            "items": "oritech:item_pipe_duct"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_item_pipe_duct_block"
+      "has_item_pipe_duct"
     ]
   ],
   "rewards": {

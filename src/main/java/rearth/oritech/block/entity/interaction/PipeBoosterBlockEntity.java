@@ -41,7 +41,7 @@ public class PipeBoosterBlockEntity extends BlockEntity implements BlockEntityTi
     private boolean setPipe;
 
     public PipeBoosterBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PIPE_BOOSTER_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.PIPE_BOOSTER.get(), pos, state);
     }
 
     @Override

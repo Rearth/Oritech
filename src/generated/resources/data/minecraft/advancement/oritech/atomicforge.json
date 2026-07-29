@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "oritech:atomic_forge_block"
+            "items": "oritech:atomic_forge"
           }
         ]
       },
@@ -18,7 +18,7 @@
       "translate": "advancements.oritech.atomicforge.description"
     },
     "icon": {
-      "id": "oritech:atomic_forge_block"
+      "id": "oritech:atomic_forge"
     },
     "title": {
       "translate": "advancements.oritech.atomicforge"

@@ -11,7 +11,7 @@
     "attributeOperationType": 0,
     "entityAttributeId": "minecraft:max_health"
   },
-  "requiredStation": "oritech:advanced_augment_station",
+  "requiredStation": "oritech:quantum_research_station",
   "requirements": [
     "oritech:augment/hpboostultra",
     "oritech:augment/gravity"

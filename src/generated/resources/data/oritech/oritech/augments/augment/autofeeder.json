@@ -9,7 +9,7 @@
     "type": "custom",
     "customAugmentId": "oritech:augment/autofeeder"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
     "oritech:augment/armor",
     "oritech:augment/hpboostmore"

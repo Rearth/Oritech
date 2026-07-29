@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "oritech:block/copper_reinforced_plating_slab"
+    },
+    "type=double": {
+      "model": "oritech:block/copper_reinforced_plating"
+    },
+    "type=top": {
+      "model": "oritech:block/copper_reinforced_plating_slab_top"
+    }
+  }
+}

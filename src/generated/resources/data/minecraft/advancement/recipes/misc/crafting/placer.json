@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_placer_block": {
+    "has_placer": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:placer_block"
+            "items": "oritech:placer"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_placer_block"
+      "has_placer"
     ]
   ],
   "rewards": {

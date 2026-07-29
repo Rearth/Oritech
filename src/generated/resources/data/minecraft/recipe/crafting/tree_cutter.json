@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "b": "#oritech:plating",
+    "c": "oritech:motor",
+    "f": "#c:ingots/electrum",
+    "s": "minecraft:iron_axe"
+  },
+  "pattern": [
+    "fff",
+    "fcf",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech:tree_cutter"
+  }
+}

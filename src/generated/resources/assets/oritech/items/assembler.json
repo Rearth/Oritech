@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/assembler",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

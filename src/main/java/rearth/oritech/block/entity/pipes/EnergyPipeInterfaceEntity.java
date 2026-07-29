@@ -33,7 +33,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     private int cacheHash;
 
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.ENERGY_PIPE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.ENERGY_PIPE.get(), pos, state);
 
         isSuperConductor = state.getBlock().equals(BlockContent.SUPERCONDUCTOR_CONNECTION.get()) || state.getBlock().equals(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get());
 

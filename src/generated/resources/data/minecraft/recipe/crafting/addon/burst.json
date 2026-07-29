@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": "#oritech:plating",
-    "c": "oritech:metal_girder_block",
+    "c": "oritech:industrial_support_girder",
     "f": "minecraft:redstone",
     "m": "#c:ingots/electrum",
     "s": "#c:ingots/steel"

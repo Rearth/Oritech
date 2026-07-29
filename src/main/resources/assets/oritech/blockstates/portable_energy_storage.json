@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "oritech:block/portable_energy_storage",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "oritech:block/portable_energy_storage",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/portable_energy_storage"
+    },
+    "facing=west": {
+      "model": "oritech:block/portable_energy_storage",
+      "y": 270
+    },
+    "facing=up": {
+      "model": "oritech:block/portable_energy_storage",
+      "x": -90
+    },
+    "facing=down": {
+      "model": "oritech:block/portable_energy_storage",
+      "x": 90
+    }
+  }
+}

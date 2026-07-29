@@ -17,7 +17,7 @@ final class OritechJeiTaintedRefineryCreation
         super(
                 OritechJeiRecipeTypes.TAINTED_REFINERY_CREATION,
                 Component.translatable("emi.category.oritech.tainted_refinery_creation"),
-                guiHelper.createDrawableItemLike(BlockContent.TAINTED_REFINERY_BLOCK.get()),
+                guiHelper.createDrawableItemLike(BlockContent.TAINTED_REFINERY.get()),
                 160,
                 82
         );
@@ -35,13 +35,13 @@ final class OritechJeiTaintedRefineryCreation
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, CreationInfo recipe, IFocusGroup focuses) {
         builder.addInputSlot(10, 10)
-                .add(BlockContent.REFINERY_BLOCK.get())
+                .add(BlockContent.REFINERY.get())
                 .setStandardSlotBackground();
         builder.addInputSlot(10, 35)
-                .add(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get())
+                .add(BlockContent.ARCANE_CATALYST.get())
                 .setStandardSlotBackground();
         builder.addOutputSlot(90, 22)
-                .add(BlockContent.TAINTED_REFINERY_BLOCK.get())
+                .add(BlockContent.TAINTED_REFINERY.get())
                 .setOutputSlotBackground();
     }
 

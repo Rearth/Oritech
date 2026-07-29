@@ -54,7 +54,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
     public float lastProgress = 0f;
 
     public SpawnerControllerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.SPAWNER_CONTROLLER_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.SPAWNER_CONTROLLER.get(), pos, state);
     }
 
     @Override
@@ -284,7 +284,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
                     var candidate = worldPosition.offset(-offset + x, -y - 1, -offset + z);
 
                     // block type is a placeholder
-                    if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE_BLOCK.get())) {
+                    if (!level.getBlockState(candidate).getBlock().equals(BlockContent.SPAWNER_CAGE.get())) {
                         hasCage = false;
                         ParticleContent.DebugBlock(level, Vec3.atLowerCornerOf(candidate));
                     }

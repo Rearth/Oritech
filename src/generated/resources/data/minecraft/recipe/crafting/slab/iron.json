@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "a": "oritech:iron_plating_block"
+    "a": "oritech:iron_plating"
   },
   "pattern": [
     "aaa"

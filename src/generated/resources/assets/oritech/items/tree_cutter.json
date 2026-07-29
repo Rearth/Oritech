@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/tree_cutter",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

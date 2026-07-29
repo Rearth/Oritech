@@ -5,7 +5,7 @@
     "a": "#c:ingots/steel",
     "e": "minecraft:redstone_torch",
     "m": "oritech:superconductor",
-    "s": "oritech:industrial_glass_block"
+    "s": "oritech:industrial_glass"
   },
   "pattern": [
     " a ",

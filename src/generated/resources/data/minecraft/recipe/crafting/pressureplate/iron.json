@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "a": "oritech:iron_plating_block"
+    "a": "oritech:iron_plating"
   },
   "pattern": [
     "aa"

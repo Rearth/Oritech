@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_superconductor_duct_block": {
+    "has_superconductor_duct": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:superconductor_duct_block"
+            "items": "oritech:superconductor_duct"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_superconductor_duct_block"
+      "has_superconductor_duct"
     ]
   ],
   "rewards": {

@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/addon_splicer",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

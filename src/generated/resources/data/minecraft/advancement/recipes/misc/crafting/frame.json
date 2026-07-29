@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_frame_block": {
+    "has_machine_frame": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_frame_block"
+            "items": "oritech:machine_frame"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_frame_block"
+      "has_machine_frame"
     ]
   ],
   "rewards": {

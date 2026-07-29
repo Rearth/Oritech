@@ -28,7 +28,7 @@ import java.util.List;
 public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
 
     public PulverizerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.PULVERIZER_ENTITY.get(), pos, state, OritechConfig.processingMachines.pulverizerData.energyPerTick.get());
+        super(BlockEntitiesContent.PULVERIZER.get(), pos, state, OritechConfig.processingMachines.pulverizerData.energyPerTick.get());
     }
 
     @Override

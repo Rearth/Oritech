@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_redstone_addon": {
+    "has_control_unit_addon": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_redstone_addon"
+            "items": "oritech:control_unit_addon"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_redstone_addon"
+      "has_control_unit_addon"
     ]
   ],
   "rewards": {

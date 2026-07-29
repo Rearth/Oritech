@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_ultimate_addon": {
+    "has_synergy_matrix_addon": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_ultimate_addon"
+            "items": "oritech:synergy_matrix_addon"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_ultimate_addon"
+      "has_synergy_matrix_addon"
     ]
   ],
   "rewards": {

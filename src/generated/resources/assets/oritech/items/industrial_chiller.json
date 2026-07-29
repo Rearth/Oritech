@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech:item/industrial_chiller",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

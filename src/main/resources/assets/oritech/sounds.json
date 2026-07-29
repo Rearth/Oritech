@@ -107,9 +107,9 @@
       "oritech:reactor_warning"
     ]
   },
-  "nuke_explosion": {
+  "manhattan_module_explosion": {
     "sounds": [
-      "oritech:nuke_explosion"
+      "oritech:manhattan_module_explosion"
     ]
   },
   "electric_shock": {

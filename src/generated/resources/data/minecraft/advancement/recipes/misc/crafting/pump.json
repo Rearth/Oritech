@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_pump_block": {
+    "has_pump": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:pump_block"
+            "items": "oritech:pump"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_pump_block"
+      "has_pump"
     ]
   ],
   "rewards": {

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_augment_application_block": {
+    "has_cybernetic_augmentation_center": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:augment_application_block"
+            "items": "oritech:cybernetic_augmentation_center"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_augment_application_block"
+      "has_cybernetic_augmentation_center"
     ]
   ],
   "rewards": {

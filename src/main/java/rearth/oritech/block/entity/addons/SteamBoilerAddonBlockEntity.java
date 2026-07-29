@@ -19,7 +19,7 @@ public class SteamBoilerAddonBlockEntity extends AddonBlockEntity implements Flu
     private UpgradableGeneratorBlockEntity cachedController;
 
     public SteamBoilerAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.STEAM_BOILER_ADDON_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.STEAM_BOILER_ADDON.get(), pos, state);
     }
 
     private boolean isConnected() {

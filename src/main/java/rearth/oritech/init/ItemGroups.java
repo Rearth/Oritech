@@ -23,7 +23,7 @@ public class ItemGroups {
     public static final Supplier<CreativeModeTab> MACHINE_GROUP = TABS.register("machine_group", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.oritech.machines"))
-                    .icon(() -> new ItemStack(BlockContent.FERTILIZER_BLOCK.value()))
+                    .icon(() -> new ItemStack(BlockContent.FERTILIZER.value()))
                     .displayItems((params, output) -> {
                         ItemGroups.AddItemsToGroup(output, ItemContent.Groups.MACHINES);
                     })
@@ -51,7 +51,7 @@ public class ItemGroups {
     public static final Supplier<CreativeModeTab> DECORATIVE_GROUP = TABS.register("decorative_group", () ->
             CreativeModeTab.builder()
                     .title(Component.translatable("itemgroup.oritech.decorative"))
-                    .icon(() -> new ItemStack(BlockContent.RESOURCE_NODE_PLATINUM.value()))
+                    .icon(() -> new ItemStack(BlockContent.PLATINUM_RESOURCE_NODE.value()))
                     .displayItems((params, output) -> {
                         ItemGroups.AddItemsToGroup(output, ItemContent.Groups.DECORATIVE);
                     })
@@ -80,7 +80,7 @@ public class ItemGroups {
                 if (fieldGroup.equals(targetGroup)) {
                     output.accept(value.value());
 
-                    if (value.equals(ItemContent.SMALL_STORAGE_ITEM)) {
+                    if (value.equals(ItemContent.PORTABLE_ENERGY_STORAGE_ITEM)) {
                         var stack = new ItemStack(value.value());
                         stack.set(ComponentContent.ENERGY, ((SmallEnergyStorageBlockItem) value.value()).getEnergyCapacity());
                         output.accept(stack);

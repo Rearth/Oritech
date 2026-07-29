@@ -53,6 +53,6 @@ public class UpgradableOritechScreenHandler extends OritechScreenHandler {
     public boolean showRedstoneAddon() {
         return super.showRedstoneAddon() ||
                 addonController.getConnectedAddons().stream()
-                        .anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.MACHINE_REDSTONE_ADDON.get()));
+                        .anyMatch(addonPos -> this.worldAccess.getBlockState(addonPos).getBlock().equals(BlockContent.CONTROL_UNIT_ADDON.get()));
     }
 }

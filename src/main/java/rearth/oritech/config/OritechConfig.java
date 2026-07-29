@@ -14,8 +14,8 @@ public class OritechConfig {
 
     public static final ProcessingMachines processingMachines = new ProcessingMachines(COMMON);
     public static final Generators generators = new Generators(COMMON);
-    public static final LaserArmConfig laserArmConfig = new LaserArmConfig(COMMON);
-    public static final DeepDrillConfig deepDrillConfig = new DeepDrillConfig(COMMON);
+    public static final EndericLaserConfig endericLaserConfig = new EndericLaserConfig(COMMON);
+    public static final BedrockExtractorConfig bedrockExtractorConfig = new BedrockExtractorConfig(COMMON);
     public static final MachineFrameConfig destroyerConfig = new MachineFrameConfig(COMMON, "destroyerConfig", 15, 40, 8, 128);
     public static final FertilizerConfig fertilizerConfig = new FertilizerConfig(COMMON);
     public static final MachineFrameConfig placerConfig = new MachineFrameConfig(COMMON, "placerConfig", 10, 5, 8, 64);
@@ -95,7 +95,7 @@ public class OritechConfig {
             .comment("Superconductor cable transfer rate in RF/t")
             .defineInRange("superConductorTransferRate", 4_194_304L, 0L, Long.MAX_VALUE);
 
-    public static final PowerPoleConfig poleConfig = new PowerPoleConfig(COMMON);
+    public static final EnergyTransmissionPoleConfig poleConfig = new EnergyTransmissionPoleConfig(COMMON);
 
     static {
         COMMON.pop();
@@ -106,7 +106,7 @@ public class OritechConfig {
         COMMON.push("equipment");
     }
 
-    public static final BasicMachineConfig charger = new BasicMachineConfig(COMMON, "charger", 500_000, 10_000, 5_000, 0);
+    public static final BasicMachineConfig equipmentCharger = new BasicMachineConfig(COMMON, "equipmentCharger", 500_000, 10_000, 5_000, 0);
 
     public static final ModConfigSpec.BooleanValue chainsawTreeCutting = COMMON
             .comment("Enable tree cutting for the chainsaw")
@@ -187,9 +187,9 @@ public class OritechConfig {
             .worldRestart()
             .defineInRange("maxUnstableTicks", 600, 0, Integer.MAX_VALUE);
 
-    public static final ModConfigSpec.BooleanValue boringNukes = COMMON
+    public static final ModConfigSpec.BooleanValue boringManhattanModules = COMMON
             .comment("Disable fancy reactor explosion effects")
-            .define("boringNukes", false);
+            .define("boringManhattanModules", false);
 
     static {
         COMMON.pop();
@@ -200,9 +200,9 @@ public class OritechConfig {
         COMMON.push("arcane");
     }
 
-    public static final ModConfigSpec.IntValue enchanterCostMultiplier = COMMON
-            .comment("Enchanter soul cost multiplier")
-            .defineInRange("enchanterCostMultiplier", 5, 0, Integer.MAX_VALUE);
+    public static final ModConfigSpec.IntValue stabilized_enchanterCostMultiplier = COMMON
+            .comment("StabilizedEnchanter soul cost multiplier")
+            .defineInRange("stabilized_enchanterCostMultiplier", 5, 0, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue catalystBaseSouls = COMMON
             .comment("Catalyst base soul capacity")
@@ -298,10 +298,10 @@ public class OritechConfig {
             .comment("Energy of tachyons produced by black holes")
             .defineInRange("blackHoleTachyonEnergy", 50_000, 0, Integer.MAX_VALUE);
 
-    public static final ModConfigSpec.LongValue unstableContainerBaseCapacity = COMMON
+    public static final ModConfigSpec.LongValue schrodingersSafeBaseCapacity = COMMON
             .comment("Unstable container base RF storage capacity")
             .worldRestart()
-            .defineInRange("unstableContainerBaseCapacity", 20_000_000L, 0L, Long.MAX_VALUE);
+            .defineInRange("schrodingersSafeBaseCapacity", 20_000_000L, 0L, Long.MAX_VALUE);
 
     static {
         COMMON.pop();
@@ -344,7 +344,7 @@ public class OritechConfig {
         public final BasicMachineConfig atomicForgeData;
         public final CentrifugeConfig centrifugeData;
         public final BasicMachineConfig foundryData;
-        public final BasicMachineConfig coolerData;
+        public final BasicMachineConfig industrial_chillerData;
         public final BasicMachineConfig fragmentForgeData;
         public final FurnaceConfig furnaceData;
         public final BasicMachineConfig pulverizerData;
@@ -357,7 +357,7 @@ public class OritechConfig {
             atomicForgeData = new BasicMachineConfig(b, "atomicForgeData", 1024, 0, 0, 1024);
             centrifugeData = new CentrifugeConfig(b);
             foundryData = new BasicMachineConfig(b, "foundryData", 50_000, 128 * 8, 0, 128);
-            coolerData = new BasicMachineConfig(b, "coolerData", 50_000, 32 * 8, 0, 32);
+            industrial_chillerData = new BasicMachineConfig(b, "industrial_chillerData", 50_000, 32 * 8, 0, 32);
             fragmentForgeData = new BasicMachineConfig(b, "fragmentForgeData", 50_000, 256 * 8, 0, 256);
             furnaceData = new FurnaceConfig(b);
             pulverizerData = new BasicMachineConfig(b, "pulverizerData", 25_000, 32 * 8, 0, 32);
@@ -390,7 +390,7 @@ public class OritechConfig {
         }
     }
 
-    public static class LaserArmConfig {
+    public static class EndericLaserConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.LongValue maxEnergyInsertion;
         public final ModConfigSpec.LongValue energyPerTick;
@@ -398,8 +398,8 @@ public class OritechConfig {
         public final ModConfigSpec.DoubleValue damageTickBase;
         public final ModConfigSpec.IntValue range;
 
-        LaserArmConfig(ModConfigSpec.Builder b) {
-            b.push("laserArmConfig");
+        EndericLaserConfig(ModConfigSpec.Builder b) {
+            b.push("endericLaserConfig");
             energyCapacity = b.defineInRange("energyCapacity", 20_000L, 0L, Long.MAX_VALUE);
             maxEnergyInsertion = b.defineInRange("maxEnergyInsertion", 128L * 8, 0L, Long.MAX_VALUE);
             energyPerTick = b.defineInRange("energyPerTick", 128L, 0L, Long.MAX_VALUE);
@@ -410,13 +410,13 @@ public class OritechConfig {
         }
     }
 
-    public static class DeepDrillConfig {
+    public static class BedrockExtractorConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.IntValue stepsPerOre;
         public final ModConfigSpec.IntValue energyPerStep;
 
-        DeepDrillConfig(ModConfigSpec.Builder b) {
-            b.push("deepDrillConfig");
+        BedrockExtractorConfig(ModConfigSpec.Builder b) {
+            b.push("bedrockExtractorConfig");
             energyCapacity = b.defineInRange("energyCapacity", 20_000L, 0L, Long.MAX_VALUE);
             stepsPerOre = b.comment("Work steps required per ore output").defineInRange("stepsPerOre", 20, 1, Integer.MAX_VALUE);
             energyPerStep = b.comment("RF consumed per work step").defineInRange("energyPerStep", 1024, 0, Integer.MAX_VALUE);
@@ -427,23 +427,23 @@ public class OritechConfig {
     public static class AddonConfig {
         public final ModConfigSpec.DoubleValue burstAddonSpeedMultiplier;
         public final ModConfigSpec.DoubleValue burstAddonThrottleMultiplier;
-        public final ModConfigSpec.LongValue addonShrinkerRF;
+        public final ModConfigSpec.LongValue addonAddonSplicerRF;
 
         AddonConfig(ModConfigSpec.Builder b) {
             b.push("addonConfig");
             burstAddonSpeedMultiplier = b.comment("Burst addon processing speed multiplier").defineInRange("burstAddonSpeedMultiplier", 8.0, 0.0, 1000.0);
             burstAddonThrottleMultiplier = b.comment("Burst addon throttle energy multiplier").defineInRange("burstAddonThrottleMultiplier", 1.2, 0.0, 100.0);
-            addonShrinkerRF = b.comment("Addon splicer RF storage capacity").defineInRange("addonShrinkerRF", 50_000_000L, 0L, Long.MAX_VALUE);
+            addonAddonSplicerRF = b.comment("Addon splicer RF storage capacity").defineInRange("addonAddonSplicerRF", 50_000_000L, 0L, Long.MAX_VALUE);
             b.pop();
         }
     }
 
-    public static class PowerPoleConfig {
+    public static class EnergyTransmissionPoleConfig {
         public final ModConfigSpec.LongValue energyCapacity;
         public final ModConfigSpec.IntValue minRange;
         public final ModConfigSpec.IntValue maxRange;
 
-        PowerPoleConfig(ModConfigSpec.Builder b) {
+        EnergyTransmissionPoleConfig(ModConfigSpec.Builder b) {
             b.push("poleConfig");
             energyCapacity = b.comment("Energy transmission rate and capacity in RF/t").defineInRange("energyCapacity", 1_000_000L, 0L, Long.MAX_VALUE);
             minRange = b.comment("Minimum separation distance between poles").defineInRange("minRange", 50, 0, Integer.MAX_VALUE);

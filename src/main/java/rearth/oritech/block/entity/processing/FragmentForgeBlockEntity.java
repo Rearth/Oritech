@@ -17,7 +17,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
-import rearth.oritech.block.entity.addons.CombiAddonEntity;
+import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
@@ -36,7 +36,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
     private boolean hasByproductAddon;
 
     public FragmentForgeBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FRAGMENT_FORGE_ENTITY.get(), pos, state, OritechConfig.processingMachines.fragmentForgeData.energyPerTick.get());
+        super(BlockEntitiesContent.FRAGMENT_FORGE.get(), pos, state, OritechConfig.processingMachines.fragmentForgeData.energyPerTick.get());
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public void getAdditionalStatFromAddon(AddonBlock addonBlock) {
-        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()) || addonBlock.addonEntity() instanceof CombiAddonEntity combi && combi.getYieldCount() > 0) {
+        if (addonBlock.state().getBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get()) || addonBlock.addonEntity() instanceof HeartOfTheMachineAddonEntity combi && combi.getYieldCount() > 0) {
             hasByproductAddon = true;
         }
     }

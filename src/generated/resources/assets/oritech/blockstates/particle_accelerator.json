@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech:block/particle_accelerator",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech:block/particle_accelerator"
+    },
+    "facing=south": {
+      "model": "oritech:block/particle_accelerator",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech:block/particle_accelerator",
+      "y": 270
+    }
+  }
+}

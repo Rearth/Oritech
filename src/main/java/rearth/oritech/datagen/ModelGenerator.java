@@ -45,9 +45,9 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.FRAME_GANTRY_ARM.get(),
             BlockContent.MACHINE_SPEED_ADDON.get(),
             BlockContent.MACHINE_EFFICIENCY_ADDON.get(),
-            BlockContent.MACHINE_ULTIMATE_ADDON.get(),
+            BlockContent.SYNERGY_MATRIX_ADDON.get(),
             BlockContent.QUARRY_ADDON.get(),
-            BlockContent.MACHINE_PROCESSING_ADDON.get(),
+            BlockContent.AUXILIARY_PROCESSING_CHAMBER_ADDON.get(),
             BlockContent.MACHINE_FLUID_ADDON.get(),
             BlockContent.MACHINE_YIELD_ADDON.get(),
             BlockContent.CROP_FILTER_ADDON.get(),
@@ -56,22 +56,22 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.MACHINE_ACCEPTOR_ADDON.get(),
             BlockContent.MACHINE_INVENTORY_PROXY_ADDON.get(),
             BlockContent.STEAM_BOILER_ADDON.get(),
-            BlockContent.MACHINE_REDSTONE_ADDON.get(),
+            BlockContent.CONTROL_UNIT_ADDON.get(),
             BlockContent.MACHINE_SILK_TOUCH_ADDON.get(),
             BlockContent.MACHINE_BURST_ADDON.get(),
-            BlockContent.MACHINE_COMBI_ADDON.get(),
-            BlockContent.MACHINE_PLATING_BLOCK.get(),
-            BlockContent.IRON_PLATING_BLOCK.get(),
-            BlockContent.CARBON_PLATING_BLOCK.get(),
-            BlockContent.NICKEL_PLATING_BLOCK.get()
+            BlockContent.HEART_OF_THE_MACHINE_ADDON.get(),
+            BlockContent.COPPER_REINFORCED_PLATING.get(),
+            BlockContent.IRON_PLATING.get(),
+            BlockContent.CARBON_PLATING.get(),
+            BlockContent.NICKEL_PLATING.get()
     );
 
     private static final Set<Block> HAND_AUTHORED_ITEM_MODEL_BLOCKS = Set.of(
             BlockContent.MACHINE_SPEED_ADDON.get(),
             BlockContent.MACHINE_EFFICIENCY_ADDON.get(),
-            BlockContent.MACHINE_ULTIMATE_ADDON.get(),
+            BlockContent.SYNERGY_MATRIX_ADDON.get(),
             BlockContent.QUARRY_ADDON.get(),
-            BlockContent.MACHINE_PROCESSING_ADDON.get(),
+            BlockContent.AUXILIARY_PROCESSING_CHAMBER_ADDON.get(),
             BlockContent.MACHINE_FLUID_ADDON.get(),
             BlockContent.MACHINE_YIELD_ADDON.get(),
             BlockContent.CROP_FILTER_ADDON.get(),
@@ -80,22 +80,22 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.MACHINE_ACCEPTOR_ADDON.get(),
             BlockContent.MACHINE_INVENTORY_PROXY_ADDON.get(),
             BlockContent.STEAM_BOILER_ADDON.get(),
-            BlockContent.MACHINE_REDSTONE_ADDON.get(),
+            BlockContent.CONTROL_UNIT_ADDON.get(),
             BlockContent.MACHINE_SILK_TOUCH_ADDON.get(),
             BlockContent.MACHINE_BURST_ADDON.get(),
-            BlockContent.MACHINE_COMBI_ADDON.get()
+            BlockContent.HEART_OF_THE_MACHINE_ADDON.get()
     );
 
     private static final Set<Item> GECKOLIB_ITEM_MODELS = Set.of(
             ToolsContent.PORTABLE_LASER.get(),
             ToolsContent.PROMETHIUM_AXE.get(),
             ToolsContent.PROMETHIUM_PICKAXE.get(),
-            ItemContent.UNSTABLE_CONTAINER.get()
+            ItemContent.SCHRODINGERS_SAFE.get()
     );
 
     private static final Set<Item> HAND_AUTHORED_ITEM_DEFINITIONS = Set.of(
-            ItemContent.SMALL_STORAGE_ITEM.get(),
-            ItemContent.SMALL_TANK_ITEM.get(),
+            ItemContent.PORTABLE_ENERGY_STORAGE_ITEM.get(),
+            ItemContent.PORTABLE_TANK_ITEM.get(),
             ItemContent.CREATIVE_TANK_ITEM.get()
     );
 
@@ -123,7 +123,7 @@ public class ModelGenerator extends ModelProvider {
 
     private void generateBlockStateModels(BlockModelGenerators generator) {
 
-        createNonTemplateModelBlock(BlockContent.MACHINE_FRAME_BLOCK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.MACHINE_FRAME.get(), generator);
         createNonTemplateModelBlock(BlockContent.FLUID_PIPE.get(), generator);
         createNonTemplateModelBlock(BlockContent.ENERGY_PIPE.get(), generator);
         createNonTemplateModelBlock(BlockContent.SUPERCONDUCTOR.get(), generator);
@@ -150,90 +150,90 @@ public class ModelGenerator extends ModelProvider {
         createModelAlias(BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
         createModelAlias(BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
         createModelAlias(BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), Oritech.id("block/framed_pipe_skinny"), generator);
-        generator.createTrivialCube(BlockContent.FLUID_PIPE_DUCT_BLOCK.get());
-        generator.createTrivialCube(BlockContent.ENERGY_PIPE_DUCT_BLOCK.get());
-        generator.createTrivialCube(BlockContent.SUPERCONDUCTOR_DUCT_BLOCK.get());
-        generator.createTrivialCube(BlockContent.ITEM_PIPE_DUCT_BLOCK.get());
-        createNonTemplateModelBlock(BlockContent.ITEM_FILTER_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.SIMPLE_AUGMENT_STATION.get(), generator);
-        createNonTemplateModelBlock(BlockContent.ADVANCED_AUGMENT_STATION.get(), generator);
+        generator.createTrivialCube(BlockContent.FLUID_PIPE_DUCT.get());
+        generator.createTrivialCube(BlockContent.ENERGY_PIPE_DUCT.get());
+        generator.createTrivialCube(BlockContent.SUPERCONDUCTOR_DUCT.get());
+        generator.createTrivialCube(BlockContent.ITEM_PIPE_DUCT.get());
+        createNonTemplateModelBlock(BlockContent.ITEM_FILTER.get(), generator);
+        createNonTemplateModelBlock(BlockContent.CYBERNETIC_RESEARCH_STATION.get(), generator);
+        createNonTemplateModelBlock(BlockContent.QUANTUM_RESEARCH_STATION.get(), generator);
         createNonTemplateModelBlock(BlockContent.ARCANE_AUGMENT_STATION.get(), generator);
 
-        createNonTemplateModelBlock(BlockContent.SMALL_STORAGE_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.LARGE_STORAGE_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.CREATIVE_STORAGE_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.SMALL_TANK_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.CREATIVE_TANK_BLOCK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.PORTABLE_ENERGY_STORAGE.get(), generator);
+        createNonTemplateModelBlock(BlockContent.LARGE_STORAGE.get(), generator);
+        createNonTemplateModelBlock(BlockContent.CREATIVE_STORAGE.get(), generator);
+        createNonTemplateModelBlock(BlockContent.PORTABLE_TANK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.CREATIVE_TANK.get(), generator);
 
-        createNonTemplateHorizontalBlock(BlockContent.PLACER_BLOCK.get(), generator);
-        createNonTemplateHorizontalBlock(BlockContent.DESTROYER_BLOCK.get(), generator);
-        createNonTemplateHorizontalBlock(BlockContent.FERTILIZER_BLOCK.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.PLACER.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.DESTROYER.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.FERTILIZER.get(), generator);
 
-        createNonTemplateHorizontalBlock(BlockContent.POWER_POLE_BLOCK.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.ENERGY_TRANSMISSION_POLE.get(), generator);
 
-        createNonTemplateModelBlock(BlockContent.PUMP_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.CHARGER_BLOCK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.PUMP.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.EQUIPMENT_CHARGER.get(), generator);
 
-        generator.createTrivialCube(BlockContent.ADDON_INDICATOR_BLOCK.get());
+        generator.createTrivialCube(BlockContent.ADDON_INDICATOR.get());
         generator.createTrivialCube(BlockContent.BLOCK_DESTROYER_HEAD.get());
         generator.createTrivialCube(BlockContent.BLOCK_PLACER_HEAD.get());
         generator.createTrivialCube(BlockContent.BLOCK_FERTILIZER_HEAD.get());
-        generator.createTrivialCube(BlockContent.PUMP_TRUNK_BLOCK.get());
+        generator.createTrivialCube(BlockContent.PUMP_TRUNK.get());
         createNonTemplateModelBlock(BlockContent.QUARRY_BEAM_RING.get(), generator);
 
         // reactor section
-        createNonTemplateHorizontalBlock(BlockContent.REACTOR_CONTROLLER.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.NUCLEAR_REACTOR_CONTROLLER.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_ENERGY_PORT.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_REDSTONE_PORT.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_FUEL_PORT.get(), generator);
-        createNonTemplateModelBlock(BlockContent.REACTOR_ABSORBER_PORT.get(), generator);
+        createNonTemplateModelBlock(BlockContent.REACTOR_COOLANT_ABSORBER_PORT.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_ROD.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_DOUBLE_ROD.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_QUAD_ROD.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_WALL.get(), Blocks.BRICKS, generator); // this is overridden by athena
-        createNonTemplateModelBlock(BlockContent.REACTOR_VENT.get(), generator);
-        createNonTemplateModelBlock(BlockContent.REACTOR_REFLECTOR.get(), generator);
+        createNonTemplateModelBlock(BlockContent.REACTOR_HEAT_VENT.get(), generator);
+        createNonTemplateModelBlock(BlockContent.REACTOR_NEUTRON_REFLECTOR.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_HEAT_PIPE.get(), generator);
-        generator.createTrivialCube(BlockContent.REACTOR_CONDENSER.get());
+        generator.createTrivialCube(BlockContent.REACTOR_HEAT_ABSORBER.get());
 
-        generator.createAmethystCluster(BlockContent.URANIUM_CRYSTAL.get());
+        generator.createAmethystCluster(BlockContent.URANITE_CRYSTAL.get());
 
-        generator.createTrivialCube(BlockContent.LOW_YIELD_NUKE.get());
-        generator.createTrivialCube(BlockContent.NUKE.get());
+        generator.createTrivialCube(BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.get());
+        generator.createTrivialCube(BlockContent.MANHATTAN_MODULE.get());
 
-        generator.createTrivialCube(BlockContent.REACTOR_COLD_INDICATOR_BLOCK.get());
-        generator.createTrivialCube(BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.get());
-        generator.createTrivialCube(BlockContent.REACTOR_HOT_INDICATOR_BLOCK.get());
+        generator.createTrivialCube(BlockContent.REACTOR_COLD_INDICATOR.get());
+        generator.createTrivialCube(BlockContent.REACTOR_MEDIUM_INDICATOR.get());
+        generator.createTrivialCube(BlockContent.REACTOR_HOT_INDICATOR.get());
 
         // these blocks all use geckolib to render/display, so the only thing this really adds are block particles (e.g. when breaking)
-        createNonTemplateModelBlock(BlockContent.PULVERIZER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.FRAGMENT_FORGE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.ASSEMBLER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.FOUNDRY_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.REFINERY_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.TAINTED_REFINERY_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.REFINERY_MODULE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.COOLER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.CENTRIFUGE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.ATOMIC_FORGE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.POWERED_FURNACE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.AUGMENT_APPLICATION_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.LASER_ARM_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.BIO_GENERATOR_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.FUEL_GENERATOR_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.BASIC_GENERATOR_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.LAVA_GENERATOR_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.BIG_SOLAR_PANEL_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.DEEP_DRILL_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.DRONE_PORT_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.SHRINKER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.TECH_DOOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.TECH_DOOR_HINGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.PULVERIZER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.FRAGMENT_FORGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.ASSEMBLER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.FOUNDRY.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.REFINERY.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.TAINTED_REFINERY.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.REFINERY_CHAMBER_MODULE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_CHILLER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.CENTRIFUGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.ATOMIC_FORGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.POWERED_FURNACE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.CYBERNETIC_AUGMENTATION_CENTER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.ENDERIC_LASER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.BIO_GENERATOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.FUEL_GENERATOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.BASIC_GENERATOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.LAVA_GENERATOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.BIG_SOLAR_PANEL.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.BEDROCK_EXTRACTOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.DRONE_PORT.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.ADDON_SPLICER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_DOOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_DOOR_HINGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.HANGAR_DOOR.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.HANGAR_DOOR_HELPER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.TREEFELLER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.STEAM_ENGINE_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.PIPE_BOOSTER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.TREE_CUTTER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.STEAM_ENGINE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.PIPE_BOOSTER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_SMALL.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_MEDIUM.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.REACTOR_EXPLOSION_LARGE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
@@ -249,28 +249,28 @@ public class ModelGenerator extends ModelProvider {
         generator.createTrivialCube(BlockContent.MACHINE_CORE_5.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_6.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_7.get());
-        createNonTemplateModelBlock(BlockContent.MACHINE_CORE_HIDDEN.get(), Blocks.AIR, generator);   // never visible
+        createNonTemplateModelBlock(BlockContent.COMPLEX_PLATING.get(), Blocks.AIR, generator);   // never visible
 
         generator.createTrivialCube(BlockContent.MACHINE_EXTENDER.get());
 
         //arcane
-        createNonTemplateModelBlock(BlockContent.SPAWNER_CAGE_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.SPAWNER_CONTROLLER_BLOCK.get(), generator);
-        generator.createCropBlock(BlockContent.WITHER_CROP_BLOCK.get(), CropBlock.AGE, 0, 1, 1, 2, 3, 3, 4, 5);
-        createNonTemplateModelBlock(BlockContent.ENCHANTER_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.UNSTABLE_CONTAINER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
-        createNonTemplateModelBlock(BlockContent.ENCHANTMENT_CATALYST_BLOCK.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.SPAWNER_CAGE.get(), generator);
+        createNonTemplateModelBlock(BlockContent.SPAWNER_CONTROLLER.get(), generator);
+        generator.createCropBlock(BlockContent.SOUL_FLOWERS.get(), CropBlock.AGE, 0, 1, 1, 2, 3, 3, 4, 5);
+        createNonTemplateModelBlock(BlockContent.STABILIZED_ENCHANTER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.SCHRODINGERS_SAFE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
+        createNonTemplateModelBlock(BlockContent.ARCANE_CATALYST.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
 
         // particle accelerator
         createNonTemplateModelBlock(BlockContent.ACCELERATOR_RING.get(), generator);
         createNonTemplateHorizontalBlock(BlockContent.ACCELERATOR_MOTOR.get(), generator);
-        createNonTemplateHorizontalBlock(BlockContent.ACCELERATOR_CONTROLLER.get(), generator);
+        createNonTemplateHorizontalBlock(BlockContent.PARTICLE_ACCELERATOR.get(), generator);
         createNonTemplateHorizontalBlock(BlockContent.ACCELERATOR_SENSOR.get(), generator);
-        createNonTemplateModelBlock(BlockContent.BLACK_HOLE_BLOCK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.BLACK_HOLE.get(), generator);
         createNonTemplateModelBlock(BlockContent.BLACK_HOLE_INNER.get(), generator);
         createNonTemplateModelBlock(BlockContent.BLACK_HOLE_MIDDLE.get(), generator);
         createNonTemplateModelBlock(BlockContent.BLACK_HOLE_OUTER.get(), generator);
-        createNonTemplateModelBlock(BlockContent.PARTICLE_COLLECTOR_BLOCK.get(), generator);
+        createNonTemplateModelBlock(BlockContent.TACHYON_ABSORBER.get(), generator);
 
         // metals
         generator.createTrivialCube(BlockContent.NICKEL_ORE.get());
@@ -280,63 +280,63 @@ public class ModelGenerator extends ModelProvider {
         generator.createTrivialCube(BlockContent.DEEPSLATE_URANIUM_ORE.get());
 
         // NODES
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_REDSTONE.get());
+        generator.createTrivialCube(BlockContent.REDSTONE_RESOURCE_NODE.get());
         generator.createTrivialCube(BlockContent.RESOURCE_NODE_LAPIS.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_IRON.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_COAL.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_GOLD.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_EMERALD.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_DIAMOND.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_COPPER.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_NICKEL.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_PLATINUM.get());
-        generator.createTrivialCube(BlockContent.RESOURCE_NODE_URANIUM.get());
+        generator.createTrivialCube(BlockContent.IRON_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.COAL_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.GOLD_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.EMERALD_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.DIAMOND_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.COPPER_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.NICKEL_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.PLATINUM_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.URANIUM_RESOURCE_NODE.get());
 
         //decorative
-        generator.createTrivialCube(BlockContent.INDUSTRIAL_GLASS_BLOCK.get());
-        generator.createTrivialCube(BlockContent.CAPACITOR_ADDON_EXTENDER.get());
-        createNonTemplateModelBlock(BlockContent.METAL_BEAM_BLOCK.get(), generator);
-        createNonTemplateModelBlock(BlockContent.METAL_GIRDER_BLOCK.get(), generator);
+        generator.createTrivialCube(BlockContent.INDUSTRIAL_GLASS.get());
+        generator.createTrivialCube(BlockContent.POWER_BANK_ADDON_EXTENDER.get());
+        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_SUPPORT_BEAM.get(), generator);
+        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_SUPPORT_GIRDER.get(), generator);
 
-        generator.blockStateOutput.accept(createWallMountedState(BlockContent.CEILING_LIGHT.get()));
-        generator.blockStateOutput.accept(createWallMountedState(BlockContent.CEILING_LIGHT_HANGING.get()));
-        registerLever(BlockContent.TECH_LEVER.get(), generator);
-        registerButton(BlockContent.TECH_BUTTON.get(), TextureMapping.cube(BlockContent.MACHINE_PLATING_BLOCK.get()), generator);
+        generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT.get()));
+        generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT_HANGING.get()));
+        registerLever(BlockContent.INDUSTRIAL_LEVER.get(), generator);
+        registerButton(BlockContent.INDUSTRIAL_BUTTON.get(), TextureMapping.cube(BlockContent.COPPER_REINFORCED_PLATING.get()), generator);
 
 
-        generator.createTrivialCube(BlockContent.STEEL_BLOCK.get());
-        generator.createTrivialCube(BlockContent.ENERGITE_BLOCK.get());
-        generator.createTrivialCube(BlockContent.NICKEL_BLOCK.get());
-        generator.createTrivialCube(BlockContent.BIOSTEEL_BLOCK.get());
-        generator.createTrivialCube(BlockContent.PLATINUM_BLOCK.get());
-        generator.createTrivialCube(BlockContent.ADAMANT_BLOCK.get());
-        generator.createTrivialCube(BlockContent.ELECTRUM_BLOCK.get());
-        generator.createTrivialCube(BlockContent.DURATIUM_BLOCK.get());
-        generator.createTrivialCube(BlockContent.BIOMASS_BLOCK.get());
-        generator.createTrivialCube(BlockContent.PLASTIC_BLOCK.get());
-        generator.createTrivialCube(BlockContent.FLUXITE_BLOCK.get());
-        generator.createTrivialCube(BlockContent.SILICON_BLOCK.get());
-        generator.createTrivialCube(BlockContent.RAW_NICKEL_BLOCK.get());
-        generator.createTrivialCube(BlockContent.RAW_PLATINUM_BLOCK.get());
-        generator.createTrivialCube(BlockContent.RAW_URANIUM_BLOCK.get());
-        generator.createTrivialCube(BlockContent.URANIUM_DUST_BLOCK.get());
+        generator.createTrivialCube(BlockContent.STEEL.get());
+        generator.createTrivialCube(BlockContent.ENERGITE.get());
+        generator.createTrivialCube(BlockContent.NICKEL.get());
+        generator.createTrivialCube(BlockContent.BIOSTEEL.get());
+        generator.createTrivialCube(BlockContent.PLATINUM.get());
+        generator.createTrivialCube(BlockContent.ADAMANT.get());
+        generator.createTrivialCube(BlockContent.ELECTRUM.get());
+        generator.createTrivialCube(BlockContent.DURATIUM.get());
+        generator.createTrivialCube(BlockContent.BIOMASS.get());
+        generator.createTrivialCube(BlockContent.PLASTIC.get());
+        generator.createTrivialCube(BlockContent.FLUXITE.get());
+        generator.createTrivialCube(BlockContent.SILICON.get());
+        generator.createTrivialCube(BlockContent.RAW_NICKEL.get());
+        generator.createTrivialCube(BlockContent.RAW_PLATINUM.get());
+        generator.createTrivialCube(BlockContent.RAW_URANIUM.get());
+        generator.createTrivialCube(BlockContent.URANIUM.get());
 
-        var machinePlatingPool = generator.familyWithExistingFullBlock(BlockContent.MACHINE_PLATING_BLOCK.get());
-        machinePlatingPool.stairs(BlockContent.MACHINE_PLATING_STAIRS.get());
-        machinePlatingPool.slab(BlockContent.MACHINE_PLATING_SLAB.get());
-        machinePlatingPool.pressurePlate(BlockContent.MACHINE_PLATING_PRESSURE_PLATE.get());
+        var copperReinforcedPlatingPool = generator.familyWithExistingFullBlock(BlockContent.COPPER_REINFORCED_PLATING.get());
+        copperReinforcedPlatingPool.stairs(BlockContent.COPPER_REINFORCED_PLATING_STAIRS.get());
+        copperReinforcedPlatingPool.slab(BlockContent.COPPER_REINFORCED_PLATING_SLAB.get());
+        copperReinforcedPlatingPool.pressurePlate(BlockContent.COPPER_REINFORCED_PLATING_PRESSURE_PLATE.get());
 
-        var ironPlatingPool = generator.familyWithExistingFullBlock(BlockContent.IRON_PLATING_BLOCK.get());
+        var ironPlatingPool = generator.familyWithExistingFullBlock(BlockContent.IRON_PLATING.get());
         ironPlatingPool.stairs(BlockContent.IRON_PLATING_STAIRS.get());
         ironPlatingPool.slab(BlockContent.IRON_PLATING_SLAB.get());
         ironPlatingPool.pressurePlate(BlockContent.IRON_PLATING_PRESSURE_PLATE.get());
 
-        var nickelPlatingPool = generator.familyWithExistingFullBlock(BlockContent.NICKEL_PLATING_BLOCK.get());
+        var nickelPlatingPool = generator.familyWithExistingFullBlock(BlockContent.NICKEL_PLATING.get());
         nickelPlatingPool.stairs(BlockContent.NICKEL_PLATING_STAIRS.get());
         nickelPlatingPool.slab(BlockContent.NICKEL_PLATING_SLAB.get());
         nickelPlatingPool.pressurePlate(BlockContent.NICKEL_PLATING_PRESSURE_PLATE.get());
 
-        var carbonPlatingPool = generator.familyWithExistingFullBlock(BlockContent.CARBON_PLATING_BLOCK.get());
+        var carbonPlatingPool = generator.familyWithExistingFullBlock(BlockContent.CARBON_PLATING.get());
         carbonPlatingPool.stairs(BlockContent.CARBON_PLATING_STAIRS.get());
         carbonPlatingPool.slab(BlockContent.CARBON_PLATING_SLAB.get());
         carbonPlatingPool.pressurePlate(BlockContent.CARBON_PLATING_PRESSURE_PLATE.get());
@@ -361,8 +361,8 @@ public class ModelGenerator extends ModelProvider {
         itemModelGenerator.generateFlatItem(ToolsContent.JETPACK_EXO_ELYTRA.get(), ModelTemplates.FLAT_ITEM);
 
         itemModelGenerator.itemModelOutput.accept(
-                ItemContent.SMALL_STORAGE_ITEM.get(),
-                ItemModelUtils.plainModel(getBlockModelLocation(ItemContent.SMALL_STORAGE_ITEM.asItem()))
+                ItemContent.PORTABLE_ENERGY_STORAGE_ITEM.get(),
+                ItemModelUtils.plainModel(getBlockModelLocation(ItemContent.PORTABLE_ENERGY_STORAGE_ITEM.asItem()))
         );
 
         RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {

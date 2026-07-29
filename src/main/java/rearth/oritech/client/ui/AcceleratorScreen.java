@@ -9,7 +9,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.TextureWidget;
-import rearth.oritech.block.entity.accelerator.AcceleratorControllerBlockEntity;
+import rearth.oritech.block.entity.accelerator.ParticleAcceleratorBlockEntity;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 
 public class AcceleratorScreen extends OritechMachineScreen<AcceleratorScreenHandler> {
@@ -60,7 +60,7 @@ public class AcceleratorScreen extends OritechMachineScreen<AcceleratorScreenHan
 
     private void updateItemParticle() {
         var shownItem = ItemStack.EMPTY;
-        if (menu.accelerator.lastEvent.lastEvent().equals(AcceleratorControllerBlockEntity.ParticleEvent.ACCELERATING) && menu.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
+        if (menu.accelerator.lastEvent.lastEvent().equals(ParticleAcceleratorBlockEntity.ParticleEvent.ACCELERATING) && menu.accelerator.lastEvent.activeParticle() != ItemStack.EMPTY)
             shownItem = menu.accelerator.lastEvent.activeParticle();
 
         activeParticleRenderer.setStack(shownItem);

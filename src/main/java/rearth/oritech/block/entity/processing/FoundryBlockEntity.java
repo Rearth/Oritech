@@ -18,7 +18,7 @@ import java.util.List;
 public class FoundryBlockEntity extends MultiblockMachineEntity {
 
     public FoundryBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FOUNDRY_ENTITY.get(), pos, state, OritechConfig.processingMachines.foundryData.energyPerTick.get());
+        super(BlockEntitiesContent.FOUNDRY.get(), pos, state, OritechConfig.processingMachines.foundryData.energyPerTick.get());
     }
 
     @Override

@@ -18,8 +18,8 @@ import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatPipeBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatVentBlock;
 import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
-import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
-import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
+import rearth.oritech.block.entity.reactor.ReactorCoolantAbsorberPortEntity;
+import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.init.BlockContent;
@@ -117,16 +117,16 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
 
         int sumProducedEnergy = menu.reactorEntity.componentStats.values().stream()
-                .mapToInt(data -> data.receivedPulses() * ReactorControllerBlockEntity.RF_PER_PULSE * stackHeight)
+                .mapToInt(data -> data.receivedPulses() * NuclearReactorControllerBlockEntity.RF_PER_PULSE * stackHeight)
                 .sum();
 
         int sumProducedHeat = menu.reactorEntity.componentStats.values().stream()
                 .filter(data -> data.receivedPulses() > 0)
-                .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::heatChanged)
+                .mapToInt(NuclearReactorControllerBlockEntity.ComponentStatistics::heatChanged)
                 .sum();
 
         int hottestComponent = menu.reactorEntity.componentStats.values().stream()
-                .mapToInt(ReactorControllerBlockEntity.ComponentStatistics::storedHeat)
+                .mapToInt(NuclearReactorControllerBlockEntity.ComponentStatistics::storedHeat)
                 .max()
                 .orElse(0);
 
@@ -183,7 +183,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int totalPulses = stats.receivedPulses();
             int createdPulses = totalPulses == 0 ? 0 : rodBlock.getInternalPulseCount();
             int externalPulses = totalPulses - createdPulses;
-            int generatedEnergy = ReactorControllerBlockEntity.RF_PER_PULSE * totalPulses;
+            int generatedEnergy = NuclearReactorControllerBlockEntity.RF_PER_PULSE * totalPulses;
             int generatedHeat = stats.heatChanged();
             int heat = stats.storedHeat();
 
@@ -202,7 +202,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         } else if (state.getBlock() instanceof ReactorHeatVentBlock) {
             tooltip.add(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
         } else if (state.getBlock() instanceof ReactorAbsorberBlock) {
-            if (portEntity instanceof ReactorAbsorberPortEntity absorberPortEntity) {
+            if (portEntity instanceof ReactorCoolantAbsorberPortEntity absorberPortEntity) {
                 tooltip.add(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
                 tooltip.add(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
             }
@@ -211,9 +211,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         return tooltip;
     }
 
-    public ReactorControllerBlockEntity.ComponentStatistics getStatsAtPosition(BlockPos pos) {
+    public NuclearReactorControllerBlockEntity.ComponentStatistics getStatsAtPosition(BlockPos pos) {
         if (menu.reactorEntity.componentStats.isEmpty()) {
-            return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
+            return NuclearReactorControllerBlockEntity.ComponentStatistics.EMPTY;
         }
 
         var reactorMin = menu.reactorEntity.areaMin;
@@ -223,7 +223,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             if (worldPos.equals(pos)) return entry.getValue();
         }
 
-        return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
+        return NuclearReactorControllerBlockEntity.ComponentStatistics.EMPTY;
     }
 
     @Override
@@ -287,7 +287,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             var hovered = getHoveredBlock();
             if (hovered != null && hovered.offset().getY() == 1) {
                 entries.add(new BlockPreviewRenderState.Entry(
-                        BlockContent.ADDON_INDICATOR_BLOCK.get().defaultBlockState(),
+                        BlockContent.ADDON_INDICATOR.get().defaultBlockState(),
                         null,
                         hovered.offset(),
                         HOVER_OVERLAY_SCALE
@@ -302,12 +302,12 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             }
 
             if (data.storedHeat() > 1000) {
-                return BlockContent.REACTOR_HOT_INDICATOR_BLOCK.get().defaultBlockState();
+                return BlockContent.REACTOR_HOT_INDICATOR.get().defaultBlockState();
             }
             if (data.storedHeat() > 200) {
-                return BlockContent.REACTOR_MEDIUM_INDICATOR_BLOCK.get().defaultBlockState();
+                return BlockContent.REACTOR_MEDIUM_INDICATOR.get().defaultBlockState();
             }
-            return BlockContent.REACTOR_COLD_INDICATOR_BLOCK.get().defaultBlockState();
+            return BlockContent.REACTOR_COLD_INDICATOR.get().defaultBlockState();
         }
 
         private void renderTooltipPanel(GuiGraphicsExtractor graphics, int blockX, int blockY, List<Component> tooltip) {

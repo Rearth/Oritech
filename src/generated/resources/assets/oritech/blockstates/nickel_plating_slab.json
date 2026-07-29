@@ -4,7 +4,7 @@
       "model": "oritech:block/nickel_plating_slab"
     },
     "type=double": {
-      "model": "oritech:block/nickel_plating_block"
+      "model": "oritech:block/nickel_plating"
     },
     "type=top": {
       "model": "oritech:block/nickel_plating_slab_top"

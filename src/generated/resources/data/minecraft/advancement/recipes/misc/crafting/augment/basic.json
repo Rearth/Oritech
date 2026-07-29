@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_simple_augment_station": {
+    "has_cybernetic_research_station": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:simple_augment_station"
+            "items": "oritech:cybernetic_research_station"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_simple_augment_station"
+      "has_cybernetic_research_station"
     ]
   ],
   "rewards": {

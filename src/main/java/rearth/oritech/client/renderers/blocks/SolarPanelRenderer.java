@@ -10,7 +10,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.client.renderers.models.SolarPanelModel;
-import rearth.oritech.client.renderers.models.LaserArmModel;
+import rearth.oritech.client.renderers.models.EndericLaserModel;
 import rearth.oritech.util.Geometry;
 import org.jspecify.annotations.Nullable;
 
@@ -45,7 +45,7 @@ public class SolarPanelRenderer<T extends BigSolarPanelEntity & GeoAnimatable, R
 
         boneSnapshots.ifPresent("pivotZ", snapshot -> {
             var lastAngle = snapshot.getRotZ();
-            var angle = LaserArmModel.lerp(lastAngle, targetAngle, 0.06f);
+            var angle = EndericLaserModel.lerp(lastAngle, targetAngle, 0.06f);
             snapshot.setRotZ(angle);
         });
     }

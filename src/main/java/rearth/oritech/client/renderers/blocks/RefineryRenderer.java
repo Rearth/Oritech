@@ -16,7 +16,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.processing.RefineryBlockEntity;
-import rearth.oritech.client.renderers.blocks.SmallTankRenderer.FluidCube;
+import rearth.oritech.client.renderers.blocks.PortableTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
@@ -80,7 +80,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R e
         var poseStack = renderPassInfo.poseStack();
         poseStack.pushPose();
         poseStack.last().set(renderPassInfo.getModelRenderMatrixPose());
-        SmallTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+        PortableTankRenderer.submitFluidCubes(renderTasks, poseStack, data.cubes(), renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

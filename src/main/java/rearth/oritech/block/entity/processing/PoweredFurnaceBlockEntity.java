@@ -25,7 +25,7 @@ public class PoweredFurnaceBlockEntity extends MultiblockMachineEntity {
     private final float FURNACE_SPEED_MULTIPLIER = OritechConfig.processingMachines.furnaceData.speedMultiplier.get().floatValue();
 
     public PoweredFurnaceBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.POWERED_FURNACE_ENTITY.get(), pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
+        super(BlockEntitiesContent.POWERED_FURNACE.get(), pos, state, OritechConfig.processingMachines.furnaceData.energyPerTick.get());
     }
 
     @Override

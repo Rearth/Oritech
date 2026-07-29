@@ -1,0 +1,360 @@
+package rearth.oritech.block.entity.arcane;
+
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.util.GeckoLibUtil;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyProvider;
+import rearth.oritech.api.transfer.item.InOutInventoryStorage;
+import rearth.oritech.api.transfer.item.ItemProvider;
+import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.ui.StabilizedEnchanterScreenHandler;
+import rearth.oritech.config.OritechConfig;
+import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.util.InventoryInputMode;
+import rearth.oritech.util.MachineSoundHandler;
+import rearth.oritech.util.ScreenProvider;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
+        implements ItemProvider, EnergyProvider, GeoBlockEntity, ScreenProvider, MenuProvider {
+
+    public static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    public static final RawAnimation UNPOWERED = RawAnimation.begin().thenPlayAndHold("unpowered");
+    public static final RawAnimation WORKING = RawAnimation.begin().thenPlay("working");
+
+    public record StabilizedEnchanterStatistics(int requiredCatalysts, int availableCatalysts) {
+        public static StabilizedEnchanterStatistics EMPTY = new StabilizedEnchanterStatistics(-1, -1);
+    }
+
+    @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
+    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 1000, 0, 0, this::setChanged, false);
+
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
+
+    protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
+
+    public static final Identifier NONE_SELECTED = Identifier.parse("o:empty");
+
+    @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
+    @NotNull
+    public Identifier selectedEnchantment = NONE_SELECTED;
+    @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
+    public int progress;
+    @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
+    public int maxProgress = 10;
+    @SyncField({SyncType.GUI_OPEN, SyncType.TICK})
+    public StabilizedEnchanterStatistics statistics = StabilizedEnchanterStatistics.EMPTY; // used for client display
+
+    private final List<ArcaneCatalystBlockEntity> cachedCatalysts = new ArrayList<>();
+    private String activeAnimation = "idle";
+
+    public StabilizedEnchanterBlockEntity(BlockPos pos, BlockState state) {
+        super(BlockEntitiesContent.STABILIZED_ENCHANTER.get(), pos, state);
+    }
+
+    @Override
+    public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
+
+        activeAnimation = "idle";
+
+        if (serverLevel.getGameTime() % 80 == 0)
+            triggerAnim("machine", activeAnimation);
+
+        // return early if there is no work to do
+        statistics = StabilizedEnchanterStatistics.EMPTY;
+
+        var content = inventory.getStacks().getFirst();
+
+        if (content.isEmpty()
+                || !inventory.getResource(1).isEmpty()
+                || selectedEnchantment.equals(NONE_SELECTED)
+                || !getSelectedEnchantment().isBound()
+                || !content.supportsEnchantment(getSelectedEnchantment())) {
+            progress = 0;
+            return;
+        }
+
+        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
+        var maxLevel = getSelectedEnchantment().value().getMaxLevel();
+
+        if (existingLevel >= maxLevel) return;
+
+        maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
+
+        if (canProgress(existingLevel + 1) && serverLevel.getGameTime() % 5 == 0) {
+            this.setChanged();
+            energyStorage.energy -= (long) getDisplayedEnergyUsage();
+            progress++;
+            activeAnimation = "working";
+
+            var center = pos.getCenter();
+            var r = serverLevel.getRandom();
+            var offset = center.add(r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f, r.nextFloat() * 8f - 4f);
+            ParticleContent.WeedKiller(serverLevel, center, offset);
+
+            if (progress >= maxProgress) {
+                progress = 0;
+                finishEnchanting();
+                if (serverLevel instanceof ServerLevel sl) {
+                    var target = pos.getCenter();
+                    sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
+                }
+                activeAnimation = "idle";
+            }
+        }
+
+    }
+
+    @Override
+    public void sendUpdate(SyncType type) {
+        super.sendUpdate(type);
+        triggerAnim("machine", activeAnimation);
+    }
+
+    public Holder<Enchantment> getSelectedEnchantment() {
+        if (selectedEnchantment.equals(NONE_SELECTED)) return null;
+        var registry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+        return registry.wrapAsHolder(registry.get(selectedEnchantment).orElseThrow().value());
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        inventory.serialize(output);
+        energyStorage.serialize(output);
+        output.store("selected", Identifier.CODEC, selectedEnchantment);
+    }
+
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        inventory.deserialize(input);
+        energyStorage.deserialize(input);
+        selectedEnchantment = input.read("selected", Identifier.CODEC).orElse(NONE_SELECTED);
+    }
+
+    private void finishEnchanting() {
+        var content = inventory.getStacks().getFirst();
+        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
+        content.enchant(getSelectedEnchantment(), existingLevel + 1);
+
+        inventory.getStacks().set(0, ItemStack.EMPTY);
+        inventory.getStacks().set(1, content);
+        statistics = new StabilizedEnchanterStatistics(0, cachedCatalysts.size());
+    }
+
+    private int getRequiredCatalystCount(int targetLevel) {
+        return getSelectedEnchantment().value().getAnvilCost() + targetLevel;
+    }
+
+    private boolean canProgress(int targetLevel) {
+
+        if (energyStorage.energy <= getDisplayedEnergyUsage()) {
+            activeAnimation = "unpowered";
+            return false;
+        }
+
+        if (level.getGameTime() % 15 == 0) updateNearbyCatalysts();
+        var requiredCatalysts = getRequiredCatalystCount(targetLevel);
+
+        statistics = new StabilizedEnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
+
+        for (var catalyst : cachedCatalysts) {
+            ParticleContent.CatalystConnection(level, catalyst.getBlockPos().getCenter(), worldPosition.above().getCenter());
+        }
+
+        if (cachedCatalysts.size() < requiredCatalysts) return false;
+
+        // get a random entry where souls > 0
+        Collections.shuffle(cachedCatalysts);
+        var usedOne = cachedCatalysts.stream().filter(elem -> elem.collectedSouls > 0).findFirst();
+        if (usedOne.isEmpty()) return false;
+
+        usedOne.get().collectedSouls--;
+        setChanged();
+
+        return true;
+    }
+
+    private int getEnchantmentCost(Enchantment enchantment, int targetLevel) {
+        return enchantment.getAnvilCost() * targetLevel * OritechConfig.stabilized_enchanterCostMultiplier.get() + 1;
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+        controllers.add(new AnimationController<>("machine", 4, state -> PlayState.CONTINUE)
+                .triggerableAnim("working", WORKING)
+                .triggerableAnim("idle", IDLE)
+                .triggerableAnim("unpowered", UNPOWERED)
+                .setSoundKeyframeHandler(new MachineSoundHandler<>(() -> 1f)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return animatableInstanceCache;
+    }
+
+    private void updateNearbyCatalysts() {
+        var chunkRadius = 1;
+
+        var startX = (worldPosition.getX() >> 4) - chunkRadius;
+        var startZ = (worldPosition.getZ() >> 4) - chunkRadius;
+        var endX = (worldPosition.getX() >> 4) + chunkRadius;
+        var endZ = (worldPosition.getZ() >> 4) + chunkRadius;
+
+        cachedCatalysts.clear();
+
+        for (int chunkX = startX; chunkX <= endX; chunkX++) {
+            for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
+                var chunk = level.getChunk(chunkX, chunkZ, ChunkStatus.FULL, false);
+                if (chunk == null) continue;
+
+                var entities = chunk.blockEntities;
+                // select all non-empty catalysts within range (16)
+                var catalysts = entities.values()
+                        .stream()
+                        .filter(elem -> elem instanceof ArcaneCatalystBlockEntity catalyst && catalyst.collectedSouls > 0 && elem.getBlockPos().distManhattan(worldPosition) < 16)
+                        .map(elem -> (ArcaneCatalystBlockEntity) elem)
+                        .toList();
+                cachedCatalysts.addAll(catalysts);
+            }
+        }
+    }
+
+    @Override
+    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
+        this.sendUpdate(SyncType.GUI_OPEN);
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return Component.literal("");
+    }
+
+    @Nullable
+    @Override
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+        return new StabilizedEnchanterScreenHandler(syncId, playerInventory, this);
+    }
+
+    @Override
+    public EnergyHandler getEnergyLookup(@Nullable Direction direction) {
+        return energyStorage;
+    }
+
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+        return List.of(
+                new GuiSlot(0, 52, 58),
+                new GuiSlot(1, 108, 58, true));
+    }
+
+    @Override
+    public ArrowConfiguration getIndicatorConfiguration() {
+        return new ArrowConfiguration(
+                Oritech.id("textures/gui/modular/arrow_empty.png"),
+                Oritech.id("textures/gui/modular/arrow_full.png"),
+                73, 58, 29, 16, true);
+    }
+
+    @Override
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(8, 7, 18, 71);
+    }
+
+    @Override
+    public float getDisplayedEnergyUsage() {
+        return 512; // todo config parameter
+    }
+
+    @Override
+    public float getProgress() {
+        return (float) progress / maxProgress;
+    }
+
+    @Override
+    public InventoryInputMode getInventoryInputMode() {
+        return InventoryInputMode.FILL_LEFT_TO_RIGHT;
+    }
+
+    @Override
+    public StacksResourceHandler<ItemStack, ItemResource> getDisplayedInventory() {
+        return inventory;
+    }
+
+    @Override
+    public MenuType<?> getScreenHandlerType() {
+        return ModScreens.STABILIZED_ENCHANTER_SCREEN.get();
+    }
+
+    @Override
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
+
+    @Override
+    public ResourceHandler<ItemResource> getItemLookup(@Nullable Direction direction) {
+        return inventory.getExternalAccess();
+    }
+
+    public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, IPayloadContext context) {
+        var blockEntity = context.player().level().getBlockEntity(packet.self);
+        if (blockEntity instanceof StabilizedEnchanterBlockEntity stabilized_enchanterBlock) {
+            stabilized_enchanterBlock.selectedEnchantment = packet.enchantmentId;
+            stabilized_enchanterBlock.setChanged();
+        }
+    }
+
+    public record SelectEnchantingPacket(BlockPos self, Identifier enchantmentId) implements CustomPacketPayload {
+
+        public static final Type<SelectEnchantingPacket> PACKET_ID = new Type<>(Oritech.id("selected_enchant"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
+    }
+
+}

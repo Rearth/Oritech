@@ -29,9 +29,9 @@ public class RecipeContent {
     public static final Supplier<RecipeType<OritechRecipe>> FUEL_GENERATOR = RECIPE_TYPES.register("fuel_generator", () -> recipeType("fuel_generator"));
     public static final Supplier<RecipeType<OritechRecipe>> LAVA_GENERATOR = RECIPE_TYPES.register("lava_generator", () -> recipeType("lava_generator"));
     public static final Supplier<RecipeType<OritechRecipe>> STEAM_ENGINE = RECIPE_TYPES.register("steam_engine", () -> recipeType("steam_engine"));
-    public static final Supplier<RecipeType<OritechRecipe>> DEEP_DRILL = RECIPE_TYPES.register("deep_drill", () -> recipeType("deep_drill"));
+    public static final Supplier<RecipeType<OritechRecipe>> BEDROCK_EXTRACTOR = RECIPE_TYPES.register("bedrock_extractor", () -> recipeType("bedrock_extractor"));
     public static final Supplier<RecipeType<OritechRecipe>> PARTICLE_COLLISION = RECIPE_TYPES.register("particle_collision", () -> recipeType("particle_collision"));
-    public static final Supplier<RecipeType<OritechRecipe>> COOLER = RECIPE_TYPES.register("cooler", () -> recipeType("cooler"));
+    public static final Supplier<RecipeType<OritechRecipe>> INDUSTRIAL_CHILLER = RECIPE_TYPES.register("industrial_chiller", () -> recipeType("industrial_chiller"));
     public static final Supplier<RecipeType<OritechRecipe>> REACTOR = RECIPE_TYPES.register("reactor", () -> recipeType("reactor"));
     public static final Supplier<RecipeType<OritechRecipe>> LASER = RECIPE_TYPES.register("laser", () -> recipeType("laser"));
     public static final Supplier<RecipeType<OritechRecipe>> FURNACE_ADAPTER = RECIPE_TYPES.register("furnace_adapter", () -> recipeType("furnace_adapter"));

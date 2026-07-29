@@ -22,7 +22,7 @@ public class ItemPipeDuctBlock extends GenericPipeDuctBlock {
 
     @Override
     public BlockState getNormalBlock() {
-        return BlockContent.ITEM_PIPE_DUCT_BLOCK.get().defaultBlockState();
+        return BlockContent.ITEM_PIPE_DUCT.get().defaultBlockState();
     }
 
     @Override

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_ceiling_light": {
+    "has_industrial_light": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:ceiling_light"
+            "items": "oritech:industrial_light"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_ceiling_light"
+      "has_industrial_light"
     ]
   ],
   "rewards": {

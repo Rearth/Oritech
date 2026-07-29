@@ -69,7 +69,7 @@ public class TagContent {
     public static final TagKey<Item> STEEL_INGOTS = cItemTag("ingots/steel");
 
     // plating
-    public static final TagKey<Item> MACHINE_PLATING = oritechItemTag("plating");
+    public static final TagKey<Item> PLATING_BLOCKS = oritechItemTag("plating");
 
     // plastic
     public static final TagKey<Item> PLASTIC_PLATES = cItemTag("plates/plastic");

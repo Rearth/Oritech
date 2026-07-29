@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "a": "oritech:machine_plating_block"
+    "a": "oritech:copper_reinforced_plating"
   },
   "pattern": [
     "a  ",
@@ -11,6 +11,6 @@
   ],
   "result": {
     "count": 4,
-    "id": "oritech:machine_plating_stairs"
+    "id": "oritech:copper_reinforced_plating_stairs"
   }
 }

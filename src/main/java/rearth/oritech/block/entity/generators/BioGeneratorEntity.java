@@ -22,7 +22,7 @@ import java.util.Set;
 
 public class BioGeneratorEntity extends MultiblockGeneratorBlockEntity {
     public BioGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIO_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.BIO_GENERATOR.get(), pos, state, OritechConfig.generators.bioGeneratorData.energyPerTick.get());
     }
 
     @Override

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_energy_pipe_duct_block": {
+    "has_energy_pipe_duct": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:energy_pipe_duct_block"
+            "items": "oritech:energy_pipe_duct"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_energy_pipe_duct_block"
+      "has_energy_pipe_duct"
     ]
   ],
   "rewards": {

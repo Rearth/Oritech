@@ -42,7 +42,7 @@ public class SpawnerControllerRenderer implements BlockEntityRenderer<SpawnerCon
         if (state.renderedEntity != null && state.hasCage) {
             var progress = Math.min(1f, entity.collectedSouls / (float) entity.maxSouls);
             if (progress != 0)
-                progress = (float) LaserArmRenderer.lerp(entity.lastProgress, progress, 0.03f);
+                progress = (float) EndericLaserRenderer.lerp(entity.lastProgress, progress, 0.03f);
             entity.lastProgress = progress;
 
             // use ColorHelper to construct package-independent ARGB color

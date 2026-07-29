@@ -1,4 +1,4 @@
-// 26.1.2	2026-06-19T22:10:43.5775931	Tags for minecraft:item mod id oritech
+// 26.1.2	2026-07-29T20:13:14.9425805	Tags for minecraft:item mod id oritech
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/bananas.json
 e2c6e20d8d6d0e3e37246a13f9af75711482a721 data/c/tags/item/carbon_fibre.json
 99505a8471e5d2356893d65d4cff2b3c634c266b data/c/tags/item/clumps.json
@@ -10,8 +10,8 @@ c357d5ee9317c0589e907b6f3b5d6379f2e22857 data/c/tags/item/clumps/nickel.json
 0c0d5d041cea565b1ff0665ad408e43176f6d5b2 data/c/tags/item/clumps/platinum.json
 99d6a3e0f3d073bdbbb3d5523bd1795490d414c0 data/c/tags/item/clumps/uranium.json
 58a30baa635abd0784a30ff69d301a709c1df035 data/c/tags/item/clumps/zinc.json
-ab4cef97c62de37dd44d99e5ddb6800f7dd4da81 data/c/tags/item/crops.json
-ab4cef97c62de37dd44d99e5ddb6800f7dd4da81 data/c/tags/item/crops/soul_flower.json
+aa49c88b5e4cf1d8cdc73dcca6787985f9707870 data/c/tags/item/crops.json
+aa49c88b5e4cf1d8cdc73dcca6787985f9707870 data/c/tags/item/crops/soul_flower.json
 20fa508e6eb1cfb89b92a4122ac12a302b4c6139 data/c/tags/item/dusts.json
 11778c765af7b8f0e93188a2f8616def68431547 data/c/tags/item/dusts/adamant.json
 bd7be57f8701cf6b4b5dcf4f294ce5f8e6f8a935 data/c/tags/item/dusts/biosteel.json
@@ -30,8 +30,7 @@ a4f65178002dfa3dbf1774ffb422dee5275d8257 data/c/tags/item/dusts/plutonium.json
 bf9c4f1c030fa14263694ca70c4af300a5666a87 data/c/tags/item/dusts/uranium.json
 0c3baaa92b73d1981f02e77e04e39308955beca0 data/c/tags/item/elytras.json
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/foods/fruit.json
-da3b54c54cd4557f640e85e9c96bdbd15d3bd0e2 data/c/tags/item/fuels/bio.json
-c6f72081bb4f1359b225aa7057d38c077e2c267f data/c/tags/item/fuels/block/bio.json
+9fac66477be962c1d545c981b69ba6b31c9973a2 data/c/tags/item/fuels/bio.json
 4ca11b759f4fb74d38586bc1432e84504e2d5ea8 data/c/tags/item/gems.json
 4ca11b759f4fb74d38586bc1432e84504e2d5ea8 data/c/tags/item/gems/fluxite.json
 cc51415941de06e104c2869273b40fc7d56a7947 data/c/tags/item/ingots.json
@@ -68,23 +67,23 @@ f400990846ac4e6ba3733f50568437f3b3180733 data/c/tags/item/raw_materials/nickel.j
 01448c09b923ed9ab9740c6a8241fb82b420c438 data/c/tags/item/raw_materials/platinum.json
 bd202849f27423161c5c29b965661fe84d3c0b3c data/c/tags/item/raw_materials/uranium.json
 1e7787f3c82969583b508332e72b930c266a23ea data/c/tags/item/silicon.json
-bdf41a18c91c15ed45b0966fcb2ccf17406c295f data/c/tags/item/storage_blocks.json
-b83a060a9615b9e6c4d9be0f19dc969ce641fce7 data/c/tags/item/storage_blocks/adamant.json
+e4e793c5a9e436d1167ecba36ef4a2bcf434455c data/c/tags/item/storage_blocks.json
+162c4ae13d2883125c21ba83c8456a642f95e4de data/c/tags/item/storage_blocks/adamant.json
 c6f72081bb4f1359b225aa7057d38c077e2c267f data/c/tags/item/storage_blocks/biomass.json
-e0f5e24c30ed06d0684ea9fb76422348c4efa19f data/c/tags/item/storage_blocks/biosteel.json
-b724fcee7c19ad180fad74930edadfbe5fc1b7d3 data/c/tags/item/storage_blocks/duratium.json
-9f82d0b6dd25f517c2a1894cd2a6db75f516288c data/c/tags/item/storage_blocks/electrum.json
-a18068b98ec8d6b8207f548a440041593043df5b data/c/tags/item/storage_blocks/energite.json
+515982359f61981641940fe400388c0da008726d data/c/tags/item/storage_blocks/biosteel.json
+dd4a242ac55955ddf4c61ecf34576cc23b537f6b data/c/tags/item/storage_blocks/duratium.json
+6e9070f461ce3f31efca0b5672c10b4381bb6164 data/c/tags/item/storage_blocks/electrum.json
+6490f6145f46595ea0f3141950bdc97ec03826ad data/c/tags/item/storage_blocks/energite.json
 78ae6b3f84a6498ad2edb05fdb93e0139080c644 data/c/tags/item/storage_blocks/fluxite.json
-aacb38a89457fa93e3f9ee8843f5a1cadacfac3c data/c/tags/item/storage_blocks/nickel.json
-3df7420ff100cbea46704bd46ed70a764a859ea2 data/c/tags/item/storage_blocks/plastic.json
-939ab0b0b2816ce5ffe7e82259d9ae395572862d data/c/tags/item/storage_blocks/platinum.json
+67d7b06c729b8bcbeff6fefb41db85bef779eabd data/c/tags/item/storage_blocks/nickel.json
+149a80c00c839ae8be1aa6faed1db3386467dee0 data/c/tags/item/storage_blocks/plastic.json
+01b3a57bcab11c3d10977358f6891b22a3fc1b4d data/c/tags/item/storage_blocks/platinum.json
 4c96d78cb6be7d75b3a9054eea2aa5461c74ba39 data/c/tags/item/storage_blocks/raw_nickel.json
 b16c46a81f488d04646dd231b4328a9db282022f data/c/tags/item/storage_blocks/raw_platinum.json
 f51c60f6fe021376425ba319fe9f26218f3d09a7 data/c/tags/item/storage_blocks/raw_uranium.json
 936f2dae9e881ec851523bcfc130dc9823154a67 data/c/tags/item/storage_blocks/silicon.json
-8c5989885433d3b63857c147910b5f0ab201f7bb data/c/tags/item/storage_blocks/steel.json
-a6290c11d518209a80f0ee170cab874abda1b162 data/c/tags/item/storage_blocks/uranium_dust.json
+b91231802354b103a5e685b0b77734021dd9c0b6 data/c/tags/item/storage_blocks/steel.json
+85d3412c3db3674dee917dd765ac4b8e050cb54a data/c/tags/item/storage_blocks/uranium_dust.json
 155de923074b66735208812821929be4f3d64f9d data/c/tags/item/tools/wrench.json
 c76015810207d3cbb8430f61f93eac486227dfe2 data/industrialforegoing/tags/item/bioreactor.json
 9d916d24691f05ed588167bbde6f55a978e71aa8 data/minecraft/tags/item/axes.json
@@ -102,10 +101,10 @@ e6911a5e5da3fb6cb428342470fc7a877a77d8b1 data/minecraft/tags/item/head_armor.jso
 b100f8cb7a51598bb3ba608cf35c4cb70ec6685c data/minecraft/tags/item/pickaxes.json
 c5014d2e2fd9dfeff0eccb24fcef5ba63b05cc7e data/minecraft/tags/item/shovels.json
 9d916d24691f05ed588167bbde6f55a978e71aa8 data/minecraft/tags/item/swords.json
-58cfdd30ae576c378bba88bc350010e79fdf4da0 data/oritech/tags/item/biomatter.json
+03e2ffbbb53820b3120884ddfce56501d7745443 data/oritech/tags/item/biomatter.json
 3492d00c40681839c142dad00b37cb30a5d0b27f data/oritech/tags/item/feeder_blacklist.json
 a2e30b1f294ad2b8c3fe306573bae223e477604c data/oritech/tags/item/paint.json
-cfe17048caf91db874b77d8b0d639b25ac451110 data/oritech/tags/item/plating.json
+2cfda3100dcc97c0f999d046cfb5b15e2c9470b9 data/oritech/tags/item/plating.json
 2268826c6d706a7f185732054fa0a2ee01865efa data/oritech/tags/item/reactor_coolant_items.json
 e0c4cb81c051951308d89d6e799d96ccf04d7d14 data/oritech/tags/item/recyclable/biomass.json
 abeefa1d5c446dfd163fa1274c4eca8f09af12dc data/oritech/tags/item/recyclable/copper_dust.json

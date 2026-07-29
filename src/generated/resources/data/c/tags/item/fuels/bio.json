@@ -4,6 +4,7 @@
     {
       "id": "#techreborn:plantball",
       "required": false
-    }
+    },
+    "oritech:biomass_block"
   ]
 }

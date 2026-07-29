@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_tech_button": {
+    "has_industrial_button": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:tech_button"
+            "items": "oritech:industrial_button"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_tech_button"
+      "has_industrial_button"
     ]
   ],
   "rewards": {

@@ -40,10 +40,10 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity {
     private int waitTicks;
 
     // cache for outgoing hits
-    private final Map<BlockPos, ParticleCollectorBlockEntity> cachedCollectors = new HashMap<>();
+    private final Map<BlockPos, TachyonAbsorberBlockEntity> cachedCollectors = new HashMap<>();
 
     public BlackHoleBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BLACK_HOLE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.BLACK_HOLE.get(), pos, state);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity {
 
         for (var candidate : BlockPos.withinManhattan(pos, pullRange, pullRange, pullRange)) {
             var candidateState = serverLevel.getBlockState(candidate);
-            if (candidate.equals(pos) || candidateState.isAir() || candidateState.is(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE_BLOCK.get()))
+            if (candidate.equals(pos) || candidateState.isAir() || candidateState.is(TagContent.BLACK_HOLE_BLACKLIST) || !candidateState.getFluidState().isEmpty() || candidateState.getBlock().equals(Blocks.MOVING_PISTON) || candidateState.getBlock().equals(BlockContent.BLACK_HOLE.get()))
                 continue;
 
             var pullTime = (long) candidate.distManhattan(pos) * OritechConfig.pullTimeMultiplier.get();
@@ -117,7 +117,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity {
                     ParticleContent.BlackHoleEmission(level, worldPosition.getCenter(), impactPos.getCenter());
 
                     var candidate = level.getBlockEntity(impactPos);
-                    if (candidate instanceof ParticleCollectorBlockEntity collectorEntity) {
+                    if (candidate instanceof TachyonAbsorberBlockEntity collectorEntity) {
                         collectorEntity.onParticleCollided();
                         cachedCollectors.put(cacheKey, collectorEntity);
                         tachyonCollected = true;
@@ -155,7 +155,7 @@ public class BlackHoleBlockEntity extends NetworkedBlockEntity {
         return BlockPos.containing(shotFrom.add(shotDirection.scale(12)));
     }
 
-    private ParticleCollectorBlockEntity tryGetCachedCollector(BlockPos key) {
+    private TachyonAbsorberBlockEntity tryGetCachedCollector(BlockPos key) {
 
         var cachedResult = cachedCollectors.get(key);
         if (cachedResult == null) {

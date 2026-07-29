@@ -11,7 +11,7 @@
     "attributeOperationType": 0,
     "entityAttributeId": "minecraft:max_health"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
     "oritech:augment/armor"
   ],

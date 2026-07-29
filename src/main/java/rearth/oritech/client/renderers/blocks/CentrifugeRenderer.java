@@ -18,7 +18,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
-import rearth.oritech.client.renderers.blocks.SmallTankRenderer.FluidCube;
+import rearth.oritech.client.renderers.blocks.PortableTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
 
@@ -106,7 +106,7 @@ public class CentrifugeRenderer<R extends BlockEntityRenderState & GeoRenderStat
         }
 
         private static <R extends GeoRenderState> void submitFluid(RenderPassInfo<R> renderPassInfo, SubmitNodeCollector renderTasks, List<FluidCube> cubes) {
-            SmallTankRenderer.submitFluidCubes(renderTasks, renderPassInfo.poseStack(), cubes, renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
+            PortableTankRenderer.submitFluidCubes(renderTasks, renderPassInfo.poseStack(), cubes, renderPassInfo.packedLight(), OverlayTexture.NO_OVERLAY);
         }
 
         private static void spawnDroplet(ClientLevel level, Vec3 position, Vec3 machineCenter, FluidCube cube) {

@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/unstable_container",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

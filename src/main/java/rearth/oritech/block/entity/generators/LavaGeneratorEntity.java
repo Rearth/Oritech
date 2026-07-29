@@ -21,7 +21,7 @@ import java.util.Set;
 
 public class LavaGeneratorEntity extends FluidMultiblockGeneratorBlockEntity {
     public LavaGeneratorEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.LAVA_GENERATOR_ENTITY.get(), pos, state, OritechConfig.generators.lavaGeneratorData.energyPerTick.get());
+        super(BlockEntitiesContent.LAVA_GENERATOR.get(), pos, state, OritechConfig.generators.lavaGeneratorData.energyPerTick.get());
     }
 
     @Override

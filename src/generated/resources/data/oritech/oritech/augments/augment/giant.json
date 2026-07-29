@@ -11,7 +11,7 @@
     "attributeOperationType": 1,
     "entityAttributeId": "minecraft:scale"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
     "oritech:augment/dwarf",
     "oritech:augment/armor"

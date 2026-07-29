@@ -60,7 +60,7 @@ public class InventoryProxyAddonBlockEntity extends AddonBlockEntity implements 
     };
 
     public InventoryProxyAddonBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.INVENTORY_PROXY_ADDON_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.INVENTORY_PROXY_ADDON.get(), pos, state);
     }
 
     private ItemStacksResourceHandler getTargetItemStorage() {

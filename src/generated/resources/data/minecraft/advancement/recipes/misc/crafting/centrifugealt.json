@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_centrifuge_block": {
+    "has_centrifuge": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:centrifuge_block"
+            "items": "oritech:centrifuge"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_centrifuge_block"
+      "has_centrifuge"
     ]
   ],
   "rewards": {

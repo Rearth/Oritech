@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": "oritech:reactor_reflector",
+    "c": "oritech:reactor_neutron_reflector",
     "r": "oritech:reactor_double_rod"
   },
   "pattern": [

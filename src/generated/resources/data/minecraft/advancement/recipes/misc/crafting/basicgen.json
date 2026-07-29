@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_basic_generator_block": {
+    "has_basic_generator": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:basic_generator_block"
+            "items": "oritech:basic_generator"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_basic_generator_block"
+      "has_basic_generator"
     ]
   ],
   "rewards": {

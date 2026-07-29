@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "b": "#oritech:plating",
-    "c": "oritech:machine_frame_block",
+    "c": "oritech:machine_frame",
     "f": "#c:ingots/copper",
     "m": "oritech:processing_unit",
     "s": "oritech:motor"
@@ -14,6 +14,6 @@
     "sbs"
   ],
   "result": {
-    "id": "oritech:placer_block"
+    "id": "oritech:placer"
   }
 }

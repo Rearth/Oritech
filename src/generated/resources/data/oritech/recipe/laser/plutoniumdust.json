@@ -1,7 +1,7 @@
 {
   "type": "oritech:machine_recipe",
   "itemInputs": [
-    "oritech:uranium_crystal"
+    "oritech:uranite_crystal"
   ],
   "itemResults": [
     {

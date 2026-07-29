@@ -5,7 +5,7 @@
     "ingredient": "minecraft:water"
   },
   "itemInputs": [
-    "#c:fuels/block/bio"
+    "#c:fuels/bio"
   ],
   "itemResults": [
     {

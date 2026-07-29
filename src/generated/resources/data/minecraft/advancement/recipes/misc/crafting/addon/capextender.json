@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_capacitor_addon_extender": {
+    "has_power_bank_addon_extender": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:capacitor_addon_extender"
+            "items": "oritech:power_bank_addon_extender"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_capacitor_addon_extender"
+      "has_power_bank_addon_extender"
     ]
   ],
   "rewards": {

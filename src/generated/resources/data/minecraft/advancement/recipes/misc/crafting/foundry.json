@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_foundry_block": {
+    "has_foundry": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:foundry_block"
+            "items": "oritech:foundry"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_foundry_block"
+      "has_foundry"
     ]
   ],
   "rewards": {

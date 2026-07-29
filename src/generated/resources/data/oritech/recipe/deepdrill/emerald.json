@@ -1,13 +1,13 @@
 {
   "type": "oritech:machine_recipe",
   "itemInputs": [
-    "oritech:resource_node_emerald"
+    "oritech:emerald_resource_node"
   ],
   "itemResults": [
     {
       "id": "minecraft:emerald"
     }
   ],
-  "recipeType": "oritech:deep_drill",
+  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

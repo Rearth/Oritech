@@ -64,20 +64,20 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     // If any block does not have a boundingShape set, this will default to a full cube
     public static VoxelShape[][] MACHINE_ACCEPTOR_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_CAPACITOR_ADDON_SHAPE;
-    public static VoxelShape[][] MACHINE_PROCESSING_ADDON_SHAPE;
+    public static VoxelShape[][] AUXILIARY_PROCESSING_CHAMBER_ADDON_SHAPE;
     public static VoxelShape[][] CROP_FILTER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_EFFICIENCY_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_FLUID_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_INVENTORY_PROXY_ADDON_SHAPE;
     public static VoxelShape[][] QUARRY_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_HUNTER_ADDON_SHAPE;
-    public static VoxelShape[][] MACHINE_REDSTONE_ADDON_SHAPE;
+    public static VoxelShape[][] CONTROL_UNIT_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_SPEED_ADDON_SHAPE;
-    public static VoxelShape[][] MACHINE_ULTIMATE_ADDON_SHAPE;
+    public static VoxelShape[][] SYNERGY_MATRIX_ADDON_SHAPE;
     public static VoxelShape[][] STEAM_BOILER_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_YIELD_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_SILK_TOUCH_ADDON_SHAPE;
-    public static VoxelShape[][] MACHINE_COMBI_ADDON_SHAPE;
+    public static VoxelShape[][] HEART_OF_THE_MACHINE_ADDON_SHAPE;
     public static VoxelShape[][] MACHINE_BURST_ADDON_SHAPE;
 
     // because this parameter is needed in appendProperties, but we can't initialize or pass it to that
@@ -309,9 +309,9 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                 consumer.accept(Component.translatable("tooltip.oritech.addon_quarry_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_HUNTER_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_hunter_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_REDSTONE_ADDON.value())
+            if (blockType == BlockContent.CONTROL_UNIT_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_redstone_desc").withStyle(ChatFormatting.GRAY));
-            if (blockType == BlockContent.MACHINE_PROCESSING_ADDON.value())
+            if (blockType == BlockContent.AUXILIARY_PROCESSING_CHAMBER_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.processing_addon_desc").withStyle(ChatFormatting.GRAY));
             if (blockType == BlockContent.MACHINE_SILK_TOUCH_ADDON.value())
                 consumer.accept(Component.translatable("tooltip.oritech.addon_silk_touch_desc").withStyle(ChatFormatting.GRAY));
@@ -331,20 +331,20 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
     static {
         MACHINE_ACCEPTOR_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_CAPACITOR_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
-        MACHINE_PROCESSING_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
-        MACHINE_ULTIMATE_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        AUXILIARY_PROCESSING_CHAMBER_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        SYNERGY_MATRIX_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         CROP_FILTER_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_EFFICIENCY_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_FLUID_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_INVENTORY_PROXY_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         QUARRY_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_HUNTER_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
-        MACHINE_REDSTONE_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        CONTROL_UNIT_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_SPEED_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         STEAM_BOILER_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_YIELD_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_SILK_TOUCH_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
-        MACHINE_COMBI_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
+        HEART_OF_THE_MACHINE_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         MACHINE_BURST_ADDON_SHAPE = new VoxelShape[Direction.values().length][AttachFace.values().length];
         for (var facing : Direction.values()) {
             if (!facing.getAxis().isHorizontal()) continue;
@@ -388,10 +388,10 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                         Geometry.rotateVoxelShape(Shapes.box(0.25, 0.125, 0.1875, 0.75, 0.4375, 0.8125), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.75, 0.125, 0.125, 0.875, 0.5, 0.875), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.125, 0.125, 0.125, 0.25, 0.5, 0.875), facing, face));
-                MACHINE_PROCESSING_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                AUXILIARY_PROCESSING_CHAMBER_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                         Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.125, 0.25, 0.25, 0.875, 0.75, 0.75), facing, face));
-                MACHINE_ULTIMATE_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                SYNERGY_MATRIX_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                         Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0.1875, 0.875, 1, 0.75), facing, face));
                 MACHINE_FLUID_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
@@ -433,7 +433,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                         Geometry.rotateVoxelShape(Shapes.box(0.5, 0.125, 0.3125, 0.75, 0.1875, 0.375), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.5, 0.125, 0.625, 0.75, 0.1875, 0.6875), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.5625, 0.1875, 0.5625, 0.6875, 0.25, 0.625), facing, face));
-                MACHINE_REDSTONE_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                CONTROL_UNIT_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                         Geometry.rotateVoxelShape(Shapes.box(0.0625, 0, 0.0625, 0.9375, 0.125, 0.9375), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.1875, 0.125, 0, 0.4375, 0.25, 0.8125), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.1875, 0, 0.0015625, 0.6875, 0.1875, 0.0640625), facing, face),
@@ -475,7 +475,7 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
                         Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.1875, 0.25, 0.875, 0.25, 0.4375), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.4375, 0.125, 0.1875, 0.875, 0.1875, 0.875), facing, face)
                 );
-                MACHINE_COMBI_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
+                HEART_OF_THE_MACHINE_ADDON_SHAPE[facing.ordinal()][face.ordinal()] = Shapes.or(
                         Geometry.rotateVoxelShape(Shapes.box(0.3125, -0.0015625, 0.25, 0.6875, 0.1234375, 0.75), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.25, 0, 0.3125, 0.75, 0.125, 0.6875), facing, face),
                         Geometry.rotateVoxelShape(Shapes.box(0.3125, 0.4375, 0.3125, 0.6875, 0.8125, 0.6875), facing, face),

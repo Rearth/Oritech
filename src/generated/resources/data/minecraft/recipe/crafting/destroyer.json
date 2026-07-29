@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "b": "#oritech:plating",
-    "c": "oritech:pulverizer_block",
+    "c": "oritech:pulverizer",
     "f": "oritech:motor",
     "m": "oritech:motor",
-    "s": "oritech:laser_arm_block"
+    "s": "oritech:enderic_laser"
   },
   "pattern": [
     "fsf",
@@ -14,6 +14,6 @@
     "bbb"
   ],
   "result": {
-    "id": "oritech:destroyer_block"
+    "id": "oritech:destroyer"
   }
 }

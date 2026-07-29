@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_lava_generator_block": {
+    "has_lava_generator": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:lava_generator_block"
+            "items": "oritech:lava_generator"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_lava_generator_block"
+      "has_lava_generator"
     ]
   ],
   "rewards": {

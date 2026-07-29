@@ -11,7 +11,7 @@
     "attributeOperationType": 1,
     "entityAttributeId": "minecraft:block_interaction_range"
   },
-  "requiredStation": "oritech:simple_augment_station",
+  "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [],
   "researchCost": [
     {

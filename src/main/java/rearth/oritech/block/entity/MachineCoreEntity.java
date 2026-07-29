@@ -34,7 +34,7 @@ public class MachineCoreEntity extends BlockEntity implements ItemProvider, Flui
     private final Map<Direction, DelegatingInventoryStorage> delegatedItem = new HashMap<>(6);
 
     public MachineCoreEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.MACHINE_CORE_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.MACHINE_CORE.get(), pos, state);
     }
 
     @Override

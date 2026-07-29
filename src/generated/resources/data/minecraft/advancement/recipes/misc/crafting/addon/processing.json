@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_machine_processing_addon": {
+    "has_auxiliary_processing_chamber_addon": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:machine_processing_addon"
+            "items": "oritech:auxiliary_processing_chamber_addon"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_machine_processing_addon"
+      "has_auxiliary_processing_chamber_addon"
     ]
   ],
   "rewards": {

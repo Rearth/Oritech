@@ -72,7 +72,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     }
 
     public FertilizerBlockEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.FERTILIZER_BLOCK_ENTITY.get(), pos, state);
+        super(BlockEntitiesContent.FERTILIZER.get(), pos, state);
     }
 
     private long getWaterUsagePerTick() {

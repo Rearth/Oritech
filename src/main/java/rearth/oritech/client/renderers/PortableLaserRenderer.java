@@ -14,7 +14,7 @@ import net.neoforged.neoforge.transfer.access.ItemAccess;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.OritechClient;
-import rearth.oritech.client.renderers.blocks.LaserArmRenderer;
+import rearth.oritech.client.renderers.blocks.EndericLaserRenderer;
 import rearth.oritech.client.renderers.models.PortableLaserModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
@@ -22,7 +22,7 @@ import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
 
-import static rearth.oritech.client.renderers.blocks.LaserArmRenderer.BEAM_TEXTURE;
+import static rearth.oritech.client.renderers.blocks.EndericLaserRenderer.BEAM_TEXTURE;
 
 public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
@@ -90,8 +90,8 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
                     pose, consumer, data.startOffset(), data.deltaVec(),
                     data.thickness() * 0.3f,
                     RenderHelpers.FULL_BRIGHT,
-                    LaserArmRenderer.CORE_COLOR_START,
-                    LaserArmRenderer.CORE_COLOR_END
+                    EndericLaserRenderer.CORE_COLOR_START,
+                    EndericLaserRenderer.CORE_COLOR_END
             );
 
             // outer glow
@@ -99,8 +99,8 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
                     pose, consumer, data.startOffset(), data.deltaVec(),
                     data.thickness(),
                     RenderHelpers.FULL_BRIGHT,
-                    LaserArmRenderer.GLOW_COLOR_START,
-                    LaserArmRenderer.GLOW_COLOR_END
+                    EndericLaserRenderer.GLOW_COLOR_START,
+                    EndericLaserRenderer.GLOW_COLOR_END
             );
         });
     }

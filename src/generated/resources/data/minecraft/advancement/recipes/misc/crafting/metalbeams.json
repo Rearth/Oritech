@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_metal_beam_block": {
+    "has_industrial_support_beam": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:metal_beam_block"
+            "items": "oritech:industrial_support_beam"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_metal_beam_block"
+      "has_industrial_support_beam"
     ]
   ],
   "rewards": {

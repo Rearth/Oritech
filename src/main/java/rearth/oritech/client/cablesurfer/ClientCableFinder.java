@@ -7,7 +7,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import rearth.oritech.block.entity.interaction.PowerPoleEntity;
+import rearth.oritech.block.entity.interaction.EnergyTransmissionPoleEntity;
 
 import java.util.ArrayList;
 
@@ -36,13 +36,13 @@ public class ClientCableFinder {
 
         var minPos = BlockPos.containing(eyePos.add(-POLE_SEARCH_RADIUS, -POLE_SEARCH_RADIUS, -POLE_SEARCH_RADIUS));
         var maxPos = BlockPos.containing(eyePos.add(POLE_SEARCH_RADIUS, POLE_SEARCH_RADIUS, POLE_SEARCH_RADIUS));
-        var nearbyPoles = new ArrayList<PowerPoleEntity>();
+        var nearbyPoles = new ArrayList<EnergyTransmissionPoleEntity>();
 
         for (var cx = (minPos.getX() >> 4); cx <= (maxPos.getX() >> 4); cx++) {
             for (var cz = (minPos.getZ() >> 4); cz <= (maxPos.getZ() >> 4); cz++) {
                 if (level.hasChunk(cx, cz)) {
                     for (var be : level.getChunk(cx, cz).getBlockEntities().values()) {
-                        if (be instanceof PowerPoleEntity pole &&
+                        if (be instanceof EnergyTransmissionPoleEntity pole &&
                                 player.distanceToSqr(Vec3.atCenterOf(pole.getBlockPos())) < POLE_SEARCH_RADIUS * POLE_SEARCH_RADIUS) {
                             nearbyPoles.add(pole);
                         }

@@ -23,7 +23,7 @@ final class OritechJeiTaintedRefineryBonuses
         super(
                 OritechJeiRecipeTypes.TAINTED_REFINERY_BONUSES,
                 Component.translatable("emi.category.oritech.tainted_refinery_bonuses"),
-                guiHelper.createDrawableItemLike(BlockContent.TAINTED_REFINERY_BLOCK.get()),
+                guiHelper.createDrawableItemLike(BlockContent.TAINTED_REFINERY.get()),
                 160,
                 90
         );

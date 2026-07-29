@@ -213,7 +213,7 @@ public class ToolsContent {
                     return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getEnergyCapacity(), tool.getMaxRFInputRate(), tool.getMaxRFOutputRate());
                 },
                 HAND_DRILL, CHAINSAW, ELECTRIC_MACE, PORTABLE_LASER, EXO_CHESTPLATE,
-                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.SMALL_STORAGE_ITEM
+                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_ENERGY_STORAGE_ITEM
         );
 
         event.registerItem(
@@ -225,7 +225,7 @@ public class ToolsContent {
                     }
                     return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getFluidCapacity());
                 },
-                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.SMALL_TANK_ITEM, ItemContent.CREATIVE_TANK_ITEM
+                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_TANK_ITEM, ItemContent.CREATIVE_TANK_ITEM
         );
 
     }

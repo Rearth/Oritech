@@ -73,8 +73,8 @@ public class PumpBlock extends Block implements EntityBlock, TooltipProvider {
     public InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
 
         if (!level.isClientSide()) {
-            var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP_BLOCK.get());
-            pumpEntity.ifPresent(pumpBlockEntity -> pumpBlockEntity.onUsed(player));
+            var pumpEntity = level.getBlockEntity(pos, BlockEntitiesContent.PUMP.get());
+            pumpEntity.ifPresent(entity -> entity.onUsed(player));
         }
         return InteractionResult.SUCCESS;
     }
@@ -94,7 +94,7 @@ public class PumpBlock extends Block implements EntityBlock, TooltipProvider {
         if (!level.isClientSide()) {
             // break all trunk blocks below
             var checkPos = pos.below();
-            while (level.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK_BLOCK.get())) {
+            while (level.getBlockState(checkPos).getBlock().equals(BlockContent.PUMP_TRUNK.get())) {
                 level.destroyBlock(checkPos, false);
                 checkPos = checkPos.below();
             }

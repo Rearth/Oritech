@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "b": "oritech:industrial_glass_block",
+    "b": "oritech:industrial_glass",
     "p": "#c:plates/plastic",
     "s": "minecraft:yellow_dye"
   },

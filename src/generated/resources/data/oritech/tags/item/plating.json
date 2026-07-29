@@ -1,8 +1,8 @@
 {
   "values": [
-    "oritech:machine_plating_block",
-    "oritech:iron_plating_block",
-    "oritech:carbon_plating_block",
-    "oritech:nickel_plating_block"
+    "oritech:copper_reinforced_plating",
+    "oritech:iron_plating",
+    "oritech:carbon_plating",
+    "oritech:nickel_plating"
   ]
 }

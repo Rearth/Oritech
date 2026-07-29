@@ -22,12 +22,12 @@ import java.util.*;
 public class AcceleratorParticleLogic {
     private final BlockPos pos;
     private final ServerLevel level;
-    private final AcceleratorControllerBlockEntity entity;
+    private final ParticleAcceleratorBlockEntity entity;
 
     private static final Map<CompPair<BlockPos, Vec3i>, BlockPos> cachedGates = new HashMap<>();    // stores the next gate for a combo of source gate and direction
     private static final Map<BlockPos, BlockPos> activeParticles = new HashMap<>(); // stores relations between position of particle -> position of controller
 
-    public AcceleratorParticleLogic(BlockPos pos, ServerLevel level, AcceleratorControllerBlockEntity entity) {
+    public AcceleratorParticleLogic(BlockPos pos, ServerLevel level, ParticleAcceleratorBlockEntity entity) {
         this.pos = pos;
         this.level = level;
         this.entity = entity;
@@ -46,13 +46,13 @@ public class AcceleratorParticleLogic {
         var checkedPositions = new HashSet<BlockPos>();
 
         var foundCollisions = new ArrayList<BlockPos>();
-        Pair<ActiveParticle, AcceleratorControllerBlockEntity> collidedWith = null;
+        Pair<ActiveParticle, ParticleAcceleratorBlockEntity> collidedWith = null;
 
         var availableDistance = particle.velocity * timePassed;
         while (availableDistance > 0.001) {
 
             if (particle.nextGate == null) {
-                exitParticle(particle, new Vec3(0, 0, 0), AcceleratorControllerBlockEntity.ParticleEvent.ERROR);
+                exitParticle(particle, new Vec3(0, 0, 0), ParticleAcceleratorBlockEntity.ParticleEvent.ERROR);
                 return;
             }
 
@@ -93,7 +93,7 @@ public class AcceleratorParticleLogic {
                     if (collidedWith != null) {
                         calculateCollision(particle, foundCollisions, collidedWith);
                     } else {
-                        exitParticle(particle, Vec3.atLowerCornerOf(nextDirection), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_NO_GATE);
+                        exitParticle(particle, Vec3.atLowerCornerOf(nextDirection), ParticleAcceleratorBlockEntity.ParticleEvent.EXITED_NO_GATE);
                     }
                     return;
                 }
@@ -111,7 +111,7 @@ public class AcceleratorParticleLogic {
                         if (collidedWith != null) {
                             calculateCollision(particle, foundCollisions, collidedWith);
                         } else {
-                            exitParticle(particle, Vec3.atLowerCornerOf(particle.nextGate.subtract(particle.lastGate)), AcceleratorControllerBlockEntity.ParticleEvent.EXITED_FAST);
+                            exitParticle(particle, Vec3.atLowerCornerOf(particle.nextGate.subtract(particle.lastGate)), ParticleAcceleratorBlockEntity.ParticleEvent.EXITED_FAST);
                         }
                         return;
                     }
@@ -141,7 +141,7 @@ public class AcceleratorParticleLogic {
         entity.onParticleMoved(renderedTrail);
     }
 
-    private void calculateCollision(ActiveParticle particle, ArrayList<BlockPos> foundCollisions, Pair<ActiveParticle, AcceleratorControllerBlockEntity> collidedWith) {
+    private void calculateCollision(ActiveParticle particle, ArrayList<BlockPos> foundCollisions, Pair<ActiveParticle, ParticleAcceleratorBlockEntity> collidedWith) {
         var even = foundCollisions.size() % 2 == 0;
         Vec3 collisionPoint;
         if (!even) {
@@ -175,7 +175,7 @@ public class AcceleratorParticleLogic {
         particle.velocity = remainingMomentum;
     }
 
-    private void exitParticle(ActiveParticle particle, Vec3 direction, AcceleratorControllerBlockEntity.ParticleEvent reason) {
+    private void exitParticle(ActiveParticle particle, Vec3 direction, ParticleAcceleratorBlockEntity.ParticleEvent reason) {
 
         var exitFrom = particle.position;
 
@@ -216,7 +216,7 @@ public class AcceleratorParticleLogic {
 
     }
 
-    private Optional<Pair<ActiveParticle, AcceleratorControllerBlockEntity>> updateParticleCollision(BlockPos blockPos, List<BlockPos> collisionPositions) {
+    private Optional<Pair<ActiveParticle, ParticleAcceleratorBlockEntity>> updateParticleCollision(BlockPos blockPos, List<BlockPos> collisionPositions) {
 
         var duplicate = !collisionPositions.isEmpty() && collisionPositions.getLast().equals(blockPos);
 
@@ -224,7 +224,7 @@ public class AcceleratorParticleLogic {
             // found collision
             var secondControllerPos = activeParticles.get(blockPos);
 
-            if (!(level.getBlockEntity(secondControllerPos) instanceof AcceleratorControllerBlockEntity secondAccelerator))
+            if (!(level.getBlockEntity(secondControllerPos) instanceof ParticleAcceleratorBlockEntity secondAccelerator))
                 return Optional.empty();
 
             var secondParticle = secondAccelerator.getParticle();

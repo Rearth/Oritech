@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_reactor_vent": {
+    "has_reactor_heat_vent": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:reactor_vent"
+            "items": "oritech:reactor_heat_vent"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_reactor_vent"
+      "has_reactor_heat_vent"
     ]
   ],
   "rewards": {

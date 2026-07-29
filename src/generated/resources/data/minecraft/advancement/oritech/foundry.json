@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": "oritech:foundry_block"
+            "items": "oritech:foundry"
           }
         ]
       },
@@ -18,7 +18,7 @@
       "translate": "advancements.oritech.foundry.description"
     },
     "icon": {
-      "id": "oritech:foundry_block"
+      "id": "oritech:foundry"
     },
     "title": {
       "translate": "advancements.oritech.foundry"

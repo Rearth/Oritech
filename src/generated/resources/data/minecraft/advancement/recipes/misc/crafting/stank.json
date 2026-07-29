@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_small_tank_block": {
+    "has_portable_tank": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:small_tank_block"
+            "items": "oritech:portable_tank"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_small_tank_block"
+      "has_portable_tank"
     ]
   ],
   "rewards": {

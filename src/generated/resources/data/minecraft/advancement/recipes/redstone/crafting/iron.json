@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_iron_plating_block": {
+    "has_iron_plating": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:iron_plating_block"
+            "items": "oritech:iron_plating"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_iron_plating_block"
+      "has_iron_plating"
     ]
   ],
   "rewards": {
