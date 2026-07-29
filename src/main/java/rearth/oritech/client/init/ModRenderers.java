@@ -24,7 +24,7 @@ public class ModRenderers {
         event.registerBlockEntityRenderer(BlockEntitiesContent.POWERED_FURNACE.get(), ctx -> new MachineRenderer<>(ctx, "models/powered_furnace"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY.get(), ctx -> new RefineryRenderer<>(ctx, "models/refinery"));
         event.registerBlockEntityRenderer(BlockEntitiesContent.TAINTED_REFINERY.get(), ctx -> new TaintedRefineryRenderer<>(ctx, "models/tainted_refinery"));
-        event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY_CHAMBER_MODULE.get(), ctx -> new MachineRenderer<>(ctx, "models/refinery_module_block"));
+        event.registerBlockEntityRenderer(BlockEntitiesContent.REFINERY_CHAMBER_MODULE.get(), ctx -> new MachineRenderer<>(ctx, "models/refinery_chamber_module"));
 
         event.registerBlockEntityRenderer(BlockEntitiesContent.CYBERNETIC_AUGMENTATION_CENTER_BLOCK.get(), ctx -> new MachineRenderer<>(ctx, "models/cybernetic_augmentation_center"));
 

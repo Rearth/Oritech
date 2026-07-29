@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/schrodingers_safe",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}
