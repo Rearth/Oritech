@@ -5,4 +5,5 @@
 - Migrate entire processing logic to the new transaction API
 - Player Augmentations now use a custom datapack type, and are no longer recipe driven
 - Schrodingers safe now uses neoforge data maps instead of tags
+- Rename internal classes, types, etc of blocks to reflect their ingame names
 - Tons of other minor improvements
