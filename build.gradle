@@ -4,6 +4,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.141'
     id 'idea'
     id 'org.moddedmc.wiki.toolkit' version '0.4.1'
+    id "me.modmuss50.mod-publish-plugin" version "2.2.0"
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -243,4 +244,55 @@ idea {
 tasks.withType(ProcessResources).configureEach {
     // Tells Gradle to ignore duplicate files rather than crashing
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+publishMods {
+    github {
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        repository = "Rearth/Oritech"
+        commitish = "26.1"
+        tagName = "v${project.version}"
+    }
+
+    file = jar.archiveFile
+    changelog = file("./CHANGELOG.MD").getText()
+    type = ALPHA
+
+    modLoaders.add("neoforge")
+
+    modrinth {
+        accessToken = providers.environmentVariable("MODRINTH_API_KEY")
+        projectId = "4sYI62kA"
+
+        environment = CLIENT_AND_SERVER
+
+        requires("geckolib")
+        requires("athena-ctm")
+        optional("oracle-index")
+
+        announcementTitle = "Neoforge Version on Modrinth"
+
+        minecraftVersions.add("26.1.2")
+        minecraftVersions.add("26.1")
+    }
+
+    curseforge {
+        accessToken = providers.environmentVariable("CURSEFORGE_API_KEY")
+        projectId = "1030830"
+
+        requires("geckolib")
+        requires("athena")
+        optional("oracle-index")
+
+        javaVersions.add(JavaVersion.VERSION_25)
+
+        client = true
+        server = true
+
+        projectSlug = "oritech"
+        announcementTitle = "Neoforge Version on CurseForge"
+
+        minecraftVersions.add("26.1.2")
+        minecraftVersions.add("26.1")
+    }
 }

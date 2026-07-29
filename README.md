@@ -7,7 +7,7 @@
 <h3 align="center">Oritech</h3>
 
 <div align="center">
-  A minecraft fabric / neoforge tech mod.
+  A minecraft neoforge tech mod.
   <br/>
   <br/>
   <a href="https://moddedmc.org/en/mod/oritech/docs"><strong>Explore the docs»</strong></a>
@@ -42,11 +42,9 @@
 ## About The Project
 
 
-An upcoming tech mod for minecraft fabric. Features advanced ore processing, powered tools and armor, and much much more.
+Features advanced ore processing, powered tools and armor, and much much more.
 
 Wiki is available online (https://moddedmc.org/en/mod/oritech/docs) or via the [Oracle Index](https://www.curseforge.com/minecraft/mc-mods/oracle-index) mod.
-
-Currently in very early access, numerous bugs and issues are to be expected.
 
 If you want to contribute, suggest ideas or just see what's planned, make sure to check out the GitHub discussions for this project (https://github.com/Rearth/Oritech/discussions).
 
