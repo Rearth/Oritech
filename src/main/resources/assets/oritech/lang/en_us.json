@@ -586,7 +586,7 @@
   "block.oritech.assembler": "Assembler",
   "block.oritech.tainted_refinery": "Tainted Refinery",
   "block.oritech.refinery": "Refinery",
-  "block.oritech.refinery_module": "Refinery Chamber Module",
+  "block.oritech.refinery_chamber_module": "Refinery Chamber Module",
   "block.oritech.carbon_plating": "Carbon Plating Block",
   "block.oritech.carbon_plating_slab": "Carbon Reinforced Plating Slab",
   "block.oritech.carbon_plating_stairs": "Carbon Reinforced Plating Stairs",
