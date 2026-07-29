@@ -45,7 +45,7 @@ public class SolarPanelRenderer<T extends BigSolarPanelEntity & GeoAnimatable, R
 
         boneSnapshots.ifPresent("pivotZ", snapshot -> {
             var lastAngle = snapshot.getRotZ();
-            var angle = EndericLaserModel.lerp(lastAngle, targetAngle, 0.06f);
+            var angle = EndericLaserModel.lerp(lastAngle, targetAngle * 10, 0.06f);
             snapshot.setRotZ(angle);
         });
     }
