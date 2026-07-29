@@ -87,10 +87,12 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
     @Override
     protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> onHit) {
 
-        // forward explosion to refinery
         if (state.getValue(USED)) {
             var controller = getControllerPos(level, pos);
             var controllerState = level.getBlockState(controller);
+            onBlockRemoved(state, level, pos);
+
+            // forward explosion to refinery
             if (controllerState.getBlock() instanceof RefineryBlock refinery) {
                 refinery.onExplosionHit(controllerState, level, controller, explosion, onHit);
                 return;

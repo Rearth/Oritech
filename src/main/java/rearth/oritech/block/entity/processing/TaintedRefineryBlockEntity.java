@@ -52,6 +52,7 @@ import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 
@@ -230,6 +231,20 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     @Override
     protected OritechRecipeInput getRecipeInput() {
         return new OritechRecipeInput(getInputView(), ownStorage.getInStack());
+    }
+
+    @Override
+    protected OritechRecipe loadRecipeFromInput(ServerLevel serverLevel, OritechRecipeInput recipeInput, RecipeType<OritechRecipe> type) {
+        if (recipeInput.isEmpty()) return OritechRecipe.EMPTY.get();
+
+        if (!currentRecipe.isEmpty() && currentRecipe.recipeType() == type && currentRecipe.matches(recipeInput, level))
+            return currentRecipe;
+
+        return serverLevel.getServer().getRecipeManager().recipeMap()
+                .getRecipesFor(type, recipeInput, level)
+                .max(Comparator.comparingInt(candidate -> candidate.value().itemInputs().size()))
+                .map(candidate -> candidate.value())
+                .orElse(OritechRecipe.EMPTY.get());
     }
 
     public int getEnergyInputMapped(long amount) {

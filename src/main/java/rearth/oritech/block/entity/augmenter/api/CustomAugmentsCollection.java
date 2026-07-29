@@ -7,9 +7,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import rearth.oritech.Oritech;
@@ -20,6 +23,7 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.util.PortalEntity;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,9 +52,9 @@ public class CustomAugmentsCollection {
             if (playerHungerCapacity < 2) return;
 
             var foodStackStream = player.getInventory().getNonEquipmentItems().stream()
-                    .filter(item -> item.has(DataComponents.FOOD) && !item.is(TagContent.FEEDER_BLACKLIST));
+                    .filter(item -> isSafeFeederFood(item, playerHungerCapacity));
             var selectedFood = foodStackStream
-                    .reduce((a, b) -> Math.abs(a.get(DataComponents.FOOD).nutrition() - playerHungerCapacity) <= Math.abs(b.get(DataComponents.FOOD).nutrition() - playerHungerCapacity) ? a : b);
+                    .max(Comparator.comparingInt(item -> item.get(DataComponents.FOOD).nutrition()));
             selectedFood.ifPresent(food -> food.finishUsingItem(player.level(), player));
 
         }
@@ -58,6 +62,21 @@ public class CustomAugmentsCollection {
         @Override
         public int refreshInterval() {
             return 10;
+        }
+
+        private boolean isSafeFeederFood(ItemStack stack, int playerHungerCapacity) {
+            var food = stack.get(DataComponents.FOOD);
+            if (food == null || stack.is(TagContent.FEEDER_BLACKLIST) || food.nutrition() > playerHungerCapacity)
+                return false;
+
+            var consumable = stack.get(DataComponents.CONSUMABLE);
+            if (consumable == null) return true;
+
+            return consumable.onConsumeEffects().stream()
+                    .filter(ApplyStatusEffectsConsumeEffect.class::isInstance)
+                    .map(ApplyStatusEffectsConsumeEffect.class::cast)
+                    .flatMap(effect -> effect.effects().stream())
+                    .noneMatch(effect -> effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL);
         }
     };
 

@@ -183,7 +183,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var level = player.level();
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return;
+        if (!(stack.getItem() instanceof PortableLaserItem laserItem) || !player.mayBuild()) return;
 
         var rfUsage = OritechStartupConfig.portableLaserConfig.energyPerTick.get();
 

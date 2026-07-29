@@ -154,7 +154,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         this.setChanged();
     }
 
-    public void onParticleCollided(float relativeSpeed, Vec3 collision, ParticleAcceleratorBlockEntity secondControllerEntity) {
+    public void onParticleCollided(long relativeSpeed, Vec3 collision, ParticleAcceleratorBlockEntity secondControllerEntity) {
 
         // create end portal area when two ender pearls collide, nether portal for two firecharges
         if (relativeSpeed > OritechConfig.endPortalRequiredSpeed.get() && activeItemParticle.getItem().equals(Items.ENDER_PEARL) && secondControllerEntity.activeItemParticle.getItem().equals(Items.ENDER_PEARL)) {
@@ -211,7 +211,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
 
     }
 
-    private boolean tryCraftResult(float speed, ItemStack inputA, ItemStack inputB) {
+    private boolean tryCraftResult(long speed, ItemStack inputA, ItemStack inputB) {
 
         if (inputA == null || inputA.isEmpty() || inputB == null || inputB.isEmpty() || !(level instanceof ServerLevel serverLevel))
             return false;
@@ -341,7 +341,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
     }
 
     // returns the amount of moment used
-    public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, LivingEntity mob) {
+    public float handleParticleEntityCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, long remainingMomentum, LivingEntity mob) {
 
         var maxApplicableDamage = mob.getHealth();
         var inflictedDamage = Math.min(remainingMomentum, maxApplicableDamage);
@@ -354,7 +354,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         return inflictedDamage;
     }
 
-    public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, float remainingMomentum, BlockState hitState) {
+    public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, long remainingMomentum, BlockState hitState) {
 
         var blockHardness = hitState.getDestroySpeed(level, checkPos);
 
@@ -521,7 +521,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
     public record LastEventPacket(BlockPos position,
                                   ParticleEvent lastEvent,
                                   // for no gate found events, we can calculate the acceptable dist based on speed
-                                  float lastEventSpeed,
+                                  long lastEventSpeed,
                                   // this is particle speed usually, and collision speed for collisions
                                   BlockPos lastEventPosition,  // where it collided/exited
                                   float minBendDist,   // acceptable dist can be calculated from dist

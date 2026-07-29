@@ -8,10 +8,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.SliderWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.api.screen.widgets.TextureWidget;
 import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
@@ -27,8 +29,11 @@ import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
+
+    private static final int WARNING_THRESHOLD_SLIDER_MAX = 3000;
 
     private LabelWidget productionLabel;
     private LabelWidget hottestLabel;
@@ -51,6 +56,7 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         addComponent(previewWidget);
         addStatsPanel();
         addStatusPanel();
+        addWarningThresholdSlider();
         addEnergyBar();
 
         var title = new LabelWidget(0, 4, imageWidth, 10, menu.reactorEntity.getBlockState().getBlock().getName());
@@ -82,11 +88,37 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
     private void addStatusPanel() {
-        statusLabel = new LabelWidget(183, 80, 87, 10, Component.translatable("text.oritech.reactor.idle").withStyle(ChatFormatting.BOLD));
+        statusLabel = new LabelWidget(183, 80, 101, 10, Component.translatable("text.oritech.reactor.idle").withStyle(ChatFormatting.BOLD));
         statusLabel.withAlignment(LabelWidget.Alignment.CENTER);
         statusLabel.withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(6, 0, 4, 0));
         statusLabel.withBrightColor();
         addComponent(statusLabel);
+    }
+
+    private void addWarningThresholdSlider() {
+        var panel = new SurfaceWidget(183, 104, 101, 44);
+        panel.withSurface(OritechSurface.PANEL_INSET);
+        panel.withZIndex(-8);
+        addComponent(panel);
+
+        var label = new LabelWidget(189, 108, 89, 10, Component.translatable("label.oritech.reactor.warning_threshold"));
+        label.withBrightColor();
+        addComponent(label);
+
+        var initialThreshold = Math.min(menu.reactorEntity.warningHeatThreshold, WARNING_THRESHOLD_SLIDER_MAX);
+        var slider = new SliderWidget(189, 120, 89, SliderWidget.Orientation.HORIZONTAL,
+                SliderWidget.ValueLabelPosition.END, null,
+                0, WARNING_THRESHOLD_SLIDER_MAX, initialThreshold, this::onWarningThresholdChanged)
+                .withTextColor(LabelWidget.BRIGHT_TEXT)
+                .withSnapValues(createNiceHeatSteps(WARNING_THRESHOLD_SLIDER_MAX))
+                .withValueFormatter(value -> Component.literal(value + " °C"));
+
+        addComponent(slider);
+    }
+
+    private void onWarningThresholdChanged(SliderWidget slider, int value) {
+        menu.reactorEntity.warningHeatThreshold = value;
+        ClientPacketDistributor.sendToServer(new NuclearReactorControllerBlockEntity.WarningThresholdPacket(menu.reactorEntity.getBlockPos(), value));
     }
 
     private void addEnergyBar() {
@@ -164,6 +196,26 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
 
         energyIndicator.withTooltip(Component.translatable("tooltip.oritech.energy_indicator", TooltipHelper.getEnergyText(amount), TooltipHelper.getEnergyText(capacity)));
         energyIndicator.setVisibleArea(0, 108 - (int) (108 * fillAmount), 36, (int) (108 * fillAmount));
+    }
+
+    private static int[] createNiceHeatSteps(int maxValue) {
+        var values = new TreeSet<Integer>();
+        values.add(0);
+        values.add(maxValue);
+
+        for (int value = 50; value < 1800 && value <= maxValue; value += 50) {
+            values.add(value);
+        }
+
+        for (int value = 1800; value <= 2200 && value <= maxValue; value += 25) {
+            values.add(value);
+        }
+
+        for (int value = 2250; value <= maxValue; value += 50) {
+            values.add(value);
+        }
+
+        return values.stream().mapToInt(Integer::intValue).toArray();
     }
 
     private List<Component> getStatsTooltip(BlockPos pos, BlockState state) {

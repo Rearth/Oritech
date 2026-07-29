@@ -218,7 +218,10 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
         if (!bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) || !bookCandidate.has(DataComponents.STORED_ENCHANTMENTS))
             return;
 
-        var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
+        var enchantmentData = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS);
+        if (enchantmentData == null || enchantmentData.isEmpty()) return;
+
+        var enchantment = enchantmentData.keySet().stream().findFirst().orElseThrow();
 
         var inputStack = inventory.getStacks().get(1);
         var toolLevel = inputStack.getTagEnchantments().getLevel(enchantment);
@@ -251,9 +254,12 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
 
         if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.has(DataComponents.STORED_ENCHANTMENTS)) {
 
-            var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
+            var enchantmentData = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS);
+            if (enchantmentData == null || enchantmentData.isEmpty()) return 0;
+
+            var enchantment = enchantmentData.keySet().stream().findFirst().orElseThrow();
             var maxLevel = enchantment.value().getMaxLevel();
-            var bookLevel = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
+            var bookLevel = enchantmentData.getLevel(enchantment);
 
             if (bookLevel != maxLevel) return 0;
 
@@ -274,9 +280,12 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
         var bookCandidate = inventory.getItem(0);
         if (bookCandidate.getItem().equals(Items.ENCHANTED_BOOK) && bookCandidate.has(DataComponents.STORED_ENCHANTMENTS)) {
 
-            var enchantment = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).keySet().stream().findFirst().get();
+            var enchantmentData = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS);
+            if (enchantmentData == null || enchantmentData.isEmpty()) return false;
+
+            var enchantment = enchantmentData.keySet().stream().findFirst().orElseThrow();
             var maxLevel = enchantment.value().getMaxLevel();
-            var level = bookCandidate.get(DataComponents.STORED_ENCHANTMENTS).getLevel(enchantment);
+            var level = enchantmentData.getLevel(enchantment);
 
             if (enchantment.is(TagContent.CATALYST_ENCHANTMENT_BLACKLIST)) return false;
 

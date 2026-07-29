@@ -40,6 +40,7 @@ import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
 import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
+import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -107,6 +108,7 @@ public class NetworkManager {
         registrar.playToServer(OritechScreenHandler.FluidContainerInteractionPacket.PACKET_ID, getAutoCodec(OritechScreenHandler.FluidContainerInteractionPacket.class), OritechScreenHandler::handleFluidContainerInteraction);
         registrar.playToServer(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.PACKET_ID, getAutoCodec(TaintedRefineryBlockEntity.RefineryTankSelectorPacket.class), TaintedRefineryBlockEntity::handleTankPacket);
         registrar.playToServer(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.PACKET_ID, getAutoCodec(ExpandableEnergyStorageBlockEntity.StorageLimitPacket.class), ExpandableEnergyStorageBlockEntity::handleLimitPacket);
+        registrar.playToServer(NuclearReactorControllerBlockEntity.WarningThresholdPacket.PACKET_ID, getAutoCodec(NuclearReactorControllerBlockEntity.WarningThresholdPacket.class), NuclearReactorControllerBlockEntity::handleWarningThresholdPacket);
 
     }
 
