@@ -1,9 +1,0 @@
-- Update to 26.1.2
-- Mod is no longer multiplatform, its now neoforge only
-- Architectury API is no longer required
-- Rewrote everything to use neoforge-native events and methods where applicable
-- Migrate entire processing logic to the new transaction API
-- Player Augmentations now use a custom datapack type, and are no longer recipe driven
-- Schrodingers safe now uses neoforge data maps instead of tags
-- Rename internal classes, types, etc of blocks to reflect their ingame names
-- Tons of other minor improvements
