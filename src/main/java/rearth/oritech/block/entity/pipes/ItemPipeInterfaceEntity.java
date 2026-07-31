@@ -78,7 +78,6 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         refreshTargetCaches(level, targets);
 
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
-        // var hasMotor = state.getValue(ItemPipeConnectionBlock.HAS_MOTOR);   // todo benchmark / decide if motor needs to be kept
 
         // do the whole thing for each direction (neighboring item container) items are taken from (usually just 1, but could be multiple)
         // tries to extract from each side (for each slot on that source machine) and then tries to insert it to any matching containers
