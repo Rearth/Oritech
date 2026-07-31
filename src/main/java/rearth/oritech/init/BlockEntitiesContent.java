@@ -26,6 +26,7 @@ import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.FluidPipeInterfaceEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
+import rearth.oritech.block.entity.pipes.SmartSplitterBlockEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
@@ -230,6 +231,8 @@ public class BlockEntitiesContent {
     public static final Supplier<BlockEntityType<ItemPipeInterfaceEntity>> ITEM_PIPE = BLOCK_ENTITY_TYPES.register("item_pipe", () -> new BlockEntityType<>(ItemPipeInterfaceEntity::new, BlockContent.ITEM_PIPE_CONNECTION.get(), BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get()));
     @AssignSidedInventory
     public static final Supplier<BlockEntityType<ItemFilterBlockEntity>> ITEM_FILTER = BLOCK_ENTITY_TYPES.register("item_filter", () -> new BlockEntityType<>(ItemFilterBlockEntity::new, BlockContent.ITEM_FILTER.get()));
+    @AssignSidedInventory
+    public static final Supplier<BlockEntityType<SmartSplitterBlockEntity>> SMART_SPLITTER = BLOCK_ENTITY_TYPES.register("smart_splitter", () -> new BlockEntityType<>(SmartSplitterBlockEntity::new, BlockContent.SMART_SPLITTER.get()));
 
     @AssignSidedEnergy
     public static final Supplier<BlockEntityType<EnergyTransmissionPoleEntity>> ENERGY_TRANSMISSION_POLE = BLOCK_ENTITY_TYPES.register("energy_transmission_pole", () -> new BlockEntityType<>(EnergyTransmissionPoleEntity::new, BlockContent.ENERGY_TRANSMISSION_POLE.get()));

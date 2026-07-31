@@ -16,6 +16,7 @@
     "oritech:framed_item_pipe",
     "oritech:item_pipe_duct",
     "oritech:item_filter",
+    "oritech:smart_splitter",
     "oritech:fluid_pipe_connection",
     "oritech:framed_fluid_pipe_connection",
     "oritech:energy_pipe_connection",
