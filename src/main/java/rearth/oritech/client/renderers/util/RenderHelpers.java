@@ -1,11 +1,12 @@
 package rearth.oritech.client.renderers.util;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
@@ -16,9 +17,13 @@ public class RenderHelpers {
     public static final int FULL_BRIGHT = 15728880;
 
 
-    public static void ExtractStateModels(List<BlockStateModelPart> list, BlockStateModel modelSet, ClientLevel level, BlockPos blockEntity, BlockState innerState) {
+    public static void ExtractStateModels(List<BlockStateModelPart> list, BlockStateModel modelSet, Level level, BlockPos blockEntity, BlockState innerState) {
         list.clear();
-        modelSet.collectParts(level, blockEntity, innerState, level.getRandom(), list);
+        if (level instanceof BlockAndTintGetter blockAndTintGetter) {
+            modelSet.collectParts(blockAndTintGetter, blockEntity, innerState, level.getRandom(), list);
+        } else {
+            modelSet.collectParts(level.getRandom(), list);
+        }
     }
 
     /**

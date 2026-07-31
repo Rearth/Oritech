@@ -3,7 +3,6 @@ package rearth.oritech.client.renderers.blocks;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
@@ -46,7 +45,9 @@ public class BlackHoleRenderer implements BlockEntityRenderer<BlackHoleBlockEnti
     public void extractRenderState(BlackHoleBlockEntity blockEntity, BlackHoleRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
 
-        var level = (ClientLevel) blockEntity.getLevel();
+        var level = blockEntity.getLevel();
+        if (level == null) return;
+
         var time = level.getGameTime();
         var renderTime = time + (double) partialTicks;
         state.gameTime = (float) renderTime;
