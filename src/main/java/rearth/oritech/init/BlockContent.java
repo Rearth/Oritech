@@ -35,6 +35,7 @@ import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
+import rearth.oritech.block.blocks.pipes.item.SmartSplitterBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
@@ -79,6 +80,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> FRAMED_ITEM_PIPE = BLOCKS.registerBlock("framed_item_pipe", ItemPipeBlock.FramedItemPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final DeferredBlock<Block> ITEM_PIPE_DUCT = BLOCKS.registerBlock("item_pipe_duct", ItemPipeDuctBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     public static final DeferredBlock<Block> ITEM_FILTER = BLOCKS.registerBlock("item_filter", ItemFilterBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+    public static final DeferredBlock<Block> SMART_SPLITTER = BLOCKS.registerBlock("smart_splitter", SmartSplitterBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).strength(1.0f, 2.0f));
 
     @NoBlockItem
     public static final DeferredBlock<Block> FLUID_PIPE_CONNECTION = BLOCKS.registerBlock("fluid_pipe_connection", FluidPipeConnectionBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
