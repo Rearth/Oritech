@@ -29,7 +29,7 @@ public class AdvancementGenerator implements AdvancementSubProvider {
 
         HolderGetter<Block> blocks = registryLookup.lookupOrThrow(Registries.BLOCK);
 
-        var background = Identifier.parse("textures/gui/advancements/backgrounds/adventure.png");
+        var background = Identifier.parse("gui/advancements/backgrounds/adventure");
         
         var rootAdvancement = Advancement.Builder.advancement()
                                 .display(

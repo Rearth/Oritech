@@ -13,7 +13,7 @@
     }
   },
   "display": {
-    "background": "minecraft:textures/gui/advancements/backgrounds/adventure.png",
+    "background": "minecraft:gui/advancements/backgrounds/adventure",
     "description": {
       "translate": "advancements.oritech.pulverizer.description"
     },
