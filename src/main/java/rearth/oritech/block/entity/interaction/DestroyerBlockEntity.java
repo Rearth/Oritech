@@ -252,7 +252,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
-        var fortuneEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.FORTUNE);
+        var fortuneEntry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE);
         sampleTool.enchant(fortuneEntry, Math.min(yieldAddons, 3));
 
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
@@ -266,7 +266,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     public static List<ItemStack> getSilkTouchDrops(BlockState state, ServerLevel level, BlockPos pos, @Nullable BlockEntity blockEntity, @Nullable Player entity) {
         var sampleTool = new ItemStack(Items.NETHERITE_PICKAXE);
         sampleTool.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
-        var silkTouchEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.SILK_TOUCH);
+        var silkTouchEntry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH);
         sampleTool.enchant(silkTouchEntry, 1);
 
         var builder = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))

@@ -299,7 +299,7 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
         if (hunterAddons > 0 && yieldAddons > 0) {
             var lootingSword = new ItemStack(Items.NETHERITE_SWORD);
             lootingSword.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
-            var lootingEntry = level.registryAccess().getOrThrow(Registries.ENCHANTMENT).value().getOrThrow(Enchantments.LOOTING);
+            var lootingEntry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.LOOTING);
             lootingSword.enchant(lootingEntry, Math.min(yieldAddons, 3));
             laserPlayerEntity.getInventory().setSelectedItem(lootingSword);
         }
