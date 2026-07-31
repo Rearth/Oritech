@@ -179,7 +179,6 @@ public class ItemContent {
         Groups value();
     }
 
-    // todo (both here and in blockcontent)
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface Compostable {

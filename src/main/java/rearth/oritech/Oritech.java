@@ -48,9 +48,6 @@ import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.util.LaserMachinePlayer;
 import rearth.oritech.util.ServerZiplineHandler;
 
-// todos: compostables
-
-
 @Mod(Oritech.MOD_ID)
 public final class Oritech {
 
@@ -132,6 +129,7 @@ public final class Oritech {
 
             EndericLaserBlockBehavior.registerDefaults();
             EndericLaserEntityBehavior.registerDefaults();
+            BlockContent.registerDispenserBehaviors();
         });
 
 

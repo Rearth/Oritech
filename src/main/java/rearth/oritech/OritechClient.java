@@ -36,6 +36,7 @@ import rearth.oritech.datagen.AdvancementGenerator;
 import rearth.oritech.datagen.BlockLootGenerator;
 import rearth.oritech.datagen.GeoItemModelGenerator;
 import rearth.oritech.datagen.ModelGenerator;
+import rearth.oritech.datagen.OritechDataMapProvider;
 import rearth.oritech.datagen.RecipeGenerator;
 import rearth.oritech.datagen.builders.OritechAugmentDataGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
@@ -100,6 +101,7 @@ public final class OritechClient {
         event.createProvider(ItemTagGenerator::new);
         event.createProvider(FluidTagGenerator::new);
         event.createProvider(EntityTagGenerator::new);
+        event.createProvider(OritechDataMapProvider::new);
 
         var generator = event.getGenerator();
         var packOutput = generator.getPackOutput();

@@ -1,5 +1,6 @@
 package rearth.oritech.init;
 
+import net.minecraft.core.dispenser.ShulkerBoxDispenseBehavior;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -515,6 +516,22 @@ public class BlockContent {
         );
     }
 
+    @SuppressWarnings("unchecked")
+    public static void registerDispenserBehaviors() {
+        RegistryReflectionUtil.IterateFields(
+                BlockContent.class,
+                DeferredBlock.class,
+                (field, identifier, value) -> {
+                    if (field.isAnnotationPresent(DispenserPlace.class)) {
+                        DispenserBlock.registerBehavior(
+                                ((DeferredBlock<Block>) value).value(),
+                                new ShulkerBoxDispenseBehavior()
+                        );
+                    }
+                }
+        );
+    }
+
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface UseGeoBlockItem {
@@ -534,8 +551,6 @@ public class BlockContent {
     public @interface NoAutoDrop {
     }
 
-    // todo
-    //  DispenserBlock.registerBehavior(value, new ShulkerBoxDispenseBehavior());
     @Retention(RetentionPolicy.RUNTIME)
     @Target({ElementType.FIELD})
     public @interface DispenserPlace {

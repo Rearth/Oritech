@@ -1,0 +1,16 @@
+{
+  "values": {
+    "oritech:banana": {
+      "chance": 0.65
+    },
+    "oritech:biomass": {
+      "chance": 0.3
+    },
+    "oritech:biomass_block": {
+      "chance": 1.0
+    },
+    "oritech:packed_wheat": {
+      "chance": 1.0
+    }
+  }
+}
