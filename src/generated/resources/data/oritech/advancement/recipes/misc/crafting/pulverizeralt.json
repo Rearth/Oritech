@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_pulverizer": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:pulverizer"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/pulverizeralt"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_pulverizer"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/pulverizeralt"
+    ]
+  }
+}

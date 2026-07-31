@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/tree_cutter"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_tree_cutter": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:tree_cutter"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tree_cutter"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/tree_cutter"
+    ]
+  }
+}

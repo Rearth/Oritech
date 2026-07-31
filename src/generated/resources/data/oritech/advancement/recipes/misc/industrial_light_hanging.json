@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_industrial_light_hanging": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:industrial_light_hanging"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:industrial_light_hanging"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_industrial_light_hanging"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:industrial_light_hanging"
+    ]
+  }
+}

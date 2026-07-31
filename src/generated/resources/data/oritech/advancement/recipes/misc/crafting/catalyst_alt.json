@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_arcane_catalyst": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:arcane_catalyst"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/catalyst_alt"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_arcane_catalyst"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/catalyst_alt"
+    ]
+  }
+}

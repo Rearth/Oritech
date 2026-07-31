@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_packed_wheat": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:packed_wheat"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/wheat_from_unpacking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_packed_wheat"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/wheat_from_unpacking"
+    ]
+  }
+}

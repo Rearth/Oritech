@@ -3,8 +3,10 @@ package rearth.oritech.datagen;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -14,6 +16,7 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import rearth.oritech.Oritech;
 import rearth.oritech.datagen.builders.*;
 import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.*;
@@ -44,6 +47,10 @@ public class RecipeGenerator extends RecipeProvider {
 
     public RecipeGenerator(HolderLookup.Provider registries, RecipeOutput output) {
         super(registries, output);
+    }
+
+    private static ResourceKey<Recipe<?>> recipeKey(String path) {
+        return ResourceKey.create(Registries.RECIPE, Oritech.id(path));
     }
 
     @Override
@@ -101,7 +108,7 @@ public class RecipeGenerator extends RecipeProvider {
         // centrifuge dirt into clay
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
-        this.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, "dirt_from_sand_and_biomass");
+        this.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, recipeKey("dirt_from_sand_and_biomass"));
         // dripstone from dripstone block
         new PulverizerRecipeBuilder(this.registries).input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
@@ -398,7 +405,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("sss")
                 .pattern("sms")
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
-                .save(exporter, "crafting/hangardoor");
+                .save(exporter);
         // metal beam
         offerRotatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.INDUSTRIAL_SUPPORT_BEAM.asItem(), 6), of(TagContent.CARBON_FIBRE), of(TagContent.STEEL_INGOTS), "metalbeams");
         // metal girder
@@ -752,7 +759,7 @@ public class RecipeGenerator extends RecipeProvider {
             SimpleCookingRecipeBuilder.generic(Ingredient.of(itemConvertible), category, CookingBookCategory.MISC, output, experience, cookingTime, recipeFactory)
                     .group(group)
                     .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(itemConvertible))
-                    .save(exporter, outputName + suffix + "_" + inputName);
+                    .save(exporter, recipeKey(outputName + suffix + "_" + inputName));
         }
     }
 
@@ -762,7 +769,7 @@ public class RecipeGenerator extends RecipeProvider {
         ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 9)
                 .requires(packed)
                 .unlockedBy("has_" + outputName, InventoryChangeTrigger.TriggerInstance.hasItems(packed))
-                .save(exporter, "crafting/" + inputName + "_from_unpacking");
+                .save(exporter, recipeKey("crafting/" + inputName + "_from_unpacking"));
 
         ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
                 .define('#', unpacked)
@@ -770,7 +777,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("###")
                 .pattern("###")
                 .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
-                .save(exporter, "crafting/" + outputName + "_from_packing");
+                .save(exporter, recipeKey("crafting/" + outputName + "_from_packing"));
     }
 
     public static void twoByTwoPacker(RecipeOutput exporter, RecipeCategory category, ItemLike packed, ItemLike unpacked) {
@@ -779,14 +786,14 @@ public class RecipeGenerator extends RecipeProvider {
         ShapelessRecipeBuilder.shapeless(BuiltInRegistries.ITEM, category, unpacked, 4)
                 .requires(packed)
                 .unlockedBy("has_" + outputName, InventoryChangeTrigger.TriggerInstance.hasItems(packed))
-                .save(exporter, "crafting/" + inputName + "_from_unpacking");
+                .save(exporter, recipeKey("crafting/" + inputName + "_from_unpacking"));
 
         ShapedRecipeBuilder.shaped(BuiltInRegistries.ITEM, category, packed)
                 .define('#', unpacked)
                 .pattern("##")
                 .pattern("##")
                 .unlockedBy("has_" + inputName, InventoryChangeTrigger.TriggerInstance.hasItems(unpacked))
-                .save(exporter, "crafting/" + outputName + "_from_packing");
+                .save(exporter, recipeKey("crafting/" + outputName + "_from_packing"));
     }
 
     private void addOreChains(RecipeOutput exporter) {
@@ -1055,7 +1062,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .shapeless(RecipeCategory.MISC, resItem, 9)
                 .requires(blockIng)
                 .unlockedBy(getHasName(resBlock), has(resBlock))
-                .save(exporter, RecipeProvider.getSimpleRecipeName(resBlock) + "blockinv");
+                .save(exporter, recipeKey(RecipeProvider.getSimpleRecipeName(resBlock) + "blockinv"));
         this
                 .shaped(RecipeCategory.MISC, resBlock)
                 .define('#', itemIng)
@@ -1063,43 +1070,43 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("###")
                 .pattern("###")
                 .unlockedBy(getHasName(resItem), has(resItem))
-                .save(exporter, RecipeProvider.getSimpleRecipeName(resBlock) + "block");
+                .save(exporter, recipeKey(RecipeProvider.getSimpleRecipeName(resBlock) + "block"));
     }
 
     // crafting shapes
     public void offerCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
         var item = output.item().value();
-        createCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+        createCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerInsulatedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.item().value();
-        createInsulatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+        createInsulatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter);
     }
 
     public void offerRotatedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, Ingredient insulation, String suffix) {
         var item = output.item().value();
-        createRotatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/" + suffix);
+        createRotatedCableRecipe(RecipeCategory.MISC, item, output.count(), input, insulation).unlockedBy(getHasName(item), has(item)).save(exporter);
     }
 
     public void offerFramedCableRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
         var item = output.item().value();
-        createFramedCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/frame_" + suffix);
+        createFramedCableRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter);
     }
 
     public void offerCableFromFrameRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient frame, String suffix) {
         var item = output.item().value();
-        this.shapeless(RecipeCategory.MISC, item, output.count()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/unframe_" + suffix);
+        this.shapeless(RecipeCategory.MISC, item, output.count()).requires(frame).unlockedBy(getHasName(item), has(item)).save(exporter, recipeKey("crafting/unframe_" + suffix));
     }
 
     public void offerCableDuctRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient input, String suffix) {
         var item = output.item().value();
-        createCableDuctRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter, "crafting/duct_" + suffix);
+        createCableDuctRecipe(RecipeCategory.MISC, item, output.count(), input).unlockedBy(getHasName(item), has(item)).save(exporter);
     }
 
     public void offerCableFromDuctRecipe(RecipeOutput exporter, ItemStackTemplate output, Ingredient duct, String suffix) {
         var item = output.item().value();
-        this.shapeless(RecipeCategory.MISC, output).requires(duct).unlockedBy("has_" + suffix, this.has(item)).save(exporter, "crafting/unduct_" + suffix);
+        this.shapeless(RecipeCategory.MISC, output).requires(duct).unlockedBy("has_" + suffix, this.has(item)).save(exporter, recipeKey("crafting/unduct_" + suffix));
     }
 
     public RecipeBuilder createCableRecipe(RecipeCategory category, Item output, int count, Ingredient input) {
@@ -1116,7 +1123,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     public void offerMotorRecipe(RecipeOutput exporter, Item output, Ingredient shaft, Ingredient core, Ingredient wall, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, 1).define('s', shaft).define('c', core).define('w', wall).pattern(" s ").pattern("wcw").pattern("wcw");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "motor/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
@@ -1125,7 +1132,7 @@ public class RecipeGenerator extends RecipeProvider {
 
     public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, count).define('a', A).define('b', B).pattern("aa ").pattern("bb ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/alloy/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {
@@ -1133,7 +1140,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("fff")
                 .pattern("fcf")
                 .pattern("sbs");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerFurnaceRecipe(RecipeOutput exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix) {
@@ -1141,7 +1148,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("fff")
                 .pattern("mcm")
                 .pattern("sbs");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerEnergyTransmissionPoleRecipe(RecipeOutput exporter, Item output, Ingredient coil, Ingredient sides, Ingredient inner, Ingredient base, String suffix) {
@@ -1149,7 +1156,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("c c")
                 .pattern("sis")
                 .pattern("bbb");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerAtomicForgeRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient middleSides, Ingredient core, Ingredient top, Ingredient frame, String suffix) {
@@ -1157,7 +1164,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("fsf")
                 .pattern("mcm")
                 .pattern("bbb");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerBatteryRecipe(RecipeOutput exporter, Item output, Ingredient inner, Ingredient sides, Ingredient top, String suffix) {
@@ -1165,7 +1172,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" t ")
                 .pattern("fcf")
                 .pattern("fcf");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerMachineFrameRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient alt, int count, String suffix) {
@@ -1173,7 +1180,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" s ")
                 .pattern("csc")
                 .pattern(" s ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerMachineCoreRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient alt, String suffix) {
@@ -1185,7 +1192,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("sss")
                 .pattern("scs")
                 .pattern("sss");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerManualFluidApplication(RecipeOutput exporter, Item output, Ingredient fluid, Ingredient base, String suffix) {
@@ -1197,7 +1204,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("bb ")
                 .pattern("bf ")
                 .pattern("   ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerPaintRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient plate, String suffix) {
@@ -1205,7 +1212,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" s ")
                 .pattern("pbp")
                 .pattern(" s ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerBeadsRecipe(RecipeOutput exporter, Item output, int count, Ingredient fluid, Ingredient base, Ingredient catalyst, String suffix) {
@@ -1213,7 +1220,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("bb ")
                 .pattern("cf ")
                 .pattern("   ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerDrillRecipe(RecipeOutput exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {
@@ -1221,7 +1228,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" a ")
                 .pattern("aea")
                 .pattern("mss");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerWrenchRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
@@ -1229,7 +1236,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" a ")
                 .pattern(" ba")
                 .pattern("a  ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerChainsawRecipe(RecipeOutput exporter, Item output, Ingredient core, Ingredient motor, Ingredient center, Ingredient head, String suffix) {
@@ -1237,7 +1244,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("aa ")
                 .pattern("ae ")
                 .pattern("mss");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerAxeRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1245,7 +1252,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("pp ")
                 .pattern("pc ")
                 .pattern(" c ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerPickaxeRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1253,7 +1260,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("ppp")
                 .pattern(" c ")
                 .pattern(" c ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerHelmetRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1261,7 +1268,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("ppp")
                 .pattern("pcp")
                 .pattern("   ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerChestplateRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1269,7 +1276,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("p p")
                 .pattern("ppp")
                 .pattern("pcp");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerLegsRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1277,7 +1284,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("ppp")
                 .pattern("pcp")
                 .pattern("p p");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerFeetRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, String suffix) {
@@ -1285,7 +1292,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("   ")
                 .pattern("p p")
                 .pattern("c c");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerRodRecipe(RecipeOutput exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
@@ -1293,7 +1300,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" c ")
                 .pattern(" r ")
                 .pattern(" r ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerRodCombinationRecipe(RecipeOutput exporter, Item output, Ingredient cap, Ingredient rod, String suffix) {
@@ -1301,7 +1308,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("   ")
                 .pattern("rcr")
                 .pattern("   ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerStarRecipe(RecipeOutput exporter, Item output, Ingredient inner, Ingredient outer, String suffix) {
@@ -1309,7 +1316,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" o ")
                 .pattern("oco")
                 .pattern(" o ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerTankRecipe(RecipeOutput exporter, Item output, Ingredient plating, Ingredient core, Ingredient sides, String suffix) {
@@ -1321,20 +1328,20 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("ppp")
                 .pattern("scs")
                 .pattern("ppp");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerTwoComponentRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, 1).define('a', A).define('b', B)
                 .pattern("ab ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerLeverRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, 1).define('a', A).define('b', B)
                 .pattern("a  ")
                 .pattern("b  ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerParticleMotorRecipe(RecipeOutput exporter, Item output, Ingredient rail, Ingredient top, Ingredient baseInner, Ingredient baseOuter, String suffix) {
@@ -1342,7 +1349,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern(" t ")
                 .pattern("rrr")
                 .pattern("oio");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerCopperReinforcedPlatingRecipe(RecipeOutput exporter, Item output, Ingredient side, Ingredient edge, Ingredient core, int count, String suffix) {
@@ -1350,7 +1357,7 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("eae")
                 .pattern("aca")
                 .pattern("eae");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerDoorRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
@@ -1358,13 +1365,13 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("aa ")
                 .pattern("aa ")
                 .pattern("aa ");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerSlabRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
         var builder = this.shaped(RecipeCategory.BUILDING_BLOCKS, output, 6).define('a', A)
                 .pattern("aaa");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/slab/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerStairsRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
@@ -1372,13 +1379,13 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("a  ")
                 .pattern("aa ")
                 .pattern("aaa");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/stairs/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     public void offerPressurePlateRecipe(RecipeOutput exporter, Item output, Ingredient A, String suffix) {
         var builder = this.shaped(RecipeCategory.REDSTONE, output, 1).define('a', A)
                 .pattern("aa");
-        builder.unlockedBy(getHasName(output), has(output)).save(exporter, "crafting/pressureplate/" + suffix);
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter);
     }
 
     private Ingredient of(TagKey<Item> item) {

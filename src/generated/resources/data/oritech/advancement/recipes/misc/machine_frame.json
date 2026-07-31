@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_machine_frame": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:machine_frame"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:machine_frame"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_machine_frame"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:machine_frame"
+    ]
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_auxiliary_processing_chamber_addon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:auxiliary_processing_chamber_addon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/addon/processingalt"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_auxiliary_processing_chamber_addon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/addon/processingalt"
+    ]
+  }
+}

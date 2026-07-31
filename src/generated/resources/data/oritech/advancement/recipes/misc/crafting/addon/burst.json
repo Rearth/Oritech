@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_machine_burst_addon": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:machine_burst_addon"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/addon/burst"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_machine_burst_addon"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/addon/burst"
+    ]
+  }
+}

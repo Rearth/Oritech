@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_tachyon_absorber": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:tachyon_absorber"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:tachyon_absorber"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_tachyon_absorber"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:tachyon_absorber"
+    ]
+  }
+}

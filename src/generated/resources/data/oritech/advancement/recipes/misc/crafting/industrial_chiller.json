@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_industrial_chiller": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:industrial_chiller"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/industrial_chiller"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_industrial_chiller"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/industrial_chiller"
+    ]
+  }
+}

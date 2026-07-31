@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cybernetic_augmentation_center": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:cybernetic_augmentation_center"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:crafting/augment/applicator"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_cybernetic_augmentation_center"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:crafting/augment/applicator"
+    ]
+  }
+}

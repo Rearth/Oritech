@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_biomass": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:fuels/bio"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:dirt_from_sand_and_biomass"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_biomass"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:dirt_from_sand_and_biomass"
+    ]
+  }
+}
