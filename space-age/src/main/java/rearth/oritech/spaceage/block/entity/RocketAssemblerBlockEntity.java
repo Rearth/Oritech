@@ -9,8 +9,11 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class RocketAssemblerBlockEntity extends BlockEntity {
 
@@ -51,13 +54,11 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
 
         var startSegment = segmentFloodFill(start);
-        var couplingsValid = segmentCouplingsValid(startSegment);
 
-        var segments = new HashSet<RocketFloodSegment>();
-        segments.add(startSegment);
+        var segments = new HashMap<UUID, RocketFloodSegment>();
+        segments.put(startSegment.id, startSegment);
 
         var openCouplings = new ArrayList<>(startSegment.couplings().stream().map(FoundCoupling::oppositeSide).toList());
-        startSegment.couplings().forEach(coupling -> openCouplings.add(coupling.oppositeSide()));
 
         var limit = 60;
 
@@ -66,12 +67,13 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             var candidate = openCouplings.removeFirst();
 
             // check if candidate is in another segment already (e.g. the second coupling connecting to this, or a coupling checked from the other side
-            var alreadyConnected = segments.stream().anyMatch(segment -> segment.blocks.stream().anyMatch(foundBlock -> foundBlock.pos.equals(candidate)));
+            var alreadyConnected = segments.values().stream().anyMatch(segment -> segment.blocks.stream().anyMatch(foundBlock -> foundBlock.pos.equals(candidate)));
             if (alreadyConnected) continue;
 
             var segment = segmentFloodFill(candidate);
+            if (segment.blocks.isEmpty()) continue;
 
-            segments.add(segment);
+            segments.put(segment.id, segment);
 
             for (var coupling : segment.couplings) {
                 openCouplings.add(coupling.oppositeSide());
@@ -81,12 +83,39 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         System.out.println("Segments: " + segments.size());
 
-        for (var segment : segments) {
+        connectRocketSegments(segments);
+
+        for (var segment : segments.values()) {
             System.out.println(segment);
             System.out.println("block count: " + segment.blocks.size() + " couplings: " + segment.couplings.size());
-            System.out.println("couplings okay: " + segment);
+            System.out.println("connected segment count: " + segment.connectedSegments.size());
+            var couplingsValid = segmentCouplingsValid(segment);
+            System.out.println("couplings okay: " + couplingsValid);
         }
 
+    }
+
+    // this is called after all segments are discovered, and connects them based on their couplings
+    private void connectRocketSegments(Map<UUID, RocketFloodSegment> segments) {
+
+        var segmentsByBlock = new HashMap<BlockPos, UUID>();
+        for (var segment : segments.values()) {
+            segment.connectedSegments.clear();
+            for (var block : segment.blocks) {
+                segmentsByBlock.put(block.pos, segment.id);
+            }
+        }
+
+        for (var segment : segments.values()) {
+            for (var coupling : segment.couplings) {
+                var connectedSegmentId = segmentsByBlock.get(coupling.oppositeSide);
+                if (connectedSegmentId == null || connectedSegmentId.equals(segment.id)) continue;
+
+                segment.connectedSegments
+                        .computeIfAbsent(connectedSegmentId, ignored -> new HashSet<>())
+                        .add(coupling);
+            }
+        }
     }
 
     // ensures no couples connect to the segment itself
@@ -178,7 +207,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         }
 
-        return new RocketFloodSegment(results, couplings);
+        return new RocketFloodSegment(results, couplings, UUID.randomUUID());
 
     }
 
@@ -192,13 +221,33 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
     private record FloodFillElement(BlockPos self, BlockPos source) {}
 
-    private record RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings) {
+    private static final class RocketFloodSegment {
+
+        private final Set<FoundBlock> blocks;
+        private final Set<FoundCoupling> couplings;
+        private final UUID id;
+        private final Map<UUID, Set<FoundCoupling>> connectedSegments = new HashMap<>();    // contains all connected segments via
+                                                                                            // id and the couplings that connect to it.
+
+        private RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings, UUID id) {
+            this.blocks = blocks;
+            this.couplings = couplings;
+            this.id = id;
+        }
+
+        private Set<FoundCoupling> couplings() {
+            return couplings;
+        }
 
         @Override
         public String toString() {
             return "RocketFloodSegment{" +
-                    "blocks=" + blocks +
+                    "id=" + id +
+                    ", blocks=" + blocks +
                     ", couplings=" + couplings +
+                    ", connectedSegments=" + connectedSegments.entrySet().stream()
+                            .map(entry -> entry.getKey() + " via " + entry.getValue())
+                            .toList() +
                     '}';
         }
     }
