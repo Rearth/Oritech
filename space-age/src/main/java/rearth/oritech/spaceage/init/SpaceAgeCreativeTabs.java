@@ -16,7 +16,7 @@ public final class SpaceAgeCreativeTabs {
 
     public static final Supplier<CreativeModeTab> MAIN = TABS.register("main", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemgroup.oritech_space_age.main"))
-            .icon(() -> new ItemStack(SpaceAgeItems.ROCKET_ENGINE_TIER_1.get()))
+            .icon(() -> new ItemStack(SpaceAgeBlocks.ROCKET_ENGINE_TIER_1.get()))
             .displayItems((parameters, output) -> SpaceAgeItems.ITEMS.getEntries().forEach(item -> output.accept(item.get())))
             .build());
 

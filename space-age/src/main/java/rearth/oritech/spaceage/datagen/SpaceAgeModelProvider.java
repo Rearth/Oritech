@@ -18,6 +18,7 @@ public class SpaceAgeModelProvider extends ModelProvider {
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
         blockModels.createHorizontallyRotatedBlock(SpaceAgeBlocks.ROCKET_ASSEMBLER.get(), TexturedModel.CUBE);
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_PAD.get());
+        blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_COUPLING.get());
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_ENGINE_TIER_1.get());
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_ENGINE_TIER_2.get());
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_ENGINE_TIER_3.get());

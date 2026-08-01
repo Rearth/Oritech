@@ -19,7 +19,6 @@ public final class SpaceAgeDataGenerators {
         var lookupProvider = event.getLookupProvider();
 
         event.createProvider(SpaceAgeModelProvider::new);
-        generator.addProvider(true, new SpaceAgeLanguageProvider(output));
         generator.addProvider(true, new SpaceAgeRecipeProvider.Runner(output, lookupProvider));
         generator.addProvider(true, new SpaceAgeBlockTagProvider(output, lookupProvider));
         generator.addProvider(true, new LootTableProvider(

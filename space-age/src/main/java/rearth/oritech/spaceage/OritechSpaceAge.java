@@ -21,6 +21,7 @@ public final class OritechSpaceAge {
     public OritechSpaceAge(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("Initializing Oritech: Space Age with {}", Oritech.MOD_ID);
 
+        SpaceAgeItems.addBlockItems();
         SpaceAgeBlocks.BLOCKS.register(modEventBus);
         SpaceAgeItems.ITEMS.register(modEventBus);
         SpaceAgeBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
