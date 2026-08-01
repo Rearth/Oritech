@@ -1,5 +1,6 @@
 package rearth.oritech.init.world;
 
+import dev.architectury.platform.Platform;
 import dev.architectury.registry.level.biome.BiomeModifications;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -26,7 +27,9 @@ public class FeatureContent implements ArchitecturyRegistryContainer<Feature<?>>
     public static final Feature<UraniumPatchFeatureConfig> URANIUM_PATCH = new UraniumPatchFeature(UraniumPatchFeatureConfig.CODEC);
     
     public static void initialize() {
-        
+
+        if (Platform.isNeoForge()) return;
+
         BiomeModifications.addProperties((context, mutable) -> {
             if (context.hasTag(BiomeTags.IS_OVERWORLD)) {
                 mutable.getGenerationProperties().addFeature(GenerationStep.Decoration.LAKES, ResourceKey.create(Registries.PLACED_FEATURE, Oritech.id("oil_spring")));
