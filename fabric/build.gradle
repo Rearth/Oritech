@@ -128,8 +128,8 @@ dependencies {
     // Alloy Forgery
     modDataImplementation "curse.maven:alloy-forgery-438718:$alloy_forgery_version_id"
     // Clutter
-    modDataImplementation "curse.maven:clutter-826060:$clutter_version_id"
-    modDataRuntimeOnly("com.terraformersmc.terraform-api:terraform-wood-api-v1:$project.terraform_wood_api_version") { transitive = false }
+//    modDataImplementation "curse.maven:clutter-826060:$clutter_version_id"
+//    modDataRuntimeOnly("com.terraformersmc.terraform-api:terraform-wood-api-v1:$project.terraform_wood_api_version") { transitive = false }
     // Energized Power
     modDataImplementation "curse.maven:energized-power-782147:$energized_power_version_id"
     // Mythic Metals
