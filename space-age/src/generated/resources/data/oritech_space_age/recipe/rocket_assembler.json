@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:advanced_computing_engine",
+    "c": "oritech:assembler",
+    "f": "oritech:machine_frame",
+    "m": "oritech:motor",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sas",
+    "mcm",
+    "sfs"
+  ],
+  "result": {
+    "id": "oritech_space_age:rocket_assembler"
+  }
+}

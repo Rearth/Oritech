@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "d": "oritech:duratium_ingot",
+    "e": "oritech:energite_ingot",
+    "t": "oritech_space_age:rocket_engine_tier_1"
+  },
+  "pattern": [
+    "ded",
+    "ete",
+    "ded"
+  ],
+  "result": {
+    "id": "oritech_space_age:rocket_engine_tier_2"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": "minecraft:iron_block",
+    "p": "oritech:iron_plating",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sss",
+    "ipi"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech_space_age:rocket_pad"
+  }
+}

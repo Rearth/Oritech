@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "e": "oritech:advanced_battery",
+    "m": "oritech:motor",
+    "p": "oritech:energy_pipe",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sms",
+    "pep",
+    " s "
+  ],
+  "result": {
+    "id": "oritech_space_age:rocket_engine_tier_1"
+  }
+}

@@ -1,0 +1,133 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.141'
+    id 'idea'
+}
+
+version = space_age_mod_version
+group = space_age_mod_group_id
+
+base {
+    archivesName = space_age_mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+repositories {
+    maven { url = 'https://modmaven.dev' }
+    maven { url = 'https://beta.cursemaven.com' }
+    maven { url = 'https://maven.blamejared.com' }
+    maven { url = 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    maven { url = 'https://maven.teamresourceful.com/repository/maven-public/' }
+}
+
+neoForge {
+    version = project.neo_version
+
+    runs {
+        spaceAgeClient {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.space_age_mod_id
+        }
+
+        spaceAgeServer {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.space_age_mod_id
+        }
+
+        spaceAgeGameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', project.space_age_mod_id
+        }
+
+        spaceAgeData {
+            clientData()
+            programArguments.addAll '--mod', project.space_age_mod_id,
+                    '--all',
+                    '--output', file('src/generated/resources/').absolutePath,
+                    '--existing', file('src/main/resources/').absolutePath
+        }
+
+        configureEach {
+            gameDirectory = rootProject.file('run-space-age')
+            systemProperty 'forge.logging.markers', 'REGISTRIES'
+            logLevel = org.slf4j.event.Level.DEBUG
+        }
+    }
+
+    mods {
+        "${space_age_mod_id}" {
+            sourceSet(sourceSets.main)
+        }
+
+        // The addon's runs load Oritech directly from the root project's output.
+        // This keeps edits in both projects live without publishing either mod first.
+        "${mod_id}" {
+            sourceSet(rootProject.sourceSets.main)
+        }
+    }
+}
+
+configurations {
+    runtimeClasspath.extendsFrom localRuntime
+}
+
+dependencies {
+    // Compile and run against the Oritech project currently checked out in this repository.
+    implementation project(':')
+
+    // Oritech's development-only runtime mods are not exported to project consumers.
+    localRuntime "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
+    compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"
+    localRuntime "mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}"
+    localRuntime 'curse.maven:jade-324717:8326300'
+}
+
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replaceProperties = [
+            minecraft_version       : minecraft_version,
+            minecraft_version_range : minecraft_version_range,
+            neo_version             : neo_version,
+            oritech_version         : rootProject.version,
+            space_age_mod_id        : space_age_mod_id,
+            space_age_mod_name      : space_age_mod_name,
+            space_age_mod_license   : mod_license,
+            space_age_mod_version   : space_age_mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+    srcDir generateModMetadata
+}
+
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(ProcessResources).configureEach {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            from components.java
+        }
+    }
+}

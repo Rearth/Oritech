@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_assembler": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:assembler"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech_space_age:rocket_assembler"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_assembler"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech_space_age:rocket_assembler"
+    ]
+  }
+}
