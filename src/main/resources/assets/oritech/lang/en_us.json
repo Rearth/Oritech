@@ -1,5 +1,6 @@
 {
   "oracle_index.title.oritech": "Oritech",
+  "message.oritech.oracle_index_missing": "Oracle Index is not installed. It is not required to play Oritech, and the same information is available online at moddedmc.wiki, but Oracle Index is highly recommended for in-game help.",
   "advancements.oritech.begin": "Oritech",
   "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Start your technological adventure by acquiring some raw nickel. Shine on, you crazy miner!",

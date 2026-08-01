@@ -14,6 +14,10 @@ public class OritechClientConfig {
             .comment("Enable help button in machine UIs")
             .define("enableHelpButton", true);
 
+    public static final ModConfigSpec.BooleanValue showOracleIndexWarning = OritechClientConfig.CLIENT
+            .comment("Show the missing Oracle Index warning once when entering a world")
+            .define("showOracleIndexWarning", true);
+
     public static final ModConfigSpec.DoubleValue maxZiplineSpeed = OritechClientConfig.CLIENT
             .comment("Maximum zipline speed in blocks/second")
             .defineInRange("maxZiplineSpeed", 8.0, 0.0, 100.0);
