@@ -256,7 +256,7 @@ publishMods {
 
     file = jar.archiveFile
     changelog = file("./CHANGELOG.MD").getText()
-    type = ALPHA
+    type = BETA
 
     modLoaders.add("neoforge")
 
