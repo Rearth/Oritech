@@ -1,2 +1,0 @@
-- Fix world generation broken with latest architectury version
-- Update translations from crowdIn
