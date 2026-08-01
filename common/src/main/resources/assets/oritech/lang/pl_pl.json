@@ -966,6 +966,7 @@
   "text.oritech.reactor.heating_up": "Nagrzewanie",
   "text.oritech.reactor.unstable": "Niestabilny",
   "text.oritech.reactor.explosion_imminent": "NIEBEZPIECZNY",
+  "label.oritech.reactor.warning_threshold": "Warning",
   "text.oritech.accelerator.ui.waiting.0": "Czekam.",
   "text.oritech.accelerator.ui.waiting.1": "Czekam..",
   "text.oritech.accelerator.ui.waiting.2": "Czekam...",
