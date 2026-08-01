@@ -1,0 +1,57 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "oritech:block/smart_splitter_base"
+      }
+    },
+    {
+      "when": { "north": "closed" },
+      "apply": { "model": "oritech:block/smart_splitter_closed" }
+    },
+    {
+      "when": { "north": "input" },
+      "apply": { "model": "oritech:block/smart_splitter_input" }
+    },
+    {
+      "when": { "north": "output" },
+      "apply": { "model": "oritech:block/smart_splitter_output" }
+    },
+    {
+      "when": { "east": "closed" },
+      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 90 }
+    },
+    {
+      "when": { "east": "input" },
+      "apply": { "model": "oritech:block/smart_splitter_input", "y": 90 }
+    },
+    {
+      "when": { "east": "output" },
+      "apply": { "model": "oritech:block/smart_splitter_output", "y": 90 }
+    },
+    {
+      "when": { "south": "closed" },
+      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 180 }
+    },
+    {
+      "when": { "south": "input" },
+      "apply": { "model": "oritech:block/smart_splitter_input", "y": 180 }
+    },
+    {
+      "when": { "south": "output" },
+      "apply": { "model": "oritech:block/smart_splitter_output", "y": 180 }
+    },
+    {
+      "when": { "west": "closed" },
+      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 270 }
+    },
+    {
+      "when": { "west": "input" },
+      "apply": { "model": "oritech:block/smart_splitter_input", "y": 270 }
+    },
+    {
+      "when": { "west": "output" },
+      "apply": { "model": "oritech:block/smart_splitter_output", "y": 270 }
+    }
+  ]
+}

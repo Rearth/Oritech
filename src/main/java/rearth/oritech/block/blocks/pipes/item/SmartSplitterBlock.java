@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -22,7 +23,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
@@ -34,18 +35,18 @@ import java.util.function.Consumer;
 
 public class SmartSplitterBlock extends Block implements EntityBlock, TooltipProvider {
 
-    public static final BooleanProperty NORTH = BooleanProperty.create("north");
-    public static final BooleanProperty EAST = BooleanProperty.create("east");
-    public static final BooleanProperty SOUTH = BooleanProperty.create("south");
-    public static final BooleanProperty WEST = BooleanProperty.create("west");
+    public static final EnumProperty<SideMode> NORTH = EnumProperty.create("north", SideMode.class);
+    public static final EnumProperty<SideMode> EAST = EnumProperty.create("east", SideMode.class);
+    public static final EnumProperty<SideMode> SOUTH = EnumProperty.create("south", SideMode.class);
+    public static final EnumProperty<SideMode> WEST = EnumProperty.create("west", SideMode.class);
 
     public SmartSplitterBlock(Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState()
-                .setValue(NORTH, false)
-                .setValue(EAST, false)
-                .setValue(SOUTH, false)
-                .setValue(WEST, false));
+                .setValue(NORTH, SideMode.CLOSED)
+                .setValue(EAST, SideMode.CLOSED)
+                .setValue(SOUTH, SideMode.CLOSED)
+                .setValue(WEST, SideMode.CLOSED));
     }
 
     @Override
@@ -64,7 +65,6 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
         return new SmartSplitterBlockEntity(pos, state);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
@@ -81,8 +81,9 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
         var clickedSide = hit.getDirection();
         if (!player.isShiftKeyDown() && clickedSide.getAxis().isHorizontal()) {
             var property = propertyFor(clickedSide);
-            var enabled = !state.getValue(property);
-            level.setBlock(pos, state.setValue(property, enabled), Block.UPDATE_ALL);
+            var enabled = state.getValue(property) != SideMode.OUTPUT;
+            var newSideMode = enabled ? SideMode.OUTPUT : SideMode.CLOSED;
+            level.setBlock(pos, state.setValue(property, newSideMode), Block.UPDATE_ALL);
             splitter.onOutputConfigurationChanged();
             player.sendSystemMessage(Component.translatable(
                     enabled ? "message.oritech.smart_splitter.output_enabled" : "message.oritech.smart_splitter.output_disabled",
@@ -115,10 +116,18 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
     }
 
     public static boolean isOutput(BlockState state, Direction direction) {
-        return direction.getAxis().isHorizontal() && state.getValue(propertyFor(direction));
+        return getSideMode(state, direction) == SideMode.OUTPUT;
     }
 
-    private static BooleanProperty propertyFor(Direction direction) {
+    public static SideMode getSideMode(BlockState state, Direction direction) {
+        return direction.getAxis().isHorizontal() ? state.getValue(propertyFor(direction)) : SideMode.CLOSED;
+    }
+
+    public static BlockState setSideMode(BlockState state, Direction direction, SideMode mode) {
+        return state.setValue(propertyFor(direction), mode);
+    }
+
+    private static EnumProperty<SideMode> propertyFor(Direction direction) {
         return switch (direction) {
             case NORTH -> NORTH;
             case EAST -> EAST;
@@ -126,5 +135,22 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
             case WEST -> WEST;
             default -> throw new IllegalArgumentException("Not a horizontal direction: " + direction);
         };
+    }
+
+    public enum SideMode implements StringRepresentable {
+        CLOSED("closed"),
+        INPUT("input"),
+        OUTPUT("output");
+
+        private final String serializedName;
+
+        SideMode(String serializedName) {
+            this.serializedName = serializedName;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return serializedName;
+        }
     }
 }

@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-31T17:37:41.7674084	Oritech Recipes
+// 26.1.2	2026-08-01T10:18:11.4139193	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -135,6 +135,7 @@ cbb75b3f08a7d0423e0490a9748ef6f1f15b5bc5 data/oritech/advancement/recipes/misc/c
 fb0ccb82ee731026509049b423a306dbfd056817 data/oritech/advancement/recipes/misc/crafting/small_nickel_dust_from_unpacking.json
 f844f35e723da24d59c0a8d693a855f48d1f4fcf data/oritech/advancement/recipes/misc/crafting/small_platinum_clump_from_unpacking.json
 3f7aef2e5a629132396c0be5e43f8e96e43e371e data/oritech/advancement/recipes/misc/crafting/small_platinum_dust_from_unpacking.json
+b4bbc8bb1bc0954668a877434cdd6f5b52c3de2a data/oritech/advancement/recipes/misc/crafting/smart_splitter.json
 ca087b95a19d4051705950afa457be8558c62707 data/oritech/advancement/recipes/misc/crafting/solar.json
 233299508dc1a701ad44032df26883691477045c data/oritech/advancement/recipes/misc/crafting/stabilized_enchanter.json
 074d908445363a126655ee75064b30bb34d7cfdf data/oritech/advancement/recipes/misc/crafting/steamgen.json
@@ -526,6 +527,7 @@ e10f47b1650ff30bc9d1c9ddaecee6087d6606ea data/oritech/recipe/crafting/small_iron
 372946e15e89b248006f1561bb07e45a06034add data/oritech/recipe/crafting/small_nickel_dust_from_unpacking.json
 805a2732a6abd9f64fbf25d734feea243dd7e6f9 data/oritech/recipe/crafting/small_platinum_clump_from_unpacking.json
 2425261107a4b4cf79b5be7ed0bc64b6d51b1085 data/oritech/recipe/crafting/small_platinum_dust_from_unpacking.json
+f717bee467697a1937b7986f1daa2a42a6621496 data/oritech/recipe/crafting/smart_splitter.json
 cd1987f67c8496a2b31f1230be51122196d1749b data/oritech/recipe/crafting/solar.json
 8d6b4d385154a0162d99c6e9266a15fede83b5ec data/oritech/recipe/crafting/stabilized_enchanter.json
 2afbee5477ab0c584ee635a8150f0c8cf020377f data/oritech/recipe/crafting/steamgen.json

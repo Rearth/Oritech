@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-29T20:15:03.801127	Loot Tables
+// 26.1.2	2026-08-01T09:43:22.8291017	Loot Tables
 2deb5f4438cc29f103dceec24d82ce621d2d9a97 data/minecraft/loot_table/blocks/jungle_leaves.json
 0f38535e0b2d03d37b02448fb3d0d370aced84ae data/oritech/loot_table/blocks/accelerator_motor.json
 10b4a8414099f038d75d04c5b02c0a145226d10f data/oritech/loot_table/blocks/accelerator_ring.json
@@ -142,6 +142,7 @@ a29c9ed69ba55884b59c479cc550534d6a2dadd8 data/oritech/loot_table/blocks/reactor_
 6da873357808aa40b4dd47d0d3a2c02edd00f193 data/oritech/loot_table/blocks/refinery.json
 b31af0f1ef3ba56c803ba9aba3799fc66e915b3c data/oritech/loot_table/blocks/refinery_chamber_module.json
 1e288800c435db8950c11406d6b608f564128f3f data/oritech/loot_table/blocks/silicon_block.json
+bd01411c36ec24daf5a1c05202fb7ad2d7611610 data/oritech/loot_table/blocks/smart_splitter.json
 affcb5dcb7289ab222f0dc5bf666904afb4d7f34 data/oritech/loot_table/blocks/soul_flowers.json
 8c3d99efe96580bd4ccf66554e044be17bd1e2b1 data/oritech/loot_table/blocks/spawner_cage.json
 a5af6e7c45cfcb4490139eb689e5461f6c4f1864 data/oritech/loot_table/blocks/spawner_controller.json

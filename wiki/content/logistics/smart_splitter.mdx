@@ -1,0 +1,47 @@
+---
+id: oritech:smart_splitter
+type: block
+title: Smart Splitter
+---
+
+The Smart Splitter is a small item buffer that distributes items evenly between its horizontal outputs. It stores one stack at a time, so it cannot mix different item types.
+
+It uses the standard item transaction API and is not tied to Oritech's item pipes. Pipes, hoppers, and other item transfer systems from other mods can interact with it as long as they use the same item transfer API.
+
+## Automatic side configuration
+
+The splitter learns how each horizontal side is being used:
+
+* A side becomes an **input** after an insertion through that side is committed.
+* A side becomes an **output** as soon as a pipe inspects it for extraction or attempts to extract through it. The output is detected even when the splitter is empty, the requested item is unavailable, or the extraction is only simulated and never committed.
+* Unused sides remain **closed**.
+
+Items may also be inserted from above or below, but only horizontal sides can be outputs.
+
+Right-click a horizontal face to toggle it between an output and closed. Sneak-right-click the block to cycle through its distribution modes. The selected mode is shown in chat.
+
+## Distribution modes
+
+### Strict
+
+Items are reserved as evenly as possible for every configured output. A pipe can only extract the share reserved for its side. Remainder items rotate between the outputs over subsequent insertions.
+
+This mode guarantees an even split, but items reserved for a blocked or unused output remain in the splitter.
+
+### Overflow
+
+Items initially receive the same even reservations as in Strict mode. If an output does not make progress for about one second, its reserved items become available to the other active outputs.
+
+Use this mode when an even split is preferred, but keeping the item flow moving is more important than preserving blocked shares indefinitely.
+
+### Round Robin
+
+Only one output may extract at a time. After one successfully committed extraction operation, the next configured output gets its turn. Simulated or rolled-back extractions do not consume a turn.
+
+The amount moved during a turn is determined by the extracting pipe, so boosted pipes can still transfer larger batches without forcing every item through a fixed-rate operation.
+
+If the current output is blocked, Round Robin waits for it. Use Overflow mode instead when blocked outputs should be bypassed automatically.
+
+<Callout variant="info">
+The splitter balances extraction opportunities and reservations. It cannot make a receiving inventory accept items, so Strict mode may intentionally hold items for an unavailable output.
+</Callout>

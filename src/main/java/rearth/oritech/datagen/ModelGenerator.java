@@ -63,7 +63,8 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.COPPER_REINFORCED_PLATING.get(),
             BlockContent.IRON_PLATING.get(),
             BlockContent.CARBON_PLATING.get(),
-            BlockContent.NICKEL_PLATING.get()
+            BlockContent.NICKEL_PLATING.get(),
+            BlockContent.SMART_SPLITTER.get()
     );
 
     private static final Set<Block> HAND_AUTHORED_ITEM_MODEL_BLOCKS = Set.of(
@@ -96,7 +97,8 @@ public class ModelGenerator extends ModelProvider {
     private static final Set<Item> HAND_AUTHORED_ITEM_DEFINITIONS = Set.of(
             ItemContent.PORTABLE_ENERGY_STORAGE_ITEM.get(),
             ItemContent.PORTABLE_TANK_ITEM.get(),
-            ItemContent.CREATIVE_TANK_ITEM.get()
+            ItemContent.CREATIVE_TANK_ITEM.get(),
+            BlockContent.SMART_SPLITTER.asItem()
     );
 
 

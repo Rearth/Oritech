@@ -506,6 +506,15 @@ public class RecipeGenerator extends RecipeProvider {
         offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.ITEM_PIPE.asItem(), 6), of(TagContent.NICKEL_INGOTS), of(ItemTags.PLANKS), "item");
         // item filter
         offerGeneratorRecipe(exporter, BlockContent.ITEM_FILTER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemTags.PLANKS), of(ItemContent.PROCESSING_UNIT), of(ItemTags.PLANKS), "itemfilter");
+        // smart splitter
+        this.shaped(RecipeCategory.MISC, BlockContent.SMART_SPLITTER)
+                .define('p', BlockContent.ITEM_PIPE)
+                .define('f', BlockContent.ITEM_FILTER)
+                .pattern(" p ")
+                .pattern("pfp")
+                .pattern(" p ")
+                .unlockedBy("has_item_filter", has(BlockContent.ITEM_FILTER))
+                .save(exporter, recipeKey("crafting/smart_splitter"));
         // fluid pipe
         offerInsulatedCableRecipe(exporter, new ItemStackTemplate(BlockContent.FLUID_PIPE.asItem(), 6), of(TagContent.SILICON), of(cItemTag("ingots/copper")), "fluidpipe");
 

@@ -20,6 +20,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 
 public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvider {
@@ -33,6 +34,7 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
 
     private final int[] reservations = new int[OUTPUT_DIRECTIONS.length];
     private final long[] lastProgress = new long[OUTPUT_DIRECTIONS.length];
+    private final EnumSet<Direction> insertedInputSides = EnumSet.noneOf(Direction.class);
     private final EnumMap<Direction, ResourceHandler<ItemResource>> sidedHandlers = new EnumMap<>(Direction.class);
     private final ResourceHandler<ItemResource> unsidedHandler = new SplitterItemHandler(null);
     private final SplitterStateJournal stateJournal = new SplitterStateJournal();
@@ -40,7 +42,6 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
     private SplitMode mode = SplitMode.STRICT;
     private int remainderCursor;
     private int roundRobinCursor;
-    private long turnStartedAt;
 
     public SmartSplitterBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.SMART_SPLITTER.get(), pos, state);
@@ -64,7 +65,6 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
             rebalanceStoredItems();
         } else {
             normalizeRoundRobinCursor();
-            turnStartedAt = gameTime();
             setChanged();
         }
         return mode;
@@ -73,7 +73,6 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
     public void onOutputConfigurationChanged() {
         if (mode == SplitMode.ROUND_ROBIN) {
             normalizeRoundRobinCursor();
-            turnStartedAt = gameTime();
             setChanged();
         } else {
             rebalanceStoredItems();
@@ -83,27 +82,27 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
     public void serverTick(Level level) {
         if (level.isClientSide() || inventory.isEmpty() || level.getGameTime() % 5 != 0) return;
 
-        if (mode == SplitMode.OVERFLOW) {
-            redistributeStaleReservations(level.getGameTime());
-        } else if (mode == SplitMode.ROUND_ROBIN
-                && activeOutputs().size() > 1
-                && level.getGameTime() - turnStartedAt >= OVERFLOW_DELAY) {
-            advanceRoundRobin(currentRoundRobinOutput());
-            turnStartedAt = level.getGameTime();
-            setChanged();
-        }
+        if (mode == SplitMode.OVERFLOW) redistributeStaleReservations(level.getGameTime());
     }
 
-    private int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+    private int insert(@Nullable Direction side, int index, ItemResource resource, int amount, TransactionContext transaction) {
+        TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        if (side != null && side.getAxis().isHorizontal() && SmartSplitterBlock.isOutput(getBlockState(), side)) return 0;
+
         var wasEmpty = inventory.isEmpty();
         var inserted = inventory.insert(index, resource, amount, transaction);
         if (inserted <= 0) return 0;
+
+        if (side != null && side.getAxis().isHorizontal()
+                && SmartSplitterBlock.getSideMode(getBlockState(), side) == SmartSplitterBlock.SideMode.CLOSED) {
+            stateJournal.updateSnapshots(transaction);
+            insertedInputSides.add(side);
+        }
 
         if (mode == SplitMode.ROUND_ROBIN) {
             if (wasEmpty) {
                 stateJournal.updateSnapshots(transaction);
                 normalizeRoundRobinCursor();
-                turnStartedAt = gameTime();
             }
         } else {
             addReservations(inserted, activeOutputs(), transaction);
@@ -114,6 +113,7 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
 
     private int extract(@Nullable Direction side, int index, ItemResource resource, int amount, TransactionContext transaction) {
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
+        configureOutputOnExtractionProbe(side);
         if (side == null || !isConfiguredOutput(side) || amount == 0) return 0;
 
         var sideIndex = outputIndex(side);
@@ -134,12 +134,20 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
 
         if (mode == SplitMode.ROUND_ROBIN) {
             advanceRoundRobin(side);
-            turnStartedAt = gameTime();
         } else {
             reservations[sideIndex] -= extracted;
         }
 
         return extracted;
+    }
+
+    private void configureOutputOnExtractionProbe(@Nullable Direction side) {
+        if (side == null || !side.getAxis().isHorizontal() || isConfiguredOutput(side)
+                || level == null || level.isClientSide() || isRemoved()) return;
+
+        var updatedState = SmartSplitterBlock.setSideMode(getBlockState(), side, SmartSplitterBlock.SideMode.OUTPUT);
+        level.setBlock(worldPosition, updatedState, net.minecraft.world.level.block.Block.UPDATE_ALL);
+        onOutputConfigurationChanged();
     }
 
     private void addReservations(int amount, List<Direction> outputs, TransactionContext transaction) {
@@ -261,7 +269,6 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
         output.putInt("split_mode", mode.ordinal());
         output.putInt("remainder_cursor", remainderCursor);
         output.putInt("round_robin_cursor", roundRobinCursor);
-        output.putLong("turn_started_at", turnStartedAt);
 
         for (var direction : OUTPUT_DIRECTIONS) {
             var name = direction.getName();
@@ -278,7 +285,6 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
         mode = SplitMode.fromOrdinal(input.getIntOr("split_mode", 0));
         remainderCursor = Math.floorMod(input.getIntOr("remainder_cursor", 0), OUTPUT_DIRECTIONS.length);
         roundRobinCursor = Math.floorMod(input.getIntOr("round_robin_cursor", 0), OUTPUT_DIRECTIONS.length);
-        turnStartedAt = input.getLongOr("turn_started_at", 0);
 
         for (var direction : OUTPUT_DIRECTIONS) {
             var name = direction.getName();
@@ -308,6 +314,7 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
 
         @Override
         public ItemResource getResource(int index) {
+            configureOutputOnExtractionProbe(side);
             return inventory.getResource(index);
         }
 
@@ -318,17 +325,19 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
 
         @Override
         public long getCapacityAsLong(int index, ItemResource resource) {
+            if (side != null && side.getAxis().isHorizontal() && SmartSplitterBlock.isOutput(getBlockState(), side)) return 0;
             return inventory.getCapacityAsLong(index, resource);
         }
 
         @Override
         public boolean isValid(int index, ItemResource resource) {
+            if (side != null && side.getAxis().isHorizontal() && SmartSplitterBlock.isOutput(getBlockState(), side)) return false;
             return inventory.isValid(index, resource);
         }
 
         @Override
         public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-            return SmartSplitterBlockEntity.this.insert(index, resource, amount, transaction);
+            return SmartSplitterBlockEntity.this.insert(side, index, resource, amount, transaction);
         }
 
         @Override
@@ -343,9 +352,9 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
             return new SplitterSnapshot(
                     reservations.clone(),
                     lastProgress.clone(),
+                    EnumSet.copyOf(insertedInputSides),
                     remainderCursor,
-                    roundRobinCursor,
-                    turnStartedAt
+                    roundRobinCursor
             );
         }
 
@@ -353,19 +362,42 @@ public class SmartSplitterBlockEntity extends BlockEntity implements ItemProvide
         protected void revertToSnapshot(SplitterSnapshot snapshot) {
             System.arraycopy(snapshot.reservations(), 0, reservations, 0, reservations.length);
             System.arraycopy(snapshot.lastProgress(), 0, lastProgress, 0, lastProgress.length);
+            insertedInputSides.clear();
+            insertedInputSides.addAll(snapshot.insertedInputSides());
             remainderCursor = snapshot.remainderCursor();
             roundRobinCursor = snapshot.roundRobinCursor();
-            turnStartedAt = snapshot.turnStartedAt();
         }
 
         @Override
         protected void onRootCommit(SplitterSnapshot originalState) {
+            applyCommittedInputSides();
             setChanged();
         }
     }
 
-    private record SplitterSnapshot(int[] reservations, long[] lastProgress, int remainderCursor,
-                                    int roundRobinCursor, long turnStartedAt) {
+    private void applyCommittedInputSides() {
+        if (insertedInputSides.isEmpty()) return;
+
+        if (level != null && !isRemoved()) {
+            var currentState = getBlockState();
+            var updatedState = currentState;
+            for (var direction : insertedInputSides) {
+                if (SmartSplitterBlock.getSideMode(updatedState, direction) == SmartSplitterBlock.SideMode.CLOSED) {
+                    updatedState = SmartSplitterBlock.setSideMode(updatedState, direction, SmartSplitterBlock.SideMode.INPUT);
+                }
+            }
+
+            if (updatedState != currentState) {
+                level.setBlock(worldPosition, updatedState, net.minecraft.world.level.block.Block.UPDATE_ALL);
+            }
+        }
+
+        insertedInputSides.clear();
+    }
+
+    private record SplitterSnapshot(int[] reservations, long[] lastProgress,
+                                    EnumSet<Direction> insertedInputSides, int remainderCursor,
+                                    int roundRobinCursor) {
     }
 
     public enum SplitMode {
