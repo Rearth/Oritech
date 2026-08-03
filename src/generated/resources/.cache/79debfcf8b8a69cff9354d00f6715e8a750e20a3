@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-29T20:13:14.9425805	Tags for minecraft:item mod id oritech
+// 26.1.2	2026-08-03T19:40:55.1994308	Tags for minecraft:item mod id oritech
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/bananas.json
 e2c6e20d8d6d0e3e37246a13f9af75711482a721 data/c/tags/item/carbon_fibre.json
 99505a8471e5d2356893d65d4cff2b3c634c266b data/c/tags/item/clumps.json
@@ -30,7 +30,8 @@ a4f65178002dfa3dbf1774ffb422dee5275d8257 data/c/tags/item/dusts/plutonium.json
 bf9c4f1c030fa14263694ca70c4af300a5666a87 data/c/tags/item/dusts/uranium.json
 0c3baaa92b73d1981f02e77e04e39308955beca0 data/c/tags/item/elytras.json
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/foods/fruit.json
-9fac66477be962c1d545c981b69ba6b31c9973a2 data/c/tags/item/fuels/bio.json
+a06d940f45613f114844bf4cf620b226d28404ed data/c/tags/item/fuels/bio.json
+c6f72081bb4f1359b225aa7057d38c077e2c267f data/c/tags/item/fuels/block/bio.json
 4ca11b759f4fb74d38586bc1432e84504e2d5ea8 data/c/tags/item/gems.json
 4ca11b759f4fb74d38586bc1432e84504e2d5ea8 data/c/tags/item/gems/fluxite.json
 cc51415941de06e104c2869273b40fc7d56a7947 data/c/tags/item/ingots.json

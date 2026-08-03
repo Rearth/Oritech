@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-01T10:18:11.4139193	Oritech Recipes
+// 26.1.2	2026-08-03T19:36:30.8150768	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -387,7 +387,7 @@ d944d63ab00d1c1805618959a91984d2b622bbe4 data/oritech/recipe/centrifuge/fluid/ad
 5de7b0910c0f6b099c407b40c947eb455227f064 data/oritech/recipe/centrifuge/fluid/batteryacid.json
 51e5bd5dce4f06536f8f4e69a05c084decb46fdf data/oritech/recipe/centrifuge/fluid/biofuel.json
 725899aede2050c6ddfe5cbcabca404e812267e5 data/oritech/recipe/centrifuge/fluid/biopolymer.json
-61a8ec8eb54d51c3ff4fd2dc38f4821575b53993 data/oritech/recipe/centrifuge/fluid/biopolymer_bioblock.json
+b8ccd7c68c345e510f0b0e41df9b4716e3ef1cdf data/oritech/recipe/centrifuge/fluid/biopolymer_bioblock.json
 eb7c93ede36b0f4dca703f39f894eeb026929be6 data/oritech/recipe/centrifuge/fluid/biopolymer_biomass.json
 a555bde70c52ffa6253ac1f2bed830595193e997 data/oritech/recipe/centrifuge/fluid/clay.json
 60400dc284a62a25e06bd16cc835efe484d3df8d data/oritech/recipe/centrifuge/fluid/clumpacid/copper.json
