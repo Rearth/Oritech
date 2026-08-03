@@ -4,7 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.entity.RocketAssemblerBlockEntity;
+import rearth.oritech.spaceage.block.entity.assembler.RocketAssemblerBlockEntity;
 
 import java.util.function.Supplier;
 

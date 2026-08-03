@@ -1,19 +1,22 @@
-package rearth.oritech.spaceage.block.entity;
+package rearth.oritech.spaceage.block.entity.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class RocketAssemblerBlockEntity extends BlockEntity {
 
@@ -91,6 +94,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         connectRocketSegments(segments);
 
+        segments.values().forEach(this::scanSegmentContent);
+
         for (var segment : segments.values()) {
             System.out.println(segment);
             System.out.println("block count: " + segment.blocks.size() + " couplings: " + segment.couplings.size());
@@ -122,11 +127,67 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         }
     }
 
-    // searches and calculates engines, weight, fuel, etc.
+    // searches and calculates engines, weight, fuel, energy, etc.
     private void scanSegmentContent(RocketFloodSegment segment) {
 
+        // value is the burn time of the fuel type (per ml)
+        var fuelTypes = new HashMap<FluidIngredient, Float>();
+        var fuelGenRecipes = ((ServerLevel) level).recipeAccess().recipeMap().byType(RecipeContent.FUEL_GENERATOR.get());
+        fuelGenRecipes.forEach(holder -> fuelTypes.put(holder.value().fluidInput().get().ingredient(), holder.value().time() / (float) holder.value().fluidInput().get().amount()));
 
+        var detectedRF = 0L;
+        var detectedFuels = new HashMap<FluidType, Long>(); // value is the total burn time available for the type on the segment
+        var detectedEngines = 0;
+        var weight = 0D;
+        var stoneWeight = Blocks.STONE.defaultBlockState().getDestroySpeed(level, worldPosition);
 
+        for (var blockData : segment.blocks) {
+
+            var worldPos = blockData.pos();
+            var worldState = blockData.state();
+
+            // fluid scan
+            var fluidCandidate = level.getCapability(Capabilities.Fluid.BLOCK, worldPos, worldState, null, null);
+            if (fluidCandidate != null) {
+                try (var transaction = Transaction.openRoot()) {
+                    var totalTaken = 0L;
+
+                    for (var typeSet : fuelTypes.entrySet()) {
+                        var typeIng = typeSet.getKey();
+                        var typeBurnTime = typeSet.getValue();
+                        for (var fluid : typeIng.fluids()) {
+                            var fluidType = fluid.value().getFluidType();
+                            var taken = fluidCandidate.extract(FluidResource.of(fluid), Integer.MAX_VALUE, transaction);
+                            var takenBurnTime = (long) taken * typeBurnTime;
+                            if (taken > 0)
+                                detectedFuels.merge(fluidType, (long) takenBurnTime, Long::sum);
+
+                            totalTaken += taken;
+                        }
+                    }
+
+                    if (totalTaken > 0) {
+                        weight += totalTaken * stoneWeight / FluidType.BUCKET_VOLUME;
+                        // transaction.commit(); // todo enable again
+                    }
+
+                }
+            }
+
+            // energy scan
+            var energyCandidate = level.getCapability(Capabilities.Energy.BLOCK, worldPos, worldState, null, null);
+            if (energyCandidate != null) {
+                detectedRF += energyCandidate.getAmountAsLong();
+            }
+
+            // weight scan
+            weight += Math.max(worldState.getDestroySpeed(level, worldPos), 0);
+
+        }
+
+        OritechSpaceAge.LOGGER.debug(
+                "Collected stats for rocket segment {}: weight={}, fuels={}, energy={}, engines={}",
+                segment.id, weight, detectedFuels, detectedRF, detectedEngines);
     }
 
     // ensures no couples connect to the segment itself
@@ -228,7 +289,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         return pos.getY() > this.worldPosition.getY() && !state.isAir();
     }
 
-    private record FloodFillElement(BlockPos self, BlockPos source) {}
+    private record FloodFillElement(BlockPos self, BlockPos source) {
+    }
 
     private static final class RocketFloodSegment {
 
@@ -236,7 +298,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         private final Set<FoundCoupling> couplings;
         private final UUID id;
         private final Map<UUID, Set<FoundCoupling>> connectedSegments = new HashMap<>();    // contains all connected segments via
-                                                                                            // id and the couplings that connect to it.
+        // id and the couplings that connect to it.
 
         private RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings, UUID id) {
             this.blocks = blocks;
@@ -255,8 +317,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                     ", blocks=" + blocks +
                     ", couplings=" + couplings +
                     ", connectedSegments=" + connectedSegments.entrySet().stream()
-                            .map(entry -> entry.getKey() + " via " + entry.getValue())
-                            .toList() +
+                    .map(entry -> entry.getKey() + " via " + entry.getValue())
+                    .toList() +
                     '}';
         }
     }
