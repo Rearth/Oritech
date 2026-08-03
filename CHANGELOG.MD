@@ -1,5 +1,0 @@
-- Make drone port energy usage configurable
-- Add oracle index warning if mod is not installed
-- Fix multi-slot inputs (e.g. assembler) not always working
-- Fix refinery catalysts not used
-- Fix biomass recipes
