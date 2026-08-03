@@ -8,6 +8,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
@@ -68,7 +69,8 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public boolean matches(OritechRecipeInput input, Level level) {
         // compare items and fluids. This will not modify any inputs.
 
-        var itemsMatching = itemInputs.isEmpty() || itemsMatch(itemInputs, input);
+        // iemless recipes must not shadow variants that use an item catalyst.
+        var itemsMatching = itemInputs.isEmpty() ? input.itemsEmpty() : itemsMatch(itemInputs, input);
         var fluidsMatching = fluidInput.isEmpty() || fluidsMatch(input, level);
 
         return itemsMatching && fluidsMatching;
@@ -77,43 +79,14 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public static boolean itemsMatch(List<Ingredient> recipeIngredients, OritechRecipeItemInput input) {
         if (recipeIngredients.isEmpty()) return true;
 
-        if (input.isEmpty()) return false;
-
-        // multiple inputs require fuzzy matching
-        if (recipeIngredients.size() > 1) {
-            return fuzzyItemMatches(recipeIngredients, input);
-        }
-
-        // if we have just one input, just test that one
-        return recipeIngredients.getFirst().test(input.getItem(0));
+        var contents = new StackedItemContents();
+        input.getStacks().forEach(contents::accountStack);
+        return contents.canCraft(recipeIngredients, null);
     }
 
     private boolean fluidsMatch(OritechRecipeInput input, Level level) {
         if (input.fluidEmpty()) return false;
         return fluidInput.get().test(input.fluidStack());
-    }
-
-    private static boolean fuzzyItemMatches(List<Ingredient> itemIngredients, OritechRecipeItemInput input) {
-
-        // Input does not need to be in the correct slots / split into different slots.
-        // We just check if we can remove all ingredients from the inventory, and fail if any input is not able to be removed.
-        var sourceItems = input.getStacks().stream().filter(stack -> !stack.isEmpty()).map(ItemStack::copy).toList();
-
-        for (var ingredient : itemIngredients) {
-            var found = false;
-
-            for (var heldStack : sourceItems) {
-                if (ingredient.test(heldStack)) {
-                    heldStack.shrink(1);
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) return false;
-        }
-
-        return true;
     }
 
     // not used since we often have multiple outputs or fluid outputs

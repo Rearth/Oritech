@@ -73,6 +73,12 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             var segment = segmentFloodFill(candidate);
             if (segment.blocks.isEmpty()) continue;
 
+            var couplingsValid = segmentCouplingsValid(segment);
+            if (!couplingsValid) {
+                OritechSpaceAge.LOGGER.warn("Couplings invalid! " + worldPosition);
+                continue;
+            }
+
             segments.put(segment.id, segment);
 
             for (var coupling : segment.couplings) {
@@ -89,8 +95,6 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             System.out.println(segment);
             System.out.println("block count: " + segment.blocks.size() + " couplings: " + segment.couplings.size());
             System.out.println("connected segment count: " + segment.connectedSegments.size());
-            var couplingsValid = segmentCouplingsValid(segment);
-            System.out.println("couplings okay: " + couplingsValid);
         }
 
     }
@@ -118,6 +122,13 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         }
     }
 
+    // searches and calculates engines, weight, fuel, etc.
+    private void scanSegmentContent(RocketFloodSegment segment) {
+
+
+
+    }
+
     // ensures no couples connect to the segment itself
     private boolean segmentCouplingsValid(RocketFloodSegment segment) {
         for (var coupling : segment.couplings) {
@@ -136,12 +147,12 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         openPositions.add(start);
 
         var visited = new HashSet<BlockPos>();
+        visited.add(start);
         var results = new HashSet<BlockPos>();
 
         while (!openPositions.isEmpty() && limit-- > 0) {
 
             var checkedPos = openPositions.removeFirst();
-            visited.add(checkedPos);
 
             var checkedState = level.getBlockState(checkedPos);
 
@@ -152,8 +163,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             for (var dir : directions) {
                 if (dir.getAxis().isVertical()) continue;
                 var nextPos = checkedPos.relative(dir);
-                if (visited.contains(nextPos)) continue;
-                openPositions.add(nextPos);
+                if (visited.add(nextPos)) openPositions.add(nextPos);
             }
 
         }
@@ -171,6 +181,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         openPositions.add(new FloodFillElement(start, start));
 
         var visited = new HashSet<BlockPos>();
+        visited.add(start);
         var results = new HashSet<FoundBlock>();
         var couplings = new HashSet<FoundCoupling>();
 
@@ -178,7 +189,6 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
             var checkedElement = openPositions.removeFirst();
             var checkedPos = checkedElement.self();
-            visited.add(checkedPos);
 
             var checkedState = level.getBlockState(checkedPos);
 
@@ -201,8 +211,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
             for (var dir : directions) {
                 var nextPos = checkedPos.relative(dir);
-                if (visited.contains(nextPos)) continue;
-                openPositions.add(new FloodFillElement(nextPos, checkedPos));
+                if (visited.add(nextPos)) openPositions.add(new FloodFillElement(nextPos, checkedPos));
             }
 
         }
