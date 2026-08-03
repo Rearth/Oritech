@@ -97,7 +97,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
 
         // Input does not need to be in the correct slots / split into different slots.
         // We just check if we can remove all ingredients from the inventory, and fail if any input is not able to be removed.
-        var sourceItems = input.getStacks().stream().filter(stack -> !stack.isEmpty()).toList();
+        var sourceItems = input.getStacks().stream().filter(stack -> !stack.isEmpty()).map(ItemStack::copy).toList();
 
         for (var ingredient : itemIngredients) {
             var found = false;
