@@ -169,7 +169,7 @@ public class RecipeGenerator extends RecipeProvider {
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).timeInSeconds(200).export(exporter, "packedwheat");
         new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS).timeInSeconds(25).export(exporter, "biomass");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.SOLID_BIOFUEL).timeInSeconds(160).export(exporter, "solidbiomass");
-        new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS).timeInSeconds(270).export(exporter, "biomassblock");
+        new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.UNHOLY_INTELLIGENCE).timeInSeconds(3000).export(exporter, "vex");
         // lava

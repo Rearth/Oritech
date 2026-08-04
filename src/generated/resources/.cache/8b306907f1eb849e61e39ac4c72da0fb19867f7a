@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-03T19:36:30.8150768	Oritech Recipes
+// 26.1.2	2026-08-04T20:14:08.1055916	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -359,7 +359,7 @@ b1b81b3e797076d68da4e0f19337cfdeb997d900 data/oritech/recipe/atomicforge/prometh
 f0eaea4f74f0a61e2efa032d942da9039159825b data/oritech/recipe/atomicforge/wafer.json
 ebb633e12a3aff90e1ce573b0f664135d0e2c151 data/oritech/recipe/basic_battery.json
 f079c89044bab3b91532da91facbe28b2f7e0d5e data/oritech/recipe/biogen/biomass.json
-d8d8f2e431af9ffdf0dd15efafff9cf2eff4a46f data/oritech/recipe/biogen/biomassblock.json
+363575a6e13f39a02070175b40906fceac8787ff data/oritech/recipe/biogen/biomassblock.json
 a6a68a364fbaf73ce1cf85c376ebe728c1e1cdad data/oritech/recipe/biogen/packedwheat.json
 46da57583f038e4925d210b0d9ec40ffe2a2af44 data/oritech/recipe/biogen/polymer.json
 333069fd87c28d1a85c9405c2e7da68f893f3b15 data/oritech/recipe/biogen/rawbio.json
