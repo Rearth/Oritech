@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:tag_empty",
+        "tag": "c:dusts/ender_pearl"
+      }
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:dusts/ender_pearl"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 100
+}

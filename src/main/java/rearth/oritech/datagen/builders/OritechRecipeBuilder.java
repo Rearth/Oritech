@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 public abstract class OritechRecipeBuilder {
 
     protected final Supplier<RecipeType<OritechRecipe>> type;
@@ -175,9 +177,7 @@ public abstract class OritechRecipeBuilder {
 
     public abstract void validate(Identifier id) throws IllegalStateException;
 
-    public void export(RecipeOutput exporter, String suffix, String namespace) {
-
-        var id = Identifier.fromNamespaceAndPath(namespace, resourcePath + "/" + suffix);
+    public void export(RecipeOutput exporter, Identifier id) {
         validate(id);
 
         exporter.accept(
@@ -192,8 +192,24 @@ public abstract class OritechRecipeBuilder {
                 null);
     }
 
+    public void export(RecipeOutput exporter, @Nullable String prefix, String suffix, String namespace) {
+        String path;
+        if (prefix == null || prefix.isEmpty()) {
+            path = String.join("/", resourcePath, suffix);
+        } else {
+            path = String.join("/", prefix, resourcePath, suffix);
+        }
+        var id = Identifier.fromNamespaceAndPath(namespace, path);
+        export(exporter, id);
+    }
+
+    public void export(RecipeOutput exporter, String suffix, String namespace) {
+        var id = Identifier.fromNamespaceAndPath(namespace, String.join("/", resourcePath, suffix));
+        export(exporter, id);
+    }
 
     public void export(RecipeOutput exporter, String suffix) {
-        export(exporter, suffix, Oritech.MOD_ID);
+        var id = Identifier.fromNamespaceAndPath(Oritech.MOD_ID, String.join("/", resourcePath, suffix));
+        export(exporter, id);
     }
 }

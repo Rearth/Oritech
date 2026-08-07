@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-04T20:14:08.1055916	Oritech Recipes
+// 26.1.2	2026-08-06T12:03:24.0606977	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -87,8 +87,8 @@ ce56e399a0b8ffe9e75daf2f46db10d6a9c52c10 data/oritech/advancement/recipes/misc/c
 19751555e9f07679a7ade36aafe2e46b13dbe669 data/oritech/advancement/recipes/misc/crafting/electricfurnacealt.json
 536e852449efaac4de941d2097e31aaa77aba519 data/oritech/advancement/recipes/misc/crafting/energy.json
 ca01da145f210e9cd7ceafc8031beb3d1de801fe data/oritech/advancement/recipes/misc/crafting/energyport.json
-36bd052a8c4ada4073800ea95050c3af1df5fde7 data/oritech/advancement/recipes/misc/crafting/equipmentCharger.json
-db041a04075f5e5575d6676a8d6146cfa5529f2d data/oritech/advancement/recipes/misc/crafting/equipmentChargeralt.json
+eb7d14673103f1cd9f9a359a23af8c5ae6b59b87 data/oritech/advancement/recipes/misc/crafting/equipmentcharger.json
+06536245b48a5a49e574d524b88cb7c7de1e3472 data/oritech/advancement/recipes/misc/crafting/equipmentchargeralt.json
 042644f5cf47a43f1fc2f1708f529e980da0916c data/oritech/advancement/recipes/misc/crafting/exoboostedelytra.json
 d842922355bffa164bd7b719a69befa38716a53b data/oritech/advancement/recipes/misc/crafting/exoboostedelytraalt.json
 6488c825333171c21911decf003fe0207efcd7bd data/oritech/advancement/recipes/misc/crafting/exojetpack.json
@@ -479,8 +479,8 @@ b84f8ca5cd6c231d9aa8217ea589c29ff8a42cd2 data/oritech/recipe/crafting/electricfu
 f9268adeb3ee93f42407cbadbbe3f6265c8726bd data/oritech/recipe/crafting/electricfurnacealt.json
 a4f7f11b3ba3a22a667fafd745819b2dac148d60 data/oritech/recipe/crafting/energy.json
 98090451aade069e538afeb6768877f34706af8d data/oritech/recipe/crafting/energyport.json
-a6c96267d133fe25fdc24c887cde461683d2ab34 data/oritech/recipe/crafting/equipmentCharger.json
-e2a8f1fd2a8554c09e7e5d9c43020442ccc86a0c data/oritech/recipe/crafting/equipmentChargeralt.json
+a6c96267d133fe25fdc24c887cde461683d2ab34 data/oritech/recipe/crafting/equipmentcharger.json
+e2a8f1fd2a8554c09e7e5d9c43020442ccc86a0c data/oritech/recipe/crafting/equipmentchargeralt.json
 a9d73bb12539f6e53c128334ceba00d5f1131c9a data/oritech/recipe/crafting/exoboostedelytra.json
 edd220b1ec83ebdf8789cda1b32857a602390acd data/oritech/recipe/crafting/exoboostedelytraalt.json
 a007060d3a7bb7b68d83aee68cc4e2a0deea98b1 data/oritech/recipe/crafting/exojetpack.json

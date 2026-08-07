@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/copper",
+    "#c:ingots/copper"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:constantan_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

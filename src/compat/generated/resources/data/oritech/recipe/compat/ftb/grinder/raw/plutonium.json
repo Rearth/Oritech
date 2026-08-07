@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:plutonium_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:plutonium_clump"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:plutonium_tiny_dust"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:uranium_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

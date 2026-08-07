@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "id": "minecraft:lava"
+    }
+  ],
+  "itemInputs": [
+    "ftbmaterials:silver_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:silver_clump"
+    }
+  ],
+  "recipeType": "oritech:refinery",
+  "time": 80
+}

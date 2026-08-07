@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-01T09:43:22.8336214	Tags for minecraft:block mod id oritech
+// 26.1.2	2026-08-06T18:34:05.1452782	Tags for minecraft:block mod id oritech
 21cbe2cdb90402a19550a1e8446fcf0da46ea989 data/c/tags/block/budding_blocks.json
 db22d0db071efe480dee805390904217f01a586e data/c/tags/block/buds.json
 defb6e7e401af9151818226e55ea213c6737fc87 data/c/tags/block/ores.json
@@ -27,7 +27,7 @@ b91231802354b103a5e685b0b77734021dd9c0b6 data/c/tags/block/storage_blocks/steel.
 aa49c88b5e4cf1d8cdc73dcca6787985f9707870 data/minecraft/tags/block/crops.json
 aa49c88b5e4cf1d8cdc73dcca6787985f9707870 data/minecraft/tags/block/maintains_farmland.json
 fd57a8e65f796270f36e3db3b0b34dff72dd0863 data/minecraft/tags/block/mineable/axe.json
-a414f1aeb62329c7665730e2dde5d0f8000577dd data/minecraft/tags/block/mineable/pickaxe.json
+584462a0066d570703ad15b993b462f66c12f00d data/minecraft/tags/block/mineable/pickaxe.json
 d0bbb280b3d1db02d1d4d4db79da013422f05d8c data/minecraft/tags/block/needs_iron_tool.json
 4d1703385c7aa74f453c913e85d6533af9243af8 data/minecraft/tags/block/needs_stone_tool.json
 f3f76653edbbe042785d05787c62093f98395db4 data/oritech/tags/block/blackhole_blacklist.json
@@ -40,4 +40,4 @@ d444197bfa15ab91774548ca604f9905ab61c596 data/oritech/tags/block/mineable/drill.
 8a17d874fbc79aeaa5c5e9c7b39b38efbabf8356 data/oritech/tags/block/reactor_wall_blocks.json
 bde845fe1a02ede5100ebab4eeecddd1329c1628 data/oritech/tags/block/refinery/arcane.json
 fa2fad88854369567d67e70283df53d9d5828615 data/oritech/tags/block/refinery/sculk.json
-1ee374dbf1abd86b28377f323fd8ea7424aad95f data/oritech/tags/block/resource_nodes.json
+dbd0fdcb6490ad9f893777c0291179bf0744cc6a data/oritech/tags/block/resource_nodes.json

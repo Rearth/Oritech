@@ -1,0 +1,27 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:tungsten_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:tungsten_clump"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:tungsten_tiny_dust"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:copper_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

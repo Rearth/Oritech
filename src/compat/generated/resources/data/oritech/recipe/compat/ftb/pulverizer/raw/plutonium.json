@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:plutonium_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:plutonium_dust"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:plutonium_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

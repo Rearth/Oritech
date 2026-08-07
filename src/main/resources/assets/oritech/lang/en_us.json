@@ -716,6 +716,15 @@
   "block.oritech.copper_resource_node": "Copper Resource Node",
   "block.oritech.nickel_resource_node": "Nickel Resource Node",
   "block.oritech.platinum_resource_node": "Platinum Resource Node",
+  "block.oritech.aluminum_resource_node": "Aluminum Resource Node",
+  "block.oritech.lead_resource_node": "Lead Resource Node",
+  "block.oritech.osmium_resource_node": "Osmium Resource Node",
+  "block.oritech.silver_resource_node": "Silver Resource Node",
+  "block.oritech.tin_resource_node": "Tin Resource Node",
+  "block.oritech.zinc_resource_node": "Zinc Resource Node",
+  "block.oritech.iridium_resource_node": "Iridium Resource Node",
+  "block.oritech.tungsten_resource_node": "Tungsten Resource Node",
+  "block.oritech.titanium_resource_node": "Titanium Resource Node",
   "block.oritech.industrial_light": "Industrial Light",
   "block.oritech.industrial_light_hanging": "Hanging Light",
   "block.oritech.industrial_button": "Industrial Button",
@@ -1319,5 +1328,7 @@
   "tag.item.oritech.recyclable.small_copper_dust": "Recyclable Small Copper Dust",
   "tag.item.oritech.recyclable.small_gold_dust": "Recyclable Small Gold Dust",
   "tag.item.oritech.recyclable.small_iron_dust": "Recyclable Small Iron Dust",
-  "tag.item.oritech.recyclable.string": "Recyclable String"
+  "tag.item.oritech.recyclable.string": "Recyclable String",
+  "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
 }

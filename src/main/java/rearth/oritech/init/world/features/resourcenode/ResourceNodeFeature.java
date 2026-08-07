@@ -4,17 +4,12 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.FeaturePlaceContext;
 import net.minecraft.world.level.levelgen.synth.ImprovedNoise;
 import rearth.oritech.Oritech;
 import rearth.oritech.config.OritechConfig;
-
-import java.util.List;
 
 public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
 
@@ -61,19 +56,11 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
 
     }
 
-    private BlockState getRandomBlockFromList(List<Identifier> list, RandomSource random) {
-        return BuiltInRegistries.BLOCK.get(getRandomFromList(list, random)).get().value().defaultBlockState();
-    }
-
-    private Identifier getRandomFromList(List<Identifier> list, RandomSource random) {
-        return list.get(random.nextInt(list.size()));
-    }
-
     private void placeBedrockNode(BlockPos startPos, FeaturePlaceContext<ResourceNodeFeatureConfig> context) {
 
         var level = context.level();
         var random = context.random();
-        var ores = context.config().nodeOres();
+        var orePool = new WeightedBlockPool(context.config().nodeOres());
 
         var radius = context.config().nodeSize();
         var overlayBlock = BuiltInRegistries.BLOCK.get(context.config().overlayBlock()).get().value().defaultBlockState();
@@ -91,7 +78,7 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
                 continue;
             // randomly replace some blocks below bedrock level with resource nodes
             if (pos.getY() <= startPos.getY() + 1 && random.nextDouble() <= context.config().nodeOreChance()) {
-                level.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
+                level.setBlock(pos, orePool.getRandom(random), 0x10);
                 // set blocks between bedrock and bedrock + overlayHeight to overlayBlock
             } else if (pos.getY() > startPos.getY() + 1 && pos.getY() <= startPos.getY() + overlayHeight + 1) {
                 level.setBlock(pos, overlayBlock, 0x10);
@@ -108,13 +95,13 @@ public class ResourceNodeFeature extends Feature<ResourceNodeFeatureConfig> {
         var random = context.random();
         var radius = context.config().boulderRadius();
         var movedCenter = startPos.relative(Axis.getRandom(random), random.nextIntBetweenInclusive(0, radius - 1));
-        var ores = context.config().boulderOres();
+        var orePool = new WeightedBlockPool(context.config().boulderOres());
         var noise = new ImprovedNoise(random);
 
         for (BlockPos pos : BlockPos.withinManhattan(movedCenter, radius, radius, radius)) {
             if (Math.sqrt(pos.distSqr(movedCenter)) > radius + noise.noise(pos.getX(), pos.getY(), pos.getZ()))
                 continue;
-            level.setBlock(pos, getRandomBlockFromList(ores, random), 0x10);
+            level.setBlock(pos, orePool.getRandom(random), 0x10);
         }
     }
 }

@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:gems/lapis"
+  ],
+  "itemResults": [
+    {
+      "id": "enderio:powdered_lapis_lazuli"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 120
+}

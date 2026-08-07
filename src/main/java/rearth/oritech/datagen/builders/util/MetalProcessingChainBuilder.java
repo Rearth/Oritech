@@ -26,9 +26,9 @@ import java.util.function.Supplier;
 
 public class MetalProcessingChainBuilder {
     private final String metalName;
-    private String resourcePath = "";
+    private String prefix = "";
     // ingredient should generally be used for recipe inputs and item for recipe output
-    // wherever possible, use ConventionalItemTags (Fabric) or Tags.Items (Neoforge) for ingredients
+    // wherever possible, use Tags.Items for ingredients
     private Ingredient ore;
     private Ingredient rawOreIngredient;
     private Item rawOreItem;
@@ -63,8 +63,8 @@ public class MetalProcessingChainBuilder {
         this.registryAccess = registryAccess;
     }
 
-    public MetalProcessingChainBuilder resourcePath(String resourcePath) {
-        this.resourcePath = resourcePath;
+    public MetalProcessingChainBuilder prefix(String prefix) {
+        this.prefix = prefix;
         return this;
     }
 
@@ -333,14 +333,14 @@ public class MetalProcessingChainBuilder {
     }
 
     public void export(RecipeOutput exporter) {
-        validate(resourcePath + "ore/" + metalName);
+        validate("ore/" + metalName);
 
         // ore block -> raw ores
-        new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, resourcePath + "ore/" + metalName);
+        new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
         var grinderOreRecipe = new GrinderRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
         if (rawOreByproduct != null)
             grinderOreRecipe.result(rawOreByproduct);
-        grinderOreRecipe.export(exporter, resourcePath + "ore/" + metalName);
+        grinderOreRecipe.export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
 
         // raw ores -> dusts in pulverizer
         if (dustItem != null) {
@@ -349,7 +349,7 @@ public class MetalProcessingChainBuilder {
                     .result(dustItem)
                     .result(firstNonNullOptional(smallDustItem, nuggetItem), 3)
                     .timeMultiplier(timeMultiplier)
-                    .export(exporter, resourcePath + "raw/" + metalName);
+                    .export(exporter, prefix, "raw/" + metalName, Oritech.MOD_ID);
         }
 
         // raw ores -> clumps (falling back to dusts) in grinder
@@ -360,7 +360,7 @@ public class MetalProcessingChainBuilder {
                     .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)
                     .result(Optional.ofNullable(clumpByproduct), byproductAmount)
                     .timeMultiplier(timeMultiplier)
-                    .export(exporter, resourcePath + "raw/" + metalName);
+                    .export(exporter, prefix, "raw/" + metalName, Oritech.MOD_ID);
         }
 
         // raw ores -> clumps (falling back to dusts) in refinery with sheol fire
@@ -371,7 +371,7 @@ public class MetalProcessingChainBuilder {
                     .result(firstNonNull(clumpItem, dustItem), 2)
                     .fluidOutput(Fluids.LAVA, 0.1f)
                     .timeMultiplier(timeMultiplier)
-                    .export(exporter, resourcePath + "rawsheol/" + metalName);
+                    .export(exporter, prefix, "rawsheol/" + metalName, Oritech.MOD_ID);
         }
 
         // clump processing into gems in centrifuge
@@ -382,14 +382,14 @@ public class MetalProcessingChainBuilder {
                     .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount : 1)
                     .result(Optional.ofNullable(dustByproduct), byproductAmount)
                     .timeMultiplier(timeMultiplier)
-                    .export(exporter, resourcePath + "clump/" + metalName);
+                    .export(exporter, prefix, "clump/" + metalName, Oritech.MOD_ID);
             // water washed
             new CentrifugeFluidRecipeBuilder(registryAccess)
                     .input(clumpIngredient)
                     .fluidInput(Fluids.WATER)
                     .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 2 : 2)
                     .timeMultiplier(timeMultiplier * 1.5f)
-                    .export(exporter, resourcePath + "clump/" + metalName);
+                    .export(exporter, prefix, "clump/" + metalName, Oritech.MOD_ID);
             // sulfuric acid washing
             new CentrifugeFluidRecipeBuilder(registryAccess)
                     .input(clumpIngredient)
@@ -397,23 +397,23 @@ public class MetalProcessingChainBuilder {
                     .result(firstNonNull(centrifugeResult, gemItem), centrifugeResult != null ? centrifugeAmount * 3 : 3)
                     .fluidOutput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f)
                     .timeMultiplier(timeMultiplier * 1.5f)
-                    .export(exporter, resourcePath + "clumpacid/" + metalName);
+                    .export(exporter, prefix, "clumpacid/" + metalName, Oritech.MOD_ID);
         }
 
         // gems to dust (doubling)
         if (gemIngredient != null) {
             // atomic forge: 1 gem -> 2 ingots
-            new AtomicForgeRecipeBuilder(registryAccess).input(gemIngredient).input(gemCatalyst).input(gemCatalyst).result(dustItem, 2).time(20).export(exporter, resourcePath + "dust/" + metalName);
+            new AtomicForgeRecipeBuilder(registryAccess).input(gemIngredient).input(gemCatalyst).input(gemCatalyst).result(dustItem, 2).time(20).export(exporter, prefix, "dust/" + metalName, Oritech.MOD_ID);
 
             // foundry alternative: 2 gems -> 3 ingots
-            new FoundryRecipeBuilder(registryAccess).input(gemIngredient).input(gemIngredient).result(ingotItem, 3).export(exporter, resourcePath + "gem/" + metalName);
+            new FoundryRecipeBuilder(registryAccess).input(gemIngredient).input(gemIngredient).result(ingotItem, 3).export(exporter, prefix, "gem/" + metalName, Oritech.MOD_ID);
         }
 
         // ingots/nuggets to dust
         if (dustItem != null)
-            RecipeHelpers.addDustRecipe(exporter, ingotIngredient, dustItem, resourcePath + "dust/" + metalName, registryAccess);
+            RecipeHelpers.addDustRecipe(exporter, ingotIngredient, dustItem, null, prefix, "dust/" + metalName, registryAccess);
         if (smallDustItem != null)
-            RecipeHelpers.addDustRecipe(exporter, nuggetIngredient, smallDustItem, resourcePath + "smalldust/" + metalName, registryAccess);
+            RecipeHelpers.addDustRecipe(exporter, nuggetIngredient, smallDustItem, null, prefix, "smalldust/" + metalName, registryAccess);
 
         // smelting/compacting
         // Using item instead of ingredient for recipe inputs, as that's what the offerSmelting/offerBlasting methods accept

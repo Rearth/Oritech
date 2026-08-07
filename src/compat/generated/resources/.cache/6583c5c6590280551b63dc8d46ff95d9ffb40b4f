@@ -1,0 +1,12 @@
+// 26.1.2	2026-08-07T12:12:55.8199641	Productive Metalworks Oritech Compat
+23b985e5381c05954a0309ddc1f57eb72d7405e3 data/oritech/recipe/compat/productivemetalworks/casting/block/nickel.json
+f0de59a6927e3beeaedf1fe384f773d6f153d2f2 data/oritech/recipe/compat/productivemetalworks/casting/block/platinum.json
+c15f84ab9a8e3d01f151b4c4a8956a9a8d6b34a4 data/oritech/recipe/compat/productivemetalworks/casting/ingot/nickel.json
+7a7036648adc47207c178441fa0b0c70e076ee38 data/oritech/recipe/compat/productivemetalworks/casting/ingot/platinum.json
+466457efb832abe6436fbc71d7aaf6ebeaef7964 data/oritech/recipe/compat/productivemetalworks/casting/nugget/nickel.json
+5ac16359355073bb03a9b6973648fda7557287ed data/oritech/recipe/compat/productivemetalworks/casting/nugget/platinum.json
+2d71d92b652fb04ecb9153e1ca40103593bd28cf data/oritech/recipe/compat/productivemetalworks/melting/copper_gem.json
+12be336141e6141f850e340109f9375734a669f2 data/oritech/recipe/compat/productivemetalworks/melting/gold_gem.json
+6cd16efcbf7428b39578bace9d67cfa320edda6b data/oritech/recipe/compat/productivemetalworks/melting/iron_gem.json
+80ee958f01dfe2772bda7625bb981393be2ccb9c data/oritech/recipe/compat/productivemetalworks/melting/nickel_gem.json
+f2a17e787470e456c2cbe2e1235bbc0241c57c6e data/oritech/recipe/compat/productivemetalworks/melting/platinum_gem.json

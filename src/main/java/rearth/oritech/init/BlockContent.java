@@ -40,6 +40,7 @@ import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
 import rearth.oritech.config.OritechStartupConfig;
+import rearth.oritech.init.BlockContent.NoAutoDrop;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.util.ColorableMachine;
@@ -359,6 +360,37 @@ public class BlockContent {
     @NoAutoDrop
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> URANIUM_RESOURCE_NODE = BLOCKS.registerSimpleBlock("uranium_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    // endregion
+
+    // region compat resource nodes
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> ALUMINUM_RESOURCE_NODE = BLOCKS.registerSimpleBlock("aluminum_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> LEAD_RESOURCE_NODE = BLOCKS.registerSimpleBlock("lead_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> OSMIUM_RESOURCE_NODE = BLOCKS.registerSimpleBlock("osmium_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> SILVER_RESOURCE_NODE = BLOCKS.registerSimpleBlock("silver_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> TIN_RESOURCE_NODE = BLOCKS.registerSimpleBlock("tin_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> ZINC_RESOURCE_NODE = BLOCKS.registerSimpleBlock("zinc_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> IRIDIUM_RESOURCE_NODE = BLOCKS.registerSimpleBlock("iridium_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> TUNGSTEN_RESOURCE_NODE = BLOCKS.registerSimpleBlock("tungsten_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    @NoAutoDrop
+    @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
+    public static final DeferredBlock<Block> TITANIUM_RESOURCE_NODE = BLOCKS.registerSimpleBlock("titanium_resource_node", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK));
+    // endregion
 
     // region decorative
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
@@ -456,7 +488,7 @@ public class BlockContent {
     public static final DeferredBlock<Block> RAW_URANIUM = BLOCKS.registerSimpleBlock("raw_uranium_block", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK));
     @ItemContent.ItemGroupTarget(ItemContent.Groups.DECORATIVE)
     public static final DeferredBlock<Block> URANIUM = BLOCKS.registerSimpleBlock("uranium", () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).lightLevel(state -> 2));
-    //endregion
+    // endregion
 
     @SuppressWarnings("unchecked")
     public static void AddBlockItems() {
