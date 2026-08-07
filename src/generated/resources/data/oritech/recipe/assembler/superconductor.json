@@ -3,7 +3,7 @@
   "itemInputs": [
     "oritech:flux_gate",
     "#c:ingots/electrum",
-    "oritech:dubios_container",
+    "oritech:dubious_container",
     "oritech:energite_ingot"
   ],
   "itemResults": [

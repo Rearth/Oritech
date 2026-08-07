@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "oritech:item/dubios_container"
+    "layer0": "oritech:item/dubious_container"
   }
 }
