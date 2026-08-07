@@ -1,7 +1,7 @@
 {
   "type": "oritech:machine_recipe",
   "itemInputs": [
-    "#c:fuels/bio"
+    "#c:fuels/block/bio"
   ],
   "itemResults": [],
   "recipeType": "oritech:bio_generator",
