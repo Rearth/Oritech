@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-04T20:14:08.1055916	Oritech Recipes
+// 26.1.2	2026-08-07T12:53:18.271876	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -87,8 +87,8 @@ ce56e399a0b8ffe9e75daf2f46db10d6a9c52c10 data/oritech/advancement/recipes/misc/c
 19751555e9f07679a7ade36aafe2e46b13dbe669 data/oritech/advancement/recipes/misc/crafting/electricfurnacealt.json
 536e852449efaac4de941d2097e31aaa77aba519 data/oritech/advancement/recipes/misc/crafting/energy.json
 ca01da145f210e9cd7ceafc8031beb3d1de801fe data/oritech/advancement/recipes/misc/crafting/energyport.json
-36bd052a8c4ada4073800ea95050c3af1df5fde7 data/oritech/advancement/recipes/misc/crafting/equipmentCharger.json
-db041a04075f5e5575d6676a8d6146cfa5529f2d data/oritech/advancement/recipes/misc/crafting/equipmentChargeralt.json
+eb7d14673103f1cd9f9a359a23af8c5ae6b59b87 data/oritech/advancement/recipes/misc/crafting/equipmentcharger.json
+06536245b48a5a49e574d524b88cb7c7de1e3472 data/oritech/advancement/recipes/misc/crafting/equipmentchargeralt.json
 042644f5cf47a43f1fc2f1708f529e980da0916c data/oritech/advancement/recipes/misc/crafting/exoboostedelytra.json
 d842922355bffa164bd7b719a69befa38716a53b data/oritech/advancement/recipes/misc/crafting/exoboostedelytraalt.json
 6488c825333171c21911decf003fe0207efcd7bd data/oritech/advancement/recipes/misc/crafting/exojetpack.json
@@ -154,7 +154,7 @@ a0af3896d9005df43b92cc7f031f7884b27d2ec7 data/oritech/advancement/recipes/misc/c
 f06699e65b4d3002e55276692b43dd98f2c44601 data/oritech/advancement/recipes/misc/crafting/_hunter.json
 674aa565fc658c4b0808f42da17564444cfa09ae data/oritech/advancement/recipes/misc/diamond_paint.json
 691b2e2fe3dba1219799d75552dc50b90d01df77 data/oritech/advancement/recipes/misc/dirt_from_sand_and_biomass.json
-803e726c0bdcf331711f053f57aca8b7cebd02dc data/oritech/advancement/recipes/misc/dubios_container.json
+c8227f8a47f59ed3b77054ee34b5ad67b15a4b43 data/oritech/advancement/recipes/misc/dubious_container.json
 adb013b3d9ac8f75ecea39ce2ffbad820501e1a3 data/oritech/advancement/recipes/misc/duratiumblock.json
 5c902e863a6cf8248ce86a4cd86db197af744f41 data/oritech/advancement/recipes/misc/duratiumblockinv.json
 cca196e922fb4d2d134dc7a699bb83b122d554eb data/oritech/advancement/recipes/misc/duratium_ingot_from_blasting_duratium_dust.json
@@ -312,7 +312,7 @@ e05c181f3c0e23e889add908f9918b738a4629b4 data/oritech/recipe/adamantblockinv.jso
 8230a0865d2c843c516bdd276f8775cb3558355d data/oritech/recipe/adamant_ingot.json
 76274c8f4f8bf89009768e31c83b440dd6667d1e data/oritech/recipe/adamant_ingot_from_blasting_adamant_dust.json
 40d37e406c226d500ad78e0d98f30f4e6522a170 data/oritech/recipe/adamant_ingot_from_smelting_adamant_dust.json
-f1f5e8a1457e7e9c078b3d750055fefb3ac1747a data/oritech/recipe/addon_splicer.json
+b6a05844db1da5c7e1aa035a05ead056e9dc1deb data/oritech/recipe/addon_splicer.json
 f9f2e8f3b86e2aef5c9ba826d0d625fef10e55e2 data/oritech/recipe/advanced_battery.json
 16901751469380b89ec1320c70c7fcdeca5480b6 data/oritech/recipe/assembler/amethystbud.json
 3111ab3e631cc150250502e1e0ba34196c93b020 data/oritech/recipe/assembler/battery.json
@@ -338,7 +338,7 @@ c285f65fa4f8b007431857e44527fb4334211655 data/oritech/recipe/assembler/reactorpl
 d8373877734993da502b5f7e2ed22162dfd5ad2e data/oritech/recipe/assembler/shroomlight.json
 5a2d886c511b2b3881191d10bf02e524ae2fbc84 data/oritech/recipe/assembler/slime.json
 beaa81776d748cdcb8ece69c7da05aed407866ce data/oritech/recipe/assembler/solidbiofuel.json
-277672d9cdf01cda55e7e46c3d0c6ae318349f08 data/oritech/recipe/assembler/superconductor.json
+5e085150dc4a564d98674d3254e100bbbe6fb08e data/oritech/recipe/assembler/superconductor.json
 c457824623749eb047a5d276caa95a9f02293d4b data/oritech/recipe/assembler/uranpelletbasic.json
 0aff5e6e78c0677fb8d7e8cd6561a4b97a9ff6af data/oritech/recipe/assembler/uranpelletbetter.json
 426d9e502508382238a3d71f695759939f2bdf6a data/oritech/recipe/assembler/uranpelletult.json
@@ -383,7 +383,7 @@ f4618776d1cdd5447cceeaa4a4399fcba579f553 data/oritech/recipe/centrifuge/clump/go
 29fa43954ff16c8fdc91a91d55b3bd16bfc9d821 data/oritech/recipe/centrifuge/clump/nickel.json
 83b6061879fdb4dca7abd4443c11d48cc724b0bb data/oritech/recipe/centrifuge/clump/platinum.json
 b6c63be286bbcb35f93518e137071826249365ff data/oritech/recipe/centrifuge/endericsculk.json
-d944d63ab00d1c1805618959a91984d2b622bbe4 data/oritech/recipe/centrifuge/fluid/advbatteryacid.json
+110e2dfe136472ebf49b99af8effd1c78ba4a53c data/oritech/recipe/centrifuge/fluid/advbatteryacid.json
 5de7b0910c0f6b099c407b40c947eb455227f064 data/oritech/recipe/centrifuge/fluid/batteryacid.json
 51e5bd5dce4f06536f8f4e69a05c084decb46fdf data/oritech/recipe/centrifuge/fluid/biofuel.json
 725899aede2050c6ddfe5cbcabca404e812267e5 data/oritech/recipe/centrifuge/fluid/biopolymer.json
@@ -410,7 +410,7 @@ b3a624e31b8451b21c75d19e60b5eb1bbd18a9de data/oritech/recipe/centrifuge/fluid/pl
 a2c8ffa87a61883c338b654ed0592aa815e0c17f data/oritech/recipe/centrifuge/fluid/siliconwafers.json
 b5fd7df4ba9fa042b4671a85fcf576baa5fa25a1 data/oritech/recipe/centrifuge/fluid/siliconwash.json
 08a8c37d8c4c4046afcbe01e5d2b057d84672c27 data/oritech/recipe/centrifuge/fluid/siliconwashbad.json
-92437edb2f704b4aac3ba6d0ce73b1b8ec2f5dbf data/oritech/recipe/centrifuge/fluid/unholyai.json
+ec4131c3f72edede97bb29c6ed19a7805f696349 data/oritech/recipe/centrifuge/fluid/unholyai.json
 4e4ec728a4c82b2b9fed66ede4077b00c25e99e3 data/oritech/recipe/centrifuge/redstoneuran.json
 cd1b52ebd4850273ae64a9d4d1b64f89b3f9a4ed data/oritech/recipe/chainsaw.json
 da4ff740a56bd8a79b72e7dec1bd13ac512cc71c data/oritech/recipe/clay_catalyst_beads.json
@@ -446,13 +446,13 @@ a92bba235c824c73cb73cd93208ba4258a2c7666 data/oritech/recipe/crafting/addon/ulti
 a919e7ecae9b4551d9603222005e0e13d0f9acc5 data/oritech/recipe/crafting/assembleralt.json
 74798c941a6f5b1f697101bb0ef1a2f4d207d135 data/oritech/recipe/crafting/atomicforge.json
 b395784cd560dc46eac748204d2e1ccec5b1a3e2 data/oritech/recipe/crafting/augment/advanced.json
-6d46f155a25fa36c739d6d2891c96242c186a35d data/oritech/recipe/crafting/augment/applicator.json
+a1eb798667f536dd90bdfb6f95f268331ea646b7 data/oritech/recipe/crafting/augment/applicator.json
 aabd9ed05ee196c2f57bc8fd2322b51997b1c250 data/oritech/recipe/crafting/augment/arcane.json
 653c99aa021a088c875676b7a861ca786cd7626f data/oritech/recipe/crafting/augment/basic.json
 99bfbd8ed46bdd452b6aec980c11c5012d4fb687 data/oritech/recipe/crafting/basicgen.json
 3193f4511c5cc49c03c758e03ef8a8c6b7e380cc data/oritech/recipe/crafting/basicjetpack.json
 d041dcfacc480fe8b987e00160969f0d0a7a28d1 data/oritech/recipe/crafting/basicjetpackalt.json
-db6604d3f9d3b73a6d2d50f2b3a3472e565361d6 data/oritech/recipe/crafting/bigstorage.json
+c2bfceb970ec885cbf73892dbc179036d7ea689f data/oritech/recipe/crafting/bigstorage.json
 0c548e3c8091ef666a6da574fbe8da0e7b6e3300 data/oritech/recipe/crafting/biogen.json
 14cffbca1924294fb8634d9921acd351429bcc4f data/oritech/recipe/crafting/boostedelytra.json
 a911ba75403b978f3d97476a3fae1b3d95f95847 data/oritech/recipe/crafting/catalyst.json
@@ -468,7 +468,7 @@ a565b6e3e1bae2ee4c648c48777ec22abb94705e data/oritech/recipe/crafting/core2.json
 cc75461083094ec4e271a0a655b62873c23f11c1 data/oritech/recipe/crafting/core3alt.json
 82e6d5409f2bec302ec45a6e2451bf67936d2152 data/oritech/recipe/crafting/core4.json
 f6c23b2c31f0e61c57caa4e2ecabe201c27a6a5d data/oritech/recipe/crafting/core5.json
-d2d8f5ad0a87030e4958aaa722e28e993d326135 data/oritech/recipe/crafting/core6.json
+bb9323be6f8efd6eaf0f3cb03c941b5ec4632c03 data/oritech/recipe/crafting/core6.json
 aff4aafdf737c4fcdd1e5e7209423ec564df69a9 data/oritech/recipe/crafting/core7.json
 65ca32b5cf71309f2395b88cd6cf47175f810bd0 data/oritech/recipe/crafting/crusher.json
 6a62d5b815ab16035d76fecdc6106a9a9827b419 data/oritech/recipe/crafting/deepdrill.json
@@ -479,8 +479,8 @@ b84f8ca5cd6c231d9aa8217ea589c29ff8a42cd2 data/oritech/recipe/crafting/electricfu
 f9268adeb3ee93f42407cbadbbe3f6265c8726bd data/oritech/recipe/crafting/electricfurnacealt.json
 a4f7f11b3ba3a22a667fafd745819b2dac148d60 data/oritech/recipe/crafting/energy.json
 98090451aade069e538afeb6768877f34706af8d data/oritech/recipe/crafting/energyport.json
-a6c96267d133fe25fdc24c887cde461683d2ab34 data/oritech/recipe/crafting/equipmentCharger.json
-e2a8f1fd2a8554c09e7e5d9c43020442ccc86a0c data/oritech/recipe/crafting/equipmentChargeralt.json
+a6c96267d133fe25fdc24c887cde461683d2ab34 data/oritech/recipe/crafting/equipmentcharger.json
+e2a8f1fd2a8554c09e7e5d9c43020442ccc86a0c data/oritech/recipe/crafting/equipmentchargeralt.json
 a9d73bb12539f6e53c128334ceba00d5f1131c9a data/oritech/recipe/crafting/exoboostedelytra.json
 edd220b1ec83ebdf8789cda1b32857a602390acd data/oritech/recipe/crafting/exoboostedelytraalt.json
 a007060d3a7bb7b68d83aee68cc4e2a0deea98b1 data/oritech/recipe/crafting/exojetpack.json
@@ -557,7 +557,7 @@ cc202f8a186dae53798ae06723f1be5785cfc1c2 data/oritech/recipe/deepdrill/nickel.js
 38c732c3eebdd711bc1fd867a33d63c0379ed63e data/oritech/recipe/deepdrill/uranium.json
 096b54f2196cac7bac22a0f7ab4675c66cdace68 data/oritech/recipe/diamond_paint.json
 45a483b0edf6d1bbe554bf84853f8117e0767507 data/oritech/recipe/dirt_from_sand_and_biomass.json
-8c7ed7246f9fa0c89aa1cc61acb6657b0063e185 data/oritech/recipe/dubios_container.json
+80acc963d164327487c9385b1db27ce4df317869 data/oritech/recipe/dubious_container.json
 ec566f4e815b59ae66b14c49e5cbe6161112718d data/oritech/recipe/duratiumblock.json
 09f5a7cb6dd2190c4c7bab477cbd792b4f96f24a data/oritech/recipe/duratiumblockinv.json
 b7571d6954fe81a0bea9a7b7261a27507fe5060d data/oritech/recipe/duratium_ingot_from_blasting_duratium_dust.json
@@ -705,7 +705,7 @@ e2bbbbf3202be3fd07f7a7f136d7eae9514eff09 data/oritech/recipe/item_pipe_duct.json
 23605268ec6f0ae0fdaf95d28f42303fe5cf6b66 data/oritech/recipe/laser/plutoniumdust.json
 35f6e4ff387a13359c641df18236731bd2c27909 data/oritech/recipe/lavagen/lava.json
 5e42e6887556f44c306c7f00cdc7b8c1dbc09cc2 data/oritech/recipe/lavagen/sheolfire.json
-7c50139aa6df545c8e665975fe10812d587ad584 data/oritech/recipe/low_yield_nuclear_explosion_device.json
+b9359c3df19d1943d44fb994f490671574abdf16 data/oritech/recipe/low_yield_nuclear_explosion_device.json
 fe03ea7d4780c0d58534a96523581e1d3dea8aaa data/oritech/recipe/machine_extender.json
 3e9c6903b36396b3626625d0f780f2d54f576217 data/oritech/recipe/machine_frame.json
 d93e6f707e596157fcd24e27940f64030b8b6535 data/oritech/recipe/magnetic_coil.json
