@@ -14,12 +14,16 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import rearth.oritech.Oritech;
 import rearth.oritech.compat.datagen.resolver.ATOMaterialResolver;
+import rearth.oritech.datagen.builders.BedrockExtractorRecipeBuilder;
 import rearth.oritech.datagen.builders.FoundryRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
+import rearth.oritech.init.BlockContent;
 
 public class ATOCompatRecipeProvider extends RecipeProvider {
     private static final String PATH = "compat/ato";
@@ -51,6 +55,14 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
         addFoundryAlloying(Materials.COPPER, Materials.TIN, Materials.BRONZE);
         addFoundryAlloying(Materials.IRON, Materials.NICKEL, Materials.INVAR, 2);
         addFoundryAlloying(Materials.COPPER, Materials.NICKEL, Materials.CONSTANTAN, 2);
+
+        addBedrockExtraction(BlockContent.ALUMINUM_RESOURCE_NODE, Materials.ALUMINUM);
+        addBedrockExtraction(BlockContent.LEAD_RESOURCE_NODE, Materials.LEAD);
+        addBedrockExtraction(BlockContent.OSMIUM_RESOURCE_NODE, Materials.OSMIUM);
+        addBedrockExtraction(BlockContent.SILVER_RESOURCE_NODE, Materials.SILVER);
+        addBedrockExtraction(BlockContent.TIN_RESOURCE_NODE, Materials.TIN);
+        addBedrockExtraction(BlockContent.ZINC_RESOURCE_NODE, Materials.ZINC);
+        addBedrockExtraction(BlockContent.IRIDIUM_RESOURCE_NODE, Materials.IRIDIUM);
 
         oreToGem(Materials.CINNABAR);
         gemToDust(Materials.CINNABAR);
@@ -84,38 +96,44 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
             .prefix(PATH).export(this.modLoadedOutput);
     }
 
-    private void addFoundryAlloying(Material materialA, Material materialB, Material output) {
-        addFoundryAlloying(materialA, materialB, output, 1);
+    private void addFoundryAlloying(Material materialA, Material materialB, Material result) {
+        addFoundryAlloying(materialA, materialB, result, 1);
     }
 
-    private void addFoundryAlloying(Material materialA, Material materialB, Material output, int outputCount) {
+    private void addFoundryAlloying(Material materialA, Material materialB, Material result, int resultCount) {
         new FoundryRecipeBuilder(this.registries)
             .input(resolver.ingredient(materialA, ItemPartType.INGOT))
             .input(resolver.ingredient(materialB, ItemPartType.INGOT))
-            .result(new ItemStackTemplate(output.get(ItemPartType.INGOT).getHolder(), outputCount))
-            .export(this.modLoadedOutput, PATH, output.getGroup(), Oritech.MOD_ID);
+            .result(resolver.item(result, ItemPartType.INGOT), resultCount)
+            .export(this.modLoadedOutput, PATH, result.getGroup(), Oritech.MOD_ID);
+    }
+
+    private void addBedrockExtraction(ItemLike block, Material result) {
+        new BedrockExtractorRecipeBuilder(this.registries)
+            .input(block).result(resolver.item(result, ItemPartType.RAW))
+            .export(this.modLoadedOutput, PATH, result.getGroup(), Oritech.MOD_ID);
     }
 
     private void oreToGem(Material material) {
         new PulverizerRecipeBuilder(this.registries)
-            .input(TagKey.create(Registries.ITEM, material.get(BlockPartType.STONE_ORE).getTag().location()))
-            .result(new ItemStackTemplate(material.get(ItemPartType.GEM).getHolder().get(), 2))
+            .input(resolver.itemTag(material, BlockPartType.STONE_ORE))
+            .result(resolver.item(material, ItemPartType.GEM), 2)
             .addToGrinder()
             .export(this.modLoadedOutput, PATH, "gem/" + material.getGroup(), Oritech.MOD_ID);
     }
 
     private void gemToDust(Material material) {
         new PulverizerRecipeBuilder(this.registries)
-            .input(TagKey.create(Registries.ITEM, material.get(ItemPartType.GEM).getTag().location()))
-            .result(new ItemStackTemplate(material.get(ItemPartType.DUST).getHolder().get()))
+            .input(resolver.itemTag(material, ItemPartType.GEM))
+            .result(resolver.item(material, ItemPartType.DUST))
             .addToGrinder()
             .export(this.modLoadedOutput, PATH, "dust/" + material.getGroup(), Oritech.MOD_ID);
     }
 
     private void oreToDust(Material material) {
         new PulverizerRecipeBuilder(this.registries)
-            .input(TagKey.create(Registries.ITEM, material.get(BlockPartType.STONE_ORE).getTag().location()))
-            .result(new ItemStackTemplate(material.get(ItemPartType.DUST).getHolder().get()))
+            .input(resolver.itemTag(material, BlockPartType.STONE_ORE))
+            .result(resolver.item(material, ItemPartType.DUST))
             .addToGrinder()
             .export(this.modLoadedOutput, PATH, "dust/" + material.getGroup(), Oritech.MOD_ID);
     }

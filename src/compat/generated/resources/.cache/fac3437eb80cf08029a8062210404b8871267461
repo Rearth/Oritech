@@ -1,4 +1,11 @@
-// 26.1.2	2026-08-06T12:13:46.4380233	ATO Oritech Compat
+// 26.1.2	2026-08-08T10:21:11.3816848	ATO Oritech Compat
+a84f95a0b449cfb353a277788b0960d223a528ed data/oritech/recipe/compat/ato/deepdrill/aluminum.json
+1f4e5909818383cf75b9772d8ec6d5e64ba508f5 data/oritech/recipe/compat/ato/deepdrill/iridium.json
+b8e22a7ed35102783429d68d46a65fd8c3151bcc data/oritech/recipe/compat/ato/deepdrill/lead.json
+9a27856ee93d3184bd41059af9725b6d54180914 data/oritech/recipe/compat/ato/deepdrill/osmium.json
+56d2372abbf60002ce8e274631d9b5e2fce847db data/oritech/recipe/compat/ato/deepdrill/silver.json
+7a7e9ce0cfaabf8d6b336eb944e5e3cce380e325 data/oritech/recipe/compat/ato/deepdrill/tin.json
+9b6c583a1f43b89d6d32c598b65038476c0ee05c data/oritech/recipe/compat/ato/deepdrill/zinc.json
 dc2daa04299fc70180c18aa48549011d26bdaf89 data/oritech/recipe/compat/ato/foundry/alloy/brass.json
 fa19104de479d18ce731a5009b1676a5c816d066 data/oritech/recipe/compat/ato/foundry/alloy/bronze.json
 864f5d0ae9a30dd52daf8524b32834479e35be3b data/oritech/recipe/compat/ato/foundry/alloy/constantan.json

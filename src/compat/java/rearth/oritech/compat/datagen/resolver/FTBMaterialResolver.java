@@ -22,11 +22,12 @@ public class FTBMaterialResolver extends MaterialResolver<Resource, ResourceType
 
     @Override
     public Ingredient ingredient(Resource resource, ResourceType type) {
-        var tag = tag(resource, type);
+        var tag = itemTag(resource, type);
         return Ingredient.of(this.itemGetter.getOrThrow(tag));
     }
 
-    protected TagKey<Item> tag(Resource resource, ResourceType type) {
+    @Override
+    public TagKey<Item> itemTag(Resource resource, ResourceType type) {
         var resourceName = resource.name().toLowerCase();
         // first tag in "c" namespace. Looking at the ResourceType class, all resource types have a "c" tag,
         // and some also have a "mekanism" tag which can be safely ignored here

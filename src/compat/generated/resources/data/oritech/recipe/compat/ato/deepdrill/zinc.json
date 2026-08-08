@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:zinc_resource_node"
+  ],
+  "itemResults": [
+    {
+      "id": "alltheores:raw_zinc"
+    }
+  ],
+  "recipeType": "oritech:bedrock_extractor",
+  "time": 1
+}

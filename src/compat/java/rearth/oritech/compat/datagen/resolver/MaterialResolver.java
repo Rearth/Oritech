@@ -3,6 +3,7 @@ package rearth.oritech.compat.datagen.resolver;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -21,6 +22,9 @@ public abstract class MaterialResolver<M, T> {
 
     // Return an ingredient using the tag for material and type
     public abstract Ingredient ingredient(M material, T type);
+
+    // Return an item tag for material and type
+    public abstract TagKey<Item> itemTag(M material, T type);
 
     // Resolve a registry item
     // Priorities are vanilla, then oritech, then ATO

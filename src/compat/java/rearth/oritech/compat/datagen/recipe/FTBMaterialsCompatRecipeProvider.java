@@ -10,12 +10,15 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.ItemStackTemplate;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import rearth.oritech.Oritech;
 import rearth.oritech.compat.datagen.resolver.FTBMaterialResolver;
+import rearth.oritech.datagen.builders.BedrockExtractorRecipeBuilder;
 import rearth.oritech.datagen.builders.FoundryRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
+import rearth.oritech.init.BlockContent;
 
 public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
     private static final String PATH = "compat/ftb";
@@ -56,6 +59,16 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
         addFoundryAlloying(Resource.COPPER, Resource.TIN, Resource.BRONZE);
         addFoundryAlloying(Resource.IRON, Resource.NICKEL, Resource.INVAR, 2);
         addFoundryAlloying(Resource.COPPER, Resource.NICKEL, Resource.CONSTANTAN, 2);
+
+        addBedrockExtraction(BlockContent.ALUMINUM_RESOURCE_NODE, Resource.ALUMINUM);
+        addBedrockExtraction(BlockContent.LEAD_RESOURCE_NODE, Resource.LEAD);
+        addBedrockExtraction(BlockContent.OSMIUM_RESOURCE_NODE, Resource.OSMIUM);
+        addBedrockExtraction(BlockContent.SILVER_RESOURCE_NODE, Resource.SILVER);
+        addBedrockExtraction(BlockContent.TIN_RESOURCE_NODE, Resource.TIN);
+        addBedrockExtraction(BlockContent.ZINC_RESOURCE_NODE, Resource.ZINC);
+        addBedrockExtraction(BlockContent.IRIDIUM_RESOURCE_NODE, Resource.IRIDIUM);
+        addBedrockExtraction(BlockContent.TITANIUM_RESOURCE_NODE, Resource.TITANIUM);
+        addBedrockExtraction(BlockContent.TUNGSTEN_RESOURCE_NODE, Resource.TUNGSTEN);
 
         oreToGem(Resource.RESONATING_ORE);
         oreToGem(Resource.DIMENSIONAL_SHARD);
@@ -103,6 +116,12 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
             .input(resolver.ingredient(resourceA, ResourceType.INGOT))
             .input(resolver.ingredient(resourceA, ResourceType.INGOT))
             .result(new ItemStackTemplate(resolver.item(result, ResourceType.INGOT), resultCount))
+            .export(this.modLoadedOutput, PATH, result.name().toLowerCase(), Oritech.MOD_ID);
+    }
+
+    private void addBedrockExtraction(ItemLike block, Resource result) {
+        new BedrockExtractorRecipeBuilder(this.registries)
+            .input(block).result(resolver.item(result, ResourceType.RAW_ORE))
             .export(this.modLoadedOutput, PATH, result.name().toLowerCase(), Oritech.MOD_ID);
     }
 

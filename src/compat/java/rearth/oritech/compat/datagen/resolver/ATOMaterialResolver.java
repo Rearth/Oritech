@@ -25,7 +25,8 @@ public class ATOMaterialResolver extends MaterialResolver<Material, MaterialPart
         return Ingredient.of(this.itemGetter.getOrThrow(tag));
     }
 
-    protected TagKey<Item> itemTag(Material material, MaterialPartType<?,?,?> type) {
+    @Override
+    public TagKey<Item> itemTag(Material material, MaterialPartType<?,?,?> type) {
         if (type instanceof ItemPartType itemType) {
             return material.get(itemType).getTag();
         } else if (type instanceof BlockPartType blockType) {
