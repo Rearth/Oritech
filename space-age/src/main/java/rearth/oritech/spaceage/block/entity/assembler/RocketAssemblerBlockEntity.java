@@ -138,7 +138,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         var detectedRF = 0L;
         var detectedFuels = new HashMap<FluidType, Long>(); // value is the total burn time available for the type on the segment
         var detectedEngines = 0;
-        var weight = 0D;
+        var weight = 0;
         var stoneWeight = Blocks.STONE.defaultBlockState().getDestroySpeed(level, worldPosition);
 
         for (var blockData : segment.blocks) {
@@ -167,7 +167,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                     }
 
                     if (totalTaken > 0) {
-                        weight += totalTaken * stoneWeight / FluidType.BUCKET_VOLUME;
+                        weight += (int) (totalTaken * stoneWeight / FluidType.BUCKET_VOLUME);
                         // transaction.commit(); // todo enable again
                     }
 
@@ -181,7 +181,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             }
 
             // weight scan
-            weight += Math.max(worldState.getDestroySpeed(level, worldPos), 0);
+            weight += (int) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
 
         }
 
