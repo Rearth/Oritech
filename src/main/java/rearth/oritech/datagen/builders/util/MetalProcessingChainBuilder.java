@@ -318,8 +318,6 @@ public class MetalProcessingChainBuilder {
     }
 
     private void validate(String path) throws IllegalStateException {
-        if (ore == null)
-            throw new IllegalStateException("ore is required for metal processing chain " + path);
         if (rawOreItem == null)
             throw new IllegalStateException("raw ore is required for metal processing chain " + path);
         if ((dustItem != null || vanillaProcessing) && ingotItem == null)
@@ -336,11 +334,13 @@ public class MetalProcessingChainBuilder {
         validate("ore/" + metalName);
 
         // ore block -> raw ores
-        new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
-        var grinderOreRecipe = new GrinderRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
-        if (rawOreByproduct != null)
-            grinderOreRecipe.result(rawOreByproduct);
-        grinderOreRecipe.export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
+        if (ore != null) {
+            new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
+            var grinderOreRecipe = new GrinderRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
+            if (rawOreByproduct != null)
+                grinderOreRecipe.result(rawOreByproduct);
+            grinderOreRecipe.export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
+        }
 
         // raw ores -> dusts in pulverizer
         if (dustItem != null) {

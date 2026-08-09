@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-08T10:29:45.3349286	FTB Materials Oritech Compat
+// 26.1.2	2026-08-08T19:24:11.6877616	FTB Materials Oritech Compat
 f7a7306432b72a945567245ecda13fdf8c982760 data/oritech/recipe/compat/ftb/centrifuge/clump/aluminum.json
 204903fca34155b19fb1aa7db0c261530a035be3 data/oritech/recipe/compat/ftb/centrifuge/clump/antimony.json
 b927842325347183720d9a7c2aa8a58a89a7bc56 data/oritech/recipe/compat/ftb/centrifuge/clump/iridium.json
@@ -61,7 +61,6 @@ d42cabbe4df1b7001959cb46a651602a3c126bc1 data/oritech/recipe/compat/ftb/grinder/
 e0b91ad5ae8483c2bc5e15220a8960ab79123f2d data/oritech/recipe/compat/ftb/grinder/ore/iridium.json
 a0e890054ee4c18206ce6fd3e4b4d25739fb48a5 data/oritech/recipe/compat/ftb/grinder/ore/lead.json
 80a9ee85b235c5d60c1648443e8c45a63bece832 data/oritech/recipe/compat/ftb/grinder/ore/osmium.json
-487babb0604d9ebd6ef9e46fb37cbf74e2c7a2a3 data/oritech/recipe/compat/ftb/grinder/ore/plutonium.json
 59d2f21a5ef6a9ba7e5d8df1f28a5cecfca1bc14 data/oritech/recipe/compat/ftb/grinder/ore/silver.json
 6efa23c6654bf641db7baa2ead0c14e74ab52d1d data/oritech/recipe/compat/ftb/grinder/ore/tin.json
 da88b299c63a6afb10168e9c89019e288f0d0741 data/oritech/recipe/compat/ftb/grinder/ore/titanium.json
@@ -121,7 +120,6 @@ fa3d799044aeddc5aa270983e3959d725bf94dd7 data/oritech/recipe/compat/ftb/pulveriz
 0a5bc2ed0343b2689695257b212ce808a20b6abc data/oritech/recipe/compat/ftb/pulverizer/ore/iridium.json
 096cdc9a74cfdebc3208c7b76114b9b1cd14ef1a data/oritech/recipe/compat/ftb/pulverizer/ore/lead.json
 733c3acaa35a3c2c4d084b7ddc4c630cbba9030d data/oritech/recipe/compat/ftb/pulverizer/ore/osmium.json
-c511cb7fe195aede31385b31538daaf26e97c4e5 data/oritech/recipe/compat/ftb/pulverizer/ore/plutonium.json
 3d91af66ce31d25d792e19a59e621c421385330d data/oritech/recipe/compat/ftb/pulverizer/ore/silver.json
 cddb4f17d5bf3452556fac986e0e3046b57b5662 data/oritech/recipe/compat/ftb/pulverizer/ore/tin.json
 3a818273bdebe3aa45740fdd21c3a35bcf589379 data/oritech/recipe/compat/ftb/pulverizer/ore/titanium.json

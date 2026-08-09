@@ -92,8 +92,15 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
     }
 
     private void addMetalProcessing(Resource resource, Resource secondary) {        
-        new MetalProcessingChainBuilder(resource.name().toLowerCase(), this.registries)
-            .ore(resolver.ingredient(resource, ResourceType.STONE_ORE))
+        var metalProcessingChain = new MetalProcessingChainBuilder(resource.name().toLowerCase(), this.registries);
+
+        var resourceTypes = resource.getResourceTypes();
+        // Every FTB Material that has any type of ORE resource has all 4 ORE resource types
+        // Just use STONE_ORE when checking if the ore resource type exists or when looking up the #c:ores tag
+        if (resourceTypes.contains(ResourceType.STONE_ORE)) {
+            metalProcessingChain = metalProcessingChain.ore(resolver.ingredient(resource, ResourceType.STONE_ORE));
+        }
+        metalProcessingChain
             .rawOre(resolver.item(resource, ResourceType.RAW_ORE))
             .rawOreByproduct(resolver.item(secondary, ResourceType.RAW_ORE))
             .ingot(resolver.ingredient(resource, ResourceType.INGOT), resolver.item(resource, ResourceType.INGOT))
