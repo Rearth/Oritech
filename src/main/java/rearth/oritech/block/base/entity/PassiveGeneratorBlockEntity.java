@@ -68,6 +68,8 @@ public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements
 
             if (available <= 0) break;
         }
+
+        energyStorage.internalExtract(energyStorage.getAmountAsLong() - available, transaction);
     }
 
     public abstract int getProductionRate();
