@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:coals"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:coal_dust"
+    }
+  ],
+  "time": 40
+}

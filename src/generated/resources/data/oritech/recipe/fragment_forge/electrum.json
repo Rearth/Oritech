@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:ingots/electrum"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:electrum_dust"
+    }
+  ],
+  "time": 40
+}

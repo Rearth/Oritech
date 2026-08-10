@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:ingots/iron"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:iron_dust"
+    }
+  ],
+  "time": 40
+}

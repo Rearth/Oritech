@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:sandstone/blocks"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:sand"
+    }
+  ],
+  "time": 120
+}

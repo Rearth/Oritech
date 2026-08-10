@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:coal_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:coal"
+    }
+  ],
+  "time": 40
+}

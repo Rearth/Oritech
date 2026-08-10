@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:wool"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:string"
+    }
+  ],
+  "time": 40
+}

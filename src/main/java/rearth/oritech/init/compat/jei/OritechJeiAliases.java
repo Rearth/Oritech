@@ -35,7 +35,7 @@ final class OritechJeiAliases {
         add(registration, "pipe_extractor", BlockContent.PIPE_BOOSTER.get());
 
         add(registration, "crusher", BlockContent.PULVERIZER.get());
-        add(registration, "grinder", BlockContent.FRAGMENT_FORGE.get());
+        add(registration, "fragment_forge", BlockContent.FRAGMENT_FORGE.get());
         add(registration, "auto_crafter", BlockContent.ASSEMBLER.get());
         add(registration, "alloy_smelter", BlockContent.FOUNDRY.get());
         add(registration, "freezer", BlockContent.INDUSTRIAL_CHILLER.get());

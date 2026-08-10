@@ -34,7 +34,7 @@ public abstract class OritechRecipeBuilder {
     protected List<FluidStackTemplate> fluidOutputs;
     protected int time = 200;
     protected float timeMultiplier = 1f;
-    protected boolean addToGrinder;
+    protected boolean addToFragmentForge;
     private final String resourcePath;
     protected final HolderLookup.Provider registryAccess;
 
@@ -168,8 +168,8 @@ public abstract class OritechRecipeBuilder {
         return this;
     }
 
-    public OritechRecipeBuilder addToGrinder() {
-        this.addToGrinder = true;
+    public OritechRecipeBuilder addToFragmentForge() {
+        this.addToFragmentForge = true;
         return this;
     }
 

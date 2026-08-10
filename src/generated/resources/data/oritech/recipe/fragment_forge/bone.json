@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:bone"
+  ],
+  "itemResults": [
+    {
+      "count": 8,
+      "id": "minecraft:bone_meal"
+    }
+  ],
+  "time": 40
+}

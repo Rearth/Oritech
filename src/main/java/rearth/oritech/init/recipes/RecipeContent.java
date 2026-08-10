@@ -19,7 +19,7 @@ public class RecipeContent {
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Oritech.MOD_ID);
 
     public static final Supplier<RecipeType<OritechRecipe>> PULVERIZER = CreateRecipeType("pulverizer");
-    public static final Supplier<RecipeType<OritechRecipe>> FRAGMENT_FORGE = CreateRecipeType("grinder");
+    public static final Supplier<RecipeType<OritechRecipe>> FRAGMENT_FORGE = CreateRecipeType("fragment_forge");
     public static final Supplier<RecipeType<OritechRecipe>> ASSEMBLER = CreateRecipeType("assembler");
     public static final Supplier<RecipeType<OritechRecipe>> REFINERY = CreateRecipeType("refinery");
     public static final Supplier<RecipeType<OritechRecipe>> FOUNDRY = CreateRecipeType("foundry");

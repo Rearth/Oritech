@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:nuggets/nickel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_nickel_dust"
+    }
+  ],
+  "time": 40
+}

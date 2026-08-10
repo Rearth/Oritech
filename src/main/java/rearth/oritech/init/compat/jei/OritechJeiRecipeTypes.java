@@ -8,7 +8,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 final class OritechJeiRecipeTypes {
 
     static final IRecipeHolderType<OritechRecipe> PULVERIZER = create("pulverizer");
-    static final IRecipeHolderType<OritechRecipe> GRINDER = create("grinder");
+    static final IRecipeHolderType<OritechRecipe> FRAGMENT_FORGE = create("fragment_forge");
     static final IRecipeHolderType<OritechRecipe> ASSEMBLER = create("assembler");
     static final IRecipeHolderType<OritechRecipe> REFINERY = create("refinery");
     static final IRecipeHolderType<OritechRecipe> FOUNDRY = create("foundry");

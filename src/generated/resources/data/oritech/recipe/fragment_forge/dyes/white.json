@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:raw_materials/dyes/white"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:white_dye"
+    }
+  ],
+  "time": 120
+}

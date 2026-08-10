@@ -1,0 +1,16 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "oritech:deepslate_uranium_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "oritech:raw_uranium"
+    },
+    {
+      "id": "oritech:small_plutonium_dust"
+    }
+  ],
+  "time": 40
+}

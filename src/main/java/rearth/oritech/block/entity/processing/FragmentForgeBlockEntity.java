@@ -146,7 +146,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     public MenuType<?> getScreenHandlerType() {
-        return ModScreens.GRINDER_SCREEN.get();
+        return ModScreens.FRAGMENT_FORGE_SCREEN.get();
     }
 
     @Override

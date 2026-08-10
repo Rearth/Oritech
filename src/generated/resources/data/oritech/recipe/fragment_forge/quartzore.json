@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:nether_quartz_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "minecraft:quartz"
+    }
+  ],
+  "time": 40
+}

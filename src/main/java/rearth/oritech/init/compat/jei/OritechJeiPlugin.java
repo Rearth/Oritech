@@ -65,7 +65,7 @@ public final class OritechJeiPlugin implements IModPlugin {
 
         registerMachineCategory(registration, OritechJeiRecipeTypes.PULVERIZER, BlockContent.PULVERIZER.get(),
                 PulverizerBlockEntity.class);
-        registerMachineCategory(registration, OritechJeiRecipeTypes.GRINDER, BlockContent.FRAGMENT_FORGE.get(),
+        registerMachineCategory(registration, OritechJeiRecipeTypes.FRAGMENT_FORGE, BlockContent.FRAGMENT_FORGE.get(),
                 FragmentForgeBlockEntity.class);
         registerMachineCategory(registration, OritechJeiRecipeTypes.ASSEMBLER, BlockContent.ASSEMBLER.get(),
                 AssemblerBlockEntity.class);
@@ -120,7 +120,7 @@ public final class OritechJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registerRecipes(registration, OritechJeiRecipeTypes.PULVERIZER, RecipeContent.PULVERIZER);
-        registerRecipes(registration, OritechJeiRecipeTypes.GRINDER, RecipeContent.FRAGMENT_FORGE);
+        registerRecipes(registration, OritechJeiRecipeTypes.FRAGMENT_FORGE, RecipeContent.FRAGMENT_FORGE);
         registerRecipes(registration, OritechJeiRecipeTypes.ASSEMBLER, RecipeContent.ASSEMBLER);
         registerRecipes(registration, OritechJeiRecipeTypes.FOUNDRY, RecipeContent.FOUNDRY);
         registerRecipes(registration, OritechJeiRecipeTypes.REFINERY, RecipeContent.REFINERY);
@@ -164,8 +164,8 @@ public final class OritechJeiPlugin implements IModPlugin {
                 UpgradableOritechScreenHandler.class, ModScreens.PULVERIZER_SCREEN.get(),
                 OritechJeiRecipeTypes.PULVERIZER, 0, 1, 3, 36);
         registration.addRecipeTransferHandler(
-                UpgradableOritechScreenHandler.class, ModScreens.GRINDER_SCREEN.get(),
-                OritechJeiRecipeTypes.GRINDER, 0, 1, 4, 36);
+                UpgradableOritechScreenHandler.class, ModScreens.FRAGMENT_FORGE_SCREEN.get(),
+                OritechJeiRecipeTypes.FRAGMENT_FORGE, 0, 1, 4, 36);
         registration.addRecipeTransferHandler(
                 UpgradableOritechScreenHandler.class, ModScreens.ASSEMBLER_SCREEN.get(),
                 OritechJeiRecipeTypes.ASSEMBLER, 0, 4, 5, 36);
@@ -192,7 +192,7 @@ public final class OritechJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         registerCraftingStations(registration, OritechJeiRecipeTypes.PULVERIZER, BlockContent.PULVERIZER.get());
-        registerCraftingStations(registration, OritechJeiRecipeTypes.GRINDER, BlockContent.FRAGMENT_FORGE.get());
+        registerCraftingStations(registration, OritechJeiRecipeTypes.FRAGMENT_FORGE, BlockContent.FRAGMENT_FORGE.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.ASSEMBLER, BlockContent.ASSEMBLER.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.FOUNDRY, BlockContent.FOUNDRY.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.REFINERY,

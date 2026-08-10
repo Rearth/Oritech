@@ -337,10 +337,10 @@ public class MetalProcessingChainBuilder {
 
         // ore block -> raw ores
         new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, resourcePath + "ore/" + metalName);
-        var grinderOreRecipe = new GrinderRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
+        var fragmentForgeOreRecipe = new FragmentForgeRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
         if (rawOreByproduct != null)
-            grinderOreRecipe.result(rawOreByproduct);
-        grinderOreRecipe.export(exporter, resourcePath + "ore/" + metalName);
+            fragmentForgeOreRecipe.result(rawOreByproduct);
+        fragmentForgeOreRecipe.export(exporter, resourcePath + "ore/" + metalName);
 
         // raw ores -> dusts in pulverizer
         if (dustItem != null) {
@@ -354,7 +354,7 @@ public class MetalProcessingChainBuilder {
 
         // raw ores -> clumps (falling back to dusts) in grinder
         if (clumpItem != null || dustItem != null) {
-            new GrinderRecipeBuilder(registryAccess)
+            new FragmentForgeRecipeBuilder(registryAccess)
                     .input(rawOreIngredient)
                     .result(firstNonNull(clumpItem, dustItem))
                     .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)

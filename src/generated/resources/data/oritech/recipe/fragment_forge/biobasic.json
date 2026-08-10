@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#oritech:biomatter"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:biomass"
+    }
+  ],
+  "time": 120
+}

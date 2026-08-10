@@ -1,0 +1,16 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:gold_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_gold"
+    },
+    {
+      "id": "minecraft:raw_copper"
+    }
+  ],
+  "time": 40
+}

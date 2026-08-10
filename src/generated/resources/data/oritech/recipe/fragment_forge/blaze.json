@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:blaze_rod"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:blaze_powder"
+    }
+  ],
+  "time": 40
+}

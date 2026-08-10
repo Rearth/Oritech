@@ -24,7 +24,7 @@ public class ModScreens {
 
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> LASER_SCREEN = MENUS.register("laser_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> PULVERIZER_SCREEN = MENUS.register("pulverizer_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
-    public static final Supplier<MenuType<UpgradableOritechScreenHandler>> GRINDER_SCREEN = MENUS.register("grinder_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
+    public static final Supplier<MenuType<UpgradableOritechScreenHandler>> FRAGMENT_FORGE_SCREEN = MENUS.register("fragment_forge", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> ASSEMBLER_SCREEN = MENUS.register("assembler_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> FOUNDRY_SCREEN = MENUS.register("foundry_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
     public static final Supplier<MenuType<UpgradableOritechScreenHandler>> INDUSTRIAL_CHILLER_SCREEN = MENUS.register("industrial_chiller_screen", () -> IMenuTypeExtension.create(UpgradableOritechScreenHandler::new));
@@ -73,7 +73,7 @@ public class ModScreens {
         event.register(TAINTED_REFINERY_SCREEN.get(), TaintedRefineryScreen::new);
 
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(PULVERIZER_SCREEN.get(), UpgradableOritechScreen::new);
-        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(GRINDER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FRAGMENT_FORGE_SCREEN.get(), UpgradableOritechScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(ASSEMBLER_SCREEN.get(), UpgradableOritechScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FOUNDRY_SCREEN.get(), UpgradableOritechScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(INDUSTRIAL_CHILLER_SCREEN.get(), UpgradableOritechScreen::new);

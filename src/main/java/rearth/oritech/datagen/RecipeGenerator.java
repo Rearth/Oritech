@@ -98,28 +98,28 @@ public class RecipeGenerator extends RecipeProvider {
         // reinforced deepslate
         new AtomicForgeRecipeBuilder(this.registries).input(Items.DEEPSLATE).input(ItemContent.DURATIUM_INGOT).input(ItemContent.DURATIUM_INGOT).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
         // cobblestone to gravel
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("cobblestones")).result(Items.GRAVEL).addToGrinder().export(exporter, "gravel");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("cobblestones")).result(Items.GRAVEL).addToFragmentForge().export(exporter, "gravel");
         // gravel to sand
-        new PulverizerRecipeBuilder(this.registries).input(Items.GRAVEL).result(Items.SAND).addToGrinder().export(exporter, "sand");
+        new PulverizerRecipeBuilder(this.registries).input(Items.GRAVEL).result(Items.SAND).addToFragmentForge().export(exporter, "sand");
         // sandstone to sand
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/blocks")).result(Items.SAND).addToGrinder().export(exporter, "sand_from_sandstone");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/blocks")).result(Items.SAND).addToFragmentForge().export(exporter, "sand_from_sandstone");
         // red sandstone to red sand
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/red_blocks")).result(Items.RED_SAND).addToGrinder().export(exporter, "red_sand");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/red_blocks")).result(Items.RED_SAND).addToFragmentForge().export(exporter, "red_sand");
         // centrifuge dirt into clay
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
         this.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, recipeKey("dirt_from_sand_and_biomass"));
         // dripstone from dripstone block
-        new PulverizerRecipeBuilder(this.registries).input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
+        new PulverizerRecipeBuilder(this.registries).input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToFragmentForge().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
         new AssemblerRecipeBuilder(this.registries).input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).timeMultiplier(0.8f).export(exporter, "shroomlight");
         // prismarine shards to crystals
-        new PulverizerRecipeBuilder(this.registries).input(Items.PRISMARINE_SHARD).result(Items.PRISMARINE_CRYSTALS, 2).addToGrinder().export(exporter, "prismarine");
+        new PulverizerRecipeBuilder(this.registries).input(Items.PRISMARINE_SHARD).result(Items.PRISMARINE_CRYSTALS, 2).addToFragmentForge().export(exporter, "prismarine");
 
         // recyclables
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToGrinder().export(exporter, "recycle/netherite_scrap");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToGrinder().export(exporter, "recycle/diamond");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_IRON_DUST).result(ItemContent.IRON_DUST).addToGrinder().export(exporter, "recycle/iron_dust");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToFragmentForge().export(exporter, "recycle/netherite_scrap");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToFragmentForge().export(exporter, "recycle/diamond");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_IRON_DUST).result(ItemContent.IRON_DUST).addToFragmentForge().export(exporter, "recycle/iron_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_SMALL_IRON_DUST).result(ItemContent.SMALL_IRON_DUST).export(exporter, "recycle/small_iron_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_GOLD_DUST).result(ItemContent.GOLD_DUST).export(exporter, "recycle/gold_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_SMALL_GOLD_DUST).result(ItemContent.SMALL_GOLD_DUST).export(exporter, "recycle/small_gold_dust");
@@ -136,16 +136,16 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addDyes(RecipeOutput exporter) {
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_WHITE_DYE).result(Items.WHITE_DYE).addToGrinder().export(exporter, "dyes/white");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_LIGHT_GRAY_DYE).result(Items.LIGHT_GRAY_DYE).addToGrinder().export(exporter, "dyes/light_gray");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLACK_DYE).result(Items.BLACK_DYE).addToGrinder().export(exporter, "dyes/black");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_RED_DYE).result(Items.RED_DYE).addToGrinder().export(exporter, "dyes/red");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_ORANGE_DYE).result(Items.ORANGE_DYE).addToGrinder().export(exporter, "dyes/orange");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_YELLOW_DYE).result(Items.YELLOW_DYE).addToGrinder().export(exporter, "dyes/yellow");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_CYAN_DYE).result(Items.CYAN_DYE).addToGrinder().export(exporter, "dyes/cyan");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLUE_DYE).result(Items.BLUE_DYE).addToGrinder().export(exporter, "dyes/blue");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_MAGENTA_DYE).result(Items.MAGENTA_DYE).addToGrinder().export(exporter, "dyes/magenta");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_PINK_DYE).result(Items.PINK_DYE).addToGrinder().export(exporter, "dyes/pink");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_WHITE_DYE).result(Items.WHITE_DYE).addToFragmentForge().export(exporter, "dyes/white");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_LIGHT_GRAY_DYE).result(Items.LIGHT_GRAY_DYE).addToFragmentForge().export(exporter, "dyes/light_gray");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLACK_DYE).result(Items.BLACK_DYE).addToFragmentForge().export(exporter, "dyes/black");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_RED_DYE).result(Items.RED_DYE).addToFragmentForge().export(exporter, "dyes/red");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_ORANGE_DYE).result(Items.ORANGE_DYE).addToFragmentForge().export(exporter, "dyes/orange");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_YELLOW_DYE).result(Items.YELLOW_DYE).addToFragmentForge().export(exporter, "dyes/yellow");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_CYAN_DYE).result(Items.CYAN_DYE).addToFragmentForge().export(exporter, "dyes/cyan");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLUE_DYE).result(Items.BLUE_DYE).addToFragmentForge().export(exporter, "dyes/blue");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_MAGENTA_DYE).result(Items.MAGENTA_DYE).addToFragmentForge().export(exporter, "dyes/magenta");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_PINK_DYE).result(Items.PINK_DYE).addToFragmentForge().export(exporter, "dyes/pink");
     }
 
     private void addBedrockExtractorOres(RecipeOutput exporter) {
@@ -337,9 +337,9 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addBiomass(RecipeOutput exporter) {
         // biomass
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
-        new PulverizerRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "packagedwheatbio");
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "hay_block");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToFragmentForge().export(exporter, "biobasic");
+        new PulverizerRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToFragmentForge().export(exporter, "packagedwheatbio");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToFragmentForge().export(exporter, "hay_block");
         new AssemblerRecipeBuilder(this.registries).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
 
@@ -643,8 +643,8 @@ public class RecipeGenerator extends RecipeProvider {
 
         // enderic entry
         new PulverizerRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 8).export(exporter, "pearl_enderic");
-        new GrinderRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 12).export(exporter, "pearl_enderic");
-        new GrinderRecipeBuilder(this.registries).input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
+        new FragmentForgeRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 12).export(exporter, "pearl_enderic");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
 
         // clay beads
         offerBeadsRecipe(exporter, ItemContent.CLAY_CATALYST_BEADS.get(), 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
@@ -917,34 +917,34 @@ public class RecipeGenerator extends RecipeProvider {
 
         // raw ores without processing chains
         // coal
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 3).export(exporter, "coalore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 3).export(exporter, "coalore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 2).export(exporter, "coalore");
         // redstone
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 12).export(exporter, "redstoneore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 12).export(exporter, "redstoneore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 8).export(exporter, "redstoneore");
         // diamond
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND, 2).export(exporter, "diamondore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND, 2).export(exporter, "diamondore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND).export(exporter, "diamondore");
         // quartz
-        new GrinderRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 3).export(exporter, "quartzore");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 3).export(exporter, "quartzore");
         new PulverizerRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 2).export(exporter, "quartzore");
         // glowstone
-        new GrinderRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 4).export(exporter, "glowstoneore");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 4).export(exporter, "glowstoneore");
         new PulverizerRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 3).export(exporter, "glowstoneore");
         // lapis
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 8).export(exporter, "lapisore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 8).export(exporter, "lapisore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 6).export(exporter, "lapisore");
         // bone
-        new GrinderRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 8).export(exporter, "bone");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 8).export(exporter, "bone");
         new PulverizerRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 6).export(exporter, "bone");
         // blaze powder
-        new GrinderRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 4).export(exporter, "blaze");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 4).export(exporter, "blaze");
         new PulverizerRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 3).export(exporter, "blaze");
         // wool
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 4).export(exporter, "string");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 4).export(exporter, "string");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 3).export(exporter, "string");
         // ancient debris
-        new GrinderRecipeBuilder(this.registries).input(Items.ANCIENT_DEBRIS).result(Items.NETHERITE_SCRAP, 2).export(exporter, "netheritescrap");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.ANCIENT_DEBRIS).result(Items.NETHERITE_SCRAP, 2).export(exporter, "netheritescrap");
     }
 
     private void addUraniumProcessing(RecipeOutput exporter) {
@@ -958,15 +958,15 @@ public class RecipeGenerator extends RecipeProvider {
         new CentrifugeRecipeBuilder(this.registries).input(cItemTag("dusts/redstone")).result(ItemContent.SMALL_URANIUM_DUST).export(exporter, "redstoneuran");
 
         // uranium ore blocks
-        new GrinderRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 3).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumore");
+        new FragmentForgeRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 3).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumore");
         new PulverizerRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 2).export(exporter, "uraniumore");
 
         // uranium crystal blocks
-        new GrinderRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 5).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumcrystal");
+        new FragmentForgeRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 5).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumcrystal");
         new PulverizerRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 4).export(exporter, "uraniumcrystal");
 
         // raw uranium in grinder
-        new GrinderRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uranium");
+        new FragmentForgeRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uranium");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).export(exporter, "uranium");
 
         // uranium gem from raw uranium / uranium dust in atomic forge
