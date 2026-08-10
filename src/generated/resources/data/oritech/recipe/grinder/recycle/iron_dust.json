@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#oritech:recyclable/iron_dust"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:iron_dust"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:industrial_chiller",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_steam"
@@ -11,6 +11,5 @@
       "id": "minecraft:snow_block"
     }
   ],
-  "recipeType": "oritech:industrial_chiller",
   "time": 200
 }

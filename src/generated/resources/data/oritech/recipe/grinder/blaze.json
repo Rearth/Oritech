@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "minecraft:blaze_rod"
   ],
@@ -9,6 +9,5 @@
       "id": "minecraft:blaze_powder"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

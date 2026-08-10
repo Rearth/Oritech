@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -80,7 +81,7 @@ public class NetworkManager {
         registerCodec(FluidStack.OPTIONAL_STREAM_CODEC, FluidStack.class);
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
-        registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
+        registerCodec(Recipe.STREAM_CODEC.map(recipe -> (OritechRecipe) recipe, recipe -> recipe), OritechRecipe.class);
         registerCodec(EndericLaserBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
         registerCodec(CyberneticAugmentationCenterEntity.ResearchState.PACKET_CODEC, CyberneticAugmentationCenterEntity.ResearchState.class);
 

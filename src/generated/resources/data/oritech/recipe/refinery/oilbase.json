@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "#c:oil"
@@ -20,6 +20,5 @@
   ],
   "itemInputs": [],
   "itemResults": [],
-  "recipeType": "oritech:refinery",
   "time": 80
 }

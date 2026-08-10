@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "minecraft:dripstone_block"
   ],
@@ -9,6 +9,5 @@
       "id": "minecraft:pointed_dripstone"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

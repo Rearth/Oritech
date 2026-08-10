@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "oritech:flux_gate",
     "#c:ingots/electrum",
@@ -12,6 +12,5 @@
       "id": "oritech:superconductor"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 192
 }

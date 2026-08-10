@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge",
   "itemInputs": [
     "#c:clumps/platinum"
   ],
@@ -11,6 +11,5 @@
       "id": "oritech:fluxite"
     }
   ],
-  "recipeType": "oritech:centrifuge",
   "time": 150
 }

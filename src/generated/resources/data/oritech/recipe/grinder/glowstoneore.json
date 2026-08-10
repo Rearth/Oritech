@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "minecraft:glowstone"
   ],
@@ -9,6 +9,5 @@
       "id": "minecraft:glowstone_dust"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

@@ -1,11 +1,10 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:fuel_generator",
   "fluidInput": {
     "amount": 100,
     "ingredient": "oritech:still_heavy_oil"
   },
   "itemInputs": [],
   "itemResults": [],
-  "recipeType": "oritech:fuel_generator",
   "time": 40
 }

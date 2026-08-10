@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#c:raw_materials/dyes/orange"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:orange_dye"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

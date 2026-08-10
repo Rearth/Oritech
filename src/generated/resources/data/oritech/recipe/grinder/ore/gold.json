@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#minecraft:gold_ores"
   ],
@@ -12,6 +12,5 @@
       "id": "minecraft:raw_copper"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

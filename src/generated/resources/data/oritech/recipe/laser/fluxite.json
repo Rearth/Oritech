@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:laser",
   "itemInputs": [
     "minecraft:amethyst_cluster"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:fluxite"
     }
   ],
-  "recipeType": "oritech:laser",
   "time": 1
 }

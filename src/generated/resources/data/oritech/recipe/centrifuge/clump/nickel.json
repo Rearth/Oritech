@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge",
   "itemInputs": [
     "#c:clumps/nickel"
   ],
@@ -12,6 +12,5 @@
       "id": "oritech:small_platinum_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge",
   "time": 100
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:foundry",
   "itemInputs": [
     "oritech:copper_gem",
     "oritech:copper_gem"
@@ -10,6 +10,5 @@
       "id": "minecraft:copper_ingot"
     }
   ],
-  "recipeType": "oritech:foundry",
   "time": 80
 }
