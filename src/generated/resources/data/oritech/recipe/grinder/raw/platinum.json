@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#c:raw_materials/platinum"
   ],
@@ -14,6 +14,5 @@
     {
       "id": "oritech:fluxite"
     }
-  ],
-  "recipeType": "oritech:grinder"
+  ]
 }

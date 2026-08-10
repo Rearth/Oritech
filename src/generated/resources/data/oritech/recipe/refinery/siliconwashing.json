@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_silicon_wash"
@@ -13,6 +13,5 @@
       "id": "oritech:silicon"
     }
   ],
-  "recipeType": "oritech:refinery",
   "time": 160
 }

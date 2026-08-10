@@ -2,7 +2,6 @@ package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -11,7 +10,6 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
@@ -26,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<T, R> {
+public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<T, R> {
 
     public static final DataTicket<RefineryFluidData> FLUID_DATA = DataTicket.create("refinery_fluids", RefineryFluidData.class);
 
@@ -34,13 +32,7 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable, R e
     private final Map<Long, VisualTankHeights> tankHeights = new HashMap<>();
 
     public RefineryRenderer(BlockEntityRendererProvider.Context context, String model) {
-        super(context, new MachineModel<>(model));
-    }
-
-    // this overrides a method from IBlockEntityRendererExtension on NF. Since this extension mixin is not available
-    // in common, we just declare the method without the override annotation
-    public AABB getRenderBoundingBox(T blockEntity) {
-        return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 6, 6);
+        super(context, new MachineModel<>(model), model);
     }
 
     // extract phase: resolve all fluid cubes and ship them to the render state via the GeckoLib DataTicket

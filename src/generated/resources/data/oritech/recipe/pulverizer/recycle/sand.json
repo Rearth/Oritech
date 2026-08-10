@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#oritech:recyclable/sand"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:sand"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

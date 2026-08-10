@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#minecraft:iron_ores"
   ],
@@ -12,6 +12,5 @@
       "id": "oritech:raw_nickel"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

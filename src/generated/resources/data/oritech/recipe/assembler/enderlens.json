@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "oritech:adamant_ingot",
     "#c:carbon_fibre",
@@ -11,6 +11,5 @@
       "id": "oritech:enderic_lens"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 144
 }

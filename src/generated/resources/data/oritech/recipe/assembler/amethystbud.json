@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#c:gems/amethyst",
     "#c:gems/amethyst",
@@ -11,6 +11,5 @@
       "id": "minecraft:budding_amethyst"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 160
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge",
   "itemInputs": [
     "#c:clumps/copper"
   ],
@@ -12,6 +12,5 @@
       "id": "oritech:small_gold_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge",
   "time": 100
 }

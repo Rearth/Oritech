@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 500,
     "ingredient": "#c:naphtha"
@@ -12,6 +12,5 @@
       "id": "oritech:reinforced_carbon_sheet"
     }
   ],
-  "recipeType": "oritech:refinery",
   "time": 240
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 250,
     "ingredient": "oritech:still_sheol_fire"
@@ -19,6 +19,5 @@
       "id": "oritech:iron_clump"
     }
   ],
-  "recipeType": "oritech:refinery",
   "time": 80
 }

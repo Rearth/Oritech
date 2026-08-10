@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#c:ingots/nickel",
     "#c:ingots/steel",
@@ -12,6 +12,5 @@
       "id": "oritech:motor"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 48
 }

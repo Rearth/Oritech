@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#c:ores/nickel"
   ],
@@ -12,6 +12,5 @@
       "id": "oritech:raw_platinum"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

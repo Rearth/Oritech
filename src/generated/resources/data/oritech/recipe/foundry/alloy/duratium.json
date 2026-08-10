@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:foundry",
   "itemInputs": [
     "#c:ingots/platinum",
     "#c:ingots/netherite"
@@ -9,6 +9,5 @@
       "id": "oritech:duratium_ingot"
     }
   ],
-  "recipeType": "oritech:foundry",
   "time": 80
 }

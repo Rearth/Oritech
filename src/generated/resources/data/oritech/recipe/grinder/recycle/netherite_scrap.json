@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#oritech:recyclable/netherite_scrap"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:netherite_scrap"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

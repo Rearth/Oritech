@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.math.Axis;
@@ -9,7 +8,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
@@ -23,16 +21,12 @@ import rearth.oritech.util.ColorHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<TaintedRefineryBlockEntity, R> {
+public class TaintedRefineryRenderer<R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<TaintedRefineryBlockEntity, R> {
 
     public static final DataTicket<TaintedRefineryFluidData> FLUID_DATA = DataTicket.create("tainted_refinery_fluids", TaintedRefineryFluidData.class);
 
     public TaintedRefineryRenderer(BlockEntityRendererProvider.Context context, String model) {
-        super(context, new MachineModel<>(model));
-    }
-
-    public AABB getRenderBoundingBox(TaintedRefineryBlockEntity blockEntity) {
-        return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 6, 6, 6);
+        super(context, new MachineModel<>(model), model);
     }
 
     // extract phase: resolve all fluid cubes and ship them to the render state via the GeckoLib DataTicket

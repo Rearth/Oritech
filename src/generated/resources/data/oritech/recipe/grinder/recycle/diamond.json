@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#oritech:recyclable/diamond"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:diamond"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

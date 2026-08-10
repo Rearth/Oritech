@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#minecraft:logs",
     "minecraft:glowstone",
@@ -11,6 +11,5 @@
       "id": "minecraft:shroomlight"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

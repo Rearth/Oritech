@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:particle_collision",
   "itemInputs": [
     "#c:feathers",
     "minecraft:saddle"
@@ -9,6 +9,5 @@
       "id": "minecraft:elytra"
     }
   ],
-  "recipeType": "oritech:particle_collision",
   "time": 10000
 }
