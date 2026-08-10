@@ -5,7 +5,7 @@
     "ingredient": "#c:sulfuric_acid"
   },
   "itemInputs": [
-    "oritech:dubios_container"
+    "oritech:dubious_container"
   ],
   "itemResults": [
     {

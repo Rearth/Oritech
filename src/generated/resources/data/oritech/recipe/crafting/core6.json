@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": "oritech:dubios_container",
+    "c": "oritech:dubious_container",
     "s": "oritech:duratium_ingot"
   },
   "pattern": [

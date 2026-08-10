@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_dubios_container": {
+    "has_dubious_container": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:dubios_container"
+            "items": "oritech:dubious_container"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "oritech:dubios_container"
+        "recipe": "oritech:dubious_container"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_dubios_container"
+      "has_dubious_container"
     ]
   ],
   "rewards": {
     "recipes": [
-      "oritech:dubios_container"
+      "oritech:dubious_container"
     ]
   }
 }

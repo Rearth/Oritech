@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "a": "oritech:dubios_container",
+    "a": "oritech:dubious_container",
     "c": "minecraft:tnt",
     "e": "oritech:uranium_pellet"
   },

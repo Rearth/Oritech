@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "oritech:crafting/equipmentCharger"
+        "recipe": "oritech:crafting/equipmentcharger"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "oritech:crafting/equipmentCharger"
+      "oritech:crafting/equipmentcharger"
     ]
   }
 }
