@@ -279,7 +279,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
         var size = 25;
 
         var level = menu.addonController.getCoreQuality();
-        var upgradeCount = (int) level - 1;
+        var upgradeCount = Math.min((int) level - 1, 6);
 
         // The 6th upgrade ring renders behind the center
         if (upgradeCount == 6) {

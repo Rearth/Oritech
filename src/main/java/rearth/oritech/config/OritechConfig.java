@@ -21,6 +21,7 @@ public class OritechConfig {
     public static final MachineFrameConfig placerConfig = new MachineFrameConfig(COMMON, "placerConfig", 10, 5, 8, 64);
     public static final AddonConfig addonConfig = new AddonConfig(COMMON);
     public static final DronePortConfig dronePortConfig = new DronePortConfig(COMMON);
+    public static final MachineCoreLevels machineCoreLevels = new MachineCoreLevels(COMMON);
 
     public static final ModConfigSpec.BooleanValue additiveAddons = COMMON
             .comment("Whether addon bonuses are added additive or multiplicative")
@@ -364,6 +365,34 @@ public class OritechConfig {
             pulverizerData = new BasicMachineConfig(b, "pulverizerData", 25_000, 32 * 8, 0, 32);
             refineryData = new BasicMachineConfig(b, "refineryData", 50_000, 64 * 8, 0, 64);
             b.pop();
+        }
+    }
+
+    public static class MachineCoreLevels {
+        public final ModConfigSpec.IntValue core1Level;
+        public final ModConfigSpec.IntValue core2Level;
+        public final ModConfigSpec.IntValue core3Level;
+        public final ModConfigSpec.IntValue core4Level;
+        public final ModConfigSpec.IntValue core5Level;
+        public final ModConfigSpec.IntValue core6Level;
+        public final ModConfigSpec.IntValue core7Level;
+
+        MachineCoreLevels(ModConfigSpec.Builder b) {
+            b.push("machineCoreLevels");
+            core1Level = defineCoreLevel(b, "core1Level", 1);
+            core2Level = defineCoreLevel(b, "core2Level", 2);
+            core3Level = defineCoreLevel(b, "core3Level", 3);
+            core4Level = defineCoreLevel(b, "core4Level", 4);
+            core5Level = defineCoreLevel(b, "core5Level", 5);
+            core6Level = defineCoreLevel(b, "core6Level", 6);
+            core7Level = defineCoreLevel(b, "core7Level", 7);
+            b.pop();
+        }
+
+        private static ModConfigSpec.IntValue defineCoreLevel(ModConfigSpec.Builder b, String name, int defaultLevel) {
+            return b.comment("Machine core level")
+                    .worldRestart()
+                    .defineInRange(name, defaultLevel, 1, Integer.MAX_VALUE);
         }
     }
 

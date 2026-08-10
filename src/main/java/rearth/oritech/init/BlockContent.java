@@ -39,6 +39,7 @@ import rearth.oritech.block.blocks.pipes.item.SmartSplitterBlock;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
@@ -236,13 +237,13 @@ public class BlockContent {
     public static final DeferredBlock<Block> PUMP = BLOCKS.registerBlock("pump", PumpBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     public static final DeferredBlock<Block> EQUIPMENT_CHARGER = BLOCKS.registerBlock("equipment_charger", EquipmentChargerBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
 
-    public static final DeferredBlock<Block> MACHINE_CORE_1 = BLOCKS.registerBlock("machine_core_1", props -> new MachineCoreBlock(props, 1), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_2 = BLOCKS.registerBlock("machine_core_2", props -> new MachineCoreBlock(props, 2), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_3 = BLOCKS.registerBlock("machine_core_3", props -> new MachineCoreBlock(props, 3), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_4 = BLOCKS.registerBlock("machine_core_4", props -> new MachineCoreBlock(props, 4), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_5 = BLOCKS.registerBlock("machine_core_5", props -> new MachineCoreBlock(props, 5), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_6 = BLOCKS.registerBlock("machine_core_6", props -> new MachineCoreBlock(props, 6), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
-    public static final DeferredBlock<Block> MACHINE_CORE_7 = BLOCKS.registerBlock("machine_core_7", props -> new MachineCoreBlock(props, 7), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_1 = BLOCKS.registerBlock("machine_core_1", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core1Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_2 = BLOCKS.registerBlock("machine_core_2", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core2Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_3 = BLOCKS.registerBlock("machine_core_3", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core3Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_4 = BLOCKS.registerBlock("machine_core_4", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core4Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_5 = BLOCKS.registerBlock("machine_core_5", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core5Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_6 = BLOCKS.registerBlock("machine_core_6", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core6Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
+    public static final DeferredBlock<Block> MACHINE_CORE_7 = BLOCKS.registerBlock("machine_core_7", props -> new MachineCoreBlock(props, OritechConfig.machineCoreLevels.core7Level::get), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion());
     @NoBlockItem
     public static final DeferredBlock<Block> COMPLEX_PLATING = BLOCKS.registerBlock("complex_plating", props -> new MachineCoreBlock(props, 1), () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(80, 1900f).noOcclusion().forceSolidOn());
 

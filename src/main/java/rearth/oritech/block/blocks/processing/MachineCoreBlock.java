@@ -34,21 +34,26 @@ import rearth.oritech.util.MultiblockMachineController;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.IntSupplier;
 
 public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvider {
 
     public static final BooleanProperty USED = BooleanProperty.create("core_used");
 
-    private final float coreQuality;
+    private final IntSupplier coreLevel;
 
-    public MachineCoreBlock(Properties settings, float coreQuality) {
+    public MachineCoreBlock(Properties settings, int coreLevel) {
+        this(settings, () -> coreLevel);
+    }
+
+    public MachineCoreBlock(Properties settings, IntSupplier coreLevel) {
         super(settings);
         this.registerDefaultState(defaultBlockState().setValue(USED, false));
-        this.coreQuality = coreQuality;
+        this.coreLevel = coreLevel;
     }
 
     public float getCoreQuality() {
-        return coreQuality;
+        return coreLevel.getAsInt();
     }
 
     @Override
