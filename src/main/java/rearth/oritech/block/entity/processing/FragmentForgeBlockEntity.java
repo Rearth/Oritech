@@ -51,7 +51,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
 
     @Override
     protected RecipeType<OritechRecipe> getOwnRecipeType() {
-        return RecipeContent.GRINDER.get();
+        return RecipeContent.FRAGMENT_FORGE.get();
     }
 
     @Override

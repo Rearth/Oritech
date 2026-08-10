@@ -21,7 +21,7 @@ public final class OritechJeiRecipeServerSync {
     public static void onDatapackSync(OnDatapackSyncEvent event) {
         event.sendRecipes(List.of(
                 RecipeContent.PULVERIZER.get(),
-                RecipeContent.GRINDER.get(),
+                RecipeContent.FRAGMENT_FORGE.get(),
                 RecipeContent.ASSEMBLER.get(),
                 RecipeContent.REFINERY.get(),
                 RecipeContent.FOUNDRY.get(),

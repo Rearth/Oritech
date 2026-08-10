@@ -120,7 +120,7 @@ public final class OritechJeiPlugin implements IModPlugin {
     @Override
     public void registerRecipes(IRecipeRegistration registration) {
         registerRecipes(registration, OritechJeiRecipeTypes.PULVERIZER, RecipeContent.PULVERIZER);
-        registerRecipes(registration, OritechJeiRecipeTypes.GRINDER, RecipeContent.GRINDER);
+        registerRecipes(registration, OritechJeiRecipeTypes.GRINDER, RecipeContent.FRAGMENT_FORGE);
         registerRecipes(registration, OritechJeiRecipeTypes.ASSEMBLER, RecipeContent.ASSEMBLER);
         registerRecipes(registration, OritechJeiRecipeTypes.FOUNDRY, RecipeContent.FOUNDRY);
         registerRecipes(registration, OritechJeiRecipeTypes.REFINERY, RecipeContent.REFINERY);

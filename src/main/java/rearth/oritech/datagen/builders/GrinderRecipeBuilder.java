@@ -7,7 +7,7 @@ import rearth.oritech.init.recipes.RecipeContent;
 public class GrinderRecipeBuilder extends OritechRecipeBuilder {
 
     public GrinderRecipeBuilder(HolderLookup.Provider registryAccess) {
-        super(RecipeContent.GRINDER, "grinder", registryAccess);
+        super(RecipeContent.FRAGMENT_FORGE, "grinder", registryAccess);
         this.time = 40;
     }
 
