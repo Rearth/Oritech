@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:zinc_nugget"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:zinc_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

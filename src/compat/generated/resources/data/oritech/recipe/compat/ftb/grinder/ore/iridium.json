@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ores/iridium"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:iridium_raw_ore"
+    },
+    {
+      "id": "oritech:raw_nickel"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

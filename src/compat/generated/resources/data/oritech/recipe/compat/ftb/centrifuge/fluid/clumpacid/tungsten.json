@@ -1,0 +1,30 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "oritech:still_sulfuric_acid"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 250,
+      "id": "oritech:still_mineral_slurry"
+    }
+  ],
+  "itemInputs": [
+    "ftbmaterials:tungsten_clump"
+  ],
+  "itemResults": [
+    {
+      "count": 3,
+      "id": "ftbmaterials:tungsten_dust"
+    }
+  ],
+  "recipeType": "oritech:centrifuge_fluid",
+  "time": 150
+}

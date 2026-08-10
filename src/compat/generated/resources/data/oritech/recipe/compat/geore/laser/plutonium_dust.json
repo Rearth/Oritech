@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "geore:uranium_cluster"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:plutonium_dust"
+    }
+  ],
+  "recipeType": "oritech:laser",
+  "time": 1
+}

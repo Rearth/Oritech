@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:or",
+        "values": [
+          {
+            "type": "neoforge:mod_loaded",
+            "modid": "alltheores"
+          },
+          {
+            "type": "neoforge:mod_loaded",
+            "modid": "ftbmaterials"
+          }
+        ]
+      }
+    }
+  ],
+  "type": "productivemetalworks:item_casting",
+  "cast": "productivemetalworks:ingot_cast",
+  "consume_cast": false,
+  "fluid": {
+    "amount": 90,
+    "ingredient": "productivemetalworks:molten_nickel"
+  },
+  "result": {
+    "id": "oritech:nickel_ingot"
+  }
+}

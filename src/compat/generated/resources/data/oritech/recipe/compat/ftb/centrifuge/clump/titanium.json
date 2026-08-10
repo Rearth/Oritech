@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:titanium_clump"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:titanium_dust"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:iron_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:centrifuge",
+  "time": 100
+}

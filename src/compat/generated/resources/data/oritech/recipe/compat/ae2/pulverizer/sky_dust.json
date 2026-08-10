@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ae2:sky_stone_block"
+  ],
+  "itemResults": [
+    {
+      "id": "ae2:sky_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

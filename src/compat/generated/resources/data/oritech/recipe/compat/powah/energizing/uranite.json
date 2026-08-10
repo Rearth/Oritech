@@ -1,0 +1,16 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "powah"
+    }
+  ],
+  "type": "powah:energizing",
+  "energy": 32000,
+  "ingredients": [
+    "oritech:uranite_crystal"
+  ],
+  "result": {
+    "id": "oritech:plutonium_dust"
+  }
+}

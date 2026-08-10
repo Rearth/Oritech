@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech:block/iridium_resource_node"
+    }
+  }
+}

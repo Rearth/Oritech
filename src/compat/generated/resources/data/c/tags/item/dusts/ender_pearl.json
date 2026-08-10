@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "ae2:ender_dust",
+      "required": false
+    },
+    {
+      "id": "enderio:powdered_ender_pearl",
+      "required": false
+    }
+  ]
+}

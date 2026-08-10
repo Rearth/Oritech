@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/iridium"
+  ],
+  "itemResults": [
+    {
+      "id": "alltheores:iridium_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}
