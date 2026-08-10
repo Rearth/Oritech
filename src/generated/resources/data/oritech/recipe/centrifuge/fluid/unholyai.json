@@ -1,17 +1,16 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_strange_matter"
   },
   "itemInputs": [
-    "oritech:dubios_container"
+    "oritech:dubious_container"
   ],
   "itemResults": [
     {
       "id": "oritech:unholy_intelligence"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 800
 }

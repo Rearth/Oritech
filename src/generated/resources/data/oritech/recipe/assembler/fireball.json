@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "minecraft:gunpowder",
     "minecraft:blaze_powder",
@@ -12,6 +12,5 @@
       "id": "minecraft:fire_charge"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

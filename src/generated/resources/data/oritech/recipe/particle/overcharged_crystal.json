@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:particle_collision",
   "itemInputs": [
     "oritech:fluxite",
     "oritech:energite_dust"
@@ -9,6 +9,5 @@
       "id": "oritech:overcharged_crystal"
     }
   ],
-  "recipeType": "oritech:particle_collision",
   "time": 5000
 }

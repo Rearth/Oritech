@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "minecraft:gravel"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:sand"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

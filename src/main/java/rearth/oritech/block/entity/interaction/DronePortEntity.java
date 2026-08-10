@@ -52,6 +52,7 @@ import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.DroneScreenHandler;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
@@ -125,11 +126,10 @@ public class DronePortEntity extends NetworkedBlockEntity
     private DroneTransferData incomingPacket;
     private boolean receivingPackage;
 
-    // config
-    private final long baseEnergyUsage = 1024;
-    private final int takeOffTime = 300;
-    private final int landTime = 260;
-    private final int totalFlightTime = takeOffTime + landTime;
+    // Tied to the takeoff and landing animations
+    private static final int TAKE_OFF_TIME = 300;
+    private static final int LAND_TIME = 260;
+    private static final int TOTAL_FLIGHT_TIME = TAKE_OFF_TIME + LAND_TIME;
 
     // client only
     @SyncField(SyncType.GUI_TICK)
@@ -230,7 +230,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     private void checkIncomingAnimation() {
-        if (level.getGameTime() == incomingPacket.arrivesAt - landTime) {
+        if (level.getGameTime() == incomingPacket.arrivesAt - LAND_TIME) {
             triggerNetworkReceiveAnimation();
         }
     }
@@ -268,7 +268,7 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     private void sendDrone() {
         var targetPort = (DronePortEntity) level.getBlockEntity(targetPosition);
-        var arriveTime = level.getGameTime() + takeOffTime + landTime;
+        var arriveTime = level.getGameTime() + TOTAL_FLIGHT_TIME;
         var data = new DroneTransferData(inventory.getStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getContent(), arriveTime);
         targetPort.setIncomingPacket(data);
 
@@ -308,7 +308,7 @@ public class DronePortEntity extends NetworkedBlockEntity
      */
     public boolean isSendingDrone() {
         var diff = level.getGameTime() - lastSentAt;
-        return diff < takeOffTime;
+        return diff < TAKE_OFF_TIME;
     }
 
     private boolean canSend() {
@@ -324,9 +324,10 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     private long calculateEnergyUsage() {
+        var baseEnergyUsage = OritechConfig.dronePortConfig.baseEnergyUsage.get();
         if (targetPosition == null) return baseEnergyUsage;
         var distance = worldPosition.distManhattan(targetPosition);
-        return (long) Math.sqrt(distance) * 50 + baseEnergyUsage;
+        return (long) Math.sqrt(distance) * OritechConfig.dronePortConfig.distanceEnergyUsage.get() + baseEnergyUsage;
     }
 
     @Override
@@ -565,9 +566,9 @@ public class DronePortEntity extends NetworkedBlockEntity
     @Override
     public int getComparatorProgress() {
         if (isSendingDrone()) {
-            return (int) (((level.getGameTime() - lastSentAt) / (float) takeOffTime) * 15);
+            return (int) (((level.getGameTime() - lastSentAt) / (float) TAKE_OFF_TIME) * 15);
         } else if (incomingPacket != null) {
-            return (int) ((totalFlightTime + (level.getGameTime() - incomingPacket.arrivesAt)) / (float) (totalFlightTime) * 15);
+            return (int) ((TOTAL_FLIGHT_TIME + (level.getGameTime() - incomingPacket.arrivesAt)) / (float) TOTAL_FLIGHT_TIME * 15);
         } else {
             return 0;
         }

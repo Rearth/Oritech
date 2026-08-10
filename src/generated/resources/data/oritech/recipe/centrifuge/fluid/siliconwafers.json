@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_silicon_wash"
@@ -13,6 +13,5 @@
       "id": "oritech:silicon_wafer"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 200
 }

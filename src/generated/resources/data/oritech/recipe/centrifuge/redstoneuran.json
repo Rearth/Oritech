@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge",
   "itemInputs": [
     "#c:dusts/redstone"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:small_uranium_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge",
   "time": 100
 }

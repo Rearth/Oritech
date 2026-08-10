@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "oritech:biosteel_ingot"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:biosteel_dust"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

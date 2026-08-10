@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -33,6 +34,11 @@ public class ItemPipeTransferRenderer implements BlockEntityRenderer<ItemPipeInt
     @Override
     public boolean shouldRenderOffScreen() {
         return true;
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(ItemPipeInterfaceEntity blockEntity) {
+        return AABB.INFINITE;
     }
 
     @Override

@@ -1,13 +1,9 @@
 package rearth.oritech.init.recipes;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
@@ -18,7 +14,6 @@ import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import rearth.oritech.Oritech;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate> itemResults,
@@ -28,92 +23,40 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     public static final Lazy<OritechRecipe> EMPTY = Lazy.of(() -> new OritechRecipe(List.of(), List.of(), Optional.empty(), List.of(), 0, RecipeContent.PULVERIZER.get()));
 
 
-    public static final MapCodec<OritechRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
-            ItemStackTemplate.CODEC.listOf().fieldOf("itemResults").forGetter(OritechRecipe::itemResults),
-            SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(OritechRecipe::fluidInput),
-            FluidStackTemplate.CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
-            Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::time),
-            Identifier.CODEC.xmap(OritechRecipe::recipeTypeFromId, OritechRecipe::idFromRecipeType).fieldOf("recipeType").forGetter(OritechRecipe::recipeType)
-    ).apply(instance, OritechRecipe::new));
-
-    public static final StreamCodec<RegistryFriendlyByteBuf, OritechRecipe> STREAM_CODEC = StreamCodec.composite(
-            Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemInputs,
-            ItemStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::itemResults,
-            ByteBufCodecs.optional(SizedFluidIngredient.STREAM_CODEC), OritechRecipe::fluidInput,
-            FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list()), OritechRecipe::fluidOutputs,
-            ByteBufCodecs.INT, OritechRecipe::time,
-            StreamCodec.of(
-                    (buf, recipeType) -> Identifier.STREAM_CODEC.encode(buf, idFromRecipeType(recipeType)),
-                    buf -> recipeTypeFromId(Identifier.STREAM_CODEC.decode(buf))
-            ), OritechRecipe::recipeType,
-            OritechRecipe::new
-    );
-
-    @SuppressWarnings("unchecked")
-    private static RecipeType<OritechRecipe> recipeTypeFromId(Identifier id) {
-        var candidate = BuiltInRegistries.RECIPE_TYPE.get(id);
-        if (candidate.isEmpty()) {
-            Oritech.LOGGER.error("Recipe not found: {}", id);
-            return RecipeContent.PULVERIZER.get();
-        }
-        return (RecipeType<OritechRecipe>) candidate.get().value();
-    }
-
-    private static Identifier idFromRecipeType(RecipeType<?> recipeType) {
-        return Objects.requireNonNull(BuiltInRegistries.RECIPE_TYPE.getKey(recipeType));
+    public static RecipeSerializer<OritechRecipe> CreateSerializerForType(RecipeType<OritechRecipe> recipeType) {
+        var codec = RecordCodecBuilder.<OritechRecipe>mapCodec(instance -> instance.group(
+                Ingredient.CODEC.listOf().fieldOf("itemInputs").forGetter(OritechRecipe::itemInputs),
+                ItemStackTemplate.CODEC.listOf().fieldOf("itemResults").forGetter(OritechRecipe::itemResults),
+                SizedFluidIngredient.CODEC.optionalFieldOf("fluidInput").forGetter(OritechRecipe::fluidInput),
+                FluidStackTemplate.CODEC.listOf().optionalFieldOf("fluidOutputs", List.of()).forGetter(OritechRecipe::fluidOutputs),
+                Codec.INT.optionalFieldOf("time", 60).forGetter(OritechRecipe::time)
+        ).apply(instance, (itemInputs, itemResults, fluidInput, fluidOutputs, time) ->
+                new OritechRecipe(itemInputs, itemResults, fluidInput, fluidOutputs, time, recipeType)));
+        return new RecipeSerializer<>(codec, ByteBufCodecs.fromCodecWithRegistries(codec.codec()));
     }
 
     @Override
     public boolean matches(OritechRecipeInput input, Level level) {
         // compare items and fluids. This will not modify any inputs.
 
-        var itemsMatching = itemInputs.isEmpty() || itemsMatch(itemInputs, input);
+        // iemless recipes must not shadow variants that use an item catalyst.
+        var itemsMatching = itemInputs.isEmpty() ? input.itemsEmpty() : itemsMatch(itemInputs, input);
         var fluidsMatching = fluidInput.isEmpty() || fluidsMatch(input, level);
 
         return itemsMatching && fluidsMatching;
     }
 
-    public static boolean itemsMatch(List<Ingredient> recipeIngredients, OritechRecipeItemInput input) {
+    public static boolean itemsMatch(List<Ingredient> recipeIngredients, OritechRecipeInput input) {
         if (recipeIngredients.isEmpty()) return true;
 
-        if (input.isEmpty()) return false;
-
-        // multiple inputs require fuzzy matching
-        if (recipeIngredients.size() > 1) {
-            return fuzzyItemMatches(recipeIngredients, input);
-        }
-
-        // if we have just one input, just test that one
-        return recipeIngredients.getFirst().test(input.getItem(0));
+        var contents = new StackedItemContents();
+        input.getStacks().forEach(contents::accountStack);
+        return contents.canCraft(recipeIngredients, null);
     }
 
     private boolean fluidsMatch(OritechRecipeInput input, Level level) {
         if (input.fluidEmpty()) return false;
         return fluidInput.get().test(input.fluidStack());
-    }
-
-    private static boolean fuzzyItemMatches(List<Ingredient> itemIngredients, OritechRecipeItemInput input) {
-
-        // Input does not need to be in the correct slots / split into different slots.
-        // We just check if we can remove all ingredients from the inventory, and fail if any input is not able to be removed.
-        var sourceItems = input.getStacks().stream().filter(stack -> !stack.isEmpty()).toList();
-
-        for (var ingredient : itemIngredients) {
-            var found = false;
-
-            for (var heldStack : sourceItems) {
-                if (ingredient.test(heldStack)) {
-                    heldStack.shrink(1);
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) return false;
-        }
-
-        return true;
     }
 
     // not used since we often have multiple outputs or fluid outputs
@@ -135,7 +78,7 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
 
     @Override
     public RecipeSerializer<? extends Recipe<OritechRecipeInput>> getSerializer() {
-        return RecipeContent.ORITECH_SERIALIZER.get();
+        return RecipeContent.GetSerializerByType(recipeType);
     }
 
     @Override

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#minecraft:coals"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:coal_dust"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

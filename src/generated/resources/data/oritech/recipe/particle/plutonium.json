@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:particle_collision",
   "itemInputs": [
     "#c:dusts/uranium",
     "oritech:fluxite"
@@ -9,6 +9,5 @@
       "id": "oritech:plutonium_dust"
     }
   ],
-  "recipeType": "oritech:particle_collision",
   "time": 2500
 }

@@ -64,7 +64,7 @@ public class TreeCutterBlockEntity extends NetworkedBlockEntity implements
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(50000, 4000, 0, 0, this::setChanged, false);
 
-    public final InOutInventoryStorage inventory = new InOutInventoryStorage(6, this::setChanged, new ContainerSlotAssignment(0, 0, 0, 1));
+    public final InOutInventoryStorage inventory = new InOutInventoryStorage(6, this::setChanged, new ContainerSlotAssignment(0, 0, 0, 6));
 
     @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
     public ColorVariant currentColor = getDefaultColor();

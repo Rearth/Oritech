@@ -5,6 +5,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
@@ -73,6 +75,7 @@ public final class OritechClient {
         neoEventBus.addListener(this::onPostClientTick);
         neoEventBus.addListener(this::onMouseClicked);
         neoEventBus.addListener(this::onBlockOutlinesRendered);
+        neoEventBus.addListener(this::onPlayerLoggingIn);
 
         // zipline cable rendering uses the split-phase extraction/submission render flow
         neoEventBus.addListener(ActiveCableRenderer::onExtractRenderState);
@@ -129,6 +132,14 @@ public final class OritechClient {
     private void registerBindings(RegisterKeyMappingsEvent event) {
         event.registerCategory(ORITECH_KEYS_CATEGORY);
         event.register(AUGMENT_SELECTOR);
+    }
+
+    private void onPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
+        if (!OritechClientConfig.showOracleIndexWarning.get() || ModList.get().isLoaded("oracle_index")) return;
+
+        event.getPlayer().sendSystemMessage(Component.translatable("message.oritech.oracle_index_missing"));
+        OritechClientConfig.showOracleIndexWarning.set(false);
+        OritechClientConfig.CLIENT_SPEC.save();
     }
 
     // wires the portable tank item renderer into the 26.1 special-model item pipeline

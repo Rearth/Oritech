@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:atomic_forge",
   "itemInputs": [
     "oritech:super_ai_chip",
     "oritech:adamant_ingot",
@@ -9,6 +9,5 @@
     {
       "id": "oritech:heisenberg_compensator"
     }
-  ],
-  "recipeType": "oritech:atomic_forge"
+  ]
 }

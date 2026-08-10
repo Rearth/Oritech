@@ -20,6 +20,7 @@ public class OritechConfig {
     public static final FertilizerConfig fertilizerConfig = new FertilizerConfig(COMMON);
     public static final MachineFrameConfig placerConfig = new MachineFrameConfig(COMMON, "placerConfig", 10, 5, 8, 64);
     public static final AddonConfig addonConfig = new AddonConfig(COMMON);
+    public static final DronePortConfig dronePortConfig = new DronePortConfig(COMMON);
 
     public static final ModConfigSpec.BooleanValue additiveAddons = COMMON
             .comment("Whether addon bonuses are added additive or multiplicative")
@@ -448,6 +449,18 @@ public class OritechConfig {
             energyCapacity = b.comment("Energy transmission rate and capacity in RF/t").defineInRange("energyCapacity", 1_000_000L, 0L, Long.MAX_VALUE);
             minRange = b.comment("Minimum separation distance between poles").defineInRange("minRange", 50, 0, Integer.MAX_VALUE);
             maxRange = b.comment("Maximum separation distance between poles").defineInRange("maxRange", 1000, 0, Integer.MAX_VALUE);
+            b.pop();
+        }
+    }
+
+    public static class DronePortConfig {
+        public final ModConfigSpec.LongValue baseEnergyUsage;
+        public final ModConfigSpec.IntValue distanceEnergyUsage;
+
+        DronePortConfig(ModConfigSpec.Builder b) {
+            b.push("dronePortConfig");
+            baseEnergyUsage = b.comment("Base RF consumed per trip").defineInRange("baseEnergyUsage", 1024L, 0L, Long.MAX_VALUE);
+            distanceEnergyUsage = b.comment("RF multiplier applied to the square root of the travel distance").defineInRange("distanceEnergyUsage", 50, 0, Integer.MAX_VALUE);
             b.pop();
         }
     }

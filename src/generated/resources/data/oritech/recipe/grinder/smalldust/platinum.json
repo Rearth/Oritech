@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#c:nuggets/platinum"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:small_platinum_dust"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

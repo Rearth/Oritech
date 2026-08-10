@@ -1,11 +1,11 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "#c:sulfuric_acid"
   },
   "itemInputs": [
-    "oritech:dubios_container"
+    "oritech:dubious_container"
   ],
   "itemResults": [
     {
@@ -13,6 +13,5 @@
       "id": "oritech:advanced_battery"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 200
 }

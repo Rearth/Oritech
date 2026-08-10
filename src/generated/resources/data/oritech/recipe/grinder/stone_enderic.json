@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "minecraft:end_stone"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:enderic_compound"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 40
 }

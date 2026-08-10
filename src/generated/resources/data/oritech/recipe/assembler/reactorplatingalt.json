@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#oritech:plating",
     "#oritech:plating",
@@ -12,6 +12,5 @@
       "id": "oritech:reactor_wall"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

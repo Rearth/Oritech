@@ -1,0 +1,7 @@
+// 26.1.2	2026-08-01T19:59:19.3436502	Loot Tables
+6d08478d63f09ddd428e7c03bb4cb1f093468059 data/oritech_space_age/loot_table/blocks/rocket_assembler.json
+b5bbf3113257e5dee99df670c8a453c12d457eb9 data/oritech_space_age/loot_table/blocks/rocket_coupling.json
+5081b4c4653182b30bef08058009da893fc874e2 data/oritech_space_age/loot_table/blocks/rocket_engine_tier_1.json
+871187891b6b2047e327e81630314bfd42e4290b data/oritech_space_age/loot_table/blocks/rocket_engine_tier_2.json
+2f99887330298604179ee60b46c27a03a0754415 data/oritech_space_age/loot_table/blocks/rocket_engine_tier_3.json
+5f294b129738004f0c6163e456c17331fa7f145e data/oritech_space_age/loot_table/blocks/rocket_pad.json

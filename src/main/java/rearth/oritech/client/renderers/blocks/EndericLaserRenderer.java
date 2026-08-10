@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
@@ -32,7 +31,7 @@ import rearth.oritech.util.Geometry;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<EndericLaserBlockEntity, R> {
+public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<EndericLaserBlockEntity, R> {
 
     private Vec3 lastActivePlayerPos = Vec3.ZERO;
     private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
@@ -86,7 +85,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
     public static final DataTicket<LaserBeamData> BEAM_DATA = DataTicket.create("laser_beam_data", LaserBeamData.class);
 
     public EndericLaserRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
-        super(context, new EndericLaserModel<>(modelPath));
+        super(context, new EndericLaserModel<>(modelPath), modelPath);
     }
 
     @Override

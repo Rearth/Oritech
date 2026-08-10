@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:grinder",
   "itemInputs": [
     "#c:storage_blocks/wheat"
   ],
@@ -9,6 +9,5 @@
       "id": "oritech:biomass"
     }
   ],
-  "recipeType": "oritech:grinder",
   "time": 120
 }

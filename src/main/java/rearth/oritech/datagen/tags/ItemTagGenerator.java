@@ -200,9 +200,8 @@ public class ItemTagGenerator extends ItemTagsProvider {
           .add(Items.WARPED_WART_BLOCK);
         
         tag(TagContent.BIOMASS)
-          .add(ItemContent.BIOMASS.get())
-          .addOptionalTag(itemTag("techreborn", "plantball"));
-        tag(TagContent.BIOMASS)
+          .add(ItemContent.BIOMASS.get());
+        tag(TagContent.BIOMASS_BLOCK)
           .add(BlockContent.BIOMASS.asItem());
         
         // dyes

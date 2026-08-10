@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech_space_age:block/rocket_assembler",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/rocket_assembler"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/rocket_assembler",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/rocket_assembler",
+      "y": 270
+    }
+  }
+}

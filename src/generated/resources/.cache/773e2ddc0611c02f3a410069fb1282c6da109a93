@@ -1,4 +1,4 @@
-// 26.1.2	2026-07-29T20:15:03.80565	Model Definitions - oritech
+// 26.1.2	2026-08-07T12:53:18.2768712	Model Definitions - oritech
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
 a0801733923625bd92b1a26db46a868174771600 assets/oritech/blockstates/accelerator_sensor.json
@@ -239,7 +239,7 @@ cbdf3a2866b0d736b890691b0b113406587bd373 assets/oritech/items/deepslate_platinum
 0d31d929e14a51754b9d7f9f28083409c705d18c assets/oritech/items/diamond_paint.json
 c78203c47a85d82c68e1c39c09334bf8b90bc60c assets/oritech/items/diamond_resource_node.json
 56ef061e399e788e154eaabeefd2c5c4a194bfff assets/oritech/items/drone_port.json
-1c3bd69f8f986ba45cfabc529fa4fb64d35646a7 assets/oritech/items/dubios_container.json
+73277f4b78333f7ec17119aacc45f99295e613b7 assets/oritech/items/dubious_container.json
 12c6b0c533c7bfe612a169ba716bec0e4c20056f assets/oritech/items/duratium.json
 fea0b4bc52afe004087b007f5d506a95e65f6b3e assets/oritech/items/duratium_dust.json
 ebe2f0cf9408b67a814cc9e0fd21076dd35463c9 assets/oritech/items/duratium_ingot.json
@@ -585,7 +585,7 @@ fec5280fe44efeefb44946be9ac4d9626b060ce6 assets/oritech/models/item/copper_dust.
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets/oritech/models/item/copper_gem.json
 84bc2922b2e7b64a95ec3160df10688923726be8 assets/oritech/models/item/copper_nugget.json
 b2128098777a7b793a8c83d3f5f3fdb1a93116c9 assets/oritech/models/item/diamond_paint.json
-d7223c34ce81a014f8cda158d07979f4adb4a597 assets/oritech/models/item/dubios_container.json
+fdf9a0446976d80f32eb852f18915e4ac6064aaa assets/oritech/models/item/dubious_container.json
 1a1a2b1ff79d6a7d432f6842f63c36ec04632223 assets/oritech/models/item/duratium_dust.json
 21a85f7686269b5fdd33e5ad42e3e09f76ace9e9 assets/oritech/models/item/duratium_ingot.json
 41593ea0e8795b0c46705add04dfef917a37bb5c assets/oritech/models/item/electric_mace.json

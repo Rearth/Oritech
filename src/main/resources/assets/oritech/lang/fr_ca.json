@@ -124,7 +124,7 @@
       "color": "gray"
     },
     {
-      "translate": "item.oritech.dubios_container",
+      "translate": "item.oritech.dubious_container",
       "italic": true,
       "color": "gray"
     }
@@ -484,7 +484,7 @@
   "item.oritech.processing_unit": "Unité de traitement",
   "item.oritech.advanced_computing_engine": "Moteur de calcul avancé",
   "item.oritech.silicon_wafer": "Plaquette de silicone",
-  "item.oritech.dubios_container": "Conteneur douteux",
+  "item.oritech.dubious_container": "Conteneur douteux",
   "item.oritech.enderic_lens": "Lentille Enderique",
   "item.oritech.flux_gate": "Contrôleur de flux",
   "item.oritech.advanced_battery": "Batterie avancée",

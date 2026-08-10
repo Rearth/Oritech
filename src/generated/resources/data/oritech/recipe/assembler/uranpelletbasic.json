@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "oritech:uranium_gem",
     "oritech:uranium_gem",
@@ -12,6 +12,5 @@
       "id": "oritech:uranium_pellet"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

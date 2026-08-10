@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "oritech_space_age:rocket_engine_tier_3"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "oritech_space_age:blocks/rocket_engine_tier_3"
+}

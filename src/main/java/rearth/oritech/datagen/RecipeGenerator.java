@@ -169,7 +169,7 @@ public class RecipeGenerator extends RecipeProvider {
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).timeInSeconds(200).export(exporter, "packedwheat");
         new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS).timeInSeconds(25).export(exporter, "biomass");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.SOLID_BIOFUEL).timeInSeconds(160).export(exporter, "solidbiomass");
-        new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS).timeInSeconds(270).export(exporter, "biomassblock");
+        new BioGeneratorRecipeBuilder(this.registries).input(TagContent.BIOMASS_BLOCK).timeInSeconds(270).export(exporter, "biomassblock");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.RAW_BIOPOLYMER).timeInSeconds(300).export(exporter, "polymer");
         new BioGeneratorRecipeBuilder(this.registries).input(ItemContent.UNHOLY_INTELLIGENCE).timeInSeconds(3000).export(exporter, "vex");
         // lava
@@ -288,7 +288,7 @@ public class RecipeGenerator extends RecipeProvider {
 
         // adv battery in centrifuge with sulfuric acid
         new CentrifugeFluidRecipeBuilder(this.registries)
-                .input(ItemContent.DUBIOS_CONTAINER)
+                .input(ItemContent.DUBIOUS_CONTAINER)
                 .fluidInput(TagContent.SULFURIC_ACID)
                 .result(ItemContent.ADVANCED_BATTERY, 8)
                 .timeMultiplier(2f)
@@ -328,7 +328,7 @@ public class RecipeGenerator extends RecipeProvider {
 
         // dubious container and strange matter in centrifuge
         new CentrifugeFluidRecipeBuilder(this.registries)
-                .input(ItemContent.DUBIOS_CONTAINER)
+                .input(ItemContent.DUBIOUS_CONTAINER)
                 .fluidInput(FluidContent.STILL_STRANGE_MATTER.get())
                 .result(ItemContent.UNHOLY_INTELLIGENCE, 1)
                 .timeMultiplier(8f)
@@ -473,13 +473,13 @@ public class RecipeGenerator extends RecipeProvider {
         offerGeneratorRecipe(exporter, BlockContent.BIG_SOLAR_PANEL.asItem(), of(BlockContent.BASIC_GENERATOR.asItem()), of(ItemContent.FLUX_GATE), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.FLUXITE), "solar");
 
         // equipmentCharger
-        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentCharger");
-        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentChargeralt");
+        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentcharger");
+        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentchargeralt");
 
         // small storage
         offerAtomicForgeRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage");
         // large storage
-        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOUS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
         // unstable container
         offerAtomicForgeRecipe(exporter, ItemContent.SCHRODINGERS_SAFE.asItem(), of(ItemContent.FLUXITE), of(ItemContent.DURATIUM_INGOT), of(BlockContent.LARGE_STORAGE), of(ItemContent.FLUX_GATE), of(ItemContent.SUPER_AI_CHIP), "unstablecontainer");
 
@@ -571,7 +571,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerEnergyTransmissionPoleRecipe(exporter, BlockContent.ENERGY_TRANSMISSION_POLE.asItem(), of(ItemContent.MAGNETIC_COIL), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.PORTABLE_ENERGY_STORAGE), of(ItemContent.CARBON_FIBRE_STRANDS), "_pole");
 
         // addon_splicer
-        offerTankRecipe(exporter, BlockContent.ADDON_SPLICER.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "addon_splicer");
+        offerTankRecipe(exporter, BlockContent.ADDON_SPLICER.asItem(), of(ItemContent.DUBIOUS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "addon_splicer");
 
         // particle accelerator
         // motor
@@ -614,7 +614,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_3.asItem(), of(TagContent.NICKEL_INGOTS), of(cItemTag("dusts/redstone")), "core3alt");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_4.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.ENDERIC_COMPOUND), "core4");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_5.asItem(), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ADVANCED_COMPUTING_ENGINE), "core5");
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), of(ItemContent.DURATIUM_INGOT), of(ItemContent.DUBIOS_CONTAINER), "core6");
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), of(ItemContent.DURATIUM_INGOT), of(ItemContent.DUBIOUS_CONTAINER), "core6");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.SUPERCONDUCTOR.asItem()), "core7");
 
         // machine extender
@@ -622,7 +622,7 @@ public class RecipeGenerator extends RecipeProvider {
 
         // augmenter
         // machine itself
-        offerAtomicForgeRecipe(exporter, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CHEST), of(TagContent.CARBON_FIBRE), of(ItemContent.DUBIOS_CONTAINER), "augment/applicator");
+        offerAtomicForgeRecipe(exporter, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CHEST), of(TagContent.CARBON_FIBRE), of(ItemContent.DUBIOUS_CONTAINER), "augment/applicator");
         // basic station
         offerGeneratorRecipe(exporter, BlockContent.CYBERNETIC_RESEARCH_STATION.asItem(), of(Items.BREWING_STAND), of(TagContent.PLATING_BLOCKS), of(cItemTag("storage_blocks/redstone")), of(TagContent.ELECTRUM_INGOTS), "augment/basic");
         // adv station
@@ -681,7 +681,7 @@ public class RecipeGenerator extends RecipeProvider {
         twoByTwoPacker(exporter, RecipeCategory.MISC, ItemContent.PACKED_WHEAT, Items.WHEAT);
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer");
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemContent.SOLID_BIOFUEL).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_biomass");
-        new CentrifugeFluidRecipeBuilder(this.registries).input(TagContent.BIOMASS).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
+        new CentrifugeFluidRecipeBuilder(this.registries).input(TagContent.BIOMASS_BLOCK).result(ItemContent.RAW_BIOPOLYMER).fluidInput(Fluids.WATER, 0.25f).export(exporter, "biopolymer_bioblock");
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemTags.SAND).result(ItemContent.POLYMER_RESIN).fluidInput(cFluidTag("biodiesel"), 0.1f).time(100).export(exporter, "polymerresin");
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET, 1).fluidInput(Fluids.WATER, 0.5f).time(120).export(exporter, "plasticoil");
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemContent.RAW_BIOPOLYMER).result(ItemContent.PLASTIC_SHEET, 2).fluidInput(FluidContent.STILL_MINERAL_SLURRY.get(), 0.25f).time(120).export(exporter, "plasticoilbetter");
@@ -702,8 +702,8 @@ public class RecipeGenerator extends RecipeProvider {
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.PROCESSING_UNIT).input(ItemContent.SILICON_WAFER).input(ItemContent.SILICON_WAFER).result(ItemContent.ADVANCED_COMPUTING_ENGINE).time(5).export(exporter, "advcomputer");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.DURATIUM_INGOT).input(ItemContent.ADVANCED_COMPUTING_ENGINE).input(ItemContent.ADVANCED_COMPUTING_ENGINE).result(ItemContent.SUPER_AI_CHIP).time(50).export(exporter, "aicomputer");
 
-        // dubios container
-        offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER.get(), of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubios");
+        // dubious container
+        offerMotorRecipe(exporter, ItemContent.DUBIOUS_CONTAINER.get(), of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubious");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY.get(), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.STEEL_INGOTS), "advbattery");
 
@@ -717,7 +717,7 @@ public class RecipeGenerator extends RecipeProvider {
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.SUPER_AI_CHIP).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.UNHOLY_INTELLIGENCE).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL.get(), of(Items.AMETHYST_BLOCK), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
-        new AssemblerRecipeBuilder(this.registries).input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
+        new AssemblerRecipeBuilder(this.registries).input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOUS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.HEISENBERG_COMPENSATOR).input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.OVERCHARGED_CRYSTAL).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
 
         // ice in industrial_chiller
@@ -1050,7 +1050,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerStarRecipe(exporter, BlockContent.REACTOR_HEAT_PIPE.asItem(), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/gold")), "reactorheatpipe");
 
         // explosives
-        offerCopperReinforcedPlatingRecipe(exporter, BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.URANIUM_PELLET), of(Items.TNT), 1, "manhattan_module");
+        offerCopperReinforcedPlatingRecipe(exporter, BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.asItem(), of(ItemContent.DUBIOUS_CONTAINER), of(ItemContent.URANIUM_PELLET), of(Items.TNT), 1, "manhattan_module");
         offerCopperReinforcedPlatingRecipe(exporter, BlockContent.MANHATTAN_MODULE.asItem(), of(ItemContent.HEISENBERG_COMPENSATOR), of(ItemContent.PLUTONIUM_PELLET), of(Items.TNT), 1, "manhattan_modulebetter");
     }
 

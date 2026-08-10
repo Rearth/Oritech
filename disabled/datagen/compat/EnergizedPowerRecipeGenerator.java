@@ -203,7 +203,7 @@ public class EnergizedPowerRecipeGenerator {
             new IngredientWithCount[]{
                 new IngredientWithCount(of(ItemContent.FLUX_GATE), 1),
                 new IngredientWithCount(of(TagContent.ELECTRUM_INGOTS), 1),
-                new IngredientWithCount(of(ItemContent.DUBIOS_CONTAINER), 1),
+                new IngredientWithCount(of(ItemContent.DUBIOUS_CONTAINER), 1),
                 new IngredientWithCount(of(ItemContent.ENERGITE_INGOT), 1)},
             new ItemStack(BlockContent.SUPERCONDUCTOR.asItem()), "superconductor");
     }
