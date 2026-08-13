@@ -73,7 +73,9 @@ public class NeoforgeFluidApiImpl implements BlockFluidApi, ItemFluidApi {
         
         for (var supplied : registeredItems) {
             event.registerItem(Capabilities.FluidHandler.ITEM,
-              (stack, ignored) -> FluidContainerItemWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack), stack),
+              (stack, ignored) -> stack.getCount() == 1
+                                    ? FluidContainerItemWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack), stack)
+                                    : null,
               supplied.get());
         }
     }

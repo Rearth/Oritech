@@ -72,7 +72,9 @@ public class FabricFluidApiImpl implements BlockFluidApi, ItemFluidApi {
     @Override
     public void registerForItem(Supplier<Item> itemSupplier) {
         net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.ITEM.registerForItems(
-          (stack, context) -> SingleSlotContainerStorageWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack)),
+          (stack, context) -> stack.getCount() == 1
+                                ? SingleSlotContainerStorageWrapper.of(((FluidApi.ItemProvider) stack.getItem()).getFluidStorage(stack))
+                                : null,
           itemSupplier.get()
         );
     }
