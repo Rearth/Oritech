@@ -87,7 +87,7 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
         if (inputEmpty()) return Optional.empty();
         
         if (!hasFluidAddon)
-            return super.getRecipe();
+            return getNormalRecipe();
         
         // get recipes matching input items
         var candidates = Objects.requireNonNull(level).getRecipeManager().getRecipesFor(getOwnRecipeType(), getInputInventory(), level);
