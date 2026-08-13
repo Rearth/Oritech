@@ -6,6 +6,7 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
+import com.google.common.primitives.Ints;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -159,7 +160,7 @@ public class SchrodingersSafeBlockEntity extends NetworkedBlockEntity implements
             var candidate = level.getCapability(Capabilities.Energy.BLOCK, worldPos, null);
             if (candidate != null) {
                 try (var transaction = Transaction.openRoot()) {
-                    var inserted = candidate.insert((int) Math.min(energyStorage.energy, energyStorage.maxExtract), transaction);  // no idea if this math.min is really needed
+                    var inserted = candidate.insert(Ints.saturatedCast(Math.min(energyStorage.energy, energyStorage.maxExtract)), transaction);  // no idea if this math.min is really needed
                     if (inserted > 0) {
                         energyStorage.internalExtract(inserted, transaction);
                         transaction.commit();
