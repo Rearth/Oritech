@@ -4,7 +4,6 @@ import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
-import com.geckolib.model.DefaultedBlockGeoModel;
 import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.util.GeckoLibUtil;
@@ -18,6 +17,7 @@ import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.block.Block;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.models.OritechBlockGeoModel;
 import rearth.oritech.util.ColorableMachine;
 
 import java.util.function.Consumer;
@@ -72,7 +72,7 @@ public class OritechGeoItem extends BlockItem implements GeoItem {
         return geoCache;
     }
 
-    private static class DefaultColoredBlockItemGeoModel extends DefaultedBlockGeoModel<OritechGeoItem> {
+    private static class DefaultColoredBlockItemGeoModel extends OritechBlockGeoModel<OritechGeoItem> {
         private final ColorableMachine.ColorVariant defaultColor;
 
         private DefaultColoredBlockItemGeoModel(Identifier assetSubpath, ColorableMachine.ColorVariant defaultColor) {

@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers.models;
 
 import com.geckolib.animatable.GeoAnimatable;
-import com.geckolib.model.DefaultedBlockGeoModel;
 import com.geckolib.renderer.base.GeoRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -9,7 +8,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.client.renderers.blocks.MachineRenderer;
 import rearth.oritech.util.ColorableMachine;
 
-public class MachineModel<T extends BlockEntity & GeoAnimatable> extends DefaultedBlockGeoModel<T> {
+public class MachineModel<T extends BlockEntity & GeoAnimatable> extends OritechBlockGeoModel<T> {
 
     public MachineModel(String subpath) {
         super(Oritech.id(subpath));
