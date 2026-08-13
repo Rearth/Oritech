@@ -8,6 +8,7 @@ import com.geckolib.renderer.layer.builtin.AutoGlowingGeoLayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
@@ -42,12 +43,13 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         super.addRenderData(animatable, relatedObject, renderState, partialTick);
 
         if (relatedObject == null) return;
-        // if (!relatedObject.renderPerspective().firstPerson()) return;
 
         var client = Minecraft.getInstance();
-        var player = client.player;
+        var player = relatedObject.itemOwner() == null ? null : relatedObject.itemOwner().asLivingEntity();
         var level = client.level;
-        if (player == null || level == null) return;
+        // Firing input is client-local. Without this ownership check, firing in third person
+        // can put the local player's beam on every rendered portable laser in view.
+        if (!(player instanceof Player aimingPlayer) || player != client.player || level == null) return;
 
         var heldStack = relatedObject.itemStack();
 
@@ -59,11 +61,11 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
             return;
 
         // target calculations
-        var startPos = player.getEyePosition();
-        var lookVec = player.getViewVector(0F);
+        var startPos = aimingPlayer.getEyePosition();
+        var lookVec = aimingPlayer.getViewVector(partialTick);
         var endPos = startPos.add(lookVec.scale(128));
 
-        var hit = PortableLaserItem.getPlayerTargetRay(player);
+        var hit = PortableLaserItem.getPlayerTargetRay(aimingPlayer);
         if (hit != null && hit.getType().equals(HitResult.Type.MISS))
             endPos = hit.getLocation();
 

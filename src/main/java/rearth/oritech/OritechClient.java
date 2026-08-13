@@ -3,10 +3,13 @@ package rearth.oritech;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -18,6 +21,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -45,6 +50,7 @@ import rearth.oritech.datagen.tags.BlockTagGenerator;
 import rearth.oritech.datagen.tags.EntityTagGenerator;
 import rearth.oritech.datagen.tags.FluidTagGenerator;
 import rearth.oritech.datagen.tags.ItemTagGenerator;
+import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.PortableLaserItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.item.tools.util.ClientTickableItem;
@@ -87,6 +93,7 @@ public final class OritechClient {
         neoEventBus.addListener(OreFinderRenderer::onSubmitGeometry);
 
         modEventBus.addListener(this::registerBindings);
+        modEventBus.addListener(this::registerClientExtensions);
         modEventBus.addListener(this::registerSpecialModelRenderers);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(ModScreens::registerScreens);
@@ -132,6 +139,15 @@ public final class OritechClient {
     private void registerBindings(RegisterKeyMappingsEvent event) {
         event.registerCategory(ORITECH_KEYS_CATEGORY);
         event.register(AUGMENT_SELECTOR);
+    }
+
+    private void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerItem(new IClientItemExtensions() {
+            @Override
+            public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
+                return hand == InteractionHand.MAIN_HAND ? HumanoidModel.ArmPose.CROSSBOW_HOLD : null;
+            }
+        }, ToolsContent.PORTABLE_LASER);
     }
 
     private void onPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
