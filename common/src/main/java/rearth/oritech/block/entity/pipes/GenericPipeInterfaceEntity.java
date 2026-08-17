@@ -116,6 +116,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
 
         data.pipeNetworks.remove(oldNetwork);
         data.pipeNetworkInterfaces.remove(oldNetwork);
+        data.removeNetworkRevision(oldNetwork);
         data.pipeNetworkLinks.remove(pos);
 
         // re-calculate old network, is either shorter or split into multiple ones (starting from ones this block was connected to)
@@ -145,6 +146,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         var netID = foundNetwork.hashCode();
         data.pipeNetworks.put(netID, foundNetwork);
         data.pipeNetworkInterfaces.put(netID, foundMachines);
+        data.markNetworkTopologyChanged(netID);
 
         // these networks will be replaced, since these nodes now belong to the new network
         var networksToRemove = new HashSet<Integer>();
@@ -157,6 +159,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         networksToRemove.stream().filter(i -> i != -1 && i != netID).forEach(i -> {
             data.pipeNetworks.remove(i);
             data.pipeNetworkInterfaces.remove(i);
+            data.removeNetworkRevision(i);
         });
 
         data.setDirty();
@@ -287,6 +290,29 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         public final HashMap<Integer, Set<Tuple<BlockPos, Direction>>> pipeNetworkInterfaces = new HashMap<>(); // list of machines that are connected to the network
 
         public final HashMap<BlockPos, Set<Direction>> machinePipeNeighbors = new HashMap<>(); // List of neighboring pipes per machine, and the direction they are in. Missing direction means no connection
+
+        // Runtime-only revisions used to invalidate dispatcher caches. Topology remains serialized
+        // in the collections above; these counters deliberately restart after a world reload.
+        private final HashMap<Integer, Long> networkRevisions = new HashMap<>();
+        private long topologyRevision;
+
+        public long getNetworkRevision(int networkId) {
+            return networkRevisions.getOrDefault(networkId, 0L);
+        }
+
+        public long getTopologyRevision() {
+            return topologyRevision;
+        }
+
+        private void markNetworkTopologyChanged(int networkId) {
+            networkRevisions.put(networkId, ++topologyRevision);
+        }
+
+        private void removeNetworkRevision(int networkId) {
+            if (networkRevisions.remove(networkId) != null) {
+                topologyRevision++;
+            }
+        }
 
         @Override
         public int hashCode() {

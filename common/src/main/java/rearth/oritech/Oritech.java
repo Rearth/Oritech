@@ -23,6 +23,7 @@ import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.augmenter.api.Augment;
 import rearth.oritech.block.entity.interaction.PowerPoleEntity;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
+import rearth.oritech.block.entity.pipes.EnergyPipeInterfaceEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.init.*;
@@ -59,6 +60,7 @@ public final class Oritech {
         
         // for pipe data
         LifecycleEvent.SERVER_STARTED.register(Oritech::onServerStarted);
+        LifecycleEvent.SERVER_STOPPED.register(server -> EnergyPipeInterfaceEntity.clearRuntimeData());
         
         // for augment data
         LifecycleEvent.SERVER_STARTED.register(server -> PlayerAugments.loadAllAugments(server.getRecipeManager()));
