@@ -4,9 +4,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
-public class LaserRecipeBuilder extends OritechRecipeBuilder {
+public class EndericLaserRecipeBuilder extends OritechRecipeBuilder {
 
-    public LaserRecipeBuilder(HolderLookup.Provider registryAccess) {
+    public EndericLaserRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.LASER, "laser", registryAccess);
         // Set the default time for laser recipes
         this.time = 1;

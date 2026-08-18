@@ -45,7 +45,7 @@ import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.EndericRailgunItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
 import rearth.oritech.util.ProgressStorage;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -96,7 +96,7 @@ public class NetworkManager {
         registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registrar.playToServer(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.class), StabilizedEnchanterBlockEntity::receiveEnchantmentSelection);
         registrar.playToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
-        registrar.playToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
+        registrar.playToServer(EndericRailgunItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(EndericRailgunItem.LaserPlayerUsePacket.class), EndericRailgunItem::receiveUsePacket);
         registrar.playToServer(ServerZiplineHandler.ZiplinePlayerUsePacket.PACKET_ID, getAutoCodec(ServerZiplineHandler.ZiplinePlayerUsePacket.class), ServerZiplineHandler::onZipLineTickUseEvent);
         registrar.playToServer(MachineBlockEntity.InventoryInputModeSelectorPacket.PACKET_ID, getAutoCodec(MachineBlockEntity.InventoryInputModeSelectorPacket.class), MachineBlockEntity::receiveCycleModePacket);
         registrar.playToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);

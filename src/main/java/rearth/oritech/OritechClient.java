@@ -51,7 +51,7 @@ import rearth.oritech.datagen.tags.EntityTagGenerator;
 import rearth.oritech.datagen.tags.FluidTagGenerator;
 import rearth.oritech.datagen.tags.ItemTagGenerator;
 import rearth.oritech.init.ToolsContent;
-import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.EndericRailgunItem;
 import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.item.tools.util.ClientTickableItem;
 
@@ -147,7 +147,7 @@ public final class OritechClient {
             public HumanoidModel.ArmPose getArmPose(LivingEntity entity, InteractionHand hand, ItemStack stack) {
                 return hand == InteractionHand.MAIN_HAND ? HumanoidModel.ArmPose.CROSSBOW_HOLD : null;
             }
-        }, ToolsContent.PORTABLE_LASER);
+        }, ToolsContent.ENDERIC_RAILGUN);
     }
 
     private void onPlayerLoggingIn(ClientPlayerNetworkEvent.LoggingIn event) {
@@ -177,8 +177,8 @@ public final class OritechClient {
         }
 
         // laser player use event
-        if (player.getMainHandItem().getItem() instanceof PortableLaserItem && laserActive) {
-            ClientPacketDistributor.sendToServer(new PortableLaserItem.LaserPlayerUsePacket());
+        if (player.getMainHandItem().getItem() instanceof EndericRailgunItem && laserActive) {
+            ClientPacketDistributor.sendToServer(new EndericRailgunItem.LaserPlayerUsePacket());
         } else {
             laserActive = false;
         }
@@ -232,7 +232,7 @@ public final class OritechClient {
 
         var client = Minecraft.getInstance();
 
-        if (client.player != null && client.player.getMainHandItem().getItem() instanceof PortableLaserItem && event.getButton() == 0 && client.screen == null) {
+        if (client.player != null && client.player.getMainHandItem().getItem() instanceof EndericRailgunItem && event.getButton() == 0 && client.screen == null) {
             var wasDown = event.getAction() == 1;
             laserActive = wasDown; // activate laser on mouse down
             event.setCanceled(wasDown);

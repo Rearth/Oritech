@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-10T20:23:51.4160496	Oritech Recipes
+// 26.1.2	2026-08-18T17:47:23.2329952	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -165,6 +165,7 @@ b40e06fb54d1cc7c3a212b0aeeb558865ee9a0fe data/oritech/advancement/recipes/misc/e
 526dee62f64fbd1ae80ac78b9c2c785fcf6206a9 data/oritech/advancement/recipes/misc/electrum_ingot.json
 091a5b567e90a4b1654a8155d85379b739deb515 data/oritech/advancement/recipes/misc/electrum_ingot_from_blasting_electrum_dust.json
 0e84da53fbe61a63bd1945a763e4b2101876018c data/oritech/advancement/recipes/misc/electrum_ingot_from_smelting_electrum_dust.json
+63df04c6aa23bf1c744e68b24fdbd2a1fa75a05a data/oritech/advancement/recipes/misc/enderic_railgun.json
 a2782cd18a37913e6849c3940d4673a95ce4d509 data/oritech/advancement/recipes/misc/energiteblock.json
 c0085a0df8ab7ad9fd53c75ea01d849f06f75119 data/oritech/advancement/recipes/misc/energiteblockinv.json
 309e9a47bfd4204d8fd5b9b850a612192632d4b8 data/oritech/advancement/recipes/misc/energite_ingot_from_blasting_energite_dust.json
@@ -245,7 +246,6 @@ c49823664af6098a00ec232cbb0fe9b57411fca9 data/oritech/advancement/recipes/misc/p
 b12194989d954fe13b9d1f733577ccdcac9e7938 data/oritech/advancement/recipes/misc/plutonium_pelletblock.json
 e071172ef82271e2c466d503bff5efc5424ba0ed data/oritech/advancement/recipes/misc/plutonium_pelletblockinv.json
 7e83456c0b9cdf5510fc82e5613d1f19edf3adaf data/oritech/advancement/recipes/misc/polymer_resin.json
-f98fb443ea6e490122be661dc748b72b5204c1fc data/oritech/advancement/recipes/misc/portable_laser.json
 55c19294610451328b9968045e6dd159e1d0ca41 data/oritech/advancement/recipes/misc/portable_tank.json
 02deb09946926933256c23a0c44d189a68524a3a data/oritech/advancement/recipes/misc/power_bank_addon_extender.json
 7a4ef642353ab965551b766f01b6afc09ffc92f7 data/oritech/advancement/recipes/misc/promethium_axe.json
@@ -568,6 +568,7 @@ bcb084018ad5627f8d8c8db8cbf558ec9e9f93c5 data/oritech/recipe/electrumblockinv.js
 6bcaa0382d036a70cd54e8440d88641af6427a3a data/oritech/recipe/electrum_ingot.json
 bd9623a4fae1d0eb89c366ae8ce60f1bae65b8b6 data/oritech/recipe/electrum_ingot_from_blasting_electrum_dust.json
 0139738cd7c1d7accf94dda06d0bfec34958bdf5 data/oritech/recipe/electrum_ingot_from_smelting_electrum_dust.json
+360fdc846806423628d7212b0c242271850e4699 data/oritech/recipe/enderic_railgun.json
 4c7ae9ae4bdb84baaa12be43ea36965f49eadb88 data/oritech/recipe/energiteblock.json
 cb5ee1ca0b22ee840e2bfce11b463bed21bdcdf5 data/oritech/recipe/energiteblockinv.json
 027babcb469a2d177ddec2cdb9b3754aaacd9939 data/oritech/recipe/energite_ingot_from_blasting_energite_dust.json
@@ -762,7 +763,6 @@ e7eb11c331e8d0e51ac0889c45fe58db5c5128b8 data/oritech/recipe/platinum_nugget.jso
 f777e9f4a0c399cf4b359ec75a578aa401b6e177 data/oritech/recipe/plutonium_pelletblock.json
 fd6c60999b9cfeaf4fec4b08b543f39ffecd913f data/oritech/recipe/plutonium_pelletblockinv.json
 27aec18c39d805d5d48299d4e4cad776f305ebef data/oritech/recipe/polymer_resin.json
-1f0d426d64f3b7c97c9639b28f879696bb83067c data/oritech/recipe/portable_laser.json
 26c7b5fba7064f21b694160ed1b902219672cad8 data/oritech/recipe/portable_tank.json
 5925e64d2f4f508a0a0451f3b18c4396c7d4f603 data/oritech/recipe/power_bank_addon_extender.json
 c22d36883d3df07e599fa50169c50ef9fa63431f data/oritech/recipe/promethium_axe.json

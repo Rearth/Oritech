@@ -350,7 +350,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerPickaxeRecipe(exporter, ToolsContent.PROMETHIUM_PICKAXE.get(), of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.DESTROYER.asItem()), "prompick");
 
         // enderic laser / portable laser
-        offerChainsawRecipe(exporter, ToolsContent.PORTABLE_LASER.get(), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.ENDERIC_LASER), "portablelaser");
+        offerChainsawRecipe(exporter, ToolsContent.ENDERIC_RAILGUN.get(), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.ENDERIC_LASER), "portablelaser");
 
         // electric mace
         offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE.get(), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
@@ -1062,8 +1062,8 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addLaserTransformations(RecipeOutput exporter) {
-        new LaserRecipeBuilder(this.registries).input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE.get()).export(exporter, "fluxite");
-        new LaserRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.PLUTONIUM_DUST.get()).export(exporter, "plutoniumdust");
+        new EndericLaserRecipeBuilder(this.registries).input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE.get()).export(exporter, "fluxite");
+        new EndericLaserRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.PLUTONIUM_DUST.get()).export(exporter, "plutoniumdust");
     }
 
     private void addCompactingRecipe(RecipeOutput exporter, ItemLike resBlock, ItemLike resItem, Ingredient itemIng, Ingredient blockIng) {

@@ -262,12 +262,12 @@ public class ItemTagGenerator extends ItemTagsProvider {
         
         // equipment enchanting
         tag(ItemTags.SWORDS)
-          .add(ToolsContent.CHAINSAW.get(), ToolsContent.PROMETHIUM_AXE.get(), ToolsContent.PORTABLE_LASER.get());
+          .add(ToolsContent.CHAINSAW.get(), ToolsContent.PROMETHIUM_AXE.get(), ToolsContent.ENDERIC_RAILGUN.get());
         tag(ItemTags.AXES)
-          .add(ToolsContent.CHAINSAW.get(), ToolsContent.PROMETHIUM_AXE.get(), ToolsContent.PORTABLE_LASER.get());
+          .add(ToolsContent.CHAINSAW.get(), ToolsContent.PROMETHIUM_AXE.get(), ToolsContent.ENDERIC_RAILGUN.get());
         
         tag(ItemTags.PICKAXES)
-          .add(ToolsContent.HAND_DRILL.get(), ToolsContent.PROMETHIUM_PICKAXE.get(), ToolsContent.PORTABLE_LASER.get());
+          .add(ToolsContent.HAND_DRILL.get(), ToolsContent.PROMETHIUM_PICKAXE.get(), ToolsContent.ENDERIC_RAILGUN.get());
         tag(ItemTags.SHOVELS)
           .add(ToolsContent.HAND_DRILL.get(), ToolsContent.PROMETHIUM_PICKAXE.get());
         

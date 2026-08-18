@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-07T12:53:18.2698776	Tags for minecraft:item mod id oritech
+// 26.1.2	2026-08-18T17:47:23.2309924	Tags for minecraft:item mod id oritech
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/bananas.json
 e2c6e20d8d6d0e3e37246a13f9af75711482a721 data/c/tags/item/carbon_fibre.json
 99505a8471e5d2356893d65d4cff2b3c634c266b data/c/tags/item/clumps.json
@@ -87,7 +87,7 @@ b91231802354b103a5e685b0b77734021dd9c0b6 data/c/tags/item/storage_blocks/steel.j
 85d3412c3db3674dee917dd765ac4b8e050cb54a data/c/tags/item/storage_blocks/uranium_dust.json
 155de923074b66735208812821929be4f3d64f9d data/c/tags/item/tools/wrench.json
 c76015810207d3cbb8430f61f93eac486227dfe2 data/industrialforegoing/tags/item/bioreactor.json
-9d916d24691f05ed588167bbde6f55a978e71aa8 data/minecraft/tags/item/axes.json
+1150ab9508dcceb084f76bce1b829cc6b6c2be07 data/minecraft/tags/item/axes.json
 4c21d79a7483ec65617b13c3a16ab34feadd8bc8 data/minecraft/tags/item/chest_armor.json
 c5014d2e2fd9dfeff0eccb24fcef5ba63b05cc7e data/minecraft/tags/item/cluster_max_harvestables.json
 4c21d79a7483ec65617b13c3a16ab34feadd8bc8 data/minecraft/tags/item/enchantable/chest_armor.json
@@ -99,9 +99,9 @@ e6911a5e5da3fb6cb428342470fc7a877a77d8b1 data/minecraft/tags/item/enchantable/he
 f8b1a5d00eda05b86c335748b7fa3c06b00fac18 data/minecraft/tags/item/foot_armor.json
 e6911a5e5da3fb6cb428342470fc7a877a77d8b1 data/minecraft/tags/item/head_armor.json
 1faf32c4f40a9f06d5ebda1262a8bcb42b297f21 data/minecraft/tags/item/leg_armor.json
-b100f8cb7a51598bb3ba608cf35c4cb70ec6685c data/minecraft/tags/item/pickaxes.json
+28715417673b5b6ab38d7cd4d7ca5066f8ab0447 data/minecraft/tags/item/pickaxes.json
 c5014d2e2fd9dfeff0eccb24fcef5ba63b05cc7e data/minecraft/tags/item/shovels.json
-9d916d24691f05ed588167bbde6f55a978e71aa8 data/minecraft/tags/item/swords.json
+1150ab9508dcceb084f76bce1b829cc6b6c2be07 data/minecraft/tags/item/swords.json
 03e2ffbbb53820b3120884ddfce56501d7745443 data/oritech/tags/item/biomatter.json
 3492d00c40681839c142dad00b37cb30a5d0b27f data/oritech/tags/item/feeder_blacklist.json
 a2e30b1f294ad2b8c3fe306573bae223e477604c data/oritech/tags/item/paint.json

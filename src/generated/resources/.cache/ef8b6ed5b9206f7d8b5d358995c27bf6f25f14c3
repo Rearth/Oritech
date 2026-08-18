@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-07T12:53:18.280871	oritech geckolib item models
+// 26.1.2	2026-08-18T17:47:23.2389927	oritech geckolib item models
 1fbb92f099976f8fafdd8d869107fc1305de387f assets/oritech/items/addon_splicer.json
 dab1edc22bb5e8b6a6eae17134b4369e75011a7e assets/oritech/items/arcane_catalyst.json
 5d755d63dc77c10d9ecb799f1fb697b77a2fea3f assets/oritech/items/assembler.json
@@ -11,6 +11,7 @@ a7a767504629c0d4267e963922c0c31d72f1890e assets/oritech/items/big_solar_panel.js
 3bdf0565e730d78085cacc505a80f83b9f8e859d assets/oritech/items/cybernetic_augmentation_center.json
 9a837528920ecb278153633b3427a211ec570369 assets/oritech/items/drone_port.json
 6ec311cf991c0e033c6ddee16cc08ea852c5c463 assets/oritech/items/enderic_laser.json
+7076145a6bc2b3239135b9717b2e332e734649eb assets/oritech/items/enderic_railgun.json
 cca9ba2dfaff9b00078f0eb2ce9f332a3bba3e93 assets/oritech/items/foundry.json
 034fe6cf2ab3e283117c054cf8e4a9567c4f9edd assets/oritech/items/fragment_forge.json
 7edc7e2969e0a71543ed203aea22deb81f54bb82 assets/oritech/items/fuel_generator.json
@@ -19,7 +20,6 @@ df62d7349da8ff9d3253f95584cc91ce6639e509 assets/oritech/items/industrial_chiller
 0079058f4ec4bb92f005c064df377ff036ca257b assets/oritech/items/industrial_door.json
 ffdf331ff1329bea4c5d368cab781d79253b4407 assets/oritech/items/lava_generator.json
 fc5d4533d3043c9efde01449ff31f40bf76205e0 assets/oritech/items/pipe_booster.json
-460b58de0534a3725d3a8a6f9be4f560fb040f8a assets/oritech/items/portable_laser.json
 3d51b79b52c9f6ecd0963f57b01279f46ba12415 assets/oritech/items/powered_furnace.json
 420520ed4575b5cc0e62a19d336006629b634d33 assets/oritech/items/promethium_axe.json
 815e2b866fcb42746cc18d0c59c89bb8621458fe assets/oritech/items/promethium_pickaxe.json

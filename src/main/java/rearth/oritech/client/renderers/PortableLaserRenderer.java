@@ -21,11 +21,11 @@ import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
-import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.EndericRailgunItem;
 
 import static rearth.oritech.client.renderers.blocks.EndericLaserRenderer.BEAM_TEXTURE;
 
-public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
+public class PortableLaserRenderer extends GeoItemRenderer<EndericRailgunItem> {
 
     // captured during extraction, consumed during submission
     public static final DataTicket<LaserBeamData> BEAM_DATA = DataTicket.create("portable_laser_beam_data", LaserBeamData.class);
@@ -39,7 +39,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
     // extract beam parameters while tool is fired in first person
     @Override
-    public void addRenderData(PortableLaserItem animatable, @Nullable RenderData relatedObject, GeoRenderState renderState, float partialTick) {
+    public void addRenderData(EndericRailgunItem animatable, @Nullable RenderData relatedObject, GeoRenderState renderState, float partialTick) {
         super.addRenderData(animatable, relatedObject, renderState, partialTick);
 
         if (relatedObject == null) return;
@@ -53,10 +53,10 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
 
         var heldStack = relatedObject.itemStack();
 
-        var singleShotAge = level.getGameTime() - PortableLaserItem.lastSingleShot;
+        var singleShotAge = level.getGameTime() - EndericRailgunItem.lastSingleShot;
         if (!OritechClient.laserActive && singleShotAge > 10) return;
 
-        if (!heldStack.is(ToolsContent.PORTABLE_LASER)) return;
+        if (!heldStack.is(ToolsContent.ENDERIC_RAILGUN)) return;
         if (animatable.getStoredEnergy(heldStack, ItemAccess.forStack(heldStack)) < OritechStartupConfig.portableLaserConfig.energyPerTick.get())
             return;
 
@@ -65,7 +65,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         var lookVec = aimingPlayer.getViewVector(partialTick);
         var endPos = startPos.add(lookVec.scale(128));
 
-        var hit = PortableLaserItem.getPlayerTargetRay(aimingPlayer);
+        var hit = EndericRailgunItem.getPlayerTargetRay(aimingPlayer);
         if (hit != null && hit.getType().equals(HitResult.Type.MISS))
             endPos = hit.getLocation();
 

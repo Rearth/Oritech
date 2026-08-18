@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture;
 public class GeoItemModelGenerator implements DataProvider {
 
     private static final List<DeferredItem<?>> GEO_ITEMS = List.of(
-            ToolsContent.PORTABLE_LASER,
+            ToolsContent.ENDERIC_RAILGUN,
             ToolsContent.PROMETHIUM_AXE,
             ToolsContent.PROMETHIUM_PICKAXE,
             ItemContent.SCHRODINGERS_SAFE

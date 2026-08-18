@@ -1,7 +1,7 @@
 {
   "model": {
     "type": "minecraft:special",
-    "base": "oritech:item/portable_laser",
+    "base": "oritech:item/enderic_railgun",
     "model": {
       "type": "geckolib:geckolib"
     }

@@ -76,7 +76,7 @@ import java.util.function.Consumer;
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
 
 
-public class PortableLaserItem extends Item implements OritechEnergyItem, GeoItem {
+public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoItem {
 
     public static final int ACTION_COOLDOWN = 24;
 
@@ -91,7 +91,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
 
     private static final Map<Player, Tuple<BlockPos, Integer>> blockBreakStats = new HashMap<>();
 
-    public PortableLaserItem(Properties settings) {
+    public EndericRailgunItem(Properties settings) {
         super(settings);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
     }
@@ -109,7 +109,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
             return InteractionResult.CONSUME;
         }
 
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem)) return InteractionResult.CONSUME;
+        if (!(stack.getItem() instanceof EndericRailgunItem laserItem)) return InteractionResult.CONSUME;
 
         if (player.isShiftKeyDown()) {
 
@@ -183,7 +183,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
         var level = player.level();
         var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-        if (!(stack.getItem() instanceof PortableLaserItem laserItem) || !player.mayBuild()) return;
+        if (!(stack.getItem() instanceof EndericRailgunItem laserItem) || !player.mayBuild()) return;
 
         var rfUsage = OritechStartupConfig.portableLaserConfig.energyPerTick.get();
 
@@ -473,7 +473,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     }
 
     public static void receiveUsePacket(LaserPlayerUsePacket packet, IPayloadContext context) {
-        PortableLaserItem.onUseTick(context.player());
+        EndericRailgunItem.onUseTick(context.player());
     }
 
     @Override
