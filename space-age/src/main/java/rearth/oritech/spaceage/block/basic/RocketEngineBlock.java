@@ -1,4 +1,4 @@
-package rearth.oritech.spaceage.block.blocks;
+package rearth.oritech.spaceage.block.basic;
 
 import net.minecraft.world.level.block.Block;
 

@@ -5,10 +5,10 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.blocks.RocketAssemblerBlock;
-import rearth.oritech.spaceage.block.blocks.RocketCouplingBlock;
-import rearth.oritech.spaceage.block.blocks.RocketEngineBlock;
-import rearth.oritech.spaceage.block.blocks.RocketPadBlock;
+import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
+import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
+import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
+import rearth.oritech.spaceage.block.basic.RocketPadBlock;
 
 public final class SpaceAgeBlocks {
 

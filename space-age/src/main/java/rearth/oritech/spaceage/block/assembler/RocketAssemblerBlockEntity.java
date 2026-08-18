@@ -1,9 +1,8 @@
-package rearth.oritech.spaceage.block.entity.assembler;
+package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -35,7 +34,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
     private void collectRocketSegments() {
 
         // start at first found block above connected pads
-        // todo offset by assembler orientation
+        // todo offset by assembler orientation (once assembler has orientation)
 
         var padBlocks = padFloodFill(worldPosition.north());
         var start = worldPosition;
@@ -138,8 +137,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         var detectedRF = 0L;
         var detectedFuels = new HashMap<FluidType, Long>(); // value is the total burn time available for the type on the segment
         var detectedEngines = 0;
-        var weight = 0;
-        var stoneWeight = Blocks.STONE.defaultBlockState().getDestroySpeed(level, worldPosition);
+        var staticWeight = 0;
+        var fuelWeight = 0f;
 
         for (var blockData : segment.blocks) {
 
@@ -159,16 +158,21 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                             var fluidType = fluid.value().getFluidType();
                             var taken = fluidCandidate.extract(FluidResource.of(fluid), Integer.MAX_VALUE, transaction);
                             var takenBurnTime = (long) taken * typeBurnTime;
-                            if (taken > 0)
+                            if (taken > 0) {
                                 detectedFuels.merge(fluidType, (long) takenBurnTime, Long::sum);
+
+                                // add weight
+                                var amountInBuckets = taken / (float) FluidType.BUCKET_VOLUME;
+                                var densityRelativeToWater = Math.max(fluidType.getDensity(), 0) / 1000f;
+                                fuelWeight += amountInBuckets * densityRelativeToWater;
+                            }
 
                             totalTaken += taken;
                         }
                     }
 
                     if (totalTaken > 0) {
-                        weight += (int) (totalTaken * stoneWeight / FluidType.BUCKET_VOLUME);
-                        // transaction.commit(); // todo enable again
+                        transaction.commit();
                     }
 
                 }
@@ -181,13 +185,13 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             }
 
             // weight scan
-            weight += (int) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
+            staticWeight += (int) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
 
         }
 
         OritechSpaceAge.LOGGER.debug(
-                "Collected stats for rocket segment {}: weight={}, fuels={}, energy={}, engines={}",
-                segment.id, weight, detectedFuels, detectedRF, detectedEngines);
+                "Collected stats for rocket segment {}: weight={}, fuelWeight={}, fuels={}, energy={}, engines={}",
+                segment.id, staticWeight, detectedFuels, fuelWeight, detectedRF, detectedEngines);
     }
 
     // ensures no couples connect to the segment itself
@@ -199,6 +203,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         return true;
     }
 
+    // returns all horizontally found pad blocks
     private Set<BlockPos> padFloodFill(BlockPos start) {
 
         var directions = Direction.values();
@@ -233,6 +238,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
     }
 
+    // finds and scans all blocks of a segment  (e.g. stops the fill at any couplings)
     private RocketFloodSegment segmentFloodFill(BlockPos start) {
 
         var directions = Direction.values();
@@ -297,8 +303,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         private final Set<FoundBlock> blocks;
         private final Set<FoundCoupling> couplings;
         private final UUID id;
-        private final Map<UUID, Set<FoundCoupling>> connectedSegments = new HashMap<>();    // contains all connected segments via
-        // id and the couplings that connect to it.
+        private final Map<UUID, Set<FoundCoupling>> connectedSegments = new HashMap<>();    // contains all connected segments via segmentId and the couplings (on itself) that connect to it.
 
         private RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings, UUID id) {
             this.blocks = blocks;
@@ -313,7 +318,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         @Override
         public String toString() {
             return "RocketFloodSegment{" +
-                    "id=" + id +
+                    "segmentId=" + id +
                     ", blocks=" + blocks +
                     ", couplings=" + couplings +
                     ", connectedSegments=" + connectedSegments.entrySet().stream()

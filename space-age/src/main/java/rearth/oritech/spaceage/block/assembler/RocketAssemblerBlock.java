@@ -1,4 +1,4 @@
-package rearth.oritech.spaceage.block.blocks;
+package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
-import rearth.oritech.spaceage.block.entity.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 
 public class RocketAssemblerBlock extends Block implements EntityBlock {
