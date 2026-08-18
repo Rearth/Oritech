@@ -58,7 +58,7 @@ import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.interaction.EndericLaserBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
-import rearth.oritech.client.renderers.PortableLaserRenderer;
+import rearth.oritech.client.renderers.EndericRailgunRenderer;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ComponentContent;
@@ -116,13 +116,13 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
             var lastMode = isMiningEnabled(stack);
             setMiningEnabled(stack, !lastMode);
 
-            player.sendSystemMessage(Component.translatable("tooltip.oritech.portable_laser.status.begin").append(Component.literal(String.valueOf(!lastMode))));
+            player.sendSystemMessage(Component.translatable("tooltip.oritech.enderic_railgun.status.begin").append(Component.literal(String.valueOf(!lastMode))));
 
             return InteractionResult.CONSUME;
         }
 
         if (isMiningEnabled(stack)) {
-            player.sendSystemMessage(Component.translatable("tooltip.oritech.portable_laser.status.shot_mining_error"));
+            player.sendSystemMessage(Component.translatable("tooltip.oritech.enderic_railgun.status.shot_mining_error"));
             return InteractionResult.PASS;
         }
 
@@ -399,16 +399,16 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
         var text = Component.translatable("tooltip.oritech.energy_indicator", storedEnergy, capacity);
         builder.accept(text.withStyle(ChatFormatting.GOLD));
 
-        var miningText = Component.translatable("tooltip.oritech.portable_laser.status.begin").withStyle(ChatFormatting.GRAY)
+        var miningText = Component.translatable("tooltip.oritech.enderic_railgun.status.begin").withStyle(ChatFormatting.GRAY)
                 .append(Component.literal(String.valueOf(isMiningEnabled(stack))).withStyle(ChatFormatting.GOLD))
-                .append(Component.translatable("tooltip.oritech.portable_laser.status.hint").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+                .append(Component.translatable("tooltip.oritech.enderic_railgun.status.hint").withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
         builder.accept(miningText);
 
         var showExtra = Minecraft.getInstance().hasControlDown();
 
         if (showExtra) {
             for (int i = 1; i <= 5; i++) {
-                builder.accept(Component.translatable("tooltip.oritech.portable_laser." + i).withStyle(ChatFormatting.GRAY));
+                builder.accept(Component.translatable("tooltip.oritech.enderic_railgun." + i).withStyle(ChatFormatting.GRAY));
             }
         } else {
             builder.accept(Component.translatable("tooltip.oritech.item_extra_info").withStyle(ChatFormatting.GRAY).withStyle(ChatFormatting.ITALIC));
@@ -456,12 +456,12 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
     @Override
     public void createGeoRenderer(Consumer<GeoRenderProvider> consumer) {
         consumer.accept(new GeoRenderProvider() {
-            private PortableLaserRenderer renderer;
+            private EndericRailgunRenderer renderer;
 
             @Override
             public @NonNull GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new PortableLaserRenderer("portable_laser");
+                    this.renderer = new EndericRailgunRenderer("enderic_railgun");
                 return renderer;
             }
         });

@@ -25,14 +25,14 @@ import rearth.oritech.item.tools.EndericRailgunItem;
 
 import static rearth.oritech.client.renderers.blocks.EndericLaserRenderer.BEAM_TEXTURE;
 
-public class PortableLaserRenderer extends GeoItemRenderer<EndericRailgunItem> {
+public class EndericRailgunRenderer extends GeoItemRenderer<EndericRailgunItem> {
 
     // captured during extraction, consumed during submission
     public static final DataTicket<LaserBeamData> BEAM_DATA = DataTicket.create("portable_laser_beam_data", LaserBeamData.class);
 
     public record LaserBeamData(Vec3 startOffset, Vec3 deltaVec, float thickness) {}
 
-    public PortableLaserRenderer(String modelName) {
+    public EndericRailgunRenderer(String modelName) {
         super(new PortableLaserModel(Oritech.id("models/" + modelName)));
         withRenderLayer(new AutoGlowingGeoLayer<>(this));
     }
