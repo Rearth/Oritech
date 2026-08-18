@@ -1055,10 +1055,10 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addReactorFuels(RecipeOutput exporter) {
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_URANIUM_PELLET).time(400).export(exporter, "smallpellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.URANIUM_PELLET).time(4000).export(exporter, "pellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_PLUTONIUM_PELLET).time(4000).export(exporter, "smallplutoniumpellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.PLUTONIUM_PELLET).time(40000).export(exporter, "plutoniumpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_URANIUM_PELLET).time(400).export(exporter, "smallpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.URANIUM_PELLET).time(4000).export(exporter, "pellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_PLUTONIUM_PELLET).time(4000).export(exporter, "smallplutoniumpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.PLUTONIUM_PELLET).time(40000).export(exporter, "plutoniumpellet");
     }
 
     private void addLaserTransformations(RecipeOutput exporter) {

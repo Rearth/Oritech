@@ -4,9 +4,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.init.recipes.RecipeContent;
 
-public class ReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
+public class NuclearReactorGeneratorRecipeBuilder extends OritechRecipeBuilder {
 
-    public ReactorGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
+    public NuclearReactorGeneratorRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.REACTOR, "reactorgen", registryAccess);
     }
 
