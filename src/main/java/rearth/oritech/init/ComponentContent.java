@@ -2,10 +2,13 @@ package rearth.oritech.init;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.entity.EntityType;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
@@ -38,4 +41,7 @@ public class ComponentContent {
             "addon_data", builder -> builder.persistent(AddonSplicerBlockEntity.ShrunkAddonData.CODEC).networkSynchronized(AddonSplicerBlockEntity.ShrunkAddonData.STREAM_CODEC)
     );
 
+    public static final Supplier<DataComponentType<HolderSet<EntityType<?>>>> DUBIOUS_CONTAINER_TARGET = COMPONENTS.registerComponentType(
+            "dubious_container_target", builder -> builder.persistent(RegistryCodecs.homogeneousList(Registries.ENTITY_TYPE)).networkSynchronized(ByteBufCodecs.holderSet(Registries.ENTITY_TYPE))
+    );
 }

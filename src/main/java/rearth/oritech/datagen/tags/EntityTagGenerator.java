@@ -18,6 +18,10 @@ public class EntityTagGenerator extends EntityTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider wrapperLookup) {
         tag(TagContent.SPAWNER_BLACKLIST)
-          .add(EntityType.ENDER_DRAGON);    // this should never actually be loaded, but it's here as a failsafe
+                .add(EntityType.ENDER_DRAGON);    // this should never actually be loaded, but it's here as a failsafe
+        tag(TagContent.FLYING_MOBS)
+                .add(EntityType.VEX)
+                .add(EntityType.ALLAY)
+                .add(EntityType.PHANTOM);
     }
 }
