@@ -14,6 +14,13 @@ public class DynamicRocketSegment {
     // if a segment is connected, all couplings to it are still coupled/connected, and vice versa
     private final Set<UUID> connectedSegments = new HashSet<>();
 
+    public DynamicRocketSegment(long availableFuelBurnTimeTicks, long availableRF, long currentFuelWeight, Set<UUID> connectedSegments) {
+        this.availableFuelBurnTimeTicks = availableFuelBurnTimeTicks;
+        this.availableRF = availableRF;
+        this.currentFuelWeight = currentFuelWeight;
+        this.connectedSegments.addAll(connectedSegments);
+    }
+
     public Set<UUID> getConnectedSegments() {
         return connectedSegments;
     }

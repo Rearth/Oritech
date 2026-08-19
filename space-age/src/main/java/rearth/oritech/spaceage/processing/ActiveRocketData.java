@@ -11,4 +11,21 @@ public class ActiveRocketData {
     private final Map<UUID, StaticRocketSegment> staticSegments = new HashMap<>();
     private final Map<UUID, DynamicRocketSegment> dynamicSegments = new HashMap<>();
 
+    public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {
+        if (!staticSegments.keySet().equals(dynamicSegments.keySet())) {
+            throw new IllegalArgumentException("Static and dynamic rocket segments must have matching IDs");
+        }
+
+        this.staticSegments.putAll(staticSegments);
+        this.dynamicSegments.putAll(dynamicSegments);
+    }
+
+    public Map<UUID, StaticRocketSegment> getStaticSegments() {
+        return Collections.unmodifiableMap(staticSegments);
+    }
+
+    public Map<UUID, DynamicRocketSegment> getDynamicSegments() {
+        return Collections.unmodifiableMap(dynamicSegments);
+    }
+
 }
