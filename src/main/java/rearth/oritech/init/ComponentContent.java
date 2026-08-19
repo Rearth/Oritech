@@ -1,10 +1,11 @@
 package rearth.oritech.init;
 
-import com.mojang.serialization.codecs.PrimitiveCodec;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.util.ExtraCodecs;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
@@ -18,11 +19,11 @@ public class ComponentContent {
 
 
     public static final Supplier<DataComponentType<Boolean>> IS_AOE_ACTIVE = COMPONENTS.registerComponentType(
-            "is_aoe_active", builder -> builder.persistent(PrimitiveCodec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
+            "is_aoe_active", builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL)
     );
 
     public static final Supplier<DataComponentType<Integer>> ENERGY = COMPONENTS.registerComponentType(
-            "energy", builder -> builder.persistent(PrimitiveCodec.INT).networkSynchronized(ByteBufCodecs.VAR_INT)
+            "energy", builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT)
     );
 
     public static final Supplier<DataComponentType<BlockPos>> TARGET_POSITION = COMPONENTS.registerComponentType(
