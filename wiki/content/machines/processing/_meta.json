@@ -1,12 +1,12 @@
 {
-  "assembler_block.mdx": "Assembler",
-  "atomic_forge_block.mdx": "Atomic Forge",
-  "centrifuge_block.mdx": "Centrifuge",
-  "cooler_block.mdx": "Industrial Chiller",
-  "foundry_block.mdx": "Foundry",
-  "fragment_forge_block.mdx": "Fragment Forge",
-  "powered_furnace_block.mdx": "Powered Furnace",
-  "pulverizer_block.mdx": "Pulverizer",
-  "refinery_block.mdx": "Refinery",
-  "refinery_module_block.mdx": "Refinery Chamber Module"
+  "assembler.mdx": "Assembler",
+  "atomic_forge.mdx": "Atomic Forge",
+  "centrifuge.mdx": "Centrifuge",
+  "industrial_chiller.mdx": "Industrial Chiller",
+  "foundry.mdx": "Foundry",
+  "fragment_forge.mdx": "Fragment Forge",
+  "powered_furnace.mdx": "Powered Furnace",
+  "pulverizer.mdx": "Pulverizer",
+  "refinery.mdx": "Refinery",
+  "refinery_chamber_module.mdx": "Refinery Chamber Module"
 }

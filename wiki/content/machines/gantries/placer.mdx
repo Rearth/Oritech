@@ -1,0 +1,24 @@
+---
+title: Placer Block
+id: oritech:placer
+type: block
+custom:
+    RF Capacity: "100,000"
+    Max RF input: "5,000"
+    Move cost: "8 RF"
+    Work cost: "64 RF"
+    Addon slots: "1"
+---
+
+The block placer places blocks from its inventory onto the layer below the [machine frame](@oritech:machine_frame).
+
+<center>
+<ModAsset location="oritech:area/block_placer" width={700} />
+</center>
+
+It can also be used to plant seeds in farmland or place saplings. The machine checks whether the position
+is valid for the item before placing it.
+
+That validity check makes it reliable for crop and tree automation, because invalid targets are skipped instead of wasting items.
+
+If several placers share the same frame, they iterate over the same working area just like other gantry machines do.

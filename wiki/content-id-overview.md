@@ -1,0 +1,158 @@
+# Wiki content ID overview
+
+Generated from the front matter of canonical pages in `wiki/content`. An em dash means that the page has no `related_items` field.
+
+- `arcane/arcane_catalyst.mdx` — id: `oritech:arcane_catalyst`; related_items: —
+- `arcane/soul_flowers.mdx` — id: `oritech:soul_flowers`; related_items: —
+- `arcane/spawner_cage.mdx` — id: `oritech:spawner_cage`; related_items: —
+- `arcane/spawner_controller.mdx` — id: `oritech:spawner_controller`; related_items: —
+- `arcane/stabilized_enchanter.mdx` — id: `oritech:stabilized_enchanter`; related_items: —
+- `arcane/tainted_refinery.mdx` — id: `oritech:tainted_refinery`; related_items: —
+- `building/copper_reinforced_plating.mdx` — id: `oritech:copper_reinforced_plating`; related_items: `oritech:carbon_plating`, `oritech:iron_plating`, `oritech:copper_reinforced_plating`, `oritech:nickel_plating`, `oritech:carbon_plating_stairs`, `oritech:iron_plating_stairs`, `oritech:copper_reinforced_plating_stairs`, `oritech:nickel_plating_stairs`
+- `building/hangar_door.mdx` — id: `oritech:hangar_door`; related_items: —
+- `building/industrial_button.mdx` — id: `oritech:industrial_button`; related_items: —
+- `building/industrial_door.mdx` — id: `oritech:industrial_door`; related_items: —
+- `building/industrial_glass.mdx` — id: `oritech:industrial_glass`; related_items: —
+- `building/industrial_lever.mdx` — id: `oritech:industrial_lever`; related_items: —
+- `building/industrial_light.mdx` — id: `oritech:industrial_light`; related_items: `oritech:industrial_light_hanging`
+- `building/industrial_paints.mdx` — id: `oritech:orange_paint`; related_items: `oritech:white_paint`, `oritech:sculk_paint`, `oritech:camo_paint`, `oritech:diamond_paint`, `oritech:fluxite_paint`, `oritech:industrial_paint`, `oritech:netherite_paint`, `oritech:redstone_paint`
+- `building/industrial_support_beam.mdx` — id: `oritech:industrial_support_beam`; related_items: —
+- `building/industrial_support_girder.mdx` — id: `oritech:industrial_support_girder`; related_items: —
+- `components/advanced_battery.mdx` — id: `oritech:advanced_battery`; related_items: —
+- `components/advanced_computing_engine.mdx` — id: `oritech:advanced_computing_engine`; related_items: —
+- `components/banana.mdx` — id: `oritech:banana`; related_items: —
+- `components/basic_battery.mdx` — id: `oritech:basic_battery`; related_items: —
+- `components/carbon_fibre_strands.mdx` — id: `oritech:carbon_fibre_strands`; related_items: —
+- `components/clay_catalyst_beads.mdx` — id: `oritech:clay_catalyst_beads`; related_items: —
+- `components/dubious_container.mdx` — id: `oritech:dubious_container`; related_items: —
+- `components/enderic_compound.mdx` — id: `oritech:enderic_compound`; related_items: —
+- `components/enderic_lens.mdx` — id: `oritech:enderic_lens`; related_items: —
+- `components/flux_gate.mdx` — id: `oritech:flux_gate`; related_items: —
+- `components/heisenberg_compensator.mdx` — id: `oritech:heisenberg_compensator`; related_items: —
+- `components/ion_thruster.mdx` — id: `oritech:ion_thruster`; related_items: —
+- `components/magnetic_coil.mdx` — id: `oritech:magnetic_coil`; related_items: —
+- `components/motor.mdx` — id: `oritech:motor`; related_items: —
+- `components/overcharged_crystal.mdx` — id: `oritech:overcharged_crystal`; related_items: —
+- `components/packed_wheat.mdx` — id: `oritech:packed_wheat`; related_items: —
+- `components/polymer_resin.mdx` — id: `oritech:polymer_resin`; related_items: —
+- `components/processing_unit.mdx` — id: `oritech:processing_unit`; related_items: —
+- `components/raw_biopolymer.mdx` — id: `oritech:raw_biopolymer`; related_items: —
+- `components/reinforced_carbon_sheet.mdx` — id: `oritech:reinforced_carbon_sheet`; related_items: —
+- `components/silicon_wafer.mdx` — id: `oritech:silicon_wafer`; related_items: —
+- `components/solid_biofuel.mdx` — id: `oritech:solid_biofuel`; related_items: —
+- `components/super_ai_chip.mdx` — id: `oritech:super_ai_chip`; related_items: —
+- `components/unholy_intelligence.mdx` — id: `oritech:unholy_intelligence`; related_items: —
+- `equipment/chainsaw.mdx` — id: `oritech:chainsaw`; related_items: —
+- `equipment/electric_mace.mdx` — id: `oritech:electric_mace`; related_items: —
+- `equipment/enderic_railgun.mdx` — id: `oritech:enderic_railgun`; related_items: —
+- `equipment/exo_suit.mdx` — id: `oritech:exo_chestplate`; related_items: `oritech:exo_helmet`, `oritech:exo_leggings`, `oritech:exo_boots`
+- `equipment/hand_drill.mdx` — id: `oritech:hand_drill`; related_items: —
+- `equipment/jetpack.mdx` — id: `oritech:jetpack`; related_items: `oritech:exo_jetpack`, `oritech:jetpack_elytra`, `oritech:jetpack_exo_elytra`
+- `equipment/promethium_axe.mdx` — id: `oritech:promethium_axe`; related_items: —
+- `equipment/promethium_pickaxe.mdx` — id: `oritech:promethium_pickaxe`; related_items: —
+- `equipment/target_designator.mdx` — id: `oritech:target_designator`; related_items: —
+- `equipment/wrench.mdx` — id: `oritech:wrench`; related_items: —
+- `logistics/creative_storage.mdx` — id: `oritech:creative_storage`; related_items: —
+- `logistics/creative_tank.mdx` — id: `oritech:creative_tank`; related_items: —
+- `logistics/energy_pipe.mdx` — id: `oritech:energy_pipe`; related_items: `oritech:framed_energy_pipe`, `oritech:energy_pipe_duct`
+- `logistics/energy_transmission_pole.mdx` — id: `oritech:energy_transmission_pole`; related_items: —
+- `logistics/fluid_pipe.mdx` — id: `oritech:fluid_pipe`; related_items: `oritech:framed_fluid_pipe`, `oritech:fluid_pipe_duct`
+- `logistics/item_filter.mdx` — id: `oritech:item_filter`; related_items: —
+- `logistics/item_pipe.mdx` — id: `oritech:item_pipe`; related_items: `oritech:framed_item_pipe`, `oritech:item_pipe_duct`, `oritech:transparent_item_pipe`
+- `logistics/large_storage.mdx` — id: `oritech:large_storage`; related_items: —
+- `logistics/portable_energy_storage.mdx` — id: `oritech:portable_energy_storage`; related_items: —
+- `logistics/portable_tank.mdx` — id: `oritech:portable_tank`; related_items: —
+- `logistics/schrodingers_safe.mdx` — id: `oritech:schrodingers_safe`; related_items: —
+- `logistics/smart_splitter.mdx` — id: `oritech:smart_splitter`; related_items: —
+- `logistics/superconductor.mdx` — id: `oritech:superconductor`; related_items: `oritech:framed_superconductor`, `oritech:superconductor_duct`
+- `machines/addons/auxiliary_processing_chamber_addon.mdx` — id: `oritech:auxiliary_processing_chamber_addon`; related_items: —
+- `machines/addons/control_unit_addon.mdx` — id: `oritech:control_unit_addon`; related_items: —
+- `machines/addons/crop_filter_addon.mdx` — id: `oritech:crop_filter_addon`; related_items: —
+- `machines/addons/heart_of_the_machine_addon.mdx` — id: `oritech:heart_of_the_machine_addon`; related_items: —
+- `machines/addons/machine_acceptor_addon.mdx` — id: `oritech:machine_acceptor_addon`; related_items: —
+- `machines/addons/machine_burst_addon.mdx` — id: `oritech:machine_burst_addon`; related_items: —
+- `machines/addons/machine_capacitor_addon.mdx` — id: `oritech:machine_capacitor_addon`; related_items: —
+- `machines/addons/machine_efficiency_addon.mdx` — id: `oritech:machine_efficiency_addon`; related_items: —
+- `machines/addons/machine_extender.mdx` — id: `oritech:machine_extender`; related_items: —
+- `machines/addons/machine_fluid_addon.mdx` — id: `oritech:machine_fluid_addon`; related_items: —
+- `machines/addons/machine_hunter_addon.mdx` — id: `oritech:machine_hunter_addon`; related_items: —
+- `machines/addons/machine_inventory_proxy_addon.mdx` — id: `oritech:machine_inventory_proxy_addon`; related_items: —
+- `machines/addons/machine_silk_touch_addon.mdx` — id: `oritech:machine_silk_touch_addon`; related_items: —
+- `machines/addons/machine_speed_addon.mdx` — id: `oritech:machine_speed_addon`; related_items: —
+- `machines/addons/machine_yield_addon.mdx` — id: `oritech:machine_yield_addon`; related_items: —
+- `machines/addons/power_bank_addon_extender.mdx` — id: `oritech:power_bank_addon_extender`; related_items: —
+- `machines/addons/quarry_addon.mdx` — id: `oritech:quarry_addon`; related_items: —
+- `machines/addons/steam_boiler_addon.mdx` — id: `oritech:steam_boiler_addon`; related_items: —
+- `machines/addons/synergy_matrix_addon.mdx` — id: `oritech:synergy_matrix_addon`; related_items: —
+- `machines/augmentations/arcane_augment_station.mdx` — id: `oritech:arcane_augment_station`; related_items: —
+- `machines/augmentations/cybernetic_augmentation_center.mdx` — id: `oritech:cybernetic_augmentation_center`; related_items: —
+- `machines/augmentations/cybernetic_research_station.mdx` — id: `oritech:cybernetic_research_station`; related_items: —
+- `machines/augmentations/quantum_research_station.mdx` — id: `oritech:quantum_research_station`; related_items: —
+- `machines/gantries/destroyer.mdx` — id: `oritech:destroyer`; related_items: —
+- `machines/gantries/fertilizer.mdx` — id: `oritech:fertilizer`; related_items: —
+- `machines/gantries/machine_frame.mdx` — id: `oritech:machine_frame`; related_items: —
+- `machines/gantries/placer.mdx` — id: `oritech:placer`; related_items: —
+- `machines/machine_core_2.mdx` — id: `oritech:machine_core_2`; related_items: `oritech:machine_core_1`, `oritech:machine_core_3`, `oritech:machine_core_4`, `oritech:machine_core_5`, `oritech:machine_core_6`, `oritech:machine_core_7`
+- `machines/powergen/basic_generator.mdx` — id: `oritech:basic_generator`; related_items: —
+- `machines/powergen/big_solar_panel.mdx` — id: `oritech:big_solar_panel`; related_items: —
+- `machines/powergen/bio_generator.mdx` — id: `oritech:bio_generator`; related_items: —
+- `machines/powergen/fuel_generator.mdx` — id: `oritech:fuel_generator`; related_items: —
+- `machines/powergen/lava_generator.mdx` — id: `oritech:lava_generator`; related_items: —
+- `machines/powergen/steam_engine.mdx` — id: `oritech:steam_engine`; related_items: `oritech:steam_boiler_addon`
+- `machines/processing/assembler.mdx` — id: `oritech:assembler`; related_items: —
+- `machines/processing/atomic_forge.mdx` — id: `oritech:atomic_forge`; related_items: —
+- `machines/processing/centrifuge.mdx` — id: `oritech:centrifuge`; related_items: —
+- `machines/processing/foundry.mdx` — id: `oritech:foundry`; related_items: —
+- `machines/processing/fragment_forge.mdx` — id: `oritech:fragment_forge`; related_items: —
+- `machines/processing/industrial_chiller.mdx` — id: `oritech:industrial_chiller`; related_items: —
+- `machines/processing/powered_furnace.mdx` — id: `oritech:powered_furnace`; related_items: —
+- `machines/processing/pulverizer.mdx` — id: `oritech:pulverizer`; related_items: —
+- `machines/processing/refinery_chamber_module.mdx` — id: `oritech:refinery_chamber_module`; related_items: —
+- `machines/processing/refinery.mdx` — id: `oritech:refinery`; related_items: —
+- `machines/utility/addon_splicer.mdx` — id: `oritech:addon_splicer`; related_items: —
+- `machines/utility/bedrock_extractor.mdx` — id: `oritech:bedrock_extractor`; related_items: —
+- `machines/utility/drone_port.mdx` — id: `oritech:drone_port`; related_items: —
+- `machines/utility/enderic_laser.mdx` — id: `oritech:enderic_laser`; related_items: —
+- `machines/utility/equipment_charger.mdx` — id: `oritech:equipment_charger`; related_items: —
+- `machines/utility/pipe_booster.mdx` — id: `oritech:pipe_booster`; related_items: —
+- `machines/utility/pump.mdx` — id: `oritech:pump`; related_items: —
+- `machines/utility/tree_cutter.mdx` — id: `oritech:tree_cutter`; related_items: —
+- `nuclear/low_yield_nuclear_explosion_device.mdx` — id: `oritech:low_yield_nuclear_explosion_device`; related_items: —
+- `nuclear/manhattan_module.mdx` — id: `oritech:manhattan_module`; related_items: —
+- `nuclear/nuclear_reactor_controller.mdx` — id: `oritech:nuclear_reactor_controller`; related_items: —
+- `nuclear/reactor_coolant_absorber_port.mdx` — id: `oritech:reactor_coolant_absorber_port`; related_items: —
+- `nuclear/reactor_double_rod.mdx` — id: `oritech:reactor_double_rod`; related_items: —
+- `nuclear/reactor_energy_port.mdx` — id: `oritech:reactor_energy_port`; related_items: —
+- `nuclear/reactor_fuel_port.mdx` — id: `oritech:reactor_fuel_port`; related_items: —
+- `nuclear/reactor_heat_absorber.mdx` — id: `oritech:reactor_heat_absorber`; related_items: —
+- `nuclear/reactor_heat_pipe.mdx` — id: `oritech:reactor_heat_pipe`; related_items: —
+- `nuclear/reactor_heat_vent.mdx` — id: `oritech:reactor_heat_vent`; related_items: —
+- `nuclear/reactor_neutron_reflector.mdx` — id: `oritech:reactor_neutron_reflector`; related_items: —
+- `nuclear/reactor_quad_rod.mdx` — id: `oritech:reactor_quad_rod`; related_items: —
+- `nuclear/reactor_redstone_port.mdx` — id: `oritech:reactor_redstone_port`; related_items: —
+- `nuclear/reactor_rod.mdx` — id: `oritech:reactor_rod`; related_items: —
+- `nuclear/reactor_wall.mdx` — id: `oritech:reactor_wall`; related_items: —
+- `nuclear/uranium_pellet.mdx` — id: `oritech:uranium_pellet`; related_items: `oritech:plutonium_pellet`, `oritech:small_plutonium_pellet`, `oritech:small_uranium_pellet`
+- `particle/accelerator_motor.mdx` — id: `oritech:accelerator_motor`; related_items: —
+- `particle/accelerator_ring.mdx` — id: `oritech:accelerator_ring`; related_items: —
+- `particle/accelerator_sensor.mdx` — id: `oritech:accelerator_sensor`; related_items: —
+- `particle/particle_accelerator.mdx` — id: `oritech:particle_accelerator`; related_items: —
+- `particle/tachyon_absorber.mdx` — id: `oritech:tachyon_absorber`; related_items: —
+- `resources/adamant_ingot.mdx` — id: `oritech:adamant_ingot`; related_items: `oritech:adamant_dust`, `oritech:adamant`
+- `resources/biomass.mdx` — id: `oritech:biomass`; related_items: `oritech:biomass_block`
+- `resources/biosteel_ingot.mdx` — id: `oritech:biosteel_ingot`; related_items: `oritech:biosteel_dust`, `oritech:biosteel`
+- `resources/duratium_ingot.mdx` — id: `oritech:duratium_ingot`; related_items: `oritech:duratium_dust`, `oritech:duratium`
+- `resources/electrum_ingot.mdx` — id: `oritech:electrum_ingot`; related_items: `oritech:electrum_dust`, `oritech:electrum`
+- `resources/energite_ingot.mdx` — id: `oritech:energite_ingot`; related_items: `oritech:energite_dust`, `oritech:energite`
+- `resources/fluxite.mdx` — id: `oritech:fluxite`; related_items: `oritech:fluxite_block`
+- `resources/nickel_ingot.mdx` — id: `oritech:nickel_ingot`; related_items: `oritech:nickel_dust`, `oritech:nickel`, `oritech:nickel_ore`
+- `resources/plastic_sheet.mdx` — id: `oritech:plastic_sheet`; related_items: `oritech:plastic`
+- `resources/platinum_ingot.mdx` — id: `oritech:platinum_ingot`; related_items: `oritech:platinum_dust`, `oritech:platinum`, `oritech:deepslate_platinum_ore`
+- `resources/prometheum_ingot.mdx` — id: `oritech:prometheum_ingot`; related_items: —
+- `resources/silicon.mdx` — id: `oritech:silicon`; related_items: —
+- `resources/steel_ingot.mdx` — id: `oritech:steel_ingot`; related_items: `oritech:steel_dust`, `oritech:steel`
+- `resources/world/deepslate_platinum_ore.mdx` — id: `oritech:deepslate_platinum_ore`; related_items: `oritech:nickel_ore`, `oritech:deepslate_nickel_ore`, `oritech:endstone_platinum_ore`
+- `resources/world/deepslate_uranium_ore.mdx` — id: `oritech:deepslate_uranium_ore`; related_items: `oritech:deepslate_uranium_ore`, `oritech:uranite_crystal`
+- `resources/world/redstone_resource_node.mdx` — id: `oritech:redstone_resource_node`; related_items: `oritech:resource_node_lapis`, `oritech:iron_resource_node`, `oritech:coal_resource_node`, `oritech:gold_resource_node`, `oritech:emerald_resource_node`, `oritech:diamond_resource_node`, `oritech:copper_resource_node`, `oritech:nickel_resource_node`, `oritech:platinum_resource_node`, `oritech:uranium_resource_node`
+- `resources/world/still_oil_bucket.mdx` — id: `oritech:still_oil_bucket`; related_items: —
+

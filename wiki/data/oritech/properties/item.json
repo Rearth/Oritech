@@ -3,7 +3,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:steel_block": {
+  "oritech:steel": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -25,11 +25,11 @@
     "rarity": "common",
     "enchantability": 9
   },
-  "oritech:destroyer_block": {
+  "oritech:destroyer": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:unstable_container": {
+  "oritech:schrodingers_safe": {
     "stack_size": 1,
     "rarity": "common"
   },
@@ -37,7 +37,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:enchanter_block": {
+  "oritech:stabilized_enchanter": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -57,11 +57,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_redstone_addon": {
+  "oritech:control_unit_addon": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:enchantment_catalyst_block": {
+  "oritech:arcane_catalyst": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -77,7 +77,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:fuel_generator_block": {
+  "oritech:fuel_generator": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -85,11 +85,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_uranium": {
+  "oritech:uranium_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_frame_block": {
+  "oritech:machine_frame": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -113,24 +113,24 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:tech_lever": {
+  "oritech:industrial_lever": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:charger_block": {
+  "oritech:equipment_charger": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:portable_laser": {
+  "oritech:enderic_railgun": {
     "stack_size": 1,
     "rarity": "common",
     "enchantability": 10
   },
-  "oritech:resource_node_nickel": {
+  "oritech:nickel_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_plating_stairs": {
+  "oritech:copper_reinforced_plating_stairs": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -150,11 +150,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:nickel_block": {
+  "oritech:nickel": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:particle_collector_block": {
+  "oritech:tachyon_absorber": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -178,7 +178,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:refinery_module_block": {
+  "oritech:refinery_chamber_module": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -190,7 +190,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:black_hole_block": {
+  "oritech:black_hole": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -202,11 +202,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:accelerator_controller": {
+  "oritech:particle_accelerator": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:creative_storage_block": {
+  "oritech:creative_storage": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -223,7 +223,7 @@
     "rarity": "common",
     "enchantability": 9
   },
-  "oritech:fertilizer_block": {
+  "oritech:fertilizer": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -239,15 +239,15 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:advanced_augment_station": {
+  "oritech:quantum_research_station": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:metal_girder_block": {
+  "oritech:industrial_support_girder": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:treefeller_block": {
+  "oritech:tree_cutter": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -263,7 +263,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:power_pole_block": {
+  "oritech:energy_transmission_pole": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -279,11 +279,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:drone_port_block": {
+  "oritech:drone_port": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:nickel_plating_block": {
+  "oritech:nickel_plating": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -295,7 +295,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:biosteel_block": {
+  "oritech:biosteel": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -307,7 +307,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_plating_block": {
+  "oritech:copper_reinforced_plating": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -315,7 +315,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:foundry_block": {
+  "oritech:foundry": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -327,15 +327,15 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:spawner_controller_block": {
+  "oritech:spawner_controller": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:energite_block": {
+  "oritech:energite": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_copper": {
+  "oritech:copper_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -343,7 +343,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:cooler_block": {
+  "oritech:industrial_chiller": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -351,11 +351,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:small_storage_block": {
+  "oritech:portable_energy_storage": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:pump_block": {
+  "oritech:pump": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -379,11 +379,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_plating_pressure_plate": {
+  "oritech:copper_reinforced_plating_pressure_plate": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:uranium_dust_block": {
+  "oritech:uranium": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -399,19 +399,19 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:superconductor_duct_block": {
+  "oritech:superconductor_duct": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:basic_generator_block": {
+  "oritech:basic_generator": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:reactor_absorber_port": {
+  "oritech:reactor_coolant_absorber_port": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:industrial_glass_block": {
+  "oritech:industrial_glass": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -443,7 +443,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:low_yield_nuke": {
+  "oritech:low_yield_nuclear_explosion_device": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -460,7 +460,7 @@
     "attack_speed": 1.6,
     "enchantability": 22
   },
-  "oritech:iron_plating_block": {
+  "oritech:iron_plating": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -472,7 +472,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_coal": {
+  "oritech:coal_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -496,15 +496,15 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:reactor_vent": {
+  "oritech:reactor_heat_vent": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:duratium_block": {
+  "oritech:duratium": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_plating_slab": {
+  "oritech:copper_reinforced_plating_slab": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -521,7 +521,7 @@
     "rarity": "common",
     "nutrition": 4
   },
-  "oritech:bio_generator_block": {
+  "oritech:bio_generator": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -533,7 +533,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:simple_augment_station": {
+  "oritech:cybernetic_research_station": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -554,7 +554,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:small_tank_block": {
+  "oritech:portable_tank": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -574,7 +574,7 @@
     "stack_size": 1,
     "rarity": "common"
   },
-  "oritech:pulverizer_block": {
+  "oritech:pulverizer": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -590,7 +590,7 @@
     "stack_size": 1,
     "rarity": "common"
   },
-  "oritech:resource_node_platinum": {
+  "oritech:platinum_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -598,7 +598,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:laser_arm_block": {
+  "oritech:enderic_laser": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -610,11 +610,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_processing_addon": {
+  "oritech:auxiliary_processing_chamber_addon": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:nuke": {
+  "oritech:manhattan_module": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -626,7 +626,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:platinum_block": {
+  "oritech:platinum": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -638,7 +638,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_gold": {
+  "oritech:gold_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -658,7 +658,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_combi_addon": {
+  "oritech:heart_of_the_machine_addon": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -670,15 +670,15 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:steam_engine_block": {
+  "oritech:steam_engine": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:powered_furnace_block": {
+  "oritech:powered_furnace": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:electrum_block": {
+  "oritech:electrum": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -690,7 +690,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:ceiling_light_hanging": {
+  "oritech:industrial_light_hanging": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -707,7 +707,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:metal_beam_block": {
+  "oritech:industrial_support_beam": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -719,7 +719,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:fluid_pipe_duct_block": {
+  "oritech:fluid_pipe_duct": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -748,11 +748,11 @@
     "stack_size": 1,
     "rarity": "common"
   },
-  "oritech:placer_block": {
+  "oritech:placer": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:carbon_plating_block": {
+  "oritech:carbon_plating": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -801,7 +801,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:item_pipe_duct_block": {
+  "oritech:item_pipe_duct": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -809,7 +809,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:reactor_controller": {
+  "oritech:nuclear_reactor_controller": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -821,7 +821,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_diamond": {
+  "oritech:diamond_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -833,7 +833,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:atomic_forge_block": {
+  "oritech:atomic_forge": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -875,7 +875,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:plastic_block": {
+  "oritech:plastic": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -884,15 +884,15 @@
     "rarity": "common",
     "enchantability": 9
   },
-  "oritech:assembler_block": {
+  "oritech:assembler": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:big_solar_panel_block": {
+  "oritech:big_solar_panel": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:refinery_block": {
+  "oritech:refinery": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -904,7 +904,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:capacitor_addon_extender": {
+  "oritech:power_bank_addon_extender": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -925,11 +925,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:spawner_cage_block": {
+  "oritech:spawner_cage": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:reactor_condenser": {
+  "oritech:reactor_heat_absorber": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -949,11 +949,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:shrinker_block": {
+  "oritech:addon_splicer": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:uranium_crystal": {
+  "oritech:uranite_crystal": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -969,7 +969,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:deep_drill_block": {
+  "oritech:bedrock_extractor": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -977,7 +977,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:tech_button": {
+  "oritech:industrial_button": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -985,11 +985,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:centrifuge_block": {
+  "oritech:centrifuge": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:pipe_booster_block": {
+  "oritech:pipe_booster": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1005,7 +1005,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_emerald": {
+  "oritech:emerald_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1013,7 +1013,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:creative_tank_block": {
+  "oritech:creative_tank": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1021,7 +1021,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_redstone": {
+  "oritech:redstone_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1037,7 +1037,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:lava_generator_block": {
+  "oritech:lava_generator": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1049,7 +1049,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:adamant_block": {
+  "oritech:adamant": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1057,7 +1057,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:resource_node_iron": {
+  "oritech:iron_resource_node": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1077,19 +1077,19 @@
     "stack_size": 1,
     "rarity": "common"
   },
-  "oritech:fragment_forge_block": {
+  "oritech:fragment_forge": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:energy_pipe_duct_block": {
+  "oritech:energy_pipe_duct": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:machine_ultimate_addon": {
+  "oritech:synergy_matrix_addon": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:wither_crop_block": {
+  "oritech:soul_flowers": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1105,11 +1105,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:augment_application_block": {
+  "oritech:cybernetic_augmentation_center": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:large_storage_block": {
+  "oritech:large_storage": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1146,7 +1146,7 @@
     "rarity": "common",
     "enchantability": 15
   },
-  "oritech:reactor_reflector": {
+  "oritech:reactor_neutron_reflector": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1154,11 +1154,11 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:tech_door": {
+  "oritech:industrial_door": {
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:ceiling_light": {
+  "oritech:industrial_light": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1166,7 +1166,7 @@
     "stack_size": 64,
     "rarity": "common"
   },
-  "oritech:item_filter_block": {
+  "oritech:item_filter": {
     "stack_size": 64,
     "rarity": "common"
   },
@@ -1175,6 +1175,18 @@
     "rarity": "common"
   },
   "oritech:carbon_plating_slab": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:hangar_door": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:tainted_refinery": {
+    "stack_size": 64,
+    "rarity": "common"
+  },
+  "oritech:smart_splitter": {
     "stack_size": 64,
     "rarity": "common"
   }

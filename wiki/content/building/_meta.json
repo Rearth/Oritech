@@ -1,12 +1,12 @@
 {
-  "ceiling_light.mdx": "Ceiling Light",
+  "industrial_light.mdx": "Ceiling Light",
   "hangar_door.mdx": "Hangar Door",
-  "industrial_glass_block.mdx": "Industrial Glass",
+  "industrial_glass.mdx": "Industrial Glass",
   "industrial_paints.mdx": "Industrial Paints",
-  "machine_plating_block.mdx": "Machine Plating Blocks",
-  "metal_beam_block.mdx": "Metal Beam",
-  "metal_girder_block.mdx": "Metal Girder",
-  "tech_button.mdx": "Industrial Button",
-  "tech_door.mdx": "Industrial Door",
-  "tech_lever.mdx": "Industrial Lever"
+  "copper_reinforced_plating.mdx": "Machine Plating Blocks",
+  "industrial_support_beam.mdx": "Metal Beam",
+  "industrial_support_girder.mdx": "Metal Girder",
+  "industrial_button.mdx": "Industrial Button",
+  "industrial_door.mdx": "Industrial Door",
+  "industrial_lever.mdx": "Industrial Lever"
 }

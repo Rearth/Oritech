@@ -1,0 +1,43 @@
+---
+id: oritech:spawner_controller
+type: block
+title: Spawner Controller
+---
+
+The Spawner Controller controls the automated mob spawning system. When placed 
+above a [spawner cage](@oritech:spawner_cage), it can be used to spawn specific mob types.
+
+<Callout variant="warning">
+    *Oritech Inc* accepts no liability for existential crises experienced by mobs questioning their 
+    purpose in life, nor for any ethical concerns you may develop about industrialized soul harvesting.
+</Callout>
+
+## Setup
+
+The mob type is determined by the first entity that walks over the controller. This 
+type can only be changed by breaking and replacing the controller. Once a mob type 
+is set, the controller will highlight the required size of the spawner cage needed 
+underneath it. 
+
+<center>
+<ModAsset location="oritech:area/mob_spawner" width={512} />
+</center>
+
+## Operation
+
+The controller collects souls from nearby deaths and consumes them to spawn the 
+assigned mob. 
+
+- **Soul Cost**: The number of souls required for one spawn is calculated based on 
+the mob's health (specifically the square root of its maximum HP).
+- **Spawn Range**: The controller attempts to find a valid spawning surface within 
+a small radius (4 blocks) around itself.
+- **Redstone Control**: Applying a redstone signal to the controller will disable 
+it, stopping all spawning operations.
+
+Right-clicking the controller provides information on its current operational state, 
+including the set mob and current soul levels.
+
+<Callout variant="info">
+    The spawner cannot be set to mob types that are part of the `oritech:spawner_blacklist` tag.
+</Callout>

@@ -35,6 +35,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         if (!(level instanceof ServerLevel)) return;
 
         var result = collectRocketSegments();
+        System.out.println(result);
     }
 
     private ActiveRocketData collectRocketSegments() {
