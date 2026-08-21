@@ -1,4 +1,4 @@
-package rearth.oritech.spaceage.processing;
+package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;

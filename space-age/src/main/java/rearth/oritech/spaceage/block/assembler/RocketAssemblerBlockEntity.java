@@ -11,14 +11,13 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import org.joml.Vector2i;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.processing.ActiveRocketData;
-import rearth.oritech.spaceage.processing.DynamicRocketSegment;
-import rearth.oritech.spaceage.processing.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.*;
 
 import java.util.*;
 
@@ -34,31 +33,22 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         if (!(level instanceof ServerLevel)) return;
 
-        var result = collectRocketSegments();
-        System.out.println(result);
-    }
+        var start = findRocketStart();
+        if (start == null) return;
 
-    private ActiveRocketData collectRocketSegments() {
+        var result = gatherRocketData(start);
 
-        // start at first found block above connected pads
-        var facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
-        var padBlocks = padFloodFill(worldPosition.relative(facing));
-        var start = worldPosition;
-
-        for (var padBlock : padBlocks) {
-
-            var above = padBlock.above();
-
-            var checkedState = level.getBlockState(above);
-            if (checkedState.isAir() || isCoupling(checkedState)) continue;
-
-            OritechSpaceAge.LOGGER.debug("Found start: " + above);
-            start = above;
-
-            break;
+        if (result == null) {
+            OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
+            return;
         }
 
-        if (start.equals(worldPosition)) return null;
+        var flightPlan = new RocketFlightPlan(start, new Vector2i(20, 1000));
+
+        RocketSimulationController.LaunchRocket(result, flightPlan);
+    }
+
+    private ActiveRocketData gatherRocketData(BlockPos start) {
 
 
         var startSegment = segmentFloodFill(start);
@@ -120,6 +110,30 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         OritechSpaceAge.LOGGER.debug("Assembled rocket with {} segments at {}", segments.size(), worldPosition);
         return rocketData;
 
+    }
+
+    private BlockPos findRocketStart() {
+
+        // start at first found block above connected pads
+        var facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var padBlocks = padFloodFill(worldPosition.relative(facing));
+        var start = worldPosition;
+
+        for (var padBlock : padBlocks) {
+
+            var above = padBlock.above();
+
+            var checkedState = level.getBlockState(above);
+            if (checkedState.isAir() || isCoupling(checkedState)) continue;
+
+            OritechSpaceAge.LOGGER.debug("Found start: " + above);
+            start = above;
+
+            break;
+        }
+
+        if (start.equals(worldPosition)) return null;
+        return start;
     }
 
     // this is called after all segments are discovered, and connects them based on their couplings
@@ -284,7 +298,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
             for (var connectedSegmentId : segment.connectedSegments.keySet()) {
                 var connectedSegment = segments.get(connectedSegmentId);
-                if (connectedSegment == null || !connectedSegment.connectedSegments.containsKey(segment.id)) return false;
+                if (connectedSegment == null || !connectedSegment.connectedSegments.containsKey(segment.id))
+                    return false;
             }
         }
 

@@ -1,4 +1,4 @@
-package rearth.oritech.spaceage.processing;
+package rearth.oritech.spaceage.simulation;
 
 import java.util.HashSet;
 import java.util.Set;
