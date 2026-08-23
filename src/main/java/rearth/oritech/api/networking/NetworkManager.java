@@ -3,6 +3,7 @@ package rearth.oritech.api.networking;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -72,6 +73,7 @@ public class NetworkManager {
         registerCodec(ByteBufCodecs.SHORT, Short.class, short.class);
         registerCodec(ByteBufCodecs.STRING_UTF8, String.class);
         registerCodec(Identifier.STREAM_CODEC, Identifier.class);
+        registerCodec(UUIDUtil.STREAM_CODEC, UUID.class);
         registerCodec(BlockPos.STREAM_CODEC, BlockPos.class);
         registerCodec(ItemStack.OPTIONAL_STREAM_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);

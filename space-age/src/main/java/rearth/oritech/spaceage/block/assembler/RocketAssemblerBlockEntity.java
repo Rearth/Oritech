@@ -45,7 +45,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         var flightPlan = new RocketFlightPlan(start, new Vector2i(20, 1000));
 
-        RocketSimulationController.LaunchRocket(result, flightPlan);
+        RocketSimulationController.launchRocket((ServerLevel) level, result, flightPlan);
     }
 
     private ActiveRocketData gatherRocketData(BlockPos start) {
