@@ -1,6 +1,5 @@
 package rearth.oritech.spaceage.client;
 
-import net.minecraft.world.level.Level;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 
@@ -28,14 +27,6 @@ public final class RocketClientController {
     public static void removeRocket(UUID rocketId) {
         if (ACTIVE_ROCKETS.remove(rocketId) != null)
             OritechSpaceAge.LOGGER.debug("Removed rocket {} from the client", rocketId);
-    }
-
-    // orbiting rockets stay on the server until they need client rendering again
-    public static void unloadRocketsInSpace(Level level, double gameTime) {
-        ACTIVE_ROCKETS.values().removeIf(rocket -> {
-            var flight = rocket.getFlight();
-            return flight != null && flight.dimension().equals(level.dimension()) && flight.isInSpace(gameTime);
-        });
     }
 
     public static void clearRockets() {

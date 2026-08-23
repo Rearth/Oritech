@@ -35,8 +35,6 @@ public final class RocketRenderer {
         var partialTick = event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         var gameTime = level.getGameTime() + partialTick;
 
-        RocketClientController.unloadRocketsInSpace(level, gameTime);
-
         var minecraft = Minecraft.getInstance();
         var modelResolver = minecraft.getBlockModelResolver();
         var blockEntityDispatcher = minecraft.getBlockEntityRenderDispatcher();
@@ -45,7 +43,8 @@ public final class RocketRenderer {
 
         for (var rocket : RocketClientController.getActiveRockets()) {
             var flight = rocket.getFlight();
-            if (flight == null || !flight.canReachOrbit() || !flight.dimension().equals(level.dimension())) continue;
+            if (flight == null || !flight.canReachOrbit() || !flight.dimension().equals(level.dimension()) || flight.isInSpace(gameTime))
+                continue;
 
             var position = RocketSimulationController.getRocketPosition(flight, gameTime);
             var blocks = collectBlocks(rocket, position, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
