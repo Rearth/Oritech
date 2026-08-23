@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "oritech_space_age:rocket_engine_tier_2"
+          "name": "oritech_space_age:ion_booster_rocket"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "oritech_space_age:blocks/rocket_engine_tier_2"
+  "random_sequence": "oritech_space_age:blocks/ion_booster_rocket"
 }

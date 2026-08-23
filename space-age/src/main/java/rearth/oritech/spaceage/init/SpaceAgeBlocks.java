@@ -10,43 +10,25 @@ import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.block.basic.RocketPadBlock;
 
+// all models are placeholders for now
 public final class SpaceAgeBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(OritechSpaceAge.MOD_ID);
 
-    public static final DeferredBlock<RocketAssemblerBlock> ROCKET_ASSEMBLER = BLOCKS.registerBlock(
-            "rocket_assembler",
-            RocketAssemblerBlock::new,
-            () -> machineProperties().noOcclusion()
-    );
+    public static final DeferredBlock<RocketAssemblerBlock> ROCKET_ASSEMBLER = BLOCKS.registerBlock("rocket_assembler", RocketAssemblerBlock::new, () -> machineProperties().noOcclusion());
 
-    public static final DeferredBlock<RocketPadBlock> ROCKET_PAD = BLOCKS.registerBlock(
-            "rocket_pad",
-            RocketPadBlock::new,
-            SpaceAgeBlocks::machineProperties
-    );
+    public static final DeferredBlock<RocketPadBlock> ROCKET_PAD = BLOCKS.registerBlock("rocket_pad", RocketPadBlock::new, SpaceAgeBlocks::machineProperties);
 
-    public static final DeferredBlock<RocketCouplingBlock> ROCKET_COUPLING = BLOCKS.registerBlock(
-            "rocket_coupling",
-            RocketCouplingBlock::new,
-            SpaceAgeBlocks::machineProperties
-    );
+    public static final DeferredBlock<RocketCouplingBlock> ROCKET_COUPLING = BLOCKS.registerBlock("rocket_coupling", RocketCouplingBlock::new, () -> machineProperties().noOcclusion());
 
-    public static final DeferredBlock<RocketEngineBlock> ROCKET_ENGINE_TIER_1 = registerRocketEngine(
-            "rocket_engine_tier_1", RocketEngineBlock.Tier.TIER_1
-    );
-    public static final DeferredBlock<RocketEngineBlock> ROCKET_ENGINE_TIER_2 = registerRocketEngine(
-            "rocket_engine_tier_2", RocketEngineBlock.Tier.TIER_2
-    );
-    public static final DeferredBlock<RocketEngineBlock> ROCKET_ENGINE_TIER_3 = registerRocketEngine(
-            "rocket_engine_tier_3", RocketEngineBlock.Tier.TIER_3
-    );
+    public static final DeferredBlock<RocketEngineBlock> BASIC_BOOSTER_ROCKET = registerRocketEngine("basic_booster_rocket", RocketEngineBlock.Type.BASIC);
+    public static final DeferredBlock<RocketEngineBlock> ION_BOOSTER_ROCKET = registerRocketEngine("ion_booster_rocket", RocketEngineBlock.Type.ION);
 
     private SpaceAgeBlocks() {
     }
 
-    private static DeferredBlock<RocketEngineBlock> registerRocketEngine(String name, RocketEngineBlock.Tier tier) {
-        return BLOCKS.registerBlock(name, properties -> new RocketEngineBlock(tier, properties), SpaceAgeBlocks::machineProperties);
+    private static DeferredBlock<RocketEngineBlock> registerRocketEngine(String name, RocketEngineBlock.Type type) {
+        return BLOCKS.registerBlock(name, properties -> new RocketEngineBlock(type, properties), () -> machineProperties().noOcclusion());
     }
 
     private static BlockBehaviour.Properties machineProperties() {

@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_motor": {
+    "has_basic_booster_rocket": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:motor"
+            "items": "oritech_space_age:basic_booster_rocket"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "oritech_space_age:rocket_engine_tier_1"
+        "recipe": "oritech_space_age:ion_booster_rocket"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_motor"
+      "has_basic_booster_rocket"
     ]
   ],
   "rewards": {
     "recipes": [
-      "oritech_space_age:rocket_engine_tier_1"
+      "oritech_space_age:ion_booster_rocket"
     ]
   }
 }

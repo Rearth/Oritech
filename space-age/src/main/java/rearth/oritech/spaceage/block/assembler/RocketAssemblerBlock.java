@@ -48,6 +48,6 @@ public class RocketAssemblerBlock extends Block implements EntityBlock {
             candidate.ifPresent(RocketAssemblerBlockEntity::assemble);
         }
 
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 }

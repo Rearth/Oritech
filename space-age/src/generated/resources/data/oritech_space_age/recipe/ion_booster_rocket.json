@@ -4,7 +4,7 @@
   "key": {
     "d": "oritech:duratium_ingot",
     "e": "oritech:energite_ingot",
-    "t": "oritech_space_age:rocket_engine_tier_1"
+    "t": "oritech_space_age:basic_booster_rocket"
   },
   "pattern": [
     "ded",
@@ -12,6 +12,6 @@
     "ded"
   ],
   "result": {
-    "id": "oritech_space_age:rocket_engine_tier_2"
+    "id": "oritech_space_age:ion_booster_rocket"
   }
 }

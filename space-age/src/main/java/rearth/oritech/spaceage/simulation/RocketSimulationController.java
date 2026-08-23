@@ -186,7 +186,7 @@ public final class RocketSimulationController {
         return new RocketFlight(true, null, dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, requiredDeltaV, impactSpeed, ascentTicks, reentryTick, impactTick, null, -1);
     }
 
-    // calculates the ideal performance of all currently connected segments
+    // calculates the ideal performance of all currently connected segments (including dynamic ones)
     public static RocketPerformance calculatePerformance(ActiveRocketData rocket) {
         long dryWeight = 0;
         long fuelWeight = 0;

@@ -1,9 +1,8 @@
 {
   "block.oritech_space_age.rocket_assembler": "Rocket Assembler",
   "block.oritech_space_age.rocket_coupling": "Rocket Coupling",
-  "block.oritech_space_age.rocket_engine_tier_1": "Rocket Engine Mk I",
-  "block.oritech_space_age.rocket_engine_tier_2": "Rocket Engine Mk II",
-  "block.oritech_space_age.rocket_engine_tier_3": "Rocket Engine Mk III",
+  "block.oritech_space_age.basic_booster_rocket": "Basic Booster Rocket",
+  "block.oritech_space_age.ion_booster_rocket": "Ion Booster Rocket",
   "block.oritech_space_age.rocket_pad": "Rocket Pad",
   "itemgroup.oritech_space_age.main": "Oritech: Space Age"
 }

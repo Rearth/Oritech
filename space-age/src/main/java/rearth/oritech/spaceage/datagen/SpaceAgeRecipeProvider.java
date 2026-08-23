@@ -40,7 +40,7 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(ItemContent.STEEL_INGOT))
                 .save(output);
 
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_1)
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET)
                 .pattern("sms")
                 .pattern("pep")
                 .pattern(" s ")
@@ -51,24 +51,14 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
                 .save(output);
 
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_2)
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ION_BOOSTER_ROCKET)
                 .pattern("ded")
                 .pattern("ete")
                 .pattern("ded")
                 .define('d', ItemContent.DURATIUM_INGOT)
                 .define('e', ItemContent.ENERGITE_INGOT)
-                .define('t', SpaceAgeBlocks.ROCKET_ENGINE_TIER_1)
-                .unlockedBy("has_tier_1_engine", has(SpaceAgeBlocks.ROCKET_ENGINE_TIER_1))
-                .save(output);
-
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_3)
-                .pattern("fsf")
-                .pattern("ftf")
-                .pattern("fsf")
-                .define('f', ItemContent.FLUXITE)
-                .define('s', BlockContent.SUPERCONDUCTOR)
-                .define('t', SpaceAgeBlocks.ROCKET_ENGINE_TIER_2)
-                .unlockedBy("has_tier_2_engine", has(SpaceAgeBlocks.ROCKET_ENGINE_TIER_2))
+                .define('t', SpaceAgeBlocks.BASIC_BOOSTER_ROCKET)
+                .unlockedBy("has_basic_booster_rocket", has(SpaceAgeBlocks.BASIC_BOOSTER_ROCKET))
                 .save(output);
     }
 

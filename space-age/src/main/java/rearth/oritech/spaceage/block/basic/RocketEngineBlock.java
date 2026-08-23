@@ -4,20 +4,19 @@ import net.minecraft.world.level.block.Block;
 
 public class RocketEngineBlock extends Block {
 
-    private final Tier tier;
+    private final Type type;
 
-    public RocketEngineBlock(Tier tier, Properties properties) {
+    public RocketEngineBlock(Type type, Properties properties) {
         super(properties);
-        this.tier = tier;
+        this.type = type;
     }
 
-    public Tier getTier() {
-        return tier;
+    public Type getType() {
+        return type;
     }
 
-    public enum Tier {
-        TIER_1,
-        TIER_2,
-        TIER_3
+    public enum Type {
+        BASIC,
+        ION
     }
 }
