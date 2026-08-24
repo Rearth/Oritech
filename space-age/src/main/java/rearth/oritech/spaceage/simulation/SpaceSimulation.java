@@ -30,12 +30,12 @@ import java.util.UUID;
 public class SpaceSimulation {
 
     // this is always the same and initialized once:
-    private static final Set<SimulatedObject> celestialObjects = new HashSet<>();
+    private static final Set<SpaceObjects.SimulatedObject> celestialObjects = new HashSet<>();
 
-    private final Set<SimulatedObject> nonCelestialObjects = new HashSet<>();
+    private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
 
-    public SpaceSimulation(UUID loadedSimulationId, Set<SimulatedObject> loadedObjects) {
+    public SpaceSimulation(UUID loadedSimulationId, Set<SpaceObjects.SimulatedObject> loadedObjects) {
         this.simulationId = loadedSimulationId;
     }
 
@@ -52,7 +52,7 @@ public class SpaceSimulation {
         var beltAsteroidCount = 20;    // in range 19.5M - 20.5M
 
         for (var i = 0; i < nearAsteroidCount; i++) {
-            var asteroid = new Asteroid();
+            var asteroid = new SpaceObjects.Asteroid();
             asteroid.currentPosition = new Vector2f(
                     (float) (Math.random() * 200_000 - 100_000),
                     (float) (Math.random() * 100_000 + 100_000)
@@ -62,7 +62,7 @@ public class SpaceSimulation {
         }
 
         for (var i = 0; i < mediumAsteroidCount; i++) {
-            var asteroid = new Asteroid();
+            var asteroid = new SpaceObjects.Asteroid();
             asteroid.currentPosition = new Vector2f(
                     (float) (Math.random() * 2_000_000 - 1_000_000),
                     (float) (Math.random() * 17_000_000 + 1_000_000)
@@ -72,7 +72,7 @@ public class SpaceSimulation {
         }
 
         for (var i = 0; i < beltAsteroidCount; i++) {
-            var asteroid = new Asteroid();
+            var asteroid = new SpaceObjects.Asteroid();
             asteroid.currentPosition = new Vector2f(
                     (float) (Math.random() * 39_000_000 - 19_500_000),
                     (float) (Math.random() * 1_000_000 + 19_500_000)
@@ -85,37 +85,25 @@ public class SpaceSimulation {
     // initializes celestial Objects once
     static {
 
-        var earth = new SimulatedObject();
+        var earth = new SpaceObjects.SimulatedObject();
         earth.currentPosition = new Vector2f(0, 0);
+        earth.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(earth);
 
-        var sun = new SimulatedObject();
+        var sun = new SpaceObjects.SimulatedObject();
         sun.currentPosition = new Vector2f(-1_000_000, 3_000_000);
+        sun.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(sun);
 
-        var mars = new SimulatedObject();
+        var mars = new SpaceObjects.SimulatedObject();
         mars.currentPosition = new Vector2f(1_000_000, 8_000_000);
+        mars.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(mars);
     }
 
     // returns a value between 0 and 1
     public static float getGravityStrength(float height) {
         return Math.clamp(1 - height / 100_000, 0, 1);
-    }
-
-    public static class SimulatedObject {
-
-        public Vector2f currentPosition;
-
-    }
-
-    // Things like asteroids. Movement itsn't applied per tick, instead events / future positions are calculated during each interaction / event
-    public static class MovableSimulatedObject extends SimulatedObject {
-        public float weight;
-    }
-
-    public static class Asteroid extends MovableSimulatedObject {
-        // loot table data here, etc. in the future
     }
 
 }
