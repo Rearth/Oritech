@@ -3,7 +3,6 @@ package rearth.oritech.init.recipes;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.world.entity.player.StackedItemContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.*;
@@ -11,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 
 import java.util.List;
@@ -47,11 +47,47 @@ public record OritechRecipe(List<Ingredient> itemInputs, List<ItemStackTemplate>
     }
 
     public static boolean itemsMatch(List<Ingredient> recipeIngredients, OritechRecipeInput input) {
-        if (recipeIngredients.isEmpty()) return true;
+        return findMatchingInputSlots(recipeIngredients, input.getStacks()) != null;
+    }
 
-        var contents = new StackedItemContents();
-        input.getStacks().forEach(contents::accountStack);
-        return contents.canCraft(recipeIngredients, null);
+    /**
+     * Assigns one item from an input slot to every recipe ingredient.
+     * <p>
+     * Each ingredient entry consumes one item, so a stack with count {@code n} can satisfy up to {@code n}
+     * entries, including repeated ingredients. Unrelated items in other input slots are allowed.
+     * {@link Ingredient#test(ItemStack)} is intentionally used instead of {@code StackedItemContents}, which
+     * compares item types without preserving custom ingredient checks such as the components on configurable
+     * bee eggs.
+     * <p>
+     * Backtracking is required when ingredients overlap. For example, a broad ingot tag must not consume the
+     * only item that can satisfy a later, more specific ingredient if another ingot is available.
+     *
+     * @return a slot index for each ingredient, or {@code null} when no complete assignment exists
+     */
+    @Nullable
+    public static int[] findMatchingInputSlots(List<Ingredient> ingredients, List<ItemStack> inputStacks) {
+        var matchedSlots = new int[ingredients.size()];
+        var remaining = inputStacks.stream().mapToInt(ItemStack::getCount).toArray();
+        return findMatchingInputSlots(ingredients, inputStacks, remaining, matchedSlots, 0) ? matchedSlots : null;
+    }
+
+    private static boolean findMatchingInputSlots(List<Ingredient> ingredients, List<ItemStack> inputStacks,
+                                                  int[] remaining, int[] matchedSlots, int ingredientIndex) {
+        if (ingredientIndex >= ingredients.size()) return true;
+
+        var ingredient = ingredients.get(ingredientIndex);
+        for (int i = 0; i < inputStacks.size(); i++) {
+            // Rotating the first slot spreads repeated ingredients across slots, matching the previous behavior.
+            var stackIndex = (i + ingredientIndex) % inputStacks.size();
+            if (remaining[stackIndex] <= 0 || !ingredient.test(inputStacks.get(stackIndex))) continue;
+
+            remaining[stackIndex]--;
+            matchedSlots[ingredientIndex] = stackIndex;
+            if (findMatchingInputSlots(ingredients, inputStacks, remaining, matchedSlots, ingredientIndex + 1)) return true;
+            remaining[stackIndex]++;
+        }
+
+        return false;
     }
 
     private boolean fluidsMatch(OritechRecipeInput input, Level level) {
