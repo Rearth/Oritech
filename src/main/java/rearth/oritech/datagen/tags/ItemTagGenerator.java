@@ -68,7 +68,6 @@ public class ItemTagGenerator extends ItemTagsProvider {
         // nuggets
         tag(Tags.Items.NUGGETS)
           .add(ItemContent.NICKEL_NUGGET.get())
-          .add(ItemContent.COPPER_NUGGET.get())
           .add(ItemContent.PLATINUM_NUGGET.get());
         
         tag(getDustTag("nickel")).add(ItemContent.NICKEL_DUST.get());
@@ -125,7 +124,6 @@ public class ItemTagGenerator extends ItemTagsProvider {
         
         // vanilla variants
         tag(TagContent.COPPER_DUSTS).add(ItemContent.COPPER_DUST.get());
-        tag(TagContent.COPPER_NUGGETS).add(ItemContent.COPPER_NUGGET.get());
         tag(TagContent.IRON_DUSTS).add(ItemContent.IRON_DUST.get());
         tag(TagContent.GOLD_DUSTS).add(ItemContent.GOLD_DUST.get());
         

@@ -6,6 +6,6 @@
   "group": "oritech",
   "ingredient": "oritech:small_copper_dust",
   "result": {
-    "id": "oritech:copper_nugget"
+    "id": "minecraft:copper_nugget"
   }
 }

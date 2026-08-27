@@ -1,7 +1,7 @@
 {
   "type": "oritech:pulverizer",
   "itemInputs": [
-    "#c:nuggets/copper"
+    "minecraft:copper_nugget"
   ],
   "itemResults": [
     {

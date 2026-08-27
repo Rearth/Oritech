@@ -23,7 +23,6 @@ public class TagContent {
 
     public static final TagKey<Item> COPPER_CLUMPS = cItemTag("clumps/copper");
     public static final TagKey<Item> COPPER_DUSTS = cItemTag("dusts/copper");
-    public static final TagKey<Item> COPPER_NUGGETS = cItemTag("nuggets/copper");
 
     public static final TagKey<Item> IRON_CLUMPS = cItemTag("clumps/iron");
     public static final TagKey<Item> IRON_DUSTS = cItemTag("dusts/iron");

@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-18T17:47:23.2309924	Tags for minecraft:item mod id oritech
+// 26.1.2	2026-08-27T21:53:30.9280175	Tags for minecraft:item mod id oritech
 f37351511d3e439347c08017e7d7ff8b4d4cd079 data/c/tags/item/bananas.json
 e2c6e20d8d6d0e3e37246a13f9af75711482a721 data/c/tags/item/carbon_fibre.json
 99505a8471e5d2356893d65d4cff2b3c634c266b data/c/tags/item/clumps.json
@@ -44,8 +44,7 @@ c61a4303a1686103e99bbd9371c40d0cd0d29099 data/c/tags/item/ingots/nickel.json
 dd1c25564ad3fe894a496b18bffb1bee05c0f86f data/c/tags/item/ingots/platinum.json
 b42b76ed236dd6679cf4138c4788adf9380b9206 data/c/tags/item/ingots/prometheum.json
 f2c9c6765893ae43ca9acfae7a1cfa4829dbd17d data/c/tags/item/ingots/steel.json
-7949daa7fb73363ea7d2574b32e5b832454fe092 data/c/tags/item/nuggets.json
-a0fc1e3dfeb8a78741f8fbdd866120a1ec9b710a data/c/tags/item/nuggets/copper.json
+1c9c18d51ef45ac0c8dbc520168e804cd4f5dfe2 data/c/tags/item/nuggets.json
 acf26660aea7d38f0df68090951344c6d7733098 data/c/tags/item/nuggets/nickel.json
 3b2cf72897a2691cef8fb0ccc24368ccba88843a data/c/tags/item/nuggets/platinum.json
 4d1703385c7aa74f453c913e85d6533af9243af8 data/c/tags/item/ores/nickel.json
