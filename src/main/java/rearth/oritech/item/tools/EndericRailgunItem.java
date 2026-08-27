@@ -338,6 +338,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
 
         // add stack to player inv, or spawn at block pos
         for (var stack : dropped) {
+            if (stack.isEmpty()) continue;
             if (!player.getInventory().add(stack))
                 level.addFreshEntity(new ItemEntity(level, targetPos.getCenter().x, targetPos.getCenter().y, targetPos.getCenter().z, stack));
         }
