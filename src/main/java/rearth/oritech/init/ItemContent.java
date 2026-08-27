@@ -67,7 +67,6 @@ public class ItemContent {
     public static final DeferredItem<Item> COPPER_DUST = ITEMS.registerSimpleItem("copper_dust");
     public static final DeferredItem<Item> SMALL_COPPER_DUST = ITEMS.registerSimpleItem("small_copper_dust");
     public static final DeferredItem<Item> COPPER_GEM = ITEMS.registerSimpleItem("copper_gem");
-    public static final DeferredItem<Item> COPPER_NUGGET = ITEMS.registerSimpleItem("copper_nugget");
     // gold
     public static final DeferredItem<Item> GOLD_CLUMP = ITEMS.registerSimpleItem("gold_clump");
     public static final DeferredItem<Item> SMALL_GOLD_CLUMP = ITEMS.registerSimpleItem("small_gold_clump");
