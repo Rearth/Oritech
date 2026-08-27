@@ -200,7 +200,6 @@ In detail, these are the following items that are from the above-mentioned sourc
 * glisco, the creator of owo-lib, for creating this awesome library and supporting in its usage
 * unilock, for providing most of the work on the EMI integration
 * The creators and maintainers of Geckolib for creating the great animation engine, and helping out in their discord
-* [LyFl0w's texture maker](https://github.com/LyFl0w/TextureMaker), which has been used for item textures. Around 10 textures made with it are still in use.
 * Ycar, for creating all tiers of the machine core textures
 * BBoldt and BLOKBUSTR, for providing most of the metal item variant textures
 * jshipley, for a lot of contributions with new features, block, mechanics and bugfixes
