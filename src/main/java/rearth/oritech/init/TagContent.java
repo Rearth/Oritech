@@ -110,6 +110,9 @@ public class TagContent {
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");
     public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = oritechBlockTag("mineable/cutter_leaves");
 
+    // pump
+    public static final TagKey<Fluid> PUMP_INFINITE_FLUIDS = oritechFluidTag("pump/infinite");
+
     // c stuff
     public static final TagKey<Block> CONVENTIONAL_ORES = cBlockTag("ores");
     public static final TagKey<Item> CONVENTIONAL_FERTILIZER = cItemTag("fertilizers");
