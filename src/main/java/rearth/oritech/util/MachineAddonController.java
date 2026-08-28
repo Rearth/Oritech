@@ -20,7 +20,7 @@ import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
 
-public interface MachineAddonController {
+public interface MachineAddonController extends MachineControllerLifecycle {
 
     // list of where actually connected addons are
     List<BlockPos> getConnectedAddons();
@@ -168,8 +168,11 @@ public interface MachineAddonController {
 
                 // if the candidate is in use with another controller
                 if (candidate.getValue(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
-                    openSlots.add(candidatePos);
-                    continue;
+                    var linkedController = level.getBlockEntity(candidateAddonEntity.getControllerPos());
+                    if (linkedController instanceof MachineAddonController) {
+                        openSlots.add(candidatePos);
+                        continue;
+                    }
                 }
 
                 // if non-layered mode, check if we have too many extenders already
@@ -297,7 +300,7 @@ public interface MachineAddonController {
 
         var listValue = output.childrenList("connectedAddons");
         for (var pos : getConnectedAddons()) {
-            listValue.addChild().store("pos", BlockPos.CODEC, pos);
+            listValue.addChild().store("pos", BlockPos.CODEC, RelativePosition.toOffset(pos, getPosForAddon()));
         }
     }
 
@@ -306,9 +309,10 @@ public interface MachineAddonController {
         setBaseAddonData(data);
 
         var connectedAddons = getConnectedAddons();
+        connectedAddons.clear();
         for (var posData : input.childrenListOrEmpty("connectedAddons")) {
             var pos = posData.read("pos", BlockPos.CODEC);
-            pos.ifPresent(connectedAddons::add);
+            pos.map(value -> RelativePosition.toWorldPosition(value, getPosForAddon())).ifPresent(connectedAddons::add);
         }
     }
 

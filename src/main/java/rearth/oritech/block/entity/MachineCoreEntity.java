@@ -20,6 +20,7 @@ import rearth.oritech.api.transfer.item.ItemProvider;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.RelativePosition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +28,7 @@ import java.util.Objects;
 
 public class MachineCoreEntity extends BlockEntity implements ItemProvider, FluidProvider, EnergyProvider {
 
-    private BlockPos controllerPos = BlockPos.ZERO;
+    private BlockPos controllerOffset = BlockPos.ZERO;
     private MultiblockMachineController controllerEntity;
     private final Map<Direction, DelegatingEnergyStorage> delegatedEnergy = new HashMap<>(6);
     private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
@@ -40,22 +41,23 @@ public class MachineCoreEntity extends BlockEntity implements ItemProvider, Flui
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.store("controller", BlockPos.CODEC, controllerPos);
+        output.store("controller", BlockPos.CODEC, controllerOffset);
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        controllerPos = input.read("controller", BlockPos.CODEC)
+        var storedPosition = input.read("controller", BlockPos.CODEC)
                 .orElse(new BlockPos(input.getIntOr("controller_x", 0), input.getIntOr("controller_y", 0), input.getIntOr("controller_z", 0)));
+        controllerOffset = RelativePosition.normalizeOffset(storedPosition, worldPosition);
     }
 
     public BlockPos getControllerPos() {
-        return controllerPos;
+        return worldPosition.offset(controllerOffset);
     }
 
     public void setControllerPos(BlockPos controllerPos) {
-        this.controllerPos = controllerPos;
+        this.controllerOffset = RelativePosition.toOffset(controllerPos, worldPosition);
         this.controllerEntity = null;    // forces cache reload
         this.setChanged();
     }

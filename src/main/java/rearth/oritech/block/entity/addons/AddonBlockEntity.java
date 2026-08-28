@@ -9,10 +9,11 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonProvider;
+import rearth.oritech.util.RelativePosition;
 
 public class AddonBlockEntity extends BlockEntity implements MachineAddonProvider {
 
-    private BlockPos controllerPos = BlockPos.ZERO;
+    private BlockPos controllerOffset = BlockPos.ZERO;
 
     public AddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ADDON.get(), pos, state);
@@ -25,26 +26,28 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     @Override
     public void setControllerPos(BlockPos pos) {
 
-        if (!controllerPos.equals(pos) && level instanceof ServerLevel serverLevel)
+        if (!getControllerPos().equals(pos) && level instanceof ServerLevel serverLevel)
             serverLevel.invalidateCapabilities(pos);
 
-        controllerPos = pos;
+        controllerOffset = RelativePosition.toOffset(pos, worldPosition);
+        setChanged();
     }
 
     @Override
     public BlockPos getControllerPos() {
-        return controllerPos;
+        return worldPosition.offset(controllerOffset);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.store("controller", BlockPos.CODEC, controllerPos);
+        output.store("controller", BlockPos.CODEC, controllerOffset);
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        controllerPos = input.read("controller", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        var storedPosition = input.read("controller", BlockPos.CODEC).orElse(BlockPos.ZERO);
+        controllerOffset = RelativePosition.normalizeOffset(storedPosition, worldPosition);
     }
 }

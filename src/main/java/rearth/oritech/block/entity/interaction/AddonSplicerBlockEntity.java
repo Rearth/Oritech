@@ -183,6 +183,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
         super.saveAdditional(output);
         inventory.serialize(output);
         serializeMultiblock(output);
+        serializeAddonData(output);
         if (currentCandidate != null) output.store("shrunk_addon", ShrunkAddonData.CODEC, currentCandidate);
         serializeColor(output);
         output.putLong("energy_stored", energyStorage.energy);
@@ -194,6 +195,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
         super.loadAdditional(input);
         inventory.deserialize(input);
         deserializeMultiblock(input);
+        deserializeAddonData(input);
         currentCandidate = input.read("shrunk_addon", ShrunkAddonData.CODEC).orElse(null);
         deserializeColor(input);
 
