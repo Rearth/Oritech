@@ -38,10 +38,10 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         
         if (player == null) return;
         
-        var heldStack = client.player.getMainHandItem();
+        var heldStack = player.getMainHandItem();
         var world = client.level;
         
-        if (isReRender || !this.renderPerspective.firstPerson()) return;
+        if (isReRender) return;
         
         var singleShotAge = world.getGameTime() - PortableLaserItem.lastSingleShot;
         
@@ -53,7 +53,7 @@ public class PortableLaserRenderer extends GeoItemRenderer<PortableLaserItem> {
         // at this point we know a laser is held and fired
         
         var startPos = player.getEyePosition();
-        var lookVec = player.getViewVector(0F);
+        var lookVec = player.getViewVector(partialTick);
         var endPos = startPos.add(lookVec.scale(128));
         
         var hit = PortableLaserItem.getPlayerTargetRay(player);

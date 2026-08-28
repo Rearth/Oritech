@@ -6,15 +6,20 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.HumanoidArm;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
+import rearth.oritech.item.tools.PortableLaserItem;
 
 @Mixin(HumanoidModel.class)
 public class HumanoidModelMixin<T extends LivingEntity> {
+
+    @Shadow public HumanoidModel.ArmPose rightArmPose;
+    @Shadow public HumanoidModel.ArmPose leftArmPose;
     
     @Shadow public ModelPart rightArm;
     @Shadow public ModelPart leftArm;
@@ -22,6 +27,16 @@ public class HumanoidModelMixin<T extends LivingEntity> {
     @Shadow public ModelPart leftLeg;
     @Shadow public ModelPart head;
     @Shadow public ModelPart body;
+
+    @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("HEAD"))
+    public void oritech$portableLaserPose(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
+        if (!(entity instanceof Player player) || !(player.getMainHandItem().getItem() instanceof PortableLaserItem)) return;
+
+        if (player.getMainArm() == HumanoidArm.RIGHT)
+            this.rightArmPose = HumanoidModel.ArmPose.CROSSBOW_HOLD;
+        else
+            this.leftArmPose = HumanoidModel.ArmPose.CROSSBOW_HOLD;
+    }
     
     @Inject(method = "setupAnim(Lnet/minecraft/world/entity/LivingEntity;FFFFF)V", at = @At("TAIL"))
     public void oritech$ziplineAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, CallbackInfo ci) {
