@@ -11,6 +11,7 @@ import rearth.oritech.api.item.containers.DelegatingInventoryStorage;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.RelativePosition;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvider, EnergyApi.BlockProvider, FluidApi.BlockProvider {
     
-    private BlockPos controllerPos = BlockPos.ZERO;
+    private BlockPos controllerOffset = BlockPos.ZERO;
     private MultiblockMachineController controllerEntity;
     private final Map<Direction, DelegatingEnergyStorage> delegatedEnergy = new HashMap<>(6);
     private final Map<Direction, DelegatingFluidStorage> delegatedFluid = new HashMap<>(6);
@@ -37,23 +38,24 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("controller_x", controllerPos.getX());
-        nbt.putInt("controller_y", controllerPos.getY());
-        nbt.putInt("controller_z", controllerPos.getZ());
+        nbt.putInt("controller_x", controllerOffset.getX());
+        nbt.putInt("controller_y", controllerOffset.getY());
+        nbt.putInt("controller_z", controllerOffset.getZ());
     }
     
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
-        controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+        var storedPosition = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+        controllerOffset = RelativePosition.normalizeOffset(storedPosition, worldPosition);
     }
     
     public BlockPos getControllerPos() {
-        return controllerPos;
+        return worldPosition.offset(controllerOffset);
     }
     
     public void setControllerPos(BlockPos controllerPos) {
-        this.controllerPos = controllerPos;
+        this.controllerOffset = RelativePosition.toOffset(controllerPos, worldPosition);
         this.controllerEntity = null;    // forces cache reload
         this.setChanged();
     }

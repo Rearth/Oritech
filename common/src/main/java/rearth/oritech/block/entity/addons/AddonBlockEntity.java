@@ -5,6 +5,7 @@ import rearth.oritech.OritechPlatform;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MachineAddonProvider;
+import rearth.oritech.util.RelativePosition;
 
 import java.util.HashSet;
 import net.minecraft.core.BlockPos;
@@ -25,7 +26,7 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
         pendingInits.clear();
     }
     
-    private BlockPos controllerPos = BlockPos.ZERO;
+    private BlockPos controllerOffset = BlockPos.ZERO;
     
     public AddonBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ADDON_ENTITY, pos, state);
@@ -37,27 +38,29 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     @Override
     public void setControllerPos(BlockPos pos) {
-        if (!controllerPos.equals(pos) && level instanceof ServerLevel serverLevel)
+        if (!getControllerPos().equals(pos) && level instanceof ServerLevel serverLevel)
             OritechPlatform.INSTANCE.resetCapabilities(serverLevel, pos);
-        controllerPos = pos;
+        controllerOffset = RelativePosition.toOffset(pos, worldPosition);
+        setChanged();
     }
     
     @Override
     public BlockPos getControllerPos() {
-        return controllerPos;
+        return worldPosition.offset(controllerOffset);
     }
     
     @Override
     protected void saveAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.saveAdditional(nbt, registryLookup);
-        nbt.putInt("controller_x", controllerPos.getX());
-        nbt.putInt("controller_y", controllerPos.getY());
-        nbt.putInt("controller_z", controllerPos.getZ());
+        nbt.putInt("controller_x", controllerOffset.getX());
+        nbt.putInt("controller_y", controllerOffset.getY());
+        nbt.putInt("controller_z", controllerOffset.getZ());
     }
     
     @Override
     protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registryLookup) {
         super.loadAdditional(nbt, registryLookup);
-        controllerPos = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+        var storedPosition = new BlockPos(nbt.getInt("controller_x"), nbt.getInt("controller_y"), nbt.getInt("controller_z"));
+        controllerOffset = RelativePosition.normalizeOffset(storedPosition, worldPosition);
     }
 }

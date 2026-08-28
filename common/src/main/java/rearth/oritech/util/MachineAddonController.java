@@ -20,7 +20,7 @@ import rearth.oritech.block.entity.addons.CombiAddonEntity;
 
 import java.util.*;
 
-public interface MachineAddonController {
+public interface MachineAddonController extends MachineControllerLifecycle {
     
     // list of where actually connected addons are
     List<BlockPos> getConnectedAddons();
@@ -168,8 +168,11 @@ public interface MachineAddonController {
                 
                 // if the candidate is in use with another controller
                 if (candidate.getValue(MachineAddonBlock.ADDON_USED) && !candidateAddonEntity.getControllerPos().equals(pos)) {
-                    openSlots.add(candidatePos);
-                    continue;
+                    var linkedController = world.getBlockEntity(candidateAddonEntity.getControllerPos());
+                    if (linkedController instanceof MachineAddonController) {
+                        openSlots.add(candidatePos);
+                        continue;
+                    }
                 }
                 
                 // if non-layered mode, check if we have too many extenders already
@@ -303,10 +306,11 @@ public interface MachineAddonController {
         
         var posList = new ListTag();
         for (var pos : getConnectedAddons()) {
+            var offset = RelativePosition.toOffset(pos, getPosForAddon());
             var posTag = new CompoundTag();
-            posTag.putInt("x", pos.getX());
-            posTag.putInt("y", pos.getY());
-            posTag.putInt("z", pos.getZ());
+            posTag.putInt("x", offset.getX());
+            posTag.putInt("y", offset.getY());
+            posTag.putInt("z", offset.getZ());
             posList.add(posTag);
         }
         nbt.put("connectedAddons", posList);
@@ -325,13 +329,14 @@ public interface MachineAddonController {
         
         var posList = nbt.getList("connectedAddons", Tag.TAG_COMPOUND);
         var connectedAddons = getConnectedAddons();
+        connectedAddons.clear();
         
         for (var posTag : posList) {
             var posCompound = (CompoundTag) posTag;
             var x = posCompound.getInt("x");
             var y = posCompound.getInt("y");
             var z = posCompound.getInt("z");
-            var pos = new BlockPos(x, y, z);
+            var pos = RelativePosition.toWorldPosition(new BlockPos(x, y, z), getPosForAddon());
             connectedAddons.add(pos);
         }
     }

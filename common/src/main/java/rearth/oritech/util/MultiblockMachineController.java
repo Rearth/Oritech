@@ -28,7 +28,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-public interface MultiblockMachineController {
+public interface MultiblockMachineController extends MachineControllerLifecycle {
     
     List<Vec3i> getCorePositions();
     
@@ -52,10 +52,11 @@ public interface MultiblockMachineController {
         
         var posList = new ListTag();
         for (var pos : getConnectedCores()) {
+            var offset = RelativePosition.toOffset(pos, getPosForMultiblock());
             var posTag = new CompoundTag();
-            posTag.putInt("x", pos.getX());
-            posTag.putInt("y", pos.getY());
-            posTag.putInt("z", pos.getZ());
+            posTag.putInt("x", offset.getX());
+            posTag.putInt("y", offset.getY());
+            posTag.putInt("z", offset.getZ());
             posList.add(posTag);
         }
         nbt.put("connectedCores", posList);
@@ -66,13 +67,14 @@ public interface MultiblockMachineController {
         
         var posList = nbt.getList("connectedCores", Tag.TAG_COMPOUND);
         var coreBlocksConnected = getConnectedCores();
+        coreBlocksConnected.clear();
         
         for (var posTag : posList) {
             var posCompound = (CompoundTag) posTag;
             var x = posCompound.getInt("x");
             var y = posCompound.getInt("y");
             var z = posCompound.getInt("z");
-            var pos = new BlockPos(x, y, z);
+            var pos = RelativePosition.toWorldPosition(new BlockPos(x, y, z), getPosForMultiblock());
             coreBlocksConnected.add(pos);
         }
         
@@ -176,6 +178,35 @@ public interface MultiblockMachineController {
         } else {
             // invalid
             return false;
+        }
+    }
+
+    // Rebuild links after a controller and its structure have been relocated together.
+    default void rescanMultiblock() {
+        var world = getWorldForMultiblock();
+        var pos = getPosForMultiblock();
+        if (world == null || !world.hasChunkAt(pos)) return;
+
+        for (var targetMachinePosition : getCorePositions()) {
+            var corePos = pos.offset(Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock()));
+            var coreState = world.getBlockState(corePos);
+            if (!(coreState.getBlock() instanceof MachineCoreBlock) || !coreState.getValue(MachineCoreBlock.USED))
+                continue;
+
+            if (world.getBlockEntity(corePos) instanceof MachineCoreEntity coreEntity) {
+                var linkedController = world.getBlockEntity(coreEntity.getControllerPos());
+                if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController))
+                    world.setBlockAndUpdate(corePos, coreState.setValue(MachineCoreBlock.USED, false));
+            }
+        }
+
+        getConnectedCores().clear();
+        var state = world.getBlockState(pos);
+        if (state.hasProperty(MultiblockMachine.ASSEMBLED)) {
+            if (state.getValue(MultiblockMachine.ASSEMBLED))
+                world.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, false));
+
+            initMultiblock(world.getBlockState(pos));
         }
     }
     
