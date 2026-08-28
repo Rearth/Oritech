@@ -1,5 +1,0 @@
-- [Backport] Store multiblock/addon positions as relative positions (improves compat with block moving / relocating mods like sable, mekanism cardboard box, etc.)
-- [Backport] Add 3rd person rendering for portable railgun
-- Fix some fluid transfer edge cases
-- Fix fluid transfers on stacks larger than 1
-- Fix centrifuge still working on fluids after the addon was removed
