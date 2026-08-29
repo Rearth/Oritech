@@ -2,12 +2,10 @@ package rearth.oritech.item.other;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.HolderSet;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -15,8 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
-import rearth.oritech.init.ComponentContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
 import java.util.function.Consumer;
 
@@ -32,9 +30,7 @@ public class MobCaptureItem extends Item {
         var resultingItem = ItemContent.UNHOLY_INTELLIGENCE.asItem();
         if (entity.isDeadOrDying() || user.level().isClientSide()) return InteractionResult.PASS;
 
-        HolderSet<EntityType<?>> targets = stack.getOrDefault(ComponentContent.DUBIOUS_CONTAINER_TARGET, HolderSet.empty());
-
-        if (entity.is(targets)) {
+        if (entity.is(TagContent.FLYING_MOBS)) {
             stack.shrink(1);
             if (stack.isEmpty()) {
                 user.setItemInHand(hand, ItemStack.EMPTY);
