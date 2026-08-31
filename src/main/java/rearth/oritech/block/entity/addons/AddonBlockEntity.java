@@ -25,11 +25,13 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
 
     @Override
     public void setControllerPos(BlockPos pos) {
+        var newOffset = RelativePosition.toOffset(pos, worldPosition);
+        if (controllerOffset.equals(newOffset)) return;
 
-        if (!getControllerPos().equals(pos) && level instanceof ServerLevel serverLevel)
+        if (level instanceof ServerLevel serverLevel)
             serverLevel.invalidateCapabilities(pos);
 
-        controllerOffset = RelativePosition.toOffset(pos, worldPosition);
+        controllerOffset = newOffset;
         setChanged();
     }
 
