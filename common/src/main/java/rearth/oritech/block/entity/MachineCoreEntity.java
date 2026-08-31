@@ -55,7 +55,10 @@ public class MachineCoreEntity extends BlockEntity implements ItemApi.BlockProvi
     }
     
     public void setControllerPos(BlockPos controllerPos) {
-        this.controllerOffset = RelativePosition.toOffset(controllerPos, worldPosition);
+        var newOffset = RelativePosition.toOffset(controllerPos, worldPosition);
+        if (controllerOffset.equals(newOffset)) return;
+
+        this.controllerOffset = newOffset;
         this.controllerEntity = null;    // forces cache reload
         this.setChanged();
     }

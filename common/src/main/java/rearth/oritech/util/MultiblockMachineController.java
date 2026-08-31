@@ -187,27 +187,75 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
         var pos = getPosForMultiblock();
         if (world == null || !world.hasChunkAt(pos)) return;
 
+        var coreBlocks = new ArrayList<MultiBlockElement>(getCorePositions().size());
+        var sumCoreQuality = 0f;
+
         for (var targetMachinePosition : getCorePositions()) {
             var corePos = pos.offset(Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock()));
             var coreState = world.getBlockState(corePos);
-            if (!(coreState.getBlock() instanceof MachineCoreBlock) || !coreState.getValue(MachineCoreBlock.USED))
+            if (!(coreState.getBlock() instanceof MachineCoreBlock coreBlock)
+                  || !(world.getBlockEntity(corePos) instanceof MachineCoreEntity coreEntity)) {
+                resetInvalidMultiblock();
+                return;
+            }
+
+            if (coreState.getValue(MachineCoreBlock.USED) && !coreEntity.getControllerPos().equals(pos)) {
+                var linkedController = world.getBlockEntity(coreEntity.getControllerPos());
+                if (linkedController instanceof MultiblockMachineController) {
+                    resetInvalidMultiblock();
+                    return;
+                }
+            }
+
+            coreBlocks.add(new MultiBlockElement(coreState, coreBlock, corePos));
+            sumCoreQuality += coreBlock.getCoreQuality();
+        }
+
+        if (coreBlocks.isEmpty()) {
+            resetInvalidMultiblock();
+            return;
+        }
+
+        var connectedCores = getConnectedCores();
+        connectedCores.clear();
+        for (var core : coreBlocks) {
+            var coreEntity = (MachineCoreEntity) world.getBlockEntity(core.pos());
+            coreEntity.setControllerPos(pos);
+            if (!core.state().getValue(MachineCoreBlock.USED))
+                world.setBlockAndUpdate(core.pos(), core.state().setValue(MachineCoreBlock.USED, true));
+            connectedCores.add(core.pos());
+        }
+
+        setCoreQuality(sumCoreQuality / coreBlocks.size());
+        var state = world.getBlockState(pos);
+        if (state.hasProperty(MultiblockMachine.ASSEMBLED) && !state.getValue(MultiblockMachine.ASSEMBLED))
+            world.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, true));
+
+        // Preserve controller-specific refresh work without cycling any block states.
+        initMultiblock(world.getBlockState(pos));
+    }
+
+    private void resetInvalidMultiblock() {
+        var world = getWorldForMultiblock();
+        var pos = getPosForMultiblock();
+        if (world == null) return;
+
+        for (var targetMachinePosition : getCorePositions()) {
+            var corePos = pos.offset(Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock()));
+            var coreState = world.getBlockState(corePos);
+            if (!(coreState.getBlock() instanceof MachineCoreBlock) || !coreState.getValue(MachineCoreBlock.USED)
+                  || !(world.getBlockEntity(corePos) instanceof MachineCoreEntity coreEntity))
                 continue;
 
-            if (world.getBlockEntity(corePos) instanceof MachineCoreEntity coreEntity) {
-                var linkedController = world.getBlockEntity(coreEntity.getControllerPos());
-                if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController))
-                    world.setBlockAndUpdate(corePos, coreState.setValue(MachineCoreBlock.USED, false));
-            }
+            var linkedController = world.getBlockEntity(coreEntity.getControllerPos());
+            if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController))
+                world.setBlockAndUpdate(corePos, coreState.setValue(MachineCoreBlock.USED, false));
         }
 
         getConnectedCores().clear();
         var state = world.getBlockState(pos);
-        if (state.hasProperty(MultiblockMachine.ASSEMBLED)) {
-            if (state.getValue(MultiblockMachine.ASSEMBLED))
-                world.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, false));
-
-            initMultiblock(world.getBlockState(pos));
-        }
+        if (state.hasProperty(MultiblockMachine.ASSEMBLED) && state.getValue(MultiblockMachine.ASSEMBLED))
+            world.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, false));
     }
     
     default void onCoreBroken(BlockPos corePos) {

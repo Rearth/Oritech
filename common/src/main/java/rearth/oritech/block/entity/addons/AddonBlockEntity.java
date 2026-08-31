@@ -38,9 +38,13 @@ public class AddonBlockEntity extends BlockEntity implements MachineAddonProvide
     
     @Override
     public void setControllerPos(BlockPos pos) {
-        if (!getControllerPos().equals(pos) && level instanceof ServerLevel serverLevel)
+        var newOffset = RelativePosition.toOffset(pos, worldPosition);
+        if (controllerOffset.equals(newOffset)) return;
+
+        if (level instanceof ServerLevel serverLevel)
             OritechPlatform.INSTANCE.resetCapabilities(serverLevel, pos);
-        controllerOffset = RelativePosition.toOffset(pos, worldPosition);
+
+        controllerOffset = newOffset;
         setChanged();
     }
     
