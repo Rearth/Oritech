@@ -72,6 +72,16 @@ public class ScrollWidget extends UIComponent {
         this.contentTotalHeight = totalHeight;
     }
 
+    /** Restores a previously saved scroll position without replaying the smoothing animation. */
+    public void setScrollPosition(float x, float y) {
+        int viewW = width - innerMargin * 2;
+        int viewH = height - innerMargin * 2;
+        scrollX = Mth.clamp(Math.round(x), 0, Math.max(0, contentTotalWidth - viewW));
+        scrollY = Mth.clamp(Math.round(y), 0, Math.max(0, contentTotalHeight - viewH));
+        renderedX = scrollX;
+        renderedY = scrollY;
+    }
+
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta, boolean shiftHeld) {
         if (!isMouseOver(mouseX, mouseY)) return false;
 
@@ -181,11 +191,15 @@ public class ScrollWidget extends UIComponent {
 
         // Scrollbar indicator
         if (verticalScroll && contentTotalHeight > ch) {
-            renderScrollbar(graphics, cx + cw, cy, 2, ch, renderedY, contentTotalHeight, ch);
+            renderVerticalScrollbar(graphics, cx + cw, cy, 2, ch, renderedY, contentTotalHeight, ch);
+        }
+        if (horizontalScroll && contentTotalWidth > cw) {
+            renderHorizontalScrollbar(graphics, cx, cy + ch, cw, 2, renderedX, contentTotalWidth, cw);
         }
     }
 
-    private void renderScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH, float scroll, int totalContent, int viewportH) {
+    private void renderVerticalScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH,
+                                         float scroll, int totalContent, int viewportH) {
         float thumbRatio = (float) viewportH / totalContent;
         int thumbH = Math.max(8, (int) (trackH * thumbRatio));
         float scrollRatio = scroll / (totalContent - viewportH);
@@ -193,6 +207,17 @@ public class ScrollWidget extends UIComponent {
 
         graphics.fill(barX, barY, barX + barW, barY + trackH, SCROLLBAR_TRACK);
         graphics.fill(barX, thumbY, barX + barW, thumbY + thumbH, SCROLLBAR_THUMB);
+    }
+
+    private void renderHorizontalScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int trackW, int barH,
+                                           float scroll, int totalContent, int viewportW) {
+        float thumbRatio = (float) viewportW / totalContent;
+        int thumbW = Math.max(8, (int) (trackW * thumbRatio));
+        float scrollRatio = scroll / (totalContent - viewportW);
+        int thumbX = barX + (int) ((trackW - thumbW) * scrollRatio);
+
+        graphics.fill(barX, barY, barX + trackW, barY + barH, SCROLLBAR_TRACK);
+        graphics.fill(thumbX, barY, thumbX + thumbW, barY + barH, SCROLLBAR_THUMB);
     }
 
     @Override

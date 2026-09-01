@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 public class RocketAssemblerMenu extends AbstractContainerMenu {
 
@@ -17,6 +18,8 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     private @Nullable ActiveRocketData rocket;
     private boolean previewLoaded;
     private int previewRevision;
+    private @Nullable SpaceSimulation.FlightPlannerSnapshot flightPlannerSnapshot;
+    private int flightPlannerRevision;
 
     public RocketAssemblerMenu(int syncId, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         super(SpaceAgeMenus.ROCKET_ASSEMBLER.get(), syncId);
@@ -47,6 +50,19 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
         this.rocket = rocket;
         this.previewLoaded = true;
         this.previewRevision++;
+    }
+
+    public @Nullable SpaceSimulation.FlightPlannerSnapshot getFlightPlannerSnapshot() {
+        return flightPlannerSnapshot;
+    }
+
+    public int getFlightPlannerRevision() {
+        return flightPlannerRevision;
+    }
+
+    public void setFlightPlannerSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
+        this.flightPlannerSnapshot = snapshot;
+        this.flightPlannerRevision++;
     }
 
     @Override

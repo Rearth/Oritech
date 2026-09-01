@@ -169,7 +169,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
         // if not aborted due to overlay, process scroll widgets
         for (var c : components) {
-            if (c instanceof ScrollWidget scrollWidget && c.isVisible() && c.isMouseOver(mouseX, mouseY)) {
+            if (c instanceof ScrollWidget scrollWidget && c.isVisible() && c.isMouseOver(relX, relY)) {
                 var hovered = scrollWidget.getTopmostHovered(relX, relY);
                 if (hovered != null)
                     graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);

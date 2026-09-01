@@ -1,8 +1,14 @@
 package rearth.oritech.spaceage.simulation;
 
+import net.minecraft.core.BlockPos;
 import org.joml.Vector2f;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -34,10 +40,12 @@ public class SpaceSimulation {
 
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
+    private final Map<BlockPos, List<FlightPlanAction>> flightPlans = new HashMap<>();
 
     // this will be used for loading the sim from disk
     public SpaceSimulation(UUID loadedSimulationId, Set<SpaceObjects.SimulatedObject> loadedObjects) {
         this.simulationId = loadedSimulationId;
+        this.nonCelestialObjects.addAll(loadedObjects);
     }
 
     public SpaceSimulation() {
@@ -58,6 +66,7 @@ public class SpaceSimulation {
                     (float) (Math.random() * 200_000 - 100_000),
                     (float) (Math.random() * 100_000 + 100_000)
             );
+            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
             asteroid.weight = (float) (Math.random() * 99 + 1);
             nonCelestialObjects.add(asteroid);
         }
@@ -68,6 +77,7 @@ public class SpaceSimulation {
                     (float) (Math.random() * 2_000_000 - 1_000_000),
                     (float) (Math.random() * 17_000_000 + 1_000_000)
             );
+            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
             asteroid.weight = (float) (Math.random() * 99 + 1);
             nonCelestialObjects.add(asteroid);
         }
@@ -78,6 +88,7 @@ public class SpaceSimulation {
                     (float) (Math.random() * 39_000_000 - 19_500_000),
                     (float) (Math.random() * 1_000_000 + 19_500_000)
             );
+            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
             asteroid.weight = (float) (Math.random() * 99 + 1);
             nonCelestialObjects.add(asteroid);
         }
@@ -86,17 +97,17 @@ public class SpaceSimulation {
     // initializes celestial Objects once
     static {
 
-        var earth = new SpaceObjects.SimulatedObject();
+        var earth = new SpaceObjects.SimulatedObject(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH);
         earth.currentPosition = new Vector2f(0, 0);
         earth.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(earth);
 
-        var sun = new SpaceObjects.SimulatedObject();
+        var sun = new SpaceObjects.SimulatedObject(UUID.fromString("00000000-0000-0000-0000-000000000002"), SpaceObjects.ObjectType.SUN);
         sun.currentPosition = new Vector2f(-1_000_000, 3_000_000);
         sun.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(sun);
 
-        var mars = new SpaceObjects.SimulatedObject();
+        var mars = new SpaceObjects.SimulatedObject(UUID.fromString("00000000-0000-0000-0000-000000000003"), SpaceObjects.ObjectType.MARS);
         mars.currentPosition = new Vector2f(1_000_000, 8_000_000);
         mars.currentState = SpaceObjects.DetectionState.PRECISE;
         celestialObjects.add(mars);
@@ -105,6 +116,114 @@ public class SpaceSimulation {
     // returns a value between 0 and 1
     public static float getGravityStrength(float height) {
         return Math.clamp(1 - height / 100_000, 0, 1);
+    }
+
+    public FlightPlannerSnapshot createFlightPlannerSnapshot(BlockPos assemblerPosition, UUID rocketId) {
+        var objects = new ArrayList<SpaceObjectData>();
+        celestialObjects.stream()
+                .map(SpaceSimulation::toData)
+                .forEach(objects::add);
+        nonCelestialObjects.stream()
+                .map(SpaceSimulation::toData)
+                .forEach(objects::add);
+        objects.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
+        return new FlightPlannerSnapshot(simulationId, rocketId, objects,
+                List.copyOf(flightPlans.getOrDefault(assemblerPosition, List.of())));
+    }
+
+    public void updateFlightPlan(BlockPos assemblerPosition, List<FlightPlanAction> actions,
+                                 Set<UUID> rocketSegments) {
+        if (actions.size() > 32) return;
+
+        var objectIds = new HashSet<UUID>();
+        celestialObjects.forEach(object -> objectIds.add(object.id));
+        nonCelestialObjects.forEach(object -> objectIds.add(object.id));
+
+        var validated = new ArrayList<FlightPlanAction>(actions.size());
+        var actionIds = new HashSet<UUID>();
+        for (var action : actions) {
+            if (!actionIds.add(action.id())) continue;
+            var targetValid = switch (action.type()) {
+                case SET_NAVIGATION_TARGET -> objectIds.contains(action.targetId());
+                case WAIT_UNTIL_DISTANCE -> action.targetId().equals(FlightPlanAction.CURRENT_TARGET)
+                        || action.targetId().equals(SpaceObjects.EARTH_ID);
+                case DISABLE_COUPLINGS -> rocketSegments.contains(action.targetId());
+                default -> true;
+            };
+            if (!targetValid) continue;
+
+            long value = switch (action.type()) {
+                case WAIT_TICKS -> Math.clamp(action.value(), 1, 72_000);
+                case WAIT_SECONDS -> Math.clamp(action.value(), 1, 3_600);
+                case WAIT_UNTIL_DISTANCE -> Math.clamp(action.value(), 0, 100_000_000);
+                case WAIT_FOR_EVENT -> Math.clamp(action.value(), 0, WaitEvent.values().length - 1);
+                default -> 0;
+            };
+            validated.add(action.withValue(value));
+        }
+        flightPlans.put(assemblerPosition.immutable(), List.copyOf(validated));
+    }
+
+    private static SpaceObjectData toData(SpaceObjects.SimulatedObject object) {
+        return new SpaceObjectData(object.id, object.type, object.currentPosition.x,
+                object.currentPosition.y, object.currentState);
+    }
+
+    public record SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y,
+                                  SpaceObjects.DetectionState detectionState) {
+    }
+
+    public record FlightPlannerSnapshot(UUID simulationId, UUID rocketId,
+                                        List<SpaceObjectData> objects, List<FlightPlanAction> actions) {
+    }
+
+    public record FlightPlanAction(UUID id, ActionType type, UUID targetId, long value) {
+        public static final UUID NO_TARGET = new UUID(0, 0);
+        public static final UUID CURRENT_TARGET = new UUID(0, 1);
+
+        public static FlightPlanAction create(ActionType type) {
+            return new FlightPlanAction(UUID.randomUUID(), type, NO_TARGET, defaultValue(type));
+        }
+
+        public FlightPlanAction withType(ActionType newType) {
+            return new FlightPlanAction(id, newType, NO_TARGET, defaultValue(newType));
+        }
+
+        public FlightPlanAction withTarget(UUID target) {
+            return new FlightPlanAction(id, type, target, value);
+        }
+
+        public FlightPlanAction withValue(long newValue) {
+            return new FlightPlanAction(id, type, targetId, newValue);
+        }
+
+        private static long defaultValue(ActionType type) {
+            return switch (type) {
+                case WAIT_TICKS -> 20;
+                case WAIT_SECONDS -> 5;
+                case WAIT_UNTIL_DISTANCE -> 1_000;
+                default -> 0;
+            };
+        }
+    }
+
+    public enum ActionType {
+        START_ENGINE_BURN,
+        STOP_ENGINE_BURN,
+        SET_NAVIGATION_TARGET,
+        DISABLE_COUPLINGS,
+        OPEN_PARACHUTES,
+        WAIT_TICKS,
+        WAIT_SECONDS,
+        WAIT_UNTIL_DISTANCE,
+        WAIT_FOR_EVENT
+    }
+
+    public enum WaitEvent {
+        ORBIT_REACHED,
+        ATMOSPHERE_EXITED,
+        TARGET_REACHED,
+        FUEL_EMPTY
     }
 
 }
