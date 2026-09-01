@@ -512,6 +512,8 @@
   "emi.title.oritech.bedrock_extractor_infinite": "Extraction is infinite.",
   "emi.title.oritech.cookingtime": "%d秒（%d刻）",
   "emi.title.oritech.collisionspeed": "最小碰撞能量： %sJ",
+  "emi.title.oritech.atomic_forge_energy": "Required energy: %s RF",
+  "emi.description.oritech.atomic_forge_laser_speed": "Laser power determines charge time",
   "emi.title.oritech.laser_interaction": "末影激光方块破坏",
   "itemgroup.oritech.machines": "Oritech 机械",
   "itemgroup.oritech.components": "Oritech 组件",
