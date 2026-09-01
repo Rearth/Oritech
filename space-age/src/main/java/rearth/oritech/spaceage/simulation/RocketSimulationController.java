@@ -49,7 +49,12 @@ public final class RocketSimulationController {
     private static final double ROCKET_PACKET_RANGE_SQUARED = ROCKET_PACKET_RANGE_BLOCKS * ROCKET_PACKET_RANGE_BLOCKS;
 
     // actual data
-    private static final Map<UUID, ActiveRocketData> ACTIVE_ROCKETS = new HashMap<>();
+    private static final Map<UUID, ActiveRocketData> ACTIVE_ROCKETS = new HashMap<>();  // todo link active rocket to specific simulations somehow
+    private static final Map<UUID, SpaceSimulation> ACTIVE_SIMULATIONS = new HashMap<>();   // as simulations are classes / references, they may be stored in here multiple times if players share a simulation
+
+    public static SpaceSimulation getForPlayer(ServerPlayer player) {
+        return ACTIVE_SIMULATIONS.computeIfAbsent(player.getUUID(), id -> new SpaceSimulation());
+    }
 
     // calculates the flight and adds the rocket to the saved active rockets
     public static void launchRocket(ServerLevel level, ActiveRocketData rocket, RocketFlightPlan flightPlan) {

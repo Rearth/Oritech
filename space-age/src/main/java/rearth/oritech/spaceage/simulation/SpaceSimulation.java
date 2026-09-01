@@ -35,6 +35,7 @@ public class SpaceSimulation {
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
 
+    // this will be used for loading the sim from disk
     public SpaceSimulation(UUID loadedSimulationId, Set<SpaceObjects.SimulatedObject> loadedObjects) {
         this.simulationId = loadedSimulationId;
     }

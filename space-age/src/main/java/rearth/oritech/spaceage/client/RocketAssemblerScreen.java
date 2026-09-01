@@ -80,6 +80,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         preview.withSurface(OritechSurface.PANEL_INSET);
         preview.withPadding(Insets.of(3));
         preview.withRotationSpeed(0.18f);
+        preview.withDragRotation();
         addComponent(preview);
 
         addComponent(new SurfaceWidget(323, 36, 145, 232 + 6, OritechSurface.PANEL_INSET));
