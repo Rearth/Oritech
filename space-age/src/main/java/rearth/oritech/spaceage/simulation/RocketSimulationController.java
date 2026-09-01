@@ -157,25 +157,17 @@ public final class RocketSimulationController {
         var orbitPosition = launchPosition.offset(0, ORBIT_HEIGHT_BLOCKS, 0);
         var impactPosition = calculateImpactPosition(launchPosition, random);
         var targetOrbit = new Vector2i(flightPlan.targetOrbit());
+        var readiness = getLaunchReadiness(performance);
 
-        if (performance.engineCount() == 0) {
-            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, "Rocket has no engines");
-        }
-        if (performance.wetMassKilograms() <= 0) {
-            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, "Rocket has no measurable mass");
-        }
-        if (performance.liftoffAccelerationMetersPerSecondSquared() <= STANDARD_GRAVITY) {
-            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, "Rocket does not have enough thrust to lift off");
+        if (readiness != LaunchReadiness.READY) {
+            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition,
+                    targetOrbit, readiness.failureReason());
         }
 
         // use constant thrust and gravity, but include gravity loss during ascent
         var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
         var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / netAcceleration);
         var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
-
-        if (performance.availableBurnSeconds() < ascentSeconds || performance.availableDeltaVMetersPerSecond() < requiredDeltaV) {
-            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, "Rocket does not have enough fuel to reach orbit");
-        }
 
         var ascentTicks = secondsToTicks(ascentSeconds);
         var reentryTick = ascentTicks + ORBIT_WAIT_TICKS;
@@ -218,6 +210,45 @@ public final class RocketSimulationController {
         var liftoffAcceleration = wetMass > 0 ? thrust / wetMass : 0;
 
         return new RocketPerformance(dryMass, fuelMass, wetMass, engineCount, thrust, fuelBurnSeconds + electricBurnSeconds, chemicalDeltaV + electricDeltaV, liftoffAcceleration);
+    }
+
+    public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket) {
+        return getLaunchReadiness(calculatePerformance(rocket));
+    }
+
+    private static LaunchReadiness getLaunchReadiness(RocketPerformance performance) {
+        if (performance.engineCount() == 0) return LaunchReadiness.NO_ENGINES;
+        if (performance.wetMassKilograms() <= 0) return LaunchReadiness.NO_MASS;
+        if (performance.liftoffAccelerationMetersPerSecondSquared() <= STANDARD_GRAVITY) {
+            return LaunchReadiness.INSUFFICIENT_THRUST;
+        }
+
+        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
+        var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / netAcceleration);
+        var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
+        if (performance.availableBurnSeconds() < ascentSeconds
+                || performance.availableDeltaVMetersPerSecond() < requiredDeltaV) {
+            return LaunchReadiness.INSUFFICIENT_FUEL;
+        }
+        return LaunchReadiness.READY;
+    }
+
+    public enum LaunchReadiness {
+        READY(null),
+        NO_ENGINES("Rocket has no engines"),
+        NO_MASS("Rocket has no measurable mass"),
+        INSUFFICIENT_THRUST("Rocket does not have enough thrust to lift off"),
+        INSUFFICIENT_FUEL("Rocket does not have enough fuel to reach orbit");
+
+        private final String failureReason;
+
+        LaunchReadiness(String failureReason) {
+            this.failureReason = failureReason;
+        }
+
+        public String failureReason() {
+            return failureReason;
+        }
     }
 
     static BlockPos calculateImpactPosition(BlockPos launchPosition, RandomGenerator random) {

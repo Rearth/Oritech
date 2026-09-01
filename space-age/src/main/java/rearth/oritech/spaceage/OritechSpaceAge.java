@@ -16,6 +16,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeCreativeTabs;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
+import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 
@@ -37,6 +38,7 @@ public final class OritechSpaceAge {
         SpaceAgeBlocks.BLOCKS.register(modEventBus);
         SpaceAgeItems.ITEMS.register(modEventBus);
         SpaceAgeBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
+        SpaceAgeMenus.MENUS.register(modEventBus);
         SpaceAgeCreativeTabs.TABS.register(modEventBus);
     }
 

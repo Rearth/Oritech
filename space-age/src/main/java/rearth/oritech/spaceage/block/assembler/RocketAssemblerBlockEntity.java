@@ -2,7 +2,12 @@ package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -21,34 +26,42 @@ import rearth.oritech.spaceage.simulation.*;
 
 import java.util.*;
 
-public class RocketAssemblerBlockEntity extends BlockEntity {
+public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvider {
 
     public RocketAssemblerBlockEntity(BlockPos pos, BlockState state) {
         super(SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get(), pos, state);
     }
 
-    public void assemble() {
+    public boolean assemble() {
 
         OritechSpaceAge.LOGGER.debug("Starting assembling process");
 
-        if (!(level instanceof ServerLevel)) return;
+        if (!(level instanceof ServerLevel)) return false;
 
         var start = findRocketStart();
-        if (start == null) return;
+        if (start == null) return false;
 
-        var result = gatherRocketData(start);
+        var result = gatherRocketData(start, true);
 
         if (result == null) {
             OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
-            return;
+            return false;
         }
 
         var flightPlan = new RocketFlightPlan(start, new Vector2i(20, 1000));
 
         RocketSimulationController.launchRocket((ServerLevel) level, result, flightPlan);
+        return true;
     }
 
-    private ActiveRocketData gatherRocketData(BlockPos start) {
+    public ActiveRocketData createPreview() {
+        if (!(level instanceof ServerLevel)) return null;
+
+        var start = findRocketStart();
+        return start == null ? null : gatherRocketData(start, false);
+    }
+
+    private ActiveRocketData gatherRocketData(BlockPos start, boolean consumeResources) {
 
 
         var startSegment = segmentFloodFill(start);
@@ -103,10 +116,10 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         var scannedSegments = new HashMap<UUID, ScannedSegmentData>();
         for (var segment : segments.values()) {
-            scannedSegments.put(segment.id, scanSegmentContent(segment));
+            scannedSegments.put(segment.id, scanSegmentContent(segment, consumeResources));
         }
 
-        var rocketData = createRocket(start, segments, scannedSegments);
+        var rocketData = createRocket(start, segments, scannedSegments, consumeResources);
         OritechSpaceAge.LOGGER.debug("Assembled rocket with {} segments at {}", segments.size(), worldPosition);
         return rocketData;
 
@@ -160,7 +173,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
     }
 
     // searches and calculates engines, weight, fuel, energy, etc.
-    private ScannedSegmentData scanSegmentContent(RocketFloodSegment segment) {
+    private ScannedSegmentData scanSegmentContent(RocketFloodSegment segment, boolean consumeResources) {
 
         // value is the burn time of the fuel type (per ml)
         var fuelTypes = new HashMap<FluidIngredient, Float>();
@@ -204,7 +217,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                         }
                     }
 
-                    if (totalTaken > 0) {
+                    if (consumeResources && totalTaken > 0) {
                         transaction.commit();
                     }
 
@@ -235,7 +248,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
     }
 
     // removes the blocks from the world, and create the actual ActiveRocketData, along with its segment data instances
-    private ActiveRocketData createRocket(BlockPos origin, Map<UUID, RocketFloodSegment> segments, Map<UUID, ScannedSegmentData> scannedSegments) {
+    private ActiveRocketData createRocket(BlockPos origin, Map<UUID, RocketFloodSegment> segments,
+                                          Map<UUID, ScannedSegmentData> scannedSegments, boolean removeBlocks) {
 
         var staticSegments = new HashMap<UUID, StaticRocketSegment>();
         var dynamicSegments = new HashMap<UUID, DynamicRocketSegment>();
@@ -272,14 +286,26 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         var rocketData = new ActiveRocketData(staticSegments, dynamicSegments);
 
-        var blocksToRemove = new HashSet<BlockPos>();
-        for (var segment : segments.values()) {
-            segment.blocks.forEach(block -> blocksToRemove.add(block.pos));
-            segment.couplings.forEach(coupling -> blocksToRemove.add(coupling.pos));
+        if (removeBlocks) {
+            var blocksToRemove = new HashSet<BlockPos>();
+            for (var segment : segments.values()) {
+                segment.blocks.forEach(block -> blocksToRemove.add(block.pos));
+                segment.couplings.forEach(coupling -> blocksToRemove.add(coupling.pos));
+            }
+            blocksToRemove.forEach(pos -> level.removeBlock(pos, false));
         }
-        blocksToRemove.forEach(pos -> level.removeBlock(pos, false));
 
         return rocketData;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getBlockState().getBlock().getName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+        return new RocketAssemblerMenu(syncId, playerInventory, this, createPreview());
     }
 
     // ensures no couples connect to the segment itself

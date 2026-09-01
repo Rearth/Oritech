@@ -7,6 +7,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import rearth.oritech.spaceage.client.RocketRenderer;
 import rearth.oritech.spaceage.datagen.SpaceAgeDataGenerators;
+import rearth.oritech.spaceage.init.SpaceAgeMenus;
 
 @Mod(value = OritechSpaceAge.MOD_ID, dist = Dist.CLIENT)
 public final class OritechSpaceAgeClient {
@@ -17,5 +18,6 @@ public final class OritechSpaceAgeClient {
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onExtractRenderState);
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
         modEventBus.addListener(SpaceAgeDataGenerators::gatherData);
+        modEventBus.addListener(SpaceAgeMenus::registerScreens);
     }
 }

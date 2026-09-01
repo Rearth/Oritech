@@ -1,6 +1,7 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -145,7 +146,8 @@ public class BlockPreviewWidget extends UIComponent {
 
         var entries = new ArrayList<BlockPreviewRenderState.Entry>(blocks.size());
         for (var entry : blocks) {
-            entries.add(new BlockPreviewRenderState.Entry(entry.state(), entry.entity(), entry.offset()));
+            entries.add(new BlockPreviewRenderState.Entry(
+                    entry.state(), entry.entity(), entry.offset(), 1f, getOverlayCoords(entry)));
         }
         appendRenderEntries(entries);
 
@@ -167,6 +169,13 @@ public class BlockPreviewWidget extends UIComponent {
      * fitting or mouse picking.
      */
     protected void appendRenderEntries(List<BlockPreviewRenderState.Entry> entries) {
+    }
+
+    /**
+     * Allows specialized previews to brighten or tint existing blocks without adding replacement models.
+     */
+    protected int getOverlayCoords(BlockEntry entry) {
+        return OverlayTexture.NO_OVERLAY;
     }
 
     private float getScale(float availableWidth, float availableHeight) {

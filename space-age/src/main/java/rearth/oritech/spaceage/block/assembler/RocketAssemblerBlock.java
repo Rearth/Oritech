@@ -2,7 +2,7 @@ package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
+import rearth.oritech.spaceage.network.RocketNetworking;
 
 public class RocketAssemblerBlock extends Block implements EntityBlock {
 
@@ -43,9 +44,14 @@ public class RocketAssemblerBlock extends Block implements EntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 
-        if (player.level() instanceof ServerLevel serverLevel) {
-            var candidate = serverLevel.getBlockEntity(pos, SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get());
-            candidate.ifPresent(RocketAssemblerBlockEntity::assemble);
+        if (player instanceof ServerPlayer serverPlayer) {
+            var candidate = level.getBlockEntity(pos, SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get());
+            candidate.ifPresent(assembler -> {
+                serverPlayer.openMenu(assembler, pos);
+                if (serverPlayer.containerMenu instanceof RocketAssemblerMenu menu) {
+                    RocketNetworking.sendAssemblerPreview(serverPlayer, pos, menu.getRocket());
+                }
+            });
         }
 
         return InteractionResult.SUCCESS;

@@ -23,7 +23,7 @@ public class ButtonWidget extends UIComponent {
     private OritechSurface normalSurface = OritechSurface.PANEL;
     private OritechSurface hoverSurface = OritechSurface.PANEL_HOVER;
     private final OritechSurface pressedSurface = OritechSurface.PANEL_PRESSED;
-    private OritechSurface disabledSurface = OritechSurface.PANEL_DARK;
+    private OritechSurface disabledSurface = OritechSurface.PANEL_DARK_HOVER;
     private Insets surfacePadding = Insets.NONE;
     private int textColor = DEFAULT_TEXT_COLOR;
     private boolean textShadow;
@@ -47,6 +47,18 @@ public class ButtonWidget extends UIComponent {
         button.hoverSurface = OritechSurface.PANEL_DARK_HOVER;
         button.disabledSurface = OritechSurface.PANEL_DARK;
         return button;
+    }
+
+    public static ButtonWidget orangePanel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
+        var button = new ButtonWidget(x, y, width, height, label, onPress);
+        button.normalSurface = OritechSurface.PANEL_ORANGE;
+        button.hoverSurface = OritechSurface.PANEL_ORANGE_HOVER;
+        return button;
+    }
+
+    public ButtonWidget withDisabledSurface(OritechSurface surface) {
+        this.disabledSurface = surface;
+        return this;
     }
 
     public ButtonWidget withTextColor(int textColor) {

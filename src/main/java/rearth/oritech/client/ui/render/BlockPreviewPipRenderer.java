@@ -8,7 +8,6 @@ import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.BlockModelRenderState;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 
 /**
@@ -56,7 +55,7 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
             }
 
             minecraft.getBlockModelResolver().update(modelState, entry.state(), DISPLAY_CONTEXT);
-            modelState.submit(poseStack, submitNodes, RenderHelpers.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0);
+            modelState.submit(poseStack, submitNodes, RenderHelpers.FULL_BRIGHT, entry.overlayCoords(), 0);
 
             if (entry.entity() != null) {
                 var blockEntityState = minecraft.getBlockEntityRenderDispatcher()

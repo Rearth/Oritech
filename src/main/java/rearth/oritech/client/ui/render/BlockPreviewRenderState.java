@@ -2,6 +2,7 @@ package rearth.oritech.client.ui.render;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -51,9 +52,13 @@ public record BlockPreviewRenderState(
         return scissorArea != null ? scissorArea.intersection(bounds) : bounds;
     }
 
-    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale) {
+    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale, int overlayCoords) {
         public Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
-            this(state, entity, offset, 1f);
+            this(state, entity, offset, 1f, OverlayTexture.NO_OVERLAY);
+        }
+
+        public Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale) {
+            this(state, entity, offset, scale, OverlayTexture.NO_OVERLAY);
         }
     }
 }
