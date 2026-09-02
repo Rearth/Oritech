@@ -1,8 +1,14 @@
 package rearth.oritech.spaceage.client;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -13,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import org.joml.Matrix3x2f;
+import org.jspecify.annotations.Nullable;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
@@ -29,6 +37,8 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.RocketPerformance;
 import rearth.oritech.spaceage.simulation.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -45,6 +55,11 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     private Tab activeTab = Tab.ROCKET;
     private int previewRevision = -1;
     private int flightPlannerRevision = -1;
+    private int draftSourceRevision = -1;
+    private List<SpaceSimulation.FlightPlanAction> draftActions = List.of();
+    private boolean flightPlanDirty;
+    private StarMapWidget flightPlanMap;
+    private RocketPerformance flightPlanPerformance;
     private ScrollWidget flightPlanActionScroll;
     private float flightPlanActionScrollX;
 
@@ -149,9 +164,17 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             return;
         }
 
-        var deltaV = RocketSimulationController.calculatePerformance(rocket).availableDeltaVMetersPerSecond();
-        addComponent(new StarMapWidget(12, 39, 456, 145, snapshot, deltaV));
-        addFlightPlanEditor(snapshot, rocket);
+        if (draftSourceRevision != menu.getFlightPlannerRevision()) {
+            draftActions = List.copyOf(snapshot.actions());
+            draftSourceRevision = menu.getFlightPlannerRevision();
+            flightPlanDirty = false;
+        }
+
+        flightPlanPerformance = RocketSimulationController.calculatePerformance(rocket);
+        var draft = currentDraftSnapshot();
+        flightPlanMap = new StarMapWidget(12, 39, 456, 145, draft, flightPlanPerformance);
+        addComponent(flightPlanMap);
+        addFlightPlanEditor(draft, rocket);
     }
 
     private void addFlightPlanEditor(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket) {
@@ -217,13 +240,13 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     private void addAction(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket) {
         var updated = new ArrayList<>(snapshot.actions());
         updated.add(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.START_ENGINE_BURN));
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private void removeAction(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket, int index) {
         var updated = new ArrayList<>(snapshot.actions());
         updated.remove(index);
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private void moveAction(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket,
@@ -232,7 +255,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         if (target < 0 || target >= snapshot.actions().size()) return;
         var updated = new ArrayList<>(snapshot.actions());
         Collections.swap(updated, index, target);
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private void cycleActionType(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket, int index) {
@@ -249,7 +272,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             changed = changed.withTarget(rocket.getStaticSegments().keySet().iterator().next());
         }
         updated.set(index, changed);
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private void cycleActionTarget(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket, int index) {
@@ -267,13 +290,13 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         if (action.type() == SpaceSimulation.ActionType.WAIT_FOR_EVENT) {
             var events = SpaceSimulation.WaitEvent.values();
             updated.set(index, action.withValue((action.value() + 1) % events.length));
-            updateFlightPlan(rocket, updated);
+            updateFlightPlanDraft(rocket, updated);
             return;
         }
         if (targets.isEmpty()) return;
         int current = targets.indexOf(action.targetId());
         updated.set(index, action.withTarget(targets.get((current + 1) % targets.size())));
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private void adjustActionValue(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket,
@@ -291,7 +314,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         if (step == 0) return;
         long minimum = action.type() == SpaceSimulation.ActionType.WAIT_UNTIL_DISTANCE ? 0 : 1;
         updated.set(index, action.withValue(Math.max(minimum, action.value() + step * direction)));
-        updateFlightPlan(rocket, updated);
+        updateFlightPlanDraft(rocket, updated);
     }
 
     private static boolean hasNumericValue(SpaceSimulation.ActionType type) {
@@ -300,14 +323,37 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 || type == SpaceSimulation.ActionType.WAIT_UNTIL_DISTANCE;
     }
 
-    private void updateFlightPlan(ActiveRocketData rocket, List<SpaceSimulation.FlightPlanAction> actions) {
-        var current = menu.getFlightPlannerSnapshot();
-        if (current != null && current.rocketId().equals(rocket.getRocketId())) {
-            menu.setFlightPlannerSnapshot(new SpaceSimulation.FlightPlannerSnapshot(
-                    current.simulationId(), current.rocketId(), current.objects(), List.copyOf(actions)));
+    private void updateFlightPlanDraft(ActiveRocketData rocket, List<SpaceSimulation.FlightPlanAction> actions) {
+        draftActions = List.copyOf(actions);
+        flightPlanDirty = true;
+        refreshFlightPlanner(rocket);
+    }
+
+    private SpaceSimulation.FlightPlannerSnapshot currentDraftSnapshot() {
+        var source = menu.getFlightPlannerSnapshot();
+        if (source == null) throw new IllegalStateException("Flight planner snapshot is not loaded");
+        return new SpaceSimulation.FlightPlannerSnapshot(
+                source.simulationId(), source.rocketId(), source.objects(), draftActions);
+    }
+
+    private void refreshFlightPlanner(ActiveRocketData rocket) {
+        var draft = currentDraftSnapshot();
+        if (flightPlanMap != null) {
+            flightPlanMap.updateFlightPath(flightPlanPerformance, draft.actions());
         }
-        ClientPacketDistributor.sendToServer(new RocketNetworking.UpdateFlightPlanPayload(
-                menu.blockPos, rocket.getRocketId(), actions));
+        if (flightPlanActionScroll != null) {
+            flightPlanActionScrollX = flightPlanActionScroll.getScrollX();
+            removeComponent(flightPlanActionScroll);
+        }
+        addFlightPlanEditor(draft, rocket);
+    }
+
+    private void submitFlightPlanIfDirty() {
+        var rocket = menu.getRocket();
+        if (!flightPlanDirty || rocket == null) return;
+        ClientPacketDistributor.sendToServer(new RocketNetworking.SubmitFlightPlanPayload(
+                menu.blockPos, rocket.getRocketId(), draftActions));
+        flightPlanDirty = false;
     }
 
     private Component actionName(SpaceSimulation.ActionType type) {
@@ -379,11 +425,20 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     private void switchTab(Tab tab) {
         if (activeTab == tab) return;
+        if (activeTab == Tab.FLIGHT_PLAN) {
+            submitFlightPlanIfDirty();
+        }
         activeTab = tab;
         if (tab == Tab.FLIGHT_PLAN) {
             ClientPacketDistributor.sendToServer(new RocketNetworking.RequestFlightPlannerPayload(menu.blockPos));
         }
         rebuildComponents();
+    }
+
+    @Override
+    public void onClose() {
+        submitFlightPlanIfDirty();
+        super.onClose();
     }
 
     private void launch() {
@@ -466,18 +521,19 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         private final List<MapObject> objects = new ArrayList<>();
         private final List<TrajectoryLeg> trajectory = new ArrayList<>();
-        private final ItemWidget rocketMarker;
+        private final Map<Integer, float[]> horizontalRanges = new HashMap<>();
+        private ItemWidget rocketMarker;
+        private double lastCommandDays;
         private float scrollY;
         private float renderedScrollY;
         private boolean dragging;
         private MapObject hovered;
 
         private StarMapWidget(int x, int y, int width, int height,
-                              SpaceSimulation.FlightPlannerSnapshot snapshot, double availableDeltaV) {
+                              SpaceSimulation.FlightPlannerSnapshot snapshot, RocketPerformance performance) {
             super(x, y, width, height);
             this.surface = OritechSurface.PANEL_INSET;
 
-            var horizontalRanges = new HashMap<Integer, float[]>();
             for (var object : snapshot.objects()) {
                 horizontalRanges.compute(distanceBand(object.y()), (ignored, range) -> {
                     if (range == null) return new float[]{object.x(), object.x()};
@@ -489,41 +545,64 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
             for (var object : snapshot.objects()) {
                 int objectSize = object.type() == SpaceObjects.ObjectType.ASTEROID ? 14 : 22;
-                var range = horizontalRanges.get(distanceBand(object.y()));
-                float normalizedX = range[1] > range[0]
-                        ? (object.x() - range[0]) / (range[1] - range[0]) - 0.5f
-                        : 0;
-                int objectX = width / 2 - objectSize / 2
-                        + Math.round(normalizedX * (width - 68));
+                int objectX = mapX(object.x(), object.y(), objectSize);
                 int objectY = contentBottom() - distancePixels(object.y()) - objectSize / 2;
                 var widget = new BlockWidget(objectX, objectY, objectSize,
                         placeholderBlock(object.type()));
                 objects.add(new MapObject(object, widget, objectX + widget.getWidth() / 2, objectY + widget.getHeight() / 2));
             }
 
-            var earth = objects.stream().filter(object -> object.data.type() == SpaceObjects.ObjectType.EARTH)
-                    .findFirst().orElse(objects.isEmpty() ? null : objects.getFirst());
-            var current = earth;
-            double remaining = availableDeltaV;
-            for (var action : snapshot.actions()) {
-                if (action.type() != SpaceSimulation.ActionType.SET_NAVIGATION_TARGET || current == null) continue;
-                var target = objects.stream().filter(object -> object.data.id().equals(action.targetId())).findFirst().orElse(null);
-                if (target == null) continue;
-                double distance = Math.hypot(target.data.x() - current.data.x(), target.data.y() - current.data.y());
-                double cost = 500 + Math.sqrt(distance) * 2;
-                boolean reachable = remaining >= cost;
-                trajectory.add(new TrajectoryLeg(current.centerX, current.centerY, target.centerX, target.centerY, reachable));
-                if (!reachable) break;
-                remaining -= cost;
-                current = target;
-            }
-            int markerX = current == null ? width / 2 : current.centerX - 6;
-            int markerY = current == null ? contentBottom() - 18 : current.centerY - 18;
-            rocketMarker = new ItemWidget(markerX, markerY, 12, new ItemStack(Items.FIREWORK_ROCKET));
-            rocketMarker.withShowOverlay(false).withTooltipFromStack(false);
+            updateFlightPath(performance, snapshot.actions());
 
             scrollY = maxScroll();
             renderedScrollY = scrollY;
+        }
+
+        private void updateFlightPath(RocketPerformance performance,
+                                      List<SpaceSimulation.FlightPlanAction> actions) {
+            trajectory.clear();
+            var objectData = objects.stream().map(MapObject::data).toList();
+            var flightPath = RocketFlightPathCalculator.calculate(performance, objectData, actions);
+            lastCommandDays = flightPath.actionMoments().isEmpty() ? 0
+                    : flightPath.actionMoments().getLast().timeSeconds() / 1_200d;
+            var objectsById = new HashMap<UUID, MapObject>();
+            objects.forEach(object -> objectsById.put(object.data.id(), object));
+            var earth = objectsById.get(SpaceObjects.EARTH_ID);
+            RocketFlightPathCalculator.PathSample previous = null;
+            UUID projectedTarget = null;
+            PathProjection projection = null;
+            float previousX = earth == null ? width / 2f : earth.centerX;
+            float previousY = 0;
+            float finalScreenX = previousX;
+            for (var sample : flightPath.samples()) {
+                if (projection == null || !sample.targetId().equals(projectedTarget)) {
+                    var target = objectsById.get(sample.targetId());
+                    projection = new PathProjection(sample.x(), sample.y(), previousX,
+                            target == null ? sample.x() : target.data.x(),
+                            target == null ? sample.y() + 1 : target.data.y(),
+                            target == null ? previousX : target.centerX);
+                    projectedTarget = sample.targetId();
+                }
+
+                float sampleX = projection.screenX(sample.x(), sample.y());
+                float sampleY = (float) (contentBottom() - distancePixelsExact(sample.y()));
+                if (previous != null && (Math.abs(sampleX - previousX) > 0.01f
+                        || Math.abs(sampleY - previousY) > 0.01f)) {
+                    trajectory.add(new TrajectoryLeg(previousX, previousY, sampleX, sampleY,
+                            previous.phase(), previous.projected()));
+                }
+                previous = sample;
+                previousX = sampleX;
+                previousY = sampleY;
+                finalScreenX = sampleX;
+            }
+            var finalSample = flightPath.samples().isEmpty() ? null : flightPath.samples().getLast();
+            int markerX = finalSample == null ? width / 2 - 6
+                    : Math.round(finalScreenX - 6);
+            int markerY = finalSample == null ? contentBottom() - 18
+                    : contentBottom() - distancePixels(finalSample.y()) - 18;
+            rocketMarker = new ItemWidget(markerX, markerY, 12, new ItemStack(Items.FIREWORK_ROCKET));
+            rocketMarker.withShowOverlay(false).withTooltipFromStack(false);
         }
 
         private int maxScroll() {
@@ -535,13 +614,17 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
 
         private static int distancePixels(double distance) {
+            return (int) Math.round(distancePixelsExact(distance));
+        }
+
+        private static double distancePixelsExact(double distance) {
             double remaining = Math.max(0, distance);
             double previousLimit = 0;
-            int pixels = 0;
+            double pixels = 0;
             for (var band : DISTANCE_BANDS) {
                 double bandDistance = band.maxDistance - previousLimit;
                 if (remaining <= bandDistance) {
-                    return pixels + (int) Math.round(remaining / bandDistance * band.pixels);
+                    return pixels + remaining / bandDistance * band.pixels;
                 }
                 remaining -= bandDistance;
                 previousLimit = band.maxDistance;
@@ -555,6 +638,27 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 if (distance <= DISTANCE_BANDS[index].maxDistance) return index;
             }
             return DISTANCE_BANDS.length;
+        }
+
+        private int mapX(double spaceX, double distance, int objectWidth) {
+            int band = distanceBand(distance);
+            double normalizedX = normalizedX(spaceX, band);
+            return width / 2 - objectWidth / 2 + (int) Math.round(normalizedX * (width - 68));
+        }
+
+        private double normalizedX(double spaceX, int band) {
+            var range = horizontalRanges.get(band);
+            double maxHorizontalDistance = range == null ? 0
+                    : Math.max(Math.abs(range[0]), Math.abs(range[1]));
+            if (maxHorizontalDistance < 0.001) {
+                maxHorizontalDistance = band < DISTANCE_BANDS.length
+                        ? DISTANCE_BANDS[band].maxDistance
+                        : DISTANCE_BANDS[DISTANCE_BANDS.length - 1].maxDistance;
+            }
+
+            // Every band shares the same physical zero axis. Only its scale changes,
+            // so a vertical trajectory can never move sideways as it crosses bands.
+            return Math.clamp(spaceX / (maxHorizontalDistance * 2), -0.5, 0.5);
         }
 
         private static BlockState placeholderBlock(SpaceObjects.ObjectType type) {
@@ -590,14 +694,21 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 graphics.text(font, Component.translatable("screen.oritech_space_age.orbit." + marker.translation),
                         8, markerY - 10, 0xFF71879A, false);
             }
-            for (var leg : trajectory) {
-                drawLine(graphics, leg.fromX, leg.fromY, leg.toX, leg.toY,
-                        leg.reachable ? 0xFFFF8A20 : 0xFF5A6068);
+            if (!trajectory.isEmpty()) {
+                var pathPose = new Matrix3x2f(graphics.pose());
+                var scissor = graphics.peekScissorStack();
+                var pathBounds = new ScreenRectangle(0, 0, viewportWidth, CONTENT_HEIGHT).transformMaxBounds(pathPose);
+                var clippedBounds = scissor == null ? pathBounds : scissor.intersection(pathBounds);
+                graphics.submitGuiElementRenderState(new FlightPathRenderState(
+                        List.copyOf(trajectory), pathPose, scissor, clippedBounds));
             }
             hovered = null;
+            boolean overStatsPanel = mouseX >= x + 9 && mouseX < x + 151
+                    && mouseY >= y + 27 && mouseY < y + 58;
             for (var object : objects) {
                 object.widget.render(graphics, (int) localMouseX, (int) localMouseY, delta);
-                if (isMouseOver(mouseX, mouseY) && object.widget.isMouseOver(localMouseX, localMouseY)) hovered = object;
+                if (!overStatsPanel && isMouseOver(mouseX, mouseY)
+                        && object.widget.isMouseOver(localMouseX, localMouseY)) hovered = object;
             }
             rocketMarker.render(graphics, (int) localMouseX, (int) localMouseY, delta);
             pose.popMatrix();
@@ -606,6 +717,22 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             graphics.fill(x + 6, y + 6, x + width - 7, y + 21, 0xD8080D18);
             graphics.text(font, Component.translatable("screen.oritech_space_age.star_system"),
                     x + 10, y + 9, 0xFFCAD8E5, true);
+            graphics.fill(x + width - 180, y + 12, x + width - 174, y + 14, 0xFFFF8A20);
+            graphics.text(font, Component.translatable("screen.oritech_space_age.path.burn"),
+                    x + width - 170, y + 9, 0xFFCAD8E5, false);
+            graphics.fill(x + width - 126, y + 12, x + width - 120, y + 14, 0xFF66B9D5);
+            graphics.text(font, Component.translatable("screen.oritech_space_age.path.coast"),
+                    x + width - 116, y + 9, 0xFFCAD8E5, false);
+            graphics.fill(x + width - 68, y + 12, x + width - 62, y + 14, 0xFFB68CFF);
+            graphics.text(font, Component.translatable("screen.oritech_space_age.path.projected"),
+                    x + width - 58, y + 9, 0xFFCAD8E5, false);
+            OritechSurface.PANEL_DARK.render(graphics, x + 9, y + 27, 142, 31);
+            graphics.text(font, Component.translatable("screen.oritech_space_age.flight_stats")
+                            .withStyle(ChatFormatting.BOLD),
+                    x + 16, y + 33, 0xFFF2F6FA, false);
+            graphics.text(font, Component.translatable("screen.oritech_space_age.last_command_days",
+                            String.format(Locale.ROOT, "%.2f", lastCommandDays)),
+                    x + 16, y + 45, 0xFFCAD8E5, false);
             renderScrollbar(graphics, viewportX + viewportWidth - 2, viewportY, viewportHeight);
         }
 
@@ -619,15 +746,6 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         private static void drawDashedLine(GuiGraphicsExtractor graphics, int fromX, int y, int toX, int color) {
             for (int lineX = fromX; lineX < toX; lineX += 8) {
                 graphics.fill(lineX, y, Math.min(lineX + 4, toX), y + 1, color);
-            }
-        }
-
-        private static void drawLine(GuiGraphicsExtractor graphics, int fromX, int fromY, int toX, int toY, int color) {
-            int steps = Math.max(Math.abs(toX - fromX), Math.abs(toY - fromY));
-            for (int i = 0; i <= steps; i++) {
-                int px = fromX + (toX - fromX) * i / Math.max(1, steps);
-                int py = fromY + (toY - fromY) * i / Math.max(1, steps);
-                graphics.fill(px, py, px + 2, py + 2, color);
             }
         }
 
@@ -678,7 +796,109 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                                  int centerX, int centerY) {
         }
 
-        private record TrajectoryLeg(int fromX, int fromY, int toX, int toY, boolean reachable) {
+        private record PathProjection(double startX, double startY, float startScreenX,
+                                      double targetX, double targetY, float targetScreenX) {
+
+            private float screenX(double x, double y) {
+                double directionX = targetX - startX;
+                double directionY = targetY - startY;
+                double lengthSquared = directionX * directionX + directionY * directionY;
+                if (lengthSquared < 0.001) return targetScreenX;
+
+                double progress = ((x - startX) * directionX + (y - startY) * directionY) / lengthSquared;
+                return (float) (startScreenX + (targetScreenX - startScreenX) * progress);
+            }
+        }
+
+        private record TrajectoryLeg(float fromX, float fromY, float toX, float toY,
+                                     RocketFlightPathCalculator.PathPhase phase, boolean projected) {
+        }
+
+        private record FlightPathRenderState(List<TrajectoryLeg> legs, Matrix3x2f pose,
+                                             @Nullable ScreenRectangle scissorArea,
+                                             @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+
+            private static final float HALF_WIDTH = 0.65f;
+            private static final float DASH_LENGTH = 4f;
+            private static final float DASH_GAP = 2.5f;
+
+            @Override
+            public void buildVertices(VertexConsumer vertices) {
+                float dashOffset = 0;
+                boolean continuingProjection = false;
+                for (var leg : legs) {
+                    float dx = leg.toX - leg.fromX;
+                    float dy = leg.toY - leg.fromY;
+                    float length = (float) Math.sqrt(dx * dx + dy * dy);
+                    if (length < 0.001f) continue;
+
+                    int color = switch (leg.phase) {
+                        case PLANNED_BURN -> 0xFFFF8A20;
+                        case PLANNED_COAST -> 0xFF66B9D5;
+                        case PROJECTED_BURN -> 0xFFB68CFF;
+                    };
+                    if (leg.projected) {
+                        if (!continuingProjection) dashOffset = 0;
+                        dashOffset = addDashedLine(vertices, leg, length, color, dashOffset);
+                        continuingProjection = true;
+                    } else {
+                        addLine(vertices, leg.fromX, leg.fromY, leg.toX, leg.toY, color);
+                        continuingProjection = false;
+                    }
+                }
+            }
+
+            private float addDashedLine(VertexConsumer vertices, TrajectoryLeg leg, float length,
+                                        int color, float dashOffset) {
+                float cycleLength = DASH_LENGTH + DASH_GAP;
+                float distance = 0;
+                while (distance < length) {
+                    float cyclePosition = (dashOffset + distance) % cycleLength;
+                    boolean drawing = cyclePosition < DASH_LENGTH;
+                    float sectionLength = (drawing ? DASH_LENGTH : cycleLength) - cyclePosition;
+                    float sectionEnd = Math.min(length, distance + sectionLength);
+                    if (drawing) {
+                        float startProgress = distance / length;
+                        float endProgress = sectionEnd / length;
+                        addLine(vertices,
+                                lerp(leg.fromX, leg.toX, startProgress),
+                                lerp(leg.fromY, leg.toY, startProgress),
+                                lerp(leg.fromX, leg.toX, endProgress),
+                                lerp(leg.fromY, leg.toY, endProgress), color);
+                    }
+                    distance = sectionEnd;
+                }
+                return (dashOffset + length) % cycleLength;
+            }
+
+            private static float lerp(float start, float end, float progress) {
+                return start + (end - start) * progress;
+            }
+
+            private void addLine(VertexConsumer vertices, float fromX, float fromY,
+                                 float toX, float toY, int color) {
+                float dx = toX - fromX;
+                float dy = toY - fromY;
+                float length = (float) Math.sqrt(dx * dx + dy * dy);
+                if (length < 0.001f) return;
+
+                float normalX = -dy / length * HALF_WIDTH;
+                float normalY = dx / length * HALF_WIDTH;
+                vertices.addVertexWith2DPose(pose, fromX - normalX, fromY - normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, fromX + normalX, fromY + normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, toX + normalX, toY + normalY).setColor(color);
+                vertices.addVertexWith2DPose(pose, toX - normalX, toY - normalY).setColor(color);
+            }
+
+            @Override
+            public RenderPipeline pipeline() {
+                return RenderPipelines.GUI;
+            }
+
+            @Override
+            public TextureSetup textureSetup() {
+                return TextureSetup.noTexture();
+            }
         }
 
         private record DistanceBand(double maxDistance, int pixels) {

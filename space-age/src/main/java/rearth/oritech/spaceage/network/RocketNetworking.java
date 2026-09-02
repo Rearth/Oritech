@@ -48,8 +48,8 @@ public final class RocketNetworking {
                 RocketNetworking::launchRocket);
         registrar.playToServer(RequestFlightPlannerPayload.TYPE, NetworkManager.getAutoCodec(RequestFlightPlannerPayload.class),
                 RocketNetworking::requestFlightPlanner);
-        registrar.playToServer(UpdateFlightPlanPayload.TYPE, NetworkManager.getAutoCodec(UpdateFlightPlanPayload.class),
-                RocketNetworking::updateFlightPlan);
+        registrar.playToServer(SubmitFlightPlanPayload.TYPE, NetworkManager.getAutoCodec(SubmitFlightPlanPayload.class),
+                RocketNetworking::submitFlightPlan);
         registrar.playToClient(FlightPlannerPayload.TYPE, NetworkManager.getAutoCodec(FlightPlannerPayload.class),
                 RocketNetworking::receiveFlightPlanner);
     }
@@ -123,7 +123,7 @@ public final class RocketNetworking {
         sendFlightPlanner(player, menu);
     }
 
-    private static void updateFlightPlan(UpdateFlightPlanPayload payload, IPayloadContext context) {
+    private static void submitFlightPlan(SubmitFlightPlanPayload payload, IPayloadContext context) {
         if (!validAssemblerMenu(context, payload.position())) return;
         var player = (ServerPlayer) context.player();
         var menu = (RocketAssemblerMenu) player.containerMenu;
@@ -132,7 +132,6 @@ public final class RocketNetworking {
 
         var simulation = RocketSimulationController.getForPlayer(player);
         simulation.updateFlightPlan(menu.blockPos, payload.actions(), rocket.getStaticSegments().keySet());
-        sendFlightPlanner(player, menu);
     }
 
     private static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
@@ -248,9 +247,9 @@ public final class RocketNetworking {
         }
     }
 
-    public record UpdateFlightPlanPayload(BlockPos position, UUID rocketId,
+    public record SubmitFlightPlanPayload(BlockPos position, UUID rocketId,
                                           List<SpaceSimulation.FlightPlanAction> actions) implements CustomPacketPayload {
-        public static final Type<UpdateFlightPlanPayload> TYPE = new Type<>(OritechSpaceAge.id("update_flight_plan"));
+        public static final Type<SubmitFlightPlanPayload> TYPE = new Type<>(OritechSpaceAge.id("submit_flight_plan"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

@@ -220,7 +220,9 @@ public class SpaceSimulation {
     }
 
     public enum WaitEvent {
-        ORBIT_REACHED,
+        LOW_ORBIT_REACHED,
+        MEDIUM_ORBIT_REACHED,
+        HIGH_ORBIT_REACHED,
         ATMOSPHERE_EXITED,
         TARGET_REACHED,
         FUEL_EMPTY
