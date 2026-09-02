@@ -1,7 +1,6 @@
 package rearth.oritech.init;
 
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
@@ -19,7 +18,6 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import java.util.List;
 
 @SuppressWarnings("NullableProblems")
 public class ItemContent {
@@ -108,7 +106,7 @@ public class ItemContent {
     public static final DeferredItem<Item> ION_THRUSTER = ITEMS.registerSimpleItem("ion_thruster");
     public static final DeferredItem<Item> ADVANCED_COMPUTING_ENGINE = ITEMS.registerSimpleItem("advanced_computing_engine");
     public static final DeferredItem<Item> SILICON_WAFER = ITEMS.registerSimpleItem("silicon_wafer");
-    public static final DeferredItem<Item> DUBIOUS_CONTAINER = ITEMS.registerItem("dubious_container", props -> new MobCaptureItem(props.stacksTo(16), List.of(EntityType.VEX, EntityType.ALLAY, EntityType.PHANTOM)));
+    public static final DeferredItem<Item> DUBIOUS_CONTAINER = ITEMS.registerItem("dubious_container", MobCaptureItem::new, props -> props.stacksTo(16));
     public static final DeferredItem<Item> ENDERIC_LENS = ITEMS.registerSimpleItem("enderic_lens");
     public static final DeferredItem<Item> FLUX_GATE = ITEMS.registerSimpleItem("flux_gate");
     public static final DeferredItem<Item> ADVANCED_BATTERY = ITEMS.registerSimpleItem("advanced_battery");
