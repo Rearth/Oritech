@@ -41,14 +41,25 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         var start = findRocketStart();
         if (start == null) return false;
 
-        var result = gatherRocketData(start, true);
+        // Launch readiness must be checked before fluids are committed and blocks are removed. The second scan is
+        // intentional: previews are side-effect free, while only a launch that passed validation may consume data.
+        var preview = gatherRocketData(start, false);
+        if (preview == null) return false;
+        var readiness = RocketPerformanceCalculator.getLaunchReadiness(preview);
+        if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {
+            OritechSpaceAge.LOGGER.warn("Rocket launch at {} failed: {}", worldPosition, readiness.failureReason());
+            return false;
+        }
 
+        var result = gatherRocketData(start, true);
         if (result == null) {
             OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
             return false;
         }
 
-        var flightPlan = new RocketFlightPlan(start, new Vector2i(20, 1000));
+        // Actual flight still uses the legacy orbit controller. The programmable plan currently remains a preview
+        // and is only stored by the player's space simulation.
+        var flightPlan = new RocketLaunchProfile(start, new Vector2i(20, 1000));
 
         RocketSimulationController.launchRocket((ServerLevel) level, result, flightPlan);
         return true;

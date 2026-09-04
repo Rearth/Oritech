@@ -29,16 +29,12 @@ import java.util.random.RandomGenerator;
 public final class RocketSimulationController {
 
     // config
-    public static final int TICKS_PER_SECOND = 20;
-    public static final int ORBIT_HEIGHT_BLOCKS = 1_000;
+    public static final int TICKS_PER_SECOND = RocketPerformanceCalculator.TICKS_PER_SECOND;
+    public static final int ORBIT_HEIGHT_BLOCKS = RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS;
     public static final int ORBIT_WAIT_TICKS = 10 * TICKS_PER_SECOND;
 
     // physics settings
-    private static final double STANDARD_GRAVITY = 9.80665;
-    private static final double KILOGRAMS_PER_WEIGHT_UNIT = 1_000;
-    private static final double ENGINE_THRUST_NEWTONS = 250_000;
-    private static final double ENGINE_SPECIFIC_IMPULSE_SECONDS = 300;
-    private static final long RF_PER_ENGINE_TICK = 1_000;
+    private static final double STANDARD_GRAVITY = RocketPerformanceCalculator.STANDARD_GRAVITY;
     private static final double MINIMUM_IMPACT_RADIUS = 125;
     private static final double MAXIMUM_IMPACT_RADIUS = 175;
     private static final float TAKEOFF_EXPLOSION_STRENGTH = 6;
@@ -57,27 +53,29 @@ public final class RocketSimulationController {
     }
 
     // calculates the flight and adds the rocket to the saved active rockets
-    public static void launchRocket(ServerLevel level, ActiveRocketData rocket, RocketFlightPlan flightPlan) {
+    public static void launchRocket(ServerLevel level, ActiveRocketData rocket, RocketLaunchProfile flightPlan) {
         OritechSpaceAge.LOGGER.debug("Planning rocket launch {} from {} in {} with {} segments", rocket.getRocketId(), flightPlan.worldStart(), level.dimension().identifier(), rocket.getStaticSegments().size());
 
         var savedData = getSavedData(level);
         var flight = calculateFlight(rocket, flightPlan, ThreadLocalRandom.current(), level.dimension());
         OritechSpaceAge.LOGGER.debug("Rocket {} performance: wetMass={}kg, engines={}, thrust={}N, acceleration={}m/s², availableDeltaV={}m/s", rocket.getRocketId(), flight.performance().wetMassKilograms(), flight.performance().engineCount(), flight.performance().thrustNewtons(), flight.performance().liftoffAccelerationMetersPerSecondSquared(), flight.performance().availableDeltaVMetersPerSecond());
 
-        if (flight.canReachOrbit()) {
-            flight = handleImpactCollisions(level, flight);
-            flight = handleTakeoffCollisions(level, rocket, flight);
-            flight = flight.scheduledAt(level.getGameTime());
-            OritechSpaceAge.LOGGER.debug("Rocket {} launched: orbitTick={}, reentryTick={}, impactTick={}, impactPos={}, impactSpeed={}m/s, ascentCollision={}", rocket.getRocketId(), flight.orbitArrivalTick(), flight.reentryTick(), flight.impactTick(), flight.impactPosition(), flight.impactSpeedMetersPerSecond(), flight.takeoffCollisionPosition());
-        } else {
+        if (!flight.canReachOrbit()) {
             OritechSpaceAge.LOGGER.debug("Rocket {} launch failed: {}", rocket.getRocketId(), flight.failureReason());
+            // Failed launches have no future event that could remove them again, so they must not enter saved data.
+            return;
         }
+
+        flight = handleImpactCollisions(level, flight);
+        flight = handleTakeoffCollisions(level, rocket, flight);
+        flight = flight.scheduledAt(level.getGameTime());
+        OritechSpaceAge.LOGGER.debug("Rocket {} launched: orbitTick={}, reentryTick={}, impactTick={}, impactPos={}, impactSpeed={}m/s, ascentCollision={}", rocket.getRocketId(), flight.orbitArrivalTick(), flight.reentryTick(), flight.impactTick(), flight.impactPosition(), flight.impactSpeedMetersPerSecond(), flight.takeoffCollisionPosition());
 
         rocket.setFlight(flight);
         ACTIVE_ROCKETS.put(rocket.getRocketId(), rocket);
         savedData.setDirty();
 
-        if (flight.canReachOrbit()) sendTakeoffDataToClients(level, rocket);
+        sendTakeoffDataToClients(level, rocket);
     }
 
     public static Map<UUID, ActiveRocketData> getActiveRockets(ServerLevel level) {
@@ -152,19 +150,19 @@ public final class RocketSimulationController {
         return server.overworld().getDataStorage().computeIfAbsent(ActiveRocketSavedData.TYPE);
     }
 
-    static RocketFlight calculateFlight(ActiveRocketData rocket, RocketFlightPlan flightPlan, RandomGenerator random) {
+    static RocketFlight calculateFlight(ActiveRocketData rocket, RocketLaunchProfile flightPlan, RandomGenerator random) {
         return calculateFlight(rocket, flightPlan, random, Level.OVERWORLD);
     }
 
-    private static RocketFlight calculateFlight(ActiveRocketData rocket, RocketFlightPlan flightPlan, RandomGenerator random, ResourceKey<Level> dimension) {
-        var performance = calculatePerformance(rocket);
+    private static RocketFlight calculateFlight(ActiveRocketData rocket, RocketLaunchProfile flightPlan, RandomGenerator random, ResourceKey<Level> dimension) {
+        var performance = RocketPerformanceCalculator.calculate(rocket);
         var launchPosition = flightPlan.worldStart();
         var orbitPosition = launchPosition.offset(0, ORBIT_HEIGHT_BLOCKS, 0);
         var impactPosition = calculateImpactPosition(launchPosition, random);
         var targetOrbit = new Vector2i(flightPlan.targetOrbit());
-        var readiness = getLaunchReadiness(performance);
+        var readiness = RocketPerformanceCalculator.getLaunchReadiness(performance);
 
-        if (readiness != LaunchReadiness.READY) {
+        if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {
             return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition,
                     targetOrbit, readiness.failureReason());
         }
@@ -181,79 +179,6 @@ public final class RocketSimulationController {
         var impactTick = reentryTick + secondsToTicks(descentSeconds);
 
         return new RocketFlight(true, null, dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, requiredDeltaV, impactSpeed, ascentTicks, reentryTick, impactTick, null, -1);
-    }
-
-    // calculates the ideal performance of all currently connected segments (including dynamic ones)
-    public static RocketPerformance calculatePerformance(ActiveRocketData rocket) {
-        long dryWeight = 0;
-        long fuelWeight = 0;
-        long fuelBurnTicks = 0;
-        long availableRF = 0;
-        int engineCount = 0;
-
-        for (var entry : rocket.getStaticSegments().entrySet()) {
-            var dynamicSegment = rocket.getDynamicSegments().get(entry.getKey());
-            var staticSegment = entry.getValue();
-            dryWeight += Math.max(0, staticSegment.staticWeight());
-            fuelWeight += Math.max(0, dynamicSegment.currentFuelWeight);
-            fuelBurnTicks += Math.max(0, dynamicSegment.availableFuelBurnTimeTicks);
-            availableRF += Math.max(0, dynamicSegment.availableRF);
-            engineCount += Math.max(0, staticSegment.engineCount());
-        }
-
-        var dryMass = dryWeight * KILOGRAMS_PER_WEIGHT_UNIT;
-        var fuelMass = fuelWeight * KILOGRAMS_PER_WEIGHT_UNIT;
-        var wetMass = dryMass + fuelMass;
-        var thrust = engineCount * ENGINE_THRUST_NEWTONS;
-
-        var fuelBurnSeconds = engineCount == 0 ? 0 : fuelBurnTicks / (double) engineCount / TICKS_PER_SECOND;
-        var electricBurnSeconds = engineCount == 0 ? 0 : availableRF / (double) RF_PER_ENGINE_TICK / engineCount / TICKS_PER_SECOND;
-
-        var chemicalDeltaV = dryMass > 0 && fuelMass > 0 && fuelBurnSeconds > 0 ? ENGINE_SPECIFIC_IMPULSE_SECONDS * STANDARD_GRAVITY * Math.log(wetMass / dryMass) : 0;
-        // RF has no fuel mass, so it uses a constant-mass electric burn
-        var electricDeltaV = dryMass > 0 ? thrust / dryMass * electricBurnSeconds : 0;
-        var liftoffAcceleration = wetMass > 0 ? thrust / wetMass : 0;
-
-        return new RocketPerformance(dryMass, fuelMass, wetMass, engineCount, thrust, fuelBurnSeconds + electricBurnSeconds, chemicalDeltaV + electricDeltaV, liftoffAcceleration);
-    }
-
-    public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket) {
-        return getLaunchReadiness(calculatePerformance(rocket));
-    }
-
-    private static LaunchReadiness getLaunchReadiness(RocketPerformance performance) {
-        if (performance.engineCount() == 0) return LaunchReadiness.NO_ENGINES;
-        if (performance.wetMassKilograms() <= 0) return LaunchReadiness.NO_MASS;
-        if (performance.liftoffAccelerationMetersPerSecondSquared() <= STANDARD_GRAVITY) {
-            return LaunchReadiness.INSUFFICIENT_THRUST;
-        }
-
-        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
-        var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / netAcceleration);
-        var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
-        if (performance.availableBurnSeconds() < ascentSeconds
-                || performance.availableDeltaVMetersPerSecond() < requiredDeltaV) {
-            return LaunchReadiness.INSUFFICIENT_FUEL;
-        }
-        return LaunchReadiness.READY;
-    }
-
-    public enum LaunchReadiness {
-        READY(null),
-        NO_ENGINES("Rocket has no engines"),
-        NO_MASS("Rocket has no measurable mass"),
-        INSUFFICIENT_THRUST("Rocket does not have enough thrust to lift off"),
-        INSUFFICIENT_FUEL("Rocket does not have enough fuel to reach orbit");
-
-        private final String failureReason;
-
-        LaunchReadiness(String failureReason) {
-            this.failureReason = failureReason;
-        }
-
-        public String failureReason() {
-            return failureReason;
-        }
     }
 
     static BlockPos calculateImpactPosition(BlockPos launchPosition, RandomGenerator random) {

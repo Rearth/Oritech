@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.network;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -17,7 +18,6 @@ import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
-import java.util.List;
 import java.util.UUID;
 
 public final class RocketNetworking {
@@ -29,7 +29,10 @@ public final class RocketNetworking {
     public static void register(PayloadRegistrar registrar) {
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.SegmentRef.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanAction.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanBranch.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlannerSnapshot.class);
 
         registrar.playToClient(SyncRocketPayload.TYPE, NetworkManager.getAutoCodec(SyncRocketPayload.class),
@@ -130,15 +133,16 @@ public final class RocketNetworking {
         var rocket = menu.getRocket();
         if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
 
+        // Only complete drafts cross the network. SpaceSimulation sanitizes the client-authored plan before storing it.
         var simulation = RocketSimulationController.getForPlayer(player);
-        simulation.updateFlightPlan(menu.blockPos, payload.actions(), rocket.getStaticSegments().keySet());
+        simulation.updateFlightPlan(GlobalPos.of(player.level().dimension(), menu.blockPos), payload.plan(), rocket);
     }
 
     private static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
         var rocket = menu.getRocket();
         if (rocket == null) return;
         var snapshot = RocketSimulationController.getForPlayer(player)
-                .createFlightPlannerSnapshot(menu.blockPos, rocket.getRocketId());
+                .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), menu.blockPos), rocket.getRocketId());
         PacketDistributor.sendToPlayer(player, new FlightPlannerPayload(menu.blockPos, snapshot));
     }
 
@@ -248,7 +252,7 @@ public final class RocketNetworking {
     }
 
     public record SubmitFlightPlanPayload(BlockPos position, UUID rocketId,
-                                          List<SpaceSimulation.FlightPlanAction> actions) implements CustomPacketPayload {
+                                          SpaceSimulation.FlightPlan plan) implements CustomPacketPayload {
         public static final Type<SubmitFlightPlanPayload> TYPE = new Type<>(OritechSpaceAge.id("submit_flight_plan"));
 
         @Override
