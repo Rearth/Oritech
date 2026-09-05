@@ -17,7 +17,6 @@ import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
-import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
@@ -73,15 +72,15 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
         addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
 
-        var rocketTab = ButtonWidget.panel(9, 9, 92, 20,
+        var rocketTab = SpaceAgeButtons.panel(9, 9, 92, 20,
                 Component.translatable("screen.oritech_space_age.rocket"), ignored -> {});
-        rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED);
+        rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         rocketTab.setActive(false);
         addComponent(rocketTab);
 
-        var flightPlanTab = ButtonWidget.panel(101, 9, 92, 20,
+        var flightPlanTab = SpaceAgeButtons.panel(101, 9, 92, 20,
                 Component.translatable("screen.oritech_space_age.flight_plan"), ignored -> openFlightPlanner());
-        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED);
+        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         addComponent(flightPlanTab);
 
         buildRocketPanel();
@@ -136,16 +135,15 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         var readiness = RocketPerformanceCalculator.getLaunchReadiness(rocket);
         if (readiness == RocketPerformanceCalculator.LaunchReadiness.READY) {
-            var launchButton = ButtonWidget.orangePanel(statsX + 16, contentTop + contentHeight - 55,
+            var launchButton = SpaceAgeButtons.orangePanel(statsX + 16, contentTop + contentHeight - 55,
                     statsWidth - 32, 40,
-                    Component.translatable("screen.oritech_space_age.launch").withStyle(ChatFormatting.BOLD, ChatFormatting.WHITE),
+                    Component.translatable("screen.oritech_space_age.launch").withStyle(ChatFormatting.BOLD),
                     ignored -> launch());
-            launchButton.withTextShadow(true);
             addComponent(launchButton);
         } else {
             int warningX = statsX + 11;
             int warningY = contentTop + contentHeight - 74;
-            var warningPanel = ButtonWidget.panel(warningX, warningY, statsWidth - 22, 61,
+            var warningPanel = SpaceAgeButtons.panel(warningX, warningY, statsWidth - 22, 61,
                     Component.empty(), ignored -> {});
             warningPanel.setActive(false);
             addComponent(warningPanel);
@@ -190,7 +188,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 this::closeSegmentConfiguration));
         addPopupComponent(new LabelWidget(popupX + 10, popupY + 9, popupWidth - 20, 14,
                 Component.translatable("screen.oritech_space_age.segment_configuration").withStyle(ChatFormatting.BOLD)));
-        addPopupComponent(ButtonWidget.darkPanel(popupX + popupWidth - 27, popupY + 7, 18, 16,
+        addPopupComponent(SpaceAgeButtons.darkPanel(popupX + popupWidth - 27, popupY + 7, 18, 16,
                 Component.literal("×"), ignored -> closeSegmentConfiguration()));
 
         segmentNameField = addRenderableWidget(new EditBox(font, leftPos + popupX + 56, topPos + popupY + 27,
@@ -205,20 +203,20 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 Component.translatable("screen.oritech_space_age.name")));
 
         int presetY = popupY + 51;
-        addPopupComponent(ButtonWidget.darkPanel(popupX + 10, presetY, 64, 18,
+        addPopupComponent(SpaceAgeButtons.darkPanel(popupX + 10, presetY, 64, 18,
                 Component.translatable("screen.oritech_space_age.segment_preset.core"), ignored -> setSegmentNamePreset("Core")));
-        addPopupComponent(ButtonWidget.darkPanel(popupX + 78, presetY, 76, 18,
+        addPopupComponent(SpaceAgeButtons.darkPanel(popupX + 78, presetY, 76, 18,
                 Component.translatable("screen.oritech_space_age.segment_preset.booster"), ignored -> setSegmentNamePreset("Booster")));
-        addPopupComponent(ButtonWidget.darkPanel(popupX + 158, presetY, 70, 18,
+        addPopupComponent(SpaceAgeButtons.darkPanel(popupX + 158, presetY, 70, 18,
                 Component.translatable("screen.oritech_space_age.segment_preset.payload"), ignored -> setSegmentNamePreset("Payload")));
 
-        addPopupComponent(ButtonWidget.panel(popupX + 10, popupY + 75, 106, 20,
+        addPopupComponent(SpaceAgeButtons.panel(popupX + 10, popupY + 75, 106, 20,
                 checkboxLabel("screen.oritech_space_age.booster", configuration.booster()),
                 ignored -> {
                     var current = currentPlan().configurationFor(ref);
                     updateSegmentConfiguration(current.withBooster(!current.booster()), true);
                 }));
-        addPopupComponent(ButtonWidget.panel(popupX + 122, popupY + 75, popupWidth - 132, 20,
+        addPopupComponent(SpaceAgeButtons.panel(popupX + 122, popupY + 75, popupWidth - 132, 20,
                 Component.translatable(segmentStagesExpanded
                         ? "screen.oritech_space_age.engine_stages.collapse"
                         : "screen.oritech_space_age.engine_stages.expand"), ignored -> {
@@ -234,7 +232,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 int currentStage = stage;
                 int stageX = popupX + 10 + ((stage - 1) % 5) * 61;
                 int stageY = popupY + 117 + ((stage - 1) / 5) * 23;
-                var stageButton = ButtonWidget.darkPanel(stageX, stageY, 56, 18,
+                var stageButton = SpaceAgeButtons.darkPanel(stageX, stageY, 56, 18,
                         checkboxLabel("screen.oritech_space_age.stage_short", configuration.usesEnginesDuring(stage), stage),
                         ignored -> toggleEngineStage(ref, currentStage));
                 stageButton.setActive(hasEngines);

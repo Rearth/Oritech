@@ -21,8 +21,9 @@ public final class RocketFlightPathCalculator {
     private static final double MINECRAFT_DAY_SECONDS = 1_200;
     private static final double MAX_NAVIGATION_SECONDS = 1_000 * MINECRAFT_DAY_SECONDS;
     private static final double MIN_STEP_SECONDS = 0.05;
-    private static final double POSITION_TOLERANCE = 200;
-    private static final double VELOCITY_TOLERANCE = 2;
+    private static final double BURN_TOLERANCE = 1e-9;
+    private static final double POSITION_TOLERANCE = 0.01;
+    private static final double VELOCITY_TOLERANCE = 0.00001;
 
     private RocketFlightPathCalculator() {
     }
@@ -129,16 +130,14 @@ public final class RocketFlightPathCalculator {
         double approachX = destination.x - state.x;
         double approachY = destination.y - state.y;
         double approachLength = Math.hypot(approachX, approachY);
-        if (approachLength < 1) return true;
-        approachX /= approachLength;
-        approachY /= approachLength;
+        approachX = approachLength < 1 ? 1 : approachX / approachLength;
+        approachY = approachLength < 1 ? 0 : approachY / approachLength;
         double targetSpeed = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                 ? action.targetVelocity() : 0;
         double targetVelocityX = approachX * targetSpeed;
         double targetVelocityY = approachY * targetSpeed;
         var navigationSamples = new ArrayList<PathSample>();
-        TwoBurnPlan constrainedPlan = null;
-        InterceptPlan maximumPlan = null;
+        TransferPlan transferPlan = null;
 
         // This is intentionally bounded per card. A broken or impossible plan should produce PLAN_BLOCKED quickly
         // instead of stalling the client while it repeatedly circles a target it cannot reach.
@@ -147,7 +146,6 @@ public final class RocketFlightPathCalculator {
                 && state.time - startTime < MAX_NAVIGATION_SECONDS; step++) {
             double offsetX = destination.x - state.x;
             double offsetY = destination.y - state.y;
-            double distance = Math.hypot(offsetX, offsetY);
             if (completeArrival(action, state, destination, targetVelocityX, targetVelocityY,
                     navigationSamples)) return true;
 
@@ -156,63 +154,28 @@ public final class RocketFlightPathCalculator {
             // The planner's resource is delta-v, so its burn rate is also the acceleration limit. Keeping those two
             // values identical prevents a path from spending more delta-v than it actually adds to craft velocity.
             double maximumAcceleration = deltaVRate;
-            if (maximumAcceleration <= 0.0001) {
-                state.blockedState = TerminalState.NO_ACTIVE_ENGINES;
+            if (transferPlan == null) {
+                var transfer = FullPowerTransfer.solve(offsetX, offsetY, state.velocityX, state.velocityY,
+                        targetVelocityX, targetVelocityY,
+                        action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM,
+                        state.burnProfile(context),
+                        action.maxSpeed() == 0 ? Double.POSITIVE_INFINITY : action.maxSpeed(),
+                        MAX_NAVIGATION_SECONDS - (state.time - startTime));
+                if (transfer == null) {
+                    state.blockedState = maximumAcceleration <= 0.0001
+                            ? TerminalState.NO_ACTIVE_ENGINES : TerminalState.NO_FEASIBLE_TRANSFER;
+                    appendNavigationSamples(state, navigationSamples);
+                    return false;
+                }
+                transferPlan = new TransferPlan(state.time, transfer);
+            }
+            var command = transferPlan.commandAt(state, maximumAcceleration);
+
+            // An exhausted transfer must already have arrived. Do not hide a prediction error with a return trip.
+            if (command.stepLimitSeconds <= BURN_TOLERANCE) {
+                state.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
                 appendNavigationSamples(state, navigationSamples);
                 return false;
-            }
-            GuidanceCommand command;
-            if (action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM) {
-                if (maximumPlan == null) {
-                    double availableDeltaV = state.availableDeltaV(context);
-                    if (availableDeltaV <= 0.0001) {
-                        state.blockedState = TerminalState.NOT_ENOUGH_DELTA_V;
-                        appendNavigationSamples(state, navigationSamples);
-                        return false;
-                    }
-                    maximumPlan = createInterceptPlan(state, offsetX, offsetY,
-                            maximumAcceleration, availableDeltaV);
-                    if (maximumPlan == null) {
-                        state.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
-                        appendNavigationSamples(state, navigationSamples);
-                        return false;
-                    }
-                }
-                command = maximumPlan.commandAt(state);
-            } else {
-                if (constrainedPlan == null) {
-                    double availableDeltaV = state.availableDeltaV(context);
-                    if (availableDeltaV <= 0.0001) {
-                        state.blockedState = TerminalState.NOT_ENOUGH_DELTA_V;
-                        appendNavigationSamples(state, navigationSamples);
-                        return false;
-                    }
-                    constrainedPlan = createTwoBurnPlan(state, destination, targetVelocityX, targetVelocityY,
-                            maximumAcceleration, availableDeltaV);
-                    if (constrainedPlan == null) {
-                        state.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
-                        appendNavigationSamples(state, navigationSamples);
-                        return false;
-                    }
-                }
-                command = constrainedPlan.commandAt(state);
-            }
-
-            // A shorter engine group can run dry without ending the stage. Re-plan from the exact current state if
-            // that leaves less thrust than the cached transfer requested; otherwise the preview would create speed
-            // which the remaining engines cannot actually provide.
-            if (command.burning && command.acceleration > maximumAcceleration * 1.0001) {
-                constrainedPlan = null;
-                maximumPlan = null;
-                continue;
-            }
-
-            // A transfer normally lands within the arrival tolerance on its final integration step. If rounding or
-            // a stage boundary leaves a small miss, discard the exhausted plan and solve the correction from here.
-            if (command.stepLimitSeconds <= 0.0001) {
-                constrainedPlan = null;
-                maximumPlan = null;
-                continue;
             }
 
             double speed = Math.hypot(state.velocityX, state.velocityY);
@@ -223,13 +186,9 @@ public final class RocketFlightPathCalculator {
                     appendNavigationSamples(state, navigationSamples);
                     return false;
                 }
-                double throttle = Math.clamp(command.acceleration / deltaVRate, 0, 1);
                 double nextEngineStop = active.stream().map(state.segments::get)
-                        .mapToDouble(segment -> segment.remainingBurnSeconds / Math.max(0.0001, throttle))
+                        .mapToDouble(segment -> segment.remainingBurnSeconds)
                         .min().orElse(0);
-                if (command.velocityError < command.acceleration * stepSeconds) {
-                    stepSeconds = Math.max(0.001, command.velocityError / command.acceleration);
-                }
                 // Hit resource boundaries exactly. Overshooting one makes the next stage start with fuel which the
                 // previous stage should already have consumed, and visibly moves its separation marker.
                 stepSeconds = Math.min(stepSeconds, nextEngineStop);
@@ -238,7 +197,7 @@ public final class RocketFlightPathCalculator {
                 return false;
             }
             stepSeconds = Math.min(stepSeconds, MAX_NAVIGATION_SECONDS - (state.time - startTime));
-            if (stepSeconds <= 0.0001) break;
+            if (stepSeconds <= BURN_TOLERANCE) break;
 
             double accelerationX = command.burning ? command.directionX * command.acceleration : 0;
             double accelerationY = command.burning ? command.directionY * command.acceleration : 0;
@@ -250,15 +209,12 @@ public final class RocketFlightPathCalculator {
             if (command.burning) {
                 // Consume exactly the delta-v applied to the trajectory. Basing this on thrust acceleration instead
                 // could drain more resource than the path gained whenever the two limits differ.
-                double throttle = Math.clamp(command.acceleration / deltaVRate, 0, 1);
-                state.consumeBurnTime(active, stepSeconds * throttle);
+                state.consumeBurnTime(active, stepSeconds);
             }
             navigationSamples.add(state.createSample(command.phase, action.targetId(),
                     command.burning ? Set.copyOf(active) : Set.of()));
 
             if (finishStage(action, state, context)) {
-                constrainedPlan = null;
-                maximumPlan = null;
                 navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
                 while (finishStage(action, state, context)) {
                     // Continue through any following stage which has no usable engines.
@@ -273,54 +229,6 @@ public final class RocketFlightPathCalculator {
                 : TerminalState.INTEGRATION_TIME_LIMIT;
         appendNavigationSamples(state, navigationSamples);
         return false;
-    }
-
-    private static InterceptPlan createInterceptPlan(CraftState state, double offsetX, double offsetY,
-                                                     double maximumAcceleration, double availableDeltaV) {
-        double timeToTarget = earliestInterceptTime(offsetX, offsetY, state.velocityX, state.velocityY,
-                maximumAcceleration, availableDeltaV);
-        if (!Double.isFinite(timeToTarget)) return null;
-
-        // This is the constant acceleration which makes p + vt + at²/2 land exactly on the target. Recalculating
-        // it from the current state corrects small integration errors without replacing the inherited velocity.
-        double accelerationX = 2 * (offsetX - state.velocityX * timeToTarget)
-                / (timeToTarget * timeToTarget);
-        double accelerationY = 2 * (offsetY - state.velocityY * timeToTarget)
-                / (timeToTarget * timeToTarget);
-        double acceleration = Math.hypot(accelerationX, accelerationY);
-        return new InterceptPlan(state.time, timeToTarget, accelerationX, accelerationY,
-                sampleStep(timeToTarget), acceleration <= 0.0001);
-    }
-
-    private static TwoBurnPlan createTwoBurnPlan(CraftState state, Point destination,
-                                                  double targetVelocityX, double targetVelocityY,
-                                                  double maximumAcceleration, double availableDeltaV) {
-        double previousDuration = MIN_STEP_SECONDS;
-        double duration = previousDuration;
-        TwoBurnSolution solution = null;
-
-        // Constrained arrivals are planned once as two constant burns. This avoids the feedback loop caused by
-        // repeatedly deciding whether to accelerate or brake from a slightly different state on every sample.
-        while (true) {
-            solution = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, duration);
-            if (solution.fits(maximumAcceleration, availableDeltaV)) break;
-            if (duration >= MAX_NAVIGATION_SECONDS) return null;
-            previousDuration = duration;
-            duration = Math.min(duration * 1.12, MAX_NAVIGATION_SECONDS);
-        }
-
-        double low = previousDuration;
-        double high = duration;
-        for (int pass = 0; pass < 32; pass++) {
-            double middle = (low + high) * 0.5;
-            var candidate = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, middle);
-            if (candidate.fits(maximumAcceleration, availableDeltaV)) high = middle;
-            else low = middle;
-        }
-        solution = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, high);
-        return new TwoBurnPlan(state.time, high * 0.5, solution.firstAccelerationX,
-                solution.firstAccelerationY, solution.secondAccelerationX, solution.secondAccelerationY,
-                sampleStep(high * 0.5));
     }
 
     private static double sampleStep(double phaseSeconds) {
@@ -343,97 +251,6 @@ public final class RocketFlightPathCalculator {
         navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
         appendNavigationSamples(state, navigationSamples);
         return true;
-    }
-
-    private static TwoBurnSolution twoBurnSolution(CraftState state, Point destination,
-                                                    double targetVelocityX, double targetVelocityY,
-                                                    double duration) {
-        double half = duration * 0.5;
-        double velocityChangeX = targetVelocityX - state.velocityX;
-        double velocityChangeY = targetVelocityY - state.velocityY;
-        double firstAccelerationX = (destination.x - state.x - state.velocityX * duration
-                - velocityChangeX * half * 0.5) / (half * half);
-        double firstAccelerationY = (destination.y - state.y - state.velocityY * duration
-                - velocityChangeY * half * 0.5) / (half * half);
-        double secondAccelerationX = velocityChangeX / half - firstAccelerationX;
-        double secondAccelerationY = velocityChangeY / half - firstAccelerationY;
-        return new TwoBurnSolution(firstAccelerationX, firstAccelerationY,
-                secondAccelerationX, secondAccelerationY, half);
-    }
-
-    private static double earliestInterceptTime(double offsetX, double offsetY,
-                                                double velocityX, double velocityY,
-                                                double maximumAcceleration, double availableDeltaV) {
-        double speedSquared = velocityX * velocityX + velocityY * velocityY;
-        double ballisticClosestTime = speedSquared <= 0.0001 ? 0
-                : Math.max(0, (offsetX * velocityX + offsetY * velocityY) / speedSquared);
-        ballisticClosestTime = Math.min(ballisticClosestTime, MAX_NAVIGATION_SECONDS);
-        double low = 0;
-        double high;
-        if (ballisticClosestTime > MIN_STEP_SECONDS
-                && requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, ballisticClosestTime)
-                <= maximumAcceleration) {
-            // Fast craft can have a very narrow intercept window around their unpowered closest approach. Testing
-            // that point explicitly prevents a logarithmic search from stepping over the useful solution.
-            high = ballisticClosestTime;
-        } else {
-            low = Math.max(0, ballisticClosestTime);
-            high = Math.max(MIN_STEP_SECONDS, low);
-            while (high < MAX_NAVIGATION_SECONDS
-                    && requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, high)
-                    > maximumAcceleration) {
-                low = high;
-                high *= 2;
-            }
-            high = Math.min(high, MAX_NAVIGATION_SECONDS);
-            if (requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, high)
-                    > maximumAcceleration) return Double.NaN;
-        }
-
-        // Acceleration establishes the earliest physically reachable interception. A binary search is both cheaper
-        // and easier to audit than a general-purpose trajectory optimiser for this preview.
-        for (int pass = 0; pass < 32; pass++) {
-            double middle = (low + high) * 0.5;
-            if (requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, middle)
-                    <= maximumAcceleration) high = middle;
-            else low = middle;
-        }
-        double earliest = high;
-        if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, earliest) <= availableDeltaV) {
-            return earliest;
-        }
-
-        // With limited fuel a slower interception can be possible even when the fastest one is not. Delta-v reaches
-        // its minimum where r/t is closest to the current velocity, so only this finite interval needs searching.
-        double projection = offsetX * velocityX + offsetY * velocityY;
-        double minimumDeltaVTime = projection > 0
-                ? (offsetX * offsetX + offsetY * offsetY) / projection
-                : MAX_NAVIGATION_SECONDS;
-        minimumDeltaVTime = Math.clamp(minimumDeltaVTime, earliest, MAX_NAVIGATION_SECONDS);
-        if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, minimumDeltaVTime)
-                > availableDeltaV) return Double.NaN;
-        low = earliest;
-        high = minimumDeltaVTime;
-        for (int pass = 0; pass < 32; pass++) {
-            double middle = (low + high) * 0.5;
-            if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, middle)
-                    <= availableDeltaV) high = middle;
-            else low = middle;
-        }
-        return high;
-    }
-
-    private static double requiredInterceptAcceleration(double offsetX, double offsetY,
-                                                         double velocityX, double velocityY,
-                                                         double seconds) {
-        return 2 * Math.hypot(offsetX - velocityX * seconds, offsetY - velocityY * seconds)
-                / (seconds * seconds);
-    }
-
-    private static double requiredInterceptDeltaV(double offsetX, double offsetY,
-                                                  double velocityX, double velocityY,
-                                                  double seconds) {
-        return requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, seconds) * seconds;
     }
 
     private static PathPhase phaseFor(CraftState state, double directionX, double directionY) {
@@ -476,63 +293,43 @@ public final class RocketFlightPathCalculator {
             var sample = samples.get(index);
             boolean stateChanged = previous == null || sample.phase() != previous.phase()
                     || sample.stage() != previous.stage()
-                    || !sample.connectedSegments().equals(previous.connectedSegments());
+                    || !sample.connectedSegments().equals(previous.connectedSegments())
+                    || !sample.firingSegments().equals(previous.firingSegments());
+            // Keep both ends of a phase boundary so downsampling never paints a burn as part of a long coast.
+            if (stateChanged && previous != null && state.samples.getLast() != previous) state.samples.add(previous);
             if (stateChanged || index % stride == 0 || index == samples.size() - 1) state.samples.add(sample);
             previous = sample;
         }
     }
 
-    private record InterceptPlan(double startTime, double duration,
-                                 double accelerationX, double accelerationY,
-                                 double sampleStepSeconds, boolean coasting) {
-        private GuidanceCommand commandAt(CraftState state) {
-            double remaining = Math.max(0, startTime + duration - state.time);
-            if (coasting) return GuidanceCommand.coast(remaining, sampleStepSeconds);
-            double acceleration = Math.hypot(accelerationX, accelerationY);
-            double directionX = accelerationX / acceleration;
-            double directionY = accelerationY / acceleration;
-            return new GuidanceCommand(true, directionX, directionY, acceleration,
-                    Double.POSITIVE_INFINITY, remaining, sampleStepSeconds,
-                    phaseFor(state, directionX, directionY));
-        }
-    }
-
-    private record TwoBurnPlan(double startTime, double halfDuration,
-                               double firstAccelerationX, double firstAccelerationY,
-                               double secondAccelerationX, double secondAccelerationY,
-                               double sampleStepSeconds) {
-        private GuidanceCommand commandAt(CraftState state) {
+    private record TransferPlan(double startTime, FullPowerTransfer transfer) {
+        private GuidanceCommand commandAt(CraftState state, double acceleration) {
             double elapsed = Math.max(0, state.time - startTime);
-            boolean firstBurn = elapsed < halfDuration;
-            double accelerationX = firstBurn ? firstAccelerationX : secondAccelerationX;
-            double accelerationY = firstBurn ? firstAccelerationY : secondAccelerationY;
-            double remaining = firstBurn ? halfDuration - elapsed : halfDuration * 2 - elapsed;
-            double acceleration = Math.hypot(accelerationX, accelerationY);
-            if (acceleration <= 0.0001) return GuidanceCommand.coast(remaining, sampleStepSeconds);
-            double directionX = accelerationX / acceleration;
-            double directionY = accelerationY / acceleration;
-            return new GuidanceCommand(true, directionX, directionY, acceleration,
-                    Double.POSITIVE_INFINITY, remaining, sampleStepSeconds,
-                    phaseFor(state, directionX, directionY));
-        }
-    }
-
-    private record TwoBurnSolution(double firstAccelerationX, double firstAccelerationY,
-                                   double secondAccelerationX, double secondAccelerationY,
-                                   double halfDuration) {
-        private boolean fits(double maximumAcceleration, double availableDeltaV) {
-            double firstAcceleration = Math.hypot(firstAccelerationX, firstAccelerationY);
-            double secondAcceleration = Math.hypot(secondAccelerationX, secondAccelerationY);
-            return Math.max(firstAcceleration, secondAcceleration) <= maximumAcceleration
-                    && (firstAcceleration + secondAcceleration) * halfDuration <= availableDeltaV;
+            double endFirst = transfer.firstSeconds();
+            double endCoast = endFirst + transfer.coastSeconds();
+            double ax, ay, remaining;
+            if (elapsed < endFirst - 1e-7) {
+                ax = transfer.firstDirectionX();
+                ay = transfer.firstDirectionY();
+                remaining = endFirst - elapsed;
+            } else if (elapsed < endCoast - 1e-7) {
+                return GuidanceCommand.coast(endCoast - elapsed, sampleStep(transfer.coastSeconds()));
+            } else {
+                ax = transfer.lastDirectionX();
+                ay = transfer.lastDirectionY();
+                remaining = Math.max(0, transfer.duration() - elapsed);
+            }
+            if (ax == 0 && ay == 0) return GuidanceCommand.coast(remaining, sampleStep(remaining));
+            return new GuidanceCommand(true, ax, ay, acceleration,
+                    remaining, sampleStep(Math.max(transfer.firstSeconds(), transfer.lastSeconds())), phaseFor(state, ax, ay));
         }
     }
 
     private record GuidanceCommand(boolean burning, double directionX, double directionY,
-                                   double acceleration, double velocityError,
+                                   double acceleration,
                                    double stepLimitSeconds, double sampleStepSeconds, PathPhase phase) {
         private static GuidanceCommand coast(double seconds, double sampleStepSeconds) {
-            return new GuidanceCommand(false, 0, 0, 0, 0, seconds, sampleStepSeconds, PathPhase.COAST);
+            return new GuidanceCommand(false, 0, 0, 0, seconds, sampleStepSeconds, PathPhase.COAST);
         }
     }
 
@@ -679,8 +476,8 @@ public final class RocketFlightPathCalculator {
             return segments.keySet().stream()
                     .filter(ref -> context.configuration(ref).usesEnginesDuring(currentStage))
                     .filter(ref -> segments.get(ref).thrust > 0
-                            && segments.get(ref).remainingBurnSeconds > 0.0001
-                            && segments.get(ref).remainingDeltaV > 0.0001)
+                            && segments.get(ref).remainingBurnSeconds > BURN_TOLERANCE
+                            && segments.get(ref).remainingDeltaV > BURN_TOLERANCE)
                     .toList();
         }
 
@@ -689,7 +486,7 @@ public final class RocketFlightPathCalculator {
             double result = 0;
             for (var ref : active) {
                 var segment = segments.get(ref);
-                result += segment.remainingDeltaV / Math.max(0.0001, segment.remainingBurnSeconds)
+                result += segment.remainingDeltaV / Math.max(BURN_TOLERANCE, segment.remainingBurnSeconds)
                         * segment.wetMass / mass;
             }
             return result;
@@ -698,7 +495,7 @@ public final class RocketFlightPathCalculator {
         private void consumeBurnTime(List<SpaceSimulation.SegmentRef> active, double seconds) {
             for (var ref : active) {
                 var segment = segments.get(ref);
-                double fraction = Math.min(1, seconds / Math.max(0.0001, segment.remainingBurnSeconds));
+                double fraction = Math.min(1, seconds / Math.max(BURN_TOLERANCE, segment.remainingBurnSeconds));
                 segment.remainingDeltaV *= 1 - fraction;
                 segment.remainingBurnSeconds = Math.max(0, segment.remainingBurnSeconds - seconds);
             }
@@ -717,27 +514,31 @@ public final class RocketFlightPathCalculator {
                     .filter(ref -> context.configuration(ref).lastEngineStage() == currentStage)
                     .toList();
             if (!endingBoosters.isEmpty()) return endingBoosters.stream()
-                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= 0.0001
-                            || segments.get(ref).remainingDeltaV <= 0.0001);
+                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= BURN_TOLERANCE
+                            || segments.get(ref).remainingDeltaV <= BURN_TOLERANCE);
             // A booster may have been selected for a later stage but still run dry now. If every booster firing in
             // this stage is empty, advance instead of leaving the craft permanently stuck on an engine-less stage.
             return !firingBoosters.isEmpty() && firingBoosters.stream()
-                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= 0.0001
-                            || segments.get(ref).remainingDeltaV <= 0.0001);
+                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= BURN_TOLERANCE
+                            || segments.get(ref).remainingDeltaV <= BURN_TOLERANCE);
         }
 
         private List<SpaceSimulation.SegmentRef> boostersEndingCurrentStage(CalculationContext context) {
             return segments.keySet().stream().filter(ref -> {
                 var configuration = context.configuration(ref);
                 return configuration.booster() && (configuration.lastEngineStage() <= currentStage
-                        || segments.get(ref).remainingBurnSeconds <= 0.0001
-                        || segments.get(ref).remainingDeltaV <= 0.0001);
+                        || segments.get(ref).remainingBurnSeconds <= BURN_TOLERANCE
+                        || segments.get(ref).remainingDeltaV <= BURN_TOLERANCE);
             }).toList();
         }
 
         private double availableDeltaV(CalculationContext context) {
+            return burnProfile(context).deltaV();
+        }
+
+        private RocketBurnProfile burnProfile(CalculationContext context) {
             var copy = copyFor(Set.copyOf(segments.keySet()));
-            double result = 0;
+            var intervals = new ArrayList<RocketBurnProfile.Interval>();
             while (true) {
                 var active = copy.activeSegments(context);
                 if (copy.currentStage < context.stageCount
@@ -753,13 +554,13 @@ public final class RocketFlightPathCalculator {
                         .mapToDouble(segment -> segment.remainingBurnSeconds).min().orElse(0);
                 if (seconds <= 0) break;
                 copy.consumeBurnTime(active, seconds);
-                result += rate * seconds;
+                intervals.add(new RocketBurnProfile.Interval(rate, seconds));
                 if (copy.stageFinished(context)) {
                     for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
                     copy.currentStage = Math.min(context.stageCount, copy.currentStage + 1);
                 }
             }
-            return result;
+            return new RocketBurnProfile(intervals);
         }
 
         private void removeSegment(SpaceSimulation.SegmentRef ref) {

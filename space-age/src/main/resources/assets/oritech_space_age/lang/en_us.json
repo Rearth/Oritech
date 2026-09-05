@@ -1,4 +1,7 @@
 {
+  "screen.oritech_space_age.action.speed_limit": "Speed cap: %s",
+  "screen.oritech_space_age.action.speed_title": "Maximum speed",
+  "screen.oritech_space_age.action.speed_help": "Cruise speed: 1–100000 m/s or max. Lower speeds save fuel. Arrival speed is separate.",
   "block.oritech_space_age.rocket_assembler": "Rocket Assembler",
   "block.oritech_space_age.rocket_coupling": "Rocket Coupling",
   "block.oritech_space_age.basic_booster_rocket": "Basic Booster Rocket",

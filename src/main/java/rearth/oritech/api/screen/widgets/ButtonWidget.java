@@ -26,6 +26,8 @@ public class ButtonWidget extends UIComponent {
     private OritechSurface disabledSurface = OritechSurface.PANEL_DARK_HOVER;
     private Insets surfacePadding = Insets.NONE;
     private int textColor = DEFAULT_TEXT_COLOR;
+    private int disabledTextColor = DISABLED_COLOR;
+    private Integer pressedTextColor;
     private boolean textShadow;
     private boolean active = true;
     private boolean hovered;
@@ -63,6 +65,16 @@ public class ButtonWidget extends UIComponent {
 
     public ButtonWidget withTextColor(int textColor) {
         this.textColor = textColor;
+        return this;
+    }
+
+    public ButtonWidget withDisabledTextColor(int textColor) {
+        this.disabledTextColor = textColor;
+        return this;
+    }
+
+    public ButtonWidget withPressedTextColor(int textColor) {
+        this.pressedTextColor = textColor;
         return this;
     }
 
@@ -129,6 +141,8 @@ public class ButtonWidget extends UIComponent {
         var font = Minecraft.getInstance().font;
         int textY = y + (height - 8) / 2 + ((hovered && active) ? 1 : 0);
         int textX = x + (width - font.width(label)) / 2;
-        graphics.text(font, label, textX, textY, active ? textColor : DISABLED_COLOR, textShadow);
+        var color = !active ? disabledTextColor
+                : pressed && pressedTextColor != null ? pressedTextColor : textColor;
+        graphics.text(font, label, textX, textY, color, textShadow);
     }
 }

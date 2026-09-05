@@ -17,6 +17,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 
 import java.util.UUID;
 
@@ -135,14 +136,14 @@ public final class RocketNetworking {
         if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
 
         // Only complete drafts cross the network. SpaceSimulation sanitizes the client-authored plan before storing it.
-        var simulation = RocketSimulationController.getForPlayer(player);
-        simulation.updateFlightPlan(GlobalPos.of(player.level().dimension(), menu.blockPos), payload.plan(), rocket);
+        SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), menu.blockPos),
+                payload.plan(), rocket);
     }
 
     private static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
         var rocket = menu.getRocket();
         if (rocket == null) return;
-        var snapshot = RocketSimulationController.getForPlayer(player)
+        var snapshot = SpaceSimulationSavedData.getForPlayer(player)
                 .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), menu.blockPos), rocket.getRocketId());
         PacketDistributor.sendToPlayer(player, new FlightPlannerPayload(menu.blockPos, snapshot));
     }

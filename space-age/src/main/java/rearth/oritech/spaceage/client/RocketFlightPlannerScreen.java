@@ -3,12 +3,14 @@ package rearth.oritech.spaceage.client;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
-import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
@@ -62,6 +64,9 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private int panelHeight;
     private int editorY;
     private int editorHeight;
+    private UUID speedAction;
+    private EditBox speedField;
+    private String speedText;
 
     public RocketFlightPlannerScreen(RocketAssemblerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 0, 0);
@@ -78,16 +83,18 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         flightPlannerRevision = menu.getFlightPlannerRevision();
         addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
 
-        var rocketTab = ButtonWidget.panel(9, 9, 92, 20,
+        var rocketTab = SpaceAgeButtons.panel(9, 9, 92, 20,
                 Component.translatable("screen.oritech_space_age.rocket"), ignored -> switchToRocketScreen());
-        rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED);
+        rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         addComponent(rocketTab);
-        var flightPlanTab = ButtonWidget.panel(101, 9, 92, 20,
+        var flightPlanTab = SpaceAgeButtons.panel(101, 9, 92, 20,
                 Component.translatable("screen.oritech_space_age.flight_plan"), ignored -> { });
         flightPlanTab.setActive(false);
-        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED);
+        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         addComponent(flightPlanTab);
         buildFlightPlanTab();
+        speedField = null;
+        if (speedAction != null) buildSpeedEditor();
     }
 
     private void buildFlightPlanTab() {
@@ -113,12 +120,14 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                 .noneMatch(branch -> branch.id().equals(activeBranchId))) activeBranchId = draftPlan.root().id();
 
         int availableHeight = panelHeight - 51;
-        editorHeight = Math.clamp(availableHeight / 3, 136, 270);
+        editorHeight = Math.min(Math.clamp(availableHeight / 3, 160, 270), Math.max(64, availableHeight - 112));
         int mapHeight = availableHeight - editorHeight - 6;
         editorY = 39 + mapHeight + 6;
+        var previousMap = flightPlanMap;
         flightPlanMap = new RocketStarMapWidget(12, 39, panelWidth - 24, mapHeight,
                 currentDraftSnapshot(), calculatedFlight, rocket, activeBranchId, selectedTarget,
                 this::selectMapTarget);
+        flightPlanMap.copyViewFrom(previousMap);
         addComponent(flightPlanMap);
         addFlightPlanEditor(rocket);
     }
@@ -152,7 +161,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                 .forEach(action -> actionOwners.put(action.id(), branch)));
         var rowByBranch = new HashMap<UUID, Integer>();
         var xByBranch = new HashMap<UUID, Integer>();
-        int rowHeight = 116;
+        var rowHeight = 138;
         int branchStartY = 8;
 
         for (int row = 0; row < draftPlan.branches().size(); row++) {
@@ -168,7 +177,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                 var parentAction = findAction(branch.parentSeparationAction());
                 branchX = parentX + cardWidth(parentAction) / 2;
                 int guideY = branchStartY + parentRow * rowHeight
-                        + (parentAction != null && parentAction.isGenerated() ? 68 : 108);
+                        + (parentAction != null && parentAction.isGenerated() ? 68 : 130);
                 scroll.addChild(new BranchConnectorWidget(branchX, guideY, branchX - 2, rowY + 17));
             }
             xByBranch.put(branch.id(), branchX);
@@ -176,9 +185,9 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
             Component branchName = branch.isRoot()
                     ? Component.translatable("screen.oritech_space_age.branch.root")
                     : Component.translatable("screen.oritech_space_age.branch.number", row + 1);
-            var branchButton = ButtonWidget.panel(branchX, rowY + 5, 70, 24, branchName,
+            var branchButton = SpaceAgeButtons.panel(branchX, rowY + 5, 70, 24, branchName,
                     ignored -> selectBranch(branch.id()));
-            branchButton.withDisabledSurface(OritechSurface.PANEL_PRESSED);
+            branchButton.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
             branchButton.setActive(!branch.id().equals(activeBranchId));
             scroll.addChild(branchButton);
 
@@ -194,7 +203,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                     cursorX += NORMAL_CARD_WIDTH;
                 }
             }
-            scroll.addChild(ButtonWidget.orangePanel(cursorX + 2, rowY + 27, 64, 32,
+            scroll.addChild(SpaceAgeButtons.orangePanel(cursorX + 2, rowY + 27, 64, 32,
                     Component.translatable("screen.oritech_space_age.action.add"),
                     ignored -> addAction(branch.id(), rocket)));
             contentWidth = Math.max(contentWidth, cursorX + 74);
@@ -221,43 +230,149 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private void addEditableCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
                                  SpaceSimulation.FlightPlanAction action, int index,
                                  ActiveRocketData rocket, int cursorX, int rowY) {
-        scroll.addChild(new SurfaceWidget(cursorX, rowY, NORMAL_CARD_WIDTH - 8, 108, OritechSurface.PANEL_INSET));
+        scroll.addChild(new SurfaceWidget(cursorX, rowY, NORMAL_CARD_WIDTH - 8, 130, OritechSurface.PANEL_INSET));
         scroll.addChild(new LabelWidget(cursorX + 5, rowY + 5, 18,
                 Component.literal(Integer.toString(index + 1)).withStyle(ChatFormatting.BOLD)));
-        scroll.addChild(ButtonWidget.darkPanel(cursorX + 22, rowY + 4, 103, 17,
+        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 22, rowY + 4, 103, 17,
                 actionName(action.type()), ignored -> cycleActionType(branch.id(), index, rocket)));
 
-        var parameter = ButtonWidget.panel(cursorX + 5, rowY + 27, 120, 17,
+        var parameter = SpaceAgeButtons.panel(cursorX + 5, rowY + 27, 120, 17,
                 actionParameter(action, rocket), ignored -> cycleActionParameter(branch.id(), index, rocket));
         parameter.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                 || action.type() == SpaceSimulation.ActionType.DECOUPLE);
         scroll.addChild(parameter);
-        var orbit = ButtonWidget.panel(cursorX + 5, rowY + 48, 120, 17,
+        var orbit = SpaceAgeButtons.panel(cursorX + 5, rowY + 48, 120, 17,
                 actionOrbit(action), ignored -> cycleActionOrbit(branch.id(), index, rocket));
         orbit.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
         scroll.addChild(orbit);
 
-        var velocity = ButtonWidget.panel(cursorX + 5, rowY + 69, 120, 17,
+        var velocity = SpaceAgeButtons.panel(cursorX + 5, rowY + 69, 120, 17,
                 actionVelocity(action), ignored -> cycleActionVelocity(branch.id(), index, rocket));
         velocity.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
         scroll.addChild(velocity);
 
-        scroll.addChild(ButtonWidget.darkPanel(cursorX + 5, rowY + 91, 18, 13, Component.literal("<"),
+        var speed = SpaceAgeButtons.panel(cursorX + 5, rowY + 91, 120, 17,
+                Component.translatable("screen.oritech_space_age.action.speed_limit",
+                        action.maxSpeed() == 0 ? "max" : action.maxSpeed() + " m/s"), ignored -> {
+                    speedAction = action.id();
+                    speedText = action.maxSpeed() == 0 ? "max" : Integer.toString(action.maxSpeed());
+                    rebuildComponents();
+                });
+        speed.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
+        scroll.addChild(speed);
+
+        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 5, rowY + 113, 18, 13, Component.literal("<"),
                 ignored -> moveAction(branch.id(), index, -1, rocket)));
-        scroll.addChild(ButtonWidget.darkPanel(cursorX + 25, rowY + 91, 18, 13, Component.literal(">"),
+        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 25, rowY + 113, 18, 13, Component.literal(">"),
                 ignored -> moveAction(branch.id(), index, 1, rocket)));
-        var decrease = ButtonWidget.darkPanel(cursorX + 49, rowY + 91, 18, 13, Component.literal("−"),
+        var decrease = SpaceAgeButtons.darkPanel(cursorX + 49, rowY + 113, 18, 13, Component.literal("−"),
                 ignored -> adjustActionVelocity(branch.id(), index, -1, rocket));
         decrease.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                 && action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM);
         scroll.addChild(decrease);
-        var increase = ButtonWidget.darkPanel(cursorX + 69, rowY + 91, 18, 13, Component.literal("+"),
+        var increase = SpaceAgeButtons.darkPanel(cursorX + 69, rowY + 113, 18, 13, Component.literal("+"),
                 ignored -> adjustActionVelocity(branch.id(), index, 1, rocket));
         increase.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                 && action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM);
         scroll.addChild(increase);
-        scroll.addChild(ButtonWidget.darkPanel(cursorX + 108, rowY + 91, 17, 13, Component.literal("×"),
+        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 108, rowY + 113, 17, 13, Component.literal("×"),
                 ignored -> removeAction(branch.id(), index, rocket)));
+    }
+
+    private void buildSpeedEditor() {
+        var popupWidth = Math.min(280, panelWidth - 12);
+        var px = (panelWidth - popupWidth) / 2;
+        var py = Math.max(4, (panelHeight - 112) / 2);
+        addEditorBackdrop(px, py, popupWidth, 112);
+        addComponent(new LabelWidget(px + 10, py + 8, popupWidth - 20, 30,
+                Component.translatable("screen.oritech_space_age.action.speed_help"))
+                .withWrap(true).withZIndex(9_001));
+        speedField = addRenderableWidget(new EditBox(font, leftPos + px + 10, topPos + py + 42,
+                popupWidth - 20, 18, Component.translatable("screen.oritech_space_age.action.speed_title")));
+        speedField.setMaxLength(20);
+        speedField.setValue(speedText);
+        speedField.setTextColor(parseSpeedLimit(speedText) != null ? 0xFFFFFFFF : 0xFFFF6666);
+        var apply = SpaceAgeButtons.panel(px + 10, py + 84, 100, 18, Component.translatable("gui.done"),
+                ignored -> applySpeedLimit());
+        apply.setZIndex(9_001);
+        apply.setActive(parseSpeedLimit(speedText) != null);
+        addComponent(apply);
+        speedField.setResponder(value -> {
+            speedText = value;
+            var valid = parseSpeedLimit(value) != null;
+            speedField.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF6666);
+            apply.setActive(valid);
+        });
+        addComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 84, 100, 18,
+                Component.translatable("gui.cancel"), ignored -> closeSpeedEditor()).withZIndex(9_001));
+        setFocused(speedField);
+    }
+
+    private void addEditorBackdrop(int px, int py, int popupWidth, int popupHeight) {
+        var backdrop = new UIComponent(0, 0, panelWidth, panelHeight) {
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+                graphics.fill(0, 0, width, height, 0x99000000);
+                OritechSurface.PANEL_DARK.render(graphics, px, py, popupWidth, popupHeight);
+            }
+            @Override
+            public boolean handleClick(double mouseX, double mouseY, int button) {
+                return true;
+            }
+            @Override
+            public boolean handleMouseScroll(double mouseX, double mouseY, double delta) {
+                return true;
+            }
+        };
+        backdrop.setZIndex(9_000);
+        addComponent(backdrop);
+    }
+
+    private static Integer parseSpeedLimit(String text) {
+        var value = text.strip().toLowerCase(Locale.ROOT);
+        if (value.equals("max")) return 0;
+        if (value.endsWith("m/s")) value = value.substring(0, value.length() - 3).strip();
+        try {
+            var speed = Integer.parseInt(value);
+            return speed > 0 && speed <= 100_000 ? speed : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private void applySpeedLimit() {
+        var value = parseSpeedLimit(speedField.getValue());
+        var action = findAction(speedAction);
+        if (value == null || action == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElseThrow();
+        speedAction = null;
+        replaceAction(branch.id(), action.id(), action.withMaxSpeed(value), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void closeSpeedEditor() {
+        speedAction = null;
+        rebuildComponents();
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (speedField != null && speedField.isMouseOver(event.x(), event.y())) {
+            setFocused(speedField);
+            return speedField.mouseClicked(event, doubleClick);
+        }
+        return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean keyPressed(KeyEvent event) {
+        if (speedAction != null) {
+            if (event.isEscape()) closeSpeedEditor();
+            else if (event.isConfirmation()) applySpeedLimit();
+            else if (speedField != null) speedField.keyPressed(event);
+            return true;
+        }
+        return super.keyPressed(event);
     }
 
     private void addAction(UUID branchId, ActiveRocketData rocket) {
@@ -381,7 +496,8 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                                      ActiveRocketData rocket) {
         var branches = new ArrayList<SpaceSimulation.FlightPlanBranch>();
         for (var branch : draftPlan.branches()) {
-            branches.add(branch.id().equals(branchId) ? branch.withActions(actions) : branch);
+            branches.add(branch.id().equals(branchId)
+                    ? branch.withActions(RocketFlightPlanRules.preserveBoosterLinks(branch, actions)) : branch);
         }
         draftPlan = RocketFlightPlanRules.normalize(draftPlan.withBranches(branches));
         menu.setDraftFlightPlan(draftPlan);
@@ -572,9 +688,9 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
             int cornerY = Math.min(endY, startY + 5);
-            graphics.fill(startX, startY, startX + 1, cornerY, 0xFF71879A);
-            graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX), cornerY, 0xFF71879A);
-            graphics.fill(endX, cornerY, endX + 1, endY, 0xFF71879A);
+            graphics.fill(startX, startY, startX + 1, cornerY, 0xFF405468);
+            graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX), cornerY, 0xFF405468);
+            graphics.fill(endX, cornerY, endX + 1, endY, 0xFF405468);
         }
     }
 }

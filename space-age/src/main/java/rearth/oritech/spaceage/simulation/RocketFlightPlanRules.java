@@ -35,6 +35,21 @@ public final class RocketFlightPlanRules {
         return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations());
     }
 
+    /** Keep generated links until recalculation can decide which booster events still exist. */
+    public static List<SpaceSimulation.FlightPlanAction> preserveBoosterLinks(
+            SpaceSimulation.FlightPlanBranch previous, List<SpaceSimulation.FlightPlanAction> edited) {
+        var result = new ArrayList<SpaceSimulation.FlightPlanAction>();
+        for (var action : edited) {
+            if (action.isGenerated()) continue;
+            result.add(action);
+            if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+                previous.actions().stream().filter(SpaceSimulation.FlightPlanAction::isGenerated)
+                        .filter(link -> link.targetId().equals(action.id())).forEach(result::add);
+            }
+        }
+        return result;
+    }
+
     /**
      * Replaces derived booster cards after recalculation. Their deterministic IDs preserve any child program while
      * removing branches for booster events that can no longer occur.
@@ -66,7 +81,8 @@ public final class RocketFlightPlanRules {
     public static SpaceSimulation.FlightPlan validate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
                                                        List<SpaceSimulation.SpaceObjectData> objects) {
         if (plan.branches().size() > MAX_BRANCHES
-                || plan.branches().stream().mapToInt(branch -> branch.actions().size()).sum() > MAX_ACTIONS
+                || plan.branches().stream().flatMap(branch -> branch.actions().stream())
+                        .filter(action -> !action.isGenerated()).count() > MAX_ACTIONS
                 || plan.branches().stream().noneMatch(SpaceSimulation.FlightPlanBranch::isRoot)) return null;
 
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
@@ -108,7 +124,8 @@ public final class RocketFlightPlanRules {
                 int targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && validatedAction.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                         ? Math.clamp(validatedAction.targetVelocity(), 0, 100_000) : 0;
-                actions.add(validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity));
+                actions.add(validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity)
+                        .withMaxSpeed(Math.clamp(validatedAction.maxSpeed(), 0, 100_000)));
             }
             validatedBranches.add(branch.withActions(actions));
         }

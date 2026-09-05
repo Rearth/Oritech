@@ -44,14 +44,6 @@ public final class RocketSimulationController {
     private static final double ROCKET_PACKET_RANGE_BLOCKS = 500;
     private static final double ROCKET_PACKET_RANGE_SQUARED = ROCKET_PACKET_RANGE_BLOCKS * ROCKET_PACKET_RANGE_BLOCKS;
 
-    // actual data
-    private static final Map<UUID, ActiveRocketData> ACTIVE_ROCKETS = new HashMap<>();  // todo link active rocket to specific simulations somehow
-    private static final Map<UUID, SpaceSimulation> ACTIVE_SIMULATIONS = new HashMap<>();   // as simulations are classes / references, they may be stored in here multiple times if players share a simulation
-
-    public static SpaceSimulation getForPlayer(ServerPlayer player) {
-        return ACTIVE_SIMULATIONS.computeIfAbsent(player.getUUID(), id -> new SpaceSimulation());
-    }
-
     // calculates the flight and adds the rocket to the saved active rockets
     public static void launchRocket(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition) {
         OritechSpaceAge.LOGGER.debug("Planning rocket launch {} from {} in {} with {} segments", rocket.getRocketId(), launchPosition, level.dimension().identifier(), rocket.getStaticSegments().size());
@@ -72,15 +64,14 @@ public final class RocketSimulationController {
         OritechSpaceAge.LOGGER.debug("Rocket {} launched: orbitTick={}, reentryTick={}, impactTick={}, impactPos={}, impactSpeed={}m/s, ascentCollision={}", rocket.getRocketId(), flight.orbitArrivalTick(), flight.reentryTick(), flight.impactTick(), flight.impactPosition(), flight.impactSpeedMetersPerSecond(), flight.takeoffCollisionPosition());
 
         rocket.setFlight(flight);
-        ACTIVE_ROCKETS.put(rocket.getRocketId(), rocket);
+        savedData.rockets.put(rocket.getRocketId(), rocket);
         savedData.setDirty();
 
         sendTakeoffDataToClients(level, rocket);
     }
 
     public static Map<UUID, ActiveRocketData> getActiveRockets(ServerLevel level) {
-        getSavedData(level);
-        return Map.copyOf(ACTIVE_ROCKETS);
+        return Map.copyOf(getSavedData(level).rockets);
     }
 
     public static void markDirty(ServerLevel level) {
@@ -88,20 +79,20 @@ public final class RocketSimulationController {
     }
 
     public static void syncActiveRocketsToPlayer(ServerPlayer player) {
-        getSavedData(player.level());
+        var savedData = getSavedData(player.level());
         RocketNetworking.clearRockets(player);
         var selectedRockets = 0;
-        for (var rocket : ACTIVE_ROCKETS.values()) {
+        for (var rocket : savedData.rockets.values()) {
             if (sendActiveRocketDataToClient(player, rocket)) selectedRockets++;
         }
-        OritechSpaceAge.LOGGER.debug("Selected {} of {} active rockets for client sync to {}", selectedRockets, ACTIVE_ROCKETS.size(), player.getGameProfile().name());
+        OritechSpaceAge.LOGGER.debug("Selected {} of {} active rockets for client sync to {}", selectedRockets, savedData.rockets.size(), player.getGameProfile().name());
     }
 
     // processes scheduled collisions and flight events once per server tick
     public static void tick(MinecraftServer server) {
         var savedData = getSavedData(server);
         var changed = false;
-        var iterator = ACTIVE_ROCKETS.entrySet().iterator();
+        var iterator = savedData.rockets.entrySet().iterator();
 
         while (iterator.hasNext()) {
             var rocket = iterator.next().getValue();
@@ -137,7 +128,7 @@ public final class RocketSimulationController {
 
         if (changed) {
             savedData.setDirty();
-            OritechSpaceAge.LOGGER.debug("Active rocket data changed; {} rockets remain", ACTIVE_ROCKETS.size());
+            OritechSpaceAge.LOGGER.debug("Active rocket data changed; {} rockets remain", savedData.rockets.size());
         }
     }
 
@@ -372,18 +363,19 @@ public final class RocketSimulationController {
         private static final Codec<ActiveRocketSavedData> CODEC =
                 ActiveRocketData.CODEC
                         .listOf()
-                        .xmap(ActiveRocketSavedData::new, ignored -> List.copyOf(ACTIVE_ROCKETS.values()));
+                        .xmap(ActiveRocketSavedData::new, data -> List.copyOf(data.rockets.values()));
 
         private static final SavedDataType<ActiveRocketSavedData> TYPE = new SavedDataType<>(OritechSpaceAge.id("active_rockets"), ActiveRocketSavedData::new, CODEC, null);
 
+        // State belongs to this server's overworld storage, never to the JVM running multiple worlds.
+        private final Map<UUID, ActiveRocketData> rockets = new HashMap<>();
+
         private ActiveRocketSavedData() {
-            ACTIVE_ROCKETS.clear();
             OritechSpaceAge.LOGGER.debug("Initialized empty active rocket saved data");
         }
 
         private ActiveRocketSavedData(List<ActiveRocketData> rockets) {
-            ACTIVE_ROCKETS.clear();
-            rockets.forEach(rocket -> ACTIVE_ROCKETS.put(rocket.getRocketId(), rocket));
+            rockets.forEach(rocket -> this.rockets.put(rocket.getRocketId(), rocket));
             OritechSpaceAge.LOGGER.debug("Loaded {} active rockets from saved data", rockets.size());
         }
     }

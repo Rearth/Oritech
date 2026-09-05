@@ -68,6 +68,10 @@ neoForge {
             sourceSet(rootProject.sourceSets.main)
         }
     }
+    unitTest {
+        enable()
+        testedMod = mods.named(project.space_age_mod_id)
+    }
 }
 
 configurations {
@@ -77,6 +81,8 @@ configurations {
 dependencies {
     // Compile and run against the Oritech project currently checked out in this repository.
     implementation project(':')
+    testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.0.3'
 
     // Oritech's development-only runtime mods are not exported to project consumers.
     localRuntime "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
@@ -111,6 +117,22 @@ neoForge.ideSyncTask generateModMetadata
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+tasks.register('transferTest', JavaExec) {
+    group = 'verification'
+    description = 'Checks full-power transfers, fuel conservation, speed limits and arrivals.'
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'rearth.oritech.spaceage.simulation.FullPowerTransferTest'
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+}
+
+tasks.named('check') { dependsOn 'transferTest' }
+
+tasks.named('test') {
+    useJUnitPlatform()
+    workingDir = layout.buildDirectory.get().asFile
 }
 
 tasks.withType(ProcessResources).configureEach {

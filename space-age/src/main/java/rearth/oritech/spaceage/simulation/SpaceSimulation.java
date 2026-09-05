@@ -1,5 +1,9 @@
 package rearth.oritech.spaceage.simulation;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.UUIDUtil;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import org.joml.Vector2f;
@@ -9,6 +13,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -22,15 +27,27 @@ public class SpaceSimulation {
     public static final UUID SUN_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
     public static final UUID MARS_ID = UUID.fromString("00000000-0000-0000-0000-000000000003");
 
+    public static final Codec<SpaceSimulation> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(simulation -> simulation.simulationId),
+            SpaceObjects.SimulatedObject.CODEC.listOf().fieldOf("objects")
+                    .forGetter(simulation -> simulation.nonCelestialObjects.stream()
+                            .sorted(Comparator.comparing(object -> object.id)).toList()),
+            StoredFlightPlan.CODEC.listOf().optionalFieldOf("flight_plans", List.of())
+                    .forGetter(simulation -> simulation.flightPlans.entrySet().stream()
+                            .map(entry -> new StoredFlightPlan(entry.getKey(), entry.getValue())).toList())
+    ).apply(instance, SpaceSimulation::new));
+
     private static final Set<SpaceObjects.SimulatedObject> CELESTIAL_OBJECTS = new HashSet<>();
 
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
     private final Map<GlobalPos, FlightPlan> flightPlans = new HashMap<>();
 
-    public SpaceSimulation(UUID loadedSimulationId, Set<SpaceObjects.SimulatedObject> loadedObjects) {
+    private SpaceSimulation(UUID loadedSimulationId, List<SpaceObjects.SimulatedObject> loadedObjects,
+                            List<StoredFlightPlan> loadedPlans) {
         simulationId = loadedSimulationId;
         nonCelestialObjects.addAll(loadedObjects);
+        loadedPlans.forEach(entry -> flightPlans.put(entry.assembler(), entry.plan()));
     }
 
     public SpaceSimulation() {
@@ -115,9 +132,10 @@ public class SpaceSimulation {
         return objects;
     }
 
-    public void updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
+    public boolean updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
         var validated = RocketFlightPlanRules.validate(plan, rocket, createObjectData());
-        if (validated != null) flightPlans.put(assemblerPosition, validated);
+        if (validated == null) return false;
+        return !validated.equals(flightPlans.put(assemblerPosition, validated));
     }
 
     private static SpaceObjectData toData(SpaceObjects.SimulatedObject object) {
@@ -133,8 +151,16 @@ public class SpaceSimulation {
                                         List<SpaceObjectData> objects, FlightPlan plan) {
     }
 
+    private record StoredFlightPlan(GlobalPos assembler, FlightPlan plan) {
+        private static final Codec<StoredFlightPlan> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                GlobalPos.CODEC.fieldOf("assembler").forGetter(StoredFlightPlan::assembler),
+                FlightPlan.CODEC.fieldOf("plan").forGetter(StoredFlightPlan::plan)
+        ).apply(instance, StoredFlightPlan::new));
+    }
+
     /** Stable segment identity for plans applied to another rocket built at the same relative positions. */
     public record SegmentRef(BlockPos anchor) {
+        public static final Codec<SegmentRef> CODEC = BlockPos.CODEC.xmap(SegmentRef::new, SegmentRef::anchor);
 
         public static SegmentRef of(StaticRocketSegment segment) {
             var anchor = segment.blocks().stream().map(StaticRocketSegment.BlockData::relativePos)
@@ -149,6 +175,13 @@ public class SpaceSimulation {
     /** Configuration follows the segment's relative anchor so reusable plans still match an identical rocket. */
     public record SegmentConfiguration(SegmentRef segment, String name, boolean booster,
                                        List<Integer> engineStages) {
+
+        public static final Codec<SegmentConfiguration> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                SegmentRef.CODEC.fieldOf("segment").forGetter(SegmentConfiguration::segment),
+                Codec.STRING.optionalFieldOf("name", "").forGetter(SegmentConfiguration::name),
+                Codec.BOOL.optionalFieldOf("booster", false).forGetter(SegmentConfiguration::booster),
+                Codec.INT.listOf().fieldOf("engine_stages").forGetter(SegmentConfiguration::engineStages)
+        ).apply(instance, SegmentConfiguration::new));
 
         public SegmentConfiguration {
             engineStages = List.copyOf(engineStages);
@@ -176,6 +209,12 @@ public class SpaceSimulation {
     }
 
     public record FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations) {
+
+        public static final Codec<FlightPlan> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                FlightPlanBranch.CODEC.listOf().fieldOf("branches").forGetter(FlightPlan::branches),
+                SegmentConfiguration.CODEC.listOf().optionalFieldOf("segments", List.of())
+                        .forGetter(FlightPlan::segmentConfigurations)
+        ).apply(instance, FlightPlan::new));
 
         public FlightPlan {
             branches = List.copyOf(branches);
@@ -209,6 +248,12 @@ public class SpaceSimulation {
     public record FlightPlanBranch(UUID id, UUID parentSeparationAction, List<FlightPlanAction> actions) {
         public static final UUID NO_PARENT = new UUID(0, 1);
 
+        public static final Codec<FlightPlanBranch> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(FlightPlanBranch::id),
+                UUIDUtil.STRING_CODEC.fieldOf("parent_action").forGetter(FlightPlanBranch::parentSeparationAction),
+                FlightPlanAction.CODEC.listOf().fieldOf("actions").forGetter(FlightPlanBranch::actions)
+        ).apply(instance, FlightPlanBranch::new));
+
         public FlightPlanBranch {
             actions = List.copyOf(actions);
         }
@@ -229,8 +274,19 @@ public class SpaceSimulation {
     /** A navigation action blocks its branch until the automatically calculated transfer is complete. */
     public record FlightPlanAction(UUID id, ActionType type, List<SegmentRef> segments,
                                    UUID targetId, OrbitBand orbit,
-                                   ArrivalVelocityMode velocityMode, int targetVelocity) {
+                                   ArrivalVelocityMode velocityMode, int targetVelocity, int maxSpeed) {
         public static final UUID NO_TARGET = new UUID(0, 0);
+
+        public static final Codec<FlightPlanAction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(FlightPlanAction::id),
+                ActionType.CODEC.fieldOf("type").forGetter(FlightPlanAction::type),
+                SegmentRef.CODEC.listOf().fieldOf("segments").forGetter(FlightPlanAction::segments),
+                UUIDUtil.STRING_CODEC.fieldOf("target").forGetter(FlightPlanAction::targetId),
+                OrbitBand.CODEC.fieldOf("orbit").forGetter(FlightPlanAction::orbit),
+                ArrivalVelocityMode.CODEC.fieldOf("arrival_mode").forGetter(FlightPlanAction::velocityMode),
+                Codec.INT.fieldOf("arrival_speed").forGetter(FlightPlanAction::targetVelocity),
+                Codec.INT.optionalFieldOf("max_speed", 0).forGetter(FlightPlanAction::maxSpeed)
+        ).apply(instance, FlightPlanAction::new));
 
         public FlightPlanAction {
             segments = List.copyOf(segments);
@@ -238,33 +294,38 @@ public class SpaceSimulation {
 
         public static FlightPlanAction create(ActionType type) {
             return new FlightPlanAction(UUID.randomUUID(), type, List.of(), NO_TARGET, OrbitBand.LOW,
-                    ArrivalVelocityMode.ZERO, 0);
+                    ArrivalVelocityMode.ZERO, 0, 0);
         }
 
         public static FlightPlanAction disconnectBooster(UUID id, SegmentRef segment, UUID navigationAction) {
             return new FlightPlanAction(id, ActionType.DISCONNECT_BOOSTER, List.of(segment),
-                    navigationAction, OrbitBand.LOW, ArrivalVelocityMode.ZERO, 0);
+                    navigationAction, OrbitBand.LOW, ArrivalVelocityMode.ZERO, 0, 0);
         }
 
         public FlightPlanAction withType(ActionType newType) {
             return new FlightPlanAction(id, newType, List.of(), NO_TARGET, OrbitBand.LOW,
-                    ArrivalVelocityMode.ZERO, 0);
+                    ArrivalVelocityMode.ZERO, 0, 0);
         }
 
         public FlightPlanAction withTarget(UUID target) {
-            return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity);
+            return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity, maxSpeed);
         }
 
         public FlightPlanAction withOrbit(OrbitBand newOrbit) {
-            return new FlightPlanAction(id, type, segments, targetId, newOrbit, velocityMode, targetVelocity);
+            return new FlightPlanAction(id, type, segments, targetId, newOrbit, velocityMode, targetVelocity, maxSpeed);
         }
 
         public FlightPlanAction withVelocity(ArrivalVelocityMode newMode, int newVelocity) {
-            return new FlightPlanAction(id, type, segments, targetId, orbit, newMode, newVelocity);
+            return new FlightPlanAction(id, type, segments, targetId, orbit, newMode, newVelocity, maxSpeed);
         }
 
         public FlightPlanAction withSegments(List<SegmentRef> newSegments) {
-            return new FlightPlanAction(id, type, newSegments, targetId, orbit, velocityMode, targetVelocity);
+            return new FlightPlanAction(id, type, newSegments, targetId, orbit, velocityMode, targetVelocity, maxSpeed);
+        }
+
+        /** Zero means unrestricted cruise speed. Arrival velocity remains a separate constraint. */
+        public FlightPlanAction withMaxSpeed(int speed) {
+            return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, speed);
         }
 
         public boolean isGenerated() {
@@ -272,20 +333,34 @@ public class SpaceSimulation {
         }
     }
 
-    public enum ActionType {
+    public enum ActionType implements StringRepresentable {
         NAVIGATE_TO,
         DECOUPLE,
         DISCONNECT_BOOSTER,
         MAINTAIN_POSITION,
-        DISCARD_CRAFT
+        DISCARD_CRAFT;
+
+        public static final Codec<ActionType> CODEC = StringRepresentable.fromEnum(ActionType::values);
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
     }
 
-    public enum OrbitBand {
+    public enum OrbitBand implements StringRepresentable {
         SURFACE(0),
         TIGHT(1_000),
         LOW(10_000),
         MEDIUM(30_000),
         HIGH(60_000);
+
+        public static final Codec<OrbitBand> CODEC = StringRepresentable.fromEnum(OrbitBand::values);
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
 
         private final double altitude;
 
@@ -298,9 +373,16 @@ public class SpaceSimulation {
         }
     }
 
-    public enum ArrivalVelocityMode {
+    public enum ArrivalVelocityMode implements StringRepresentable {
         ZERO,
         MAXIMUM,
-        CUSTOM
+        CUSTOM;
+
+        public static final Codec<ArrivalVelocityMode> CODEC = StringRepresentable.fromEnum(ArrivalVelocityMode::values);
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
     }
 }

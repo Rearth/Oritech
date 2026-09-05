@@ -121,6 +121,13 @@ final class RocketStarMapWidget extends UIComponent {
         selectedTarget = selection;
     }
 
+    void copyViewFrom(RocketStarMapWidget previous) {
+        if (previous == null || !previous.snapshot.simulationId().equals(snapshot.simulationId())) return;
+        cameraX = previous.cameraX;
+        cameraY = previous.cameraY;
+        zoom = Math.clamp(previous.zoom, minimumZoom * 0.5, MAX_ZOOM);
+    }
+
     private void setSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
         this.snapshot = snapshot;
         objects.clear();
@@ -350,9 +357,8 @@ final class RocketStarMapWidget extends UIComponent {
                 double distance = Math.hypot(mouseX - nearestX, mouseY - nearestY);
                 if (distance < closestDistance) {
                     closestDistance = distance;
-                    var stateSample = first.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)
-                            || progress >= 0.5 ? second : first;
-                    hoveredPathPoint = new HoveredPathPoint(stateSample,
+                    // Samples describe the interval ending at that sample, matching the path's colour.
+                    hoveredPathPoint = new HoveredPathPoint(second,
                             interpolatePathSpeed(first, second, progress));
                 }
             }
@@ -362,8 +368,7 @@ final class RocketStarMapWidget extends UIComponent {
     private static double interpolatePathSpeed(RocketFlightPathCalculator.PathSample first,
                                                RocketFlightPathCalculator.PathSample second,
                                                double progress) {
-        // Every solver step uses constant acceleration, so interpolating its velocity components gives the exact
-        // speed at the hovered point without storing hundreds of nearly identical tooltip samples.
+        // Approximate speed along the short displayed chord between two trajectory samples.
         double velocityX = first.velocityX() + (second.velocityX() - first.velocityX()) * progress;
         double velocityY = first.velocityY() + (second.velocityY() - first.velocityY()) * progress;
         return Math.hypot(velocityX, velocityY);
@@ -383,7 +388,7 @@ final class RocketStarMapWidget extends UIComponent {
             }
         }
         graphics.text(font, Component.translatable("screen.oritech_space_age.map_controls"),
-                x + width - 160, y + 9, 0xFF71879A, false);
+                x + width - 160, y + 9, 0xFFA7BACB, false);
     }
 
     private void renderStats(GuiGraphicsExtractor graphics) {
