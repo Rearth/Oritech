@@ -67,6 +67,18 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private UUID speedAction;
     private EditBox speedField;
     private String speedText;
+    private UUID actionTypeAction;
+    private UUID targetAction;
+    private EditBox targetSearchField;
+    private String targetSearch = "";
+    private ScrollWidget targetList;
+    private final List<TargetOption> targetOptions = new ArrayList<>();
+    private UUID arrivalAction;
+    private EditBox arrivalField;
+    private String arrivalText;
+    private RocketStarMapWidget.NavigationContextRequest mapContextRequest;
+    private int dropdownX;
+    private int dropdownY;
 
     public RocketFlightPlannerScreen(RocketAssemblerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, 0, 0);
@@ -94,7 +106,15 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         addComponent(flightPlanTab);
         buildFlightPlanTab();
         speedField = null;
+        targetSearchField = null;
+        targetList = null;
+        targetOptions.clear();
+        arrivalField = null;
         if (speedAction != null) buildSpeedEditor();
+        else if (actionTypeAction != null) buildActionTypeMenu();
+        else if (targetAction != null) buildTargetMenu();
+        else if (arrivalAction != null) buildArrivalEditor();
+        else if (mapContextRequest != null) buildMapContextMenu();
     }
 
     private void buildFlightPlanTab() {
@@ -126,7 +146,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         var previousMap = flightPlanMap;
         flightPlanMap = new RocketStarMapWidget(12, 39, panelWidth - 24, mapHeight,
                 currentDraftSnapshot(), calculatedFlight, rocket, activeBranchId, selectedTarget,
-                this::selectMapTarget);
+                this::selectMapTarget, this::openMapContextMenu);
         flightPlanMap.copyViewFrom(previousMap);
         addComponent(flightPlanMap);
         addFlightPlanEditor(rocket);
@@ -147,6 +167,12 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
 
     private void selectMapTarget(RocketStarMapWidget.NavigationSelection selection) {
         selectedTarget = selection;
+    }
+
+    private void openMapContextMenu(RocketStarMapWidget.NavigationContextRequest request) {
+        closeEditorState();
+        mapContextRequest = request;
+        rebuildComponents();
     }
 
     private void addFlightPlanEditor(ActiveRocketData rocket) {
@@ -175,10 +201,11 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                 int parentX = displayXByAction.getOrDefault(branch.parentSeparationAction(),
                         xByBranch.getOrDefault(parent == null ? null : parent.id(), 5) + 78);
                 var parentAction = findAction(branch.parentSeparationAction());
-                branchX = parentX + cardWidth(parentAction) / 2;
+                int connectorX = parentX + cardWidth(parentAction) / 2;
+                branchX = connectorX + 18;
                 int guideY = branchStartY + parentRow * rowHeight
                         + (parentAction != null && parentAction.isGenerated() ? 68 : 130);
-                scroll.addChild(new BranchConnectorWidget(branchX, guideY, branchX - 2, rowY + 17));
+                scroll.addChild(new BranchConnectorWidget(connectorX, guideY, branchX, rowY + 17));
             }
             xByBranch.put(branch.id(), branchX);
 
@@ -234,10 +261,14 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         scroll.addChild(new LabelWidget(cursorX + 5, rowY + 5, 18,
                 Component.literal(Integer.toString(index + 1)).withStyle(ChatFormatting.BOLD)));
         scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 22, rowY + 4, 103, 17,
-                actionName(action.type()), ignored -> cycleActionType(branch.id(), index, rocket)));
+                actionName(action.type()), ignored -> openActionTypeMenu(action.id(), cursorX + 22, rowY + 21)));
 
         var parameter = SpaceAgeButtons.panel(cursorX + 5, rowY + 27, 120, 17,
-                actionParameter(action, rocket), ignored -> cycleActionParameter(branch.id(), index, rocket));
+                actionParameter(action, rocket), ignored -> {
+                    if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+                        openTargetMenu(action.id(), cursorX + 5, rowY + 44);
+                    } else cycleActionParameter(branch.id(), index, rocket);
+                });
         parameter.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                 || action.type() == SpaceSimulation.ActionType.DECOUPLE);
         scroll.addChild(parameter);
@@ -247,15 +278,15 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         scroll.addChild(orbit);
 
         var velocity = SpaceAgeButtons.panel(cursorX + 5, rowY + 69, 120, 17,
-                actionVelocity(action), ignored -> cycleActionVelocity(branch.id(), index, rocket));
+                actionVelocity(action), ignored -> openArrivalEditor(action.id()));
         velocity.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
         scroll.addChild(velocity);
 
         var speed = SpaceAgeButtons.panel(cursorX + 5, rowY + 91, 120, 17,
                 Component.translatable("screen.oritech_space_age.action.speed_limit",
-                        action.maxSpeed() == 0 ? "max" : action.maxSpeed() + " m/s"), ignored -> {
+                        action.maxSpeed() == 0 ? "Maximum" : action.maxSpeed() + " m/s"), ignored -> {
                     speedAction = action.id();
-                    speedText = action.maxSpeed() == 0 ? "max" : Integer.toString(action.maxSpeed());
+                    speedText = action.maxSpeed() == 0 ? "maximum" : Integer.toString(action.maxSpeed());
                     rebuildComponents();
                 });
         speed.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
@@ -308,6 +339,131 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         setFocused(speedField);
     }
 
+    private void buildActionTypeMenu() {
+        var popupWidth = Math.min(210, panelWidth - 12);
+        int popupHeight = 18 + EDITABLE_ACTION_TYPES.length * 22;
+        var px = Math.clamp(dropdownX, 6, Math.max(6, panelWidth - popupWidth - 6));
+        var py = Math.clamp(dropdownY, 6, Math.max(6, panelHeight - popupHeight - 6));
+        addContextMenuBackdrop();
+        addComponent(new SurfaceWidget(px, py, popupWidth, popupHeight, OritechSurface.PANEL_DARK)
+                .withZIndex(9_000));
+        addComponent(new LabelWidget(px + 10, py + 7, popupWidth - 20,
+                Component.translatable("screen.oritech_space_age.action.choose_type"))
+                .withBrightColor().withZIndex(9_001));
+        for (int index = 0; index < EDITABLE_ACTION_TYPES.length; index++) {
+            var type = EDITABLE_ACTION_TYPES[index];
+            addComponent(SpaceAgeButtons.panel(px + 10, py + 18 + index * 22, popupWidth - 20, 18,
+                    actionName(type), ignored -> selectActionType(type)).withZIndex(9_001));
+        }
+    }
+
+    private void buildTargetMenu() {
+        var popupWidth = Math.min(310, panelWidth - 12);
+        var popupHeight = Math.min(250, panelHeight - 12);
+        var px = Math.clamp(dropdownX, 6, Math.max(6, panelWidth - popupWidth - 6));
+        var py = Math.clamp(dropdownY, 6, Math.max(6, panelHeight - popupHeight - 6));
+        addContextMenuBackdrop();
+        addComponent(new SurfaceWidget(px, py, popupWidth, popupHeight, OritechSurface.PANEL_DARK)
+                .withZIndex(9_000));
+        addComponent(new LabelWidget(px + 10, py + 8, popupWidth - 42,
+                Component.translatable("screen.oritech_space_age.action.choose_target"))
+                .withBrightColor().withZIndex(9_001));
+        addComponent(SpaceAgeButtons.darkPanel(px + popupWidth - 28, py + 6, 18, 16, Component.literal("×"),
+                ignored -> closeEditors()).withZIndex(9_001));
+        targetSearchField = addRenderableWidget(new EditBox(font, leftPos + px + 10, topPos + py + 27,
+                popupWidth - 20, 18, Component.translatable("screen.oritech_space_age.action.search_targets")));
+        targetSearchField.setMaxLength(40);
+        targetSearchField.setValue(targetSearch);
+        targetList = new ScrollWidget(px + 10, py + 50, popupWidth - 20, popupHeight - 60)
+                .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
+        targetList.setZIndex(9_001);
+        targetOptions.clear();
+        var objects = currentDraftSnapshot().objects().stream()
+                .sorted(Comparator.comparing(object -> RocketStarMapWidget.objectName(object).getString(),
+                        String.CASE_INSENSITIVE_ORDER)).toList();
+        for (var object : objects) {
+            var button = SpaceAgeButtons.panel(4, 0, popupWidth - 36, 18,
+                    RocketStarMapWidget.objectName(object), ignored -> selectNavigationTarget(object));
+            targetList.addChild(button);
+            targetOptions.add(new TargetOption(button,
+                    RocketStarMapWidget.objectName(object).getString().toLowerCase(Locale.ROOT)));
+        }
+        filterTargetOptions();
+        addComponent(targetList);
+        targetSearchField.setResponder(value -> {
+            targetSearch = value;
+            filterTargetOptions();
+        });
+        setFocused(targetSearchField);
+    }
+
+    private void filterTargetOptions() {
+        if (targetList == null) return;
+        var query = targetSearch.strip().toLowerCase(Locale.ROOT);
+        int y = 4;
+        for (var option : targetOptions) {
+            boolean visible = query.isEmpty() || option.searchText.contains(query);
+            option.button.setVisible(visible);
+            if (visible) {
+                option.button.setY(y);
+                y += 21;
+            }
+        }
+        targetList.setContentDimensions(targetList.getWidth() - 8, Math.max(targetList.getHeight() - 8, y + 3));
+    }
+
+    private void buildArrivalEditor() {
+        var popupWidth = Math.min(290, panelWidth - 12);
+        var popupHeight = 132;
+        var px = (panelWidth - popupWidth) / 2;
+        var py = Math.max(4, (panelHeight - popupHeight) / 2);
+        addEditorBackdrop(px, py, popupWidth, popupHeight);
+        addComponent(new LabelWidget(px + 10, py + 8, popupWidth - 20, 24,
+                Component.translatable("screen.oritech_space_age.action.arrival_help"))
+                .withWrap(true).withBrightColor().withZIndex(9_001));
+        addComponent(SpaceAgeButtons.panel(px + 10, py + 35, (popupWidth - 24) / 2, 18,
+                Component.translatable("screen.oritech_space_age.action.velocity_zero"),
+                ignored -> applyArrival(SpaceSimulation.ArrivalVelocityMode.ZERO, 0)).withZIndex(9_001));
+        addComponent(SpaceAgeButtons.panel(px + 14 + (popupWidth - 24) / 2, py + 35,
+                (popupWidth - 24) / 2, 18,
+                Component.translatable("screen.oritech_space_age.action.velocity_maximum"),
+                ignored -> applyArrival(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0)).withZIndex(9_001));
+        addComponent(new LabelWidget(px + 10, py + 64, 70,
+                Component.translatable("screen.oritech_space_age.action.velocity_custom_title"))
+                .withBrightColor().withZIndex(9_001));
+        arrivalField = addRenderableWidget(new EditBox(font, leftPos + px + 82, topPos + py + 59,
+                popupWidth - 92, 18, Component.translatable("screen.oritech_space_age.action.velocity_custom_title")));
+        arrivalField.setMaxLength(10);
+        arrivalField.setValue(arrivalText);
+        var apply = SpaceAgeButtons.panel(px + 10, py + 104, 100, 18, Component.translatable("gui.done"),
+                ignored -> applyCustomArrival());
+        apply.setZIndex(9_001);
+        apply.setActive(parseArrivalVelocity(arrivalText) != null);
+        addComponent(apply);
+        arrivalField.setResponder(value -> {
+            arrivalText = value;
+            var valid = parseArrivalVelocity(value) != null;
+            arrivalField.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF6666);
+            apply.setActive(valid);
+        });
+        addComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 104, 100, 18,
+                Component.translatable("gui.cancel"), ignored -> closeEditors()).withZIndex(9_001));
+        setFocused(arrivalField);
+    }
+
+    private void buildMapContextMenu() {
+        int popupWidth = 176;
+        int popupHeight = 30;
+        int px = Math.clamp(mapContextRequest.mouseX(), 6, Math.max(6, panelWidth - popupWidth - 6));
+        int py = Math.clamp(mapContextRequest.mouseY(), 6, Math.max(6, panelHeight - popupHeight - 6));
+        addContextMenuBackdrop();
+        addComponent(new SurfaceWidget(px, py, popupWidth, popupHeight, OritechSurface.PANEL_DARK)
+                .withZIndex(9_000));
+        addComponent(SpaceAgeButtons.panel(px + 6, py + 6, popupWidth - 12, 18,
+                Component.translatable("screen.oritech_space_age.action.add_navigation_target"),
+                ignored -> addNavigationTargetFromMap()).withZIndex(9_001));
+    }
+
     private void addEditorBackdrop(int px, int py, int popupWidth, int popupHeight) {
         var backdrop = new UIComponent(0, 0, panelWidth, panelHeight) {
             @Override
@@ -328,9 +484,25 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         addComponent(backdrop);
     }
 
+    private void addContextMenuBackdrop() {
+        var backdrop = new UIComponent(0, 0, panelWidth, panelHeight) {
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+            }
+
+            @Override
+            public boolean handleClick(double mouseX, double mouseY, int button) {
+                closeEditors();
+                return true;
+            }
+        };
+        backdrop.setZIndex(8_999);
+        addComponent(backdrop);
+    }
+
     private static Integer parseSpeedLimit(String text) {
         var value = text.strip().toLowerCase(Locale.ROOT);
-        if (value.equals("max")) return 0;
+        if (value.equals("max") || value.equals("maximum")) return 0;
         if (value.endsWith("m/s")) value = value.substring(0, value.length() - 3).strip();
         try {
             var speed = Integer.parseInt(value);
@@ -351,7 +523,112 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     }
 
     private void closeSpeedEditor() {
+        closeEditors();
+    }
+
+    private static Integer parseArrivalVelocity(String text) {
+        var value = text.strip().toLowerCase(Locale.ROOT);
+        if (value.endsWith("m/s")) value = value.substring(0, value.length() - 3).strip();
+        try {
+            var speed = Integer.parseInt(value);
+            return speed >= 0 && speed <= 100_000 ? speed : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private void openActionTypeMenu(UUID actionId, int contentX, int contentY) {
+        closeEditorState();
+        actionTypeAction = actionId;
+        setDropdownPosition(contentX, contentY);
+        rebuildComponents();
+    }
+
+    private void selectActionType(SpaceSimulation.ActionType type) {
+        var action = findAction(actionTypeAction);
+        if (action == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        var changed = action.withType(type);
+        if (type == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            changed = changed.withTarget(selectedTarget.objectId()).withOrbit(selectedTarget.orbit());
+        } else if (type == SpaceSimulation.ActionType.DECOUPLE) {
+            var pairs = connectedPairs(flightPlanRocket);
+            if (!pairs.isEmpty()) changed = changed.withSegments(pairs.getFirst());
+        }
+        closeEditorState();
+        replaceAction(branch.id(), action.id(), changed, flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void openTargetMenu(UUID actionId, int contentX, int contentY) {
+        closeEditorState();
+        targetAction = actionId;
+        targetSearch = "";
+        setDropdownPosition(contentX, contentY);
+        rebuildComponents();
+    }
+
+    private void setDropdownPosition(int contentX, int contentY) {
+        dropdownX = flightPlanActionScroll.getX() + 4 + contentX - Math.round(flightPlanActionScroll.getScrollX());
+        dropdownY = flightPlanActionScroll.getY() + 4 + contentY - Math.round(flightPlanActionScroll.getScrollY());
+    }
+
+    private void selectNavigationTarget(SpaceSimulation.SpaceObjectData target) {
+        var action = findAction(targetAction);
+        if (action == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        var changed = action.withTarget(target.id()).withOrbit(
+                RocketFlightPlanRules.compatibleOrbit(target.type(), action.orbit()));
+        selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
+        closeEditorState();
+        replaceAction(branch.id(), action.id(), changed, flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void openArrivalEditor(UUID actionId) {
+        var action = findAction(actionId);
+        if (action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return;
+        closeEditorState();
+        arrivalAction = actionId;
+        arrivalText = Integer.toString(Math.max(0, action.targetVelocity()));
+        rebuildComponents();
+    }
+
+    private void applyCustomArrival() {
+        var velocity = arrivalField == null ? null : parseArrivalVelocity(arrivalField.getValue());
+        if (velocity != null) applyArrival(SpaceSimulation.ArrivalVelocityMode.CUSTOM, velocity);
+    }
+
+    private void applyArrival(SpaceSimulation.ArrivalVelocityMode mode, int velocity) {
+        var action = findAction(arrivalAction);
+        if (action == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        closeEditorState();
+        replaceAction(branch.id(), action.id(), action.withVelocity(mode, velocity), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void addNavigationTargetFromMap() {
+        if (mapContextRequest == null || activeBranchId == null) return;
+        selectedTarget = mapContextRequest.selection();
+        closeEditorState();
+        addAction(activeBranchId, flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void closeEditorState() {
         speedAction = null;
+        actionTypeAction = null;
+        targetAction = null;
+        arrivalAction = null;
+        mapContextRequest = null;
+    }
+
+    private void closeEditors() {
+        closeEditorState();
         rebuildComponents();
     }
 
@@ -361,7 +638,27 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
             setFocused(speedField);
             return speedField.mouseClicked(event, doubleClick);
         }
+        if (targetSearchField != null && targetSearchField.isMouseOver(event.x(), event.y())) {
+            setFocused(targetSearchField);
+            return targetSearchField.mouseClicked(event, doubleClick);
+        }
+        if (arrivalField != null && arrivalField.isMouseOver(event.x(), event.y())) {
+            setFocused(arrivalField);
+            return arrivalField.mouseClicked(event, doubleClick);
+        }
         return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        if (targetList != null) {
+            double relativeX = mouseX - leftPos;
+            double relativeY = mouseY - topPos;
+            if (targetList.isMouseOver(relativeX, relativeY)) {
+                return targetList.handleMouseScroll(relativeX, relativeY, scrollY);
+            }
+        }
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override
@@ -370,6 +667,21 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
             if (event.isEscape()) closeSpeedEditor();
             else if (event.isConfirmation()) applySpeedLimit();
             else if (speedField != null) speedField.keyPressed(event);
+            return true;
+        }
+        if (targetAction != null) {
+            if (event.isEscape()) closeEditors();
+            else if (targetSearchField != null) targetSearchField.keyPressed(event);
+            return true;
+        }
+        if (arrivalAction != null) {
+            if (event.isEscape()) closeEditors();
+            else if (event.isConfirmation()) applyCustomArrival();
+            else if (arrivalField != null) arrivalField.keyPressed(event);
+            return true;
+        }
+        if (actionTypeAction != null || mapContextRequest != null) {
+            if (event.isEscape()) closeEditors();
             return true;
         }
         return super.keyPressed(event);
@@ -406,22 +718,6 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         updateBranchActions(branchId, editable, rocket);
     }
 
-    private void cycleActionType(UUID branchId, int index, ActiveRocketData rocket) {
-        var branch = findBranch(branchId);
-        if (branch == null) return;
-        var current = branch.actions().get(index);
-        if (current.isGenerated()) return;
-        int currentType = java.util.Arrays.asList(EDITABLE_ACTION_TYPES).indexOf(current.type());
-        var changed = current.withType(EDITABLE_ACTION_TYPES[(currentType + 1) % EDITABLE_ACTION_TYPES.length]);
-        if (changed.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
-            changed = changed.withTarget(selectedTarget.objectId()).withOrbit(selectedTarget.orbit());
-        } else if (changed.type() == SpaceSimulation.ActionType.DECOUPLE) {
-            var pairs = connectedPairs(rocket);
-            if (!pairs.isEmpty()) changed = changed.withSegments(pairs.getFirst());
-        }
-        replaceAction(branchId, current.id(), changed, rocket);
-    }
-
     private void cycleActionParameter(UUID branchId, int index, ActiveRocketData rocket) {
         var branch = findBranch(branchId);
         if (branch == null) return;
@@ -456,18 +752,6 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         var changed = action.withOrbit(bands.get((current + 1) % bands.size()));
         selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
         replaceAction(branchId, action.id(), changed, rocket);
-    }
-
-    private void cycleActionVelocity(UUID branchId, int index, ActiveRocketData rocket) {
-        var branch = findBranch(branchId);
-        if (branch == null) return;
-        var action = branch.actions().get(index);
-        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return;
-        var modes = SpaceSimulation.ArrivalVelocityMode.values();
-        var mode = modes[(action.velocityMode().ordinal() + 1) % modes.length];
-        int velocity = mode == SpaceSimulation.ArrivalVelocityMode.CUSTOM
-                ? Math.max(100, action.targetVelocity()) : 0;
-        replaceAction(branchId, action.id(), action.withVelocity(mode, velocity), rocket);
     }
 
     private void adjustActionVelocity(UUID branchId, int index, int direction, ActiveRocketData rocket) {
@@ -570,7 +854,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket) {
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
             return currentDraftSnapshot().objects().stream().filter(object -> object.id().equals(action.targetId()))
-                    .findFirst().map(object -> RocketStarMapWidget.objectName(object.type()))
+                    .findFirst().map(RocketStarMapWidget::objectName)
                     .orElse(Component.translatable("screen.oritech_space_age.action.no_target"));
         }
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE) {
@@ -687,10 +971,14 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
 
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-            int cornerY = Math.min(endY, startY + 5);
-            graphics.fill(startX, startY, startX + 1, cornerY, 0xFF405468);
-            graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX), cornerY, 0xFF405468);
-            graphics.fill(endX, cornerY, endX + 1, endY, 0xFF405468);
+            int cornerY = Math.min(endY, startY + 7);
+            int color = 0xFFD58A32;
+            graphics.fill(startX - 1, startY, startX + 1, cornerY + 1, color);
+            graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX) + 1, cornerY + 1, color);
+            graphics.fill(endX - 1, cornerY, endX + 1, endY, color);
         }
+    }
+
+    private record TargetOption(UIComponent button, String searchText) {
     }
 }

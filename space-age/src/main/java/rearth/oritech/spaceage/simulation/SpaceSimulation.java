@@ -47,6 +47,7 @@ public class SpaceSimulation {
                             List<StoredFlightPlan> loadedPlans) {
         simulationId = loadedSimulationId;
         nonCelestialObjects.addAll(loadedObjects);
+        assignMissingAsteroidNames();
         loadedPlans.forEach(entry -> flightPlans.put(entry.assembler(), entry.plan()));
     }
 
@@ -61,6 +62,17 @@ public class SpaceSimulation {
         addAsteroidRing(5, 3_400_000, 4_000_000);
         addAsteroidRing(20, 5_500_000, 7_500_000);
         addAsteroidRing(20, 8_500_000, 9_500_000);
+        assignMissingAsteroidNames();
+    }
+
+    private void assignMissingAsteroidNames() {
+        var asteroids = nonCelestialObjects.stream()
+                .filter(object -> object.type == SpaceObjects.ObjectType.ASTEROID)
+                .sorted(Comparator.comparing(object -> object.id)).toList();
+        for (int index = 0; index < asteroids.size(); index++) {
+            var asteroid = asteroids.get(index);
+            if (asteroid.name.isBlank()) asteroid.name = "Asteroid " + String.format(Locale.ROOT, "%03d", index + 1);
+        }
     }
 
     private void addNearEarthAsteroids(int count) {
@@ -140,11 +152,15 @@ public class SpaceSimulation {
 
     private static SpaceObjectData toData(SpaceObjects.SimulatedObject object) {
         return new SpaceObjectData(object.id, object.type, object.currentPosition.x,
-                object.currentPosition.y, object.radius, object.surfaceGravity, object.currentState);
+                object.currentPosition.y, object.radius, object.surfaceGravity, object.currentState, object.name);
     }
 
     public record SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float radius,
-                                  float surfaceGravity, SpaceObjects.DetectionState detectionState) {
+                                  float surfaceGravity, SpaceObjects.DetectionState detectionState, String name) {
+        public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float radius,
+                               float surfaceGravity, SpaceObjects.DetectionState detectionState) {
+            this(id, type, x, y, radius, surfaceGravity, detectionState, "");
+        }
     }
 
     public record FlightPlannerSnapshot(UUID simulationId, UUID rocketId,

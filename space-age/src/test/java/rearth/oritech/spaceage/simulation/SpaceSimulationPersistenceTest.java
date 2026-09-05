@@ -43,6 +43,10 @@ class SpaceSimulationPersistenceTest {
         var initial = simulation.createFlightPlannerSnapshot(assembler, rocketId);
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
+        assertFalse(target.name().isBlank());
+        assertEquals(initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID).count(),
+                initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
+                        .map(SpaceSimulation.SpaceObjectData::name).distinct().count());
 
         var coreId = UUID.randomUUID();
         var boosterId = UUID.randomUUID();

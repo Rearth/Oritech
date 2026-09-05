@@ -44,14 +44,16 @@ public class SpaceObjects {
                 Codec.FLOAT.fieldOf("radius").forGetter(object -> object.radius),
                 Codec.FLOAT.fieldOf("gravity").forGetter(object -> object.surfaceGravity),
                 DetectionState.CODEC.fieldOf("detection").forGetter(object -> object.currentState),
+                Codec.STRING.optionalFieldOf("name", "").forGetter(object -> object.name),
                 Codec.FLOAT.optionalFieldOf("weight", 0F)
                         .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.weight : 0F)
-        ).apply(instance, (id, type, x, y, radius, gravity, detection, weight) -> {
+        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
             object.radius = radius;
             object.surfaceGravity = gravity;
             object.currentState = detection;
+            object.name = name;
             if (object instanceof MovableSimulatedObject movable) movable.weight = weight;
             return object;
         }));
@@ -61,6 +63,7 @@ public class SpaceObjects {
         public Vector2f currentPosition;
         public float radius;
         public float surfaceGravity;
+        public String name = "";
         public DetectionState currentState = DetectionState.HIDDEN;
 
         public SimulatedObject(ObjectType type) {

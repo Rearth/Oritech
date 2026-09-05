@@ -49,6 +49,7 @@ final class RocketStarMapWidget extends UIComponent {
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> pathsByBranch = new HashMap<>();
     private final Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames = new HashMap<>();
     private final Consumer<NavigationSelection> selectionListener;
+    private final Consumer<NavigationContextRequest> contextMenuListener;
     private SpaceSimulation.FlightPlannerSnapshot snapshot;
     private RocketFlightPathCalculator.FlightPath flightPath;
     private UUID selectedBranch;
@@ -69,10 +70,12 @@ final class RocketStarMapWidget extends UIComponent {
                         RocketFlightPathCalculator.FlightPath flightPath,
                         ActiveRocketData rocket,
                         UUID selectedBranch, NavigationSelection selectedTarget,
-                        Consumer<NavigationSelection> selectionListener) {
+                        Consumer<NavigationSelection> selectionListener,
+                        Consumer<NavigationContextRequest> contextMenuListener) {
         super(x, y, width, height);
         surface = OritechSurface.PANEL_INSET;
         this.selectionListener = selectionListener;
+        this.contextMenuListener = contextMenuListener;
         this.selectedTarget = selectedTarget;
         var segments = rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
                 .sorted(java.util.Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
@@ -270,8 +273,9 @@ final class RocketStarMapWidget extends UIComponent {
         object.widget.setSize(size, size);
         object.widget.render(graphics, mouseX, mouseY, delta);
         if (isInsideViewport(mouseX, mouseY) && object.widget.isMouseOver(mouseX, mouseY)) hoveredObject = object;
-        if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
-            graphics.text(Minecraft.getInstance().font, objectName(object.data.type()),
+        if (object.data.type() != SpaceObjects.ObjectType.ASTEROID || hoveredObject == object
+                || selectedTarget != null && selectedTarget.objectId.equals(object.data.id())) {
+            graphics.text(Minecraft.getInstance().font, objectName(object.data),
                     (int) Math.round(position.x + size / 2d + 3), (int) Math.round(position.y - 4),
                     0xFF9FB2C4, false);
         }
@@ -383,7 +387,7 @@ final class RocketStarMapWidget extends UIComponent {
             var object = objectById(selectedTarget.objectId);
             if (object != null) {
                 graphics.text(font, Component.translatable("screen.oritech_space_age.selected_target",
-                                objectName(object.data.type()), orbitName(selectedTarget.orbit)),
+                                objectName(object.data), orbitName(selectedTarget.orbit)),
                         x + 82, y + 9, 0xFFF6C65B, false);
             }
         }
@@ -451,7 +455,14 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
-        if (button != 0 || !isInsideViewport(mouseX, mouseY)) return false;
+        if (!isInsideViewport(mouseX, mouseY)) return false;
+        if (button == 1 && hoveredObject != null) {
+            contextMenuListener.accept(new NavigationContextRequest(
+                    new NavigationSelection(hoveredObject.data.id(), SpaceSimulation.OrbitBand.SURFACE),
+                    (int) mouseX, (int) mouseY));
+            return true;
+        }
+        if (button != 0) return false;
         dragging = true;
         movedWhileDragging = false;
         return true;
@@ -499,7 +510,7 @@ final class RocketStarMapWidget extends UIComponent {
         MapObject object = hoveredSelection == null ? hoveredObject : objectById(hoveredSelection.objectId);
         if (object != null) {
             var lines = new ArrayList<Component>();
-            lines.add(objectName(object.data.type()).copy().withStyle(ChatFormatting.BOLD));
+            lines.add(objectName(object.data).copy().withStyle(ChatFormatting.BOLD));
             if (hoveredSelection != null && hoveredSelection.orbit != SpaceSimulation.OrbitBand.SURFACE) {
                 lines.add(Component.translatable("screen.oritech_space_age.orbit_selection",
                         orbitName(hoveredSelection.orbit)));
@@ -598,6 +609,10 @@ final class RocketStarMapWidget extends UIComponent {
         return Component.translatable("screen.oritech_space_age.object." + type.name().toLowerCase(Locale.ROOT));
     }
 
+    static Component objectName(SpaceSimulation.SpaceObjectData object) {
+        return object.name().isBlank() ? objectName(object.type()) : Component.literal(object.name());
+    }
+
     static Component orbitName(SpaceSimulation.OrbitBand orbit) {
         return Component.translatable("screen.oritech_space_age.orbit." + orbit.name().toLowerCase(Locale.ROOT));
     }
@@ -611,6 +626,9 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     record NavigationSelection(UUID objectId, SpaceSimulation.OrbitBand orbit) {
+    }
+
+    record NavigationContextRequest(NavigationSelection selection, int mouseX, int mouseY) {
     }
 
     private record MapObject(SpaceSimulation.SpaceObjectData data, BlockWidget widget) {
