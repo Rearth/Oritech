@@ -21,6 +21,8 @@ public class SpaceObjects {
         public final UUID id;
         public final ObjectType type;
         public Vector2f currentPosition;
+        public float radius;
+        public float surfaceGravity;
         public DetectionState currentState = DetectionState.HIDDEN;
 
         public SimulatedObject(ObjectType type) {

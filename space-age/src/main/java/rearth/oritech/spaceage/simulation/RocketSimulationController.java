@@ -53,11 +53,11 @@ public final class RocketSimulationController {
     }
 
     // calculates the flight and adds the rocket to the saved active rockets
-    public static void launchRocket(ServerLevel level, ActiveRocketData rocket, RocketLaunchProfile flightPlan) {
-        OritechSpaceAge.LOGGER.debug("Planning rocket launch {} from {} in {} with {} segments", rocket.getRocketId(), flightPlan.worldStart(), level.dimension().identifier(), rocket.getStaticSegments().size());
+    public static void launchRocket(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition) {
+        OritechSpaceAge.LOGGER.debug("Planning rocket launch {} from {} in {} with {} segments", rocket.getRocketId(), launchPosition, level.dimension().identifier(), rocket.getStaticSegments().size());
 
         var savedData = getSavedData(level);
-        var flight = calculateFlight(rocket, flightPlan, ThreadLocalRandom.current(), level.dimension());
+        var flight = calculateFlight(rocket, launchPosition, ThreadLocalRandom.current(), level.dimension());
         OritechSpaceAge.LOGGER.debug("Rocket {} performance: wetMass={}kg, engines={}, thrust={}N, acceleration={}m/s², availableDeltaV={}m/s", rocket.getRocketId(), flight.performance().wetMassKilograms(), flight.performance().engineCount(), flight.performance().thrustNewtons(), flight.performance().liftoffAccelerationMetersPerSecondSquared(), flight.performance().availableDeltaVMetersPerSecond());
 
         if (!flight.canReachOrbit()) {
@@ -150,16 +150,16 @@ public final class RocketSimulationController {
         return server.overworld().getDataStorage().computeIfAbsent(ActiveRocketSavedData.TYPE);
     }
 
-    static RocketFlight calculateFlight(ActiveRocketData rocket, RocketLaunchProfile flightPlan, RandomGenerator random) {
-        return calculateFlight(rocket, flightPlan, random, Level.OVERWORLD);
+    static RocketFlight calculateFlight(ActiveRocketData rocket, BlockPos launchPosition, RandomGenerator random) {
+        return calculateFlight(rocket, launchPosition, random, Level.OVERWORLD);
     }
 
-    private static RocketFlight calculateFlight(ActiveRocketData rocket, RocketLaunchProfile flightPlan, RandomGenerator random, ResourceKey<Level> dimension) {
+    private static RocketFlight calculateFlight(ActiveRocketData rocket, BlockPos launchPosition,
+                                                RandomGenerator random, ResourceKey<Level> dimension) {
         var performance = RocketPerformanceCalculator.calculate(rocket);
-        var launchPosition = flightPlan.worldStart();
         var orbitPosition = launchPosition.offset(0, ORBIT_HEIGHT_BLOCKS, 0);
         var impactPosition = calculateImpactPosition(launchPosition, random);
-        var targetOrbit = new Vector2i(flightPlan.targetOrbit());
+        var targetOrbit = new Vector2i(20, ORBIT_HEIGHT_BLOCKS);
         var readiness = RocketPerformanceCalculator.getLaunchReadiness(performance);
 
         if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {

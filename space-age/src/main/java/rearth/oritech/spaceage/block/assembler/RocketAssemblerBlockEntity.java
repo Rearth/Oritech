@@ -16,7 +16,6 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-import org.joml.Vector2i;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
@@ -57,11 +56,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
             return false;
         }
 
-        // Actual flight still uses the legacy orbit controller. The programmable plan currently remains a preview
-        // and is only stored by the player's space simulation.
-        var flightPlan = new RocketLaunchProfile(start, new Vector2i(20, 1000));
-
-        RocketSimulationController.launchRocket((ServerLevel) level, result, flightPlan);
+        RocketSimulationController.launchRocket((ServerLevel) level, result, start);
         return true;
     }
 

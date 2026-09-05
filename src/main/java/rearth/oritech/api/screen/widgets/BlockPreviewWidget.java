@@ -39,6 +39,10 @@ public class BlockPreviewWidget extends UIComponent {
     public record BlockEntry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
     }
 
+    /** Camera values which can be carried over when a screen has to rebuild its widgets. */
+    public record ViewState(float pitch, float yaw, float yawVelocity, float pitchVelocity) {
+    }
+
     private final List<BlockEntry> blocks = new ArrayList<>();
     private float rotationX = DEFAULT_X_ROTATION;
     private float rotationY = DEFAULT_Y_ROTATION;
@@ -76,6 +80,23 @@ public class BlockPreviewWidget extends UIComponent {
         this.rotationY = yRotation;
         this.lastRenderedRotationX = this.rotationX;
         this.lastRenderedRotation = yRotation + rotation;
+        scaleDirty = true;
+        return this;
+    }
+
+    public ViewState getViewState() {
+        return new ViewState(rotationX, wrapDegrees(rotationY + rotation), yawVelocity, pitchVelocity);
+    }
+
+    public BlockPreviewWidget withViewState(ViewState state) {
+        if (state == null) return this;
+        rotationX = Mth.clamp(state.pitch(), MIN_PITCH, MAX_PITCH);
+        rotationY = state.yaw();
+        rotation = 0;
+        yawVelocity = state.yawVelocity();
+        pitchVelocity = state.pitchVelocity();
+        lastRenderedRotationX = rotationX;
+        lastRenderedRotation = rotationY;
         scaleDirty = true;
         return this;
     }

@@ -30,6 +30,7 @@ public final class RocketNetworking {
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentRef.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.SegmentConfiguration.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanAction.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanBranch.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);

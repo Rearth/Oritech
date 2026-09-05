@@ -20,6 +20,9 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     private int previewRevision;
     private @Nullable SpaceSimulation.FlightPlannerSnapshot flightPlannerSnapshot;
     private int flightPlannerRevision;
+    private @Nullable SpaceSimulation.FlightPlan draftFlightPlan;
+    private @Nullable java.util.UUID draftRocketId;
+    private boolean draftFlightPlanDirty;
 
     public RocketAssemblerMenu(int syncId, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         super(SpaceAgeMenus.ROCKET_ASSEMBLER.get(), syncId);
@@ -47,9 +50,18 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     }
 
     public void setPreview(@Nullable ActiveRocketData rocket) {
+        boolean changedRocket = this.rocket == null || rocket == null
+                || !this.rocket.getRocketId().equals(rocket.getRocketId());
         this.rocket = rocket;
         this.previewLoaded = true;
         this.previewRevision++;
+        if (changedRocket) {
+            flightPlannerSnapshot = null;
+            draftFlightPlan = null;
+            draftRocketId = null;
+            draftFlightPlanDirty = false;
+            flightPlannerRevision++;
+        }
     }
 
     public @Nullable SpaceSimulation.FlightPlannerSnapshot getFlightPlannerSnapshot() {
@@ -62,7 +74,30 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
 
     public void setFlightPlannerSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
         this.flightPlannerSnapshot = snapshot;
+        if (draftFlightPlan == null || !snapshot.rocketId().equals(draftRocketId) || !draftFlightPlanDirty) {
+            draftFlightPlan = snapshot.plan();
+            draftRocketId = snapshot.rocketId();
+            draftFlightPlanDirty = false;
+        }
         this.flightPlannerRevision++;
+    }
+
+    public @Nullable SpaceSimulation.FlightPlan getDraftFlightPlan() {
+        return draftFlightPlan;
+    }
+
+    public void setDraftFlightPlan(SpaceSimulation.FlightPlan plan) {
+        draftFlightPlan = plan;
+        draftRocketId = rocket == null ? null : rocket.getRocketId();
+        draftFlightPlanDirty = true;
+    }
+
+    public boolean isDraftFlightPlanDirty() {
+        return draftFlightPlanDirty;
+    }
+
+    public void markDraftFlightPlanSaved() {
+        draftFlightPlanDirty = false;
     }
 
     @Override

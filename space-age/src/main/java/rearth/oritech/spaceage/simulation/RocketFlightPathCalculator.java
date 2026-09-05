@@ -1,5 +1,6 @@
 package rearth.oritech.spaceage.simulation;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -8,28 +9,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 /**
- * Executes a flight plan against a lightweight two-dimensional physics model.
- * Each rocket segment keeps its own fuel and engines. Connected segments share
- * one position and velocity until a separation action splits them into two craft.
+ * Compiles high-level navigation actions into a bounded two-dimensional flight preview.
+ * The guidance simulation is deliberately small, but it keeps velocity continuous between navigation actions.
  */
 public final class RocketFlightPathCalculator {
 
-    private static final double EARTH_GRAVITY = RocketPerformanceCalculator.STANDARD_GRAVITY;
-    private static final double TARGET_REACHED_DISTANCE = 1_000;
-    private static final double LOW_ORBIT_DISTANCE = 1_000;
-    private static final double MEDIUM_ORBIT_DISTANCE = 20_000;
-    private static final double HIGH_ORBIT_DISTANCE = 40_000;
-    private static final double ATMOSPHERE_DISTANCE = 100_000;
-    private static final double SPACE_DRAG = 0.0001;
-    private static final double STOPPED_SPEED = 0.1;
-    private static final double ARRIVAL_SPEED_TOLERANCE = 1;
-    private static final double SURFACE_TARGET_DISTANCE = 4;
-
-    public static final Settings DEFAULT_SETTINGS = new Settings(0.25, 2, 1, 21_600, 43_200);
-    public static final InitialState EARTH_START = new InitialState(0, 0, 0, 0, 0);
+    private static final int MAX_NAVIGATION_STEPS = 10_000;
+    private static final int MAX_SAMPLES_PER_NAVIGATION = 1000;
+    private static final double MINECRAFT_DAY_SECONDS = 1_200;
+    private static final double MAX_NAVIGATION_SECONDS = 1_000 * MINECRAFT_DAY_SECONDS;
+    private static final double MIN_STEP_SECONDS = 0.05;
+    private static final double POSITION_TOLERANCE = 200;
+    private static final double VELOCITY_TOLERANCE = 2;
 
     private RocketFlightPathCalculator() {
     }
@@ -37,125 +30,545 @@ public final class RocketFlightPathCalculator {
     public static FlightPath calculate(ActiveRocketData rocket,
                                        List<SpaceSimulation.SpaceObjectData> objects,
                                        SpaceSimulation.FlightPlan plan) {
-        return calculate(rocket, objects, plan, EARTH_START, DEFAULT_SETTINGS, 0, 0);
-    }
-
-    public static FlightPath calculate(ActiveRocketData rocket,
-                                       List<SpaceSimulation.SpaceObjectData> objects,
-                                       SpaceSimulation.FlightPlan plan, int launchX, int launchZ) {
-        return calculate(rocket, objects, plan, EARTH_START, DEFAULT_SETTINGS, launchX, launchZ);
-    }
-
-    /** This overload also allows a future uploaded plan to begin while already in space. */
-    public static FlightPath calculate(ActiveRocketData rocket,
-                                       List<SpaceSimulation.SpaceObjectData> objects,
-                                       SpaceSimulation.FlightPlan plan,
-                                       InitialState initialState, Settings settings) {
-        return calculate(rocket, objects, plan, initialState, settings, 0, 0);
-    }
-
-    private static FlightPath calculate(ActiveRocketData rocket,
-                                        List<SpaceSimulation.SpaceObjectData> objects,
-                                        SpaceSimulation.FlightPlan plan,
-                                        InitialState initialState, Settings settings,
-                                        int launchX, int launchZ) {
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
         objects.forEach(object -> objectsById.put(object.id(), object));
+        var earth = objectsById.get(SpaceObjects.EARTH_ID);
+        if (earth == null) return new FlightPath(List.of(), List.of(), 0);
 
-        var initialCraft = createInitialCraft(rocket, initialState, settings, launchX, launchZ);
         var branchesByParent = new HashMap<UUID, SpaceSimulation.FlightPlanBranch>();
-        for (var branch : plan.branches()) {
-            if (!branch.isRoot()) branchesByParent.put(branch.parentSeparationAction(), branch);
-        }
+        plan.branches().stream().filter(branch -> !branch.isRoot())
+                .forEach(branch -> branchesByParent.put(branch.parentSeparationAction(), branch));
+        var configurations = new HashMap<SpaceSimulation.SegmentRef, SpaceSimulation.SegmentConfiguration>();
+        rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
+                .forEach(ref -> configurations.put(ref, plan.configurationFor(ref)));
 
-        var pathsByBranch = new LinkedHashMap<UUID, CraftPath>();
-        simulateBranch(plan.root(), initialCraft, objectsById, branchesByParent, pathsByBranch);
+        var context = new CalculationContext(objectsById, branchesByParent, configurations,
+                RocketFlightPlanRules.stageCount(plan, rocket.getStaticSegments().size()));
+        var initial = createInitialCraft(rocket, earth);
+        simulateBranch(plan.root(), initial, context);
 
-        // Keep the editor order stable even though child branches are calculated recursively.
         var orderedPaths = new ArrayList<CraftPath>();
         for (var branch : plan.branches()) {
-            var path = pathsByBranch.remove(branch.id());
+            var path = context.paths.remove(branch.id());
             if (path != null) orderedPaths.add(path);
         }
-        orderedPaths.addAll(pathsByBranch.values());
-        double lastCommand = orderedPaths.stream()
-                .flatMap(path -> path.actionMoments().stream())
-                .mapToDouble(ActionMoment::timeSeconds).max().orElse(initialState.timeSeconds());
-        return new FlightPath(orderedPaths, lastCommand);
+        orderedPaths.addAll(context.paths.values());
+        double lastCommand = orderedPaths.stream().flatMap(path -> path.actionMoments().stream())
+                .mapToDouble(ActionMoment::timeSeconds).max().orElse(0);
+        return new FlightPath(orderedPaths, List.copyOf(context.boosterEvents), lastCommand);
     }
 
-    private static CraftState createInitialCraft(ActiveRocketData rocket, InitialState initialState,
-                                                  Settings settings, int launchX, int launchZ) {
+    private static CraftState createInitialCraft(ActiveRocketData rocket,
+                                                  SpaceSimulation.SpaceObjectData earth) {
         var refsById = new HashMap<UUID, SpaceSimulation.SegmentRef>();
-        rocket.getStaticSegments().forEach((id, segment) ->
-                refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
-
-        var segmentStates = new LinkedHashMap<SpaceSimulation.SegmentRef, SegmentState>();
+        rocket.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
+        var segments = new LinkedHashMap<SpaceSimulation.SegmentRef, SegmentState>();
         var connections = new HashMap<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>>();
         for (var entry : rocket.getStaticSegments().entrySet()) {
-            var id = entry.getKey();
-            var ref = refsById.get(id);
-            var dynamic = rocket.getDynamicSegments().get(id);
-            // Calculate this segment alone. This prevents its engines from using
-            // fuel or energy that belongs to another attached segment.
-            var singleSegmentRocket = new ActiveRocketData(Map.of(id, entry.getValue()), Map.of(id, dynamic));
-            var performance = RocketPerformanceCalculator.calculate(singleSegmentRocket);
-            segmentStates.put(ref, new SegmentState(performance.dryMassKilograms(),
-                    performance.fuelMassKilograms(), performance.availableBurnSeconds(),
-                    performance.availableBurnSeconds(), performance.thrustNewtons(), false, false));
+            var ref = refsById.get(entry.getKey());
+            var dynamic = rocket.getDynamicSegments().get(entry.getKey());
+            var segmentRocket = new ActiveRocketData(Map.of(entry.getKey(), entry.getValue()),
+                    Map.of(entry.getKey(), dynamic));
+            var performance = RocketPerformanceCalculator.calculate(segmentRocket);
+            segments.put(ref, new SegmentState(performance.wetMassKilograms(), performance.thrustNewtons(),
+                    performance.availableDeltaVMetersPerSecond(), performance.availableBurnSeconds()));
 
             var neighbours = new LinkedHashSet<SpaceSimulation.SegmentRef>();
-            for (var connectedId : dynamic.getConnectedSegments()) {
-                var connectedRef = refsById.get(connectedId);
-                if (connectedRef != null) neighbours.add(connectedRef);
-            }
+            dynamic.getConnectedSegments().stream().map(refsById::get).filter(java.util.Objects::nonNull)
+                    .forEach(neighbours::add);
             connections.put(ref, neighbours);
         }
-        return new CraftState(settings, segmentStates, connections, initialState, launchX, launchZ);
+
+        // A newly assembled rocket begins on Earth itself. Its first line must not appear to originate from an
+        // arbitrary side of low orbit simply because that orbit is the planner's default selection.
+        return new CraftState(segments, connections, earth.x(), earth.y(), 0);
     }
 
     private static void simulateBranch(SpaceSimulation.FlightPlanBranch branch, CraftState state,
-                                       Map<UUID, SpaceSimulation.SpaceObjectData> objects,
-                                       Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent,
-                                       Map<UUID, CraftPath> paths) {
+                                       CalculationContext context) {
         state.branchId = branch.id();
-        state.projected = false;
-        state.addSample(true);
-        boolean planCompleted = true;
+        state.addSample(PathPhase.COAST, SpaceSimulation.FlightPlanAction.NO_TARGET);
+        boolean completed = true;
 
         for (int index = 0; index < branch.actions().size(); index++) {
             var action = branch.actions().get(index);
-            boolean completed;
-            if (action.type() == SpaceSimulation.ActionType.DISABLE_COUPLINGS) {
-                completed = separate(action, state, objects, branchesByParent, paths);
-            } else {
-                completed = executeAction(action, state, objects);
-            }
-            state.addSample(true);
+            if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) continue;
+            completed = switch (action.type()) {
+                case NAVIGATE_TO -> navigate(action, state, context);
+                case DECOUPLE -> separate(action, state, context);
+                case MAINTAIN_POSITION -> {
+                    state.maintainingPosition = true;
+                    yield true;
+                }
+                case DISCARD_CRAFT -> {
+                    state.discarded = true;
+                    yield true;
+                }
+                case DISCONNECT_BOOSTER -> true;
+            };
             state.actionMoments.add(new ActionMoment(branch.id(), index, action.id(), state.time,
                     state.x, state.y, completed));
-            if (!completed) {
-                planCompleted = false;
-                break;
-            }
-            // These actions intentionally end a branch. Later cards remain stored so a future editor can move them,
-            // but they are unreachable until the terminal action is moved or removed.
-            if (state.discarded || state.maintainingOrbit) break;
+            if (!completed || state.maintainingPosition || state.discarded) break;
         }
 
-        if (planCompleted && !state.crashed && !state.discarded) {
-            state.projected = true;
-            state.addSample(true);
-            advanceToTerminalState(state);
+        var terminal = state.discarded ? TerminalState.DISCARDED
+                : state.maintainingPosition ? TerminalState.MAINTAINING_POSITION
+                : completed ? TerminalState.READY : state.blockedState;
+        context.paths.put(branch.id(), state.toPath(terminal, context));
+    }
+
+    private static boolean navigate(SpaceSimulation.FlightPlanAction action, CraftState state,
+                                    CalculationContext context) {
+        var target = context.objects.get(action.targetId());
+        if (target == null || state.segments.isEmpty()) return false;
+        while (finishStage(action, state, context)) {
+            // Empty configured stages are skipped here so a reusable plan cannot strand a slightly different rocket.
         }
-        state.addSample(true);
-        paths.put(branch.id(), state.toPath(planCompleted));
+        var destination = targetPoint(state.x, state.y, target, action.orbit());
+        double startTime = state.time;
+        double approachX = destination.x - state.x;
+        double approachY = destination.y - state.y;
+        double approachLength = Math.hypot(approachX, approachY);
+        if (approachLength < 1) return true;
+        approachX /= approachLength;
+        approachY /= approachLength;
+        double targetSpeed = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
+                ? action.targetVelocity() : 0;
+        double targetVelocityX = approachX * targetSpeed;
+        double targetVelocityY = approachY * targetSpeed;
+        var navigationSamples = new ArrayList<PathSample>();
+        TwoBurnPlan constrainedPlan = null;
+        InterceptPlan maximumPlan = null;
+
+        // This is intentionally bounded per card. A broken or impossible plan should produce PLAN_BLOCKED quickly
+        // instead of stalling the client while it repeatedly circles a target it cannot reach.
+        int step = 0;
+        for (; step < MAX_NAVIGATION_STEPS
+                && state.time - startTime < MAX_NAVIGATION_SECONDS; step++) {
+            double offsetX = destination.x - state.x;
+            double offsetY = destination.y - state.y;
+            double distance = Math.hypot(offsetX, offsetY);
+            if (completeArrival(action, state, destination, targetVelocityX, targetVelocityY,
+                    navigationSamples)) return true;
+
+            var active = state.activeSegments(context);
+            double deltaVRate = state.deltaVPerSecond(active);
+            // The planner's resource is delta-v, so its burn rate is also the acceleration limit. Keeping those two
+            // values identical prevents a path from spending more delta-v than it actually adds to craft velocity.
+            double maximumAcceleration = deltaVRate;
+            if (maximumAcceleration <= 0.0001) {
+                state.blockedState = TerminalState.NO_ACTIVE_ENGINES;
+                appendNavigationSamples(state, navigationSamples);
+                return false;
+            }
+            GuidanceCommand command;
+            if (action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM) {
+                if (maximumPlan == null) {
+                    double availableDeltaV = state.availableDeltaV(context);
+                    if (availableDeltaV <= 0.0001) {
+                        state.blockedState = TerminalState.NOT_ENOUGH_DELTA_V;
+                        appendNavigationSamples(state, navigationSamples);
+                        return false;
+                    }
+                    maximumPlan = createInterceptPlan(state, offsetX, offsetY,
+                            maximumAcceleration, availableDeltaV);
+                    if (maximumPlan == null) {
+                        state.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
+                        appendNavigationSamples(state, navigationSamples);
+                        return false;
+                    }
+                }
+                command = maximumPlan.commandAt(state);
+            } else {
+                if (constrainedPlan == null) {
+                    double availableDeltaV = state.availableDeltaV(context);
+                    if (availableDeltaV <= 0.0001) {
+                        state.blockedState = TerminalState.NOT_ENOUGH_DELTA_V;
+                        appendNavigationSamples(state, navigationSamples);
+                        return false;
+                    }
+                    constrainedPlan = createTwoBurnPlan(state, destination, targetVelocityX, targetVelocityY,
+                            maximumAcceleration, availableDeltaV);
+                    if (constrainedPlan == null) {
+                        state.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
+                        appendNavigationSamples(state, navigationSamples);
+                        return false;
+                    }
+                }
+                command = constrainedPlan.commandAt(state);
+            }
+
+            // A shorter engine group can run dry without ending the stage. Re-plan from the exact current state if
+            // that leaves less thrust than the cached transfer requested; otherwise the preview would create speed
+            // which the remaining engines cannot actually provide.
+            if (command.burning && command.acceleration > maximumAcceleration * 1.0001) {
+                constrainedPlan = null;
+                maximumPlan = null;
+                continue;
+            }
+
+            // A transfer normally lands within the arrival tolerance on its final integration step. If rounding or
+            // a stage boundary leaves a small miss, discard the exhausted plan and solve the correction from here.
+            if (command.stepLimitSeconds <= 0.0001) {
+                constrainedPlan = null;
+                maximumPlan = null;
+                continue;
+            }
+
+            double speed = Math.hypot(state.velocityX, state.velocityY);
+            double stepSeconds = command.sampleStepSeconds;
+            stepSeconds = Math.min(stepSeconds, command.stepLimitSeconds);
+            if (command.burning) {
+                if (active.isEmpty() || maximumAcceleration <= 0.0001) {
+                    appendNavigationSamples(state, navigationSamples);
+                    return false;
+                }
+                double throttle = Math.clamp(command.acceleration / deltaVRate, 0, 1);
+                double nextEngineStop = active.stream().map(state.segments::get)
+                        .mapToDouble(segment -> segment.remainingBurnSeconds / Math.max(0.0001, throttle))
+                        .min().orElse(0);
+                if (command.velocityError < command.acceleration * stepSeconds) {
+                    stepSeconds = Math.max(0.001, command.velocityError / command.acceleration);
+                }
+                // Hit resource boundaries exactly. Overshooting one makes the next stage start with fuel which the
+                // previous stage should already have consumed, and visibly moves its separation marker.
+                stepSeconds = Math.min(stepSeconds, nextEngineStop);
+            } else if (speed <= 0.0001 && !Double.isFinite(command.stepLimitSeconds)) {
+                appendNavigationSamples(state, navigationSamples);
+                return false;
+            }
+            stepSeconds = Math.min(stepSeconds, MAX_NAVIGATION_SECONDS - (state.time - startTime));
+            if (stepSeconds <= 0.0001) break;
+
+            double accelerationX = command.burning ? command.directionX * command.acceleration : 0;
+            double accelerationY = command.burning ? command.directionY * command.acceleration : 0;
+            state.x += state.velocityX * stepSeconds + accelerationX * stepSeconds * stepSeconds * 0.5;
+            state.y += state.velocityY * stepSeconds + accelerationY * stepSeconds * stepSeconds * 0.5;
+            state.velocityX += accelerationX * stepSeconds;
+            state.velocityY += accelerationY * stepSeconds;
+            state.time += stepSeconds;
+            if (command.burning) {
+                // Consume exactly the delta-v applied to the trajectory. Basing this on thrust acceleration instead
+                // could drain more resource than the path gained whenever the two limits differ.
+                double throttle = Math.clamp(command.acceleration / deltaVRate, 0, 1);
+                state.consumeBurnTime(active, stepSeconds * throttle);
+            }
+            navigationSamples.add(state.createSample(command.phase, action.targetId(),
+                    command.burning ? Set.copyOf(active) : Set.of()));
+
+            if (finishStage(action, state, context)) {
+                constrainedPlan = null;
+                maximumPlan = null;
+                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+                while (finishStage(action, state, context)) {
+                    // Continue through any following stage which has no usable engines.
+                }
+            }
+        }
+
+        if (completeArrival(action, state, destination, targetVelocityX, targetVelocityY,
+                navigationSamples)) return true;
+        state.blockedState = step >= MAX_NAVIGATION_STEPS
+                ? TerminalState.INTEGRATION_STEP_LIMIT
+                : TerminalState.INTEGRATION_TIME_LIMIT;
+        appendNavigationSamples(state, navigationSamples);
+        return false;
+    }
+
+    private static InterceptPlan createInterceptPlan(CraftState state, double offsetX, double offsetY,
+                                                     double maximumAcceleration, double availableDeltaV) {
+        double timeToTarget = earliestInterceptTime(offsetX, offsetY, state.velocityX, state.velocityY,
+                maximumAcceleration, availableDeltaV);
+        if (!Double.isFinite(timeToTarget)) return null;
+
+        // This is the constant acceleration which makes p + vt + at²/2 land exactly on the target. Recalculating
+        // it from the current state corrects small integration errors without replacing the inherited velocity.
+        double accelerationX = 2 * (offsetX - state.velocityX * timeToTarget)
+                / (timeToTarget * timeToTarget);
+        double accelerationY = 2 * (offsetY - state.velocityY * timeToTarget)
+                / (timeToTarget * timeToTarget);
+        double acceleration = Math.hypot(accelerationX, accelerationY);
+        return new InterceptPlan(state.time, timeToTarget, accelerationX, accelerationY,
+                sampleStep(timeToTarget), acceleration <= 0.0001);
+    }
+
+    private static TwoBurnPlan createTwoBurnPlan(CraftState state, Point destination,
+                                                  double targetVelocityX, double targetVelocityY,
+                                                  double maximumAcceleration, double availableDeltaV) {
+        double previousDuration = MIN_STEP_SECONDS;
+        double duration = previousDuration;
+        TwoBurnSolution solution = null;
+
+        // Constrained arrivals are planned once as two constant burns. This avoids the feedback loop caused by
+        // repeatedly deciding whether to accelerate or brake from a slightly different state on every sample.
+        while (true) {
+            solution = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, duration);
+            if (solution.fits(maximumAcceleration, availableDeltaV)) break;
+            if (duration >= MAX_NAVIGATION_SECONDS) return null;
+            previousDuration = duration;
+            duration = Math.min(duration * 1.12, MAX_NAVIGATION_SECONDS);
+        }
+
+        double low = previousDuration;
+        double high = duration;
+        for (int pass = 0; pass < 32; pass++) {
+            double middle = (low + high) * 0.5;
+            var candidate = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, middle);
+            if (candidate.fits(maximumAcceleration, availableDeltaV)) high = middle;
+            else low = middle;
+        }
+        solution = twoBurnSolution(state, destination, targetVelocityX, targetVelocityY, high);
+        return new TwoBurnPlan(state.time, high * 0.5, solution.firstAccelerationX,
+                solution.firstAccelerationY, solution.secondAccelerationX, solution.secondAccelerationY,
+                sampleStep(high * 0.5));
+    }
+
+    private static double sampleStep(double phaseSeconds) {
+        // Constant-acceleration phases integrate exactly, so a fixed sample count stays smooth without making long
+        // low-thrust transfers perform tens of thousands of otherwise identical steps.
+        return Math.max(MIN_STEP_SECONDS, phaseSeconds / 160);
+    }
+
+    private static boolean completeArrival(SpaceSimulation.FlightPlanAction action, CraftState state,
+                                           Point destination, double targetVelocityX, double targetVelocityY,
+                                           List<PathSample> navigationSamples) {
+        double distance = Math.hypot(destination.x - state.x, destination.y - state.y);
+        if (!hasArrived(action, state, distance, targetVelocityX, targetVelocityY)) return false;
+        state.x = destination.x;
+        state.y = destination.y;
+        if (action.velocityMode() != SpaceSimulation.ArrivalVelocityMode.MAXIMUM) {
+            state.velocityX = targetVelocityX;
+            state.velocityY = targetVelocityY;
+        }
+        navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+        appendNavigationSamples(state, navigationSamples);
+        return true;
+    }
+
+    private static TwoBurnSolution twoBurnSolution(CraftState state, Point destination,
+                                                    double targetVelocityX, double targetVelocityY,
+                                                    double duration) {
+        double half = duration * 0.5;
+        double velocityChangeX = targetVelocityX - state.velocityX;
+        double velocityChangeY = targetVelocityY - state.velocityY;
+        double firstAccelerationX = (destination.x - state.x - state.velocityX * duration
+                - velocityChangeX * half * 0.5) / (half * half);
+        double firstAccelerationY = (destination.y - state.y - state.velocityY * duration
+                - velocityChangeY * half * 0.5) / (half * half);
+        double secondAccelerationX = velocityChangeX / half - firstAccelerationX;
+        double secondAccelerationY = velocityChangeY / half - firstAccelerationY;
+        return new TwoBurnSolution(firstAccelerationX, firstAccelerationY,
+                secondAccelerationX, secondAccelerationY, half);
+    }
+
+    private static double earliestInterceptTime(double offsetX, double offsetY,
+                                                double velocityX, double velocityY,
+                                                double maximumAcceleration, double availableDeltaV) {
+        double speedSquared = velocityX * velocityX + velocityY * velocityY;
+        double ballisticClosestTime = speedSquared <= 0.0001 ? 0
+                : Math.max(0, (offsetX * velocityX + offsetY * velocityY) / speedSquared);
+        ballisticClosestTime = Math.min(ballisticClosestTime, MAX_NAVIGATION_SECONDS);
+        double low = 0;
+        double high;
+        if (ballisticClosestTime > MIN_STEP_SECONDS
+                && requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, ballisticClosestTime)
+                <= maximumAcceleration) {
+            // Fast craft can have a very narrow intercept window around their unpowered closest approach. Testing
+            // that point explicitly prevents a logarithmic search from stepping over the useful solution.
+            high = ballisticClosestTime;
+        } else {
+            low = Math.max(0, ballisticClosestTime);
+            high = Math.max(MIN_STEP_SECONDS, low);
+            while (high < MAX_NAVIGATION_SECONDS
+                    && requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, high)
+                    > maximumAcceleration) {
+                low = high;
+                high *= 2;
+            }
+            high = Math.min(high, MAX_NAVIGATION_SECONDS);
+            if (requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, high)
+                    > maximumAcceleration) return Double.NaN;
+        }
+
+        // Acceleration establishes the earliest physically reachable interception. A binary search is both cheaper
+        // and easier to audit than a general-purpose trajectory optimiser for this preview.
+        for (int pass = 0; pass < 32; pass++) {
+            double middle = (low + high) * 0.5;
+            if (requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, middle)
+                    <= maximumAcceleration) high = middle;
+            else low = middle;
+        }
+        double earliest = high;
+        if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, earliest) <= availableDeltaV) {
+            return earliest;
+        }
+
+        // With limited fuel a slower interception can be possible even when the fastest one is not. Delta-v reaches
+        // its minimum where r/t is closest to the current velocity, so only this finite interval needs searching.
+        double projection = offsetX * velocityX + offsetY * velocityY;
+        double minimumDeltaVTime = projection > 0
+                ? (offsetX * offsetX + offsetY * offsetY) / projection
+                : MAX_NAVIGATION_SECONDS;
+        minimumDeltaVTime = Math.clamp(minimumDeltaVTime, earliest, MAX_NAVIGATION_SECONDS);
+        if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, minimumDeltaVTime)
+                > availableDeltaV) return Double.NaN;
+        low = earliest;
+        high = minimumDeltaVTime;
+        for (int pass = 0; pass < 32; pass++) {
+            double middle = (low + high) * 0.5;
+            if (requiredInterceptDeltaV(offsetX, offsetY, velocityX, velocityY, middle)
+                    <= availableDeltaV) high = middle;
+            else low = middle;
+        }
+        return high;
+    }
+
+    private static double requiredInterceptAcceleration(double offsetX, double offsetY,
+                                                         double velocityX, double velocityY,
+                                                         double seconds) {
+        return 2 * Math.hypot(offsetX - velocityX * seconds, offsetY - velocityY * seconds)
+                / (seconds * seconds);
+    }
+
+    private static double requiredInterceptDeltaV(double offsetX, double offsetY,
+                                                  double velocityX, double velocityY,
+                                                  double seconds) {
+        return requiredInterceptAcceleration(offsetX, offsetY, velocityX, velocityY, seconds) * seconds;
+    }
+
+    private static PathPhase phaseFor(CraftState state, double directionX, double directionY) {
+        double speed = Math.hypot(state.velocityX, state.velocityY);
+        double speedChange = speed < 0.0001 ? 1
+                : (directionX * state.velocityX + directionY * state.velocityY) / speed;
+        return speedChange > 0.2 ? PathPhase.ACCELERATE
+                : speedChange < -0.2 ? PathPhase.BRAKE : PathPhase.REDIRECT;
+    }
+
+    private static boolean hasArrived(SpaceSimulation.FlightPlanAction action, CraftState state, double distance,
+                                      double targetVelocityX, double targetVelocityY) {
+        if (distance > POSITION_TOLERANCE) return false;
+        if (action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM) return true;
+        return Math.hypot(state.velocityX - targetVelocityX,
+                state.velocityY - targetVelocityY) <= VELOCITY_TOLERANCE * 2;
+    }
+
+    private static boolean finishStage(SpaceSimulation.FlightPlanAction navigation, CraftState state,
+                                       CalculationContext context) {
+        boolean canAdvance = state.currentStage < context.stageCount;
+        if (!state.stageFinished(context)
+                && !(canAdvance && state.activeSegments(context).isEmpty())) return false;
+        int finishedStage = state.currentStage;
+        var detachedBoosters = state.boostersEndingCurrentStage(context);
+        for (var booster : detachedBoosters) {
+            disconnectBooster(navigation, booster, state, context, new Point(state.x, state.y),
+                    new Point(state.velocityX, state.velocityY), state.time, finishedStage);
+        }
+        if (!canAdvance) return !detachedBoosters.isEmpty();
+        state.currentStage++;
+        return true;
+    }
+
+    private static void appendNavigationSamples(CraftState state, List<PathSample> samples) {
+        if (samples.isEmpty()) return;
+        int stride = Math.max(1, (int) Math.ceil(samples.size() / (double) MAX_SAMPLES_PER_NAVIGATION));
+        PathSample previous = null;
+        for (int index = 0; index < samples.size(); index++) {
+            var sample = samples.get(index);
+            boolean stateChanged = previous == null || sample.phase() != previous.phase()
+                    || sample.stage() != previous.stage()
+                    || !sample.connectedSegments().equals(previous.connectedSegments());
+            if (stateChanged || index % stride == 0 || index == samples.size() - 1) state.samples.add(sample);
+            previous = sample;
+        }
+    }
+
+    private record InterceptPlan(double startTime, double duration,
+                                 double accelerationX, double accelerationY,
+                                 double sampleStepSeconds, boolean coasting) {
+        private GuidanceCommand commandAt(CraftState state) {
+            double remaining = Math.max(0, startTime + duration - state.time);
+            if (coasting) return GuidanceCommand.coast(remaining, sampleStepSeconds);
+            double acceleration = Math.hypot(accelerationX, accelerationY);
+            double directionX = accelerationX / acceleration;
+            double directionY = accelerationY / acceleration;
+            return new GuidanceCommand(true, directionX, directionY, acceleration,
+                    Double.POSITIVE_INFINITY, remaining, sampleStepSeconds,
+                    phaseFor(state, directionX, directionY));
+        }
+    }
+
+    private record TwoBurnPlan(double startTime, double halfDuration,
+                               double firstAccelerationX, double firstAccelerationY,
+                               double secondAccelerationX, double secondAccelerationY,
+                               double sampleStepSeconds) {
+        private GuidanceCommand commandAt(CraftState state) {
+            double elapsed = Math.max(0, state.time - startTime);
+            boolean firstBurn = elapsed < halfDuration;
+            double accelerationX = firstBurn ? firstAccelerationX : secondAccelerationX;
+            double accelerationY = firstBurn ? firstAccelerationY : secondAccelerationY;
+            double remaining = firstBurn ? halfDuration - elapsed : halfDuration * 2 - elapsed;
+            double acceleration = Math.hypot(accelerationX, accelerationY);
+            if (acceleration <= 0.0001) return GuidanceCommand.coast(remaining, sampleStepSeconds);
+            double directionX = accelerationX / acceleration;
+            double directionY = accelerationY / acceleration;
+            return new GuidanceCommand(true, directionX, directionY, acceleration,
+                    Double.POSITIVE_INFINITY, remaining, sampleStepSeconds,
+                    phaseFor(state, directionX, directionY));
+        }
+    }
+
+    private record TwoBurnSolution(double firstAccelerationX, double firstAccelerationY,
+                                   double secondAccelerationX, double secondAccelerationY,
+                                   double halfDuration) {
+        private boolean fits(double maximumAcceleration, double availableDeltaV) {
+            double firstAcceleration = Math.hypot(firstAccelerationX, firstAccelerationY);
+            double secondAcceleration = Math.hypot(secondAccelerationX, secondAccelerationY);
+            return Math.max(firstAcceleration, secondAcceleration) <= maximumAcceleration
+                    && (firstAcceleration + secondAcceleration) * halfDuration <= availableDeltaV;
+        }
+    }
+
+    private record GuidanceCommand(boolean burning, double directionX, double directionY,
+                                   double acceleration, double velocityError,
+                                   double stepLimitSeconds, double sampleStepSeconds, PathPhase phase) {
+        private static GuidanceCommand coast(double seconds, double sampleStepSeconds) {
+            return new GuidanceCommand(false, 0, 0, 0, 0, seconds, sampleStepSeconds, PathPhase.COAST);
+        }
+    }
+
+    private static void disconnectBooster(SpaceSimulation.FlightPlanAction navigation,
+                                          SpaceSimulation.SegmentRef booster, CraftState state,
+                                          CalculationContext context, Point position, Point velocity, double eventTime,
+                                          int stage) {
+        var segment = state.segments.remove(booster);
+        if (segment == null) return;
+        for (var neighbour : state.connections.getOrDefault(booster, Set.of())) {
+            var neighbourConnections = state.connections.get(neighbour);
+            if (neighbourConnections != null) neighbourConnections.remove(booster);
+        }
+        state.connections.remove(booster);
+
+        UUID eventId = boosterEventId(navigation.id(), booster);
+        var child = context.branchesByParent.get(eventId);
+        if (child == null) child = new SpaceSimulation.FlightPlanBranch(eventId, eventId, List.of());
+        context.boosterEvents.add(new BoosterEvent(eventId, state.branchId, child.id(), navigation.id(), booster,
+                stage, eventTime, position.x, position.y));
+
+        var detached = new CraftState(new LinkedHashMap<>(Map.of(booster, segment.copy())),
+                new HashMap<>(Map.of(booster, new LinkedHashSet<>())), position.x, position.y, eventTime);
+        detached.velocityX = velocity.x;
+        detached.velocityY = velocity.y;
+        detached.currentStage = state.currentStage;
+        simulateBranch(child, detached, context);
+    }
+
+    private static UUID boosterEventId(UUID navigationAction, SpaceSimulation.SegmentRef booster) {
+        String key = navigationAction + ":" + booster.anchor().asLong();
+        return UUID.nameUUIDFromBytes(key.getBytes(StandardCharsets.UTF_8));
     }
 
     private static boolean separate(SpaceSimulation.FlightPlanAction action, CraftState state,
-                                    Map<UUID, SpaceSimulation.SpaceObjectData> objects,
-                                    Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent,
-                                    Map<UUID, CraftPath> paths) {
+                                    CalculationContext context) {
         if (action.segments().size() != 2) return false;
         var retainedRef = action.segments().get(0);
         var detachedRef = action.segments().get(1);
@@ -166,352 +579,209 @@ public final class RocketFlightPathCalculator {
         state.connections.get(detachedRef).remove(retainedRef);
         var retained = state.connectedComponent(retainedRef);
         if (retained.contains(detachedRef)) return true;
-
         var detached = state.connectedComponent(detachedRef);
-        // Both craft inherit the exact state at separation. Their programs can then be calculated independently,
-        // while recursive evaluation still produces one flat list of paths for the screen.
         var detachedState = state.copyFor(detached);
         state.retain(retained);
 
-        var child = branchesByParent.get(action.id());
-        if (child == null) {
-            // A detached craft with no explicit program still needs a projected trajectory.
-            child = new SpaceSimulation.FlightPlanBranch(action.id(), action.id(), List.of());
-        }
-        simulateBranch(child, detachedState, objects, branchesByParent, paths);
+        var child = context.branchesByParent.get(action.id());
+        if (child == null) child = new SpaceSimulation.FlightPlanBranch(action.id(), action.id(), List.of());
+        simulateBranch(child, detachedState, context);
         return true;
     }
 
-    private static boolean executeAction(SpaceSimulation.FlightPlanAction action, CraftState state,
-                                         Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
-        return switch (action.type()) {
-            case START_ENGINE_BURN -> state.setEngines(action.segments(), true, false);
-            case START_BRAKING_BURN -> state.startBrakingBurn(action.segments());
-            case STOP_ENGINE_BURN -> state.setEngines(action.segments(), false, false);
-            case SET_NAVIGATION_TARGET -> {
-                var target = objects.get(action.targetId());
-                if (target == null) yield false;
-                state.setNavigationTarget(target);
-                yield true;
-            }
-            case SET_SURFACE_DESTINATION -> {
-                state.setSurfaceDestination(action.value(), action.secondaryValue());
-                yield true;
-            }
-            case SET_ARRIVAL_VELOCITY -> {
-                state.arrivalSpeed = Math.max(0, action.value());
-                yield true;
-            }
-            case WAIT_TICKS -> advanceFor(action.value() / 20d, state, ignored -> false);
-            case WAIT_SECONDS -> advanceFor(action.value(), state, ignored -> false);
-            case WAIT_UNTIL_DISTANCE -> waitForDistance(action, state, objects);
-            case WAIT_FOR_EVENT -> waitForEvent(action, state, objects);
-            case WAIT_UNTIL_BRAKING_POINT -> waitForBrakingPoint(action, state);
-            case MAINTAIN_ORBIT -> state.beginStationKeeping(action.segments());
-            case DISCARD_CRAFT -> {
-                state.discard();
-                yield true;
-            }
-            case OPEN_PARACHUTES -> state.hasSegments(action.segments());
-            case DISABLE_COUPLINGS -> true;
-        };
+    private static Point targetPoint(double sourceX, double sourceY,
+                                     SpaceSimulation.SpaceObjectData target,
+                                     SpaceSimulation.OrbitBand orbit) {
+        double offsetX = sourceX - target.x();
+        double offsetY = sourceY - target.y();
+        double length = Math.hypot(offsetX, offsetY);
+        double orbitRadius = target.radius() + orbit.altitude();
+        // A surface target lies on the body's edge, not its centre. Apart from looking more natural in the map,
+        // this also keeps the navigation solver from flying through a planet before declaring arrival.
+        if (length < 1) return new Point(target.x() + orbitRadius, target.y());
+        return new Point(target.x() + offsetX / length * orbitRadius,
+                target.y() + offsetY / length * orbitRadius);
     }
 
-    private static boolean waitForDistance(SpaceSimulation.FlightPlanAction action, CraftState state,
-                                           Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
-        double threshold = action.value();
-        boolean currentTarget = action.targetId().equals(SpaceSimulation.FlightPlanAction.CURRENT_TARGET);
-        var reference = currentTarget ? null : objects.get(SpaceObjects.EARTH_ID);
-        if (currentTarget && !state.hasTarget || !currentTarget && reference == null) return false;
+    private static final class CalculationContext {
+        private final Map<UUID, SpaceSimulation.SpaceObjectData> objects;
+        private final Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent;
+        private final Map<SpaceSimulation.SegmentRef, SpaceSimulation.SegmentConfiguration> configurations;
+        private final int stageCount;
+        private final Map<UUID, CraftPath> paths = new LinkedHashMap<>();
+        private final List<BoosterEvent> boosterEvents = new ArrayList<>();
 
-        double initialDistance = currentTarget ? state.distanceToTarget()
-                : distance(state.x, state.y, reference.x(), reference.y());
-        double initialDifference = initialDistance - threshold;
-        if (Math.abs(initialDifference) < 0.5) return true;
-        boolean initiallyOutside = initialDifference > 0;
-        return advanceUntil(state, current -> {
-            double currentDistance = currentTarget ? current.distanceToTarget()
-                    : distance(current.x, current.y, reference.x(), reference.y());
-            double difference = currentDistance - threshold;
-            return initiallyOutside ? difference <= 0 : difference >= 0;
-        });
-    }
-
-    private static boolean waitForEvent(SpaceSimulation.FlightPlanAction action, CraftState state,
-                                        Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
-        var events = SpaceSimulation.WaitEvent.values();
-        int eventIndex = (int) Math.clamp(action.value(), 0, events.length - 1);
-        Predicate<CraftState> condition = switch (events[eventIndex]) {
-            case LOW_ORBIT_REACHED -> current -> current.y >= LOW_ORBIT_DISTANCE;
-            case MEDIUM_ORBIT_REACHED -> current -> current.y >= MEDIUM_ORBIT_DISTANCE;
-            case HIGH_ORBIT_REACHED -> current -> current.y >= HIGH_ORBIT_DISTANCE;
-            case ATMOSPHERE_EXITED -> current -> current.y >= ATMOSPHERE_DISTANCE;
-            case TARGET_REACHED -> current -> {
-                return current.hasTarget && current.distanceToTarget() <= current.targetReachedDistance();
-            };
-            case FUEL_EMPTY -> current -> current.areSegmentsEmpty(action.segments());
-        };
-        if (!state.hasSegments(action.segments())) return false;
-        if (condition.test(state)) return true;
-        return advanceUntil(state, condition);
-    }
-
-    private static boolean waitForBrakingPoint(SpaceSimulation.FlightPlanAction action, CraftState state) {
-        if (!state.hasTarget || !state.hasSegments(action.segments())
-                || !state.hasEnoughBrakingDeltaV(action.segments())) return false;
-        if (state.shouldStartBraking(action.segments())) return true;
-        return advanceUntil(state, current -> current.shouldStartBraking(action.segments()));
-    }
-
-    private static boolean advanceFor(double seconds, CraftState state, Predicate<CraftState> stopCondition) {
-        double requestedTime = state.time + Math.max(0, seconds);
-        double targetTime = Math.min(requestedTime, state.simulationDeadline);
-        while (state.time < targetTime) {
-            integrate(state, Math.min(integrationStep(state, targetTime), targetTime - state.time));
-            if (stopCondition.test(state)) return true;
-            if (state.crashed) return false;
-        }
-        return state.time >= requestedTime;
-    }
-
-    private static boolean advanceUntil(CraftState state, Predicate<CraftState> condition) {
-        double deadline = terminalDeadline(state);
-        while (state.time < deadline) {
-            integrate(state, Math.min(integrationStep(state, deadline), deadline - state.time));
-            if (condition.test(state)) return true;
-            if (state.crashed || state.isSettled()) return false;
-        }
-        return false;
-    }
-
-    private static void advanceToTerminalState(CraftState state) {
-        double deadline = terminalDeadline(state);
-        while (state.time < deadline && !state.crashed && !state.isSettled()) {
-            integrate(state, Math.min(integrationStep(state, deadline), deadline - state.time));
-        }
-    }
-
-    private static double terminalDeadline(CraftState state) {
-        return Math.min(state.simulationDeadline,
-                state.time + state.remainingActiveBurnSeconds() + state.settings.maxCoastSeconds);
-    }
-
-    private static double integrationStep(CraftState state, double targetTime) {
-        if (state.hasActiveBrakingBurn() && state.hasTarget) {
-            double approachWindow = Math.max(state.targetReachedDistance() * 10,
-                    Math.hypot(state.velocityX, state.velocityY) * 10);
-            if (state.distanceToTarget() < approachWindow) return state.settings.stepSeconds;
-        }
-        return targetTime - state.time > 60 ? state.settings.longStepSeconds : state.settings.stepSeconds;
-    }
-
-    private static void integrate(CraftState state, double step) {
-        if (state.maintainingOrbit) {
-            state.integrateStationKeeping(step);
-            return;
+        private CalculationContext(Map<UUID, SpaceSimulation.SpaceObjectData> objects,
+                                   Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent,
+                                   Map<SpaceSimulation.SegmentRef, SpaceSimulation.SegmentConfiguration> configurations,
+                                   int stageCount) {
+            this.objects = objects;
+            this.branchesByParent = branchesByParent;
+            this.configurations = configurations;
+            this.stageCount = stageCount;
         }
 
-        double accelerationX = 0;
-        double accelerationY = -EARTH_GRAVITY * SpaceSimulation.getGravityStrength((float) Math.max(0, state.y));
-        boolean producingThrust = state.canProduceThrust();
-        if (!producingThrust) {
-            // Space drag is a preview safeguard rather than realistic aerodynamics. It lets abandoned craft reach a
-            // terminal state, but must never reduce acceleration while an engine is actively burning.
-            accelerationX -= state.velocityX * SPACE_DRAG;
-            accelerationY -= state.velocityY * SPACE_DRAG;
+        private SpaceSimulation.SegmentConfiguration configuration(SpaceSimulation.SegmentRef ref) {
+            return configurations.getOrDefault(ref,
+                    new SpaceSimulation.SegmentConfiguration(ref, "", false, List.of(1)));
         }
-
-        if (producingThrust) {
-            state.updateSurfaceHeading();
-            double forwardImpulse = 0;
-            double brakingImpulse = 0;
-            for (var segment : state.segments.values()) {
-                if (!segment.canProduceThrust()) continue;
-                double burnStep = Math.min(step, segment.remainingBurnSeconds);
-                if (segment.brakingBurn) brakingImpulse += segment.thrust * burnStep;
-                else forwardImpulse += segment.thrust * burnStep;
-                segment.remainingBurnSeconds -= burnStep;
-            }
-            double currentMass = state.currentMass();
-            if (currentMass > 0) {
-                double forwardAcceleration = forwardImpulse / step / currentMass;
-                accelerationX += state.headingX * forwardAcceleration;
-                accelerationY += state.headingY * forwardAcceleration;
-
-                // A braking burn aims for the requested arrival velocity, rather than simply pointing away from
-                // the target. Capping this impulse avoids oscillating around zero with coarse preview time steps.
-                double velocityErrorX = state.desiredArrivalVelocityX() - state.velocityX;
-                double velocityErrorY = state.desiredArrivalVelocityY() - state.velocityY;
-                double velocityError = Math.hypot(velocityErrorX, velocityErrorY);
-                if (brakingImpulse > 0 && velocityError > 0.0001) {
-                    double brakingAcceleration = Math.min(brakingImpulse / step / currentMass, velocityError / step);
-                    accelerationX += velocityErrorX / velocityError * brakingAcceleration;
-                    accelerationY += velocityErrorY / velocityError * brakingAcceleration;
-                }
-            }
-        }
-
-        state.velocityX += accelerationX * step;
-        state.velocityY += accelerationY * step;
-        state.x += state.velocityX * step;
-        state.y += state.velocityY * step;
-        state.time += step;
-
-        // Ground contact prevents an idle or underpowered preview from falling below the map.
-        if (state.y > 1) state.leftGround = true;
-        if (state.y <= 0) {
-            if (state.leftGround && state.velocityY < 0) state.crashed = true;
-            state.y = 0;
-            state.velocityY = state.crashed ? 0 : Math.max(0, state.velocityY);
-        }
-        if (state.hasArrived()) state.stopBrakingEngines();
-        state.addSample(false);
-    }
-
-    private static double distance(double x1, double y1, double x2, double y2) {
-        return Math.hypot(x2 - x1, y2 - y1);
-    }
-
-    /** maxCoastSeconds limits automatic projection; maxDurationSeconds limits the complete client calculation. */
-    public record Settings(double stepSeconds, double longStepSeconds, double sampleIntervalSeconds,
-                           double maxCoastSeconds, double maxDurationSeconds) {
-        public Settings(double stepSeconds, double longStepSeconds, double sampleIntervalSeconds,
-                        double maxCoastSeconds) {
-            this(stepSeconds, longStepSeconds, sampleIntervalSeconds, maxCoastSeconds, maxCoastSeconds * 2);
-        }
-
-        public Settings {
-            if (stepSeconds <= 0 || longStepSeconds < stepSeconds || sampleIntervalSeconds <= 0
-                    || maxCoastSeconds <= 0 || maxDurationSeconds <= 0) {
-                throw new IllegalArgumentException("Flight path settings must use positive durations");
-            }
-        }
-    }
-
-    public record InitialState(double x, double y, double velocityX, double velocityY, double timeSeconds) {
-    }
-
-    public record PathSample(double timeSeconds, double x, double y, double velocityX, double velocityY,
-                             PathPhase phase, double remainingDeltaV, UUID targetId, boolean projected) {
-    }
-
-    public record ActionMoment(UUID branchId, int actionIndex, UUID actionId, double timeSeconds,
-                               double x, double y, boolean completed) {
-    }
-
-    public record CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments,
-                            List<PathSample> samples, List<ActionMoment> actionMoments,
-                            double durationSeconds, double remainingDeltaV, boolean fuelDepleted,
-                            TerminalState terminalState) {
-    }
-
-    public record FlightPath(List<CraftPath> paths, double lastCommandSeconds) {
-    }
-
-    public enum PathPhase {
-        PLANNED_BURN,
-        PLANNED_COAST,
-        PROJECTED_BURN
-    }
-
-    public enum TerminalState {
-        STOPPED,
-        EARTH_IMPACT,
-        MAINTAINING_ORBIT,
-        DISCARDED,
-        PLAN_BLOCKED,
-        MAX_DURATION
     }
 
     private static final class SegmentState {
-        private final double dryMass;
-        private final double initialFuelMass;
-        private final double initialBurnSeconds;
+        private final double wetMass;
         private final double thrust;
+        private double remainingDeltaV;
         private double remainingBurnSeconds;
-        private boolean enginesEnabled;
-        private boolean brakingBurn;
 
-        private SegmentState(double dryMass, double initialFuelMass, double initialBurnSeconds,
-                             double remainingBurnSeconds, double thrust, boolean enginesEnabled,
-                             boolean brakingBurn) {
-            this.dryMass = dryMass;
-            this.initialFuelMass = initialFuelMass;
-            this.initialBurnSeconds = initialBurnSeconds;
-            this.remainingBurnSeconds = remainingBurnSeconds;
+        private SegmentState(double wetMass, double thrust, double remainingDeltaV, double remainingBurnSeconds) {
+            this.wetMass = wetMass;
             this.thrust = thrust;
-            this.enginesEnabled = enginesEnabled;
-            this.brakingBurn = brakingBurn;
+            this.remainingDeltaV = remainingDeltaV;
+            this.remainingBurnSeconds = remainingBurnSeconds;
         }
 
         private SegmentState copy() {
-            return new SegmentState(dryMass, initialFuelMass, initialBurnSeconds,
-                    remainingBurnSeconds, thrust, enginesEnabled, brakingBurn);
-        }
-
-        private boolean canProduceThrust() {
-            return enginesEnabled && thrust > 0 && remainingBurnSeconds > 0;
-        }
-
-        private double currentMass() {
-            double fuelRatio = initialBurnSeconds <= 0 ? 0 : remainingBurnSeconds / initialBurnSeconds;
-            return dryMass + initialFuelMass * Math.clamp(fuelRatio, 0, 1);
+            return new SegmentState(wetMass, thrust, remainingDeltaV, remainingBurnSeconds);
         }
     }
 
     private static final class CraftState {
-        private final Settings settings;
         private final Map<SpaceSimulation.SegmentRef, SegmentState> segments;
         private final Map<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>> connections;
         private final List<PathSample> samples = new ArrayList<>();
         private final List<ActionMoment> actionMoments = new ArrayList<>();
-        private final int launchX;
-        private final int launchZ;
         private UUID branchId;
-        private double nextSampleTime;
-        private double simulationDeadline;
-        private double time;
         private double x;
         private double y;
+        private double time;
         private double velocityX;
         private double velocityY;
-        private double headingX;
-        private double headingY = 1;
-        private boolean projected;
-        private boolean leftGround;
-        private boolean crashed;
-        private boolean maintainingOrbit;
+        private int currentStage = 1;
+        private boolean maintainingPosition;
         private boolean discarded;
-        private boolean collectSamples = true;
-        private boolean hasTarget;
-        private boolean surfaceTarget;
-        private double targetX;
-        private double targetY;
-        private double surfaceArcHeight;
-        private double arrivalDirectionX;
-        private double arrivalDirectionY = 1;
-        private double arrivalSpeed;
-        private Set<SpaceSimulation.SegmentRef> stationKeepingSegments = Set.of();
-        private UUID targetId = SpaceSimulation.FlightPlanAction.NO_TARGET;
+        private TerminalState blockedState = TerminalState.PLAN_BLOCKED;
 
-        private CraftState(Settings settings, Map<SpaceSimulation.SegmentRef, SegmentState> segments,
+        private CraftState(Map<SpaceSimulation.SegmentRef, SegmentState> segments,
                            Map<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>> connections,
-                           InitialState initial, int launchX, int launchZ) {
-            this.settings = settings;
+                           double x, double y, double time) {
             this.segments = segments;
             this.connections = connections;
-            this.launchX = launchX;
-            this.launchZ = launchZ;
-            this.time = initial.timeSeconds;
-            this.nextSampleTime = initial.timeSeconds;
-            // Malformed or extremely long client plans must not freeze the render thread. The deadline covers
-            // explicit waits as well as the automatic burn/coast projection after the last command.
-            this.simulationDeadline = initial.timeSeconds + settings.maxDurationSeconds;
-            this.x = initial.x;
-            this.y = initial.y;
-            this.velocityX = initial.velocityX;
-            this.velocityY = initial.velocityY;
-            this.leftGround = initial.y > 1;
+            this.x = x;
+            this.y = y;
+            this.time = time;
+        }
+
+        private double mass() {
+            return segments.values().stream().mapToDouble(segment -> segment.wetMass).sum();
+        }
+
+        private List<SpaceSimulation.SegmentRef> activeSegments(CalculationContext context) {
+            return segments.keySet().stream()
+                    .filter(ref -> context.configuration(ref).usesEnginesDuring(currentStage))
+                    .filter(ref -> segments.get(ref).thrust > 0
+                            && segments.get(ref).remainingBurnSeconds > 0.0001
+                            && segments.get(ref).remainingDeltaV > 0.0001)
+                    .toList();
+        }
+
+        private double deltaVPerSecond(List<SpaceSimulation.SegmentRef> active) {
+            double mass = Math.max(1, mass());
+            double result = 0;
+            for (var ref : active) {
+                var segment = segments.get(ref);
+                result += segment.remainingDeltaV / Math.max(0.0001, segment.remainingBurnSeconds)
+                        * segment.wetMass / mass;
+            }
+            return result;
+        }
+
+        private void consumeBurnTime(List<SpaceSimulation.SegmentRef> active, double seconds) {
+            for (var ref : active) {
+                var segment = segments.get(ref);
+                double fraction = Math.min(1, seconds / Math.max(0.0001, segment.remainingBurnSeconds));
+                segment.remainingDeltaV *= 1 - fraction;
+                segment.remainingBurnSeconds = Math.max(0, segment.remainingBurnSeconds - seconds);
+            }
+        }
+
+        private boolean stageFinished(CalculationContext context) {
+            // Shorter boosters may sit empty until the longest stage-ending booster is spent. They then separate
+            // together, which produces one clear stage boundary in both the path and the timeline.
+            var firingBoosters = segments.keySet().stream()
+                    .filter(ref -> {
+                        var configuration = context.configuration(ref);
+                        return configuration.booster()
+                                && configuration.usesEnginesDuring(currentStage);
+                    }).toList();
+            var endingBoosters = firingBoosters.stream()
+                    .filter(ref -> context.configuration(ref).lastEngineStage() == currentStage)
+                    .toList();
+            if (!endingBoosters.isEmpty()) return endingBoosters.stream()
+                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= 0.0001
+                            || segments.get(ref).remainingDeltaV <= 0.0001);
+            // A booster may have been selected for a later stage but still run dry now. If every booster firing in
+            // this stage is empty, advance instead of leaving the craft permanently stuck on an engine-less stage.
+            return !firingBoosters.isEmpty() && firingBoosters.stream()
+                    .allMatch(ref -> segments.get(ref).remainingBurnSeconds <= 0.0001
+                            || segments.get(ref).remainingDeltaV <= 0.0001);
+        }
+
+        private List<SpaceSimulation.SegmentRef> boostersEndingCurrentStage(CalculationContext context) {
+            return segments.keySet().stream().filter(ref -> {
+                var configuration = context.configuration(ref);
+                return configuration.booster() && (configuration.lastEngineStage() <= currentStage
+                        || segments.get(ref).remainingBurnSeconds <= 0.0001
+                        || segments.get(ref).remainingDeltaV <= 0.0001);
+            }).toList();
+        }
+
+        private double availableDeltaV(CalculationContext context) {
+            var copy = copyFor(Set.copyOf(segments.keySet()));
+            double result = 0;
+            while (true) {
+                var active = copy.activeSegments(context);
+                if (copy.currentStage < context.stageCount
+                        && (copy.stageFinished(context) || active.isEmpty())) {
+                    for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
+                    copy.currentStage++;
+                    continue;
+                }
+                if (active.isEmpty()) break;
+                double rate = copy.deltaVPerSecond(active);
+                if (rate <= 0) break;
+                double seconds = active.stream().map(copy.segments::get)
+                        .mapToDouble(segment -> segment.remainingBurnSeconds).min().orElse(0);
+                if (seconds <= 0) break;
+                copy.consumeBurnTime(active, seconds);
+                result += rate * seconds;
+                if (copy.stageFinished(context)) {
+                    for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
+                    copy.currentStage = Math.min(context.stageCount, copy.currentStage + 1);
+                }
+            }
+            return result;
+        }
+
+        private void removeSegment(SpaceSimulation.SegmentRef ref) {
+            segments.remove(ref);
+            for (var neighbour : connections.getOrDefault(ref, Set.of())) {
+                var neighbourConnections = connections.get(neighbour);
+                if (neighbourConnections != null) neighbourConnections.remove(ref);
+            }
+            connections.remove(ref);
+        }
+
+        private Set<SpaceSimulation.SegmentRef> connectedComponent(SpaceSimulation.SegmentRef start) {
+            var result = new LinkedHashSet<SpaceSimulation.SegmentRef>();
+            var open = new ArrayList<SpaceSimulation.SegmentRef>();
+            open.add(start);
+            while (!open.isEmpty()) {
+                var current = open.removeLast();
+                if (!result.add(current)) continue;
+                connections.getOrDefault(current, Set.of()).stream().filter(neighbour -> !result.contains(neighbour))
+                        .forEach(open::add);
+            }
+            return result;
         }
 
         private CraftState copyFor(Set<SpaceSimulation.SegmentRef> component) {
@@ -523,21 +793,10 @@ public final class RocketFlightPathCalculator {
                 neighbours.retainAll(component);
                 copiedConnections.put(ref, neighbours);
             }
-            var copy = new CraftState(settings, copiedSegments, copiedConnections,
-                    new InitialState(x, y, velocityX, velocityY, time), launchX, launchZ);
-            copy.targetId = targetId;
-            copy.hasTarget = hasTarget;
-            copy.surfaceTarget = surfaceTarget;
-            copy.targetX = targetX;
-            copy.targetY = targetY;
-            copy.surfaceArcHeight = surfaceArcHeight;
-            copy.arrivalDirectionX = arrivalDirectionX;
-            copy.arrivalDirectionY = arrivalDirectionY;
-            copy.arrivalSpeed = arrivalSpeed;
-            copy.headingX = headingX;
-            copy.headingY = headingY;
-            copy.leftGround = leftGround;
-            copy.simulationDeadline = simulationDeadline;
+            var copy = new CraftState(copiedSegments, copiedConnections, x, y, time);
+            copy.velocityX = velocityX;
+            copy.velocityY = velocityY;
+            copy.currentStage = currentStage;
             return copy;
         }
 
@@ -547,315 +806,69 @@ public final class RocketFlightPathCalculator {
             connections.values().forEach(neighbours -> neighbours.retainAll(retained));
         }
 
-        private Set<SpaceSimulation.SegmentRef> connectedComponent(SpaceSimulation.SegmentRef start) {
-            var result = new LinkedHashSet<SpaceSimulation.SegmentRef>();
-            var open = new ArrayList<SpaceSimulation.SegmentRef>();
-            open.add(start);
-            while (!open.isEmpty()) {
-                var current = open.removeLast();
-                if (!result.add(current)) continue;
-                for (var neighbour : connections.getOrDefault(current, Set.of())) {
-                    if (!result.contains(neighbour)) open.add(neighbour);
-                }
-            }
-            return result;
+        private void addSample(PathPhase phase, UUID target) {
+            samples.add(createSample(phase, target, Set.of()));
         }
 
-        private boolean setEngines(List<SpaceSimulation.SegmentRef> selected, boolean enabled,
-                                   boolean brakingBurn) {
-            if (!hasSegments(selected)) return false;
-            selectedSegments(selected).forEach(segment -> {
-                segment.enginesEnabled = enabled;
-                segment.brakingBurn = enabled && brakingBurn;
-            });
-            return true;
+        private PathSample createSample(PathPhase phase, UUID target,
+                                        Set<SpaceSimulation.SegmentRef> firingSegments) {
+            return new PathSample(time, x, y, Math.hypot(velocityX, velocityY), velocityX, velocityY,
+                    phase, target, currentStage, Set.copyOf(segments.keySet()), firingSegments);
         }
 
-        private boolean startBrakingBurn(List<SpaceSimulation.SegmentRef> selected) {
-            return hasTarget && setEngines(selected, true, true);
-        }
-
-        private void setNavigationTarget(SpaceSimulation.SpaceObjectData target) {
-            targetId = target.id();
-            hasTarget = true;
-            surfaceTarget = false;
-            targetX = target.x();
-            targetY = target.y();
-            double offsetX = targetX - x;
-            double offsetY = targetY - y;
-            double targetDistance = Math.hypot(offsetX, offsetY);
-            if (targetDistance < 0.0001) return;
-
-            // Keep this heading until another navigation command is executed. Re-aiming
-            // every tick makes an overshooting rocket turn around and loop over its target.
-            headingX = offsetX / targetDistance;
-            headingY = offsetY / targetDistance;
-            arrivalDirectionX = headingX;
-            arrivalDirectionY = headingY;
-        }
-
-        private void setSurfaceDestination(long worldX, long worldZ) {
-            double routeDistance = Math.hypot(worldX - launchX, worldZ - launchZ);
-            targetId = SpaceSimulation.FlightPlanAction.SURFACE_TARGET;
-            hasTarget = true;
-            surfaceTarget = true;
-            targetX = routeDistance;
-            targetY = 0;
-            // The surface coordinates are flattened into a vertical flight plane. This keeps the reusable physics
-            // two-dimensional while still making path length, fuel use and arrival timing depend on the real route.
-            surfaceArcHeight = Math.clamp(routeDistance * 0.25, 1_000, 20_000);
-            arrivalDirectionX = 1;
-            arrivalDirectionY = 0;
-            updateSurfaceHeading();
-        }
-
-        private void updateSurfaceHeading() {
-            if (!surfaceTarget || targetX < 0.0001) return;
-            if (x >= targetX) {
-                headingX = arrivalDirectionX;
-                headingY = arrivalDirectionY;
-                return;
-            }
-            double progress = inverseSmoothStep(Math.clamp(x / targetX, 0, 1));
-            double lookAhead = Math.min(1, progress + 0.025);
-            double guideX = targetX * smoothStep(lookAhead);
-            double guideY = 4 * surfaceArcHeight * lookAhead * (1 - lookAhead);
-            double offsetX = guideX - x;
-            double offsetY = guideY - y;
-            double length = Math.hypot(offsetX, offsetY);
-            if (length < 0.0001) return;
-            headingX = offsetX / length;
-            headingY = offsetY / length;
-        }
-
-        private static double smoothStep(double value) {
-            return value * value * (3 - 2 * value);
-        }
-
-        private static double inverseSmoothStep(double value) {
-            double low = 0;
-            double high = 1;
-            // There is no useful closed form here for the preview. A few binary-search steps are stable and cheap,
-            // and avoid adding another coordinate system solely for surface flights.
-            for (int i = 0; i < 10; i++) {
-                double middle = (low + high) * 0.5;
-                if (smoothStep(middle) < value) low = middle;
-                else high = middle;
-            }
-            return (low + high) * 0.5;
-        }
-
-        private double distanceToTarget() {
-            return hasTarget ? distance(x, y, targetX, targetY) : Double.POSITIVE_INFINITY;
-        }
-
-        private double targetReachedDistance() {
-            return surfaceTarget ? SURFACE_TARGET_DISTANCE : TARGET_REACHED_DISTANCE;
-        }
-
-        private double desiredArrivalVelocityX() {
-            return arrivalDirectionX * arrivalSpeed;
-        }
-
-        private double desiredArrivalVelocityY() {
-            return arrivalDirectionY * arrivalSpeed;
-        }
-
-        private double arrivalVelocityError() {
-            return Math.hypot(desiredArrivalVelocityX() - velocityX,
-                    desiredArrivalVelocityY() - velocityY);
-        }
-
-        private boolean hasArrived() {
-            return hasTarget && distanceToTarget() <= targetReachedDistance()
-                    && arrivalVelocityError() <= ARRIVAL_SPEED_TOLERANCE;
-        }
-
-        private void stopBrakingEngines() {
-            segments.values().stream().filter(segment -> segment.brakingBurn).forEach(segment -> {
-                segment.enginesEnabled = false;
-                segment.brakingBurn = false;
-            });
-        }
-
-        private boolean hasEnoughBrakingDeltaV(List<SpaceSimulation.SegmentRef> selected) {
-            double mass = currentMass();
-            if (mass <= 0) return false;
-            double availableDeltaV = selectedSegments(selected).stream()
-                    .mapToDouble(segment -> segment.thrust * segment.remainingBurnSeconds).sum() / mass;
-            return availableDeltaV + ARRIVAL_SPEED_TOLERANCE >= arrivalVelocityError();
-        }
-
-        private boolean shouldStartBraking(List<SpaceSimulation.SegmentRef> selected) {
-            double remainingDistance = distanceToTarget();
-            if (!Double.isFinite(remainingDistance) || remainingDistance <= targetReachedDistance()) return true;
-
-            double offsetX = targetX - x;
-            double offsetY = targetY - y;
-            double directionX = offsetX / remainingDistance;
-            double directionY = offsetY / remainingDistance;
-            double relativeClosingSpeed = (velocityX - desiredArrivalVelocityX()) * directionX
-                    + (velocityY - desiredArrivalVelocityY()) * directionY;
-            if (relativeClosingSpeed <= ARRIVAL_SPEED_TOLERANCE) return false;
-
-            double thrust = selectedSegments(selected).stream()
-                    .filter(segment -> segment.thrust > 0 && segment.remainingBurnSeconds > 0)
-                    .mapToDouble(segment -> segment.thrust).sum();
-            double acceleration = currentMass() <= 0 ? 0 : thrust / currentMass();
-            if (acceleration <= 0) return false;
-            double estimatedBrakingDistance = relativeClosingSpeed * relativeClosingSpeed / (2 * acceleration);
-            if (remainingDistance > estimatedBrakingDistance * 1.25 + targetReachedDistance()) return false;
-
-            // The cheap estimate keeps long flights fast. Near turnover, copying the small craft state gives us a
-            // result that also accounts for gravity, other burning segments and propellant lost during braking.
-            return brakingWouldReachTarget(selected, directionX, directionY);
-        }
-
-        private boolean brakingWouldReachTarget(List<SpaceSimulation.SegmentRef> selected,
-                                                double initialDirectionX, double initialDirectionY) {
-            var prediction = copyFor(Set.copyOf(segments.keySet()));
-            prediction.collectSamples = false;
-            prediction.setEngines(selected, true, true);
-            double deadline = Math.min(prediction.simulationDeadline,
-                    prediction.time + prediction.remainingActiveBurnSeconds() + 60);
-
-            while (prediction.time < deadline && !prediction.crashed) {
-                integrate(prediction, Math.min(integrationStep(prediction, deadline), deadline - prediction.time));
-                double remainingAlongRoute = (targetX - prediction.x) * initialDirectionX
-                        + (targetY - prediction.y) * initialDirectionY;
-                if (prediction.arrivalVelocityError() <= ARRIVAL_SPEED_TOLERANCE) {
-                    return remainingAlongRoute <= targetReachedDistance();
-                }
-                // Reaching the target plane while still too fast means braking any later would also overshoot.
-                if (remainingAlongRoute <= targetReachedDistance()) return true;
-                if (prediction.areSegmentsEmpty(selected)) return true;
-            }
-            return false;
-        }
-
-        private boolean beginStationKeeping(List<SpaceSimulation.SegmentRef> selected) {
-            if (!hasSegments(selected)) return false;
-            var refs = selected.isEmpty() ? new LinkedHashSet<>(segments.keySet()) : new LinkedHashSet<>(selected);
-            boolean hasUsableEngine = refs.stream().map(segments::get)
-                    .anyMatch(segment -> segment.thrust > 0 && segment.remainingBurnSeconds > 0);
-            if (!hasUsableEngine) return false;
-            segments.values().forEach(segment -> {
-                segment.enginesEnabled = false;
-                segment.brakingBurn = false;
-            });
-            stationKeepingSegments = Set.copyOf(refs);
-            maintainingOrbit = true;
-            velocityX = 0;
-            velocityY = 0;
-            return true;
-        }
-
-        private void integrateStationKeeping(double step) {
-            var available = stationKeepingSegments.stream().map(segments::get)
-                    .filter(segment -> segment.thrust > 0 && segment.remainingBurnSeconds > 0).toList();
-            if (available.isEmpty()) {
-                maintainingOrbit = false;
-                integrate(this, step);
-                return;
-            }
-
-            // Holding is intentionally abstract: higher gravity consumes more propellant, but the craft remains at
-            // one map position. A later orbital simulation can replace this without changing the plan action.
-            double gravity = SpaceSimulation.getGravityStrength((float) Math.max(0, y));
-            double burnSeconds = step * (0.0001 + gravity * 0.002) / available.size();
-            available.forEach(segment -> segment.remainingBurnSeconds =
-                    Math.max(0, segment.remainingBurnSeconds - burnSeconds));
-            velocityX = 0;
-            velocityY = 0;
-            time += step;
-            addSample(false);
-        }
-
-        private void discard() {
-            discarded = true;
-            maintainingOrbit = false;
-            velocityX = 0;
-            velocityY = 0;
-            segments.values().forEach(segment -> {
-                segment.enginesEnabled = false;
-                segment.brakingBurn = false;
-            });
-        }
-
-        private boolean hasSegments(List<SpaceSimulation.SegmentRef> selected) {
-            return selected.isEmpty() || selected.stream().allMatch(segments::containsKey);
-        }
-
-        private List<SegmentState> selectedSegments(List<SpaceSimulation.SegmentRef> selected) {
-            if (selected.isEmpty()) return new ArrayList<>(segments.values());
-            return selected.stream().map(segments::get).toList();
-        }
-
-        private boolean areSegmentsEmpty(List<SpaceSimulation.SegmentRef> selected) {
-            return hasSegments(selected) && selectedSegments(selected).stream()
-                    .noneMatch(segment -> segment.remainingBurnSeconds > 0);
-        }
-
-        private boolean canProduceThrust() {
-            return !discarded && !maintainingOrbit
-                    && segments.values().stream().anyMatch(SegmentState::canProduceThrust);
-        }
-
-        private boolean hasActiveBrakingBurn() {
-            return segments.values().stream().anyMatch(segment -> segment.canProduceThrust() && segment.brakingBurn);
-        }
-
-        private double remainingActiveBurnSeconds() {
-            return segments.values().stream().filter(segment -> segment.enginesEnabled)
-                    .mapToDouble(segment -> segment.remainingBurnSeconds).max().orElse(0);
-        }
-
-        private double currentMass() {
-            return segments.values().stream().mapToDouble(SegmentState::currentMass).sum();
-        }
-
-        private double remainingDeltaV() {
-            double mass = currentMass();
-            if (mass <= 0) return 0;
-            return segments.values().stream()
-                    .mapToDouble(segment -> segment.thrust * segment.remainingBurnSeconds).sum() / mass;
-        }
-
-        private void addSample(boolean force) {
-            if (!collectSamples) return;
-            if (!force && time + 0.0001 < nextSampleTime) return;
-            var phase = canProduceThrust()
-                    ? projected ? PathPhase.PROJECTED_BURN : PathPhase.PLANNED_BURN
-                    : PathPhase.PLANNED_COAST;
-            var sample = new PathSample(time, x, y, velocityX, velocityY, phase,
-                    remainingDeltaV(), targetId, projected);
-            if (samples.isEmpty() || force || !samePosition(samples.getLast(), sample)) samples.add(sample);
-            nextSampleTime = time + settings.sampleIntervalSeconds;
-        }
-
-        private static boolean samePosition(PathSample first, PathSample second) {
-            return Math.abs(first.x - second.x) < 0.001 && Math.abs(first.y - second.y) < 0.001
-                    && first.phase == second.phase && first.targetId.equals(second.targetId)
-                    && first.projected == second.projected;
-        }
-
-        private boolean isSettled() {
-            if (maintainingOrbit) return false;
-            if (canProduceThrust()) return false;
-            if (Math.hypot(velocityX, velocityY) > STOPPED_SPEED) return false;
-            return y <= 0 || SpaceSimulation.getGravityStrength((float) y) <= 0;
-        }
-
-        private CraftPath toPath(boolean planCompleted) {
-            var terminal = discarded ? TerminalState.DISCARDED
-                    : maintainingOrbit ? TerminalState.MAINTAINING_ORBIT
-                    : crashed ? TerminalState.EARTH_IMPACT
-                    : isSettled() ? TerminalState.STOPPED
-                    : time >= simulationDeadline - 0.0001 ? TerminalState.MAX_DURATION
-                    : planCompleted ? TerminalState.MAX_DURATION : TerminalState.PLAN_BLOCKED;
-            boolean depleted = segments.values().stream().noneMatch(segment -> segment.remainingBurnSeconds > 0);
+        private CraftPath toPath(TerminalState terminal, CalculationContext context) {
             return new CraftPath(branchId, Set.copyOf(segments.keySet()), List.copyOf(samples),
-                    List.copyOf(actionMoments), time, remainingDeltaV(), depleted, terminal);
+                    List.copyOf(actionMoments), time, availableDeltaV(context), terminal);
+        }
+    }
+
+    private record Point(double x, double y) {
+    }
+
+    public record PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
+                             double velocityX, double velocityY, PathPhase phase, UUID targetId,
+                             int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
+                             Set<SpaceSimulation.SegmentRef> firingSegments) {
+    }
+
+    public record ActionMoment(UUID branchId, int actionIndex, UUID actionId, double timeSeconds,
+                               double x, double y, boolean completed) {
+    }
+
+    public record BoosterEvent(UUID id, UUID branchId, UUID childBranchId, UUID navigationActionId,
+                               SpaceSimulation.SegmentRef segment, int stage,
+                               double timeSeconds, double x, double y) {
+    }
+
+    public record CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments,
+                            List<PathSample> samples, List<ActionMoment> actionMoments,
+                            double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
+    }
+
+    public record FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents,
+                             double lastCommandSeconds) {
+    }
+
+    public enum PathPhase {
+        ACCELERATE,
+        REDIRECT,
+        COAST,
+        BRAKE
+    }
+
+    public enum TerminalState {
+        READY,
+        MAINTAINING_POSITION,
+        DISCARDED,
+        PLAN_BLOCKED,
+        NOT_ENOUGH_DELTA_V,
+        NO_ACTIVE_ENGINES,
+        NO_FEASIBLE_TRANSFER,
+        INTEGRATION_STEP_LIMIT,
+        INTEGRATION_TIME_LIMIT;
+
+        public boolean isFailure() {
+            return this != READY && this != MAINTAINING_POSITION && this != DISCARDED;
         }
     }
 }

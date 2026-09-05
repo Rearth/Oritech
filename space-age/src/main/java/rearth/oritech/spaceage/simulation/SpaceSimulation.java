@@ -13,160 +13,127 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-
-// Owns the lightweight star-system state and the plans created inside that simulation.
-// one or more players can use the same space simulation
-// A player by default gets his own simulation. However if he uses a space interaction block / module that is already
-// used with another simulation, he joins that one.
-// There is also the option of manually leaving existing ones to get a new instance.
-
-// Positions in space are in 2d, where X is the "right" / relative offset to the height / orbit. Units are blocks
-// Y is "away" from the earth (distance from surface), with outer space and the sun both away from earth, but at different X positions.
-// different orbits are also at specific Y heights each.
-
-// general orbit bands / distances:
-// low earth orbit: ~1000 distance. High gravity
-// medium earth orbit: ~20 000 distance. Medium Gravity
-// High / Geostationary Orbit: ~40 000. Low gravity
-// initial outer space: ~100 000. Gravity influence reaches 0 at 100 000.
-// first few asteroids are between ~100000 and ~200000
-// sun: 3 000 000
-// mars: 8 000 000
-// asteroid ring: 20 000 000
-
+/**
+ * Owns one game-scaled solar system and the flight plans created inside it.
+ * Positions use one shared two-dimensional orbital plane with the sun at the origin.
+ */
 public class SpaceSimulation {
 
-    // Space objects use one shared horizontal range. This keeps the star map and
-    // flight path on the same simple coordinate system at every distance.
-    public static final float HORIZONTAL_POSITION_LIMIT = 1_000_000;
-    private static final float HORIZONTAL_OBJECT_SPREAD = HORIZONTAL_POSITION_LIMIT * 0.9f;
+    public static final UUID SUN_ID = UUID.fromString("00000000-0000-0000-0000-000000000002");
+    public static final UUID MARS_ID = UUID.fromString("00000000-0000-0000-0000-000000000003");
 
-    // this is always the same and initialized once:
-    private static final Set<SpaceObjects.SimulatedObject> celestialObjects = new HashSet<>();
+    private static final Set<SpaceObjects.SimulatedObject> CELESTIAL_OBJECTS = new HashSet<>();
 
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
-    // A simulation may contain assemblers from several dimensions. GlobalPos prevents two matching block
-    // coordinates from accidentally sharing a plan.
     private final Map<GlobalPos, FlightPlan> flightPlans = new HashMap<>();
 
-    // this will be used for loading the sim from disk
     public SpaceSimulation(UUID loadedSimulationId, Set<SpaceObjects.SimulatedObject> loadedObjects) {
-        this.simulationId = loadedSimulationId;
-        this.nonCelestialObjects.addAll(loadedObjects);
+        simulationId = loadedSimulationId;
+        nonCelestialObjects.addAll(loadedObjects);
     }
 
     public SpaceSimulation() {
-        this.simulationId = UUID.randomUUID();
+        simulationId = UUID.randomUUID();
         generateRandomObjects();
     }
 
     private void generateRandomObjects() {
-        // add asteroids (and more things in the future) to nonCelestialObjects
+        // Asteroids use polar placement so the belt is meaningful in the new solar coordinate system.
+        addNearEarthAsteroids(8);
+        addAsteroidRing(5, 3_400_000, 4_000_000);
+        addAsteroidRing(20, 5_500_000, 7_500_000);
+        addAsteroidRing(20, 8_500_000, 9_500_000);
+    }
 
-        var nearAsteroidCount = 5; // in range 100k - 200k
-        var mediumAsteroidCount = 20; // in range 1M - 18 M
-        var beltAsteroidCount = 20;    // in range 19.5M - 20.5M
-
-        for (var i = 0; i < nearAsteroidCount; i++) {
+    private void addNearEarthAsteroids(int count) {
+        // These sit just outside Earth's high orbit, mostly on the side facing away from the sun.
+        for (int index = 0; index < count; index++) {
+            double angle = Math.PI - 1.1 + 2.2 * index / Math.max(1, count - 1);
+            double radius = 140_000 + Math.random() * 70_000;
             var asteroid = new SpaceObjects.Asteroid();
-            asteroid.currentPosition = new Vector2f(
-                    distributedHorizontalPosition(i, nearAsteroidCount),
-                    (float) (Math.random() * 100_000 + 100_000)
-            );
+            asteroid.currentPosition = new Vector2f((float) (-3_000_000 + Math.cos(angle) * radius),
+                    (float) (Math.sin(angle) * radius));
             asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
-            asteroid.weight = (float) (Math.random() * 99 + 1);
-            nonCelestialObjects.add(asteroid);
-        }
-
-        for (var i = 0; i < mediumAsteroidCount; i++) {
-            var asteroid = new SpaceObjects.Asteroid();
-            asteroid.currentPosition = new Vector2f(
-                    distributedHorizontalPosition(i, mediumAsteroidCount),
-                    (float) (Math.random() * 17_000_000 + 1_000_000)
-            );
-            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
-            asteroid.weight = (float) (Math.random() * 99 + 1);
-            nonCelestialObjects.add(asteroid);
-        }
-
-        for (var i = 0; i < beltAsteroidCount; i++) {
-            var asteroid = new SpaceObjects.Asteroid();
-            asteroid.currentPosition = new Vector2f(
-                    distributedHorizontalPosition(i, beltAsteroidCount),
-                    (float) (Math.random() * 1_000_000 + 19_500_000)
-            );
-            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
-            asteroid.weight = (float) (Math.random() * 99 + 1);
+            asteroid.weight = (float) (Math.random() * 40 + 1);
+            asteroid.radius = 1_500 + asteroid.weight * 35;
+            asteroid.surfaceGravity = asteroid.weight * 0.0002f;
             nonCelestialObjects.add(asteroid);
         }
     }
 
-    // initializes celestial Objects once
+    private void addAsteroidRing(int count, double minimumRadius, double maximumRadius) {
+        double angleOffset = Math.random() * Math.PI * 2;
+        for (int index = 0; index < count; index++) {
+            double angle = angleOffset + Math.PI * 2 * index / count;
+            double radius = minimumRadius + Math.random() * (maximumRadius - minimumRadius);
+            var asteroid = new SpaceObjects.Asteroid();
+            asteroid.currentPosition = new Vector2f((float) (Math.cos(angle) * radius),
+                    (float) (Math.sin(angle) * radius));
+            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
+            asteroid.weight = (float) (Math.random() * 99 + 1);
+            asteroid.radius = 1_500 + asteroid.weight * 35;
+            asteroid.surfaceGravity = asteroid.weight * 0.0002f;
+            nonCelestialObjects.add(asteroid);
+        }
+    }
+
     static {
+        var sun = new SpaceObjects.SimulatedObject(SUN_ID, SpaceObjects.ObjectType.SUN);
+        sun.currentPosition = new Vector2f(0, 0);
+        sun.radius = 250_000;
+        sun.surfaceGravity = 274;
+        sun.currentState = SpaceObjects.DetectionState.PRECISE;
+        CELESTIAL_OBJECTS.add(sun);
 
         var earth = new SpaceObjects.SimulatedObject(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH);
-        earth.currentPosition = new Vector2f(0, 0);
+        earth.currentPosition = new Vector2f(-3_000_000, 0);
+        earth.radius = 60_000;
+        earth.surfaceGravity = 9.81f;
         earth.currentState = SpaceObjects.DetectionState.PRECISE;
-        celestialObjects.add(earth);
+        CELESTIAL_OBJECTS.add(earth);
 
-        var sun = new SpaceObjects.SimulatedObject(UUID.fromString("00000000-0000-0000-0000-000000000002"), SpaceObjects.ObjectType.SUN);
-        sun.currentPosition = new Vector2f(HORIZONTAL_POSITION_LIMIT * -2 / 3, 3_000_000);
-        sun.currentState = SpaceObjects.DetectionState.PRECISE;
-        celestialObjects.add(sun);
-
-        var mars = new SpaceObjects.SimulatedObject(UUID.fromString("00000000-0000-0000-0000-000000000003"), SpaceObjects.ObjectType.MARS);
-        mars.currentPosition = new Vector2f(HORIZONTAL_POSITION_LIMIT * 2 / 3, 8_000_000);
+        var mars = new SpaceObjects.SimulatedObject(MARS_ID, SpaceObjects.ObjectType.MARS);
+        mars.currentPosition = new Vector2f(5_000_000, 1_500_000);
+        mars.radius = 45_000;
+        mars.surfaceGravity = 3.71f;
         mars.currentState = SpaceObjects.DetectionState.PRECISE;
-        celestialObjects.add(mars);
-    }
-
-    // returns a value between 0 and 1
-    public static float getGravityStrength(float height) {
-        return Math.clamp(1 - height / 100_000, 0, 1);
+        CELESTIAL_OBJECTS.add(mars);
     }
 
     public FlightPlannerSnapshot createFlightPlannerSnapshot(GlobalPos assemblerPosition, UUID rocketId) {
         var objects = createObjectData();
-        return new FlightPlannerSnapshot(simulationId, rocketId, assemblerPosition.pos().getX(),
-                assemblerPosition.pos().getZ(), objects,
+        return new FlightPlannerSnapshot(simulationId, rocketId, objects,
                 flightPlans.getOrDefault(assemblerPosition, FlightPlan.empty()));
     }
 
     private List<SpaceObjectData> createObjectData() {
-        // Screens receive immutable values rather than the mutable simulation objects. This also keeps internal
-        // asteroid state out of the networking codec when more simulation-only fields are added later.
         var objects = new ArrayList<SpaceObjectData>();
-        celestialObjects.stream()
-                .map(SpaceSimulation::toData)
-                .forEach(objects::add);
-        nonCelestialObjects.stream()
-                .map(SpaceSimulation::toData)
-                .forEach(objects::add);
+        CELESTIAL_OBJECTS.stream().map(SpaceSimulation::toData).forEach(objects::add);
+        nonCelestialObjects.stream().map(SpaceSimulation::toData).forEach(objects::add);
         objects.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
         return objects;
     }
 
     public void updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
-        // The client edits freely, but the stored copy is always rebuilt from values valid for this exact rocket.
         var validated = RocketFlightPlanRules.validate(plan, rocket, createObjectData());
         if (validated != null) flightPlans.put(assemblerPosition, validated);
     }
 
     private static SpaceObjectData toData(SpaceObjects.SimulatedObject object) {
         return new SpaceObjectData(object.id, object.type, object.currentPosition.x,
-                object.currentPosition.y, object.currentState);
+                object.currentPosition.y, object.radius, object.surfaceGravity, object.currentState);
     }
 
-    public record SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y,
-                                  SpaceObjects.DetectionState detectionState) {
+    public record SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float radius,
+                                  float surfaceGravity, SpaceObjects.DetectionState detectionState) {
     }
 
-    public record FlightPlannerSnapshot(UUID simulationId, UUID rocketId, int launchX, int launchZ,
+    public record FlightPlannerSnapshot(UUID simulationId, UUID rocketId,
                                         List<SpaceObjectData> objects, FlightPlan plan) {
     }
 
-    /** A stable segment reference used by plans that may be applied to another identical rocket. */
+    /** Stable segment identity for plans applied to another rocket built at the same relative positions. */
     public record SegmentRef(BlockPos anchor) {
 
         public static SegmentRef of(StaticRocketSegment segment) {
@@ -179,33 +146,68 @@ public class SpaceSimulation {
         }
     }
 
-    private static float distributedHorizontalPosition(int index, int count) {
-        if (count <= 1) return 0;
-        return -HORIZONTAL_OBJECT_SPREAD + index * HORIZONTAL_OBJECT_SPREAD * 2 / (count - 1);
+    /** Configuration follows the segment's relative anchor so reusable plans still match an identical rocket. */
+    public record SegmentConfiguration(SegmentRef segment, String name, boolean booster,
+                                       List<Integer> engineStages) {
+
+        public SegmentConfiguration {
+            engineStages = List.copyOf(engineStages);
+        }
+
+        public boolean usesEnginesDuring(int stage) {
+            return engineStages.contains(stage);
+        }
+
+        public int lastEngineStage() {
+            return engineStages.stream().mapToInt(Integer::intValue).max().orElse(0);
+        }
+
+        public SegmentConfiguration withName(String newName) {
+            return new SegmentConfiguration(segment, newName, booster, engineStages);
+        }
+
+        public SegmentConfiguration withBooster(boolean newBooster) {
+            return new SegmentConfiguration(segment, name, newBooster, engineStages);
+        }
+
+        public SegmentConfiguration withEngineStages(List<Integer> newEngineStages) {
+            return new SegmentConfiguration(segment, name, booster, newEngineStages);
+        }
     }
 
-    public record FlightPlan(List<FlightPlanBranch> branches) {
+    public record FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations) {
 
         public FlightPlan {
             branches = List.copyOf(branches);
+            segmentConfigurations = List.copyOf(segmentConfigurations);
         }
 
         public static FlightPlan empty() {
-            return new FlightPlan(List.of(FlightPlanBranch.root()));
+            return new FlightPlan(List.of(FlightPlanBranch.root()), List.of());
         }
 
         public FlightPlanBranch root() {
             return branches.stream().filter(FlightPlanBranch::isRoot).findFirst()
                     .orElseGet(FlightPlanBranch::root);
         }
+
+        public FlightPlan withBranches(List<FlightPlanBranch> newBranches) {
+            return new FlightPlan(newBranches, segmentConfigurations);
+        }
+
+        public FlightPlan withSegmentConfigurations(List<SegmentConfiguration> newConfigurations) {
+            return new FlightPlan(branches, newConfigurations);
+        }
+
+        public SegmentConfiguration configurationFor(SegmentRef segment) {
+            return segmentConfigurations.stream().filter(configuration -> configuration.segment().equals(segment))
+                    .findFirst().orElse(new SegmentConfiguration(segment, "", false, List.of(1)));
+        }
     }
 
-    /**
-     * Branches are stored as a flat list to keep editing and networking simple.
-     * A child points to the separation action that creates its craft.
-     */
+    /** Branches stay flat because this makes timeline editing and network serialization easy to follow. */
     public record FlightPlanBranch(UUID id, UUID parentSeparationAction, List<FlightPlanAction> actions) {
-        public static final UUID NO_PARENT = new UUID(0, 2);
+        public static final UUID NO_PARENT = new UUID(0, 1);
 
         public FlightPlanBranch {
             actions = List.copyOf(actions);
@@ -224,81 +226,81 @@ public class SpaceSimulation {
         }
     }
 
-    /**
-     * An empty segment list means all segments in the current craft. A separation
-     * stores two segments: the first stays on this branch and the second branches off.
-     */
+    /** A navigation action blocks its branch until the automatically calculated transfer is complete. */
     public record FlightPlanAction(UUID id, ActionType type, List<SegmentRef> segments,
-                                   UUID targetId, long value, long secondaryValue) {
+                                   UUID targetId, OrbitBand orbit,
+                                   ArrivalVelocityMode velocityMode, int targetVelocity) {
         public static final UUID NO_TARGET = new UUID(0, 0);
-        public static final UUID CURRENT_TARGET = new UUID(0, 1);
-        /** Synthetic target used by the preview after world X/Z coordinates are flattened into its flight plane. */
-        public static final UUID SURFACE_TARGET = new UUID(0, 3);
 
         public FlightPlanAction {
             segments = List.copyOf(segments);
         }
 
         public static FlightPlanAction create(ActionType type) {
-            return new FlightPlanAction(UUID.randomUUID(), type, List.of(), NO_TARGET, defaultValue(type), 0);
+            return new FlightPlanAction(UUID.randomUUID(), type, List.of(), NO_TARGET, OrbitBand.LOW,
+                    ArrivalVelocityMode.ZERO, 0);
+        }
+
+        public static FlightPlanAction disconnectBooster(UUID id, SegmentRef segment, UUID navigationAction) {
+            return new FlightPlanAction(id, ActionType.DISCONNECT_BOOSTER, List.of(segment),
+                    navigationAction, OrbitBand.LOW, ArrivalVelocityMode.ZERO, 0);
         }
 
         public FlightPlanAction withType(ActionType newType) {
-            return new FlightPlanAction(id, newType, List.of(), NO_TARGET, defaultValue(newType), 0);
+            return new FlightPlanAction(id, newType, List.of(), NO_TARGET, OrbitBand.LOW,
+                    ArrivalVelocityMode.ZERO, 0);
         }
 
         public FlightPlanAction withTarget(UUID target) {
-            return new FlightPlanAction(id, type, segments, target, value, secondaryValue);
+            return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity);
         }
 
-        public FlightPlanAction withValue(long newValue) {
-            return new FlightPlanAction(id, type, segments, targetId, newValue, secondaryValue);
+        public FlightPlanAction withOrbit(OrbitBand newOrbit) {
+            return new FlightPlanAction(id, type, segments, targetId, newOrbit, velocityMode, targetVelocity);
         }
 
-        public FlightPlanAction withSecondaryValue(long newValue) {
-            return new FlightPlanAction(id, type, segments, targetId, value, newValue);
+        public FlightPlanAction withVelocity(ArrivalVelocityMode newMode, int newVelocity) {
+            return new FlightPlanAction(id, type, segments, targetId, orbit, newMode, newVelocity);
         }
 
         public FlightPlanAction withSegments(List<SegmentRef> newSegments) {
-            return new FlightPlanAction(id, type, newSegments, targetId, value, secondaryValue);
+            return new FlightPlanAction(id, type, newSegments, targetId, orbit, velocityMode, targetVelocity);
         }
 
-        private static long defaultValue(ActionType type) {
-            return switch (type) {
-                case WAIT_TICKS -> 20;
-                case WAIT_SECONDS -> 5;
-                case WAIT_UNTIL_DISTANCE -> 1_000;
-                case SET_ARRIVAL_VELOCITY -> 0;
-                default -> 0;
-            };
+        public boolean isGenerated() {
+            return type == ActionType.DISCONNECT_BOOSTER;
         }
     }
 
     public enum ActionType {
-        START_ENGINE_BURN,
-        START_BRAKING_BURN,
-        STOP_ENGINE_BURN,
-        SET_NAVIGATION_TARGET,
-        SET_SURFACE_DESTINATION,
-        SET_ARRIVAL_VELOCITY,
-        DISABLE_COUPLINGS,
-        OPEN_PARACHUTES,
-        WAIT_TICKS,
-        WAIT_SECONDS,
-        WAIT_UNTIL_DISTANCE,
-        WAIT_FOR_EVENT,
-        WAIT_UNTIL_BRAKING_POINT,
-        MAINTAIN_ORBIT,
+        NAVIGATE_TO,
+        DECOUPLE,
+        DISCONNECT_BOOSTER,
+        MAINTAIN_POSITION,
         DISCARD_CRAFT
     }
 
-    public enum WaitEvent {
-        LOW_ORBIT_REACHED,
-        MEDIUM_ORBIT_REACHED,
-        HIGH_ORBIT_REACHED,
-        ATMOSPHERE_EXITED,
-        TARGET_REACHED,
-        FUEL_EMPTY
+    public enum OrbitBand {
+        SURFACE(0),
+        TIGHT(1_000),
+        LOW(10_000),
+        MEDIUM(30_000),
+        HIGH(60_000);
+
+        private final double altitude;
+
+        OrbitBand(double altitude) {
+            this.altitude = altitude;
+        }
+
+        public double altitude() {
+            return altitude;
+        }
     }
 
+    public enum ArrivalVelocityMode {
+        ZERO,
+        MAXIMUM,
+        CUSTOM
+    }
 }
