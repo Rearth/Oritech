@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.init;
 
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -20,6 +21,9 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<RocketPadBlock> ROCKET_PAD = BLOCKS.registerBlock("rocket_pad", RocketPadBlock::new, SpaceAgeBlocks::machineProperties);
 
     public static final DeferredBlock<RocketCouplingBlock> ROCKET_COUPLING = BLOCKS.registerBlock("rocket_coupling", RocketCouplingBlock::new, () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<Block> ASTEROID_ANCHOR = BLOCKS.registerSimpleBlock("asteroid_anchor",
+            () -> machineProperties().noOcclusion());
 
     public static final DeferredBlock<RocketEngineBlock> BASIC_BOOSTER_ROCKET = registerRocketEngine("basic_booster_rocket", RocketEngineBlock.Type.BASIC);
     public static final DeferredBlock<RocketEngineBlock> ION_BOOSTER_ROCKET = registerRocketEngine("ion_booster_rocket", RocketEngineBlock.Type.ION);

@@ -17,6 +17,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 
 import java.util.UUID;
@@ -29,9 +30,11 @@ public final class RocketNetworking {
     @SuppressWarnings("unchecked")
     public static void register(PayloadRegistrar registrar) {
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
+        NetworkManager.getAutoCodec(SpaceObjects.AsteroidMaterial.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentRef.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentConfiguration.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.ActionAddon.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanAction.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanBranch.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);

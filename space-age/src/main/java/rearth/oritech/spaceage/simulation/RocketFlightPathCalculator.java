@@ -56,7 +56,9 @@ public final class RocketFlightPathCalculator {
         orderedPaths.addAll(context.paths.values());
         double lastCommand = orderedPaths.stream().flatMap(path -> path.actionMoments().stream())
                 .mapToDouble(ActionMoment::timeSeconds).max().orElse(0);
-        return new FlightPath(orderedPaths, List.copyOf(context.boosterEvents), lastCommand);
+        return new FlightPath(orderedPaths, List.copyOf(context.boosterEvents), lastCommand,
+                List.copyOf(context.arrivalPredictions), List.copyOf(context.asteroidPaths),
+                List.copyOf(context.navigationAborts));
     }
 
     private static CraftState createInitialCraft(ActiveRocketData rocket,
@@ -96,6 +98,7 @@ public final class RocketFlightPathCalculator {
             if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) continue;
             completed = switch (action.type()) {
                 case NAVIGATE_TO -> navigate(action, state, context);
+                case CONNECT_ASTEROID -> connectAsteroid(action, state, context);
                 case DECOUPLE -> separate(action, state, context);
                 case MAINTAIN_POSITION -> {
                     state.maintainingPosition = true;
@@ -108,11 +111,14 @@ public final class RocketFlightPathCalculator {
                 case DISCONNECT_BOOSTER -> true;
             };
             state.actionMoments.add(new ActionMoment(branch.id(), index, action.id(), state.time,
-                    state.x, state.y, completed));
-            if (!completed || state.maintainingPosition || state.discarded) break;
+                    state.x, state.y, completed, Set.copyOf(state.segments.keySet()),
+                    state.attachedAsteroid == null ? SpaceSimulation.FlightPlanAction.NO_TARGET
+                            : state.attachedAsteroid.id()));
+            if (!completed || state.maintainingPosition || state.discarded || state.destroyed) break;
         }
 
-        var terminal = state.discarded ? TerminalState.DISCARDED
+        var terminal = state.destroyed ? TerminalState.DESTROYED
+                : state.discarded ? TerminalState.DISCARDED
                 : state.maintainingPosition ? TerminalState.MAINTAINING_POSITION
                 : completed ? TerminalState.READY : state.blockedState;
         context.paths.put(branch.id(), state.toPath(terminal, context));
@@ -125,7 +131,8 @@ public final class RocketFlightPathCalculator {
         while (finishStage(action, state, context)) {
             // Empty configured stages are skipped here so a reusable plan cannot strand a slightly different rocket.
         }
-        var destination = targetPoint(state.x, state.y, target, action.orbit());
+        var destination = targetPoint(state.x, state.y, target.xAt(state.time), target.yAt(state.time),
+                target.radius(), action.orbit());
         double startTime = state.time;
         double approachX = destination.x - state.x;
         double approachY = destination.y - state.y;
@@ -134,8 +141,8 @@ public final class RocketFlightPathCalculator {
         approachY = approachLength < 1 ? 0 : approachY / approachLength;
         double targetSpeed = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                 ? action.targetVelocity() : 0;
-        double targetVelocityX = approachX * targetSpeed;
-        double targetVelocityY = approachY * targetSpeed;
+        double targetVelocityX = target.velocityX() + approachX * targetSpeed;
+        double targetVelocityY = target.velocityY() + approachY * targetSpeed;
         var navigationSamples = new ArrayList<PathSample>();
         TransferPlan transferPlan = null;
 
@@ -144,10 +151,12 @@ public final class RocketFlightPathCalculator {
         int step = 0;
         for (; step < MAX_NAVIGATION_STEPS
                 && state.time - startTime < MAX_NAVIGATION_SECONDS; step++) {
+            destination = targetPoint(state.x, state.y, target.xAt(state.time), target.yAt(state.time),
+                    target.radius(), action.orbit());
             double offsetX = destination.x - state.x;
             double offsetY = destination.y - state.y;
-            if (completeArrival(action, state, destination, targetVelocityX, targetVelocityY,
-                    navigationSamples)) return true;
+            if (completeArrival(action, state, target, destination, targetVelocityX, targetVelocityY,
+                    navigationSamples, context)) return true;
 
             var active = state.activeSegments(context);
             double deltaVRate = state.deltaVPerSecond(active);
@@ -155,8 +164,9 @@ public final class RocketFlightPathCalculator {
             // values identical prevents a path from spending more delta-v than it actually adds to craft velocity.
             double maximumAcceleration = deltaVRate;
             if (transferPlan == null) {
-                var transfer = FullPowerTransfer.solve(offsetX, offsetY, state.velocityX, state.velocityY,
-                        targetVelocityX, targetVelocityY,
+                var transfer = FullPowerTransfer.solve(offsetX, offsetY,
+                        state.velocityX - target.velocityX(), state.velocityY - target.velocityY(),
+                        targetVelocityX - target.velocityX(), targetVelocityY - target.velocityY(),
                         action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM,
                         state.burnProfile(context),
                         action.maxSpeed() == 0 ? Double.POSITIVE_INFINITY : action.maxSpeed(),
@@ -168,6 +178,18 @@ public final class RocketFlightPathCalculator {
                     return false;
                 }
                 transferPlan = new TransferPlan(state.time, transfer);
+            }
+            var abort = navigationAbort(action, state, target, destination, transferPlan);
+            if (abort != null) {
+                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+                appendNavigationSamples(state, navigationSamples);
+                if (action.targetId().equals(SpaceObjects.EARTH_ID)
+                        && action.orbit() == SpaceSimulation.OrbitBand.SURFACE) {
+                    state.lastEarthSurfaceAction = action;
+                }
+                context.navigationAborts.add(new NavigationAbortMoment(action.id(), state.branchId,
+                        abort.addon.id(), abort.actualValue, state.time, state.x, state.y));
+                return true;
             }
             var command = transferPlan.commandAt(state, maximumAcceleration);
 
@@ -222,13 +244,28 @@ public final class RocketFlightPathCalculator {
             }
         }
 
-        if (completeArrival(action, state, destination, targetVelocityX, targetVelocityY,
-                navigationSamples)) return true;
+        if (completeArrival(action, state, target, destination, targetVelocityX, targetVelocityY,
+                navigationSamples, context)) return true;
         state.blockedState = step >= MAX_NAVIGATION_STEPS
                 ? TerminalState.INTEGRATION_STEP_LIMIT
                 : TerminalState.INTEGRATION_TIME_LIMIT;
         appendNavigationSamples(state, navigationSamples);
         return false;
+    }
+
+    private static AbortResult navigationAbort(SpaceSimulation.FlightPlanAction action, CraftState state,
+                                               SpaceSimulation.SpaceObjectData target, Point destination,
+                                               TransferPlan transferPlan) {
+        if (action.addons().isEmpty()) return null;
+        var addon = action.addons().getFirst();
+        double distance = Math.hypot(destination.x - state.x, destination.y - state.y);
+        double actual = switch (addon.type()) {
+            case DISTANCE_FROM_TARGET -> distance;
+            case TIME_BEFORE_ARRIVAL -> Math.max(0,
+                    transferPlan.transfer.duration() - (state.time - transferPlan.startTime));
+            case DESIRED_UNCERTAINTY -> AsteroidImpactRules.landingUncertaintyBlocks(distance);
+        };
+        return actual <= addon.value() ? new AbortResult(addon, actual) : null;
     }
 
     private static double sampleStep(double phaseSeconds) {
@@ -238,8 +275,9 @@ public final class RocketFlightPathCalculator {
     }
 
     private static boolean completeArrival(SpaceSimulation.FlightPlanAction action, CraftState state,
-                                           Point destination, double targetVelocityX, double targetVelocityY,
-                                           List<PathSample> navigationSamples) {
+                                           SpaceSimulation.SpaceObjectData target, Point destination,
+                                           double targetVelocityX, double targetVelocityY,
+                                           List<PathSample> navigationSamples, CalculationContext context) {
         double distance = Math.hypot(destination.x - state.x, destination.y - state.y);
         if (!hasArrived(action, state, distance, targetVelocityX, targetVelocityY)) return false;
         state.x = destination.x;
@@ -250,6 +288,34 @@ public final class RocketFlightPathCalculator {
         }
         navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
         appendNavigationSamples(state, navigationSamples);
+        state.currentTarget = target.id();
+        state.currentOrbit = action.orbit();
+        if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE) {
+            if (target.id().equals(SpaceObjects.EARTH_ID)) state.lastEarthSurfaceAction = action;
+            double relativeSpeed = Math.hypot(state.velocityX - target.velocityX(),
+                    state.velocityY - target.velocityY());
+            var prediction = AsteroidImpactRules.predictArrival(state.rocketMass(), target, relativeSpeed,
+                    state.attachedAsteroid, action);
+            context.arrivalPredictions.add(new ArrivalPrediction(action.id(), state.branchId, target.id(), prediction));
+            if (prediction.outcome() != AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH) state.destroyed = true;
+        }
+        return true;
+    }
+
+    private static boolean connectAsteroid(SpaceSimulation.FlightPlanAction action, CraftState state,
+                                           CalculationContext context) {
+        var asteroid = context.objects.get(action.targetId());
+        double relativeSpeed = asteroid == null ? Double.POSITIVE_INFINITY
+                : Math.hypot(state.velocityX - asteroid.velocityX(), state.velocityY - asteroid.velocityY());
+        if (asteroid == null || asteroid.type() != SpaceObjects.ObjectType.ASTEROID
+                || state.attachedAsteroid != null || !asteroid.id().equals(state.currentTarget)
+                || (state.currentOrbit != SpaceSimulation.OrbitBand.SURFACE
+                && state.currentOrbit != SpaceSimulation.OrbitBand.TIGHT) || action.segments().size() != 1
+                || !state.segments.containsKey(action.segments().getFirst())
+                || !AsteroidImpactRules.canConnectAsteroid(relativeSpeed)) return false;
+        state.attachedAsteroid = asteroid;
+        state.asteroidAnchor = action.segments().getFirst();
+        state.addSample(PathPhase.COAST, asteroid.id());
         return true;
     }
 
@@ -366,6 +432,14 @@ public final class RocketFlightPathCalculator {
 
     private static boolean separate(SpaceSimulation.FlightPlanAction action, CraftState state,
                                     CalculationContext context) {
+        if (state.attachedAsteroid != null && action.targetId().equals(state.attachedAsteroid.id())
+                && action.segments().size() == 1 && action.segments().getFirst().equals(state.asteroidAnchor)) {
+            context.asteroidPaths.add(predictReleasedAsteroid(state, context));
+            state.attachedAsteroid = null;
+            state.asteroidAnchor = null;
+            state.addSample(PathPhase.COAST, action.targetId());
+            return true;
+        }
         if (action.segments().size() != 2) return false;
         var retainedRef = action.segments().get(0);
         var detachedRef = action.segments().get(1);
@@ -386,18 +460,92 @@ public final class RocketFlightPathCalculator {
         return true;
     }
 
-    private static Point targetPoint(double sourceX, double sourceY,
-                                     SpaceSimulation.SpaceObjectData target,
-                                     SpaceSimulation.OrbitBand orbit) {
-        double offsetX = sourceX - target.x();
-        double offsetY = sourceY - target.y();
+    private static AsteroidPath predictReleasedAsteroid(CraftState state, CalculationContext context) {
+        var asteroid = state.attachedAsteroid;
+        var earth = context.objects.get(SpaceObjects.EARTH_ID);
+        var samples = new ArrayList<MotionSample>();
+        double x = state.x;
+        double y = state.y;
+        double velocityX = state.velocityX;
+        double velocityY = state.velocityY;
+        double time = state.time;
+        int uncertainty = earth == null ? 100_000 : AsteroidImpactRules.landingUncertaintyBlocks(
+                Math.max(0, Math.hypot(x - earth.xAt(time), y - earth.yAt(time)) - earth.radius()));
+        samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));
+        AsteroidImpactRules.ImpactPrediction impact = null;
+        if (earth != null && Math.hypot(x - earth.xAt(time), y - earth.yAt(time)) <= earth.radius()) {
+            double relativeSpeed = Math.hypot(velocityX - earth.velocityX(), velocityY - earth.velocityY());
+            var landing = state.lastEarthSurfaceAction == null
+                    ? SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                    .withTarget(earth.id()).withOrbit(SpaceSimulation.OrbitBand.SURFACE)
+                    : state.lastEarthSurfaceAction;
+            impact = AsteroidImpactRules.predictArrival(0, earth, relativeSpeed, asteroid, landing);
+            return new AsteroidPath(asteroid.id(), List.copyOf(samples), impact, uncertainty);
+        }
+        for (int step = 0; earth != null && step < 480; step++) {
+            double seconds = 2_500;
+            double previousX = x;
+            double previousY = y;
+            double previousTime = time;
+            double previousVelocityX = velocityX;
+            double previousVelocityY = velocityY;
+            double drag = Math.exp(-AsteroidImpactRules.SPACE_DRAG_PER_SECOND * seconds);
+            x += velocityX * seconds;
+            y += velocityY * seconds;
+            velocityX *= drag;
+            velocityY *= drag;
+            time += seconds;
+            double hitFraction = segmentCircleIntersectionFraction(
+                    previousX - earth.xAt(previousTime), previousY - earth.yAt(previousTime),
+                    x - earth.xAt(time), y - earth.yAt(time), earth.radius());
+            if (Double.isFinite(hitFraction)) {
+                x = previousX + (x - previousX) * hitFraction;
+                y = previousY + (y - previousY) * hitFraction;
+                time = previousTime + seconds * hitFraction;
+                double hitDrag = Math.exp(-AsteroidImpactRules.SPACE_DRAG_PER_SECOND * seconds * hitFraction);
+                velocityX = previousVelocityX * hitDrag;
+                velocityY = previousVelocityY * hitDrag;
+                samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));
+                double relativeSpeed = Math.hypot(velocityX - earth.velocityX(), velocityY - earth.velocityY());
+                var landing = state.lastEarthSurfaceAction == null
+                        ? SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                        .withTarget(earth.id()).withOrbit(SpaceSimulation.OrbitBand.SURFACE)
+                        : state.lastEarthSurfaceAction;
+                impact = AsteroidImpactRules.predictArrival(0, earth, relativeSpeed, asteroid, landing);
+                break;
+            }
+            samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));
+            if (Math.hypot(velocityX, velocityY) < 0.01) break;
+        }
+        return new AsteroidPath(asteroid.id(), List.copyOf(samples), impact, uncertainty);
+    }
+
+    private static double segmentCircleIntersectionFraction(double startX, double startY,
+                                                            double endX, double endY, double radius) {
+        double deltaX = endX - startX;
+        double deltaY = endY - startY;
+        double a = deltaX * deltaX + deltaY * deltaY;
+        double c = startX * startX + startY * startY - radius * radius;
+        if (c <= 0) return 0;
+        if (a <= BURN_TOLERANCE) return Double.NaN;
+        double b = 2 * (startX * deltaX + startY * deltaY);
+        double discriminant = b * b - 4 * a * c;
+        if (discriminant < 0) return Double.NaN;
+        double fraction = (-b - Math.sqrt(discriminant)) / (2 * a);
+        return fraction >= 0 && fraction <= 1 ? fraction : Double.NaN;
+    }
+
+    private static Point targetPoint(double sourceX, double sourceY, double targetX, double targetY,
+                                     double radius, SpaceSimulation.OrbitBand orbit) {
+        double offsetX = sourceX - targetX;
+        double offsetY = sourceY - targetY;
         double length = Math.hypot(offsetX, offsetY);
-        double orbitRadius = target.radius() + orbit.altitude();
+        double orbitRadius = radius + orbit.altitude();
         // A surface target lies on the body's edge, not its centre. Apart from looking more natural in the map,
         // this also keeps the navigation solver from flying through a planet before declaring arrival.
-        if (length < 1) return new Point(target.x() + orbitRadius, target.y());
-        return new Point(target.x() + offsetX / length * orbitRadius,
-                target.y() + offsetY / length * orbitRadius);
+        if (length < 1) return new Point(targetX + orbitRadius, targetY);
+        return new Point(targetX + offsetX / length * orbitRadius,
+                targetY + offsetY / length * orbitRadius);
     }
 
     private static final class CalculationContext {
@@ -407,6 +555,9 @@ public final class RocketFlightPathCalculator {
         private final int stageCount;
         private final Map<UUID, CraftPath> paths = new LinkedHashMap<>();
         private final List<BoosterEvent> boosterEvents = new ArrayList<>();
+        private final List<ArrivalPrediction> arrivalPredictions = new ArrayList<>();
+        private final List<AsteroidPath> asteroidPaths = new ArrayList<>();
+        private final List<NavigationAbortMoment> navigationAborts = new ArrayList<>();
 
         private CalculationContext(Map<UUID, SpaceSimulation.SpaceObjectData> objects,
                                    Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent,
@@ -456,6 +607,12 @@ public final class RocketFlightPathCalculator {
         private int currentStage = 1;
         private boolean maintainingPosition;
         private boolean discarded;
+        private boolean destroyed;
+        private UUID currentTarget = SpaceSimulation.FlightPlanAction.NO_TARGET;
+        private SpaceSimulation.OrbitBand currentOrbit = SpaceSimulation.OrbitBand.LOW;
+        private SpaceSimulation.SpaceObjectData attachedAsteroid;
+        private SpaceSimulation.SegmentRef asteroidAnchor;
+        private SpaceSimulation.FlightPlanAction lastEarthSurfaceAction;
         private TerminalState blockedState = TerminalState.PLAN_BLOCKED;
 
         private CraftState(Map<SpaceSimulation.SegmentRef, SegmentState> segments,
@@ -469,6 +626,12 @@ public final class RocketFlightPathCalculator {
         }
 
         private double mass() {
+            double asteroidMass = attachedAsteroid == null ? 0
+                    : attachedAsteroid.mass() * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS;
+            return rocketMass() + asteroidMass;
+        }
+
+        private double rocketMass() {
             return segments.values().stream().mapToDouble(segment -> segment.wetMass).sum();
         }
 
@@ -598,6 +761,11 @@ public final class RocketFlightPathCalculator {
             copy.velocityX = velocityX;
             copy.velocityY = velocityY;
             copy.currentStage = currentStage;
+            copy.currentTarget = currentTarget;
+            copy.currentOrbit = currentOrbit;
+            copy.attachedAsteroid = attachedAsteroid;
+            copy.asteroidAnchor = asteroidAnchor;
+            copy.lastEarthSurfaceAction = lastEarthSurfaceAction;
             return copy;
         }
 
@@ -614,7 +782,8 @@ public final class RocketFlightPathCalculator {
         private PathSample createSample(PathPhase phase, UUID target,
                                         Set<SpaceSimulation.SegmentRef> firingSegments) {
             return new PathSample(time, x, y, Math.hypot(velocityX, velocityY), velocityX, velocityY,
-                    phase, target, currentStage, Set.copyOf(segments.keySet()), firingSegments);
+                    phase, target, currentStage, Set.copyOf(segments.keySet()), firingSegments,
+                    attachedAsteroid == null ? SpaceSimulation.FlightPlanAction.NO_TARGET : attachedAsteroid.id());
         }
 
         private CraftPath toPath(TerminalState terminal, CalculationContext context) {
@@ -626,14 +795,18 @@ public final class RocketFlightPathCalculator {
     private record Point(double x, double y) {
     }
 
+    private record AbortResult(SpaceSimulation.ActionAddon addon, double actualValue) {
+    }
+
     public record PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
                              double velocityX, double velocityY, PathPhase phase, UUID targetId,
                              int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
-                             Set<SpaceSimulation.SegmentRef> firingSegments) {
+                             Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
     }
 
     public record ActionMoment(UUID branchId, int actionIndex, UUID actionId, double timeSeconds,
-                               double x, double y, boolean completed) {
+                               double x, double y, boolean completed,
+                               Set<SpaceSimulation.SegmentRef> connectedSegments, UUID attachedAsteroidId) {
     }
 
     public record BoosterEvent(UUID id, UUID branchId, UUID childBranchId, UUID navigationActionId,
@@ -647,7 +820,26 @@ public final class RocketFlightPathCalculator {
     }
 
     public record FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents,
-                             double lastCommandSeconds) {
+                             double lastCommandSeconds, List<ArrivalPrediction> arrivalPredictions,
+                             List<AsteroidPath> asteroidPaths, List<NavigationAbortMoment> navigationAborts) {
+        public FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents, double lastCommandSeconds) {
+            this(paths, boosterEvents, lastCommandSeconds, List.of(), List.of(), List.of());
+        }
+    }
+
+    public record ArrivalPrediction(UUID actionId, UUID branchId, UUID targetId,
+                                    AsteroidImpactRules.ImpactPrediction impact) {
+    }
+
+    public record AsteroidPath(UUID asteroidId, List<MotionSample> samples,
+                               AsteroidImpactRules.ImpactPrediction earthImpact, int landingUncertaintyBlocks) {
+    }
+
+    public record NavigationAbortMoment(UUID actionId, UUID branchId, UUID addonId, double actualValue,
+                                        double timeSeconds, double x, double y) {
+    }
+
+    public record MotionSample(double timeSeconds, double x, double y, double speedMetersPerSecond) {
     }
 
     public enum PathPhase {
@@ -661,6 +853,7 @@ public final class RocketFlightPathCalculator {
         READY,
         MAINTAINING_POSITION,
         DISCARDED,
+        DESTROYED,
         PLAN_BLOCKED,
         NOT_ENOUGH_DELTA_V,
         NO_ACTIVE_ENGINES,

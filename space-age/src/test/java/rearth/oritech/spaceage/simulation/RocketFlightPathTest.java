@@ -38,8 +38,13 @@ public final class RocketFlightPathTest {
         require(slower.remainingDeltaV() > path.remainingDeltaV() + 700, "speed cap saves fuel");
         require(slower.samples().stream().allMatch(sample -> sample.speedMetersPerSecond() <= 100.0001), "speed cap");
         var maximum = action.withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
-        ready(RocketFlightPathCalculator.calculate(rocket, objects,
-                plan.withBranches(List.of(base.root().withActions(List.of(maximum))))).paths().getFirst());
+        var collision = RocketFlightPathCalculator.calculate(rocket, objects,
+                plan.withBranches(List.of(base.root().withActions(List.of(maximum)))));
+        require(collision.paths().getFirst().terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED,
+                "maximum-speed surface arrival is destructive");
+        require(collision.arrivalPredictions().getFirst().impact().outcome()
+                        == AsteroidImpactRules.ArrivalOutcome.HEAVY_IMPACT,
+                "maximum-speed surface arrival predicts a heavy impact");
 
         // Stage one drops a spent booster; the retained craft must finish the transfer at its new full power.
         var boosterId = UUID.randomUUID();
@@ -84,6 +89,50 @@ public final class RocketFlightPathTest {
     @Test
     void coastingJustBeforeEngineExhaustionKeepsTheRemainingBurn() {
         checkMarsArrival(15_000_001, 1500);
+    }
+
+    @Test
+    void navigationCompletionConditionsStopEarlyWithoutEndingThePlan() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var segmentId = UUID.randomUUID();
+        var segment = new StaticRocketSegment(segmentId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Map.of(), 25, 1);
+        var rocket = new ActiveRocketData(Map.of(segmentId, segment),
+                Map.of(segmentId, new DynamicRocketSegment(0, 2_000_000, 0, Set.of())));
+        var objects = List.of(
+                new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                        0, 0, 0, 0, SpaceObjects.DetectionState.PRECISE),
+                new SpaceSimulation.SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
+                        8_000_000, 0, 0, 0, SpaceObjects.DetectionState.PRECISE));
+        var base = SpaceSimulation.FlightPlan.empty();
+
+        for (var type : SpaceSimulation.ActionAddonType.values()) {
+            int threshold = switch (type) {
+                case DISTANCE_FROM_TARGET -> 500_000;
+                case TIME_BEFORE_ARRIVAL -> 120;
+                case DESIRED_UNCERTAINTY -> 512;
+            };
+            var addon = new SpaceSimulation.ActionAddon(UUID.randomUUID(), type, threshold);
+            var navigate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                    .withTarget(SpaceSimulation.MARS_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE)
+                    .withAddons(List.of(addon));
+            var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION);
+            var plan = base.withBranches(List.of(base.root().withActions(List.of(navigate, maintain))));
+            var result = RocketFlightPathCalculator.calculate(rocket, objects, plan);
+            var path = result.paths().getFirst();
+            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.MAINTAINING_POSITION,
+                    type + " condition did not continue to the next card");
+            require(path.actionMoments().size() == 2 && path.actionMoments().stream()
+                    .allMatch(RocketFlightPathCalculator.ActionMoment::completed), type + " actions did not complete");
+            require(result.navigationAborts().size() == 1, type + " did not record its completion condition");
+            var abort = result.navigationAborts().getFirst();
+            require(abort.addonId().equals(addon.id()) && abort.actualValue() <= threshold,
+                    type + " stopped outside its configured threshold");
+            require(Math.hypot(abort.x() - 8_000_000, abort.y()) > 0.01,
+                    type + " completed at the destination instead of early");
+        }
     }
 
     private void checkMarsArrival(long boosterRF, int speedCap) {

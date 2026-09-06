@@ -3,6 +3,7 @@
     "oritech_space_age:rocket_assembler",
     "oritech_space_age:rocket_pad",
     "oritech_space_age:rocket_coupling",
+    "oritech_space_age:asteroid_anchor",
     "oritech_space_age:basic_booster_rocket",
     "oritech_space_age:ion_booster_rocket"
   ]

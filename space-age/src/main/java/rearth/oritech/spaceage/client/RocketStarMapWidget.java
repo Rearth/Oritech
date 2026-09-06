@@ -40,13 +40,14 @@ import java.util.function.Consumer;
 final class RocketStarMapWidget extends UIComponent {
 
     private static final double PLANE_TILT = 0.58;
-    private static final double MAX_ZOOM = 0.012;
+    private static final double MAX_ZOOM = 0.024;
     private static final int CIRCLE_SEGMENTS = 72;
 
     private final List<MapObject> objects = new ArrayList<>();
     private final List<BranchMarker> rocketMarkers = new ArrayList<>();
     private final List<SeparationMarker> separationMarkers = new ArrayList<>();
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> pathsByBranch = new HashMap<>();
+    private final Map<UUID, MotionPosition> displayedObjectPositions = new HashMap<>();
     private final Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames = new HashMap<>();
     private final Consumer<NavigationSelection> selectionListener;
     private final Consumer<NavigationContextRequest> contextMenuListener;
@@ -86,8 +87,8 @@ final class RocketStarMapWidget extends UIComponent {
             defaultSegmentNames.put(segments.get(index), "S" + (index + 1));
         }
         setSnapshot(snapshot);
-        fitSystem();
         updateFlightPath(snapshot, flightPath, selectedBranch);
+        fitSystem();
     }
 
     void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -97,6 +98,7 @@ final class RocketStarMapWidget extends UIComponent {
         this.flightPath = flightPath;
         this.selectedBranch = selectedBranch;
         pathsByBranch.clear();
+        displayedObjectPositions.clear();
         rocketMarkers.clear();
         separationMarkers.clear();
         for (var path : flightPath.paths()) {
@@ -107,6 +109,22 @@ final class RocketStarMapWidget extends UIComponent {
             var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
             marker.withShowOverlay(false).withTooltipFromStack(false);
             rocketMarkers.add(new BranchMarker(path.branchId(), last.x(), last.y(), marker));
+        }
+        var selectedPath = pathsByBranch.get(selectedBranch);
+        if (selectedPath != null) {
+            var actions = new HashMap<UUID, SpaceSimulation.FlightPlanAction>();
+            snapshot.plan().branches().forEach(branch -> branch.actions()
+                    .forEach(action -> actions.put(action.id(), action)));
+            for (var moment : selectedPath.actionMoments()) {
+                var action = actions.get(moment.actionId());
+                if (!moment.completed() || action == null
+                        || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
+                var target = snapshot.objects().stream().filter(object -> object.id().equals(action.targetId()))
+                        .findFirst().orElse(null);
+                if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID) continue;
+                displayedObjectPositions.put(target.id(), new MotionPosition(
+                        target.xAt(moment.timeSeconds()), target.yAt(moment.timeSeconds()), moment.timeSeconds()));
+            }
         }
         for (var event : flightPath.boosterEvents()) {
             var marker = separationMarkers.stream().filter(existing -> existing.matches(event)).findFirst().orElse(null);
@@ -145,10 +163,10 @@ final class RocketStarMapWidget extends UIComponent {
             zoom = minimumZoom = 0.0001;
             return;
         }
-        double minX = objects.stream().mapToDouble(object -> object.data.x()).min().orElse(-1);
-        double maxX = objects.stream().mapToDouble(object -> object.data.x()).max().orElse(1);
-        double minY = objects.stream().mapToDouble(object -> object.data.y()).min().orElse(-1);
-        double maxY = objects.stream().mapToDouble(object -> object.data.y()).max().orElse(1);
+        double minX = objects.stream().mapToDouble(this::objectX).min().orElse(-1);
+        double maxX = objects.stream().mapToDouble(this::objectX).max().orElse(1);
+        double minY = objects.stream().mapToDouble(this::objectY).min().orElse(-1);
+        double maxY = objects.stream().mapToDouble(this::objectY).max().orElse(1);
         cameraX = (minX + maxX) * 0.5;
         cameraY = (minY + maxY) * 0.5;
         double fitX = Math.max(1, maxX - minX) * 1.12;
@@ -176,6 +194,7 @@ final class RocketStarMapWidget extends UIComponent {
 
         var lines = new ArrayList<LineSegment>();
         addSolarOrbits(lines);
+        addAsteroidMotion(lines);
         addLocalOrbits(lines);
         addFlightPaths(lines);
         submitLines(graphics, lines, viewportX, viewportY, viewportWidth, viewportHeight);
@@ -209,15 +228,27 @@ final class RocketStarMapWidget extends UIComponent {
 
     private void addLocalOrbits(List<LineSegment> lines) {
         for (var object : objects) {
+            double objectX = objectX(object);
+            double objectY = objectY(object);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
                 if (band == SpaceSimulation.OrbitBand.SURFACE) continue;
                 double radius = object.data.radius() + band.altitude();
                 if (radius * zoom < 18) continue;
                 boolean selected = selectedTarget != null && selectedTarget.objectId.equals(object.data.id())
                         && selectedTarget.orbit == band;
-                addCircle(lines, object.data.x(), object.data.y(), radius,
+                addCircle(lines, objectX, objectY, radius,
                         selected ? 0xDDF6C65B : 0x77577A91, selected ? 1.2f : 0.65f);
             }
+        }
+    }
+
+    private void addAsteroidMotion(List<LineSegment> lines) {
+        for (var object : objects) {
+            var position = displayedObjectPositions.get(object.data.id());
+            if (position == null) continue;
+            var from = project(object.data.x(), object.data.y());
+            var to = project(position.x, position.y);
+            lines.add(new LineSegment(from.x, from.y, to.x, to.y, 0x6685A7BC, 0.7f));
         }
     }
 
@@ -238,6 +269,15 @@ final class RocketStarMapWidget extends UIComponent {
                 if (!path.branchId().equals(selectedBranch)) color = color & 0x00FFFFFF | 0x66000000;
                 lines.add(new LineSegment(from.x, from.y, to.x, to.y, color,
                         path.branchId().equals(selectedBranch) ? 1.3f : 0.8f));
+            }
+        }
+        for (var path : flightPath.asteroidPaths()) {
+            for (int index = 1; index < path.samples().size(); index++) {
+                var first = path.samples().get(index - 1);
+                var second = path.samples().get(index);
+                var from = project(first.x(), first.y());
+                var to = project(second.x(), second.y());
+                lines.add(new LineSegment(from.x, from.y, to.x, to.y, 0xFFD89A62, 1.1f));
             }
         }
     }
@@ -265,7 +305,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     private void renderObject(GuiGraphicsExtractor graphics, MapObject object,
                               int mouseX, int mouseY, float delta) {
-        var position = project(object.data.x(), object.data.y());
+        var position = project(objectX(object), objectY(object));
         int minimum = object.data.type() == SpaceObjects.ObjectType.ASTEROID ? 10 : 16;
         int size = (int) Math.clamp(object.data.radius() * zoom * 2, minimum, 54);
         object.widget.setPosition((int) Math.round(position.x - size / 2f),
@@ -317,15 +357,17 @@ final class RocketStarMapWidget extends UIComponent {
         double closestDistance = 5;
         NavigationSelection closest = null;
         for (var object : objects) {
-            double offsetX = world.x - object.data.x();
-            double offsetY = world.y - object.data.y();
+            double objectX = objectX(object);
+            double objectY = objectY(object);
+            double offsetX = world.x - objectX;
+            double offsetY = world.y - objectY;
             double angle = Math.atan2(offsetY, offsetX);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
                 if (band == SpaceSimulation.OrbitBand.SURFACE) continue;
                 double radius = object.data.radius() + band.altitude();
                 if (radius * zoom < 18) continue;
-                Point ringPoint = project(object.data.x() + Math.cos(angle) * radius,
-                        object.data.y() + Math.sin(angle) * radius);
+                Point ringPoint = project(objectX + Math.cos(angle) * radius,
+                        objectY + Math.sin(angle) * radius);
                 double screenDistance = Math.hypot(mouseX - ringPoint.x, mouseY - ringPoint.y);
                 if (screenDistance < closestDistance) {
                     closestDistance = screenDistance;
@@ -524,8 +566,21 @@ final class RocketStarMapWidget extends UIComponent {
                         String.format(Locale.ROOT, "%.0f", percentage)));
             }
             lines.add(Component.translatable("screen.oritech_space_age.object.position",
+                    format(objectX(object)), format(objectY(object))));
+            var motion = displayedObjectPositions.get(object.data.id());
+            if (motion != null) lines.add(Component.translatable("screen.oritech_space_age.object.arrival_position",
+                    String.format(Locale.ROOT, "%.2f", motion.timeSeconds / 1_200),
                     format(object.data.x()), format(object.data.y())));
             lines.add(Component.translatable("screen.oritech_space_age.object.radius", format(object.data.radius())));
+            if (object.data.type() == SpaceObjects.ObjectType.ASTEROID) {
+                lines.add(Component.translatable("screen.oritech_space_age.object.mass",
+                        format(object.data.mass() * 1_000)));
+                lines.add(Component.translatable("screen.oritech_space_age.object.velocity",
+                        formatSpeed(Math.hypot(object.data.velocityX(), object.data.velocityY()))));
+                lines.add(Component.translatable("screen.oritech_space_age.object.materials"));
+                object.data.materials().forEach(material -> lines.add(Component.literal(
+                        "• " + material.block() + " × " + material.amount())));
+            }
             lines.add(Component.translatable("screen.oritech_space_age.object.detection",
                     object.data.detectionState().name().toLowerCase(Locale.ROOT)));
             return lines;
@@ -540,6 +595,11 @@ final class RocketStarMapWidget extends UIComponent {
                 formatSpeed(hoveredPathPoint.speedMetersPerSecond)));
         lines.add(Component.translatable("screen.oritech_space_age.path_connected"));
         addSegmentNames(lines, hoveredPathSample.connectedSegments());
+        if (!hoveredPathSample.attachedAsteroidId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+            var asteroid = objectById(hoveredPathSample.attachedAsteroidId());
+            if (asteroid != null) lines.add(Component.translatable(
+                    "screen.oritech_space_age.path.attached_asteroid", objectName(asteroid.data)));
+        }
         lines.add(Component.translatable("screen.oritech_space_age.path_firing"));
         if (hoveredPathSample.firingSegments().isEmpty()) {
             lines.add(Component.translatable("screen.oritech_space_age.path_none"));
@@ -584,6 +644,16 @@ final class RocketStarMapWidget extends UIComponent {
 
     private MapObject objectById(UUID id) {
         return objects.stream().filter(object -> object.data.id().equals(id)).findFirst().orElse(null);
+    }
+
+    private double objectX(MapObject object) {
+        var position = displayedObjectPositions.get(object.data.id());
+        return position == null ? object.data.x() : position.x;
+    }
+
+    private double objectY(MapObject object) {
+        var position = displayedObjectPositions.get(object.data.id());
+        return position == null ? object.data.y() : position.y;
     }
 
     private static double gravityAtOrbit(SpaceSimulation.SpaceObjectData object,
@@ -632,6 +702,9 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private record MapObject(SpaceSimulation.SpaceObjectData data, BlockWidget widget) {
+    }
+
+    private record MotionPosition(double x, double y, double timeSeconds) {
     }
 
     private record BranchMarker(UUID branchId, double worldX, double worldY, ItemWidget widget) {

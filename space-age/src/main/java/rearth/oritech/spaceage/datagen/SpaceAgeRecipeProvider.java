@@ -51,6 +51,17 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
                 .save(output);
 
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ASTEROID_ANCHOR)
+                .pattern("sis")
+                .pattern("ama")
+                .pattern("sis")
+                .define('s', ItemContent.STEEL_INGOT)
+                .define('i', Items.IRON_BLOCK)
+                .define('a', ItemContent.ADVANCED_COMPUTING_ENGINE)
+                .define('m', ItemContent.MOTOR)
+                .unlockedBy("has_advanced_computing_engine", has(ItemContent.ADVANCED_COMPUTING_ENGINE))
+                .save(output);
+
         shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ION_BOOSTER_ROCKET)
                 .pattern("ded")
                 .pattern("ete")

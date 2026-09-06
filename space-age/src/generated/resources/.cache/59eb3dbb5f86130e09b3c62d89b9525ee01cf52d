@@ -1,4 +1,5 @@
-// 26.1.2	2026-08-23T21:14:31.538225	Loot Tables
+// 26.1.2	2026-09-05T21:31:20.016156	Loot Tables
+67faff8348ca879b8086987f3cfb3ad3a9319252 data/oritech_space_age/loot_table/blocks/asteroid_anchor.json
 0592858497e3fae0476770ee73b569642eb26b11 data/oritech_space_age/loot_table/blocks/basic_booster_rocket.json
 66b879b15718bdc57faf4a41c72d14d8f34e5513 data/oritech_space_age/loot_table/blocks/ion_booster_rocket.json
 6d08478d63f09ddd428e7c03bb4cb1f093468059 data/oritech_space_age/loot_table/blocks/rocket_assembler.json

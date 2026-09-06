@@ -18,6 +18,7 @@ import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -39,6 +40,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private static final int GENERATED_CARD_WIDTH = 98;
     private static final SpaceSimulation.ActionType[] EDITABLE_ACTION_TYPES = {
             SpaceSimulation.ActionType.NAVIGATE_TO,
+            SpaceSimulation.ActionType.CONNECT_ASTEROID,
             SpaceSimulation.ActionType.DECOUPLE,
             SpaceSimulation.ActionType.MAINTAIN_POSITION,
             SpaceSimulation.ActionType.DISCARD_CRAFT
@@ -76,6 +78,14 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     private UUID arrivalAction;
     private EditBox arrivalField;
     private String arrivalText;
+    private UUID landingAction;
+    private EditBox landingXField;
+    private EditBox landingZField;
+    private String landingXText;
+    private String landingZText;
+    private UUID addonAction;
+    private EditBox addonValueField;
+    private String addonValueText;
     private RocketStarMapWidget.NavigationContextRequest mapContextRequest;
     private int dropdownX;
     private int dropdownY;
@@ -110,10 +120,15 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         targetList = null;
         targetOptions.clear();
         arrivalField = null;
+        landingXField = null;
+        landingZField = null;
+        addonValueField = null;
         if (speedAction != null) buildSpeedEditor();
         else if (actionTypeAction != null) buildActionTypeMenu();
         else if (targetAction != null) buildTargetMenu();
         else if (arrivalAction != null) buildArrivalEditor();
+        else if (landingAction != null) buildLandingEditor();
+        else if (addonAction != null) buildAddonEditor();
         else if (mapContextRequest != null) buildMapContextMenu();
     }
 
@@ -187,7 +202,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                 .forEach(action -> actionOwners.put(action.id(), branch)));
         var rowByBranch = new HashMap<UUID, Integer>();
         var xByBranch = new HashMap<UUID, Integer>();
-        var rowHeight = 138;
+        var rowHeight = 164;
         int branchStartY = 8;
 
         for (int row = 0; row < draftPlan.branches().size(); row++) {
@@ -227,6 +242,10 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                     cursorX += GENERATED_CARD_WIDTH;
                 } else {
                     addEditableCard(scroll, branch, action, index, rocket, cursorX, rowY);
+                    if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                            && (!action.addons().isEmpty() || canAddNavigationAddon(branch, action))) {
+                        addNavigationAddonCard(scroll, branch, action, rocket, cursorX, rowY);
+                    }
                     cursorX += NORMAL_CARD_WIDTH;
                 }
             }
@@ -270,16 +289,28 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                     } else cycleActionParameter(branch.id(), index, rocket);
                 });
         parameter.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                || action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
                 || action.type() == SpaceSimulation.ActionType.DECOUPLE);
+        if (action.type() == SpaceSimulation.ActionType.DECOUPLE
+                && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+            var asteroidPath = calculatedFlight.asteroidPaths().stream()
+                    .filter(path -> path.asteroidId().equals(action.targetId())).findFirst().orElse(null);
+            if (asteroidPath != null) parameter.withTooltip(releasedAsteroidTooltip(asteroidPath));
+        }
         scroll.addChild(parameter);
         var orbit = SpaceAgeButtons.panel(cursorX + 5, rowY + 48, 120, 17,
-                actionOrbit(action), ignored -> cycleActionOrbit(branch.id(), index, rocket));
+                actionOrbit(action), ignored -> {
+                    if (isEarthSurface(action)) openLandingEditor(action.id());
+                    else cycleActionOrbit(branch.id(), index, rocket);
+                });
         orbit.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
         scroll.addChild(orbit);
 
         var velocity = SpaceAgeButtons.panel(cursorX + 5, rowY + 69, 120, 17,
                 actionVelocity(action), ignored -> openArrivalEditor(action.id()));
         velocity.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
+        var prediction = arrivalPrediction(action.id());
+        if (prediction != null) velocity.withTooltip(arrivalTooltip(prediction.impact()));
         scroll.addChild(velocity);
 
         var speed = SpaceAgeButtons.panel(cursorX + 5, rowY + 91, 120, 17,
@@ -308,6 +339,28 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         scroll.addChild(increase);
         scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 108, rowY + 113, 17, 13, Component.literal("×"),
                 ignored -> removeAction(branch.id(), index, rocket)));
+    }
+
+    private void addNavigationAddonCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
+                                        SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
+                                        int cursorX, int rowY) {
+        scroll.addChild(new AddonConnectorWidget(cursorX + 66, rowY + 130, rowY + 135));
+        if (action.addons().isEmpty()) {
+            scroll.addChild(SpaceAgeButtons.orangePanel(cursorX + 54, rowY + 135, 24, 20,
+                    Component.literal("+"), ignored -> addNavigationAddon(branch.id(), action.id(), rocket))
+                    .withTooltip(Component.translatable("screen.oritech_space_age.action.add_completion_condition")));
+            return;
+        }
+        var addon = action.addons().getFirst();
+        var button = SpaceAgeButtons.darkPanel(cursorX + 5, rowY + 135, 99, 20,
+                addonSummary(addon), ignored -> openAddonEditor(action.id()));
+        var moment = calculatedFlight.navigationAborts().stream()
+                .filter(item -> item.addonId().equals(addon.id())).findFirst().orElse(null);
+        if (moment != null) button.withTooltip(Component.translatable(
+                "screen.oritech_space_age.action.condition_reached", formatAddonValue(addon.type(), moment.actualValue())));
+        scroll.addChild(button);
+        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 107, rowY + 135, 18, 20,
+                Component.literal("×"), ignored -> removeNavigationAddon(branch.id(), action.id(), rocket)));
     }
 
     private void buildSpeedEditor() {
@@ -350,10 +403,22 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         addComponent(new LabelWidget(px + 10, py + 7, popupWidth - 20,
                 Component.translatable("screen.oritech_space_age.action.choose_type"))
                 .withBrightColor().withZIndex(9_001));
+        var editedAction = findAction(actionTypeAction);
+        var editedBranch = draftPlan.branches().stream()
+                .filter(branch -> branch.actions().stream().anyMatch(action -> action.id().equals(actionTypeAction)))
+                .findFirst().orElse(null);
+        boolean canConnectAsteroid = editedAction != null && editedBranch != null
+                && !RocketFlightPlanRules.asteroidAnchorSegments(flightPlanRocket).isEmpty()
+                && asteroidArrivalBefore(editedBranch, editedAction.id()) != null
+                && connectedAsteroidBefore(editedBranch, editedAction.id()) == null;
         for (int index = 0; index < EDITABLE_ACTION_TYPES.length; index++) {
             var type = EDITABLE_ACTION_TYPES[index];
-            addComponent(SpaceAgeButtons.panel(px + 10, py + 18 + index * 22, popupWidth - 20, 18,
-                    actionName(type), ignored -> selectActionType(type)).withZIndex(9_001));
+            var button = SpaceAgeButtons.panel(px + 10, py + 18 + index * 22, popupWidth - 20, 18,
+                    actionName(type), ignored -> selectActionType(type));
+            button.setActive(type != SpaceSimulation.ActionType.CONNECT_ASTEROID
+                    || editedAction != null && editedAction.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
+                    || canConnectAsteroid);
+            addComponent(button.withZIndex(9_001));
         }
     }
 
@@ -379,6 +444,11 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         targetList.setZIndex(9_001);
         targetOptions.clear();
         var objects = currentDraftSnapshot().objects().stream()
+                .filter(object -> {
+                    var action = findAction(targetAction);
+                    return action == null || action.type() != SpaceSimulation.ActionType.CONNECT_ASTEROID
+                            || object.type() == SpaceObjects.ObjectType.ASTEROID;
+                })
                 .sorted(Comparator.comparing(object -> RocketStarMapWidget.objectName(object).getString(),
                         String.CASE_INSENSITIVE_ORDER)).toList();
         for (var object : objects) {
@@ -449,6 +519,87 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         addComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 104, 100, 18,
                 Component.translatable("gui.cancel"), ignored -> closeEditors()).withZIndex(9_001));
         setFocused(arrivalField);
+    }
+
+    private void buildLandingEditor() {
+        var popupWidth = Math.min(300, panelWidth - 12);
+        var popupHeight = 126;
+        var px = (panelWidth - popupWidth) / 2;
+        var py = Math.max(4, (panelHeight - popupHeight) / 2);
+        addEditorBackdrop(px, py, popupWidth, popupHeight);
+        addComponent(new LabelWidget(px + 10, py + 8, popupWidth - 20, 24,
+                Component.translatable("screen.oritech_space_age.action.landing_help"))
+                .withWrap(true).withBrightColor().withZIndex(9_001));
+        addComponent(new LabelWidget(px + 10, py + 43, 18, Component.literal("X"))
+                .withBrightColor().withZIndex(9_001));
+        landingXField = addRenderableWidget(new EditBox(font, leftPos + px + 28, topPos + py + 38,
+                100, 18, Component.literal("X")));
+        landingXField.setValue(landingXText);
+        addComponent(new LabelWidget(px + 150, py + 43, 18, Component.literal("Z"))
+                .withBrightColor().withZIndex(9_001));
+        landingZField = addRenderableWidget(new EditBox(font, leftPos + px + 168, topPos + py + 38,
+                100, 18, Component.literal("Z")));
+        landingZField.setValue(landingZText);
+        var apply = SpaceAgeButtons.panel(px + 10, py + 94, 88, 18, Component.translatable("gui.done"),
+                ignored -> applyLandingCoordinates());
+        apply.setZIndex(9_001);
+        addComponent(apply);
+        addComponent(SpaceAgeButtons.panel(px + 106, py + 94, 88, 18,
+                Component.translatable("screen.oritech_space_age.action.next_orbit"), ignored -> nextLandingOrbit())
+                .withZIndex(9_001));
+        addComponent(SpaceAgeButtons.panel(px + 202, py + 94, 88, 18,
+                Component.translatable("gui.cancel"), ignored -> closeEditors()).withZIndex(9_001));
+        landingXField.setResponder(value -> landingXText = value);
+        landingZField.setResponder(value -> landingZText = value);
+        setFocused(landingXField);
+    }
+
+    private void buildAddonEditor() {
+        var action = findAction(addonAction);
+        if (action == null || action.addons().isEmpty()) return;
+        var addon = action.addons().getFirst();
+        var popupWidth = Math.min(350, panelWidth - 12);
+        var popupHeight = 144;
+        var px = (panelWidth - popupWidth) / 2;
+        var py = Math.max(4, (panelHeight - popupHeight) / 2);
+        addEditorBackdrop(px, py, popupWidth, popupHeight);
+        addComponent(new LabelWidget(px + 10, py + 8, popupWidth - 20, 24,
+                Component.translatable("screen.oritech_space_age.action.completion_help"))
+                .withWrap(true).withBrightColor().withZIndex(9_001));
+        int typeWidth = (popupWidth - 28) / 3;
+        var types = SpaceSimulation.ActionAddonType.values();
+        for (int index = 0; index < types.length; index++) {
+            var type = types[index];
+            var button = SpaceAgeButtons.panel(px + 10 + index * (typeWidth + 4), py + 38, typeWidth, 28,
+                    addonTypeName(type), ignored -> selectAddonType(type));
+            button.setActive(type != addon.type());
+            addComponent(button.withZIndex(9_001));
+        }
+        addComponent(new LabelWidget(px + 10, py + 79, 72,
+                Component.translatable("screen.oritech_space_age.action.condition_value"))
+                .withBrightColor().withZIndex(9_001));
+        addonValueField = addRenderableWidget(new EditBox(font, leftPos + px + 82, topPos + py + 74,
+                popupWidth - 172, 18, Component.translatable("screen.oritech_space_age.action.condition_value")));
+        addonValueField.setMaxLength(10);
+        addonValueField.setValue(addonValueText);
+        addComponent(new LabelWidget(px + popupWidth - 82, py + 79, 72, addonUnit(addon.type()))
+                .withBrightColor().withZIndex(9_001));
+        var apply = SpaceAgeButtons.panel(px + 10, py + 116, 100, 18, Component.translatable("gui.done"),
+                ignored -> applyAddonValue());
+        apply.setZIndex(9_001);
+        apply.setActive(parseAddonValue(addon.type(), addonValueText) != null);
+        addComponent(apply);
+        addComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 116, 100, 18,
+                Component.translatable("gui.cancel"), ignored -> closeEditors()).withZIndex(9_001));
+        addonValueField.setTextColor(parseAddonValue(addon.type(), addonValueText) == null
+                ? 0xFFFF6666 : 0xFFFFFFFF);
+        addonValueField.setResponder(value -> {
+            addonValueText = value;
+            var valid = parseAddonValue(addon.type(), value) != null;
+            addonValueField.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF6666);
+            apply.setActive(valid);
+        });
+        setFocused(addonValueField);
     }
 
     private void buildMapContextMenu() {
@@ -552,9 +703,33 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         var changed = action.withType(type);
         if (type == SpaceSimulation.ActionType.NAVIGATE_TO) {
             changed = changed.withTarget(selectedTarget.objectId()).withOrbit(selectedTarget.orbit());
+            if (isEarthSurface(changed)) {
+                var offset = landingOffset(changed);
+                changed = changed.withLanding(0, 0, offset[0], offset[1]);
+            }
+        } else if (type == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(flightPlanRocket);
+            var arrival = asteroidArrivalBefore(branch, action.id());
+            var asteroid = arrival == null ? selectedObject() : currentDraftSnapshot().objects().stream()
+                    .filter(object -> object.id().equals(arrival.targetId())).findFirst().orElse(null);
+            if (anchors.isEmpty()) return;
+            if (asteroid == null || asteroid.type() != SpaceObjects.ObjectType.ASTEROID) {
+                asteroid = currentDraftSnapshot().objects().stream()
+                        .filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID).findFirst().orElse(null);
+            }
+            if (asteroid == null) return;
+            var orbit = arrival == null ? RocketFlightPlanRules.compatibleOrbit(asteroid.type(), selectedTarget.orbit())
+                    : arrival.orbit();
+            changed = changed.withTarget(asteroid.id()).withOrbit(orbit).withSegments(List.of(anchors.getFirst()));
         } else if (type == SpaceSimulation.ActionType.DECOUPLE) {
-            var pairs = connectedPairs(flightPlanRocket);
-            if (!pairs.isEmpty()) changed = changed.withSegments(pairs.getFirst());
+            var connected = connectedAsteroidBefore(branch, action.id());
+            if (connected != null) {
+                changed = changed.withTarget(connected.targetId()).withOrbit(connected.orbit())
+                        .withSegments(connected.segments());
+            } else {
+                var pairs = connectedPairs(flightPlanRocket);
+                if (!pairs.isEmpty()) changed = changed.withSegments(pairs.getFirst());
+            }
         }
         closeEditorState();
         replaceAction(branch.id(), action.id(), changed, flightPlanRocket);
@@ -581,10 +756,123 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         if (branch == null) return;
         var changed = action.withTarget(target.id()).withOrbit(
                 RocketFlightPlanRules.compatibleOrbit(target.type(), action.orbit()));
+        if (isEarthSurface(changed)) {
+            var offset = landingOffset(changed);
+            changed = changed.withLanding(changed.landingX(), changed.landingZ(), offset[0], offset[1]);
+        }
         selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
         closeEditorState();
         replaceAction(branch.id(), action.id(), changed, flightPlanRocket);
         rebuildComponents();
+    }
+
+    private void openLandingEditor(UUID actionId) {
+        var action = findAction(actionId);
+        if (!isEarthSurface(action)) return;
+        closeEditorState();
+        landingAction = actionId;
+        landingXText = Integer.toString(action.landingX());
+        landingZText = Integer.toString(action.landingZ());
+        rebuildComponents();
+    }
+
+    private void applyLandingCoordinates() {
+        var action = findAction(landingAction);
+        var x = parseCoordinate(landingXField == null ? "" : landingXField.getValue());
+        var z = parseCoordinate(landingZField == null ? "" : landingZField.getValue());
+        if (action == null || x == null || z == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        var offset = landingOffset(action);
+        closeEditorState();
+        replaceAction(branch.id(), action.id(), action.withLanding(x, z, offset[0], offset[1]), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void nextLandingOrbit() {
+        var action = findAction(landingAction);
+        var branch = action == null ? null : draftPlan.branches().stream()
+                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        closeEditorState();
+        cycleActionOrbit(branch.id(), branch.actions().indexOf(action), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private static Integer parseCoordinate(String value) {
+        try {
+            return Integer.parseInt(value.strip());
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private void addNavigationAddon(UUID branchId, UUID actionId, ActiveRocketData rocket) {
+        var action = findAction(actionId);
+        if (action == null || !action.addons().isEmpty()) return;
+        var addon = SpaceSimulation.ActionAddon.create(SpaceSimulation.ActionAddonType.DISTANCE_FROM_TARGET);
+        replaceAction(branchId, actionId, action.withAddons(List.of(addon)), rocket);
+        addonAction = actionId;
+        addonValueText = Integer.toString(addon.value());
+        rebuildComponents();
+    }
+
+    private void openAddonEditor(UUID actionId) {
+        var action = findAction(actionId);
+        if (action == null || action.addons().isEmpty()) return;
+        closeEditorState();
+        addonAction = actionId;
+        addonValueText = Integer.toString(action.addons().getFirst().value());
+        rebuildComponents();
+    }
+
+    private void selectAddonType(SpaceSimulation.ActionAddonType type) {
+        var action = findAction(addonAction);
+        if (action == null || action.addons().isEmpty()) return;
+        var changed = action.addons().getFirst().withType(type);
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        addonValueText = Integer.toString(changed.value());
+        replaceAction(branch.id(), action.id(), action.withAddons(List.of(changed)), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void applyAddonValue() {
+        var action = findAction(addonAction);
+        var value = action == null || action.addons().isEmpty() || addonValueField == null ? null
+                : parseAddonValue(action.addons().getFirst().type(), addonValueField.getValue());
+        if (action == null || action.addons().isEmpty() || value == null) return;
+        var branch = draftPlan.branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        var changed = action.addons().getFirst().withValue(value);
+        closeEditorState();
+        replaceAction(branch.id(), action.id(), action.withAddons(List.of(changed)), flightPlanRocket);
+        rebuildComponents();
+    }
+
+    private void removeNavigationAddon(UUID branchId, UUID actionId, ActiveRocketData rocket) {
+        var action = findAction(actionId);
+        if (action == null) return;
+        replaceAction(branchId, actionId, action.withAddons(List.of()), rocket);
+    }
+
+    private static Integer parseAddonValue(SpaceSimulation.ActionAddonType type, String value) {
+        try {
+            int result = Integer.parseInt(value.strip());
+            return result > 0 && RocketFlightPlanRules.clampAddonValue(type, result) == result ? result : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    private static int[] landingOffset(SpaceSimulation.FlightPlanAction action) {
+        if (action.landingOffsetX() != 0 || action.landingOffsetZ() != 0) {
+            return new int[]{action.landingOffsetX(), action.landingOffsetZ()};
+        }
+        var random = new java.util.Random(action.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits());
+        double angle = random.nextDouble() * Math.PI * 2;
+        double radius = Math.sqrt(random.nextDouble()) * AsteroidImpactRules.LANDING_UNCERTAINTY_BLOCKS;
+        return new int[]{(int) Math.round(Math.cos(angle) * radius), (int) Math.round(Math.sin(angle) * radius)};
     }
 
     private void openArrivalEditor(UUID actionId) {
@@ -624,6 +912,8 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         actionTypeAction = null;
         targetAction = null;
         arrivalAction = null;
+        landingAction = null;
+        addonAction = null;
         mapContextRequest = null;
     }
 
@@ -645,6 +935,18 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         if (arrivalField != null && arrivalField.isMouseOver(event.x(), event.y())) {
             setFocused(arrivalField);
             return arrivalField.mouseClicked(event, doubleClick);
+        }
+        if (landingXField != null && landingXField.isMouseOver(event.x(), event.y())) {
+            setFocused(landingXField);
+            return landingXField.mouseClicked(event, doubleClick);
+        }
+        if (landingZField != null && landingZField.isMouseOver(event.x(), event.y())) {
+            setFocused(landingZField);
+            return landingZField.mouseClicked(event, doubleClick);
+        }
+        if (addonValueField != null && addonValueField.isMouseOver(event.x(), event.y())) {
+            setFocused(addonValueField);
+            return addonValueField.mouseClicked(event, doubleClick);
         }
         return super.mouseClicked(event, doubleClick);
     }
@@ -680,6 +982,19 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
             else if (arrivalField != null) arrivalField.keyPressed(event);
             return true;
         }
+        if (landingAction != null) {
+            if (event.isEscape()) closeEditors();
+            else if (event.isConfirmation()) applyLandingCoordinates();
+            else if (getFocused() == landingZField && landingZField != null) landingZField.keyPressed(event);
+            else if (landingXField != null) landingXField.keyPressed(event);
+            return true;
+        }
+        if (addonAction != null) {
+            if (event.isEscape()) closeEditors();
+            else if (event.isConfirmation()) applyAddonValue();
+            else if (addonValueField != null) addonValueField.keyPressed(event);
+            return true;
+        }
         if (actionTypeAction != null || mapContextRequest != null) {
             if (event.isEscape()) closeEditors();
             return true;
@@ -692,6 +1007,10 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         if (branch == null || editableActionCount() >= RocketFlightPlanRules.MAX_ACTIONS) return;
         var action = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
                 .withTarget(selectedTarget.objectId()).withOrbit(selectedTarget.orbit());
+        if (isEarthSurface(action)) {
+            var offset = landingOffset(action);
+            action = action.withLanding(0, 0, offset[0], offset[1]);
+        }
         var actions = withoutGenerated(branch.actions());
         actions.add(action);
         updateBranchActions(branchId, actions, rocket);
@@ -731,7 +1050,15 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                     RocketFlightPlanRules.compatibleOrbit(target.type(), action.orbit()));
             selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
             replaceAction(branchId, action.id(), changed, rocket);
+        } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(rocket);
+            if (anchors.isEmpty()) return;
+            var current = action.segments().isEmpty() ? null : action.segments().getFirst();
+            int anchorIndex = anchors.indexOf(current);
+            replaceAction(branchId, action.id(), action.withSegments(
+                    List.of(anchors.get((anchorIndex + 1) % anchors.size()))), rocket);
         } else if (action.type() == SpaceSimulation.ActionType.DECOUPLE) {
+            if (!action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) return;
             var pairs = connectedPairs(rocket);
             if (pairs.isEmpty()) return;
             int current = pairs.indexOf(action.segments());
@@ -743,13 +1070,18 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         var branch = findBranch(branchId);
         if (branch == null) return;
         var action = branch.actions().get(index);
-        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return;
+        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO
+                && action.type() != SpaceSimulation.ActionType.CONNECT_ASTEROID) return;
         var target = currentDraftSnapshot().objects().stream()
                 .filter(object -> object.id().equals(action.targetId())).findFirst().orElse(null);
         if (target == null) return;
         var bands = RocketFlightPlanRules.availableOrbits(target.type());
         int current = bands.indexOf(action.orbit());
         var changed = action.withOrbit(bands.get((current + 1) % bands.size()));
+        if (isEarthSurface(changed)) {
+            var offset = landingOffset(changed);
+            changed = changed.withLanding(changed.landingX(), changed.landingZ(), offset[0], offset[1]);
+        }
         selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
         replaceAction(branchId, action.id(), changed, rocket);
     }
@@ -857,7 +1189,16 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
                     .findFirst().map(RocketStarMapWidget::objectName)
                     .orElse(Component.translatable("screen.oritech_space_age.action.no_target"));
         }
+        if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+            var asteroid = objectName(action.targetId());
+            var segment = action.segments().isEmpty() ? "?" : segmentName(action.segments().getFirst(), rocket);
+            return Component.translatable("screen.oritech_space_age.action.asteroid_connection", asteroid, segment);
+        }
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE) {
+            if (!action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+                return Component.translatable("screen.oritech_space_age.action.release_asteroid",
+                        objectName(action.targetId()));
+            }
             if (action.segments().size() != 2) {
                 return Component.translatable("screen.oritech_space_age.action.no_segment");
             }
@@ -868,9 +1209,19 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
     }
 
     private Component actionOrbit(SpaceSimulation.FlightPlanAction action) {
-        return action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                ? RocketStarMapWidget.orbitName(action.orbit())
-                : Component.translatable("screen.oritech_space_age.action.no_scope");
+        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO
+                && action.type() != SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+            return Component.translatable("screen.oritech_space_age.action.no_scope");
+        }
+        if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+            return Component.translatable("screen.oritech_space_age.action.asteroid_connection_range",
+                    (int) AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED);
+        }
+        if (isEarthSurface(action)) {
+            return Component.translatable("screen.oritech_space_age.action.earth_coordinates",
+                    action.landingX(), action.landingZ());
+        }
+        return RocketStarMapWidget.orbitName(action.orbit());
     }
 
     private Component actionVelocity(SpaceSimulation.FlightPlanAction action) {
@@ -977,6 +1328,161 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
             graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX) + 1, cornerY + 1, color);
             graphics.fill(endX - 1, cornerY, endX + 1, endY, color);
         }
+    }
+
+    private static final class AddonConnectorWidget extends UIComponent {
+        private final int lineX;
+        private final int startY;
+        private final int endY;
+
+        private AddonConnectorWidget(int lineX, int startY, int endY) {
+            super(lineX - 1, startY, 2, Math.max(1, endY - startY));
+            this.lineX = lineX;
+            this.startY = startY;
+            this.endY = endY;
+        }
+
+        @Override
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+            graphics.fill(lineX - 1, startY, lineX + 1, endY, 0xFFD58A32);
+        }
+    }
+
+    private SpaceSimulation.SpaceObjectData selectedObject() {
+        return currentDraftSnapshot().objects().stream()
+                .filter(object -> object.id().equals(selectedTarget.objectId())).findFirst().orElse(null);
+    }
+
+    private String objectName(UUID id) {
+        return currentDraftSnapshot().objects().stream().filter(object -> object.id().equals(id)).findFirst()
+                .map(object -> RocketStarMapWidget.objectName(object).getString()).orElse("?");
+    }
+
+    private static boolean isEarthSurface(SpaceSimulation.FlightPlanAction action) {
+        return action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                && action.targetId().equals(SpaceObjects.EARTH_ID)
+                && action.orbit() == SpaceSimulation.OrbitBand.SURFACE;
+    }
+
+    private RocketFlightPathCalculator.ArrivalPrediction arrivalPrediction(UUID actionId) {
+        return calculatedFlight.arrivalPredictions().stream()
+                .filter(prediction -> prediction.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    private static List<Component> arrivalTooltip(AsteroidImpactRules.ImpactPrediction prediction) {
+        var lines = new ArrayList<Component>();
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_outcome."
+                + prediction.outcome().name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD));
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_relative_speed",
+                String.format(Locale.ROOT, "%.1f", prediction.relativeSpeedMetersPerSecond())));
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_position",
+                prediction.landingX(), prediction.landingZ()));
+        if (prediction.craterRadiusBlocks() > 0) {
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_crater",
+                    prediction.craterRadiusBlocks()));
+        }
+        if (prediction.fragmentCount() > 0) {
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_fragments."
+                    + prediction.fragmentationMode().name().toLowerCase(Locale.ROOT), prediction.fragmentCount()));
+            for (int index = 0; index < prediction.fragments().size(); index++) {
+                var fragment = prediction.fragments().get(index);
+                lines.add(Component.translatable("screen.oritech_space_age.arrival_fragment",
+                        index + 1, String.format(Locale.ROOT, "%.0f", fragment.mass() * 1_000),
+                        String.format(Locale.ROOT, "%.0f", fragment.radius())));
+            }
+            if (prediction.remainingTargetMass() > 0) {
+                lines.add(Component.translatable("screen.oritech_space_age.arrival_remaining_asteroid",
+                        String.format(Locale.ROOT, "%.0f", prediction.remainingTargetMass() * 1_000)));
+            }
+        }
+        if (!prediction.recoverableMaterials().isEmpty()) {
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_recoverable"));
+            prediction.recoverableMaterials().forEach(material -> lines.add(Component.literal(
+                    "• " + material.block() + " × " + material.amount())));
+        }
+        return lines;
+    }
+
+    private static List<Component> releasedAsteroidTooltip(RocketFlightPathCalculator.AsteroidPath path) {
+        if (path.earthImpact() == null) {
+            return List.of(Component.translatable("screen.oritech_space_age.released_asteroid_miss"),
+                    Component.translatable("screen.oritech_space_age.action.predicted_uncertainty",
+                            path.landingUncertaintyBlocks()));
+        }
+        var lines = new ArrayList<>(arrivalTooltip(path.earthImpact()));
+        lines.add(Component.translatable("screen.oritech_space_age.action.predicted_uncertainty",
+                path.landingUncertaintyBlocks()));
+        return lines;
+    }
+
+    private boolean canAddNavigationAddon(SpaceSimulation.FlightPlanBranch branch,
+                                           SpaceSimulation.FlightPlanAction action) {
+        var path = calculatedFlight.paths().stream().filter(item -> item.branchId().equals(branch.id()))
+                .findFirst().orElse(null);
+        if (path == null) return false;
+        var moment = path.actionMoments().stream().filter(item -> item.actionId().equals(action.id()))
+                .findFirst().orElse(null);
+        return moment != null && (moment.connectedSegments().size() > 1
+                || !moment.attachedAsteroidId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET));
+    }
+
+    private static Component addonTypeName(SpaceSimulation.ActionAddonType type) {
+        return Component.translatable("screen.oritech_space_age.action.condition."
+                + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    private static Component addonUnit(SpaceSimulation.ActionAddonType type) {
+        return Component.translatable("screen.oritech_space_age.action.condition_unit."
+                + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    private static Component addonSummary(SpaceSimulation.ActionAddon addon) {
+        return Component.translatable("screen.oritech_space_age.action.condition_summary."
+                + addon.type().name().toLowerCase(Locale.ROOT), addon.value());
+    }
+
+    private static String formatAddonValue(SpaceSimulation.ActionAddonType type, double value) {
+        return switch (type) {
+            case DISTANCE_FROM_TARGET -> String.format(Locale.ROOT, "%.0f m", value);
+            case TIME_BEFORE_ARRIVAL -> String.format(Locale.ROOT, "%.0f s", value);
+            case DESIRED_UNCERTAINTY -> String.format(Locale.ROOT, "±%.0f blocks", value);
+        };
+    }
+
+    private SpaceSimulation.FlightPlanAction connectedAsteroidBefore(
+            SpaceSimulation.FlightPlanBranch branch, UUID beforeAction) {
+        SpaceSimulation.FlightPlanAction connected = null;
+        for (var action : branch.actions()) {
+            if (action.id().equals(beforeAction)) break;
+            if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) connected = action;
+            if (action.type() == SpaceSimulation.ActionType.DECOUPLE
+                    && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) connected = null;
+        }
+        return connected;
+    }
+
+    private SpaceSimulation.FlightPlanAction asteroidArrivalBefore(
+            SpaceSimulation.FlightPlanBranch branch, UUID beforeAction) {
+        SpaceSimulation.FlightPlanAction arrival = null;
+        for (var action : branch.actions()) {
+            if (action.id().equals(beforeAction)) break;
+            if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
+            var target = currentDraftSnapshot().objects().stream()
+                    .filter(object -> object.id().equals(action.targetId())).findFirst().orElse(null);
+            arrival = target != null && target.type() == SpaceObjects.ObjectType.ASTEROID
+                    && (action.orbit() == SpaceSimulation.OrbitBand.TIGHT
+                    || action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
+                    && canConnectAfter(action) ? action : null;
+        }
+        return arrival;
+    }
+
+    private static boolean canConnectAfter(SpaceSimulation.FlightPlanAction action) {
+        return switch (action.velocityMode()) {
+            case ZERO -> true;
+            case CUSTOM -> action.targetVelocity() <= AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED;
+            case MAXIMUM -> false;
+        };
     }
 
     private record TargetOption(UIComponent button, String searchText) {

@@ -1,8 +1,10 @@
-// 26.1.2	2026-08-23T21:14:31.5392261	Oritech: Space Age Recipes
+// 26.1.2	2026-09-05T21:31:20.016156	Oritech: Space Age Recipes
+96760ca81bb104b160a388b2a088ef4cfea5699d data/oritech_space_age/advancement/recipes/misc/asteroid_anchor.json
 c1441a2ffc935af9d33d03b1dd760138a1ea3ab9 data/oritech_space_age/advancement/recipes/misc/basic_booster_rocket.json
 bce9a503e2298286520e379ed2a294dec2c2280a data/oritech_space_age/advancement/recipes/misc/ion_booster_rocket.json
 d494a85cc1acae013f2e4a6e9b2bd3597fbdedba data/oritech_space_age/advancement/recipes/misc/rocket_assembler.json
 0643c91cd84bbaccc148cfe529452279b1bbb89f data/oritech_space_age/advancement/recipes/misc/rocket_pad.json
+3af9ec87589045193d3e63c0577afc83923ac0cc data/oritech_space_age/recipe/asteroid_anchor.json
 1f68d52f0a1abd00dd16665447c63e36125e0e9b data/oritech_space_age/recipe/basic_booster_rocket.json
 c7089928b297430ad1eecfd8f63347529dc81543 data/oritech_space_age/recipe/ion_booster_rocket.json
 a9005ea91a3da834ec1761cd8ebda0e73fcd0a81 data/oritech_space_age/recipe/rocket_assembler.json

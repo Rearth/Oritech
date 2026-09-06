@@ -3,8 +3,10 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import org.joml.Vector2f;
+import java.util.List;
 import java.util.Locale;
 
 import java.util.UUID;
@@ -46,15 +48,25 @@ public class SpaceObjects {
                 DetectionState.CODEC.fieldOf("detection").forGetter(object -> object.currentState),
                 Codec.STRING.optionalFieldOf("name", "").forGetter(object -> object.name),
                 Codec.FLOAT.optionalFieldOf("weight", 0F)
-                        .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.weight : 0F)
-        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight) -> {
+                        .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.weight : 0F),
+                Codec.FLOAT.optionalFieldOf("velocity_x", 0F)
+                        .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.velocity.x : 0F),
+                Codec.FLOAT.optionalFieldOf("velocity_y", 0F)
+                        .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.velocity.y : 0F),
+                AsteroidMaterial.CODEC.listOf().optionalFieldOf("materials", List.of())
+                        .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of())
+        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
             object.radius = radius;
             object.surfaceGravity = gravity;
             object.currentState = detection;
             object.name = name;
-            if (object instanceof MovableSimulatedObject movable) movable.weight = weight;
+            if (object instanceof MovableSimulatedObject movable) {
+                movable.weight = weight;
+                movable.velocity = new Vector2f(velocityX, velocityY);
+            }
+            if (object instanceof Asteroid asteroid) asteroid.materials = List.copyOf(materials);
             return object;
         }));
 
@@ -80,6 +92,7 @@ public class SpaceObjects {
     // Things like asteroids. Movement itsn't applied per tick, instead events / future positions are calculated during each interaction / event
     public static class MovableSimulatedObject extends SimulatedObject {
         public float weight;
+        public Vector2f velocity = new Vector2f();
 
         public MovableSimulatedObject(UUID id, ObjectType type) {
             super(id, type);
@@ -87,6 +100,8 @@ public class SpaceObjects {
     }
 
     public static class Asteroid extends MovableSimulatedObject {
+        public List<AsteroidMaterial> materials = List.of();
+
         public Asteroid() {
             this(UUID.randomUUID());
         }
@@ -94,7 +109,12 @@ public class SpaceObjects {
         private Asteroid(UUID id) {
             super(id, ObjectType.ASTEROID);
         }
+    }
 
-        // loot table data here, etc. in the future
+    public record AsteroidMaterial(Identifier block, int amount) {
+        public static final Codec<AsteroidMaterial> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Identifier.CODEC.fieldOf("block").forGetter(AsteroidMaterial::block),
+                Codec.INT.fieldOf("amount").forGetter(AsteroidMaterial::amount)
+        ).apply(instance, AsteroidMaterial::new));
     }
 }

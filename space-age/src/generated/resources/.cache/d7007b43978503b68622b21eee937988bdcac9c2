@@ -1,9 +1,11 @@
-// 26.1.2	2026-08-23T21:14:31.5372265	Model Definitions - oritech_space_age
+// 26.1.2	2026-09-05T21:31:20.0151562	Model Definitions - oritech_space_age
+7fcd2d9be0fe6567c7f5ecd0c308545bd509fd3d assets/oritech_space_age/blockstates/asteroid_anchor.json
 29db540ea059e1426e36dbaf8d754e43497d368f assets/oritech_space_age/blockstates/basic_booster_rocket.json
 1dbe12d964d9e078a94ed6721bfb848f9be363b2 assets/oritech_space_age/blockstates/ion_booster_rocket.json
 a6afddd0e0cd5d496fb575fdc4c2ec48acb2f3d8 assets/oritech_space_age/blockstates/rocket_assembler.json
 b78c7f0e95346f6c96a5a7b840cfb65e04a8482e assets/oritech_space_age/blockstates/rocket_coupling.json
 701164c366530de0dfb9ccb92476a3dae38613fc assets/oritech_space_age/blockstates/rocket_pad.json
+f37b0b86d350832bf5e15f38c69dcfc8904fa1cd assets/oritech_space_age/items/asteroid_anchor.json
 3b423af62aa7e912cb042eaa6b9e9690ae768a57 assets/oritech_space_age/items/basic_booster_rocket.json
 9a80121097c518cf842ab95cfb087a569231c053 assets/oritech_space_age/items/ion_booster_rocket.json
 aa7ac18808465f22f2a57a10fd47a7a0376dcecb assets/oritech_space_age/items/rocket_assembler.json

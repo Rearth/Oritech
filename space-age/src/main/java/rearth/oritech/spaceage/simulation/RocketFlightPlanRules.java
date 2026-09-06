@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
 /** Keeps the client editor and server storage on the same small set of mission-plan rules. */
 public final class RocketFlightPlanRules {
@@ -120,12 +121,20 @@ public final class RocketFlightPlanRules {
                     var target = objectsById.get(action.targetId());
                     if (target == null) continue;
                     validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
+                } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+                    var target = objectsById.get(action.targetId());
+                    if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID) continue;
+                    validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
                 }
+                var addons = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                        ? validatedAction.addons().stream().limit(1)
+                        .map(addon -> addon.withValue(clampAddonValue(addon.type(), addon.value()))).toList()
+                        : List.<SpaceSimulation.ActionAddon>of();
                 int targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && validatedAction.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                         ? Math.clamp(validatedAction.targetVelocity(), 0, 100_000) : 0;
                 actions.add(validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity)
-                        .withMaxSpeed(Math.clamp(validatedAction.maxSpeed(), 0, 100_000)));
+                        .withMaxSpeed(Math.clamp(validatedAction.maxSpeed(), 0, 100_000)).withAddons(addons));
             }
             validatedBranches.add(branch.withActions(actions));
         }
@@ -198,12 +207,38 @@ public final class RocketFlightPlanRules {
                                          ActiveRocketData rocket) {
         if (!action.segments().stream().allMatch(segmentIds::containsKey)) return false;
         if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) return action.segments().size() == 1;
+        if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
+                || action.type() == SpaceSimulation.ActionType.DECOUPLE
+                && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+            return action.segments().size() == 1 && containsAsteroidAnchor(rocket, segmentIds.get(action.segments().getFirst()));
+        }
         if (action.type() != SpaceSimulation.ActionType.DECOUPLE) return true;
         if (action.segments().size() != 2) return false;
         UUID first = segmentIds.get(action.segments().get(0));
         UUID second = segmentIds.get(action.segments().get(1));
         var segment = rocket.getStaticSegments().get(first);
         return segment != null && segment.getConnectedSegments().contains(second);
+    }
+
+    public static int clampAddonValue(SpaceSimulation.ActionAddonType type, int value) {
+        return switch (type) {
+            case DISTANCE_FROM_TARGET -> Math.clamp(value, 1, 10_000_000);
+            case TIME_BEFORE_ARRIVAL -> Math.clamp(value, 1, 1_000_000);
+            case DESIRED_UNCERTAINTY -> Math.clamp(value, 1, 100_000);
+        };
+    }
+
+    public static List<SpaceSimulation.SegmentRef> asteroidAnchorSegments(ActiveRocketData rocket) {
+        return rocket.getStaticSegments().values().stream()
+                .filter(segment -> segment.blocks().stream().anyMatch(block -> block.state().is(SpaceAgeBlocks.ASTEROID_ANCHOR)))
+                .map(SpaceSimulation.SegmentRef::of).sorted(java.util.Comparator.comparingLong(ref -> ref.anchor().asLong()))
+                .toList();
+    }
+
+    private static boolean containsAsteroidAnchor(ActiveRocketData rocket, UUID segmentId) {
+        var segment = rocket.getStaticSegments().get(segmentId);
+        return segment != null && segment.blocks().stream()
+                .anyMatch(block -> block.state().is(SpaceAgeBlocks.ASTEROID_ANCHOR));
     }
 
     private static void addBranchAndChildren(SpaceSimulation.FlightPlanBranch branch,

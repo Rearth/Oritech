@@ -44,6 +44,8 @@ class SpaceSimulationPersistenceTest {
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
         assertFalse(target.name().isBlank());
+        assertTrue(Math.hypot(target.velocityX(), target.velocityY()) > 0);
+        assertFalse(target.materials().isEmpty());
         assertEquals(initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID).count(),
                 initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                         .map(SpaceSimulation.SpaceObjectData::name).distinct().count());
@@ -63,7 +65,10 @@ class SpaceSimulationPersistenceTest {
         var boosterRef = SpaceSimulation.SegmentRef.of(booster);
         var navigate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
                 .withTarget(target.id()).withOrbit(SpaceSimulation.OrbitBand.TIGHT)
-                .withVelocity(SpaceSimulation.ArrivalVelocityMode.CUSTOM, 50).withMaxSpeed(500);
+                .withVelocity(SpaceSimulation.ArrivalVelocityMode.CUSTOM, 50).withMaxSpeed(500)
+                .withLanding(1200, -3400, 17, -9)
+                .withAddons(List.of(new SpaceSimulation.ActionAddon(UUID.randomUUID(),
+                        SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY, 192)));
         var separate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
                 .withSegments(List.of(coreRef, boosterRef));
         var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), separate.id(),
@@ -96,6 +101,17 @@ class SpaceSimulationPersistenceTest {
 
         // Use the same record codec as the planner packets, including the speed cap.
         NetworkManager.loadDefaultCodecs();
+        NetworkManager.getAutoCodec(SpaceObjects.AsteroidMaterial.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.ActionAddon.class);
+        var snapshotCodec = ReflectiveCodecBuilder.create(SpaceSimulation.FlightPlannerSnapshot.class);
+        var snapshotBuffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY, ConnectionType.NEOFORGE);
+        try {
+            snapshotCodec.encode(snapshotBuffer, before);
+            assertEquals(before, snapshotCodec.decode(snapshotBuffer));
+        } finally {
+            snapshotBuffer.release();
+        }
         var codec = ReflectiveCodecBuilder.create(SpaceSimulation.FlightPlan.class);
         var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY, ConnectionType.NEOFORGE);
         try {
