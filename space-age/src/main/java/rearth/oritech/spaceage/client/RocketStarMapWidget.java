@@ -42,11 +42,14 @@ final class RocketStarMapWidget extends UIComponent {
     private static final double PLANE_TILT = 0.58;
     private static final double MAX_ZOOM = 0.024;
     private static final int CIRCLE_SEGMENTS = 72;
+    private static final double TRANSFER_CURVE_RATIO = 0.12;
 
     private final List<MapObject> objects = new ArrayList<>();
     private final List<BranchMarker> rocketMarkers = new ArrayList<>();
     private final List<SeparationMarker> separationMarkers = new ArrayList<>();
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> pathsByBranch = new HashMap<>();
+    private final Map<UUID, List<RenderedPathSegment>> renderedPathsByBranch = new HashMap<>();
+    private final Map<UUID, SpaceSimulation.FlightPlanAction> actionsById = new HashMap<>();
     private final Map<UUID, MotionPosition> displayedObjectPositions = new HashMap<>();
     private final Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames = new HashMap<>();
     private final Consumer<NavigationSelection> selectionListener;
@@ -99,25 +102,26 @@ final class RocketStarMapWidget extends UIComponent {
         this.flightPath = flightPath;
         this.selectedBranch = selectedBranch;
         pathsByBranch.clear();
+        actionsById.clear();
+        snapshot.plan().branches().forEach(branch -> branch.actions()
+                .forEach(action -> actionsById.put(action.id(), action)));
         displayedObjectPositions.clear();
         rocketMarkers.clear();
         separationMarkers.clear();
         for (var path : flightPath.paths()) {
             pathsByBranch.put(path.branchId(), path);
             if (path.samples().isEmpty()
-                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED) continue;
+                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED
+                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED) continue;
             var last = path.samples().getLast();
             var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
             marker.withShowOverlay(false).withTooltipFromStack(false);
-            rocketMarkers.add(new BranchMarker(path.branchId(), last.x(), last.y(), marker));
+            rocketMarkers.add(new BranchMarker(path.branchId(), last.timeSeconds(), last.x(), last.y(), marker));
         }
         var selectedPath = pathsByBranch.get(selectedBranch);
         if (selectedPath != null) {
-            var actions = new HashMap<UUID, SpaceSimulation.FlightPlanAction>();
-            snapshot.plan().branches().forEach(branch -> branch.actions()
-                    .forEach(action -> actions.put(action.id(), action)));
             for (var moment : selectedPath.actionMoments()) {
-                var action = actions.get(moment.actionId());
+                var action = actionsById.get(moment.actionId());
                 if (!moment.completed() || action == null
                         || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
                 var target = snapshot.objects().stream().filter(object -> object.id().equals(action.targetId()))
@@ -293,12 +297,11 @@ final class RocketStarMapWidget extends UIComponent {
 
     private void addFlightPaths(List<LineSegment> lines) {
         if (flightPath == null) return;
+        renderedPathsByBranch.clear();
         for (var path : flightPath.paths()) {
-            for (int index = 1; index < path.samples().size(); index++) {
-                var first = path.samples().get(index - 1);
-                var second = path.samples().get(index);
-                var from = project(first.x(), first.y());
-                var to = project(second.x(), second.y());
+            var renderedSegments = renderedPathSegments(path);
+            for (var segment : renderedSegments) {
+                var second = segment.secondSample;
                 int color = switch (second.phase()) {
                     case ACCELERATE -> 0xFFFF8A20;
                     case REDIRECT -> 0xFF8FDB68;
@@ -306,19 +309,234 @@ final class RocketStarMapWidget extends UIComponent {
                     case BRAKE -> 0xFFB68CFF;
                 };
                 if (!path.branchId().equals(selectedBranch)) color = color & 0x00FFFFFF | 0x66000000;
-                lines.add(new LineSegment(from.x, from.y, to.x, to.y, color,
+                lines.add(new LineSegment(segment.from.x, segment.from.y, segment.to.x, segment.to.y, color,
                         path.branchId().equals(selectedBranch) ? 1.3f : 0.8f));
             }
         }
         for (var path : flightPath.asteroidPaths()) {
-            for (int index = 1; index < path.samples().size(); index++) {
-                var first = path.samples().get(index - 1);
-                var second = path.samples().get(index);
-                var from = project(first.x(), first.y());
-                var to = project(second.x(), second.y());
-                lines.add(new LineSegment(from.x, from.y, to.x, to.y, 0xFFD89A62, 1.1f));
+            for (var segment : renderedAsteroidPathSegments(path)) {
+                lines.add(new LineSegment(segment.from.x, segment.from.y,
+                        segment.to.x, segment.to.y, 0xFFD89A62, 1.1f));
             }
         }
+    }
+
+    private List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
+        var cached = renderedPathsByBranch.get(path.branchId());
+        if (cached != null) return cached;
+        var samples = path.samples();
+        var segments = new ArrayList<RenderedPathSegment>();
+        Point runOrigin = renderedBranchOrigin(path.branchId());
+        UUID abortedTarget = null;
+        PathCurve abortedCurve = null;
+        int runStart = 1;
+        while (runStart < samples.size()) {
+            UUID actionId = samples.get(runStart).actionId();
+            UUID targetId = samples.get(runStart).targetId();
+            int runEnd = runStart;
+            while (runEnd + 1 < samples.size() && samples.get(runEnd + 1).actionId().equals(actionId)) runEnd++;
+            var action = actionsById.get(actionId);
+            boolean navigation = action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO;
+            Point curveDestination = navigation ? abortDestination(path.branchId(), actionId) : null;
+            boolean continuesAbortedNavigation = navigation && targetId.equals(abortedTarget);
+            PathCurve inheritedCurve = abortedCurve != null
+                    && (!navigation || continuesAbortedNavigation) ? abortedCurve : null;
+            if (navigation && inheritedCurve == null && curveDestination == null) {
+                abortedTarget = null;
+                abortedCurve = null;
+            }
+            var renderedRun = addRenderedPathRun(segments, samples, runStart - 1, runEnd, runOrigin,
+                    curveDestination, inheritedCurve, navigation ? curveDirection(path.branchId()) : 0);
+            runOrigin = renderedRun.end;
+            if (curveDestination != null) {
+                abortedTarget = targetId;
+                abortedCurve = renderedRun.curve;
+            } else if (navigation && inheritedCurve != null) {
+                abortedTarget = null;
+                abortedCurve = null;
+            }
+            runStart = runEnd + 1;
+        }
+        renderedPathsByBranch.put(path.branchId(), segments);
+        return segments;
+    }
+
+    private RenderedRun addRenderedPathRun(List<RenderedPathSegment> segments,
+                                           List<RocketFlightPathCalculator.PathSample> samples,
+                                           int firstIndex, int lastIndex, Point runOrigin,
+                                           Point curveDestination, PathCurve inheritedCurve,
+                                           int curveDirection) {
+        int pointCount = lastIndex - firstIndex + 1;
+        var points = new Point[pointCount];
+        for (int index = 0; index < pointCount; index++) {
+            var sample = samples.get(firstIndex + index);
+            points[index] = new Point(sample.x(), sample.y());
+        }
+        if (inheritedCurve == null) alignPathOrigin(points, runOrigin);
+        PathCurve fixedCurve = inheritedCurve;
+        if (fixedCurve == null && curveDestination != null) {
+            fixedCurve = PathCurve.create(points[0], curveDestination, curveDirection);
+        }
+        if (fixedCurve != null) {
+            for (int index = 0; index < points.length; index++) points[index] = fixedCurve.apply(points[index]);
+        }
+        Point renderedEnd = points[points.length - 1];
+        for (var line : curvedPolyline(points, fixedCurve == null ? curveDirection : 0)) {
+            int secondSampleIndex = firstIndex + line.segmentIndex;
+            if (secondSampleIndex > lastIndex) continue;
+            segments.add(new RenderedPathSegment(project(line.from.x, line.from.y),
+                    project(line.to.x, line.to.y), line.from, line.to,
+                    samples.get(secondSampleIndex - 1), samples.get(secondSampleIndex),
+                    line.sampleProgressFrom, line.sampleProgressTo));
+            renderedEnd = line.to;
+        }
+        return new RenderedRun(renderedEnd, fixedCurve);
+    }
+
+    private Point abortDestination(UUID branchId, UUID actionId) {
+        if (flightPath == null) return null;
+        return flightPath.navigationAborts().stream()
+                .filter(abort -> abort.branchId().equals(branchId) && abort.actionId().equals(actionId))
+                .findFirst().map(abort -> new Point(abort.destinationX(), abort.destinationY())).orElse(null);
+    }
+
+    private List<RenderedAsteroidSegment> renderedAsteroidPathSegments(
+            RocketFlightPathCalculator.AsteroidPath path) {
+        var samples = path.samples();
+        if (samples.size() < 2) return List.of();
+        var points = new Point[samples.size()];
+        for (int index = 0; index < samples.size(); index++) {
+            points[index] = new Point(samples.get(index).x(), samples.get(index).y());
+        }
+        var incoming = incomingAsteroidSegment(path.asteroidId(), samples.getFirst().timeSeconds());
+        alignPathOrigin(points, incoming == null ? null : incoming.worldTo);
+        int direction = asteroidCurveDirection(path.asteroidId(), points, incoming);
+        return curvedPolyline(points, direction).stream()
+                .map(line -> new RenderedAsteroidSegment(project(line.from.x, line.from.y),
+                        project(line.to.x, line.to.y)))
+                .toList();
+    }
+
+    private static void alignPathOrigin(Point[] points, Point origin) {
+        if (origin == null) return;
+        double offsetX = origin.x - points[0].x;
+        double offsetY = origin.y - points[0].y;
+        var distances = new double[points.length];
+        for (int index = 1; index < points.length; index++) {
+            distances[index] = distances[index - 1]
+                    + Math.hypot(points[index].x - points[index - 1].x,
+                    points[index].y - points[index - 1].y);
+        }
+        double totalDistance = distances[points.length - 1];
+        if (totalDistance == 0) {
+            java.util.Arrays.fill(points, origin);
+            return;
+        }
+        for (int index = 0; index < points.length; index++) {
+            double remaining = 1 - distances[index] / totalDistance;
+            points[index] = new Point(points[index].x + offsetX * remaining,
+                    points[index].y + offsetY * remaining);
+        }
+    }
+
+    private List<CurvedLine> curvedPolyline(Point[] points, int curveDirection) {
+        var lines = new ArrayList<CurvedLine>();
+        var distances = new double[points.length];
+        for (int index = 1; index < points.length; index++) {
+            distances[index] = distances[index - 1]
+                    + Math.hypot(points[index].x - points[index - 1].x,
+                    points[index].y - points[index - 1].y);
+        }
+        Point start = points[0];
+        Point end = points[points.length - 1];
+        double chordX = end.x - start.x;
+        double chordY = end.y - start.y;
+        double chordLength = Math.hypot(chordX, chordY);
+        double curve = isNearlyStraight(points, distances[points.length - 1], chordX, chordY, chordLength)
+                && curveDirection != 0
+                ? chordLength * TRANSFER_CURVE_RATIO * curveDirection : 0;
+        double normalX = chordLength == 0 ? 0 : -chordY / chordLength;
+        double normalY = chordLength == 0 ? 0 : chordX / chordLength;
+        double totalDistance = distances[points.length - 1];
+
+        for (int index = 1; index < points.length; index++) {
+            Point rawFrom = points[index - 1];
+            Point rawTo = points[index];
+            double segmentLength = Math.hypot(rawTo.x - rawFrom.x, rawTo.y - rawFrom.y);
+            double screenLength = Math.hypot((rawTo.x - rawFrom.x) * zoom,
+                    (rawTo.y - rawFrom.y) * zoom * PLANE_TILT);
+            int minimumSubdivisions = points.length <= 4 ? 8 : 1;
+            int subdivisions = curve == 0 ? 1 : Math.min(32,
+                    Math.max(minimumSubdivisions, (int) Math.ceil(screenLength / 16)));
+            Point from = curvedPoint(rawFrom, normalX, normalY, curve,
+                    totalDistance == 0 ? 0 : distances[index - 1] / totalDistance);
+            for (int subdivision = 1; subdivision <= subdivisions; subdivision++) {
+                double sampleProgress = subdivision / (double) subdivisions;
+                double baseX = rawFrom.x + (rawTo.x - rawFrom.x) * sampleProgress;
+                double baseY = rawFrom.y + (rawTo.y - rawFrom.y) * sampleProgress;
+                double distance = distances[index - 1] + segmentLength * sampleProgress;
+                Point to = curvedPoint(new Point(baseX, baseY), normalX, normalY, curve,
+                        totalDistance == 0 ? 0 : distance / totalDistance);
+                lines.add(new CurvedLine(from, to, index,
+                        (subdivision - 1d) / subdivisions, sampleProgress));
+                from = to;
+            }
+        }
+        return lines;
+    }
+
+    private static boolean isNearlyStraight(Point[] points, double pathLength,
+                                            double chordX, double chordY, double chordLength) {
+        if (chordLength < 0.001 || pathLength > chordLength * 1.05) return false;
+        double maximumDeviation = 0;
+        for (int index = 1; index < points.length - 1; index++) {
+            double offsetX = points[index].x - points[0].x;
+            double offsetY = points[index].y - points[0].y;
+            maximumDeviation = Math.max(maximumDeviation,
+                    Math.abs(offsetX * chordY - offsetY * chordX) / chordLength);
+        }
+        return maximumDeviation <= chordLength * 0.025;
+    }
+
+    private static Point curvedPoint(Point point, double normalX, double normalY,
+                                     double curve, double progress) {
+        double offset = Math.sin(Math.PI * progress) * curve;
+        return new Point(point.x + normalX * offset, point.y + normalY * offset);
+    }
+
+    private static int curveDirection(UUID branchId) {
+        return (branchId.hashCode() & 1) == 0 ? 1 : -1;
+    }
+
+    private static int asteroidCurveDirection(UUID asteroidId, Point[] points, RenderedPathSegment incomingSegment) {
+        if (incomingSegment == null) return curveDirection(asteroidId);
+        Point incoming = new Point(incomingSegment.worldTo.x - incomingSegment.worldFrom.x,
+                incomingSegment.worldTo.y - incomingSegment.worldFrom.y);
+        Point start = points[0];
+        Point end = points[points.length - 1];
+        double chordX = end.x - start.x;
+        double chordY = end.y - start.y;
+        double cross = chordX * incoming.y - chordY * incoming.x;
+        return Math.abs(cross) < 0.001 ? curveDirection(asteroidId) : cross > 0 ? 1 : -1;
+    }
+
+    private RenderedPathSegment incomingAsteroidSegment(UUID asteroidId, double releaseTime) {
+        RenderedPathSegment closest = null;
+        double closestTime = Double.NEGATIVE_INFINITY;
+        for (var segments : renderedPathsByBranch.values()) {
+            for (var segment : segments) {
+                boolean carriesAsteroid = segment.firstSample.attachedAsteroidId().equals(asteroidId)
+                        || segment.secondSample.attachedAsteroidId().equals(asteroidId);
+                double segmentTime = segment.secondSample.timeSeconds();
+                if (carriesAsteroid && segmentTime <= releaseTime + 0.01 && segmentTime >= closestTime
+                        && Math.hypot(segment.worldTo.x - segment.worldFrom.x,
+                        segment.worldTo.y - segment.worldFrom.y) > 0.001) {
+                    closest = segment;
+                    closestTime = segmentTime;
+                }
+            }
+        }
+        return closest;
     }
 
     private void addCircle(List<LineSegment> lines, double centerX, double centerY, double radius,
@@ -352,8 +570,7 @@ final class RocketStarMapWidget extends UIComponent {
         object.widget.setSize(size, size);
         object.widget.render(graphics, mouseX, mouseY, delta);
         if (isInsideViewport(mouseX, mouseY) && object.widget.isMouseOver(mouseX, mouseY)) hoveredObject = object;
-        if (object.data.type() != SpaceObjects.ObjectType.ASTEROID || hoveredObject == object
-                || selectedTarget != null && selectedTarget.objectId.equals(object.data.id())) {
+        if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
             graphics.text(Minecraft.getInstance().font, objectName(object.data),
                     (int) Math.round(position.x + size / 2d + 3), (int) Math.round(position.y - 4),
                     0xFF9FB2C4, false);
@@ -370,14 +587,41 @@ final class RocketStarMapWidget extends UIComponent {
 
     private void renderRocket(GuiGraphicsExtractor graphics, BranchMarker marker,
                               int mouseX, int mouseY, float delta) {
-        var position = project(marker.worldX, marker.worldY);
+        var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
+        var ownPath = renderedPathsByBranch.get(marker.branchId);
+        if (ownPath == null || ownPath.isEmpty()) {
+            Point branchOrigin = renderedBranchOrigin(marker.branchId);
+            if (branchOrigin != null) position = project(branchOrigin.x, branchOrigin.y);
+        }
         marker.widget.setPosition((int) Math.round(position.x - 6), (int) Math.round(position.y - 6));
         marker.widget.render(graphics, mouseX, mouseY, delta);
     }
 
+    private Point renderedBranchOrigin(UUID branchId) {
+        if (flightPath == null) return null;
+        for (var event : flightPath.boosterEvents()) {
+            if (!event.childBranchId().equals(branchId)) continue;
+            var parent = pathsByBranch.get(event.branchId());
+            if (parent != null) renderedPathSegments(parent);
+            return renderedWorldPosition(event.branchId(), event.timeSeconds(), event.x(), event.y());
+        }
+        var branch = snapshot.plan().branches().stream().filter(item -> item.id().equals(branchId))
+                .findFirst().orElse(null);
+        if (branch == null || branch.isRoot()) return null;
+        for (var parent : flightPath.paths()) {
+            var moment = parent.actionMoments().stream()
+                    .filter(item -> item.actionId().equals(branch.parentSeparationAction()))
+                    .findFirst().orElse(null);
+            if (moment == null) continue;
+            renderedPathSegments(parent);
+            return renderedWorldPosition(parent.branchId(), moment.timeSeconds(), moment.x(), moment.y());
+        }
+        return null;
+    }
+
     private void renderSeparations(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         for (var marker : separationMarkers) {
-            var position = project(marker.worldX, marker.worldY);
+            var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
             int markerX = (int) Math.round(position.x);
             int markerY = (int) Math.round(position.y);
             boolean selected = marker.branchId.equals(selectedBranch) || marker.childBranches.contains(selectedBranch);
@@ -388,6 +632,46 @@ final class RocketStarMapWidget extends UIComponent {
                 hoveredSeparation = marker;
             }
         }
+    }
+
+    private Point renderedPosition(UUID branchId, double timeSeconds, double worldX, double worldY) {
+        var segments = renderedPathsByBranch.get(branchId);
+        if (segments == null) return project(worldX, worldY);
+        for (var segment : segments) {
+            double firstTime = segment.firstSample.timeSeconds();
+            double secondTime = segment.secondSample.timeSeconds();
+            if (timeSeconds < firstTime - 0.01 || timeSeconds > secondTime + 0.01) continue;
+            double timeProgress = secondTime - firstTime <= 0.0001 ? 1
+                    : Math.clamp((timeSeconds - firstTime) / (secondTime - firstTime), 0, 1);
+            if (timeProgress < segment.sampleProgressFrom - 0.0001
+                    || timeProgress > segment.sampleProgressTo + 0.0001) continue;
+            double segmentProgress = segment.sampleProgressTo - segment.sampleProgressFrom <= 0.0001 ? 1
+                    : Math.clamp((timeProgress - segment.sampleProgressFrom)
+                    / (segment.sampleProgressTo - segment.sampleProgressFrom), 0, 1);
+            return new Point(segment.from.x + (segment.to.x - segment.from.x) * segmentProgress,
+                    segment.from.y + (segment.to.y - segment.from.y) * segmentProgress);
+        }
+        return project(worldX, worldY);
+    }
+
+    private Point renderedWorldPosition(UUID branchId, double timeSeconds, double worldX, double worldY) {
+        var segments = renderedPathsByBranch.get(branchId);
+        if (segments == null) return new Point(worldX, worldY);
+        for (var segment : segments) {
+            double firstTime = segment.firstSample.timeSeconds();
+            double secondTime = segment.secondSample.timeSeconds();
+            if (timeSeconds < firstTime - 0.01 || timeSeconds > secondTime + 0.01) continue;
+            double timeProgress = secondTime - firstTime <= 0.0001 ? 1
+                    : Math.clamp((timeSeconds - firstTime) / (secondTime - firstTime), 0, 1);
+            if (timeProgress < segment.sampleProgressFrom - 0.0001
+                    || timeProgress > segment.sampleProgressTo + 0.0001) continue;
+            double segmentProgress = segment.sampleProgressTo - segment.sampleProgressFrom <= 0.0001 ? 1
+                    : Math.clamp((timeProgress - segment.sampleProgressFrom)
+                    / (segment.sampleProgressTo - segment.sampleProgressFrom), 0, 1);
+            return new Point(segment.worldFrom.x + (segment.worldTo.x - segment.worldFrom.x) * segmentProgress,
+                    segment.worldFrom.y + (segment.worldTo.y - segment.worldFrom.y) * segmentProgress);
+        }
+        return new Point(worldX, worldY);
     }
 
     private void findHoveredSelection(double mouseX, double mouseY) {
@@ -427,11 +711,11 @@ final class RocketStarMapWidget extends UIComponent {
         if (flightPath == null || !isInsideViewport(mouseX, mouseY)) return;
         double closestDistance = 6;
         for (var path : flightPath.paths()) {
-            for (int index = 1; index < path.samples().size(); index++) {
-                var first = path.samples().get(index - 1);
-                var second = path.samples().get(index);
-                var from = project(first.x(), first.y());
-                var to = project(second.x(), second.y());
+            var renderedSegments = renderedPathsByBranch.get(path.branchId());
+            if (renderedSegments == null) renderedSegments = renderedPathSegments(path);
+            for (var segment : renderedSegments) {
+                var from = segment.from;
+                var to = segment.to;
                 double lineX = to.x - from.x;
                 double lineY = to.y - from.y;
                 double lengthSquared = lineX * lineX + lineY * lineY;
@@ -443,8 +727,10 @@ final class RocketStarMapWidget extends UIComponent {
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     // Samples describe the interval ending at that sample, matching the path's colour.
-                    hoveredPathPoint = new HoveredPathPoint(second,
-                            interpolatePathSpeed(first, second, progress));
+                    double sampleProgress = segment.sampleProgressFrom
+                            + (segment.sampleProgressTo - segment.sampleProgressFrom) * progress;
+                    hoveredPathPoint = new HoveredPathPoint(segment.secondSample,
+                            interpolatePathSpeed(segment.firstSample, segment.secondSample, sampleProgress));
                 }
             }
         }
@@ -753,7 +1039,8 @@ final class RocketStarMapWidget extends UIComponent {
     private record MotionPosition(double x, double y, double timeSeconds) {
     }
 
-    private record BranchMarker(UUID branchId, double worldX, double worldY, ItemWidget widget) {
+    private record BranchMarker(UUID branchId, double timeSeconds,
+                                double worldX, double worldY, ItemWidget widget) {
     }
 
     private record SeparationMarker(UUID branchId, int stage, double timeSeconds,
@@ -768,6 +1055,47 @@ final class RocketStarMapWidget extends UIComponent {
 
     private record HoveredPathPoint(RocketFlightPathCalculator.PathSample sample,
                                     double speedMetersPerSecond) {
+    }
+
+    private record RenderedRun(Point end, PathCurve curve) {
+    }
+
+    private record PathCurve(double startX, double startY,
+                             double directionX, double directionY, double lengthSquared,
+                             double normalX, double normalY, double curve) {
+
+        private static PathCurve create(Point start, Point end, int curveDirection) {
+            double directionX = end.x - start.x;
+            double directionY = end.y - start.y;
+            double lengthSquared = directionX * directionX + directionY * directionY;
+            double length = Math.sqrt(lengthSquared);
+            double normalX = length == 0 ? 0 : -directionY / length;
+            double normalY = length == 0 ? 0 : directionX / length;
+            return new PathCurve(start.x, start.y, directionX, directionY, lengthSquared,
+                    normalX, normalY, length * TRANSFER_CURVE_RATIO * curveDirection);
+        }
+
+        private Point apply(Point point) {
+            if (lengthSquared <= 0.000001) return point;
+            double progress = Math.clamp(
+                    ((point.x - startX) * directionX + (point.y - startY) * directionY) / lengthSquared,
+                    0, 1);
+            double offset = Math.sin(Math.PI * progress) * curve;
+            return new Point(point.x + normalX * offset, point.y + normalY * offset);
+        }
+    }
+
+    private record RenderedPathSegment(Point from, Point to, Point worldFrom, Point worldTo,
+                                       RocketFlightPathCalculator.PathSample firstSample,
+                                       RocketFlightPathCalculator.PathSample secondSample,
+                                       double sampleProgressFrom, double sampleProgressTo) {
+    }
+
+    private record RenderedAsteroidSegment(Point from, Point to) {
+    }
+
+    private record CurvedLine(Point from, Point to, int segmentIndex,
+                              double sampleProgressFrom, double sampleProgressTo) {
     }
 
     private record Point(double x, double y) {

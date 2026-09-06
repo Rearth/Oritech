@@ -106,7 +106,8 @@ public final class RocketFlightPathCalculator {
     private static void simulateBranch(SpaceSimulation.FlightPlanBranch branch, CraftState state,
                                        CalculationContext context) {
         state.branchId = branch.id();
-        state.addSample(PathPhase.COAST, SpaceSimulation.FlightPlanAction.NO_TARGET);
+        state.addSample(PathPhase.COAST, SpaceSimulation.FlightPlanAction.NO_TARGET,
+                SpaceSimulation.FlightPlanAction.NO_TARGET);
         boolean completed = true;
 
         for (int index = 0; index < branch.actions().size(); index++) {
@@ -198,14 +199,15 @@ public final class RocketFlightPathCalculator {
             }
             var abort = navigationAbort(action, state, target, destination, transferPlan);
             if (abort != null) {
-                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
                 appendNavigationSamples(state, navigationSamples);
                 if (action.targetId().equals(SpaceObjects.EARTH_ID)
                         && action.orbit() == SpaceSimulation.OrbitBand.SURFACE) {
                     state.lastEarthSurfaceAction = action;
                 }
                 context.navigationAborts.add(new NavigationAbortMoment(action.id(), state.branchId,
-                        abort.addon.id(), abort.actualValue, state.time, state.x, state.y));
+                        abort.addon.id(), abort.actualValue, state.time, state.x, state.y,
+                        destination.x, destination.y));
                 return true;
             }
             var command = transferPlan.commandAt(state, maximumAcceleration);
@@ -250,11 +252,11 @@ public final class RocketFlightPathCalculator {
                 // could drain more resource than the path gained whenever the two limits differ.
                 state.consumeBurnTime(active, stepSeconds);
             }
-            navigationSamples.add(state.createSample(command.phase, action.targetId(),
+            navigationSamples.add(state.createSample(command.phase, action.targetId(), action.id(),
                     command.burning ? Set.copyOf(active) : Set.of()));
 
             if (finishStage(action, state, context)) {
-                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+                navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
                 while (finishStage(action, state, context)) {
                     // Continue through any following stage which has no usable engines.
                 }
@@ -304,7 +306,7 @@ public final class RocketFlightPathCalculator {
             state.velocityX = targetVelocityX;
             state.velocityY = targetVelocityY;
         }
-        navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), Set.of()));
+        navigationSamples.add(state.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
         appendNavigationSamples(state, navigationSamples);
         state.currentTarget = target.id();
         state.currentOrbit = action.orbit();
@@ -333,7 +335,7 @@ public final class RocketFlightPathCalculator {
                 || !AsteroidImpactRules.canConnectAsteroid(relativeSpeed)) return false;
         state.attachedAsteroid = asteroid;
         state.asteroidAnchor = action.segments().getFirst();
-        state.addSample(PathPhase.COAST, asteroid.id());
+        state.addSample(PathPhase.COAST, asteroid.id(), action.id());
         return true;
     }
 
@@ -440,6 +442,14 @@ public final class RocketFlightPathCalculator {
         detached.velocityX = velocity.x;
         detached.velocityY = velocity.y;
         detached.currentStage = state.currentStage;
+        detached.currentTarget = state.currentTarget;
+        detached.currentOrbit = state.currentOrbit;
+        detached.lastEarthSurfaceAction = state.lastEarthSurfaceAction;
+        if (booster.equals(state.asteroidAnchor)) {
+            detached.attachedAsteroid = state.attachedAsteroid;
+            detached.asteroidAnchor = state.asteroidAnchor;
+            state.clearAsteroidAttachment();
+        }
         simulateBranch(child, detached, context);
     }
 
@@ -455,7 +465,7 @@ public final class RocketFlightPathCalculator {
             context.asteroidPaths.add(predictReleasedAsteroid(state, context));
             state.attachedAsteroid = null;
             state.asteroidAnchor = null;
-            state.addSample(PathPhase.COAST, action.targetId());
+            state.addSample(PathPhase.COAST, action.targetId(), action.id());
             return true;
         }
         if (action.segments().size() != 2) return false;
@@ -788,8 +798,10 @@ public final class RocketFlightPathCalculator {
             copy.currentStage = currentStage;
             copy.currentTarget = currentTarget;
             copy.currentOrbit = currentOrbit;
-            copy.attachedAsteroid = attachedAsteroid;
-            copy.asteroidAnchor = asteroidAnchor;
+            if (asteroidAnchor != null && component.contains(asteroidAnchor)) {
+                copy.attachedAsteroid = attachedAsteroid;
+                copy.asteroidAnchor = asteroidAnchor;
+            }
             copy.lastEarthSurfaceAction = lastEarthSurfaceAction;
             return copy;
         }
@@ -798,16 +810,22 @@ public final class RocketFlightPathCalculator {
             segments.keySet().removeIf(ref -> !retained.contains(ref));
             connections.keySet().removeIf(ref -> !retained.contains(ref));
             connections.values().forEach(neighbours -> neighbours.retainAll(retained));
+            if (asteroidAnchor != null && !retained.contains(asteroidAnchor)) clearAsteroidAttachment();
         }
 
-        private void addSample(PathPhase phase, UUID target) {
-            samples.add(createSample(phase, target, Set.of()));
+        private void clearAsteroidAttachment() {
+            attachedAsteroid = null;
+            asteroidAnchor = null;
         }
 
-        private PathSample createSample(PathPhase phase, UUID target,
+        private void addSample(PathPhase phase, UUID target, UUID actionId) {
+            samples.add(createSample(phase, target, actionId, Set.of()));
+        }
+
+        private PathSample createSample(PathPhase phase, UUID target, UUID actionId,
                                         Set<SpaceSimulation.SegmentRef> firingSegments) {
             return new PathSample(time, x, y, Math.hypot(velocityX, velocityY), velocityX, velocityY,
-                    phase, target, currentStage, Set.copyOf(segments.keySet()), firingSegments,
+                    phase, target, actionId, currentStage, Set.copyOf(segments.keySet()), firingSegments,
                     attachedAsteroid == null ? SpaceSimulation.FlightPlanAction.NO_TARGET : attachedAsteroid.id());
         }
 
@@ -824,7 +842,7 @@ public final class RocketFlightPathCalculator {
     }
 
     public record PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
-                             double velocityX, double velocityY, PathPhase phase, UUID targetId,
+                             double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
                              int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
                              Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
     }
@@ -861,7 +879,8 @@ public final class RocketFlightPathCalculator {
     }
 
     public record NavigationAbortMoment(UUID actionId, UUID branchId, UUID addonId, double actualValue,
-                                        double timeSeconds, double x, double y) {
+                                        double timeSeconds, double x, double y,
+                                        double destinationX, double destinationY) {
     }
 
     public record MotionSample(double timeSeconds, double x, double y, double speedMetersPerSecond) {

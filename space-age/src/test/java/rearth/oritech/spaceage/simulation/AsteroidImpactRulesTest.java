@@ -149,4 +149,57 @@ class AsteroidImpactRulesTest {
         assertEquals(SpaceSimulation.FlightPlanAction.NO_TARGET,
                 invalidPath.actionMoments().getLast().attachedAsteroidId());
     }
+
+    @Test
+    void anchoredAsteroidFollowsItsSegmentWhenTheRocketSplits() {
+        var anchorId = UUID.randomUUID();
+        var coreId = UUID.randomUUID();
+        var anchor = new StaticRocketSegment(anchorId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Map.of(coreId, Set.of()), 25, 1);
+        var core = new StaticRocketSegment(coreId,
+                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), Blocks.STONE.defaultBlockState())),
+                Map.of(anchorId, Set.of()), 25, 1);
+        var rocket = new ActiveRocketData(Map.of(anchorId, anchor, coreId, core), Map.of(
+                anchorId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of(coreId)),
+                coreId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of(anchorId))));
+        var anchorRef = SpaceSimulation.SegmentRef.of(anchor);
+        var coreRef = SpaceSimulation.SegmentRef.of(core);
+        var asteroidId = UUID.randomUUID();
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var asteroid = new SpaceSimulation.SpaceObjectData(asteroidId, SpaceObjects.ObjectType.ASTEROID,
+                300_000, 0, 2_000, 0.01f, SpaceObjects.DetectionState.PRECISE);
+        var arrive = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(asteroidId).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
+        var connect = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.CONNECT_ASTEROID)
+                .withTarget(asteroidId).withOrbit(SpaceSimulation.OrbitBand.SURFACE)
+                .withSegments(List.of(anchorRef));
+
+        assertAsteroidOwnerAfterSplit(rocket, List.of(earth, asteroid), arrive, connect,
+                coreRef, anchorRef, false);
+        assertAsteroidOwnerAfterSplit(rocket, List.of(earth, asteroid), arrive, connect,
+                anchorRef, coreRef, true);
+    }
+
+    private static void assertAsteroidOwnerAfterSplit(ActiveRocketData rocket,
+                                                       List<SpaceSimulation.SpaceObjectData> objects,
+                                                       SpaceSimulation.FlightPlanAction arrive,
+                                                       SpaceSimulation.FlightPlanAction connect,
+                                                       SpaceSimulation.SegmentRef retained,
+                                                       SpaceSimulation.SegmentRef detached,
+                                                       boolean parentKeepsAsteroid) {
+        var split = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
+                .withSegments(List.of(retained, detached));
+        var base = SpaceSimulation.FlightPlan.empty();
+        var root = base.root().withActions(List.of(arrive, connect, split));
+        var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), split.id(), List.of());
+        var result = RocketFlightPathCalculator.calculate(rocket, objects,
+                base.withBranches(List.of(root, child)));
+        var parentPath = result.paths().stream().filter(path -> path.branchId().equals(root.id())).findFirst().orElseThrow();
+        var childPath = result.paths().stream().filter(path -> path.branchId().equals(child.id())).findFirst().orElseThrow();
+        UUID asteroidId = connect.targetId();
+        assertEquals(parentKeepsAsteroid, parentPath.actionMoments().getLast().attachedAsteroidId().equals(asteroidId));
+        assertEquals(!parentKeepsAsteroid, childPath.samples().getFirst().attachedAsteroidId().equals(asteroidId));
+    }
 }

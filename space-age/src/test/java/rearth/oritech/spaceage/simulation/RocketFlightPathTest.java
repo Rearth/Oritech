@@ -132,6 +132,8 @@ public final class RocketFlightPathTest {
                     type + " stopped outside its configured threshold");
             require(Math.hypot(abort.x() - 8_000_000, abort.y()) > 0.01,
                     type + " completed at the destination instead of early");
+            require(Math.hypot(abort.destinationX() - 8_000_000, abort.destinationY()) < 0.01,
+                    type + " did not retain its intended destination");
         }
     }
 
@@ -163,6 +165,10 @@ public final class RocketFlightPathTest {
         var path = firstCalculation.paths().getFirst();
         ready(path);
         require(path.actionMoments().size() == actions.size(), "all navigation actions completed");
+        for (var action : actions) {
+            require(path.samples().stream().anyMatch(sample -> sample.actionId().equals(action.id())),
+                    "navigation samples lost their action boundary");
+        }
         var departure = path.samples().getFirst();
         require(Math.abs(Math.hypot(departure.x() - earth.x(), departure.y() - earth.y()) - earth.radius()) < 0.01,
                 "first path did not start on Earth's surface");
