@@ -44,7 +44,7 @@ class SpaceSimulationPersistenceTest {
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
         assertFalse(target.name().isBlank());
-        assertTrue(Math.hypot(target.velocityX(), target.velocityY()) > 0);
+        assertEquals(0, Math.hypot(target.velocityX(), target.velocityY()));
         assertFalse(target.materials().isEmpty());
         assertEquals(initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID).count(),
                 initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)

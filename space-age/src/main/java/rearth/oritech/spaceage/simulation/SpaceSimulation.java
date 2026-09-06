@@ -76,10 +76,7 @@ public class SpaceSimulation {
             if (asteroid.name.isBlank()) asteroid.name = "Asteroid " + String.format(Locale.ROOT, "%03d", index + 1);
             if (asteroid.weight <= 0) asteroid.weight = Math.max(1, (asteroid.radius - 1_500) / 35);
             if (asteroid.materials.isEmpty()) asteroid.materials = sampleMaterials(asteroid.weight, asteroid.id.hashCode());
-            if (asteroid.velocity.lengthSquared() == 0) {
-                var random = new java.util.Random(asteroid.id.getMostSignificantBits() ^ asteroid.id.getLeastSignificantBits());
-                asteroid.velocity = tangentialVelocity(asteroid.currentPosition, 12 + random.nextDouble() * 18);
-            }
+            asteroid.velocity = new Vector2f();
         }
     }
 
@@ -93,7 +90,6 @@ public class SpaceSimulation {
                     (float) (Math.sin(angle) * radius));
             asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
             asteroid.weight = (float) (Math.random() * 40 + 1);
-            asteroid.velocity = tangentialVelocity(asteroid.currentPosition, 18 + Math.random() * 12);
             asteroid.radius = 1_500 + asteroid.weight * 35;
             asteroid.surfaceGravity = asteroid.weight * 0.0002f;
             asteroid.materials = sampleMaterials(asteroid.weight, index);
@@ -111,17 +107,11 @@ public class SpaceSimulation {
                     (float) (Math.sin(angle) * radius));
             asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
             asteroid.weight = (float) (Math.random() * 99 + 1);
-            asteroid.velocity = tangentialVelocity(asteroid.currentPosition, 12 + Math.random() * 18);
             asteroid.radius = 1_500 + asteroid.weight * 35;
             asteroid.surfaceGravity = asteroid.weight * 0.0002f;
             asteroid.materials = sampleMaterials(asteroid.weight, index);
             nonCelestialObjects.add(asteroid);
         }
-    }
-
-    private static Vector2f tangentialVelocity(Vector2f position, double speed) {
-        double length = Math.max(1, Math.hypot(position.x, position.y));
-        return new Vector2f((float) (-position.y / length * speed), (float) (position.x / length * speed));
     }
 
     private static List<SpaceObjects.AsteroidMaterial> sampleMaterials(float mass, int variant) {

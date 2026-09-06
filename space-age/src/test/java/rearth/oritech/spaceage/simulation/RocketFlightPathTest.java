@@ -135,6 +135,74 @@ public final class RocketFlightPathTest {
         }
     }
 
+    @Test
+    void allTargetPointsUseStableRandomOffsets() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var segmentId = UUID.randomUUID();
+        var segment = new StaticRocketSegment(segmentId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Map.of(), 25, 1);
+        var rocket = new ActiveRocketData(Map.of(segmentId, segment),
+                Map.of(segmentId, new DynamicRocketSegment(0, 100_000_000, 0, Set.of())));
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var mars = new SpaceSimulation.SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
+                8_000_000, 0, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
+        var visitMars = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(SpaceSimulation.MARS_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
+        var earthSurface = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
+        var earthHigh = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.HIGH);
+        var actions = List.of(visitMars, earthSurface, earthHigh);
+        var base = SpaceSimulation.FlightPlan.empty();
+        var plan = base.withBranches(List.of(base.root().withActions(actions)));
+
+        var firstCalculation = RocketFlightPathCalculator.calculate(rocket, List.of(earth, mars), plan);
+        var path = firstCalculation.paths().getFirst();
+        ready(path);
+        require(path.actionMoments().size() == actions.size(), "all navigation actions completed");
+        var departure = path.samples().getFirst();
+        require(Math.abs(Math.hypot(departure.x() - earth.x(), departure.y() - earth.y()) - earth.radius()) < 0.01,
+                "first path did not start on Earth's surface");
+        var targets = Map.of(SpaceObjects.EARTH_ID, earth, SpaceSimulation.MARS_ID, mars);
+        double sourceX = departure.x();
+        double sourceY = departure.y();
+        double startTime = 0;
+        for (int index = 0; index < actions.size(); index++) {
+            var action = actions.get(index);
+            var target = targets.get(action.targetId());
+            var arrival = path.actionMoments().get(index);
+            double targetX = target.xAt(startTime);
+            double targetY = target.yAt(startTime);
+            double nearestAngle = Math.atan2(sourceY - targetY, sourceX - targetX);
+            double arrivalAngle = Math.atan2(arrival.y() - target.yAt(arrival.timeSeconds()),
+                    arrival.x() - target.xAt(arrival.timeSeconds()));
+            double difference = Math.abs(nearestAngle - arrivalAngle) % (Math.PI * 2);
+            difference = Math.min(difference, Math.PI * 2 - difference);
+            require(difference <= Math.toRadians(70) + 0.000001,
+                    "target point exceeded the 70 degree range");
+            require(Math.abs(Math.hypot(arrival.x() - target.xAt(arrival.timeSeconds()),
+                    arrival.y() - target.yAt(arrival.timeSeconds()))
+                    - (target.radius() + action.orbit().altitude())) < 0.01,
+                    "target point did not lie on the selected surface or orbit");
+            sourceX = arrival.x();
+            sourceY = arrival.y();
+            startTime = arrival.timeSeconds();
+        }
+
+        var repeated = RocketFlightPathCalculator.calculate(rocket, List.of(earth, mars), plan)
+                .paths().getFirst().actionMoments();
+        for (int index = 0; index < repeated.size(); index++) {
+            var first = path.actionMoments().get(index);
+            var second = repeated.get(index);
+            require(Math.abs(first.x() - second.x()) < 0.000001
+                            && Math.abs(first.y() - second.y()) < 0.000001,
+                    "random target point changed during recalculation");
+        }
+    }
+
     private void checkMarsArrival(long boosterRF, int speedCap) {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
@@ -163,16 +231,22 @@ public final class RocketFlightPathTest {
         var result = RocketFlightPathCalculator.calculate(rocket, objects, plan);
         var path = result.paths().getFirst();
         ready(path);
-        var length = Math.hypot(8_000_000, 1_500_000);
-        var arrivalDistance = length - 105_000;
+        var departure = path.samples().getFirst();
+        var arrival = path.samples().getLast();
+        double routeX = arrival.x() - departure.x();
+        double routeY = arrival.y() - departure.y();
+        double routeLength = Math.hypot(routeX, routeY);
         var previousDistance = 0d;
         for (var sample : path.samples()) {
-            var distance = ((sample.x() + 3_000_000) * 8_000_000 + sample.y() * 1_500_000) / length;
-            require(distance <= arrivalDistance + 0.01, "overshot Mars orbit by " + (distance - arrivalDistance));
+            var distance = ((sample.x() - departure.x()) * routeX
+                    + (sample.y() - departure.y()) * routeY) / routeLength;
+            require(distance <= routeLength + 0.01, "overshot Mars orbit by " + (distance - routeLength));
             require(distance >= previousDistance - 0.01, "route turned back after overshooting");
             require(sample.speedMetersPerSecond() <= speedCap + 0.0001, "cruise cap exceeded");
             previousDistance = distance;
         }
+        require(Math.abs(Math.hypot(arrival.x() - 5_000_000, arrival.y() - 1_500_000) - 105_000) < 0.01,
+                "arrival missed Mars high orbit");
         require(result.boosterEvents().size() == 1, "one booster separation");
         var eventTime = result.boosterEvents().getFirst().timeSeconds();
         require(path.samples().stream().anyMatch(sample -> sample.timeSeconds() <= eventTime

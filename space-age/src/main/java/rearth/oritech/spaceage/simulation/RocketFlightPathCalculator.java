@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -24,6 +25,7 @@ public final class RocketFlightPathCalculator {
     private static final double BURN_TOLERANCE = 1e-9;
     private static final double POSITION_TOLERANCE = 0.01;
     private static final double VELOCITY_TOLERANCE = 0.00001;
+    private static final double MAX_TARGET_POINT_OFFSET = Math.toRadians(70);
 
     private RocketFlightPathCalculator() {
     }
@@ -45,7 +47,7 @@ public final class RocketFlightPathCalculator {
 
         var context = new CalculationContext(objectsById, branchesByParent, configurations,
                 RocketFlightPlanRules.stageCount(plan, rocket.getStaticSegments().size()));
-        var initial = createInitialCraft(rocket, earth);
+        var initial = createInitialCraft(rocket, earth, plan.root(), objectsById);
         simulateBranch(plan.root(), initial, context);
 
         var orderedPaths = new ArrayList<CraftPath>();
@@ -62,7 +64,9 @@ public final class RocketFlightPathCalculator {
     }
 
     private static CraftState createInitialCraft(ActiveRocketData rocket,
-                                                  SpaceSimulation.SpaceObjectData earth) {
+                                                  SpaceSimulation.SpaceObjectData earth,
+                                                  SpaceSimulation.FlightPlanBranch root,
+                                                  Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
         var refsById = new HashMap<UUID, SpaceSimulation.SegmentRef>();
         rocket.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
         var segments = new LinkedHashMap<SpaceSimulation.SegmentRef, SegmentState>();
@@ -82,9 +86,21 @@ public final class RocketFlightPathCalculator {
             connections.put(ref, neighbours);
         }
 
-        // A newly assembled rocket begins on Earth itself. Its first line must not appear to originate from an
-        // arbitrary side of low orbit simply because that orbit is the planner's default selection.
-        return new CraftState(segments, connections, earth.x(), earth.y(), 0);
+        double initialX = earth.x();
+        double initialY = earth.y();
+        var firstAction = root.actions().stream().filter(action -> !action.isGenerated()).findFirst().orElse(null);
+        if (firstAction != null && firstAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            var target = objects.get(firstAction.targetId());
+            if (target != null) {
+                double offsetX = target.x() - earth.x();
+                double offsetY = target.y() - earth.y();
+                double angle = Math.hypot(offsetX, offsetY) < 1
+                        ? targetPointOffset(firstAction) : Math.atan2(offsetY, offsetX);
+                initialX += Math.cos(angle) * earth.radius();
+                initialY += Math.sin(angle) * earth.radius();
+            }
+        }
+        return new CraftState(segments, connections, initialX, initialY, 0);
     }
 
     private static void simulateBranch(SpaceSimulation.FlightPlanBranch branch, CraftState state,
@@ -131,8 +147,9 @@ public final class RocketFlightPathCalculator {
         while (finishStage(action, state, context)) {
             // Empty configured stages are skipped here so a reusable plan cannot strand a slightly different rocket.
         }
-        var destination = targetPoint(state.x, state.y, target.xAt(state.time), target.yAt(state.time),
-                target.radius(), action.orbit());
+        double destinationAngle = targetPointAngle(action, state, target);
+        var destination = targetPoint(target.xAt(state.time), target.yAt(state.time),
+                target.radius(), action.orbit(), destinationAngle);
         double startTime = state.time;
         double approachX = destination.x - state.x;
         double approachY = destination.y - state.y;
@@ -151,12 +168,12 @@ public final class RocketFlightPathCalculator {
         int step = 0;
         for (; step < MAX_NAVIGATION_STEPS
                 && state.time - startTime < MAX_NAVIGATION_SECONDS; step++) {
-            destination = targetPoint(state.x, state.y, target.xAt(state.time), target.yAt(state.time),
-                    target.radius(), action.orbit());
+            destination = targetPoint(target.xAt(state.time), target.yAt(state.time),
+                    target.radius(), action.orbit(), destinationAngle);
             double offsetX = destination.x - state.x;
             double offsetY = destination.y - state.y;
             if (completeArrival(action, state, target, destination, targetVelocityX, targetVelocityY,
-                    navigationSamples, context)) return true;
+                    destinationAngle, navigationSamples, context)) return true;
 
             var active = state.activeSegments(context);
             double deltaVRate = state.deltaVPerSecond(active);
@@ -245,7 +262,7 @@ public final class RocketFlightPathCalculator {
         }
 
         if (completeArrival(action, state, target, destination, targetVelocityX, targetVelocityY,
-                navigationSamples, context)) return true;
+                destinationAngle, navigationSamples, context)) return true;
         state.blockedState = step >= MAX_NAVIGATION_STEPS
                 ? TerminalState.INTEGRATION_STEP_LIMIT
                 : TerminalState.INTEGRATION_TIME_LIMIT;
@@ -277,6 +294,7 @@ public final class RocketFlightPathCalculator {
     private static boolean completeArrival(SpaceSimulation.FlightPlanAction action, CraftState state,
                                            SpaceSimulation.SpaceObjectData target, Point destination,
                                            double targetVelocityX, double targetVelocityY,
+                                           double destinationAngle,
                                            List<PathSample> navigationSamples, CalculationContext context) {
         double distance = Math.hypot(destination.x - state.x, destination.y - state.y);
         if (!hasArrived(action, state, distance, targetVelocityX, targetVelocityY)) return false;
@@ -535,17 +553,24 @@ public final class RocketFlightPathCalculator {
         return fraction >= 0 && fraction <= 1 ? fraction : Double.NaN;
     }
 
-    private static Point targetPoint(double sourceX, double sourceY, double targetX, double targetY,
-                                     double radius, SpaceSimulation.OrbitBand orbit) {
-        double offsetX = sourceX - targetX;
-        double offsetY = sourceY - targetY;
-        double length = Math.hypot(offsetX, offsetY);
+    private static double targetPointAngle(SpaceSimulation.FlightPlanAction action, CraftState state,
+                                           SpaceSimulation.SpaceObjectData target) {
+        double targetX = target.xAt(state.time);
+        double targetY = target.yAt(state.time);
+        double nearestAngle = Math.atan2(state.y - targetY, state.x - targetX);
+        return nearestAngle + targetPointOffset(action);
+    }
+
+    private static double targetPointOffset(SpaceSimulation.FlightPlanAction action) {
+        long seed = action.id().getMostSignificantBits() ^ Long.rotateLeft(action.id().getLeastSignificantBits(), 32);
+        return (new Random(seed).nextDouble() * 2 - 1) * MAX_TARGET_POINT_OFFSET;
+    }
+
+    private static Point targetPoint(double targetX, double targetY, double radius,
+                                     SpaceSimulation.OrbitBand orbit, double angle) {
         double orbitRadius = radius + orbit.altitude();
-        // A surface target lies on the body's edge, not its centre. Apart from looking more natural in the map,
-        // this also keeps the navigation solver from flying through a planet before declaring arrival.
-        if (length < 1) return new Point(targetX + orbitRadius, targetY);
-        return new Point(targetX + offsetX / length * orbitRadius,
-                targetY + offsetY / length * orbitRadius);
+        return new Point(targetX + Math.cos(angle) * orbitRadius,
+                targetY + Math.sin(angle) * orbitRadius);
     }
 
     private static final class CalculationContext {

@@ -65,6 +65,7 @@ final class RocketStarMapWidget extends UIComponent {
     private double minimumZoom;
     private boolean dragging;
     private boolean movedWhileDragging;
+    private boolean tooltipsEnabled = true;
 
     RocketStarMapWidget(int x, int y, int width, int height,
                         SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -192,8 +193,10 @@ final class RocketStarMapWidget extends UIComponent {
         // The vanilla portal shader is intentionally bright. This veil keeps the map labels and paths readable.
         graphics.fill(viewportX, viewportY, viewportX + viewportWidth, viewportY + viewportHeight, 0x99030810);
 
+        renderSurfaceDiscs(graphics, viewportX, viewportY, viewportWidth, viewportHeight);
         var lines = new ArrayList<LineSegment>();
         addSolarOrbits(lines);
+        addSurfaceRadii(lines);
         addAsteroidMotion(lines);
         addLocalOrbits(lines);
         addFlightPaths(lines);
@@ -242,10 +245,46 @@ final class RocketStarMapWidget extends UIComponent {
         }
     }
 
+    private void addSurfaceRadii(List<LineSegment> lines) {
+        for (var object : objects) {
+            if (object.data.radius() * zoom < 2) continue;
+            boolean selected = selectedTarget != null && selectedTarget.objectId.equals(object.data.id())
+                    && selectedTarget.orbit == SpaceSimulation.OrbitBand.SURFACE;
+            addCircle(lines, objectX(object), objectY(object), object.data.radius(),
+                    selected ? 0xDDF6C65B : 0x997C93A6, selected ? 1.25f : 0.8f);
+        }
+    }
+
+    private void renderSurfaceDiscs(GuiGraphicsExtractor graphics,
+                                    int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+        for (var object : objects) {
+            if (object.data.radius() * zoom < 2) continue;
+            var center = project(objectX(object), objectY(object));
+            int color = switch (object.data.type()) {
+                case SUN -> 0x66D7A438;
+                case EARTH -> 0x665A91B8;
+                case MARS -> 0x66975D4C;
+                case ASTEROID -> 0x666F675E;
+            };
+            double radiusX = object.data.radius() * zoom;
+            double radiusY = radiusX * PLANE_TILT;
+            int startY = Math.max(viewportY, (int) Math.floor(center.y - radiusY));
+            int endY = Math.min(viewportY + viewportHeight, (int) Math.ceil(center.y + radiusY));
+            for (int row = startY; row < endY; row++) {
+                double normalizedY = (row + 0.5 - center.y) / radiusY;
+                double halfWidth = radiusX * Math.sqrt(Math.max(0, 1 - normalizedY * normalizedY));
+                int startX = Math.max(viewportX, (int) Math.floor(center.x - halfWidth));
+                int endX = Math.min(viewportX + viewportWidth, (int) Math.ceil(center.x + halfWidth));
+                if (startX < endX) graphics.fill(startX, row, endX, row + 1, color);
+            }
+        }
+    }
+
     private void addAsteroidMotion(List<LineSegment> lines) {
         for (var object : objects) {
             var position = displayedObjectPositions.get(object.data.id());
             if (position == null) continue;
+            if (Math.hypot(position.x - object.data.x(), position.y - object.data.y()) < 1) continue;
             var from = project(object.data.x(), object.data.y());
             var to = project(position.x, position.y);
             lines.add(new LineSegment(from.x, from.y, to.x, to.y, 0x6685A7BC, 0.7f));
@@ -532,12 +571,13 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean hasTooltip() {
-        return hoveredSeparation != null || hoveredObject != null || hoveredSelection != null
-                || hoveredPathPoint != null;
+        return tooltipsEnabled && (hoveredSeparation != null || hoveredObject != null || hoveredSelection != null
+                || hoveredPathPoint != null);
     }
 
     @Override
     public List<Component> getTooltip() {
+        if (!tooltipsEnabled) return List.of();
         if (hoveredSeparation != null) {
             var lines = new ArrayList<Component>();
             lines.add(Component.translatable("screen.oritech_space_age.separation_stage",
@@ -568,9 +608,11 @@ final class RocketStarMapWidget extends UIComponent {
             lines.add(Component.translatable("screen.oritech_space_age.object.position",
                     format(objectX(object)), format(objectY(object))));
             var motion = displayedObjectPositions.get(object.data.id());
-            if (motion != null) lines.add(Component.translatable("screen.oritech_space_age.object.arrival_position",
+            if (motion != null && Math.hypot(motion.x - object.data.x(), motion.y - object.data.y()) >= 1) {
+                lines.add(Component.translatable("screen.oritech_space_age.object.arrival_position",
                     String.format(Locale.ROOT, "%.2f", motion.timeSeconds / 1_200),
                     format(object.data.x()), format(object.data.y())));
+            }
             lines.add(Component.translatable("screen.oritech_space_age.object.radius", format(object.data.radius())));
             if (object.data.type() == SpaceObjects.ObjectType.ASTEROID) {
                 lines.add(Component.translatable("screen.oritech_space_age.object.mass",
@@ -644,6 +686,10 @@ final class RocketStarMapWidget extends UIComponent {
 
     private MapObject objectById(UUID id) {
         return objects.stream().filter(object -> object.data.id().equals(id)).findFirst().orElse(null);
+    }
+
+    void setTooltipsEnabled(boolean enabled) {
+        tooltipsEnabled = enabled;
     }
 
     private double objectX(MapObject object) {

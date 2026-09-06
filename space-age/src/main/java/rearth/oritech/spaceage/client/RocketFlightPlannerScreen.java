@@ -115,6 +115,7 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         addComponent(flightPlanTab);
         buildFlightPlanTab();
+        if (flightPlanMap != null) flightPlanMap.setTooltipsEnabled(!hasOpenPopup());
         speedField = null;
         targetSearchField = null;
         targetList = null;
@@ -130,6 +131,12 @@ public class RocketFlightPlannerScreen extends OritechWidgetScreen<RocketAssembl
         else if (landingAction != null) buildLandingEditor();
         else if (addonAction != null) buildAddonEditor();
         else if (mapContextRequest != null) buildMapContextMenu();
+    }
+
+    private boolean hasOpenPopup() {
+        return speedAction != null || actionTypeAction != null || targetAction != null
+                || arrivalAction != null || landingAction != null || addonAction != null
+                || mapContextRequest != null;
     }
 
     private void buildFlightPlanTab() {
