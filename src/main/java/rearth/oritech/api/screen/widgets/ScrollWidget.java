@@ -30,8 +30,14 @@ public class ScrollWidget extends UIComponent {
     private boolean verticalScroll = true;
     private boolean horizontalScroll = false;
     private boolean dragScrolling = false;
+    // Opt in only when children describe their drawing area with accurate bounds.
+    private boolean renderCulling = false;
+    // Small effects outside a child's surface should still appear near a viewport edge.
+    private int renderCullOverflow = 0;
     private int scrollSpeed = 10;
     private final int innerMargin = 4;
+    // Reuse the sorting buffer instead of copying every child on every frame.
+    private final List<UIComponent> renderCandidates = new ArrayList<>();
 
     public ScrollWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -55,6 +61,16 @@ public class ScrollWidget extends UIComponent {
 
     public ScrollWidget withDragScrolling(boolean enabled) {
         this.dragScrolling = enabled;
+        return this;
+    }
+
+    /**
+     * Skips children outside the viewport before sorting and rendering them.
+     * The overflow allowance keeps effects that extend slightly past a component's bounds visible at an edge.
+     */
+    public ScrollWidget withRenderCulling(int overflow) {
+        this.renderCulling = true;
+        this.renderCullOverflow = Math.max(0, overflow);
         return this;
     }
 
@@ -170,9 +186,6 @@ public class ScrollWidget extends UIComponent {
         var pose = graphics.pose();
         graphics.enableScissor(cx, cy, cx + cw, cy + ch);
 
-        var sorted = new ArrayList<>(children);
-        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
-
         // Translate so children at (0,0) render at the content origin
         pose.pushMatrix();
         pose.translate(cx - renderedX, cy - renderedY);
@@ -181,9 +194,16 @@ public class ScrollWidget extends UIComponent {
         float childMouseX = mouseX - cx + renderedX;
         float childMouseY = mouseY - cy + renderedY;
 
-        for (var child : sorted) {
-            if (child.isVisible())
-                child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
+        renderCandidates.clear();
+        for (var child : children) {
+            if (child.isVisible() && (!renderCulling || isChildInViewport(child, renderedX, renderedY, cw, ch))) {
+                renderCandidates.add(child);
+            }
+        }
+        renderCandidates.sort(Comparator.comparingInt(UIComponent::getZIndex));
+
+        for (var child : renderCandidates) {
+            child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
         }
 
         pose.popMatrix();
@@ -196,6 +216,19 @@ public class ScrollWidget extends UIComponent {
         if (horizontalScroll && contentTotalWidth > cw) {
             renderHorizontalScrollbar(graphics, cx, cy + ch, cw, 2, renderedX, contentTotalWidth, cw);
         }
+    }
+
+    /**
+     * Uses padded bounds because a component surface may extend past its content area.
+     * Subclasses can widen this for components that draw beyond their declared bounds.
+     */
+    protected boolean isChildInViewport(UIComponent child, float viewportX, float viewportY, int viewportWidth, int viewportHeight) {
+        int left = child.paddedX();
+        int top = child.paddedY();
+        int right = left + child.paddedWidth();
+        int bottom = top + child.paddedHeight();
+        return right > viewportX - renderCullOverflow && left < viewportX + viewportWidth + renderCullOverflow
+                && bottom > viewportY - renderCullOverflow && top < viewportY + viewportHeight + renderCullOverflow;
     }
 
     private void renderVerticalScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH,
