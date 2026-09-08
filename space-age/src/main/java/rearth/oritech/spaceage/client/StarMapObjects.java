@@ -181,6 +181,23 @@ final class StarMapObjects {
         return objects.stream().filter(object -> object.data.id().equals(id)).findFirst().orElse(null);
     }
 
+    RocketStarMapWidget.NavigationSelection outermostOrbit(Entry object) {
+        var orbits = RocketFlightPlanRules.availableOrbits(object.data.type());
+        return new RocketStarMapWidget.NavigationSelection(object.data.id(), orbits.getLast());
+    }
+
+    List<StarMapCamera.Point> focusPoints(RocketStarMapWidget.NavigationSelection selection) {
+        var object = byId(selection.objectId());
+        if (object == null) return List.of();
+        var radius = object.data.radius() + selection.orbit().altitude();
+        var centerX = x(object);
+        var centerY = y(object);
+        return List.of(new StarMapCamera.Point(centerX - radius, centerY),
+                new StarMapCamera.Point(centerX + radius, centerY),
+                new StarMapCamera.Point(centerX, centerY - radius),
+                new StarMapCamera.Point(centerX, centerY + radius));
+    }
+
     StarMapTooltip.ArrivalPosition arrivalPosition(UUID objectId) {
         return displayedPositions.get(objectId);
     }

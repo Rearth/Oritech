@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.client;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.state.BlockState;
@@ -119,6 +120,15 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         super(menu, inventory, title);
         screenInventory = inventory;
         screenTitle = title;
+    }
+
+    @Override
+    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (doubleClick && !hasOpenPopup() && flightPlanMap != null
+                && flightPlanMap.handleDoubleClick(event.x() - leftPos, event.y() - topPos, event.button())) {
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -244,7 +254,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         updateBranchActions(branchId, editable, rocket);
     }
 
-    void cycleActionParameter(UUID branchId, int index, ActiveRocketData rocket) {
+    @Override
+    protected void cycleActionParameter(UUID branchId, int index, ActiveRocketData rocket) {
         var branch = findBranch(branchId);
         if (branch == null) return;
         var action = branch.actions().get(index);
@@ -387,7 +398,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
     }
 
-    Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket) {
+    @Override
+    protected Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket) {
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
             return currentDraftSnapshot().objects().stream().filter(object -> object.id().equals(action.targetId()))
                     .findFirst().map(RocketStarMapWidget::objectName)
@@ -412,7 +424,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         return Component.translatable("screen.oritech_space_age.action.no_parameter");
     }
 
-    Component actionOrbit(SpaceSimulation.FlightPlanAction action) {
+    @Override
+    protected Component actionOrbit(SpaceSimulation.FlightPlanAction action) {
         if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO
                 && action.type() != SpaceSimulation.ActionType.CONNECT_ASTEROID) {
             return Component.translatable("screen.oritech_space_age.action.no_scope");
@@ -514,8 +527,9 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 .filter(prediction -> prediction.actionId().equals(actionId)).findFirst().orElse(null);
     }
 
-    boolean canAddNavigationAddon(SpaceSimulation.FlightPlanBranch branch,
-                                           SpaceSimulation.FlightPlanAction action) {
+    @Override
+    protected boolean canAddNavigationAddon(SpaceSimulation.FlightPlanBranch branch,
+                                             SpaceSimulation.FlightPlanAction action) {
         var path = calculatedFlight.paths().stream().filter(item -> item.branchId().equals(branch.id()))
                 .findFirst().orElse(null);
         if (path == null) return false;

@@ -1,6 +1,5 @@
 package rearth.oritech.spaceage.client;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.OritechSurface;
@@ -19,6 +18,7 @@ final class FlightPlannerCards {
     // Space reserved by each card, including its gap to the next card.
     private static final int NORMAL_CARD_WIDTH = 142;
     private static final int GENERATED_CARD_WIDTH = 98;
+    private static final int CARD_HEIGHT = 84;
     // Reads current labels and connects buttons to the screen's editing operations.
     private final RocketFlightPlannerScreen screen;
 
@@ -39,7 +39,7 @@ final class FlightPlannerCards {
                 .forEach(action -> actionOwners.put(action.id(), branch)));
         var rowByBranch = new HashMap<UUID, Integer>();
         var xByBranch = new HashMap<UUID, Integer>();
-        var rowHeight = 164;
+        var rowHeight = 108;
         int branchStartY = 8;
 
         for (int row = 0; row < screen.draftPlan().branches().size(); row++) {
@@ -56,7 +56,7 @@ final class FlightPlannerCards {
                 int connectorX = parentX + cardWidth(parentAction) / 2;
                 branchX = connectorX + 18;
                 int guideY = branchStartY + parentRow * rowHeight
-                        + (parentAction != null && parentAction.isGenerated() ? 68 : 130);
+                        + (parentAction != null && parentAction.isGenerated() ? 68 : CARD_HEIGHT);
                 scroll.addChild(FlightPlannerCards.branchConnector(connectorX, guideY, branchX, rowY + 17));
             }
             xByBranch.put(branch.id(), branchX);
@@ -79,10 +79,6 @@ final class FlightPlannerCards {
                     cursorX += GENERATED_CARD_WIDTH;
                 } else {
                     addEditableCard(scroll, branch, action, index, rocket, cursorX, rowY);
-                    if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                            && (!action.addons().isEmpty() || screen.canAddNavigationAddon(branch, action))) {
-                        addNavigationAddonCard(scroll, branch, action, rocket, cursorX, rowY);
-                    }
                     cursorX += NORMAL_CARD_WIDTH;
                 }
             }
@@ -112,89 +108,45 @@ final class FlightPlannerCards {
     private void addEditableCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
                                  SpaceSimulation.FlightPlanAction action, int index,
                                  ActiveRocketData rocket, int cursorX, int rowY) {
-        scroll.addChild(new SurfaceWidget(cursorX, rowY, NORMAL_CARD_WIDTH - 8, 130, OritechSurface.PANEL_INSET));
-        scroll.addChild(new LabelWidget(cursorX + 5, rowY + 5, 18,
-                Component.literal(Integer.toString(index + 1)).withStyle(ChatFormatting.BOLD)));
-        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 22, rowY + 4, 103, 17,
-                FlightPlannerLabels.actionName(action.type()), ignored -> screen.openActionTypeMenu(action.id(), cursorX + 22, rowY + 21)));
-
-        var parameter = SpaceAgeButtons.panel(cursorX + 5, rowY + 27, 120, 17,
-                screen.actionParameter(action, rocket), ignored -> {
-                    if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
-                        screen.openTargetMenu(action.id(), cursorX + 5, rowY + 44);
-                    } else screen.cycleActionParameter(branch.id(), index, rocket);
-                });
-        parameter.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                || action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
-                || action.type() == SpaceSimulation.ActionType.DECOUPLE);
+        var card = SpaceAgeButtons.darkPanel(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
+                Component.empty(), ignored -> screen.openActionEditor(action.id()));
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE
                 && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
             var asteroidPath = screen.calculatedFlight().asteroidPaths().stream()
                     .filter(path -> path.asteroidId().equals(action.targetId())).findFirst().orElse(null);
-            if (asteroidPath != null) parameter.withTooltip(FlightPlannerLabels.releasedAsteroidTooltip(asteroidPath));
+            if (asteroidPath != null) card.withTooltip(FlightPlannerLabels.releasedAsteroidTooltip(asteroidPath));
         }
-        scroll.addChild(parameter);
-        var orbit = SpaceAgeButtons.panel(cursorX + 5, rowY + 48, 120, 17,
-                screen.actionOrbit(action), ignored -> {
-                    if (FlightPlannerLabels.isEarthSurface(action)) screen.openLandingEditor(action.id());
-                    else screen.cycleActionOrbit(branch.id(), index, rocket);
-                });
-        orbit.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
-        scroll.addChild(orbit);
-
-        var velocity = SpaceAgeButtons.panel(cursorX + 5, rowY + 69, 120, 17,
-                FlightPlannerLabels.actionVelocity(action), ignored -> screen.openArrivalEditor(action.id()));
-        velocity.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
-        var prediction = screen.arrivalPrediction(action.id());
-        if (prediction != null) velocity.withTooltip(FlightPlannerLabels.arrivalTooltip(prediction.impact()));
-        scroll.addChild(velocity);
-
-        var speed = SpaceAgeButtons.panel(cursorX + 5, rowY + 91, 120, 17,
-                Component.translatable("screen.oritech_space_age.action.speed_limit",
-                        action.maxSpeed() == 0 ? "Maximum" : action.maxSpeed() + " m/s"), ignored -> {
-                    screen.openSpeedEditor(action);
-                });
-        speed.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO);
-        scroll.addChild(speed);
-
-        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 5, rowY + 113, 18, 13, Component.literal("<"),
-                ignored -> screen.moveAction(branch.id(), index, -1, rocket)));
-        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 25, rowY + 113, 18, 13, Component.literal(">"),
-                ignored -> screen.moveAction(branch.id(), index, 1, rocket)));
-        var decrease = SpaceAgeButtons.darkPanel(cursorX + 49, rowY + 113, 18, 13, Component.literal("−"),
-                ignored -> screen.adjustActionVelocity(branch.id(), index, -1, rocket));
-        decrease.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                && action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM);
-        scroll.addChild(decrease);
-        var increase = SpaceAgeButtons.darkPanel(cursorX + 69, rowY + 113, 18, 13, Component.literal("+"),
-                ignored -> screen.adjustActionVelocity(branch.id(), index, 1, rocket));
-        increase.setActive(action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                && action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM);
-        scroll.addChild(increase);
-        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 108, rowY + 113, 17, 13, Component.literal("×"),
-                ignored -> screen.removeAction(branch.id(), index, rocket)));
-    }
-
-    private void addNavigationAddonCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
-                                        SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
-                                        int cursorX, int rowY) {
-        scroll.addChild(FlightPlannerCards.addonConnector(cursorX + 66, rowY + 130, rowY + 135));
-        if (action.addons().isEmpty()) {
-            scroll.addChild(SpaceAgeButtons.orangePanel(cursorX + 54, rowY + 135, 24, 20,
-                    Component.literal("+"), ignored -> screen.addNavigationAddon(branch.id(), action.id(), rocket))
-                    .withTooltip(Component.translatable("screen.oritech_space_age.action.add_completion_condition")));
-            return;
+        scroll.addChild(card);
+        scroll.addChild(new LabelWidget(cursorX + 6, rowY + 7, NORMAL_CARD_WIDTH - 20,
+                Component.literal((index + 1) + ". ").append(FlightPlannerLabels.actionName(action.type())))
+                .withBrightColor().withShadow(true));
+        scroll.addChild(new LabelWidget(cursorX + 6, rowY + 23, NORMAL_CARD_WIDTH - 20, 20,
+                screen.actionParameter(action, rocket)).withBrightColor().withWrap(true));
+        if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            var details = Component.empty().append(screen.actionOrbit(action)).append(" · ")
+                    .append(FlightPlannerLabels.actionVelocity(action));
+            if (!action.addons().isEmpty()) details.append(" · ")
+                    .append(FlightPlannerLabels.addonSummary(action.addons().getFirst()));
+            scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18, details)
+                    .withBrightColor().withWrap(true));
         }
-        var addon = action.addons().getFirst();
-        var button = SpaceAgeButtons.darkPanel(cursorX + 5, rowY + 135, 99, 20,
-                FlightPlannerLabels.addonSummary(addon), ignored -> screen.openAddonEditor(action.id()));
-        var moment = screen.calculatedFlight().navigationAborts().stream()
-                .filter(item -> item.addonId().equals(addon.id())).findFirst().orElse(null);
-        if (moment != null) button.withTooltip(Component.translatable(
-                "screen.oritech_space_age.action.condition_reached", FlightPlannerLabels.formatAddonValue(addon.type(), moment.actualValue())));
-        scroll.addChild(button);
-        scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 107, rowY + 135, 18, 20,
-                Component.literal("×"), ignored -> screen.removeNavigationAddon(branch.id(), action.id(), rocket)));
+
+        var editable = branch.actions().stream().filter(item -> !item.isGenerated()).toList();
+        int editableIndex = editable.indexOf(action);
+        var earlier = SpaceAgeButtons.panel(cursorX + 5, rowY + 65, 35, 14, Component.literal("←"),
+                ignored -> screen.moveAction(branch.id(), index, -1, rocket));
+        earlier.setActive(editableIndex > 0);
+        earlier.setZIndex(1);
+        scroll.addChild(earlier.withTooltip(Component.translatable("screen.oritech_space_age.action.move_earlier")));
+        var later = SpaceAgeButtons.panel(cursorX + 43, rowY + 65, 35, 14, Component.literal("→"),
+                ignored -> screen.moveAction(branch.id(), index, 1, rocket));
+        later.setActive(editableIndex >= 0 && editableIndex < editable.size() - 1);
+        later.setZIndex(1);
+        scroll.addChild(later.withTooltip(Component.translatable("screen.oritech_space_age.action.move_later")));
+        var remove = SpaceAgeButtons.panel(cursorX + 113, rowY + 65, 16, 14, Component.literal("×"),
+                ignored -> screen.removeAction(branch.id(), index, rocket));
+        remove.setZIndex(1);
+        scroll.addChild(remove.withTooltip(Component.translatable("screen.oritech_space_age.action.remove")));
     }
 
     private static int cardWidth(SpaceSimulation.FlightPlanAction action) {
@@ -215,12 +167,4 @@ final class FlightPlannerCards {
         };
     }
 
-    static UIComponent addonConnector(int lineX, int startY, int endY) {
-        return new UIComponent(lineX - 1, startY, 2, Math.max(1, endY - startY)) {
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                graphics.fill(lineX - 1, startY, lineX + 1, endY, 0xFFD58A32);
-            }
-        };
-    }
 }

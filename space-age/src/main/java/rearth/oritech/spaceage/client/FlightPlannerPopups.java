@@ -33,13 +33,116 @@ final class FlightPlannerPopups {
     }
 
     void build() {
+        if (editors.actionEditorAction != null) buildActionEditor();
+        boolean nestedEditor = editors.speedAction != null || editors.actionTypeAction != null
+                || editors.targetAction != null || editors.arrivalAction != null
+                || editors.landingAction != null || editors.addonAction != null;
+        if (editors.actionEditorAction != null && nestedEditor) editors.setPopupLayerOffset(100);
         if (editors.speedAction != null) buildSpeedEditor();
         else if (editors.actionTypeAction != null) buildActionTypeMenu();
         else if (editors.targetAction != null) buildTargetMenu();
         else if (editors.arrivalAction != null) buildArrivalEditor();
         else if (editors.landingAction != null) buildLandingEditor();
         else if (editors.addonAction != null) buildAddonEditor();
-        else if (editors.mapContextRequest != null) buildMapContextMenu();
+        else if (editors.actionEditorAction == null && editors.mapContextRequest != null) buildMapContextMenu();
+        editors.setPopupLayerOffset(0);
+    }
+
+    private void buildActionEditor() {
+        var action = editors.findAction(editors.actionEditorAction);
+        var branch = action == null ? null : editors.draftPlan().branches().stream()
+                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null) return;
+        int settingCount = switch (action.type()) {
+            case NAVIGATE_TO -> 5 + ((!action.addons().isEmpty() || editors.canAddNavigationAddon(branch, action)) ? 1 : 0);
+            case CONNECT_ASTEROID, DECOUPLE -> 2;
+            case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
+            case DISCONNECT_BOOSTER -> 0;
+        };
+        var popupWidth = Math.min(380, editors.panelWidth() - 12);
+        var popupHeight = 66 + settingCount * 25;
+        var px = (editors.panelWidth() - popupWidth) / 2;
+        var py = Math.max(4, (editors.panelHeight() - popupHeight) / 2);
+        addEditorBackdrop(px, py, popupWidth, popupHeight);
+        editors.addPopupComponent(new LabelWidget(px + 10, py + 8, popupWidth - 48,
+                Component.translatable("screen.oritech_space_age.action.configuration",
+                        FlightPlannerLabels.actionName(action.type())))
+                .withBrightColor().withZIndex(9_001));
+        editors.addPopupComponent(SpaceAgeButtons.darkPanel(px + popupWidth - 28, py + 6, 18, 16,
+                Component.literal("×"), ignored -> editors.closeActionEditor()).withZIndex(9_001));
+
+        int rowY = py + 29;
+        int buttonX = px + 92;
+        int buttonWidth = popupWidth - 102;
+        addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.type");
+        int typeMenuY = rowY + 16;
+        editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                FlightPlannerLabels.actionName(action.type()), ignored ->
+                        editors.openActionTypeMenuFromEditor(action.id(), buttonX, typeMenuY)).withZIndex(9_001));
+        rowY += 25;
+
+        if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.target");
+            int targetMenuY = rowY + 16;
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                    editors.actionParameter(action, editors.flightPlanRocket()), ignored ->
+                            editors.openTargetMenuFromEditor(action.id(), buttonX, targetMenuY)).withZIndex(9_001));
+            rowY += 25;
+
+            addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.orbit");
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                    editors.actionOrbit(action), ignored -> {
+                        if (FlightPlannerLabels.isEarthSurface(action)) editors.openLandingEditor(action.id());
+                        else editors.cycleEditedOrbit(action.id());
+                    }).withZIndex(9_001));
+            rowY += 25;
+
+            addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.arrival");
+            var arrival = SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                    FlightPlannerLabels.actionVelocity(action), ignored -> editors.openArrivalEditor(action.id()));
+            var prediction = editors.calculatedFlight().arrivalPredictions().stream()
+                    .filter(item -> item.actionId().equals(action.id())).findFirst().orElse(null);
+            if (prediction != null) arrival.withTooltip(FlightPlannerLabels.arrivalTooltip(prediction.impact()));
+            editors.addPopupComponent(arrival.withZIndex(9_001));
+            rowY += 25;
+
+            addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.cruise");
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                    Component.translatable("screen.oritech_space_age.action.speed_limit",
+                            action.maxSpeed() == 0 ? "Maximum" : action.maxSpeed() + " m/s"),
+                    ignored -> editors.openSpeedEditor(action)).withZIndex(9_001));
+            rowY += 25;
+
+            if (!action.addons().isEmpty() || editors.canAddNavigationAddon(branch, action)) {
+                addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.completion");
+                var label = action.addons().isEmpty()
+                        ? Component.translatable("screen.oritech_space_age.action.no_completion_condition")
+                        : FlightPlannerLabels.addonSummary(action.addons().getFirst());
+                editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18, label,
+                        ignored -> editors.editNavigationAddon(action.id())).withZIndex(9_001));
+                rowY += 25;
+            }
+        } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
+                || action.type() == SpaceSimulation.ActionType.DECOUPLE) {
+            addSettingLabel(px, rowY, action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
+                    ? "screen.oritech_space_age.action.setting.anchor"
+                    : "screen.oritech_space_age.action.setting.connection");
+            var parameter = SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                    editors.actionParameter(action, editors.flightPlanRocket()), ignored ->
+                            editors.cycleEditedParameter(action.id()));
+            parameter.setActive(action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
+                    || action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET));
+            editors.addPopupComponent(parameter.withZIndex(9_001));
+            rowY += 25;
+        }
+
+        editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 110, rowY, 100, 18,
+                Component.translatable("gui.done"), ignored -> editors.closeActionEditor()).withZIndex(9_001));
+    }
+
+    private void addSettingLabel(int px, int rowY, String translationKey) {
+        editors.addPopupComponent(new LabelWidget(px + 10, rowY, 78, Component.translatable(translationKey))
+                .withBrightColor().withZIndex(9_001));
     }
 
     private void buildSpeedEditor() {
@@ -268,6 +371,9 @@ final class FlightPlannerPopups {
         apply.setZIndex(9_001);
         apply.setActive(editors.parseAddonValue(addon.type(), editors.addonValueText) != null);
         editors.addPopupComponent(apply);
+        editors.addPopupComponent(SpaceAgeButtons.darkPanel(px + 118, py + 116, 100, 18,
+                Component.translatable("screen.oritech_space_age.action.remove_condition"),
+                ignored -> editors.removeEditedNavigationAddon()).withZIndex(9_001));
         editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 116, 100, 18,
                 Component.translatable("gui.cancel"), ignored -> editors.closeEditors()).withZIndex(9_001));
         editors.addonValueField.setTextColor(editors.parseAddonValue(addon.type(), editors.addonValueText) == null

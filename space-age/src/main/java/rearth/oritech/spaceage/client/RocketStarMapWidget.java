@@ -77,6 +77,8 @@ final class RocketStarMapWidget extends UIComponent {
     private boolean movedWhileDragging;
     // The planner can hide map tooltips while a popup is open.
     private boolean tooltipsEnabled = true;
+    // The compact trajectory key expands only when requested.
+    private boolean legendExpanded;
 
     RocketStarMapWidget(int x, int y, int width, int height,
                         SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -100,6 +102,7 @@ final class RocketStarMapWidget extends UIComponent {
         }
         updateFlightPath(snapshot, flightPath, selectedBranch);
         fitSystem();
+        fitFlightPath();
     }
 
     void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -165,8 +168,32 @@ final class RocketStarMapWidget extends UIComponent {
                 viewportX(), viewportY(), viewportWidth(), viewportHeight());
     }
 
+    private void fitFlightPath() {
+        var points = new ArrayList<StarMapCamera.Point>();
+        for (var path : flightPath.paths()) {
+            if (path.samples().isEmpty()) continue;
+            var first = path.samples().getFirst();
+            points.add(new StarMapCamera.Point(first.x(), first.y()));
+            for (var moment : path.actionMoments()) {
+                var action = actionsById.get(moment.actionId());
+                if (action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+                    points.add(new StarMapCamera.Point(moment.x(), moment.y()));
+                }
+            }
+        }
+        if (points.size() > 1) {
+            var first = points.getFirst();
+            boolean hasRoute = points.stream().anyMatch(point -> Math.hypot(
+                    point.x() - first.x(), point.y() - first.y()) > 1);
+            if (hasRoute) camera.focus(points,
+                    viewportX(), viewportY(), viewportWidth(), viewportHeight());
+        }
+    }
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+        camera.advanceZoom();
+        camera.advancePan();
         int viewportX = x + 5;
         int viewportY = y + 22;
         int viewportWidth = width - 10;
@@ -185,6 +212,7 @@ final class RocketStarMapWidget extends UIComponent {
         var viewport = new StarMapObjects.Viewport(viewportX, viewportY, viewportWidth, viewportHeight);
         mapObjects.renderSurfaceDiscs(graphics, camera, viewport);
         prepareLines(viewport);
+        for (var marker : rocketMarkers) renderRocket(graphics, marker, mouseX, mouseY, delta);
         StarMapLineRenderer.submit(graphics, cachedLines, viewportX, viewportY, viewportWidth, viewportHeight);
 
         hoveredObject = null;
@@ -195,11 +223,11 @@ final class RocketStarMapWidget extends UIComponent {
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
                 isInsideViewport(mouseX, mouseY));
         if (isInsideViewport(mouseX, mouseY)) hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
-        for (var marker : rocketMarkers) renderRocket(graphics, marker, mouseX, mouseY, delta);
         renderSeparations(graphics, mouseX, mouseY);
         graphics.disableScissor();
 
-        StarMapOverlay.render(graphics, x, y, width, selectedTargetLabel(), flightPath, pathsByBranch.get(selectedBranch));
+        StarMapOverlay.render(graphics, x, y, width, height, selectedTargetLabel(), flightPath,
+                pathsByBranch.get(selectedBranch), legendExpanded);
     }
 
     private void prepareLines(StarMapObjects.Viewport viewport) {
@@ -343,6 +371,10 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
+        if (button == 0 && StarMapOverlay.isOverLegend(mouseX, mouseY, x, y, width, height, legendExpanded)) {
+            legendExpanded = !legendExpanded;
+            return true;
+        }
         if (!isInsideViewport(mouseX, mouseY)) return false;
         if (button == 1 && hoveredObject != null) {
             contextMenuListener.accept(new NavigationContextRequest(
@@ -353,13 +385,29 @@ final class RocketStarMapWidget extends UIComponent {
         if (button != 0) return false;
         dragging = true;
         movedWhileDragging = false;
+        camera.beginDrag();
+        return true;
+    }
+
+    boolean handleDoubleClick(double mouseX, double mouseY, int button) {
+        if (button != 0 || !isInsideViewport(mouseX, mouseY)) return false;
+        var focus = hoveredSelection;
+        if (hoveredObject != null && (focus == null || focus.orbit() == SpaceSimulation.OrbitBand.SURFACE)) {
+            focus = mapObjects.outermostOrbit(hoveredObject);
+        }
+        if (focus == null) return false;
+        dragging = false;
+        selectedTarget = focus;
+        selectionListener.accept(focus);
+        camera.focus(mapObjects.focusPoints(focus),
+                viewportX(), viewportY(), viewportWidth(), viewportHeight());
         return true;
     }
 
     @Override
     public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
         if (!dragging || button != 0) return false;
-        camera.pan(deltaX, deltaY);
+        camera.dragBy(deltaX, deltaY);
         movedWhileDragging |= Math.abs(deltaX) + Math.abs(deltaY) > 0.5;
         return true;
     }
@@ -368,6 +416,7 @@ final class RocketStarMapWidget extends UIComponent {
     public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
         if (!dragging || button != 0) return false;
         dragging = false;
+        camera.endDrag();
         if (!movedWhileDragging && hoveredSelection != null) {
             selectedTarget = hoveredSelection;
             selectionListener.accept(selectedTarget);
@@ -398,10 +447,7 @@ final class RocketStarMapWidget extends UIComponent {
     private boolean isInsideViewport(double mouseX, double mouseY) {
         boolean insideMap = mouseX >= viewportX() && mouseX < viewportX() + viewportWidth()
                 && mouseY >= viewportY() && mouseY < viewportY() + viewportHeight();
-        boolean overStats = mouseX >= x + 9 && mouseX < x + 185 && mouseY >= y + 27 && mouseY < y + 85;
-        boolean overLegend = mouseX >= x + width - 181 && mouseX < x + width - 9
-                && mouseY >= y + 27 && mouseY < y + 103;
-        return insideMap && !overStats && !overLegend;
+        return insideMap && !StarMapOverlay.isOverLegend(mouseX, mouseY, x, y, width, height, legendExpanded);
     }
 
     private Point project(double worldX, double worldY) {
