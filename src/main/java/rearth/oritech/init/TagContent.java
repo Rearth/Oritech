@@ -141,6 +141,7 @@ public class TagContent {
 
     // spawner blacklist
     public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.create(Registries.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
+    public static final TagKey<EntityType<?>> FLYING_MOBS = TagKey.create(Registries.ENTITY_TYPE, Oritech.id("flying_mobs"));
 
     public static final TagKey<Block> BLACK_HOLE_BLACKLIST = TagKey.create(Registries.BLOCK, Oritech.id("blackhole_blacklist"));
 
