@@ -512,6 +512,8 @@
   "emi.title.oritech.bedrock_extractor_infinite": "Extraction is infinite.",
   "emi.title.oritech.cookingtime": "%ds (%d ticks)",
   "emi.title.oritech.collisionspeed": "Min. collision energy: %sJ",
+  "emi.title.oritech.atomic_forge_energy": "Required energy: %s RF",
+  "emi.description.oritech.atomic_forge_laser_speed": "Laser power determines charge time",
   "emi.title.oritech.laser_interaction": "Enderic Laser Block Destruction",
   "itemgroup.oritech.machines": "Oritech Machines",
   "itemgroup.oritech.components": "Oritech Components",
