@@ -1,6 +1,6 @@
 {
   "oracle_index.title.oritech": "Oritech",
-  "message.oritech.oracle_index_missing": "Oracle Index не установлен. Он не является обязательным для игры, вся информация доступна на moddedmc.wiki, но Oracle Index рекомендуется для внутриигровой помощи.",
+  "message.oritech.oracle_index_missing": "Oracle Index не установлен. Он не является обязательным для игры, и вся информация доступна на moddedmc.wiki, но Oracle Index рекомендуется для внутриигровой помощи.",
   "advancements.oritech.begin": "Oritech",
   "key.oritech.hotkey_category": "Oritech",
   "advancements.oritech.begin.description": "Никель & Диме - начните свое технологическое приключение с добычи необработанного никеля. Сияй, сумасшедший шахтер!",
@@ -204,7 +204,7 @@
   "message.oritech.smart_splitter.output_disabled": "%s output disabled",
   "message.oritech.smart_splitter.mode": "Smart Splitter mode: %s",
   "message.oritech.smart_splitter.mode.strict": "Strict",
-  "message.oritech.smart_splitter.mode.overflow": "Overflow",
+  "message.oritech.smart_splitter.mode.overflow": "Переполнение",
   "message.oritech.smart_splitter.mode.round_robin": "Round Robin",
   "tooltip.oritech.machine_frame": "Да, есть настройка для изменения размеров этого блока.",
   "tooltip.oritech.machine_frame.1": "Макс. размер: %sx%s блоков.",
