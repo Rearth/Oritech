@@ -49,10 +49,11 @@ final class RocketMapPaths {
             var action = actionsById.get(actionId);
             boolean navigation = action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO;
             Point curveDestination = navigation ? abortDestination(path.branchId(), actionId) : null;
-            // Instant cards keep the stopped curve; a new destination starts a fresh one.
-            var inherited = !navigation || targetId.equals(abortedTarget) ? abortedCurve : null;
             var runSamples = samples.subList(runStart - 1, runEnd + 1);
             var points = runSamples.stream().map(sample -> new Point(sample.x(), sample.y())).toArray(Point[]::new);
+            // Instant cards keep the stopped curve. Navigation only keeps it when the destination itself is unchanged.
+            var inherited = !navigation || targetId.equals(abortedTarget) && abortedCurve != null
+                    && abortedCurve.endsAt(points[points.length - 1]) ? abortedCurve : null;
             if (inherited == null) RocketMapCurve.alignOrigin(points, runOrigin);
             var curve = inherited != null ? inherited : RocketMapCurve.create(points[0],
                     curveDestination == null ? points[points.length - 1] : curveDestination, navigation);

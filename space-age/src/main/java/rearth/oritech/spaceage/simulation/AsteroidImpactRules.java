@@ -12,7 +12,6 @@ public final class AsteroidImpactRules {
 
     public static final double KILOGRAMS_PER_ASTEROID_MASS = 1_000;
     public static final double SPACE_DRAG_PER_SECOND = 0.000002;
-    public static final int LANDING_UNCERTAINTY_BLOCKS = 64;
     public static final double MAX_ASTEROID_CONNECTION_SPEED = 12;
     private static final double SAFE_ASTEROID_SPEED = 6;
     private static final double ASTEROID_CHIP_ENERGY_PER_KILOGRAM = 30_000;

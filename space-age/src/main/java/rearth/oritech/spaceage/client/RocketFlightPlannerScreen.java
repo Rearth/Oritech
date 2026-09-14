@@ -324,7 +324,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var actions = withoutGenerated(branch.actions());
         int index = actions.stream().map(SpaceSimulation.FlightPlanAction::id).toList().indexOf(actionId);
         if (index < 0) return;
-        actions.set(index, changed);
+        actions.set(index, RocketFlightPlanRules.applyLandingUncertainty(changed));
         updateBranchActions(branchId, actions, rocket);
     }
 
@@ -418,8 +418,10 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             if (action.segments().size() != 2) {
                 return Component.translatable("screen.oritech_space_age.action.no_segment");
             }
-            return Component.literal(segmentName(action.segments().get(0), rocket) + " > "
-                    + segmentName(action.segments().get(1), rocket));
+            var retained = segmentName(action.segments().get(0), rocket);
+            var detached = segmentName(action.segments().get(1), rocket);
+            return Component.translatable("screen.oritech_space_age.action.decouple_summary",
+                    retained, detached, retained, detached);
         }
         return Component.translatable("screen.oritech_space_age.action.no_parameter");
     }
@@ -448,7 +450,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                         .thenComparingInt(ref -> ref.anchor().getZ())).toList();
     }
 
-    String segmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket) {
+    @Override
+    protected String segmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket) {
         String customName = draftPlan.configurationFor(ref).name();
         if (!customName.isBlank()) return customName;
         int index = segmentRefs(rocket).indexOf(ref);

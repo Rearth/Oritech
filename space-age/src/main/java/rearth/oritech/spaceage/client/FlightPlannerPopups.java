@@ -14,6 +14,7 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.Locale;
 
 /** Builds popup controls; their text, selected card and input handling stay in the editor. */
@@ -36,7 +37,7 @@ final class FlightPlannerPopups {
         if (editors.actionEditorAction != null) buildActionEditor();
         boolean nestedEditor = editors.speedAction != null || editors.actionTypeAction != null
                 || editors.targetAction != null || editors.arrivalAction != null
-                || editors.landingAction != null || editors.addonAction != null;
+                || editors.landingAction != null || editors.addonAction != null || editors.decoupleAction != null;
         if (editors.actionEditorAction != null && nestedEditor) editors.setPopupLayerOffset(100);
         if (editors.speedAction != null) buildSpeedEditor();
         else if (editors.actionTypeAction != null) buildActionTypeMenu();
@@ -44,6 +45,7 @@ final class FlightPlannerPopups {
         else if (editors.arrivalAction != null) buildArrivalEditor();
         else if (editors.landingAction != null) buildLandingEditor();
         else if (editors.addonAction != null) buildAddonEditor();
+        else if (editors.decoupleAction != null) buildDecoupleEditor();
         else if (editors.actionEditorAction == null && editors.mapContextRequest != null) buildMapContextMenu();
         editors.setPopupLayerOffset(0);
     }
@@ -54,7 +56,7 @@ final class FlightPlannerPopups {
                 .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
         if (branch == null) return;
         int settingCount = switch (action.type()) {
-            case NAVIGATE_TO -> 5 + ((!action.addons().isEmpty() || editors.canAddNavigationAddon(branch, action)) ? 1 : 0);
+            case NAVIGATE_TO -> 5;
             case CONNECT_ASTEROID, DECOUPLE -> 2;
             case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
             case DISCONNECT_BOOSTER -> 0;
@@ -78,7 +80,8 @@ final class FlightPlannerPopups {
         int typeMenuY = rowY + 16;
         editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                 FlightPlannerLabels.actionName(action.type()), ignored ->
-                        editors.openActionTypeMenuFromEditor(action.id(), buttonX, typeMenuY)).withZIndex(9_001));
+                        editors.openActionTypeMenuFromEditor(action.id(), buttonX, typeMenuY))
+                .withTooltip(FlightPlannerLabels.actionTooltip(action.type())).withZIndex(9_001));
         rowY += 25;
 
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
@@ -86,7 +89,9 @@ final class FlightPlannerPopups {
             int targetMenuY = rowY + 16;
             editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                     editors.actionParameter(action, editors.flightPlanRocket()), ignored ->
-                            editors.openTargetMenuFromEditor(action.id(), buttonX, targetMenuY)).withZIndex(9_001));
+                            editors.openTargetMenuFromEditor(action.id(), buttonX, targetMenuY))
+                    .withTooltip(Component.translatable("screen.oritech_space_age.action.target_tooltip"))
+                    .withZIndex(9_001));
             rowY += 25;
 
             addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.orbit");
@@ -94,7 +99,8 @@ final class FlightPlannerPopups {
                     editors.actionOrbit(action), ignored -> {
                         if (FlightPlannerLabels.isEarthSurface(action)) editors.openLandingEditor(action.id());
                         else editors.cycleEditedOrbit(action.id());
-                    }).withZIndex(9_001));
+                    }).withTooltip(Component.translatable("screen.oritech_space_age.action.destination_tooltip"))
+                    .withZIndex(9_001));
             rowY += 25;
 
             addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.arrival");
@@ -102,7 +108,10 @@ final class FlightPlannerPopups {
                     FlightPlannerLabels.actionVelocity(action), ignored -> editors.openArrivalEditor(action.id()));
             var prediction = editors.calculatedFlight().arrivalPredictions().stream()
                     .filter(item -> item.actionId().equals(action.id())).findFirst().orElse(null);
-            if (prediction != null) arrival.withTooltip(FlightPlannerLabels.arrivalTooltip(prediction.impact()));
+            var arrivalTooltip = new ArrayList<Component>();
+            arrivalTooltip.add(Component.translatable("screen.oritech_space_age.action.arrival_tooltip"));
+            if (prediction != null) arrivalTooltip.addAll(FlightPlannerLabels.arrivalTooltip(prediction.impact()));
+            arrival.withTooltip(arrivalTooltip);
             editors.addPopupComponent(arrival.withZIndex(9_001));
             rowY += 25;
 
@@ -110,26 +119,27 @@ final class FlightPlannerPopups {
             editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                     Component.translatable("screen.oritech_space_age.action.speed_limit",
                             action.maxSpeed() == 0 ? "Maximum" : action.maxSpeed() + " m/s"),
-                    ignored -> editors.openSpeedEditor(action)).withZIndex(9_001));
+                    ignored -> editors.openSpeedEditor(action))
+                    .withTooltip(Component.translatable("screen.oritech_space_age.action.cruise_tooltip"))
+                    .withZIndex(9_001));
             rowY += 25;
-
-            if (!action.addons().isEmpty() || editors.canAddNavigationAddon(branch, action)) {
-                addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.completion");
-                var label = action.addons().isEmpty()
-                        ? Component.translatable("screen.oritech_space_age.action.no_completion_condition")
-                        : FlightPlannerLabels.addonSummary(action.addons().getFirst());
-                editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18, label,
-                        ignored -> editors.editNavigationAddon(action.id())).withZIndex(9_001));
-                rowY += 25;
-            }
         } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
                 || action.type() == SpaceSimulation.ActionType.DECOUPLE) {
             addSettingLabel(px, rowY, action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
                     ? "screen.oritech_space_age.action.setting.anchor"
                     : "screen.oritech_space_age.action.setting.connection");
-            var parameter = SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
-                    editors.actionParameter(action, editors.flightPlanRocket()), ignored ->
-                            editors.cycleEditedParameter(action.id()));
+            Component parameterLabel = editors.actionParameter(action, editors.flightPlanRocket());
+            if (action.type() == SpaceSimulation.ActionType.DECOUPLE && action.segments().size() == 2
+                    && action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+                parameterLabel = Component.translatable("screen.oritech_space_age.action.decouple_connection",
+                        editors.segmentName(action.segments().get(0), editors.flightPlanRocket()),
+                        editors.segmentName(action.segments().get(1), editors.flightPlanRocket()));
+            }
+            var parameter = SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18, parameterLabel, ignored -> {
+                if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
+                    editors.cycleEditedParameter(action.id());
+                } else editors.openDecoupleEditor(action.id());
+            });
             parameter.setActive(action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
                     || action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET));
             editors.addPopupComponent(parameter.withZIndex(9_001));
@@ -140,6 +150,73 @@ final class FlightPlannerPopups {
                 Component.translatable("gui.done"), ignored -> editors.closeActionEditor()).withZIndex(9_001));
     }
 
+    private void buildDecoupleEditor() {
+        var popupWidth = Math.min(560, editors.panelWidth() - 12);
+        var popupHeight = Math.min(270, editors.panelHeight() - 12);
+        var px = (editors.panelWidth() - popupWidth) / 2;
+        var py = Math.max(4, (editors.panelHeight() - popupHeight) / 2);
+        addEditorBackdrop(px, py, popupWidth, popupHeight);
+        editors.addPopupComponent(new LabelWidget(px + 10, py + 8, popupWidth - 44,
+                Component.translatable("screen.oritech_space_age.action.decouple_editor"))
+                .withBrightColor().withZIndex(9_001));
+        editors.addPopupComponent(new LabelWidget(px + 10, py + 24, popupWidth - 20, 28,
+                Component.translatable("screen.oritech_space_age.action.decouple_help"))
+                .withBrightColor().withWrap(true).withZIndex(9_001));
+
+        int listWidth = (popupWidth - 34) / 2;
+        int listY = py + 68;
+        int listHeight = popupHeight - 106;
+        editors.addPopupComponent(new LabelWidget(px + 10, py + 55, listWidth,
+                Component.translatable("screen.oritech_space_age.action.decouple_keep"))
+                .withBrightColor().withZIndex(9_001));
+        editors.addPopupComponent(new LabelWidget(px + 24 + listWidth, py + 55, listWidth,
+                Component.translatable("screen.oritech_space_age.action.decouple_new_branch"))
+                .withBrightColor().withZIndex(9_001));
+
+        var retainedList = new ScrollWidget(px + 10, listY, listWidth, listHeight)
+                .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
+        retainedList.setZIndex(9_001);
+        var retained = editors.decoupleCandidates();
+        for (int index = 0; index < retained.size(); index++) {
+            var segment = retained.get(index);
+            var button = SpaceAgeButtons.panel(4, 4 + index * 22, listWidth - 16, 18,
+                    Component.literal(editors.segmentName(segment, editors.flightPlanRocket())),
+                    ignored -> editors.selectDecoupleRetained(segment));
+            selectListButton(button, segment.equals(editors.decoupleRetained));
+            retainedList.addChild(button);
+        }
+        retainedList.setContentDimensions(listWidth - 8, Math.max(listHeight - 8, 8 + retained.size() * 22));
+        editors.addPopupComponent(retainedList);
+
+        var detachedList = new ScrollWidget(px + 24 + listWidth, listY, listWidth, listHeight)
+                .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
+        detachedList.setZIndex(9_001);
+        var detached = editors.decoupleNeighbors(editors.decoupleRetained);
+        for (int index = 0; index < detached.size(); index++) {
+            var segment = detached.get(index);
+            var button = SpaceAgeButtons.panel(4, 4 + index * 22, listWidth - 16, 18,
+                    Component.literal(editors.segmentName(segment, editors.flightPlanRocket())),
+                    ignored -> editors.selectDecoupleDetached(segment));
+            selectListButton(button, segment.equals(editors.decoupleDetached));
+            detachedList.addChild(button);
+        }
+        detachedList.setContentDimensions(listWidth - 8, Math.max(listHeight - 8, 8 + detached.size() * 22));
+        editors.addPopupComponent(detachedList);
+
+        var apply = SpaceAgeButtons.panel(px + 10, py + popupHeight - 28, 100, 18,
+                Component.translatable("gui.done"), ignored -> editors.applyDecoupleSelection());
+        apply.setActive(editors.decoupleRetained != null && editors.decoupleDetached != null);
+        editors.addPopupComponent(apply.withZIndex(9_001));
+        editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + popupHeight - 28, 100, 18,
+                Component.translatable("gui.cancel"), ignored -> editors.closeEditors()).withZIndex(9_001));
+    }
+
+    private static void selectListButton(rearth.oritech.api.screen.widgets.ButtonWidget button, boolean selected) {
+        button.withDisabledSurface(OritechSurface.PANEL_PRESSED)
+                .withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(selected);
+        button.setActive(!selected);
+    }
+
     private void addSettingLabel(int px, int rowY, String translationKey) {
         editors.addPopupComponent(new LabelWidget(px + 10, rowY, 78, Component.translatable(translationKey))
                 .withBrightColor().withZIndex(9_001));
@@ -148,17 +225,23 @@ final class FlightPlannerPopups {
     private void buildSpeedEditor() {
         var popupWidth = Math.min(280, editors.panelWidth() - 12);
         var px = (editors.panelWidth() - popupWidth) / 2;
-        var py = Math.max(4, (editors.panelHeight() - 112) / 2);
-        addEditorBackdrop(px, py, popupWidth, 112);
+        var py = Math.max(4, (editors.panelHeight() - 132) / 2);
+        addEditorBackdrop(px, py, popupWidth, 132);
         editors.addPopupComponent(new LabelWidget(px + 10, py + 8, popupWidth - 20, 30,
                 Component.translatable("screen.oritech_space_age.action.speed_help"))
                 .withWrap(true).withZIndex(9_001));
-        editors.speedField = editors.addPopupField(new EditBox(font, leftPos + px + 10, topPos + py + 42,
-                popupWidth - 20, 18, Component.translatable("screen.oritech_space_age.action.speed_title")));
+        editors.addPopupComponent(SpaceAgeButtons.panel(px + 10, py + 35, popupWidth - 20, 18,
+                Component.translatable("screen.oritech_space_age.action.speed_maximum"),
+                ignored -> editors.applySpeedLimit(0)).withZIndex(9_001));
+        editors.addPopupComponent(new LabelWidget(px + 10, py + 64, 70,
+                Component.translatable("screen.oritech_space_age.action.speed_custom_title"))
+                .withBrightColor().withZIndex(9_001));
+        editors.speedField = editors.addPopupField(new EditBox(font, leftPos + px + 82, topPos + py + 59,
+                popupWidth - 92, 18, Component.translatable("screen.oritech_space_age.action.speed_custom_title")));
         editors.speedField.setMaxLength(20);
         editors.speedField.setValue(editors.speedText);
         editors.speedField.setTextColor(editors.parseSpeedLimit(editors.speedText) != null ? 0xFFFFFFFF : 0xFFFF6666);
-        var apply = SpaceAgeButtons.panel(px + 10, py + 84, 100, 18, Component.translatable("gui.done"),
+        var apply = SpaceAgeButtons.panel(px + 10, py + 104, 100, 18, Component.translatable("gui.done"),
                 ignored -> editors.applySpeedLimit());
         apply.setZIndex(9_001);
         apply.setActive(editors.parseSpeedLimit(editors.speedText) != null);
@@ -169,7 +252,7 @@ final class FlightPlannerPopups {
             editors.speedField.setTextColor(valid ? 0xFFFFFFFF : 0xFFFF6666);
             apply.setActive(valid);
         });
-        editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 84, 100, 18,
+        editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 110, py + 104, 100, 18,
                 Component.translatable("gui.cancel"), ignored -> editors.closeSpeedEditor()).withZIndex(9_001));
         editors.focusPopup(editors.speedField);
     }
@@ -355,7 +438,7 @@ final class FlightPlannerPopups {
             var button = SpaceAgeButtons.panel(px + 10 + index * (typeWidth + 4), py + 38, typeWidth, 28,
                     FlightPlannerLabels.addonTypeName(type), ignored -> editors.selectAddonType(type));
             button.setActive(type != addon.type());
-            editors.addPopupComponent(button.withZIndex(9_001));
+            editors.addPopupComponent(button.withTooltip(FlightPlannerLabels.addonTooltip(type)).withZIndex(9_001));
         }
         editors.addPopupComponent(new LabelWidget(px + 10, py + 79, 72,
                 Component.translatable("screen.oritech_space_age.action.condition_value"))

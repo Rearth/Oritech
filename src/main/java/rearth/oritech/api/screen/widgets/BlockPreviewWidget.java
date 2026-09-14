@@ -50,6 +50,7 @@ public class BlockPreviewWidget extends UIComponent {
     private float rotationSpeed;
     private float yawVelocity;
     private float pitchVelocity;
+    private long lastMomentumNanos;
     private float maxHorizontalRadius;
     private float maxVerticalRadius;
     private float centerX;
@@ -164,17 +165,6 @@ public class BlockPreviewWidget extends UIComponent {
     @Override
     public void tick() {
         rotation = wrapDegrees(rotation + rotationSpeed);
-
-        if (dragRotationEnabled && !draggingRotation) {
-            rotation = wrapDegrees(rotation + yawVelocity);
-            rotationX = Mth.clamp(rotationX + pitchVelocity, MIN_PITCH, MAX_PITCH);
-
-            if (rotationX == MIN_PITCH || rotationX == MAX_PITCH) {
-                pitchVelocity = 0f;
-            }
-            yawVelocity = damp(yawVelocity);
-            pitchVelocity = damp(pitchVelocity);
-        }
     }
 
     @Override
@@ -184,6 +174,7 @@ public class BlockPreviewWidget extends UIComponent {
         draggingRotation = true;
         yawVelocity = 0f;
         pitchVelocity = 0f;
+        lastMomentumNanos = System.nanoTime();
         return true;
     }
 
@@ -206,6 +197,7 @@ public class BlockPreviewWidget extends UIComponent {
         if (button != 0 || !draggingRotation) return false;
 
         draggingRotation = false;
+        lastMomentumNanos = System.nanoTime();
         return true;
     }
 
@@ -215,6 +207,7 @@ public class BlockPreviewWidget extends UIComponent {
             hoveredBlock = null;
             return;
         }
+        advanceMomentum();
 
         int cx = contentX();
         int cy = contentY();
@@ -226,9 +219,8 @@ public class BlockPreviewWidget extends UIComponent {
             return;
         }
 
-        var momentumDelta = dragRotationEnabled && !draggingRotation ? delta : 0f;
-        lastRenderedRotationX = Mth.clamp(rotationX + pitchVelocity * momentumDelta, MIN_PITCH, MAX_PITCH);
-        lastRenderedRotation = rotationY + rotation + rotationSpeed * delta + yawVelocity * momentumDelta;
+        lastRenderedRotationX = rotationX;
+        lastRenderedRotation = rotationY + rotation + rotationSpeed * delta;
         hoveredBlock = findBlockAt(mouseX, mouseY);
 
         var entries = new ArrayList<BlockPreviewRenderState.Entry>(blocks.size());
@@ -350,8 +342,25 @@ public class BlockPreviewWidget extends UIComponent {
                 .rotateY((float) Math.toRadians(yRotation));
     }
 
-    private static float damp(float velocity) {
-        var damped = velocity * MOMENTUM_DAMPING;
+    private void advanceMomentum() {
+        long now = System.nanoTime();
+        if (lastMomentumNanos == 0) {
+            lastMomentumNanos = now;
+            return;
+        }
+        double elapsedTicks = Math.min(1, (now - lastMomentumNanos) / 50_000_000d);
+        lastMomentumNanos = now;
+        if (!dragRotationEnabled || draggingRotation || elapsedTicks <= 0) return;
+        rotation = wrapDegrees(rotation + (float) (yawVelocity * elapsedTicks));
+        rotationX = Mth.clamp(rotationX + (float) (pitchVelocity * elapsedTicks), MIN_PITCH, MAX_PITCH);
+        if (rotationX == MIN_PITCH || rotationX == MAX_PITCH) pitchVelocity = 0f;
+        float damping = (float) Math.pow(MOMENTUM_DAMPING, elapsedTicks);
+        yawVelocity = damp(yawVelocity, damping);
+        pitchVelocity = damp(pitchVelocity, damping);
+    }
+
+    private static float damp(float velocity, float damping) {
+        var damped = velocity * damping;
         return Math.abs(damped) < 0.001f ? 0f : damped;
     }
 

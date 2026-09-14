@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -133,8 +134,9 @@ public final class RocketFlightPlanRules {
                 int targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && validatedAction.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                         ? Math.clamp(validatedAction.targetVelocity(), 0, 100_000) : 0;
-                actions.add(validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity)
-                        .withMaxSpeed(Math.clamp(validatedAction.maxSpeed(), 0, 100_000)).withAddons(addons));
+                var boundedAction = validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity)
+                        .withMaxSpeed(Math.clamp(validatedAction.maxSpeed(), 0, 100_000)).withAddons(addons);
+                actions.add(applyLandingUncertainty(boundedAction));
             }
             validatedBranches.add(branch.withActions(actions));
         }
@@ -142,6 +144,21 @@ public final class RocketFlightPlanRules {
         var normalized = trimEngineStageGaps(
                 normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations)), segmentIds.keySet());
         return normalized.branches().size() <= MAX_BRANCHES ? normalized : null;
+    }
+
+    public static SpaceSimulation.FlightPlanAction applyLandingUncertainty(
+            SpaceSimulation.FlightPlanAction action) {
+        if (!action.targetId().equals(SpaceObjects.EARTH_ID)
+                || action.orbit() != SpaceSimulation.OrbitBand.SURFACE) return action;
+        int uncertainty = action.addons().stream()
+                .filter(addon -> addon.type() == SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY)
+                .mapToInt(SpaceSimulation.ActionAddon::value).findFirst().orElse(0);
+        if (uncertainty <= 0) return action.withLanding(action.landingX(), action.landingZ(), 0, 0);
+        var random = new Random(action.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits());
+        double angle = random.nextDouble() * Math.PI * 2;
+        double radius = Math.sqrt(random.nextDouble()) * uncertainty;
+        return action.withLanding(action.landingX(), action.landingZ(),
+                (int) Math.round(Math.cos(angle) * radius), (int) Math.round(Math.sin(angle) * radius));
     }
 
     /** A booster creates the stage after its final enabled stage; ordinary engine selections do not. */

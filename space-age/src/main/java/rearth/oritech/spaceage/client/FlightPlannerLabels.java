@@ -19,6 +19,11 @@ final class FlightPlannerLabels {
         return Component.translatable("screen.oritech_space_age.action." + type.name().toLowerCase(Locale.ROOT));
     }
 
+    static Component actionTooltip(SpaceSimulation.ActionType type) {
+        return Component.translatable("screen.oritech_space_age.action.tooltip."
+                + type.name().toLowerCase(Locale.ROOT));
+    }
+
     static Component actionVelocity(SpaceSimulation.FlightPlanAction action) {
         if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) {
             return Component.translatable("screen.oritech_space_age.action.no_velocity");
@@ -47,6 +52,12 @@ final class FlightPlannerLabels {
     static Component addonSummary(SpaceSimulation.ActionAddon addon) {
         return Component.translatable("screen.oritech_space_age.action.condition_summary."
                 + addon.type().name().toLowerCase(Locale.ROOT), addon.value());
+    }
+
+    static List<Component> addonTooltip(SpaceSimulation.ActionAddonType type) {
+        return List.of(Component.translatable("screen.oritech_space_age.action.abort_tooltip"),
+                Component.translatable("screen.oritech_space_age.action.condition_tooltip."
+                        + type.name().toLowerCase(Locale.ROOT)));
     }
 
     static String formatAddonValue(SpaceSimulation.ActionAddonType type, double value) {

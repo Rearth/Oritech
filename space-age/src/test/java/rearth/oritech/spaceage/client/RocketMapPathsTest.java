@@ -52,6 +52,24 @@ class RocketMapPathsTest {
     }
 
     @Test
+    void earlyStopContinuationEndsOnAChangedOrbitRadius() {
+        var outward = navigation(UUID.randomUUID());
+        var release = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE);
+        var continuation = navigation(outward.targetId()).withOrbit(SpaceSimulation.OrbitBand.HIGH);
+        var plan = plan(outward, release, continuation);
+        var path = path(plan.root().id(), List.of(sample(0, 0, 0, outward),
+                sample(5, 50, 0, outward), sample(5, 50, 0, release), sample(10, 100, 30, continuation)));
+        var abort = new NavigationAbortMoment(outward.id(), path.branchId(), UUID.randomUUID(),
+                50, 5, 50, 0, 100, 0);
+        var geometry = new RocketMapPaths(plan,
+                new FlightPath(List.of(path), List.of(), 10, List.of(), List.of(), List.of(abort)));
+
+        var segments = geometry.renderedPathSegments(path);
+        assertPoint(segments.getLast().to(), 100, 30);
+        assertJoined(segments);
+    }
+
+    @Test
     void childBranchesAndEmptyProgramsStartAtDisplayedSeparation() {
         var action = navigation(UUID.randomUUID());
         var plan = plan(action);

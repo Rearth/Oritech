@@ -19,8 +19,9 @@ import java.util.UUID;
 /** Celestial object state and all object, surface, and orbit map rendering. */
 final class StarMapObjects {
 
-    // Reference rings need enough pieces to remain smooth while zoomed in.
-    private static final int CIRCLE_SEGMENTS = 48;
+    // Reference rings adapt to their screen size so true orbit points remain on the visible ring.
+    private static final int MIN_CIRCLE_SEGMENTS = 48;
+    private static final int MAX_CIRCLE_SEGMENTS = 512;
     // Surface discs are simple background geometry; the foreground icons remain block previews.
     private static final int DISC_SEGMENTS = 28;
 
@@ -205,13 +206,19 @@ final class StarMapObjects {
     private static void addCircle(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
                                   double centerX, double centerY, double radius, int color, float width) {
         if (!circleIntersects(viewport, camera, centerX, centerY, radius)) return;
+        var segments = circleSegments(radius * camera.zoom());
         var previous = project(camera, viewport, centerX + radius, centerY);
-        for (var index = 1; index <= CIRCLE_SEGMENTS; index++) {
-            var angle = Math.PI * 2 * index / CIRCLE_SEGMENTS;
+        for (var index = 1; index <= segments; index++) {
+            var angle = Math.PI * 2 * index / segments;
             var next = project(camera, viewport, centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
             lines.add(new StarMapLineRenderer.Line(previous.x(), previous.y(), next.x(), next.y(), color, width));
             previous = next;
         }
+    }
+
+    static int circleSegments(double screenRadius) {
+        return (int) Math.clamp(Math.ceil(Math.PI * 2 * screenRadius / 8),
+                MIN_CIRCLE_SEGMENTS, MAX_CIRCLE_SEGMENTS);
     }
 
     private static StarMapCamera.Point project(StarMapCamera camera, Viewport viewport, double x, double y) {

@@ -10,7 +10,6 @@ import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -57,6 +56,10 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected UUID addonAction;
     protected EditBox addonValueField;
     protected String addonValueText;
+    // Decouple editor keeps the ordered coupling sides locally until Done is pressed.
+    protected UUID decoupleAction;
+    protected SpaceSimulation.SegmentRef decoupleRetained;
+    protected SpaceSimulation.SegmentRef decoupleDetached;
     // Target and click position for the map's right-click menu.
     protected RocketStarMapWidget.NavigationContextRequest mapContextRequest;
     // Dropdown origin in panel coordinates after accounting for card scrolling.
@@ -86,6 +89,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected abstract SpaceSimulation.FlightPlanAction connectedAsteroidBefore(SpaceSimulation.FlightPlanBranch branch, UUID actionId);
     protected abstract SpaceSimulation.FlightPlanAction asteroidArrivalBefore(SpaceSimulation.FlightPlanBranch branch, UUID actionId);
     protected abstract List<List<SpaceSimulation.SegmentRef>> connectedPairs(ActiveRocketData rocket);
+    protected abstract String segmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket);
     protected abstract void replaceAction(UUID branchId, UUID actionId, SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket);
     protected abstract void cycleActionOrbit(UUID branchId, int index, ActiveRocketData rocket);
     protected abstract void cycleActionParameter(UUID branchId, int index, ActiveRocketData rocket);
@@ -110,7 +114,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected boolean hasOpenPopup() {
         return actionEditorAction != null || speedAction != null || actionTypeAction != null || targetAction != null
-                || arrivalAction != null || landingAction != null || addonAction != null
+                || arrivalAction != null || landingAction != null || addonAction != null || decoupleAction != null
                 || mapContextRequest != null;
     }
 
@@ -150,8 +154,12 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected void applySpeedLimit() {
         var value = parseSpeedLimit(speedField.getValue());
+        if (value != null) applySpeedLimit(value);
+    }
+
+    protected void applySpeedLimit(int value) {
         var action = findAction(speedAction);
-        if (value == null || action == null) return;
+        if (action == null) return;
         var branch = draftPlan().branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElseThrow();
         speedAction = null;
         replaceAction(branch.id(), action.id(), action.withMaxSpeed(value), flightPlanRocket());
@@ -351,15 +359,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         replaceAction(branchId, actionId, action.withAddons(List.of()), rocket);
     }
 
-    protected void editNavigationAddon(UUID actionId) {
-        var action = findAction(actionId);
-        var branch = action == null ? null : draftPlan().branches().stream()
-                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
-        if (branch == null) return;
-        if (action.addons().isEmpty()) addNavigationAddon(branch.id(), action.id(), flightPlanRocket());
-        else openAddonEditor(action.id());
-    }
-
     protected void removeEditedNavigationAddon() {
         var action = findAction(addonAction);
         var branch = action == null ? null : draftPlan().branches().stream()
@@ -388,18 +387,69 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         rebuildComponents();
     }
 
+    protected void openDecoupleEditor(UUID actionId) {
+        var action = findAction(actionId);
+        if (action == null || action.type() != SpaceSimulation.ActionType.DECOUPLE
+                || !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) return;
+        var pairs = connectedPairs(flightPlanRocket());
+        if (pairs.isEmpty()) return;
+        closeNestedEditorState();
+        decoupleAction = actionId;
+        if (action.segments().size() == 2) {
+            decoupleRetained = action.segments().get(0);
+            decoupleDetached = action.segments().get(1);
+        } else {
+            decoupleRetained = pairs.getFirst().get(0);
+            decoupleDetached = pairs.getFirst().get(1);
+        }
+        rebuildComponents();
+    }
+
+    protected void selectDecoupleRetained(SpaceSimulation.SegmentRef retained) {
+        decoupleRetained = retained;
+        var neighbors = decoupleNeighbors(retained);
+        if (!neighbors.contains(decoupleDetached)) decoupleDetached = neighbors.isEmpty() ? null : neighbors.getFirst();
+        rebuildComponents();
+    }
+
+    protected void selectDecoupleDetached(SpaceSimulation.SegmentRef detached) {
+        decoupleDetached = detached;
+        rebuildComponents();
+    }
+
+    protected List<SpaceSimulation.SegmentRef> decoupleCandidates() {
+        return connectedPairs(flightPlanRocket()).stream().flatMap(List::stream).distinct()
+                .sorted(java.util.Comparator.comparing(ref -> segmentName(ref, flightPlanRocket()), String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
+    protected List<SpaceSimulation.SegmentRef> decoupleNeighbors(SpaceSimulation.SegmentRef retained) {
+        if (retained == null) return List.of();
+        return connectedPairs(flightPlanRocket()).stream().filter(pair -> pair.contains(retained))
+                .map(pair -> pair.get(0).equals(retained) ? pair.get(1) : pair.get(0)).distinct()
+                .sorted(java.util.Comparator.comparing(ref -> segmentName(ref, flightPlanRocket()), String.CASE_INSENSITIVE_ORDER))
+                .toList();
+    }
+
+    protected void applyDecoupleSelection() {
+        var action = findAction(decoupleAction);
+        var branch = action == null ? null : draftPlan().branches().stream()
+                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
+        if (branch == null || decoupleRetained == null || decoupleDetached == null
+                || !decoupleNeighbors(decoupleRetained).contains(decoupleDetached)) return;
+        var changed = action.withSegments(List.of(decoupleRetained, decoupleDetached));
+        closeNestedEditorState();
+        replaceAction(branch.id(), action.id(), changed, flightPlanRocket());
+        rebuildComponents();
+    }
+
     protected static Integer parseAddonValue(SpaceSimulation.ActionAddonType type, String value) {
         return FlightPlannerLabels.parseAddonValue(type, value);
     }
 
     protected static int[] landingOffset(SpaceSimulation.FlightPlanAction action) {
-        if (action.landingOffsetX() != 0 || action.landingOffsetZ() != 0) {
-            return new int[]{action.landingOffsetX(), action.landingOffsetZ()};
-        }
-        var random = new java.util.Random(action.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits());
-        double angle = random.nextDouble() * Math.PI * 2;
-        double radius = Math.sqrt(random.nextDouble()) * AsteroidImpactRules.LANDING_UNCERTAINTY_BLOCKS;
-        return new int[]{(int) Math.round(Math.cos(angle) * radius), (int) Math.round(Math.sin(angle) * radius)};
+        var adjusted = RocketFlightPlanRules.applyLandingUncertainty(action);
+        return new int[]{adjusted.landingOffsetX(), adjusted.landingOffsetZ()};
     }
 
     protected void openArrivalEditor(UUID actionId) {
@@ -447,11 +497,14 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         arrivalAction = null;
         landingAction = null;
         addonAction = null;
+        decoupleAction = null;
+        decoupleRetained = null;
+        decoupleDetached = null;
     }
 
     protected void closeEditors() {
         if (actionEditorAction != null && (speedAction != null || actionTypeAction != null || targetAction != null
-                || arrivalAction != null || landingAction != null || addonAction != null)) {
+                || arrivalAction != null || landingAction != null || addonAction != null || decoupleAction != null)) {
             closeNestedEditorState();
         } else closeEditorState();
         rebuildComponents();
@@ -537,6 +590,11 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         }
         if (actionTypeAction != null || mapContextRequest != null) {
             if (event.isEscape()) closeEditors();
+            return true;
+        }
+        if (decoupleAction != null) {
+            if (event.isEscape()) closeEditors();
+            else if (event.isConfirmation()) applyDecoupleSelection();
             return true;
         }
         if (actionEditorAction != null) {

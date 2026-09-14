@@ -38,6 +38,10 @@ record RocketMapCurve(double startX, double startY,
         return new Point(point.x() + normalX * offset, point.y() + normalY * offset);
     }
 
+    boolean endsAt(Point point) {
+        return Math.hypot(point.x() - (startX + directionX), point.y() - (startY + directionY)) <= 0.01;
+    }
+
     static void alignOrigin(Point[] points, Point origin) {
         if (origin == null) return;
         // Join the previous displayed endpoint, then fade its offset out before reaching the new target.
