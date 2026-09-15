@@ -2,7 +2,9 @@
   "required": true,
   "package": "rearth.oritech.mixin",
   "compatibilityLevel": "JAVA_25",
-  "mixins": [],
+  "mixins": [
+    "LivingEntityInvoker"
+  ],
   "client": [
     "client.AvatarRenderStateMixin",
     "client.AvatarRendererMixin",
