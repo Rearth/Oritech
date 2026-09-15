@@ -20,6 +20,9 @@ import java.util.UUID;
  */
 public final class RocketFlightPathCalculator {
 
+    // Sparse full-power correction burns, averaged as delta-v spent per second for each tonne of craft.
+    static final double STATION_KEEPING_DELTA_V_PER_SECOND_PER_TONNE = 0.0001;
+
     private RocketFlightPathCalculator() {
     }
 
@@ -111,6 +114,7 @@ public final class RocketFlightPathCalculator {
                 case CONNECT_ASTEROID -> connectAsteroid(action, state, context);
                 case DECOUPLE -> separate(action, state, context);
                 case MAINTAIN_POSITION -> {
+                    maintainPosition(action, state, context);
                     state.maintainingPosition = true;
                     yield true;
                 }
@@ -129,9 +133,27 @@ public final class RocketFlightPathCalculator {
 
         var terminal = state.destroyed ? TerminalState.DESTROYED
                 : state.discarded ? TerminalState.DISCARDED
-                : state.maintainingPosition ? TerminalState.MAINTAINING_POSITION
+                : state.maintainingPosition ? TerminalState.STATION_KEEPING_EXHAUSTED
                 : completed ? TerminalState.READY : state.blockedState;
         context.paths.put(branch.id(), state.toPath(terminal, context));
+    }
+
+    private static void maintainPosition(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
+        var availableDeltaV = state.availableDeltaV(context);
+        var tonnes = Math.max(1, state.rocketMass() / 1_000);
+        var costPerSecond = tonnes * STATION_KEEPING_DELTA_V_PER_SECOND_PER_TONNE;
+        var duration = availableDeltaV / costPerSecond;
+        state.velocityX = 0;
+        state.velocityY = 0;
+        if (duration > 0 && Double.isFinite(duration)) {
+            state.time += duration;
+            state.addSample(PathPhase.COAST, state.currentTarget, action.id());
+        }
+        // Maintain position is terminal, so all reachable propulsion is spent by the time it expires.
+        state.segments.values().forEach(segment -> {
+            segment.remainingDeltaV = 0;
+            segment.remainingBurnSeconds = 0;
+        });
     }
 
     static boolean finishStage(SpaceSimulation.FlightPlanAction navigation, Craft state,
@@ -352,7 +374,7 @@ public final class RocketFlightPathCalculator {
 
     public enum TerminalState {
         READY,
-        MAINTAINING_POSITION,
+        STATION_KEEPING_EXHAUSTED,
         DISCARDED,
         DESTROYED,
         PLAN_BLOCKED,
@@ -363,7 +385,7 @@ public final class RocketFlightPathCalculator {
         INTEGRATION_TIME_LIMIT;
 
         public boolean isFailure() {
-            return this != READY && this != MAINTAINING_POSITION && this != DISCARDED;
+            return this != READY && this != STATION_KEEPING_EXHAUSTED && this != DISCARDED;
         }
     }
 }

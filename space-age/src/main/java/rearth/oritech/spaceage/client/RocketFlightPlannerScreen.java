@@ -284,27 +284,6 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         }
     }
 
-    @Override
-    protected void cycleActionOrbit(UUID branchId, int index, ActiveRocketData rocket) {
-        var branch = findBranch(branchId);
-        if (branch == null) return;
-        var action = branch.actions().get(index);
-        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO
-                && action.type() != SpaceSimulation.ActionType.CONNECT_ASTEROID) return;
-        var target = currentDraftSnapshot().objects().stream()
-                .filter(object -> object.id().equals(action.targetId())).findFirst().orElse(null);
-        if (target == null) return;
-        var bands = RocketFlightPlanRules.availableOrbits(target.type());
-        int current = bands.indexOf(action.orbit());
-        var changed = action.withOrbit(bands.get((current + 1) % bands.size()));
-        if (FlightPlannerLabels.isEarthSurface(changed)) {
-            var offset = landingOffset(changed);
-            changed = changed.withLanding(changed.landingX(), changed.landingZ(), offset[0], offset[1]);
-        }
-        selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
-        replaceAction(branchId, action.id(), changed, rocket);
-    }
-
     void adjustActionVelocity(UUID branchId, int index, int direction, ActiveRocketData rocket) {
         var branch = findBranch(branchId);
         if (branch == null) return;
@@ -436,10 +415,6 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             return Component.translatable("screen.oritech_space_age.action.asteroid_connection_range",
                     (int) AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED);
         }
-        if (FlightPlannerLabels.isEarthSurface(action)) {
-            return Component.translatable("screen.oritech_space_age.action.earth_coordinates",
-                    action.landingX(), action.landingZ());
-        }
         return RocketStarMapWidget.orbitName(action.orbit());
     }
 
@@ -528,6 +503,17 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     RocketFlightPathCalculator.ArrivalPrediction arrivalPrediction(UUID actionId) {
         return calculatedFlight.arrivalPredictions().stream()
                 .filter(prediction -> prediction.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    double actionDurationSeconds(UUID actionId) {
+        for (var path : calculatedFlight.paths()) {
+            var previousTime = path.samples().isEmpty() ? 0 : path.samples().getFirst().timeSeconds();
+            for (var moment : path.actionMoments()) {
+                if (moment.actionId().equals(actionId)) return Math.max(0, moment.timeSeconds() - previousTime);
+                previousTime = moment.timeSeconds();
+            }
+        }
+        return Double.NaN;
     }
 
     @Override

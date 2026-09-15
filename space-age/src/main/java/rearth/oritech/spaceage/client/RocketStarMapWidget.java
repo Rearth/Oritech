@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
@@ -79,6 +80,10 @@ final class RocketStarMapWidget extends UIComponent {
     private boolean tooltipsEnabled = true;
     // The compact trajectory key expands only when requested.
     private boolean legendExpanded;
+    // Header controls restore useful views after manual panning and zooming.
+    private final ButtonWidget fitSystemButton;
+    private final ButtonWidget fitRouteButton;
+    private UIComponent hoveredMapControl;
 
     RocketStarMapWidget(int x, int y, int width, int height,
                         SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -92,6 +97,16 @@ final class RocketStarMapWidget extends UIComponent {
         this.selectionListener = selectionListener;
         this.contextMenuListener = contextMenuListener;
         this.selectedTarget = selectedTarget;
+        fitSystemButton = SpaceAgeButtons.darkPanel(x + width - 118, y + 6, 52, 14,
+                Component.translatable("screen.oritech_space_age.map.fit_system"), ignored -> fitSystem());
+        fitSystemButton.withTooltip(
+                Component.translatable("screen.oritech_space_age.map.fit_system_tooltip"),
+                Component.translatable("screen.oritech_space_age.map_controls"));
+        fitRouteButton = SpaceAgeButtons.darkPanel(x + width - 62, y + 6, 52, 14,
+                Component.translatable("screen.oritech_space_age.map.fit_route"), ignored -> fitFlightPath());
+        fitRouteButton.withTooltip(
+                Component.translatable("screen.oritech_space_age.map.fit_route_tooltip"),
+                Component.translatable("screen.oritech_space_age.map_controls"));
         var segments = rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
                 .sorted(java.util.Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
                         .thenComparingInt(item -> item.anchor().getX())
@@ -113,6 +128,7 @@ final class RocketStarMapWidget extends UIComponent {
         this.flightPath = flightPath;
         mapPaths = new RocketMapPaths(snapshot.plan(), flightPath);
         this.selectedBranch = selectedBranch;
+        fitRouteButton.setActive(flightPath.paths().stream().anyMatch(path -> path.samples().size() > 1));
         pathsByBranch.clear();
         renderedPathsByBranch.clear();
         cachedView = null;
@@ -131,6 +147,7 @@ final class RocketStarMapWidget extends UIComponent {
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED
+                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED) continue;
             var last = path.samples().getLast();
             var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
@@ -161,6 +178,7 @@ final class RocketStarMapWidget extends UIComponent {
     void copyViewFrom(RocketStarMapWidget previous) {
         if (previous == null || !previous.snapshot.simulationId().equals(snapshot.simulationId())) return;
         camera.copyFrom(previous.camera);
+        legendExpanded = previous.legendExpanded;
     }
 
     private void fitSystem() {
@@ -226,8 +244,12 @@ final class RocketStarMapWidget extends UIComponent {
         renderSeparations(graphics, mouseX, mouseY);
         graphics.disableScissor();
 
-        StarMapOverlay.render(graphics, x, y, width, height, selectedTargetLabel(), flightPath,
+        StarMapOverlay.render(graphics, x, y, width, height, selectedTargetLabel(), selectedBranchLabel(),
                 pathsByBranch.get(selectedBranch), legendExpanded);
+        fitSystemButton.render(graphics, mouseX, mouseY, delta);
+        fitRouteButton.render(graphics, mouseX, mouseY, delta);
+        hoveredMapControl = fitSystemButton.isMouseOver(mouseX, mouseY) ? fitSystemButton
+                : fitRouteButton.isMouseOver(mouseX, mouseY) ? fitRouteButton : null;
     }
 
     private void prepareLines(StarMapObjects.Viewport viewport) {
@@ -362,6 +384,17 @@ final class RocketStarMapWidget extends UIComponent {
                 objectName(object.data()), orbitName(selectedTarget.orbit));
     }
 
+    private Component selectedBranchLabel() {
+        var branches = snapshot.plan().branches();
+        for (int index = 0; index < branches.size(); index++) {
+            var branch = branches.get(index);
+            if (!branch.id().equals(selectedBranch)) continue;
+            return branch.isRoot() ? Component.translatable("screen.oritech_space_age.branch.root")
+                    : Component.translatable("screen.oritech_space_age.branch.number", index + 1);
+        }
+        return Component.literal("–");
+    }
+
     @Override
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
         if (!isInsideViewport(mouseX, mouseY)) return false;
@@ -371,6 +404,10 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
+        if (fitSystemButton.isMouseOver(mouseX, mouseY)
+                && fitSystemButton.handleClick(mouseX, mouseY, button)) return true;
+        if (fitRouteButton.isMouseOver(mouseX, mouseY)
+                && fitRouteButton.handleClick(mouseX, mouseY, button)) return true;
         if (button == 0 && StarMapOverlay.isOverLegend(mouseX, mouseY, x, y, width, height, legendExpanded)) {
             legendExpanded = !legendExpanded;
             return true;
@@ -414,6 +451,8 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+        if (fitSystemButton.handleMouseRelease(mouseX, mouseY, button)
+                || fitRouteButton.handleMouseRelease(mouseX, mouseY, button)) return true;
         if (!dragging || button != 0) return false;
         dragging = false;
         camera.endDrag();
@@ -426,13 +465,15 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean hasTooltip() {
-        return tooltipsEnabled && (hoveredSeparation != null || hoveredObject != null || hoveredSelection != null
+        return tooltipsEnabled && (hoveredMapControl != null || hoveredSeparation != null
+                || hoveredObject != null || hoveredSelection != null
                 || hoveredPathPoint != null);
     }
 
     @Override
     public List<Component> getTooltip() {
         if (!tooltipsEnabled) return List.of();
+        if (hoveredMapControl != null) return hoveredMapControl.getTooltip();
         StarMapObjects.Entry object = hoveredSelection == null ? hoveredObject : mapObjects.byId(hoveredSelection.objectId);
         var separation = hoveredSeparation == null ? null
                 : new StarMapTooltip.Separation(hoveredSeparation.stage, hoveredSeparation.timeSeconds, hoveredSeparation.segments);

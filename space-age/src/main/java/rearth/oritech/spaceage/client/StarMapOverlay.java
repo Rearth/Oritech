@@ -20,13 +20,12 @@ final class StarMapOverlay {
     }
 
     static void render(GuiGraphicsExtractor graphics, int x, int y, int width, int height,
-                       Component selectedTarget, RocketFlightPathCalculator.FlightPath flightPath,
+                       Component selectedTarget, Component selectedBranch,
                        RocketFlightPathCalculator.CraftPath selectedPath, boolean legendExpanded) {
         var font = Minecraft.getInstance().font;
         graphics.fill(x + 6, y + 6, x + width - 6, y + 21, 0xDD080D18);
         graphics.text(font, Component.translatable("screen.oritech_space_age.star_system"), x + 10, y + 9, 0xFFCAD8E5, true);
         if (selectedTarget != null) graphics.text(font, selectedTarget, x + 82, y + 9, 0xFFF6C65B, false);
-        graphics.text(font, Component.translatable("screen.oritech_space_age.map_controls"), x + width - 160, y + 9, 0xFFA7BACB, false);
 
         int statsRight = x + width - 9;
         int statsX = Math.max(x + 195, statsRight - 470);
@@ -34,8 +33,10 @@ final class StarMapOverlay {
         var deltaV = selectedPath == null ? "–" : String.format(Locale.ROOT, "%.0f", selectedPath.remainingDeltaV());
         var status = selectedPath == null ? Component.literal("–") : Component.translatable(
                 "screen.oritech_space_age.terminal." + selectedPath.terminalState().name().toLowerCase(Locale.ROOT));
+        var duration = selectedPath == null ? "–"
+                : String.format(Locale.ROOT, "%.2f", selectedPath.durationSeconds() / 1_200d);
         var summary = Component.translatable("screen.oritech_space_age.flight_stats_compact",
-                String.format(Locale.ROOT, "%.2f", flightPath.lastCommandSeconds() / 1_200d), deltaV, status);
+                selectedBranch, duration, deltaV, status);
         graphics.text(font, summary, statsX + 8, y - 24,
                 selectedPath != null && selectedPath.terminalState().isFailure() ? 0xFFFF9999 : 0xFFCAD8E5, false);
 

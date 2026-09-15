@@ -161,32 +161,35 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
                 var hovered = overlay.getTopmostHovered(relX, relY);
                 if (hovered != null) {
                     graphics.nextStratum();
-                    graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
+                    renderWrappedTooltip(graphics, hovered.getTooltip(), mouseX, mouseY);
                 }
-                return;
-            }
-        }
-
-        // if not aborted due to overlay, process scroll widgets
-        for (var c : components) {
-            if (c instanceof ScrollWidget scrollWidget && c.isVisible() && c.isMouseOver(relX, relY)) {
-                var hovered = scrollWidget.getTopmostHovered(relX, relY);
-                if (hovered != null)
-                    graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, hovered.getTooltip(), mouseX, mouseY);
                 return;
             }
         }
 
         UIComponent topHovered = null;
         for (var c : components) {
-            if (c.isVisible() && c.isMouseOver(relX, relY) && c.hasTooltip()) {
-                if (topHovered == null || c.getZIndex() > topHovered.getZIndex())
+            if (c.isVisible() && c.isMouseOver(relX, relY)) {
+                // Later components render last when z-indices match.
+                if (topHovered == null || c.getZIndex() >= topHovered.getZIndex())
                     topHovered = c;
             }
         }
 
-        if (topHovered != null && !topHovered.getTooltip().isEmpty() && !topHovered.getTooltip().stream().allMatch(elem -> elem.getString().isBlank()))
-            graphics.setComponentTooltipForNextFrame(Minecraft.getInstance().font, topHovered.getTooltip(), mouseX, mouseY);
+        if (topHovered instanceof ScrollWidget scrollWidget) {
+            topHovered = scrollWidget.getTopmostHovered(relX, relY);
+        }
+        if (topHovered != null && topHovered.hasTooltip()
+                && !topHovered.getTooltip().stream().allMatch(elem -> elem.getString().isBlank())) {
+            renderWrappedTooltip(graphics, topHovered.getTooltip(), mouseX, mouseY);
+        }
+    }
+
+    private void renderWrappedTooltip(GuiGraphicsExtractor graphics, List<Component> lines, int mouseX, int mouseY) {
+        var font = Minecraft.getInstance().font;
+        var maxWidth = Math.max(80, Math.min(280, graphics.guiWidth() - 24));
+        var wrapped = lines.stream().flatMap(line -> font.split(line, maxWidth).stream()).toList();
+        graphics.setTooltipForNextFrame(font, wrapped, mouseX, mouseY);
     }
 
     @Override

@@ -12,6 +12,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
@@ -134,6 +135,9 @@ final class FlightPlannerCards {
         var card = SpaceAgeButtons.darkPanel(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
                 Component.empty(), ignored -> screen.openActionEditor(action.id()));
         card.withTooltip(FlightPlannerLabels.actionTooltip(action.type()));
+        if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+            card.addTooltipLine(stationKeepingEstimate(action));
+        }
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE
                 && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
             var asteroidPath = screen.calculatedFlight().asteroidPaths().stream()
@@ -158,6 +162,9 @@ final class FlightPlannerCards {
                     .append(FlightPlannerLabels.actionVelocity(action));
             scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18, details)
                     .withBrightColor().withWrap(true));
+        } else if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+            scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18,
+                    stationKeepingEstimate(action)).withBrightColor().withWrap(true));
         } else if (action.type() == SpaceSimulation.ActionType.DECOUPLE && action.segments().size() == 2
                 && action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
             scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18,
@@ -183,6 +190,16 @@ final class FlightPlannerCards {
                 ignored -> screen.removeAction(branch.id(), index, rocket));
         remove.setZIndex(1);
         scroll.addChild(remove.withTooltip(Component.translatable("screen.oritech_space_age.action.remove")));
+    }
+
+    private Component stationKeepingEstimate(SpaceSimulation.FlightPlanAction action) {
+        var seconds = screen.actionDurationSeconds(action.id());
+        if (!Double.isFinite(seconds)) {
+            return Component.translatable("screen.oritech_space_age.action.station_keeping_unavailable");
+        }
+        var days = seconds / 1_200d;
+        return Component.translatable("screen.oritech_space_age.action.station_keeping_estimate",
+                String.format(Locale.ROOT, "%.2f", days));
     }
 
     private void addNavigationAddonCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,

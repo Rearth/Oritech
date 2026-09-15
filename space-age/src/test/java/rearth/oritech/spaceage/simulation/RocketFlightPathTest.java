@@ -122,7 +122,7 @@ public final class RocketFlightPathTest {
             var plan = base.withBranches(List.of(base.root().withActions(List.of(navigate, maintain))));
             var result = RocketFlightPathCalculator.calculate(rocket, objects, plan);
             var path = result.paths().getFirst();
-            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.MAINTAINING_POSITION,
+            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED,
                     type + " condition did not continue to the next card");
             require(path.actionMoments().size() == 2 && path.actionMoments().stream()
                     .allMatch(RocketFlightPathCalculator.ActionMoment::completed), type + " actions did not complete");
@@ -135,6 +135,36 @@ public final class RocketFlightPathTest {
             require(Math.hypot(abort.destinationX() - 8_000_000, abort.destinationY()) < 0.01,
                     type + " did not retain its intended destination");
         }
+    }
+
+    @Test
+    void stationKeepingExpiresAndCostsMoreForLargerCraft() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var segmentId = UUID.randomUUID();
+        var smallSegment = new StaticRocketSegment(segmentId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Map.of(), 25, 1);
+        var largeSegment = new StaticRocketSegment(segmentId, smallSegment.blocks(), Map.of(), 50, 1);
+        var dynamic = new DynamicRocketSegment(0, 2_000_000, 0, Set.of());
+        var smallRocket = new ActiveRocketData(Map.of(segmentId, smallSegment), Map.of(segmentId, dynamic));
+        var largeRocket = new ActiveRocketData(Map.of(segmentId, largeSegment), Map.of(segmentId, dynamic));
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION);
+        var empty = SpaceSimulation.FlightPlan.empty();
+        var plan = empty.withBranches(List.of(empty.root().withActions(List.of(maintain))));
+
+        var small = RocketFlightPathCalculator.calculate(smallRocket, List.of(earth), plan).paths().getFirst();
+        var large = RocketFlightPathCalculator.calculate(largeRocket, List.of(earth), plan).paths().getFirst();
+        require(small.durationSeconds() > 0 && Double.isFinite(small.durationSeconds()),
+                "station keeping must have a finite lifetime");
+        require(large.durationSeconds() < small.durationSeconds(),
+                "larger craft must spend station keeping resources faster");
+        require(small.remainingDeltaV() == 0 && large.remainingDeltaV() == 0,
+                "station keeping must exhaust the propulsion budget");
+        require(small.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED,
+                "station keeping must report its expiration");
     }
 
     @Test

@@ -46,8 +46,9 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected UUID arrivalAction;
     protected EditBox arrivalField;
     protected String arrivalText;
-    // Landing popup: edited card and the Overworld X/Z input fields and text.
-    protected UUID landingAction;
+    // Destination popup: edited card and optional Earth-surface X/Z fields.
+    protected UUID destinationAction;
+    protected SpaceSimulation.OrbitBand destinationOrbit;
     protected EditBox landingXField;
     protected EditBox landingZField;
     protected String landingXText;
@@ -91,7 +92,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected abstract List<List<SpaceSimulation.SegmentRef>> connectedPairs(ActiveRocketData rocket);
     protected abstract String segmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket);
     protected abstract void replaceAction(UUID branchId, UUID actionId, SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket);
-    protected abstract void cycleActionOrbit(UUID branchId, int index, ActiveRocketData rocket);
     protected abstract void cycleActionParameter(UUID branchId, int index, ActiveRocketData rocket);
     protected abstract Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket);
     protected abstract Component actionOrbit(SpaceSimulation.FlightPlanAction action);
@@ -114,7 +114,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected boolean hasOpenPopup() {
         return actionEditorAction != null || speedAction != null || actionTypeAction != null || targetAction != null
-                || arrivalAction != null || landingAction != null || addonAction != null || decoupleAction != null
+                || arrivalAction != null || destinationAction != null || addonAction != null || decoupleAction != null
                 || mapContextRequest != null;
     }
 
@@ -269,36 +269,43 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         rebuildComponents();
     }
 
-    protected void openLandingEditor(UUID actionId) {
+    protected void openDestinationMenuFromEditor(UUID actionId, int panelX, int panelY) {
         var action = findAction(actionId);
-        if (!FlightPlannerLabels.isEarthSurface(action)) return;
+        if (action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return;
         closeNestedEditorState();
-        landingAction = actionId;
+        destinationAction = actionId;
+        destinationOrbit = action.orbit();
         landingXText = Integer.toString(action.landingX());
         landingZText = Integer.toString(action.landingZ());
+        dropdownX = panelX;
+        dropdownY = panelY;
         rebuildComponents();
     }
 
-    protected void applyLandingCoordinates() {
-        var action = findAction(landingAction);
-        var x = parseCoordinate(landingXField == null ? "" : landingXField.getValue());
-        var z = parseCoordinate(landingZField == null ? "" : landingZField.getValue());
-        if (action == null || x == null || z == null) return;
+    protected void selectDestinationOrbit(SpaceSimulation.OrbitBand orbit) {
+        var action = findAction(destinationAction);
+        if (action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return;
+        destinationOrbit = orbit;
+        rebuildComponents();
+    }
+
+    protected void applyDestination() {
+        var action = findAction(destinationAction);
+        if (action == null || destinationOrbit == null) return;
         var branch = draftPlan().branches().stream().filter(item -> item.actions().contains(action)).findFirst().orElse(null);
         if (branch == null) return;
-        var offset = landingOffset(action);
+        var changed = action.withOrbit(destinationOrbit);
+        if (FlightPlannerLabels.isEarthSurface(changed)) {
+            var x = parseCoordinate(landingXField == null ? "" : landingXField.getValue());
+            var z = parseCoordinate(landingZField == null ? "" : landingZField.getValue());
+            if (x == null || z == null) return;
+            changed = changed.withLanding(x, z, 0, 0);
+            var offset = landingOffset(changed);
+            changed = changed.withLanding(x, z, offset[0], offset[1]);
+        }
+        setSelectedTarget(new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit()));
         closeNestedEditorState();
-        replaceAction(branch.id(), action.id(), action.withLanding(x, z, offset[0], offset[1]), flightPlanRocket());
-        rebuildComponents();
-    }
-
-    protected void nextLandingOrbit() {
-        var action = findAction(landingAction);
-        var branch = action == null ? null : draftPlan().branches().stream()
-                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
-        if (branch == null) return;
-        closeNestedEditorState();
-        cycleActionOrbit(branch.id(), branch.actions().indexOf(action), flightPlanRocket());
+        replaceAction(branch.id(), action.id(), changed, flightPlanRocket());
         rebuildComponents();
     }
 
@@ -366,15 +373,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         if (branch == null) return;
         closeNestedEditorState();
         removeNavigationAddon(branch.id(), action.id(), flightPlanRocket());
-        rebuildComponents();
-    }
-
-    protected void cycleEditedOrbit(UUID actionId) {
-        var action = findAction(actionId);
-        var branch = action == null ? null : draftPlan().branches().stream()
-                .filter(item -> item.actions().contains(action)).findFirst().orElse(null);
-        if (branch == null) return;
-        cycleActionOrbit(branch.id(), branch.actions().indexOf(action), flightPlanRocket());
         rebuildComponents();
     }
 
@@ -495,7 +493,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         actionTypeAction = null;
         targetAction = null;
         arrivalAction = null;
-        landingAction = null;
+        destinationAction = null;
+        destinationOrbit = null;
         addonAction = null;
         decoupleAction = null;
         decoupleRetained = null;
@@ -504,7 +503,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected void closeEditors() {
         if (actionEditorAction != null && (speedAction != null || actionTypeAction != null || targetAction != null
-                || arrivalAction != null || landingAction != null || addonAction != null || decoupleAction != null)) {
+                || arrivalAction != null || destinationAction != null || addonAction != null || decoupleAction != null)) {
             closeNestedEditorState();
         } else closeEditorState();
         rebuildComponents();
@@ -575,9 +574,9 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             else if (arrivalField != null) arrivalField.keyPressed(event);
             return true;
         }
-        if (landingAction != null) {
+        if (destinationAction != null) {
             if (event.isEscape()) closeEditors();
-            else if (event.isConfirmation()) applyLandingCoordinates();
+            else if (event.isConfirmation()) applyDestination();
             else if (getFocused() == landingZField && landingZField != null) landingZField.keyPressed(event);
             else if (landingXField != null) landingXField.keyPressed(event);
             return true;
