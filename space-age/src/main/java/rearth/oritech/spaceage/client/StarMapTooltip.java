@@ -58,7 +58,7 @@ final class StarMapTooltip {
         if (selection != null && selection.orbit() != SpaceSimulation.OrbitBand.SURFACE) {
             lines.add(Component.translatable("screen.oritech_space_age.orbit_selection", RocketStarMapWidget.orbitName(selection.orbit())));
         }
-        if (selection != null && object.type() != SpaceObjects.ObjectType.ASTEROID) {
+        if (selection != null && object.type() != SpaceObjects.ObjectType.ASTEROID && object.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
             var gravity = gravityAtOrbit(object, selection.orbit());
             var percentage = object.surfaceGravity() <= 0 ? 0 : gravity / object.surfaceGravity() * 100;
             lines.add(Component.translatable("screen.oritech_space_age.orbit_gravity", String.format(Locale.ROOT, "%.2f", gravity),
@@ -72,14 +72,24 @@ final class StarMapTooltip {
                     String.format(Locale.ROOT, "%.2f", arrival.timeSeconds() / 1_200), format(object.x()), format(object.y())));
         }
         lines.add(Component.translatable("screen.oritech_space_age.object.radius", format(object.radius())));
+        if (object.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
+            lines.add(Component.translatable("screen.oritech_space_age.object.unsurveyed_help"));
+        }
         if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
+            lines.add(Component.translatable("screen.oritech_space_age.object.position_uncertainty", Math.round(object.uncertainty())));
+            lines.add(Component.translatable("screen.oritech_space_age.object.composition_confidence", Math.round(object.compositionConfidence() * 100)));
             lines.add(Component.translatable("screen.oritech_space_age.object.mass", format(object.mass() * 1_000)));
             lines.add(Component.translatable("screen.oritech_space_age.object.velocity",
                     formatSpeed(Math.hypot(object.velocityX(), object.velocityY()))));
             lines.add(Component.translatable("screen.oritech_space_age.object.materials"));
-            object.materials().forEach(material -> lines.add(Component.literal("• " + material.block() + " × " + material.amount())));
+            object.materials().forEach(material -> lines.add(material.amount() > 0
+                    ? Component.translatable("screen.oritech_space_age.object.material_known",
+                            material.block().toString(), material.amount())
+                    : Component.translatable("screen.oritech_space_age.object.material_unknown",
+                            material.block().toString())));
         }
-        lines.add(Component.translatable("screen.oritech_space_age.object.detection", object.detectionState().name().toLowerCase(Locale.ROOT)));
+        lines.add(Component.translatable("screen.oritech_space_age.object.detection",
+                Component.translatable("screen.oritech_space_age.object.detection." + object.detectionState().getSerializedName())));
         return lines;
     }
 

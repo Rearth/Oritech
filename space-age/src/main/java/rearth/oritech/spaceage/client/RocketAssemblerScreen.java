@@ -48,6 +48,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     private UUID selectedSegment;
     private UUID pendingSegment;
     private boolean segmentStagesExpanded;
+    private EditBox rocketNameField;
     private EditBox segmentNameField;
     private RocketPreviewWidget rocketPreview;
     private BlockPreviewWidget.ViewState previewViewState;
@@ -61,6 +62,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     @Override
     protected void buildComponents() {
         segmentNameField = null;
+        rocketNameField = null;
         panelWidth = width - WINDOW_PADDING * 2;
         panelHeight = height - WINDOW_PADDING * 2;
         setPanelSize(panelWidth, panelHeight);
@@ -99,6 +101,14 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             return;
         }
 
+        int nameWidth = Math.max(60, Math.min(220, panelWidth - 217));
+        rocketNameField = addRenderableWidget(new EditBox(font, leftPos + 205, topPos + 10,
+                nameWidth, 18, Component.translatable("screen.oritech_space_age.rocket_name")));
+        rocketNameField.setMaxLength(RocketFlightPlanRules.MAX_ROCKET_NAME_LENGTH);
+        rocketNameField.setHint(Component.translatable("screen.oritech_space_age.rocket_name"));
+        rocketNameField.setValue(currentPlan().name());
+        rocketNameField.setResponder(name -> menu.setDraftFlightPlan(currentPlan().withName(name)));
+
         int contentTop = 39;
         int contentHeight = panelHeight - contentTop - 12;
         int statsWidth = Math.clamp(panelWidth / 3, 130, 240);
@@ -133,7 +143,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 stat("acceleration", format(performance.liftoffAccelerationMetersPerSecondSquared()))
         ));
 
-        var readiness = RocketPerformanceCalculator.getLaunchReadiness(rocket);
+        var readiness = RocketPerformanceCalculator.getLaunchReadiness(rocket, currentPlan());
         if (readiness == RocketPerformanceCalculator.LaunchReadiness.READY) {
             var launchButton = SpaceAgeButtons.orangePanel(statsX + 16, contentTop + contentHeight - 55,
                     statsWidth - 32, 40,
@@ -180,7 +190,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 .map(SpaceSimulation.SegmentRef::of).toList();
         int stageCount = RocketFlightPlanRules.editableStageCount(currentPlan(), segmentRefs);
         int stageRows = Math.max(1, (stageCount + 4) / 5);
-        int popupHeight = segmentStagesExpanded ? 143 + stageRows * 23 : 119;
+        int popupHeight = segmentStagesExpanded ? 143 + stageRows * 23 : 143;
         int popupX = (panelWidth - popupWidth) / 2;
         int popupY = Math.max(34, (panelHeight - popupHeight) / 2);
 
@@ -188,8 +198,8 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 this::closeSegmentConfiguration));
         addPopupComponent(new LabelWidget(popupX + 10, popupY + 9, popupWidth - 20, 14,
                 Component.translatable("screen.oritech_space_age.segment_configuration").withStyle(ChatFormatting.BOLD)));
-        addPopupComponent(SpaceAgeButtons.darkPanel(popupX + popupWidth - 27, popupY + 7, 18, 16,
-                Component.literal("×"), ignored -> closeSegmentConfiguration()));
+        addPopupComponent(SpaceAgeButtons.close(popupX + popupWidth - 27, popupY + 7,
+                ignored -> closeSegmentConfiguration()));
 
         segmentNameField = addRenderableWidget(new EditBox(font, leftPos + popupX + 56, topPos + popupY + 27,
                 popupWidth - 67, 18, Component.translatable("screen.oritech_space_age.segment_name")));
@@ -240,6 +250,8 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 addPopupComponent(stageButton);
             }
         }
+        addPopupComponent(SpaceAgeButtons.panel(popupX + popupWidth - 110, popupY + popupHeight - 24, 100, 18,
+                Component.translatable("gui.done"), ignored -> closeSegmentConfiguration()));
     }
 
     private void addPopupComponent(UIComponent component) {
@@ -293,7 +305,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     private void launch() {
         RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
-        ClientPacketDistributor.sendToServer(new RocketNetworking.LaunchRocketPayload(menu.blockPos));
+        ClientPacketDistributor.sendToServer(new RocketNetworking.LaunchRocketPayload(menu.blockPos, currentPlan()));
     }
 
     private void addMessagePanel(Component message) {
@@ -391,10 +403,13 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (segmentNameField != null && segmentNameField.isMouseOver(event.x(), event.y())) {
-            setFocused(segmentNameField);
-            return segmentNameField.mouseClicked(event, doubleClick);
+        for (var field : new EditBox[]{rocketNameField, segmentNameField}) {
+            if (field != null && field.isMouseOver(event.x(), event.y())) {
+                setFocused(field);
+                return field.mouseClicked(event, doubleClick);
+            }
         }
+        setFocused(null);
         return super.mouseClicked(event, doubleClick);
     }
 
@@ -404,9 +419,14 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             closeSegmentConfiguration();
             return true;
         }
-        if (segmentNameField != null && segmentNameField.isFocused()) {
+        if (event.isEscape()) {
+            setFocused(null);
+            return super.keyPressed(event);
+        }
+        if ((segmentNameField != null && segmentNameField.isFocused())
+                || (rocketNameField != null && rocketNameField.isFocused())) {
             // Container screens normally interpret E as the inventory shortcut before charTyped reaches a field.
-            segmentNameField.keyPressed(event);
+            getFocused().keyPressed(event);
             return true;
         }
         return super.keyPressed(event);

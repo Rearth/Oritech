@@ -16,7 +16,7 @@ public class SpaceObjects {
     public static final UUID EARTH_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     public enum ObjectType implements StringRepresentable {
-        EARTH, SUN, MARS, ASTEROID;
+        EARTH, SUN, MARS, SURVEY_REGION, ASTEROID;
 
         public static final Codec<ObjectType> CODEC = StringRepresentable.fromEnum(ObjectType::values);
 
@@ -54,8 +54,9 @@ public class SpaceObjects {
                 Codec.FLOAT.optionalFieldOf("velocity_y", 0F)
                         .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.velocity.y : 0F),
                 AsteroidMaterial.CODEC.listOf().optionalFieldOf("materials", List.of())
-                        .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of())
-        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials) -> {
+                        .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of()),
+                SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> java.util.Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null))
+        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
             object.radius = radius;
@@ -66,7 +67,7 @@ public class SpaceObjects {
                 movable.weight = weight;
                 movable.velocity = new Vector2f(velocityX, velocityY);
             }
-            if (object instanceof Asteroid asteroid) asteroid.materials = List.copyOf(materials);
+            if (object instanceof Asteroid asteroid) { asteroid.materials = List.copyOf(materials); asteroid.landing = landing.orElse(null); }
             return object;
         }));
 
@@ -101,6 +102,7 @@ public class SpaceObjects {
 
     public static class Asteroid extends MovableSimulatedObject {
         public List<AsteroidMaterial> materials = List.of();
+        public SpaceSimulation.FlightPlanAction landing;
 
         public Asteroid() {
             this(UUID.randomUUID());

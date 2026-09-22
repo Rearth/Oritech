@@ -2,19 +2,15 @@ package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
-import rearth.oritech.block.entity.reactor.NuclearExplosionEntity;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.network.RocketNetworking;
 
@@ -22,52 +18,40 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
-import java.util.random.RandomGenerator;
 
 public final class RocketSimulationController {
 
     // config
     public static final int TICKS_PER_SECOND = RocketPerformanceCalculator.TICKS_PER_SECOND;
     public static final int ORBIT_HEIGHT_BLOCKS = RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS;
-    public static final int ORBIT_WAIT_TICKS = 10 * TICKS_PER_SECOND;
 
     // physics settings
     private static final double STANDARD_GRAVITY = RocketPerformanceCalculator.STANDARD_GRAVITY;
-    private static final double MINIMUM_IMPACT_RADIUS = 125;
-    private static final double MAXIMUM_IMPACT_RADIUS = 175;
     private static final float TAKEOFF_EXPLOSION_STRENGTH = 6;
-    private static final double REFERENCE_IMPACT_ENERGY_JOULES = 100_000_000;
-    private static final int MINIMUM_NUCLEAR_STRENGTH = 1;  // todo increase again
-    private static final int MAXIMUM_NUCLEAR_STRENGTH = 1;
     private static final double ROCKET_PACKET_RANGE_BLOCKS = 500;
     private static final double ROCKET_PACKET_RANGE_SQUARED = ROCKET_PACKET_RANGE_BLOCKS * ROCKET_PACKET_RANGE_BLOCKS;
 
-    // calculates the flight and adds the rocket to the saved active rockets
-    public static void launchRocket(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition) {
-        OritechSpaceAge.LOGGER.debug("Planning rocket launch {} from {} in {} with {} segments", rocket.getRocketId(), launchPosition, level.dimension().identifier(), rocket.getStaticSegments().size());
-
-        var savedData = getSavedData(level);
-        var flight = calculateFlight(rocket, launchPosition, ThreadLocalRandom.current(), level.dimension());
-        OritechSpaceAge.LOGGER.debug("Rocket {} performance: wetMass={}kg, engines={}, thrust={}N, acceleration={}m/s², availableDeltaV={}m/s", rocket.getRocketId(), flight.performance().wetMassKilograms(), flight.performance().engineCount(), flight.performance().thrustNewtons(), flight.performance().liftoffAccelerationMetersPerSecondSquared(), flight.performance().availableDeltaVMetersPerSecond());
-
-        if (!flight.canReachOrbit()) {
-            OritechSpaceAge.LOGGER.debug("Rocket {} launch failed: {}", rocket.getRocketId(), flight.failureReason());
-            // Failed launches have no future event that could remove them again, so they must not enter saved data.
-            return;
-        }
-
-        flight = handleImpactCollisions(level, flight);
-        flight = handleTakeoffCollisions(level, rocket, flight);
-        flight = flight.scheduledAt(level.getGameTime());
-        OritechSpaceAge.LOGGER.debug("Rocket {} launched: orbitTick={}, reentryTick={}, impactTick={}, impactPos={}, impactSpeed={}m/s, ascentCollision={}", rocket.getRocketId(), flight.orbitArrivalTick(), flight.reentryTick(), flight.impactTick(), flight.impactPosition(), flight.impactSpeedMetersPerSecond(), flight.takeoffCollisionPosition());
-
+    public static void launchMissionVisual(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition) {
+        var performance = RocketPerformanceCalculator.calculate(rocket);
+        var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / Math.max(0.1, performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY));
+        var flight = new RocketFlight(true, null, level.dimension(), performance, launchPosition,
+                launchPosition.above(ORBIT_HEIGHT_BLOCKS), launchPosition, new Vector2i(0, ORBIT_HEIGHT_BLOCKS),
+                0, 0, secondsToTicks(ascentSeconds), -1, -1, null, -1);
+        flight = handleTakeoffCollisions(level, rocket, flight).scheduledAt(level.getGameTime());
         rocket.setFlight(flight);
-        savedData.rockets.put(rocket.getRocketId(), rocket);
-        savedData.setDirty();
-
+        var saved = getSavedData(level); saved.rockets.put(rocket.getRocketId(), rocket); saved.setDirty();
         sendTakeoffDataToClients(level, rocket);
+    }
+
+    public static void beginReentry(ServerLevel level, ActiveRocketData rocket, BlockPos landing, long ticks, double speed) {
+        var now = level.getGameTime();
+        if (speed <= 12) ticks = Math.max(200, ticks);
+        rocket.setFlight(new RocketFlight(true, null, level.dimension(), RocketPerformanceCalculator.calculate(rocket),
+                landing, landing.above(ORBIT_HEIGHT_BLOCKS), landing, new Vector2i(0, 0), 0, speed,
+                now - 1, now, now + ticks, null, -1));
+        var data = getSavedData(level); data.rockets.put(rocket.getRocketId(), rocket); data.setDirty();
+        sendReentryDataToClients(level, rocket);
     }
 
     public static Map<UUID, ActiveRocketData> getActiveRockets(ServerLevel level) {
@@ -105,19 +89,22 @@ public final class RocketSimulationController {
                 OritechSpaceAge.LOGGER.debug("Rocket {} hit an ascent obstruction at {} on tick {}", rocket.getRocketId(), flight.takeoffCollisionPosition(), gameTime);
                 sendTakeoffCollisionDataToClients(level, rocket, flight.takeoffCollisionPosition(), TAKEOFF_EXPLOSION_STRENGTH);
                 explodeOnTakeoffCollision(level, flight.takeoffCollisionPosition());
+                var mission = MissionSavedData.get(server).craft.get(rocket.getRocketId());
+                if (mission != null) {
+                    mission.ended = true; mission.status = MissionState.STATUS_DESTROYED;
+                    mission.report(gameTime); MissionSavedData.get(server).receive(mission);
+                }
                 iterator.remove();
                 changed = true;
             } else if (flight.canReachOrbit() && flight.impactTick() >= 0 && gameTime >= flight.impactTick()) {
-                var explosionStrength = calculateImpactExplosionStrength(flight);
-                OritechSpaceAge.LOGGER.debug("Rocket {} impacted at {} on tick {} with speed {}m/s; nuclear strength={}", rocket.getRocketId(), flight.impactPosition(), gameTime, flight.impactSpeedMetersPerSecond(), explosionStrength);
-                sendImpactDataToClients(level, rocket, explosionStrength);
-                explodeOnImpact(level, flight, explosionStrength);
+                unloadOrbitRocketFromClients(level, rocket);
                 iterator.remove();
                 changed = true;
             } else if (flight.canReachOrbit()) {
-                if (gameTime == flight.orbitArrivalTick()) {
+                if (gameTime >= flight.orbitArrivalTick() && flight.reentryTick() < 0) {
                     OritechSpaceAge.LOGGER.debug("Rocket {} reached orbit {} on tick {}", rocket.getRocketId(), flight.targetOrbit(), gameTime);
                     unloadOrbitRocketFromClients(level, rocket);
+                    iterator.remove(); changed = true;
                 }
                 if (gameTime == flight.reentryTick()) {
                     OritechSpaceAge.LOGGER.debug("Rocket {} began reentry toward {} on tick {}", rocket.getRocketId(), flight.impactPosition(), gameTime);
@@ -139,46 +126,6 @@ public final class RocketSimulationController {
 
     private static ActiveRocketSavedData getSavedData(MinecraftServer server) {
         return server.overworld().getDataStorage().computeIfAbsent(ActiveRocketSavedData.TYPE);
-    }
-
-    static RocketFlight calculateFlight(ActiveRocketData rocket, BlockPos launchPosition, RandomGenerator random) {
-        return calculateFlight(rocket, launchPosition, random, Level.OVERWORLD);
-    }
-
-    private static RocketFlight calculateFlight(ActiveRocketData rocket, BlockPos launchPosition,
-                                                RandomGenerator random, ResourceKey<Level> dimension) {
-        var performance = RocketPerformanceCalculator.calculate(rocket);
-        var orbitPosition = launchPosition.offset(0, ORBIT_HEIGHT_BLOCKS, 0);
-        var impactPosition = calculateImpactPosition(launchPosition, random);
-        var targetOrbit = new Vector2i(20, ORBIT_HEIGHT_BLOCKS);
-        var readiness = RocketPerformanceCalculator.getLaunchReadiness(performance);
-
-        if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {
-            return RocketFlight.failed(dimension, performance, launchPosition, orbitPosition, impactPosition,
-                    targetOrbit, readiness.failureReason());
-        }
-
-        // use constant thrust and gravity, but include gravity loss during ascent
-        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
-        var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / netAcceleration);
-        var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
-
-        var ascentTicks = secondsToTicks(ascentSeconds);
-        var reentryTick = ascentTicks + ORBIT_WAIT_TICKS;
-        var descentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / STANDARD_GRAVITY);
-        var impactSpeed = STANDARD_GRAVITY * descentSeconds;
-        var impactTick = reentryTick + secondsToTicks(descentSeconds);
-
-        return new RocketFlight(true, null, dimension, performance, launchPosition, orbitPosition, impactPosition, targetOrbit, requiredDeltaV, impactSpeed, ascentTicks, reentryTick, impactTick, null, -1);
-    }
-
-    static BlockPos calculateImpactPosition(BlockPos launchPosition, RandomGenerator random) {
-        var angle = random.nextDouble() * Math.PI * 2;
-        // square-root sampling distributes impacts evenly over the ring
-        var radiusSquared = MINIMUM_IMPACT_RADIUS * MINIMUM_IMPACT_RADIUS + random.nextDouble() * (MAXIMUM_IMPACT_RADIUS * MAXIMUM_IMPACT_RADIUS - MINIMUM_IMPACT_RADIUS * MINIMUM_IMPACT_RADIUS);
-        var radius = Math.sqrt(radiusSquared);
-
-        return new BlockPos(launchPosition.getX() + (int) Math.round(Math.cos(angle) * radius), launchPosition.getY(), launchPosition.getZ() + (int) Math.round(Math.sin(angle) * radius));
     }
 
     private static long secondsToTicks(double seconds) {
@@ -209,7 +156,16 @@ public final class RocketSimulationController {
         }
 
         var progress = Mth.clamp((gameTime - flight.reentryTick()) / Math.max(1, flight.impactTick() - flight.reentryTick()), 0, 1);
-        return orbitPosition.lerp(impactPosition, progress * progress);
+        var duration = Math.max(1, flight.impactTick() - flight.reentryTick()) / 20.0;
+        var height = Math.max(1, orbitPosition.y - impactPosition.y);
+        return orbitPosition.lerp(impactPosition, descentProgress(progress, height, duration, flight.impactSpeedMetersPerSecond()));
+    }
+
+    static double descentProgress(double progress, double height, double seconds, double arrivalSpeed) {
+        if (arrivalSpeed > 12) return progress * progress;
+        // Constant braking: derivative at touchdown matches the requested speed (zero for a gentle landing).
+        var finalSlope = Math.clamp(arrivalSpeed * seconds / height, 0, 2);
+        return (2 - finalSlope) * progress + (finalSlope - 1) * progress * progress;
     }
 
     // scans the vertical area swept by the rocket and plans the first found collision
@@ -261,36 +217,8 @@ public final class RocketSimulationController {
         return flight.withTakeoffCollision(collisionPosition, Math.max(1, secondsToTicks(collisionSeconds)));
     }
 
-    // resolves the ground height and updates the descent timing
-    private static RocketFlight handleImpactCollisions(ServerLevel level, RocketFlight flight) {
-        var impactPosition = flight.impactPosition();
-        var surfaceY = Math.max(level.getMinY(), level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, impactPosition.getX(), impactPosition.getZ()) - 1);
-        var surfacePosition = new BlockPos(impactPosition.getX(), surfaceY, impactPosition.getZ());
-        var descentHeight = Math.max(0, flight.orbitPosition().getY() - surfacePosition.getY());
-        var descentSeconds = Math.sqrt(2 * descentHeight / STANDARD_GRAVITY);
-        var impactSpeed = STANDARD_GRAVITY * descentSeconds;
-        var impactTick = flight.reentryTick() + secondsToTicks(descentSeconds);
-        OritechSpaceAge.LOGGER.debug("Resolved rocket impact surface at {}: fallDistance={}, fallTime={}s, speed={}m/s", surfacePosition, descentHeight, descentSeconds, impactSpeed);
-        return flight.withImpact(surfacePosition, impactSpeed, impactTick);
-    }
-
     private static void explodeOnTakeoffCollision(ServerLevel level, BlockPos position) {
         level.explode(null, position.getX() + 0.5, position.getY() + 0.5, position.getZ() + 0.5, TAKEOFF_EXPLOSION_STRENGTH, false, Level.ExplosionInteraction.BLOCK);
-    }
-
-    private static int calculateImpactExplosionStrength(RocketFlight flight) {
-        var mass = flight.performance().wetMassKilograms();
-        var speed = flight.impactSpeedMetersPerSecond();
-        var kineticEnergy = 0.5 * mass * speed * speed;
-        // blast radius scales with the cube root of the impact energy; 100 MJ results in size 9
-        return Mth.clamp((int) Math.round(9 * Math.cbrt(kineticEnergy / REFERENCE_IMPACT_ENERGY_JOULES)), MINIMUM_NUCLEAR_STRENGTH, MAXIMUM_NUCLEAR_STRENGTH);
-    }
-
-    private static void explodeOnImpact(ServerLevel level, RocketFlight flight, int strength) {
-        var position = flight.impactPosition();
-        var explosionState = BlockContent.REACTOR_EXPLOSION_SMALL.get().defaultBlockState();
-        level.setBlockAndUpdate(position, explosionState);
-        level.setBlockEntity(new NuclearExplosionEntity(position, explosionState, strength));
     }
 
     private static void sendTakeoffDataToClients(ServerLevel level, ActiveRocketData rocket) {
@@ -314,12 +242,6 @@ public final class RocketSimulationController {
     private static void sendTakeoffCollisionDataToClients(ServerLevel level, ActiveRocketData rocket, BlockPos collisionPosition, float explosionStrength) {
         var recipients = sendToPlayersNearRocket(level, collisionPosition, player -> RocketNetworking.sendCollision(player, rocket.getRocketId(), collisionPosition, 0, explosionStrength, false));
         logClientSelection("takeoff collision", rocket, collisionPosition, recipients);
-    }
-
-    private static void sendImpactDataToClients(ServerLevel level, ActiveRocketData rocket, int nuclearExplosionStrength) {
-        var position = rocket.getFlight().impactPosition();
-        var recipients = sendToPlayersNearRocket(level, position, player -> RocketNetworking.sendCollision(player, rocket.getRocketId(), position, rocket.getFlight().impactSpeedMetersPerSecond(), nuclearExplosionStrength, true));
-        logClientSelection("impact", rocket, position, recipients);
     }
 
     private static boolean sendActiveRocketDataToClient(ServerPlayer player, ActiveRocketData rocket) {

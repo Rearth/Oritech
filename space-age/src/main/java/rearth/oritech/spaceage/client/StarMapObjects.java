@@ -8,6 +8,7 @@ import rearth.oritech.api.screen.widgets.BlockWidget;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SurveyRules;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.ArrayList;
@@ -22,11 +23,9 @@ final class StarMapObjects {
     // Reference rings adapt to their screen size so true orbit points remain on the visible ring.
     private static final int MIN_CIRCLE_SEGMENTS = 48;
     private static final int MAX_CIRCLE_SEGMENTS = 512;
-    // Surface discs are simple background geometry; the foreground icons remain block previews.
-    private static final int DISC_SEGMENTS = 28;
-
     // Each object keeps its 3D block widget so its familiar planet icon can be reused each frame.
     private final List<Entry> objects = new ArrayList<>();
+    private final List<FogPatch> fogBridges = new ArrayList<>();
     // Asteroids move only for the selected craft's completed navigation events.
     private final Map<UUID, StarMapTooltip.ArrivalPosition> displayedPositions = new HashMap<>();
 
@@ -35,6 +34,24 @@ final class StarMapObjects {
         for (var object : snapshot.objects()) {
             int size = object.type() == SpaceObjects.ObjectType.ASTEROID ? 12 : 18;
             objects.add(new Entry(object, new BlockWidget(0, 0, size, placeholderBlock(object.type()))));
+        }
+        connectFog();
+    }
+
+    private record FogPatch(double x, double y, double radius) { }
+
+    private void connectFog() {
+        fogBridges.clear();
+        var regions = objects.stream().map(Entry::data).filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION).toList();
+        for (int a = 0; a < regions.size(); a++) for (int b = a + 1; b < regions.size(); b++) {
+            var first = regions.get(a);
+            var second = regions.get(b);
+            if (Math.hypot(first.x() - second.x(), first.y() - second.y()) > (first.radius() + second.radius()) * 1.15) continue;
+            for (int part = 1; part <= 4; part++) {
+                var t = part / 5.0;
+                fogBridges.add(new FogPatch(first.x() + (second.x() - first.x()) * t,
+                        first.y() + (second.y() - first.y()) * t, Math.min(first.radius(), second.radius()) * .8));
+            }
         }
     }
 
@@ -60,6 +77,14 @@ final class StarMapObjects {
 
     void renderSurfaceDiscs(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport) {
         var discs = new ArrayList<StarMapObjectRenderer.Disc>();
+        for (var patch : fogBridges) {
+            var center = project(camera, viewport, patch.x(), patch.y());
+            var radius = patch.radius() * camera.zoom();
+            if (radius >= 2 && intersects(viewport, center.x(), center.y(), radius, radius * StarMapCamera.PLANE_TILT)) {
+                discs.add(new StarMapObjectRenderer.Disc(center.x(), center.y(), radius, radius * StarMapCamera.PLANE_TILT,
+                        0x507F858D, 0x007F858D, circleSegments(radius)));
+            }
+        }
         for (var object : objects) {
             if (object.data.radius() * camera.zoom() < 2) continue;
             var center = project(camera, viewport, x(object), y(object));
@@ -68,11 +93,26 @@ final class StarMapObjects {
                 case EARTH -> 0x665A91B8;
                 case MARS -> 0x66975D4C;
                 case ASTEROID -> 0x666F675E;
+                case SURVEY_REGION -> 0x407F858D;
             };
             var radiusX = object.data.radius() * camera.zoom();
             var radiusY = radiusX * StarMapCamera.PLANE_TILT;
             if (!intersects(viewport, center.x(), center.y(), radiusX, radiusY)) continue;
-            discs.add(new StarMapObjectRenderer.Disc(center.x(), center.y(), radiusX, radiusY, color, DISC_SEGMENTS));
+            if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
+                // Stable overlapping, feathered puffs merge into a continuous belt at system scale.
+                var random = new java.util.Random(object.data.id().getLeastSignificantBits());
+                discs.add(new StarMapObjectRenderer.Disc(center.x(), center.y(), radiusX, radiusY,
+                        0x657F858D, 0x007F858D, circleSegments(radiusX)));
+                for (int puff = 0; puff < 9; puff++) {
+                    var angle = random.nextDouble() * Math.PI * 2;
+                    var offset = 0.25 + random.nextDouble() * 0.35;
+                    var size = 0.4 + random.nextDouble() * 0.25;
+                    discs.add(new StarMapObjectRenderer.Disc(center.x() + Math.cos(angle) * radiusX * offset,
+                            center.y() + Math.sin(angle) * radiusY * offset, radiusX * size, radiusY * size,
+                            0x387F858D, 0x007F858D, circleSegments(radiusX * size)));
+                }
+            } else discs.add(new StarMapObjectRenderer.Disc(center.x(), center.y(), radiusX, radiusY, color,
+                    circleSegments(radiusX)));
         }
         StarMapObjectRenderer.submit(graphics, discs, viewport);
     }
@@ -92,7 +132,8 @@ final class StarMapObjects {
             if (object.data.radius() * camera.zoom() >= 2) {
                 var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id())
                         && selectedTarget.orbit() == SpaceSimulation.OrbitBand.SURFACE;
-                addCircle(lines, camera, viewport, objectX, objectY, object.data.radius(),
+                if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION && !selected) continue;
+                addCircle(lines, camera, viewport, objectX, objectY, SurveyRules.navigationRadius(object.data),
                         selected ? 0xDDF6C65B : 0x997C93A6, selected ? 1.25f : 0.8f);
             }
         }
@@ -130,6 +171,13 @@ final class StarMapObjects {
         Entry hovered = null;
         for (var object : objects) {
             var position = project(camera, viewport, x(object), y(object));
+            if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
+                var radiusX = Math.max(5, object.data.radius() * camera.zoom());
+                var dx = (mouseX - position.x()) / radiusX;
+                var dy = (mouseY - position.y()) / (radiusX * StarMapCamera.PLANE_TILT);
+                if (pointerInViewport && dx * dx + dy * dy <= 1 && hovered == null) hovered = object;
+                continue;
+            }
             var minimum = object.data.type() == SpaceObjects.ObjectType.ASTEROID ? 10 : 16;
             var size = (int) Math.clamp(object.data.radius() * camera.zoom() * 2, minimum, 54);
             var radius = size / 2d;
@@ -137,7 +185,7 @@ final class StarMapObjects {
             if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
             object.widget.setPosition((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius));
             object.widget.setSize(size, size);
-            object.widget.render(graphics, mouseX, mouseY, delta);
+            if (object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION) object.widget.render(graphics, mouseX, mouseY, delta);
             if (pointerInViewport && object.widget.isMouseOver(mouseX, mouseY)) hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
@@ -190,7 +238,7 @@ final class StarMapObjects {
     List<StarMapCamera.Point> focusPoints(RocketStarMapWidget.NavigationSelection selection) {
         var object = byId(selection.objectId());
         if (object == null) return List.of();
-        var radius = object.data.radius() + selection.orbit().altitude();
+        var radius = SurveyRules.navigationRadius(object.data) + selection.orbit().altitude();
         var centerX = x(object);
         var centerY = y(object);
         return List.of(new StarMapCamera.Point(centerX - radius, centerY),
@@ -230,6 +278,7 @@ final class StarMapObjects {
             case EARTH -> Blocks.GRASS_BLOCK.defaultBlockState();
             case SUN -> Blocks.GOLD_BLOCK.defaultBlockState();
             case MARS -> Blocks.RED_SAND.defaultBlockState();
+            case SURVEY_REGION -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
             case ASTEROID -> Blocks.IRON_ORE.defaultBlockState();
         };
     }

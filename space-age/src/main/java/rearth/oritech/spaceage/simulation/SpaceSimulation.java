@@ -35,17 +35,21 @@ public class SpaceSimulation {
                             .sorted(Comparator.comparing(object -> object.id)).toList()),
             StoredFlightPlan.CODEC.listOf().optionalFieldOf("flight_plans", List.of())
                     .forGetter(simulation -> simulation.flightPlans.entrySet().stream()
-                            .map(entry -> new StoredFlightPlan(entry.getKey(), entry.getValue())).toList())
+                            .map(entry -> new StoredFlightPlan(entry.getKey(), entry.getValue())).toList()),
+            SurveyKnowledge.CODEC.optionalFieldOf("earth_knowledge").forGetter(simulation -> java.util.Optional.of(simulation.earthKnowledge))
     ).apply(instance, SpaceSimulation::new));
 
     private static final Set<SpaceObjects.SimulatedObject> CELESTIAL_OBJECTS = new HashSet<>();
 
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
+    public final SurveyKnowledge earthKnowledge;
+    public UUID id() { return simulationId; }
     private final Map<GlobalPos, FlightPlan> flightPlans = new HashMap<>();
 
     private SpaceSimulation(UUID loadedSimulationId, List<SpaceObjects.SimulatedObject> loadedObjects,
-                            List<StoredFlightPlan> loadedPlans) {
+                            List<StoredFlightPlan> loadedPlans, java.util.Optional<SurveyKnowledge> knowledge) {
+        earthKnowledge = knowledge.orElseGet(SurveyKnowledge::new);
         simulationId = loadedSimulationId;
         nonCelestialObjects.addAll(loadedObjects);
         assignMissingAsteroidNames();
@@ -54,15 +58,21 @@ public class SpaceSimulation {
 
     public SpaceSimulation() {
         simulationId = UUID.randomUUID();
+        earthKnowledge = new SurveyKnowledge();
         generateRandomObjects();
     }
 
     private void generateRandomObjects() {
-        // Asteroids use polar placement so the belt is meaningful in the new solar coordinate system.
-        addNearEarthAsteroids(8);
-        addAsteroidRing(5, 3_400_000, 4_000_000);
-        addAsteroidRing(20, 5_500_000, 7_500_000);
-        addAsteroidRing(20, 8_500_000, 9_500_000);
+        addCluster(-3_160_000, 0, 55_000, 12);
+        for (int index = 0; index < 72; index++) {
+            var angle = index * Math.PI * 2 / 72;
+            addCluster(Math.cos(angle) * 6_500_000, Math.sin(angle) * 6_500_000, 310_000, 4);
+        }
+        for (int index = 0; index < 10; index++) {
+            var angle = Math.random() * Math.PI * 2;
+            var radius = 3_500_000 + Math.random() * 6_000_000;
+            addCluster(Math.cos(angle) * radius, Math.sin(angle) * radius, 150_000, 6);
+        }
         assignMissingAsteroidNames();
     }
 
@@ -76,37 +86,24 @@ public class SpaceSimulation {
             if (asteroid.name.isBlank()) asteroid.name = "Asteroid " + String.format(Locale.ROOT, "%03d", index + 1);
             if (asteroid.weight <= 0) asteroid.weight = Math.max(1, (asteroid.radius - 1_500) / 35);
             if (asteroid.materials.isEmpty()) asteroid.materials = sampleMaterials(asteroid.weight, asteroid.id.hashCode());
-            asteroid.velocity = new Vector2f();
+
         }
     }
 
-    private void addNearEarthAsteroids(int count) {
-        // These sit just outside Earth's high orbit, mostly on the side facing away from the sun.
+    private void addCluster(double x, double y, double radius, int count) {
+        var region = new SpaceObjects.SimulatedObject(UUID.randomUUID(), SpaceObjects.ObjectType.SURVEY_REGION);
+        region.currentPosition = new Vector2f((float) x, (float) y);
+        region.radius = (float) radius;
+        region.name = "Survey region";
+        region.currentState = SpaceObjects.DetectionState.HINTED;
+        nonCelestialObjects.add(region);
         for (int index = 0; index < count; index++) {
-            double angle = Math.PI - 1.1 + 2.2 * index / Math.max(1, count - 1);
-            double radius = 140_000 + Math.random() * 70_000;
+            var angle = Math.random() * Math.PI * 2;
+            var offset = Math.sqrt(Math.random()) * radius;
             var asteroid = new SpaceObjects.Asteroid();
-            asteroid.currentPosition = new Vector2f((float) (-3_000_000 + Math.cos(angle) * radius),
-                    (float) (Math.sin(angle) * radius));
-            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
-            asteroid.weight = (float) (Math.random() * 40 + 1);
-            asteroid.radius = 1_500 + asteroid.weight * 35;
-            asteroid.surfaceGravity = asteroid.weight * 0.0002f;
-            asteroid.materials = sampleMaterials(asteroid.weight, index);
-            nonCelestialObjects.add(asteroid);
-        }
-    }
-
-    private void addAsteroidRing(int count, double minimumRadius, double maximumRadius) {
-        double angleOffset = Math.random() * Math.PI * 2;
-        for (int index = 0; index < count; index++) {
-            double angle = angleOffset + Math.PI * 2 * index / count;
-            double radius = minimumRadius + Math.random() * (maximumRadius - minimumRadius);
-            var asteroid = new SpaceObjects.Asteroid();
-            asteroid.currentPosition = new Vector2f((float) (Math.cos(angle) * radius),
-                    (float) (Math.sin(angle) * radius));
-            asteroid.currentState = SpaceObjects.DetectionState.ROUGH;
-            asteroid.weight = (float) (Math.random() * 99 + 1);
+            asteroid.currentPosition = new Vector2f((float) (x + Math.cos(angle) * offset), (float) (y + Math.sin(angle) * offset));
+            asteroid.currentState = SpaceObjects.DetectionState.HIDDEN;
+            asteroid.weight = (float) (1 + Math.random() * 80);
             asteroid.radius = 1_500 + asteroid.weight * 35;
             asteroid.surfaceGravity = asteroid.weight * 0.0002f;
             asteroid.materials = sampleMaterials(asteroid.weight, index);
@@ -157,12 +154,96 @@ public class SpaceSimulation {
                 flightPlans.getOrDefault(assemblerPosition, FlightPlan.empty()));
     }
 
-    private List<SpaceObjectData> createObjectData() {
+    public List<SpaceObjectData> createObjectData() { return knownObjects(earthKnowledge); }
+
+    public List<SpaceObjectData> knownObjects(SurveyKnowledge knowledge) {
+        var truth = truth();
+        var visible = new ArrayList<>(truth.stream().filter(object -> {
+            if (object.type() == SpaceObjects.ObjectType.ASTEROID) return false;
+            if (object.type() != SpaceObjects.ObjectType.SURVEY_REGION) return true;
+            return truth.stream().anyMatch(candidate -> candidate.type() == SpaceObjects.ObjectType.ASTEROID
+                    && Math.hypot(candidate.x() - object.x(), candidate.y() - object.y()) <= object.radius()
+                    && knowledge.contact(candidate.id()) == null);
+        }).toList());
+        visible.addAll(knowledge.contacts());
+        visible.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
+        return List.copyOf(visible);
+    }
+
+    public List<SpaceObjectData> truth() {
         var objects = new ArrayList<SpaceObjectData>();
         CELESTIAL_OBJECTS.stream().map(SpaceSimulation::toData).forEach(objects::add);
         nonCelestialObjects.stream().map(SpaceSimulation::toData).forEach(objects::add);
         objects.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
         return objects;
+    }
+
+    public void tickAsteroids(net.minecraft.server.level.ServerLevel level) {
+        var removed = new ArrayList<SpaceObjects.SimulatedObject>();
+        for (var object : nonCelestialObjects) {
+            if (!(object instanceof SpaceObjects.Asteroid asteroid) || asteroid.velocity.lengthSquared() == 0) continue;
+            asteroid.currentPosition.add(asteroid.velocity.x / 20, asteroid.velocity.y / 20);
+            if (Math.hypot(asteroid.currentPosition.x + 3_000_000, asteroid.currentPosition.y) > 60_000) continue;
+            var action = asteroid.landing == null ? FlightPlanAction.create(ActionType.NAVIGATE_TO) : asteroid.landing;
+            var pos = new BlockPos(action.landingX() + action.landingOffsetX(), 0, action.landingZ() + action.landingOffsetZ());
+            if (!level.hasChunkAt(pos)) { asteroid.currentPosition.sub(asteroid.velocity.x / 20, asteroid.velocity.y / 20); continue; }
+            var earth = toData(CELESTIAL_OBJECTS.stream().filter(o -> o.id.equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow());
+            var impact = AsteroidImpactRules.predictArrival(0, earth, asteroid.velocity.length(), toData(asteroid), action);
+            deliverAsteroid(level, impact); removed.add(asteroid);
+        }
+        nonCelestialObjects.removeAll(removed);
+    }
+
+    public void moveAttached(UUID id, double x, double y) {
+        nonCelestialObjects.stream().filter(o -> o.id.equals(id)).findFirst().ifPresent(o -> o.currentPosition.set((float) x, (float) y));
+    }
+
+    public void releaseAsteroid(UUID id, double x, double y, double vx, double vy, FlightPlanAction landing) {
+        nonCelestialObjects.stream().filter(o -> o.id.equals(id)).findFirst().ifPresent(o -> {
+            o.currentPosition.set((float) x, (float) y);
+            if (o instanceof SpaceObjects.Asteroid asteroid) {
+                asteroid.velocity.set((float) vx, (float) vy); asteroid.landing = landing;
+            }
+        });
+    }
+
+    public void applyAsteroidImpact(UUID targetId, AsteroidImpactRules.ImpactPrediction impact) {
+        var target = nonCelestialObjects.stream().filter(o -> o.id.equals(targetId)).findFirst().orElse(null);
+        if (!(target instanceof SpaceObjects.Asteroid asteroid) || impact.fragments().isEmpty()) return;
+        for (int index = 0; index < impact.fragments().size(); index++) {
+            var fragment = impact.fragments().get(index);
+            var child = new SpaceObjects.Asteroid();
+            var angle = index * Math.PI * 2 / impact.fragments().size();
+            child.currentPosition = new Vector2f(asteroid.currentPosition).add((float) Math.cos(angle) * asteroid.radius, (float) Math.sin(angle) * asteroid.radius);
+            child.weight = fragment.mass(); child.radius = fragment.radius(); child.materials = fragment.materials();
+            child.name = asteroid.name + " fragment " + (index + 1); nonCelestialObjects.add(child);
+        }
+        if (impact.remainingTargetMass() <= 0) nonCelestialObjects.remove(asteroid);
+        else {
+            double fraction = impact.remainingTargetMass() / asteroid.weight;
+            asteroid.weight = impact.remainingTargetMass(); asteroid.radius *= (float) Math.cbrt(fraction);
+            asteroid.materials = AsteroidImpactRules.scaleMaterials(asteroid.materials, fraction);
+        }
+    }
+
+    public void recoverAsteroid(net.minecraft.server.level.ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact) {
+        if (nonCelestialObjects.removeIf(o -> o.id.equals(id))) deliverAsteroid(level, impact);
+    }
+
+    private static void deliverAsteroid(net.minecraft.server.level.ServerLevel level, AsteroidImpactRules.ImpactPrediction impact) {
+        var pos = new BlockPos(impact.landingX(), level.getHeight(net.minecraft.world.level.levelgen.Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                impact.landingX(), impact.landingZ()), impact.landingZ());
+        if (impact.craterRadiusBlocks() > 0) level.explode(null, pos.getX(), pos.getY(), pos.getZ(),
+                Math.min(12, impact.craterRadiusBlocks()), net.minecraft.world.level.Level.ExplosionInteraction.BLOCK);
+        for (var material : impact.recoverableMaterials()) {
+            var item = net.minecraft.core.registries.BuiltInRegistries.BLOCK.getValue(material.block()).asItem();
+            int remaining = material.amount();
+            while (remaining > 0) {
+                int count = Math.min(64, remaining); remaining -= count;
+                level.addFreshEntity(new net.minecraft.world.entity.item.ItemEntity(level, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5,
+                        new net.minecraft.world.item.ItemStack(item, count)));
+            }
+        }
     }
 
     public boolean updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
@@ -185,7 +266,25 @@ public class SpaceSimulation {
                                   float velocityX, float velocityY, float radius,
                                   float surfaceGravity, float mass,
                                   SpaceObjects.DetectionState detectionState, String name,
-                                  List<SpaceObjects.AsteroidMaterial> materials) {
+                                  List<SpaceObjects.AsteroidMaterial> materials, float uncertainty, float compositionConfidence) {
+        public static final Codec<SpaceObjectData> CODEC = RecordCodecBuilder.create(i -> i.group(
+                UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(SpaceObjectData::id),
+                SpaceObjects.ObjectType.CODEC.fieldOf("type").forGetter(SpaceObjectData::type),
+                Codec.FLOAT.fieldOf("x").forGetter(SpaceObjectData::x), Codec.FLOAT.fieldOf("y").forGetter(SpaceObjectData::y),
+                Codec.FLOAT.fieldOf("vx").forGetter(SpaceObjectData::velocityX), Codec.FLOAT.fieldOf("vy").forGetter(SpaceObjectData::velocityY),
+                Codec.FLOAT.fieldOf("radius").forGetter(SpaceObjectData::radius), Codec.FLOAT.fieldOf("gravity").forGetter(SpaceObjectData::surfaceGravity),
+                Codec.FLOAT.fieldOf("mass").forGetter(SpaceObjectData::mass),
+                SpaceObjects.DetectionState.CODEC.fieldOf("detection").forGetter(SpaceObjectData::detectionState),
+                Codec.STRING.fieldOf("name").forGetter(SpaceObjectData::name),
+                SpaceObjects.AsteroidMaterial.CODEC.listOf().fieldOf("materials").forGetter(SpaceObjectData::materials),
+                Codec.FLOAT.fieldOf("uncertainty").forGetter(SpaceObjectData::uncertainty),
+                Codec.FLOAT.fieldOf("composition").forGetter(SpaceObjectData::compositionConfidence)
+        ).apply(i, SpaceObjectData::new));
+        public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float vx, float vy,
+                               float radius, float gravity, float mass, SpaceObjects.DetectionState state, String name,
+                               List<SpaceObjects.AsteroidMaterial> materials) {
+            this(id, type, x, y, vx, vy, radius, gravity, mass, state, name, materials, 0, 1);
+        }
         public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float radius,
                                float surfaceGravity, SpaceObjects.DetectionState detectionState) {
             this(id, type, x, y, 0, 0, radius, surfaceGravity, 0, detectionState, "", List.of());
@@ -265,21 +364,28 @@ public class SpaceSimulation {
         }
     }
 
-    public record FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations) {
+    public record FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations,
+                             String name) {
 
         public static final Codec<FlightPlan> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 FlightPlanBranch.CODEC.listOf().fieldOf("branches").forGetter(FlightPlan::branches),
                 SegmentConfiguration.CODEC.listOf().optionalFieldOf("segments", List.of())
-                        .forGetter(FlightPlan::segmentConfigurations)
+                        .forGetter(FlightPlan::segmentConfigurations),
+                Codec.STRING.optionalFieldOf("name", "").forGetter(FlightPlan::name)
         ).apply(instance, FlightPlan::new));
 
         public FlightPlan {
             branches = List.copyOf(branches);
             segmentConfigurations = List.copyOf(segmentConfigurations);
+            name = name == null ? "" : name;
+        }
+
+        public FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations) {
+            this(branches, segmentConfigurations, "");
         }
 
         public static FlightPlan empty() {
-            return new FlightPlan(List.of(FlightPlanBranch.root()), List.of());
+            return new FlightPlan(List.of(FlightPlanBranch.root()), List.of(), "");
         }
 
         public FlightPlanBranch root() {
@@ -288,11 +394,15 @@ public class SpaceSimulation {
         }
 
         public FlightPlan withBranches(List<FlightPlanBranch> newBranches) {
-            return new FlightPlan(newBranches, segmentConfigurations);
+            return new FlightPlan(newBranches, segmentConfigurations, name);
         }
 
         public FlightPlan withSegmentConfigurations(List<SegmentConfiguration> newConfigurations) {
-            return new FlightPlan(branches, newConfigurations);
+            return new FlightPlan(branches, newConfigurations, name);
+        }
+
+        public FlightPlan withName(String newName) {
+            return new FlightPlan(branches, segmentConfigurations, newName);
         }
 
         public SegmentConfiguration configurationFor(SegmentRef segment) {
@@ -333,7 +443,11 @@ public class SpaceSimulation {
                                    UUID targetId, OrbitBand orbit,
                                    ArrivalVelocityMode velocityMode, int targetVelocity, int maxSpeed,
                                    int landingX, int landingZ, int landingOffsetX, int landingOffsetZ,
-                                   List<ActionAddon> addons) {
+                                   List<ActionAddon> addons, ServiceSettings service) {
+        public FlightPlanAction(UUID id, ActionType type, List<SegmentRef> segments, UUID targetId, OrbitBand orbit,
+                ArrivalVelocityMode mode, int velocity, int speed, int x, int z, int ox, int oz, List<ActionAddon> addons) {
+            this(id, type, segments, targetId, orbit, mode, velocity, speed, x, z, ox, oz, addons, ServiceSettings.DEFAULT);
+        }
         public static final UUID NO_TARGET = new UUID(0, 0);
 
         public static final Codec<FlightPlanAction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -349,7 +463,8 @@ public class SpaceSimulation {
                 Codec.INT.optionalFieldOf("landing_z", 0).forGetter(FlightPlanAction::landingZ),
                 Codec.INT.optionalFieldOf("landing_offset_x", 0).forGetter(FlightPlanAction::landingOffsetX),
                 Codec.INT.optionalFieldOf("landing_offset_z", 0).forGetter(FlightPlanAction::landingOffsetZ),
-                ActionAddon.CODEC.listOf().optionalFieldOf("addons", List.of()).forGetter(FlightPlanAction::addons)
+                ActionAddon.CODEC.listOf().optionalFieldOf("addons", List.of()).forGetter(FlightPlanAction::addons),
+                ServiceSettings.CODEC.optionalFieldOf("service", ServiceSettings.DEFAULT).forGetter(FlightPlanAction::service)
         ).apply(instance, FlightPlanAction::new));
 
         public FlightPlanAction {
@@ -374,43 +489,58 @@ public class SpaceSimulation {
 
         public FlightPlanAction withTarget(UUID target) {
             return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service);
         }
 
         public FlightPlanAction withOrbit(OrbitBand newOrbit) {
             return new FlightPlanAction(id, type, segments, targetId, newOrbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service);
         }
 
         public FlightPlanAction withVelocity(ArrivalVelocityMode newMode, int newVelocity) {
             return new FlightPlanAction(id, type, segments, targetId, orbit, newMode, newVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service);
         }
 
         public FlightPlanAction withSegments(List<SegmentRef> newSegments) {
             return new FlightPlanAction(id, type, newSegments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service);
         }
 
         /** Zero means unrestricted cruise speed. Arrival velocity remains a separate constraint. */
         public FlightPlanAction withMaxSpeed(int speed) {
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, speed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service);
         }
 
         public FlightPlanAction withLanding(int x, int z, int offsetX, int offsetZ) {
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    x, z, offsetX, offsetZ, addons);
+                    x, z, offsetX, offsetZ, addons, service);
         }
 
         public FlightPlanAction withAddons(List<ActionAddon> newAddons) {
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, newAddons);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, newAddons, service);
+        }
+
+        public FlightPlanAction withService(ServiceSettings settings) {
+            return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, settings);
         }
 
         public boolean isGenerated() {
             return type == ActionType.DISCONNECT_BOOSTER;
         }
+    }
+
+    public record ServiceSettings(int durationTicks, boolean untilPrecise, int timeoutTicks, int slot) {
+        public static final ServiceSettings DEFAULT = new ServiceSettings(SpaceBalance.DAY, false, 0, -1);
+        public static final Codec<ServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.intRange(1, 24_000_000).fieldOf("duration").forGetter(ServiceSettings::durationTicks),
+                Codec.BOOL.fieldOf("until_precise").forGetter(ServiceSettings::untilPrecise),
+                Codec.intRange(0, 24_000_000).fieldOf("timeout").forGetter(ServiceSettings::timeoutTicks),
+                Codec.intRange(-1, 35).fieldOf("slot").forGetter(ServiceSettings::slot)
+        ).apply(i, ServiceSettings::new));
     }
 
     public record ActionAddon(UUID id, ActionAddonType type, int value) {
@@ -436,7 +566,9 @@ public class SpaceSimulation {
     public enum ActionAddonType implements StringRepresentable {
         DISTANCE_FROM_TARGET(50_000),
         TIME_BEFORE_ARRIVAL(120),
-        DESIRED_UNCERTAINTY(256);
+        DESIRED_UNCERTAINTY(256),
+        LOW_RF(10),
+        LOW_FUEL(10);
 
         public static final Codec<ActionAddonType> CODEC = StringRepresentable.fromEnum(ActionAddonType::values);
         private final int defaultValue;
@@ -449,6 +581,14 @@ public class SpaceSimulation {
             return defaultValue;
         }
 
+        public boolean isNavigationCondition() {
+            return this == DISTANCE_FROM_TARGET || this == TIME_BEFORE_ARRIVAL || this == DESIRED_UNCERTAINTY;
+        }
+
+        public boolean isMaintainPositionCondition() {
+            return !isNavigationCondition();
+        }
+
         @Override
         public String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
@@ -456,6 +596,9 @@ public class SpaceSimulation {
     }
 
     public enum ActionType implements StringRepresentable {
+        SCAN,
+        TRANSMIT_INFORMATION,
+        RELAY,
         NAVIGATE_TO,
         CONNECT_ASTEROID,
         DECOUPLE,

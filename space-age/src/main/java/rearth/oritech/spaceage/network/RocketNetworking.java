@@ -35,6 +35,7 @@ public final class RocketNetworking {
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentRef.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentConfiguration.class);
         NetworkManager.getAutoCodec(SpaceSimulation.ActionAddon.class);
+        NetworkManager.getAutoCodec(SpaceSimulation.ServiceSettings.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanAction.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanBranch.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);
@@ -138,6 +139,9 @@ public final class RocketNetworking {
         var rocket = menu.getRocket();
         if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
 
+        if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu control) {
+            MissionNetworking.submit(player, control, payload.plan()); return;
+        }
         // Only complete drafts cross the network. SpaceSimulation sanitizes the client-authored plan before storing it.
         SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), menu.blockPos),
                 payload.plan(), rocket);
@@ -168,7 +172,7 @@ public final class RocketNetworking {
         }
 
         var assembler = serverPlayer.level().getBlockEntity(payload.position(), SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get());
-        if (assembler.isPresent() && assembler.get().assemble()) {
+        if (assembler.isPresent() && assembler.get().assemble(serverPlayer, payload.plan())) {
             serverPlayer.closeContainer();
         } else {
             serverPlayer.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.oritech_space_age.rocket_invalid"));
@@ -237,7 +241,7 @@ public final class RocketNetworking {
         }
     }
 
-    public record LaunchRocketPayload(BlockPos position) implements CustomPacketPayload {
+    public record LaunchRocketPayload(BlockPos position, SpaceSimulation.FlightPlan plan) implements CustomPacketPayload {
 
         public static final Type<LaunchRocketPayload> TYPE = new Type<>(OritechSpaceAge.id("launch_rocket"));
 

@@ -19,10 +19,14 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
             MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
 
+    public static final Supplier<MenuType<rearth.oritech.spaceage.block.MissionControlMenu>> MISSION_CONTROL =
+            MENUS.register("mission_control", () -> IMenuTypeExtension.create(rearth.oritech.spaceage.block.MissionControlMenu::new));
+
     private SpaceAgeMenus() {
     }
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
+        event.register(MISSION_CONTROL.get(), rearth.oritech.spaceage.client.MissionControlScreen::new);
     }
 }

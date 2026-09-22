@@ -42,6 +42,8 @@ final class RocketFlightPathState {
         final List<ArrivalPrediction> arrivalPredictions = new ArrayList<>();
         final List<AsteroidPath> asteroidPaths = new ArrayList<>();
         final List<NavigationAbortMoment> navigationAborts = new ArrayList<>();
+        final List<RocketFlightPathCalculator.ScanEstimate> scanEstimates = new ArrayList<>();
+        final List<RocketFlightPathCalculator.StationKeepingEstimate> stationKeepingEstimates = new ArrayList<>();
 
         Context(Map<UUID, SpaceSimulation.SpaceObjectData> objects,
                 Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent,
@@ -61,22 +63,47 @@ final class RocketFlightPathState {
 
     /** Remaining resources for one attached segment. */
     static final class Segment {
-        // Fixed mass and whether this segment can provide thrust.
         final double wetMass;
-        final double thrust;
-        // Remaining full-power resources for this segment.
-        double remainingDeltaV;
-        double remainingBurnSeconds;
-
-        Segment(double wetMass, double thrust, double remainingDeltaV, double remainingBurnSeconds) {
-            this.wetMass = wetMass;
-            this.thrust = thrust;
-            this.remainingDeltaV = remainingDeltaV;
-            this.remainingBurnSeconds = remainingBurnSeconds;
+        final double chemicalThrust;
+        final double ionThrust;
+        double chemicalSeconds;
+        double ionSeconds;
+        final RocketHardware hardware;
+        double rf;
+        double initialRF;
+        double initialFuelTicks;
+        Segment(double mass, double chemicalThrust, double ionThrust, double chemicalSeconds, double ionSeconds,
+                RocketHardware hardware) {
+            this.wetMass = mass;
+            this.chemicalThrust = chemicalThrust;
+            this.ionThrust = ionThrust;
+            this.chemicalSeconds = chemicalSeconds;
+            this.ionSeconds = ionSeconds;
+            this.hardware = hardware;
         }
-
+        double seconds() {
+            return Math.min(chemicalSeconds > BURN_TOLERANCE ? chemicalSeconds : Double.POSITIVE_INFINITY,
+                    ionSeconds > BURN_TOLERANCE ? ionSeconds : Double.POSITIVE_INFINITY);
+        }
+        double thrust(boolean atmosphere) {
+            return (chemicalSeconds > BURN_TOLERANCE ? chemicalThrust : 0)
+                    + (ionSeconds > BURN_TOLERANCE ? ionThrust * (atmosphere ? SpaceBalance.ION_ATMOSPHERE : 1) : 0);
+        }
+        void consume(double seconds) {
+            chemicalSeconds = Math.max(0, chemicalSeconds - seconds);
+            rf = Math.max(0, rf - Math.min(ionSeconds, seconds) * hardware.ion() * SpaceBalance.ION_RF * 20);
+            ionSeconds = Math.max(0, ionSeconds - seconds);
+        }
+        void spendRF(double amount) {
+            rf = Math.max(0, rf - amount);
+            if (hardware.ion() > 0) ionSeconds = Math.min(ionSeconds, rf / (20 * SpaceBalance.ION_RF * hardware.ion()));
+        }
         Segment copy() {
-            return new Segment(wetMass, thrust, remainingDeltaV, remainingBurnSeconds);
+            var copy = new Segment(wetMass, chemicalThrust, ionThrust, chemicalSeconds, ionSeconds, hardware);
+            copy.rf = rf;
+            copy.initialRF = initialRF;
+            copy.initialFuelTicks = initialFuelTicks;
+            return copy;
         }
     }
 
@@ -99,6 +126,7 @@ final class RocketFlightPathState {
         // One-based stage selects which configured engines may fire.
         int currentStage = 1;
         // Terminal cards and unsafe arrivals stop this branch.
+        boolean atmosphere;
         boolean maintainingPosition;
         boolean discarded;
         boolean destroyed;
@@ -136,19 +164,18 @@ final class RocketFlightPathState {
         List<SpaceSimulation.SegmentRef> activeSegments(Context context) {
             return segments.keySet().stream()
                     .filter(ref -> context.configuration(ref).usesEnginesDuring(currentStage))
-                    .filter(ref -> segments.get(ref).thrust > 0
-                            && segments.get(ref).remainingBurnSeconds > BURN_TOLERANCE
-                            && segments.get(ref).remainingDeltaV > BURN_TOLERANCE)
+                    .filter(ref -> segments.get(ref).thrust(false) > 0)
                     .toList();
         }
+
+        boolean inAtmosphere() { return atmosphere; }
 
         double deltaVPerSecond(List<SpaceSimulation.SegmentRef> active) {
             var mass = Math.max(1, mass());
             var result = 0.0;
             for (var ref : active) {
                 var segment = segments.get(ref);
-                result += segment.remainingDeltaV / Math.max(BURN_TOLERANCE, segment.remainingBurnSeconds)
-                        * segment.wetMass / mass;
+                result += segment.thrust(inAtmosphere()) / mass;
             }
             return result;
         }
@@ -168,9 +195,7 @@ final class RocketFlightPathState {
         void consumeBurnTime(List<SpaceSimulation.SegmentRef> active, double seconds) {
             for (var ref : active) {
                 var segment = segments.get(ref);
-                var fraction = Math.min(1, seconds / Math.max(BURN_TOLERANCE, segment.remainingBurnSeconds));
-                segment.remainingDeltaV *= 1 - fraction;
-                segment.remainingBurnSeconds = Math.max(0, segment.remainingBurnSeconds - seconds);
+                segment.consume(seconds);
             }
         }
 
@@ -194,7 +219,7 @@ final class RocketFlightPathState {
 
         private boolean isEmpty(SpaceSimulation.SegmentRef ref) {
             var segment = segments.get(ref);
-            return segment.remainingBurnSeconds <= BURN_TOLERANCE || segment.remainingDeltaV <= BURN_TOLERANCE;
+            return segment.thrust(false) == 0;
         }
 
         double availableDeltaV(Context context) {
@@ -216,7 +241,7 @@ final class RocketFlightPathState {
                 var rate = copy.deltaVPerSecond(active);
                 if (rate <= 0) break;
                 var seconds = active.stream().map(copy.segments::get)
-                        .mapToDouble(segment -> segment.remainingBurnSeconds).min().orElse(0);
+                        .mapToDouble(segment -> segment.seconds()).min().orElse(0);
                 if (seconds <= 0) break;
                 copy.consumeBurnTime(active, seconds);
                 intervals.add(new RocketBurnProfile.Interval(rate, seconds));
@@ -260,6 +285,7 @@ final class RocketFlightPathState {
                 copiedConnections.put(ref, neighbours);
             }
             var copy = new Craft(copiedSegments, copiedConnections, x, y, time);
+            copy.atmosphere = atmosphere;
             copy.velocityX = velocityX;
             copy.velocityY = velocityY;
             copy.currentStage = currentStage;

@@ -71,6 +71,7 @@ final class RocketStarMapWidget extends UIComponent {
     // Path state under the pointer, including interpolated speed.
     private StarMapTooltip.PathPoint hoveredPathPoint;
     // View conversion and zoom limits for this map instance.
+    private List<rearth.oritech.spaceage.simulation.SpaceCommunications.Node> coverageNodes = List.of();
     private final StarMapCamera camera = new StarMapCamera();
     // A left-button press is active inside the map.
     private boolean dragging;
@@ -230,7 +231,6 @@ final class RocketStarMapWidget extends UIComponent {
         var viewport = new StarMapObjects.Viewport(viewportX, viewportY, viewportWidth, viewportHeight);
         mapObjects.renderSurfaceDiscs(graphics, camera, viewport);
         prepareLines(viewport);
-        for (var marker : rocketMarkers) renderRocket(graphics, marker, mouseX, mouseY, delta);
         StarMapLineRenderer.submit(graphics, cachedLines, viewportX, viewportY, viewportWidth, viewportHeight);
 
         hoveredObject = null;
@@ -241,11 +241,17 @@ final class RocketStarMapWidget extends UIComponent {
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
                 isInsideViewport(mouseX, mouseY));
         if (isInsideViewport(mouseX, mouseY)) hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
+        if (hoveredPathPoint != null && hoveredObject != null
+                && hoveredObject.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) {
+            hoveredObject = null;
+            hoveredSelection = null;
+        }
+        for (var marker : rocketMarkers) renderRocket(graphics, marker, mouseX, mouseY, delta);
         renderSeparations(graphics, mouseX, mouseY);
         graphics.disableScissor();
 
         StarMapOverlay.render(graphics, x, y, width, height, selectedTargetLabel(), selectedBranchLabel(),
-                pathsByBranch.get(selectedBranch), legendExpanded);
+                pathsByBranch.get(selectedBranch), legendExpanded, showSummary, commandAltitude >= 0);
         fitSystemButton.render(graphics, mouseX, mouseY, delta);
         fitRouteButton.render(graphics, mouseX, mouseY, delta);
         hoveredMapControl = fitSystemButton.isMouseOver(mouseX, mouseY) ? fitSystemButton
@@ -257,10 +263,72 @@ final class RocketStarMapWidget extends UIComponent {
         if (view.equals(cachedView)) return;
         var lines = new ArrayList<StarMapLineRenderer.Line>();
         mapObjects.addReferenceLines(lines, camera, viewport, selectedTarget);
+        addCoverage(lines, viewport);
         addFlightPaths(lines);
         cachedLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         cachedView = view;
         cachedPathHover = null;
+    }
+
+    void showOnlyCraftMarkers(java.util.Set<UUID> craftIds) {
+        rocketMarkers.removeIf(marker -> !craftIds.contains(marker.branchId()));
+    }
+
+    private boolean showSummary = true;
+    private Map<UUID, Component> craftLabels = Map.of();
+
+    void setCraftLabels(Map<UUID, Component> labels) { craftLabels = Map.copyOf(labels); }
+
+    void setShowSummary(boolean show) { showSummary = show; }
+
+    void setFleetTimes(Map<UUID, Double> times) {
+        rocketMarkers.clear();
+        times.forEach((id, time) -> {
+            var path = pathsByBranch.get(id);
+            if (path == null || path.samples().isEmpty()) return;
+            var sample = rearth.oritech.spaceage.simulation.MissionController.sample(path.samples(), time,
+                    rearth.oritech.spaceage.simulation.MissionState.Position.surface());
+            var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
+            marker.withShowOverlay(false).withTooltipFromStack(false);
+            rocketMarkers.add(new BranchMarker(id, time, sample.x(), sample.y(), marker));
+        });
+    }
+
+    void setCoverage(List<rearth.oritech.spaceage.simulation.SpaceCommunications.Node> nodes) {
+        coverageNodes = List.copyOf(nodes); cachedView = null;
+    }
+    private double commandAltitude = -2;
+    void setCommandCoverage(double altitude) { commandAltitude = altitude; cachedView = null; }
+
+    private void addCoverage(List<StarMapLineRenderer.Line> lines, StarMapObjects.Viewport viewport) {
+        if (commandAltitude >= 0) {
+            double radius = 60_000 + commandAltitude;
+            for (int part = 0; part < 128; part += 2) {
+                double start = part * Math.PI * 2 / 128, end = (part + 1) * Math.PI * 2 / 128;
+                var first = camera.project(-3_000_000 + Math.cos(start) * radius, Math.sin(start) * radius,
+                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                var last = camera.project(-3_000_000 + Math.cos(end) * radius, Math.sin(end) * radius,
+                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                lines.add(new StarMapLineRenderer.Line(first.x(), first.y(), last.x(), last.y(), 0xFF5AD6EB, 1.4f));
+            }
+        }
+        for (var band : List.of(SpaceSimulation.OrbitBand.LOW, SpaceSimulation.OrbitBand.HIGH)) {
+            int count = rearth.oritech.spaceage.simulation.SpaceBalance.slots(band);
+            var covered = new java.util.HashSet<Integer>();
+            coverageNodes.stream().filter(n -> n.orbit() == band && n.relay() && n.slot() >= 0 && n.antennas() > 0).forEach(n -> {
+                covered.add(n.slot());
+            });
+            for (int slot = 0; slot < count; slot++) for (int part = 0; part < 8; part++) {
+                double start = Math.PI + (slot - .45 + part * .9 / 8) * Math.PI * 2 / count;
+                double end = start + .9 / 8 * Math.PI * 2 / count;
+                double radius = 60_000 + band.altitude();
+                var a = camera.project(-3_000_000 + Math.cos(start) * radius, Math.sin(start) * radius,
+                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                var b = camera.project(-3_000_000 + Math.cos(end) * radius, Math.sin(end) * radius,
+                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                lines.add(new StarMapLineRenderer.Line(a.x(), a.y(), b.x(), b.y(), covered.contains(slot) ? 0xFF69CE95 : 0x88535B68, 1.8f));
+            }
+        }
     }
 
     private void addFlightPaths(List<StarMapLineRenderer.Line> lines) {
@@ -308,6 +376,15 @@ final class RocketStarMapWidget extends UIComponent {
                 viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) return;
         marker.widget.setPosition((int) Math.round(position.x - 6), (int) Math.round(position.y - 6));
         marker.widget.render(graphics, mouseX, mouseY, delta);
+        var label = craftLabels.get(marker.branchId);
+        if (label != null) {
+            var font = net.minecraft.client.Minecraft.getInstance().font;
+            int labelWidth = font.width(label);
+            int labelX = (int) Math.clamp(position.x + 9, viewportX() + 3, Math.max(viewportX() + 3, viewportX() + viewportWidth() - labelWidth - 3));
+            int labelY = (int) Math.max(viewportY() + 3, position.y - 15);
+            graphics.fill(labelX - 2, labelY - 2, labelX + labelWidth + 2, labelY + 10, 0xCC080D18);
+            graphics.text(font, label, labelX, labelY, 0xFF5AD6EB, true);
+        }
     }
 
     private void renderSeparations(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
@@ -380,6 +457,7 @@ final class RocketStarMapWidget extends UIComponent {
     private Component selectedTargetLabel() {
         if (selectedTarget == null) return null;
         var object = mapObjects.byId(selectedTarget.objectId);
+        if (object != null && object.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) return objectName(object.data());
         return object == null ? null : Component.translatable("screen.oritech_space_age.selected_target",
                 objectName(object.data()), orbitName(selectedTarget.orbit));
     }

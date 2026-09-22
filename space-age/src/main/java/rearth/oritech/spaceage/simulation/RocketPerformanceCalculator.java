@@ -8,9 +8,7 @@ public final class RocketPerformanceCalculator {
     public static final int LAUNCH_ORBIT_HEIGHT_BLOCKS = 1_000;
 
     private static final double KILOGRAMS_PER_WEIGHT_UNIT = 1_000;
-    private static final double ENGINE_THRUST_NEWTONS = 250_000;
-    private static final double ENGINE_SPECIFIC_IMPULSE_SECONDS = 300;
-    private static final long RF_PER_ENGINE_TICK = 1_000;
+    static final double ENGINE_THRUST_NEWTONS = 250_000;
 
     private RocketPerformanceCalculator() {
     }
@@ -18,40 +16,52 @@ public final class RocketPerformanceCalculator {
     // The overview calls this for the complete rocket, while the path calculator calls it once per segment so
     // resources cannot move between stages. Supporting both keeps the underlying engine rules identical.
     public static RocketPerformance calculate(ActiveRocketData rocket) {
-        long dryWeight = 0;
-        long fuelWeight = 0;
-        long fuelBurnTicks = 0;
-        long availableRF = 0;
-        int engineCount = 0;
-
+        double dryMass = 0, fuelMass = 0, thrust = 0, launchThrust = 0, deltaV = 0, duration = 0;
+        int engines = 0;
         for (var entry : rocket.getStaticSegments().entrySet()) {
-            var dynamicSegment = rocket.getDynamicSegments().get(entry.getKey());
-            var staticSegment = entry.getValue();
-            dryWeight += Math.max(0, staticSegment.staticWeight());
-            fuelWeight += Math.max(0, dynamicSegment.currentFuelWeight);
-            fuelBurnTicks += Math.max(0, dynamicSegment.availableFuelBurnTimeTicks);
-            availableRF += Math.max(0, dynamicSegment.availableRF);
-            engineCount += Math.max(0, staticSegment.engineCount());
+            var segment = entry.getValue();
+            var resources = rocket.getDynamicSegments().get(entry.getKey());
+            var hardware = RocketHardware.of(segment);
+            var dry = segment.staticWeight() * KILOGRAMS_PER_WEIGHT_UNIT;
+            var fuel = resources.currentFuelWeight * KILOGRAMS_PER_WEIGHT_UNIT;
+            var wet = Math.max(1, dry + fuel);
+            var chemicalTime = hardware.chemicalSeconds(resources);
+            var ionTime = hardware.ionSeconds(resources);
+            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * ENGINE_THRUST_NEWTONS : 0;
+            var ionThrust = ionTime > 0 ? hardware.ion() * ENGINE_THRUST_NEWTONS : 0;
+            dryMass += dry;
+            fuelMass += fuel;
+            thrust += chemicalThrust + ionThrust;
+            launchThrust += chemicalThrust + ionThrust * SpaceBalance.ION_ATMOSPHERE;
+            engines += hardware.chemical() + hardware.ion();
+            duration = Math.max(duration, Math.max(chemicalTime, ionTime));
+            deltaV += chemicalThrust * chemicalTime + ionThrust * ionTime;
         }
+        var mass = dryMass + fuelMass;
+        return new RocketPerformance(dryMass, fuelMass, mass, engines, thrust, duration,
+                mass > 0 ? deltaV / mass : 0, mass > 0 ? launchThrust / mass : 0);
+    }
 
-        var dryMass = dryWeight * KILOGRAMS_PER_WEIGHT_UNIT;
-        var fuelMass = fuelWeight * KILOGRAMS_PER_WEIGHT_UNIT;
-        var wetMass = dryMass + fuelMass;
-        var thrust = engineCount * ENGINE_THRUST_NEWTONS;
-
-        var fuelBurnSeconds = engineCount == 0 ? 0
-                : fuelBurnTicks / (double) engineCount / TICKS_PER_SECOND;
-        var electricBurnSeconds = engineCount == 0 ? 0
-                : availableRF / (double) RF_PER_ENGINE_TICK / engineCount / TICKS_PER_SECOND;
-
-        var chemicalDeltaV = dryMass > 0 && fuelMass > 0 && fuelBurnSeconds > 0
-                ? ENGINE_SPECIFIC_IMPULSE_SECONDS * STANDARD_GRAVITY * Math.log(wetMass / dryMass) : 0;
-        // RF does not add fuel mass, so its contribution uses the constant dry mass.
-        var electricDeltaV = dryMass > 0 ? thrust / dryMass * electricBurnSeconds : 0;
-        var liftoffAcceleration = wetMass > 0 ? thrust / wetMass : 0;
-
-        return new RocketPerformance(dryMass, fuelMass, wetMass, engineCount, thrust,
-                fuelBurnSeconds + electricBurnSeconds, chemicalDeltaV + electricDeltaV, liftoffAcceleration);
+    public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan) {
+        var all = calculate(rocket);
+        double thrust = 0, burnSeconds = 0, deltaV = 0;
+        int engines = 0;
+        for (var entry : rocket.getStaticSegments().entrySet()) {
+            if (!plan.configurationFor(SpaceSimulation.SegmentRef.of(entry.getValue())).usesEnginesDuring(1)) continue;
+            var resources = rocket.getDynamicSegments().get(entry.getKey());
+            var hardware = RocketHardware.of(entry.getValue());
+            var chemicalTime = hardware.chemicalSeconds(resources);
+            var ionTime = hardware.ionSeconds(resources);
+            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * ENGINE_THRUST_NEWTONS : 0;
+            var ionThrust = ionTime > 0 ? hardware.ion() * ENGINE_THRUST_NEWTONS * SpaceBalance.ION_ATMOSPHERE : 0;
+            engines += hardware.chemical() + hardware.ion();
+            thrust += chemicalThrust + ionThrust;
+            burnSeconds = Math.max(burnSeconds, Math.max(chemicalTime, ionTime));
+            deltaV += chemicalThrust * chemicalTime + ionThrust * ionTime;
+        }
+        var mass = Math.max(1, all.wetMassKilograms());
+        return getLaunchReadiness(new RocketPerformance(all.dryMassKilograms(), all.fuelMassKilograms(), all.wetMassKilograms(),
+                engines, thrust, burnSeconds, deltaV / mass, thrust / mass));
     }
 
     public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket) {

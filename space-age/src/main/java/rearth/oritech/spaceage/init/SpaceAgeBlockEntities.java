@@ -19,6 +19,11 @@ public final class SpaceAgeBlockEntities {
                     SpaceAgeBlocks.ROCKET_ASSEMBLER.get()
             ));
 
+    public static final Supplier<BlockEntityType<rearth.oritech.spaceage.block.GroundStationBlockEntity>> GROUND_STATION =
+            BLOCK_ENTITY_TYPES.register("ground_station", () -> new BlockEntityType<>(
+                    rearth.oritech.spaceage.block.GroundStationBlockEntity::new,
+                    SpaceAgeBlocks.MISSION_CONTROL.get(), SpaceAgeBlocks.SPACE_SCANNER.get(), SpaceAgeBlocks.ANTENNA.get()));
+
     private SpaceAgeBlockEntities() {
     }
 }

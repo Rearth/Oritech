@@ -31,11 +31,11 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         super(SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get(), pos, state);
     }
 
-    public boolean assemble() {
+    public boolean assemble(net.minecraft.server.level.ServerPlayer player, SpaceSimulation.FlightPlan plan) {
 
         OritechSpaceAge.LOGGER.debug("Starting assembling process");
 
-        if (!(level instanceof ServerLevel)) return false;
+        if (!(level instanceof ServerLevel) || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return false;
 
         var start = findRocketStart();
         if (start == null) return false;
@@ -44,19 +44,29 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         // intentional: previews are side-effect free, while only a launch that passed validation may consume data.
         var preview = gatherRocketData(start, false);
         if (preview == null) return false;
-        var readiness = RocketPerformanceCalculator.getLaunchReadiness(preview);
+        var readiness = RocketPerformanceCalculator.getLaunchReadiness(preview, plan);
         if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {
             OritechSpaceAge.LOGGER.warn("Rocket launch at {} failed: {}", worldPosition, readiness.failureReason());
             return false;
         }
 
+        var system = SpaceSimulationSavedData.getForPlayer(player);
+        var validated = RocketFlightPlanRules.validate(plan, preview, system.createObjectData());
+        if (validated == null || validated.root().actions().isEmpty()
+                || validated.branches().stream().mapToInt(b -> b.actions().size()).sum() != plan.branches().stream().mapToInt(b -> b.actions().size()).sum()) return false;
+        validated = MissionController.resolveOrbitSlots(validated, MissionSavedData.get(player.level().getServer()), player.getUUID(), preview.getRocketId());
+        var first = validated.root().actions().getFirst();
+        if (first.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return false;
+        var firstPlan = validated.withBranches(java.util.List.of(validated.root().withActions(java.util.List.of(first))));
+        var predicted = RocketFlightPathCalculator.calculate(preview, system.createObjectData(), firstPlan);
+        if (predicted.paths().isEmpty() || predicted.paths().getFirst().terminalState().isFailure()) return false;
         var result = gatherRocketData(start, true);
         if (result == null) {
             OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
             return false;
         }
 
-        RocketSimulationController.launchRocket((ServerLevel) level, result, start);
+        MissionController.launch((ServerLevel) level, player.getUUID(), result, validated, start);
         return true;
     }
 
@@ -122,7 +132,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
 
         var scannedSegments = new HashMap<UUID, ScannedSegmentData>();
         for (var segment : segments.values()) {
-            scannedSegments.put(segment.id, scanSegmentContent(segment, consumeResources));
+            scannedSegments.put(segment.id, scanSegmentContent(segment, false));
         }
 
         var rocketData = createRocket(start, segments, scannedSegments, consumeResources);
@@ -268,7 +278,9 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
 
             var blocks = new HashSet<StaticRocketSegment.BlockData>();
             for (var block : segment.blocks) {
-                blocks.add(new StaticRocketSegment.BlockData(block.pos.subtract(origin), block.state));
+                var entity = level.getBlockEntity(block.pos);
+                blocks.add(new StaticRocketSegment.BlockData(block.pos.subtract(origin), block.state,
+                        entity == null ? new net.minecraft.nbt.CompoundTag() : entity.saveWithFullMetadata(level.registryAccess())));
             }
 
             var couplings = new HashMap<UUID, Set<StaticRocketSegment.CouplingData>>();
@@ -282,7 +294,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
             });
 
             staticSegments.put(segment.id, new StaticRocketSegment(
-                    segment.id, blocks, couplings, scannedData.staticWeight, scannedData.engineCount));
+                    segment.id, blocks, couplings, scannedData.staticWeight, scannedData.engineCount, scannedData.availableRF, scannedData.availableFuelBurnTimeTicks));
             dynamicSegments.put(segment.id, new DynamicRocketSegment(
                     scannedData.availableFuelBurnTimeTicks,
                     scannedData.availableRF,
@@ -298,7 +310,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
                 segment.blocks.forEach(block -> blocksToRemove.add(block.pos));
                 segment.couplings.forEach(coupling -> blocksToRemove.add(coupling.pos));
             }
-            blocksToRemove.forEach(pos -> level.removeBlock(pos, false));
+            blocksToRemove.forEach(pos -> { level.removeBlockEntity(pos); level.removeBlock(pos, false); });
         }
 
         return rocketData;

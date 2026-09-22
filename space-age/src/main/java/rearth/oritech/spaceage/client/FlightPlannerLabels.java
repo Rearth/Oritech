@@ -6,10 +6,13 @@ import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /** Shared planner text and validation, kept apart from screen layout. */
 final class FlightPlannerLabels {
@@ -22,6 +25,55 @@ final class FlightPlannerLabels {
     static Component actionTooltip(SpaceSimulation.ActionType type) {
         return Component.translatable("screen.oritech_space_age.action.tooltip."
                 + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component blockedTooltip(RocketFlightPathCalculator.TerminalState state) {
+        return Component.translatable("screen.oritech_space_age.blocked." + state.name().toLowerCase(Locale.ROOT))
+                .withStyle(ChatFormatting.RED);
+    }
+
+    static RocketFlightPathCalculator.ScanEstimate scanEstimate(RocketFlightPathCalculator.FlightPath flight, UUID actionId) {
+        return flight.scanEstimates().stream().filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    static RocketFlightPathCalculator.StationKeepingEstimate stationKeepingEstimate(
+            RocketFlightPathCalculator.FlightPath flight, UUID actionId) {
+        return flight.stationKeepingEstimates().stream()
+                .filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    static Component stationKeepingDuration(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
+        if (estimate == null || !Double.isFinite(estimate.durationSeconds()))
+            return Component.translatable("screen.oritech_space_age.action.station_keeping_unavailable");
+        return Component.translatable("screen.oritech_space_age.action.station_keeping_estimate",
+                String.format(Locale.ROOT, "%.2f", estimate.durationSeconds() / 1_200d));
+    }
+
+    static Component stationKeepingEnd(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
+        if (estimate == null) return Component.empty();
+        return Component.translatable("screen.oritech_space_age.action.station_keeping_ends",
+                Component.translatable("screen.oritech_space_age.action.station_keeping_end."
+                        + estimate.end().name().toLowerCase(Locale.ROOT)));
+    }
+
+    static Component scanEnergyLabel(RocketFlightPathCalculator.ScanEstimate estimate) {
+        return estimate == null || !Double.isFinite(estimate.requiredRF())
+                ? Component.translatable("screen.oritech_space_age.scan.energy_unknown")
+                : Component.translatable("screen.oritech_space_age.scan.energy_estimate",
+                        TooltipHelper.getEnergyText((long) estimate.requiredRF()));
+    }
+
+    static List<Component> scanEnergyTooltip(RocketFlightPathCalculator.ScanEstimate estimate) {
+        var lines = new ArrayList<Component>();
+        lines.add(scanEnergyLabel(estimate));
+        if (estimate != null) {
+            if (Double.isFinite(estimate.requiredRF())) lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
+                    String.format(Locale.ROOT, "%,d", (long) estimate.requiredRF())));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_available", String.format(Locale.ROOT, "%,d", estimate.availableRF())));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_rate", SpaceBalance.SCANNER_RF, estimate.scanners()));
+        }
+        lines.add(Component.translatable("screen.oritech_space_age.scan.energy_help"));
+        return lines;
     }
 
     static Component actionVelocity(SpaceSimulation.FlightPlanAction action) {
@@ -65,6 +117,7 @@ final class FlightPlannerLabels {
             case DISTANCE_FROM_TARGET -> String.format(Locale.ROOT, "%.0f m", value);
             case TIME_BEFORE_ARRIVAL -> String.format(Locale.ROOT, "%.0f s", value);
             case DESIRED_UNCERTAINTY -> String.format(Locale.ROOT, "±%.0f blocks", value);
+            case LOW_RF, LOW_FUEL -> String.format(Locale.ROOT, "%.0f%%", value);
         };
     }
 

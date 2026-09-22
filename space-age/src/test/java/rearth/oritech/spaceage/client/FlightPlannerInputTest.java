@@ -33,6 +33,8 @@ class FlightPlannerInputTest {
         assertEquals(10_000_000, FlightPlannerLabels.parseAddonValue(DISTANCE_FROM_TARGET, "10000000"));
         assertEquals(1_000_000, FlightPlannerLabels.parseAddonValue(TIME_BEFORE_ARRIVAL, "1000000"));
         assertEquals(100_000, FlightPlannerLabels.parseAddonValue(DESIRED_UNCERTAINTY, "100000"));
+        assertEquals(100, FlightPlannerLabels.parseAddonValue(LOW_RF, "100"));
+        assertEquals(100, FlightPlannerLabels.parseAddonValue(LOW_FUEL, "100"));
         assertNull(FlightPlannerLabels.parseAddonValue(DISTANCE_FROM_TARGET, "10000001"));
         assertNull(FlightPlannerLabels.parseAddonValue(TIME_BEFORE_ARRIVAL, "1000001"));
         assertNull(FlightPlannerLabels.parseAddonValue(DESIRED_UNCERTAINTY, "100001"));

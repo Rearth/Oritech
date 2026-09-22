@@ -34,6 +34,7 @@ public final class OritechSpaceAge {
         NeoForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
         modEventBus.addListener(this::addNetworkHandlers);
 
+        rearth.oritech.spaceage.init.SpaceAgeComponents.COMPONENTS.register(modEventBus);
         SpaceAgeItems.addBlockItems();
         SpaceAgeBlocks.BLOCKS.register(modEventBus);
         SpaceAgeItems.ITEMS.register(modEventBus);
@@ -44,10 +45,12 @@ public final class OritechSpaceAge {
 
     private void addNetworkHandlers(RegisterPayloadHandlersEvent event) {
         RocketNetworking.register(event.registrar("1"));
+        rearth.oritech.spaceage.network.MissionNetworking.register(event.registrar("1"));
     }
 
     private void onServerTickPost(ServerTickEvent.Post event) {
         RocketSimulationController.tick(event.getServer());
+        rearth.oritech.spaceage.simulation.MissionController.tick(event.getServer());
     }
 
     private void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {

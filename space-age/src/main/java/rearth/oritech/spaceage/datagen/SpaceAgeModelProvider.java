@@ -22,6 +22,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
         blockModels.createHorizontallyRotatedBlock(SpaceAgeBlocks.ROCKET_ASSEMBLER.get(), TexturedModel.CUBE);
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_PAD.get());
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_COUPLING.get());
+        createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.ANTENNA.get(), blockModels);
+        itemModels.itemModelOutput.accept(rearth.oritech.spaceage.init.SpaceAgeItems.MISSION_CARD.get(),
+                net.minecraft.client.data.models.model.ItemModelUtils.plainModel(OritechSpaceAge.id("item/mission_card")));
         createCustomModelBlock(SpaceAgeBlocks.ASTEROID_ANCHOR.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.ION_BOOSTER_ROCKET.get(), blockModels);

@@ -19,6 +19,18 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes() {
+        for (var block : java.util.List.of(SpaceAgeBlocks.MISSION_CONTROL, SpaceAgeBlocks.SPACE_SCANNER, SpaceAgeBlocks.ANTENNA)) {
+            shaped(net.minecraft.data.recipes.RecipeCategory.MISC, block)
+                    .pattern("sss").pattern("pcp").pattern("sfs")
+                    .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.PROCESSING_UNIT)
+                    .define('c', block == SpaceAgeBlocks.ANTENNA ? Items.COPPER_INGOT : Items.ENDER_PEARL)
+                    .define('f', BlockContent.MACHINE_FRAME)
+                    .unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
+        }
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, rearth.oritech.spaceage.init.SpaceAgeItems.MISSION_CARD)
+                .pattern("pp").pattern("sc").define('p', Items.PAPER).define('s', ItemContent.STEEL_INGOT)
+                .define('c', ItemContent.PROCESSING_UNIT).unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
+
         shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ASSEMBLER)
                 .pattern("sas")
                 .pattern("mcm")

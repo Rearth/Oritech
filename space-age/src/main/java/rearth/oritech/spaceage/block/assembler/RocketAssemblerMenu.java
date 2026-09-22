@@ -24,6 +24,10 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     private @Nullable java.util.UUID draftRocketId;
     private boolean draftFlightPlanDirty;
 
+    protected RocketAssemblerMenu(net.minecraft.world.inventory.MenuType<?> type, int id, BlockPos pos) {
+        super(type, id); this.blockPos = pos;
+    }
+
     public RocketAssemblerMenu(int syncId, Inventory inventory, RegistryFriendlyByteBuf buffer) {
         super(SpaceAgeMenus.ROCKET_ASSEMBLER.get(), syncId);
         this.blockPos = buffer.readBlockPos();
@@ -64,6 +68,12 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
         }
     }
 
+    /** Replaces changing resources/flight state without treating the same rocket as a new preview. */
+    public void updatePreviewData(ActiveRocketData rocket) {
+        this.rocket = rocket;
+        this.previewLoaded = true;
+    }
+
     public @Nullable SpaceSimulation.FlightPlannerSnapshot getFlightPlannerSnapshot() {
         return flightPlannerSnapshot;
     }
@@ -80,6 +90,11 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
             draftFlightPlanDirty = false;
         }
         this.flightPlannerRevision++;
+    }
+
+    /** Replaces live mission inputs without rebuilding an open editor. */
+    public void updateFlightPlannerSnapshotData(SpaceSimulation.FlightPlannerSnapshot snapshot) {
+        this.flightPlannerSnapshot = snapshot;
     }
 
     public @Nullable SpaceSimulation.FlightPlan getDraftFlightPlan() {

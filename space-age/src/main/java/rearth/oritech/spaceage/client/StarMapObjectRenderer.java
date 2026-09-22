@@ -27,7 +27,10 @@ final class StarMapObjectRenderer {
         graphics.submitGuiElementRenderState(new RenderState(List.copyOf(discs), pose, scissor, clippedBounds));
     }
 
-    record Disc(double x, double y, double radiusX, double radiusY, int color, int sides) {
+    record Disc(double x, double y, double radiusX, double radiusY, int color, int edgeColor, int sides) {
+        Disc(double x, double y, double radiusX, double radiusY, int color, int sides) {
+            this(x, y, radiusX, radiusY, color, color, sides);
+        }
     }
 
     private record RenderState(List<Disc> discs, Matrix3x2f pose,
@@ -44,8 +47,8 @@ final class StarMapObjectRenderer {
                     var nextY = disc.y() + Math.sin(angle) * disc.radiusY();
                     // GUI geometry is quad based; this degenerate quad is one triangle-fan slice.
                     vertices.addVertexWith2DPose(pose, (float) disc.x(), (float) disc.y()).setColor(disc.color());
-                    vertices.addVertexWith2DPose(pose, (float) previousX, (float) previousY).setColor(disc.color());
-                    vertices.addVertexWith2DPose(pose, (float) nextX, (float) nextY).setColor(disc.color());
+                    vertices.addVertexWith2DPose(pose, (float) previousX, (float) previousY).setColor(disc.edgeColor());
+                    vertices.addVertexWith2DPose(pose, (float) nextX, (float) nextY).setColor(disc.edgeColor());
                     vertices.addVertexWith2DPose(pose, (float) disc.x(), (float) disc.y()).setColor(disc.color());
                     previousX = nextX;
                     previousY = nextY;

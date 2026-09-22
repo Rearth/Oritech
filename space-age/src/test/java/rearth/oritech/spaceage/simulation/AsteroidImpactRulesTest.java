@@ -2,8 +2,8 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
 import java.util.List;
 import java.util.Map;
@@ -63,7 +63,7 @@ class AsteroidImpactRulesTest {
     void attachedAsteroidMassReducesAvailableAcceleration() {
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
                 Map.of(segmentId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of())));
@@ -97,7 +97,7 @@ class AsteroidImpactRulesTest {
     void releasedAsteroidStopsAtEarthAndConnectsFromEitherCloseOrbit() {
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
                 Map.of(segmentId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of())));
@@ -143,7 +143,7 @@ class AsteroidImpactRulesTest {
         var invalidPlan = base.withBranches(List.of(base.root().withActions(List.of(flyby, connect))));
         var invalidPath = RocketFlightPathCalculator.calculate(rocket, List.of(earth, asteroid), invalidPlan)
                 .paths().getFirst();
-        assertEquals(RocketFlightPathCalculator.TerminalState.PLAN_BLOCKED, invalidPath.terminalState());
+        assertEquals(RocketFlightPathCalculator.TerminalState.UNSAFE_ASTEROID_APPROACH, invalidPath.terminalState());
         assertTrue(!invalidPath.actionMoments().getLast().completed(),
                 "a maximum-speed asteroid flyby must not attach the asteroid");
         assertEquals(SpaceSimulation.FlightPlanAction.NO_TARGET,
@@ -155,10 +155,10 @@ class AsteroidImpactRulesTest {
         var anchorId = UUID.randomUUID();
         var coreId = UUID.randomUUID();
         var anchor = new StaticRocketSegment(anchorId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(coreId, Set.of()), 25, 1);
         var core = new StaticRocketSegment(coreId,
-                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(anchorId, Set.of()), 25, 1);
         var rocket = new ActiveRocketData(Map.of(anchorId, anchor, coreId, core), Map.of(
                 anchorId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of(coreId)),

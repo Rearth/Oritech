@@ -26,12 +26,14 @@ public final class RocketAssemblerClientController {
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof RocketAssemblerMenu menu
                 && menu.blockPos.equals(position)) {
+            menu.markDraftFlightPlanSaved();
             menu.setFlightPlannerSnapshot(snapshot);
         }
     }
 
     /** Both assembler tabs edit the same menu-owned draft, so tab switches never discard client changes. */
     public static void submitFlightPlanIfDirty(RocketAssemblerMenu menu) {
+        if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu) return;
         var rocket = menu.getRocket();
         var plan = menu.getDraftFlightPlan();
         if (!menu.isDraftFlightPlanDirty() || rocket == null || plan == null) return;

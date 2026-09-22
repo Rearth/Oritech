@@ -12,6 +12,9 @@ public final class SpaceAgeItems {
 
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(OritechSpaceAge.MOD_ID);
 
+    public static final net.neoforged.neoforge.registries.DeferredItem<net.minecraft.world.item.Item> MISSION_CARD =
+            ITEMS.registerItem("mission_card", rearth.oritech.spaceage.item.MissionCardItem::new, () -> new net.minecraft.world.item.Item.Properties().stacksTo(1));
+
     private SpaceAgeItems() {
     }
 

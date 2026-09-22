@@ -35,6 +35,19 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
         if (!freeArrival && (Math.hypot(arrivalX, arrivalY) > speedLimit
                 || Math.hypot(arrivalX - vx, arrivalY - vy) > deltaV + 1e-7)) return null;
 
+        var distance = Math.hypot(dx, dy);
+        if (distance > 1e-7) {
+            var x = dx / distance;
+            var y = dy / distance;
+            var initial = vx * x + vy * y;
+            var arrival = arrivalX * x + arrivalY * y;
+            if (initial >= 0 && arrival >= 0 && Math.abs(vx * y - vy * x) < 1e-7
+                    && (freeArrival || Math.abs(arrivalX * y - arrivalY * x) < 1e-7)) {
+                var straight = straightTransfer(distance, initial, arrival, freeArrival, profile, speedLimit, x, y);
+                if (straight != null && straight.duration() <= timeLimit) return straight;
+            }
+        }
+
         var low = 0d;
         // A fast craft may have a very narrow intercept window; seed it with an exact ballistic intercept.
         var high = ballistic ? ballisticTime : Math.min(0.05, timeLimit);
@@ -58,6 +71,36 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
             }
         }
         return result;
+    }
+
+    /** Along a straight approach, distance grows monotonically with peak speed even across stage changes.
+     * Prefer continuous burns when the available stages can cover the distance; coast only for fuel or speed limits. */
+    private static FullPowerTransfer straightTransfer(double distance, double initial, double arrival, boolean freeArrival,
+                                                      RocketBurnProfile profile, double cap, double x, double y) {
+        var low = Math.max(initial, freeArrival ? 0 : arrival);
+        var high = Math.min(cap, freeArrival ? initial + profile.deltaV() : (profile.deltaV() + initial + arrival) / 2);
+        if (high < low || burnDistance(profile, low, initial, arrival, freeArrival) > distance + 1e-7) return null;
+        if (burnDistance(profile, high, initial, arrival, freeArrival) >= distance) {
+            for (int iteration = 0; iteration < 70; iteration++) {
+                var middle = (low + high) / 2;
+                if (burnDistance(profile, middle, initial, arrival, freeArrival) < distance) low = middle;
+                else high = middle;
+            }
+        }
+        var peak = high;
+        if (peak <= 0) return null;
+        var first = profile.burn(0, peak - initial);
+        var last = profile.burn(peak - initial, freeArrival ? 0 : peak - arrival);
+        var coast = Math.max(0, (distance - burnDistance(profile, peak, initial, arrival, freeArrival)) / peak);
+        return new FullPowerTransfer(first.seconds(), coast, last.seconds(),
+                first.seconds() == 0 ? 0 : x, first.seconds() == 0 ? 0 : y,
+                last.seconds() == 0 ? 0 : -x, last.seconds() == 0 ? 0 : -y);
+    }
+
+    private static double burnDistance(RocketBurnProfile profile, double peak, double initial, double arrival, boolean freeArrival) {
+        var first = profile.burn(0, peak - initial);
+        var last = profile.burn(peak - initial, freeArrival ? 0 : peak - arrival);
+        return initial * first.seconds() + first.distance() + peak * last.seconds() - last.distance();
     }
 
     private static FullPowerTransfer atDuration(double dx, double dy, double vx, double vy,

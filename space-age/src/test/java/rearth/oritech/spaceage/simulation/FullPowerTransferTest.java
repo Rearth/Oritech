@@ -1,12 +1,15 @@
 package rearth.oritech.spaceage.simulation;
 
+import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/** Dependency-free numerical regression tests; run with :space-age:transferTest. */
+/** Numerical regression coverage for full-power transfers. */
 public final class FullPowerTransferTest {
-    public static void main(String[] args) {
+    @Test
+    void fullPowerTransfersRespectFuelSpeedAndArrivalConstraints() {
         var longTrip = check(8_000_000, 0, 0, 0, 0, 0, false, 10, 1000, Double.POSITIVE_INFINITY);
         close(longTrip.firstSeconds(), 50, 1e-5, "full fuel acceleration burn");
         close(longTrip.coastSeconds(), 15950, 1e-3, "long trip coast");
@@ -62,7 +65,6 @@ public final class FullPowerTransferTest {
             check(cap * 10_000 * Math.cos(angle), cap * 10_000 * Math.sin(angle),
                     0, 0, 0, 0, false, profile, cap);
         }
-        System.out.println("Full-power transfer regressions passed");
     }
 
     private static FullPowerTransfer check(double dx, double dy, double vx, double vy,

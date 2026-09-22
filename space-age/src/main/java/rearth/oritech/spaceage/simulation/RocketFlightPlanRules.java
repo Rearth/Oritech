@@ -17,6 +17,7 @@ public final class RocketFlightPlanRules {
     public static final int MAX_BRANCHES = 16;
     public static final int MAX_ACTIONS = 64;
     public static final int MAX_SEGMENT_NAME_LENGTH = 32;
+    public static final int MAX_ROCKET_NAME_LENGTH = 48;
     private static final List<SpaceSimulation.OrbitBand> ASTEROID_DESTINATIONS = List.of(
             SpaceSimulation.OrbitBand.SURFACE, SpaceSimulation.OrbitBand.TIGHT);
     private static final List<SpaceSimulation.OrbitBand> CELESTIAL_DESTINATIONS = List.of(
@@ -34,7 +35,7 @@ public final class RocketFlightPlanRules {
 
         var result = new ArrayList<SpaceSimulation.FlightPlanBranch>();
         addBranchAndChildren(root, byParentAction, result, new HashSet<>());
-        return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations());
+        return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations(), plan.name());
     }
 
     /** Keep generated links until recalculation can decide which booster events still exist. */
@@ -77,11 +78,21 @@ public final class RocketFlightPlanRules {
             }
             branches.add(branch.withActions(actions));
         }
-        return normalize(new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations()));
+        return normalize(new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations(), plan.name()));
     }
 
     public static SpaceSimulation.FlightPlan validate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
                                                        List<SpaceSimulation.SpaceObjectData> objects) {
+        return validate(plan, rocket, objects, true);
+    }
+
+    public static SpaceSimulation.FlightPlan validateInFlight(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                                             List<SpaceSimulation.SpaceObjectData> objects) {
+        return validate(plan, rocket, objects, false);
+    }
+
+    private static SpaceSimulation.FlightPlan validate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                                       List<SpaceSimulation.SpaceObjectData> objects, boolean launch) {
         if (plan.branches().size() > MAX_BRANCHES
                 || plan.branches().stream().flatMap(branch -> branch.actions().stream())
                         .filter(action -> !action.isGenerated()).count() > MAX_ACTIONS
@@ -103,7 +114,7 @@ public final class RocketFlightPlanRules {
             if (name.length() > MAX_SEGMENT_NAME_LENGTH) name = name.substring(0, MAX_SEGMENT_NAME_LENGTH);
             var stages = configuration.engineStages().stream()
                     .mapToInt(Integer::intValue)
-                    .filter(stage -> stage >= 1 && stage <= segmentCount)
+                    .filter(stage -> stage >= 1 && stage <= (launch ? segmentCount : MAX_ACTIONS))
                     .distinct().sorted().boxed().toList();
             configurations.add(new SpaceSimulation.SegmentConfiguration(
                     configuration.segment(), name, configuration.booster(), stages));
@@ -127,8 +138,20 @@ public final class RocketFlightPlanRules {
                     if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID) continue;
                     validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
                 }
-                var addons = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                        ? validatedAction.addons().stream().limit(1)
+                if (validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                        && (!validatedAction.targetId().equals(SpaceObjects.EARTH_ID) || !SpaceBalance.hasSlots(validatedAction.orbit()))) {
+                    var settings = validatedAction.service();
+                    validatedAction = validatedAction.withService(new SpaceSimulation.ServiceSettings(settings.durationTicks(),
+                            settings.untilPrecise(), settings.timeoutTicks(), -1));
+                }
+                var validatedType = validatedAction.type();
+                var addons = validatedType == SpaceSimulation.ActionType.NAVIGATE_TO
+                        || validatedType == SpaceSimulation.ActionType.MAINTAIN_POSITION
+                        ? validatedAction.addons().stream()
+                        .filter(addon -> validatedType == SpaceSimulation.ActionType.NAVIGATE_TO
+                                ? addon.type().isNavigationCondition()
+                                : addon.type().isMaintainPositionCondition())
+                        .limit(1)
                         .map(addon -> addon.withValue(clampAddonValue(addon.type(), addon.value()))).toList()
                         : List.<SpaceSimulation.ActionAddon>of();
                 int targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
@@ -141,8 +164,10 @@ public final class RocketFlightPlanRules {
             validatedBranches.add(branch.withActions(actions));
         }
 
-        var normalized = trimEngineStageGaps(
-                normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations)), segmentIds.keySet());
+        String rocketName = plan.name().strip();
+        if (rocketName.length() > MAX_ROCKET_NAME_LENGTH) rocketName = rocketName.substring(0, MAX_ROCKET_NAME_LENGTH);
+        var normalized = normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations, rocketName));
+        if (launch) normalized = trimEngineStageGaps(normalized, segmentIds.keySet());
         return normalized.branches().size() <= MAX_BRANCHES ? normalized : null;
     }
 
@@ -207,6 +232,7 @@ public final class RocketFlightPlanRules {
     }
 
     public static List<SpaceSimulation.OrbitBand> availableOrbits(SpaceObjects.ObjectType type) {
+        if (type == SpaceObjects.ObjectType.SURVEY_REGION) return List.of(SpaceSimulation.OrbitBand.SURFACE);
         return type == SpaceObjects.ObjectType.ASTEROID ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
     }
 
@@ -242,6 +268,7 @@ public final class RocketFlightPlanRules {
             case DISTANCE_FROM_TARGET -> Math.clamp(value, 1, 10_000_000);
             case TIME_BEFORE_ARRIVAL -> Math.clamp(value, 1, 1_000_000);
             case DESIRED_UNCERTAINTY -> Math.clamp(value, 1, 100_000);
+            case LOW_RF, LOW_FUEL -> Math.clamp(value, 1, 100);
         };
     }
 

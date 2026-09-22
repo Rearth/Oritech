@@ -15,7 +15,7 @@ public final class RocketFlightPathTest {
         Bootstrap.bootStrap();
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(id, segment),
                 Map.of(id, new DynamicRocketSegment(0, 2_000_000, 0, Set.of())));
@@ -50,7 +50,7 @@ public final class RocketFlightPathTest {
         var boosterId = UUID.randomUUID();
         var core = new StaticRocketSegment(id, segment.blocks(), Map.of(boosterId, Set.of()), 25, 1);
         var booster = new StaticRocketSegment(boosterId,
-                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(id, Set.of()), 25, 1);
         var stagedRocket = new ActiveRocketData(Map.of(id, core, boosterId, booster), Map.of(
                 id, new DynamicRocketSegment(0, 2_000_000, 0, Set.of(boosterId)),
@@ -97,7 +97,7 @@ public final class RocketFlightPathTest {
         Bootstrap.bootStrap();
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
                 Map.of(segmentId, new DynamicRocketSegment(0, 2_000_000, 0, Set.of())));
@@ -109,10 +109,12 @@ public final class RocketFlightPathTest {
         var base = SpaceSimulation.FlightPlan.empty();
 
         for (var type : SpaceSimulation.ActionAddonType.values()) {
+            if (!type.isNavigationCondition()) continue;
             int threshold = switch (type) {
                 case DISTANCE_FROM_TARGET -> 500_000;
                 case TIME_BEFORE_ARRIVAL -> 120;
                 case DESIRED_UNCERTAINTY -> 512;
+                default -> throw new AssertionError(type);
             };
             var addon = new SpaceSimulation.ActionAddon(UUID.randomUUID(), type, threshold);
             var navigate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
@@ -122,7 +124,7 @@ public final class RocketFlightPathTest {
             var plan = base.withBranches(List.of(base.root().withActions(List.of(navigate, maintain))));
             var result = RocketFlightPathCalculator.calculate(rocket, objects, plan);
             var path = result.paths().getFirst();
-            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED,
+            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.READY,
                     type + " condition did not continue to the next card");
             require(path.actionMoments().size() == 2 && path.actionMoments().stream()
                     .allMatch(RocketFlightPathCalculator.ActionMoment::completed), type + " actions did not complete");
@@ -138,33 +140,127 @@ public final class RocketFlightPathTest {
     }
 
     @Test
-    void stationKeepingExpiresAndCostsMoreForLargerCraft() {
+    void maintainPositionResourceConditionsContinueThePlan() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         var segmentId = UUID.randomUUID();
-        var smallSegment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
-                Map.of(), 25, 1);
-        var largeSegment = new StaticRocketSegment(segmentId, smallSegment.blocks(), Map.of(), 50, 1);
+        var segment = new StaticRocketSegment(segmentId, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                        rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(),
+                        rearth.oritech.spaceage.init.SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
+                Map.of(), 25, 2, 2_000_000, 20_000);
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        for (var type : SpaceSimulation.ActionAddonType.values()) {
+            if (!type.isMaintainPositionCondition()) continue;
+            var dynamic = new DynamicRocketSegment(20_000,
+                    type == SpaceSimulation.ActionAddonType.LOW_FUEL ? 100_000_000 : 2_000_000,
+                    1_000, Set.of());
+            var rocket = new ActiveRocketData(Map.of(segmentId, segment), Map.of(segmentId, dynamic));
+            var condition = new SpaceSimulation.ActionAddon(UUID.randomUUID(), type, 50);
+            var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION)
+                    .withAddons(List.of(condition));
+            var discard = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DISCARD_CRAFT);
+            var empty = SpaceSimulation.FlightPlan.empty();
+            var plan = empty.withBranches(List.of(empty.root().withActions(List.of(maintain, discard))));
+
+            var result = RocketFlightPathCalculator.calculate(rocket, List.of(earth), plan);
+            var path = result.paths().getFirst();
+            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED,
+                    type + " condition did not continue to the next card");
+            require(path.actionMoments().size() == 2, type + " did not complete maintain position");
+            require(result.navigationAborts().stream().anyMatch(moment -> moment.addonId().equals(condition.id())),
+                    type + " did not record its trigger");
+        }
+    }
+
+    @Test
+    void stationKeepingConsumesFixedDeltaVRegardlessOfEngineCount() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var segmentId = UUID.randomUUID();
+        var oneEngine = new StaticRocketSegment(segmentId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Map.of(), 25, 1, 2_000_000, 0);
+        var fourEngines = new StaticRocketSegment(segmentId,
+                java.util.stream.IntStream.range(0, 4).mapToObj(x -> new StaticRocketSegment.BlockData(
+                        new BlockPos(x, 0, 0), rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()))
+                        .collect(java.util.stream.Collectors.toSet()),
+                Map.of(), 25, 4, 2_000_000, 0);
         var dynamic = new DynamicRocketSegment(0, 2_000_000, 0, Set.of());
-        var smallRocket = new ActiveRocketData(Map.of(segmentId, smallSegment), Map.of(segmentId, dynamic));
-        var largeRocket = new ActiveRocketData(Map.of(segmentId, largeSegment), Map.of(segmentId, dynamic));
+        var oneEngineRocket = new ActiveRocketData(Map.of(segmentId, oneEngine), Map.of(segmentId, dynamic));
+        var fourEngineRocket = new ActiveRocketData(Map.of(segmentId, fourEngines), Map.of(segmentId, dynamic));
         var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
                 0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
         var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION);
         var empty = SpaceSimulation.FlightPlan.empty();
         var plan = empty.withBranches(List.of(empty.root().withActions(List.of(maintain))));
 
-        var small = RocketFlightPathCalculator.calculate(smallRocket, List.of(earth), plan).paths().getFirst();
-        var large = RocketFlightPathCalculator.calculate(largeRocket, List.of(earth), plan).paths().getFirst();
-        require(small.durationSeconds() > 0 && Double.isFinite(small.durationSeconds()),
+        var one = RocketFlightPathCalculator.calculate(oneEngineRocket, List.of(earth), plan).paths().getFirst();
+        var four = RocketFlightPathCalculator.calculate(fourEngineRocket, List.of(earth), plan).paths().getFirst();
+        require(one.durationSeconds() > 0 && Double.isFinite(one.durationSeconds()),
                 "station keeping must have a finite lifetime");
-        require(large.durationSeconds() < small.durationSeconds(),
-                "larger craft must spend station keeping resources faster");
-        require(small.remainingDeltaV() == 0 && large.remainingDeltaV() == 0,
+        require(Math.abs(one.durationSeconds() - four.durationSeconds()) < 0.000001,
+                "engine count changed the lifetime of the same delta-v reserve");
+        var expectedDays = RocketPerformanceCalculator.calculate(oneEngineRocket).availableDeltaVMetersPerSecond()
+                / SpaceBalance.STATION_KEEPING_DELTA_V_PER_DAY;
+        require(Math.abs(one.durationSeconds() / 1_200 - expectedDays) < 0.000001,
+                "station keeping did not consume the configured delta-v per Minecraft day");
+        require(one.remainingDeltaV() == 0 && four.remainingDeltaV() == 0,
                 "station keeping must exhaust the propulsion budget");
-        require(small.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED,
-                "station keeping must report its expiration");
+        require(one.terminalState() == RocketFlightPathCalculator.TerminalState.READY,
+                "station keeping must complete when its first required resource expires");
+    }
+
+    @Test
+    void stationKeepingEndsAtItsFirstRequiredResource() {
+        SharedConstants.tryDetectVersion();
+        Bootstrap.bootStrap();
+        var segmentId = UUID.randomUUID();
+        var segment = new StaticRocketSegment(segmentId, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                        rearth.oritech.spaceage.init.SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(),
+                        rearth.oritech.spaceage.init.SpaceAgeBlocks.ANTENNA.get().defaultBlockState())),
+                Map.of(), 25, 1, 2_000_000, 20_000);
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+
+        var fuelLimited = maintainEstimate(segmentId, segment, earth, 2_000_000);
+        var rfLimited = maintainEstimate(segmentId, segment, earth, 1_000);
+        require(fuelLimited.end() == RocketFlightPathCalculator.StationKeepingEnd.FUEL,
+                "fuel should limit a well-powered chemical craft");
+        require(rfLimited.end() == RocketFlightPathCalculator.StationKeepingEnd.RF,
+                "antenna RF should limit a craft with a nearly empty battery");
+        require(rfLimited.durationSeconds() < fuelLimited.durationSeconds(),
+                "station keeping must stop at the earlier required resource");
+
+        var lateLowRf = new SpaceSimulation.ActionAddon(UUID.randomUUID(),
+                SpaceSimulation.ActionAddonType.LOW_RF, 10);
+        var withLateCondition = maintainForecast(segmentId, segment, earth, 2_000_000, lateLowRf);
+        require(withLateCondition.stationKeepingEstimates().getFirst().end()
+                        == RocketFlightPathCalculator.StationKeepingEnd.FUEL,
+                "a threshold after automatic fuel exhaustion must not replace the actual ending");
+        require(withLateCondition.navigationAborts().isEmpty(),
+                "a threshold reached after station keeping ends must not trigger");
+    }
+
+    private static RocketFlightPathCalculator.StationKeepingEstimate maintainEstimate(
+            UUID segmentId, StaticRocketSegment segment, SpaceSimulation.SpaceObjectData earth, long rf) {
+        return maintainForecast(segmentId, segment, earth, rf, null).stationKeepingEstimates().getFirst();
+    }
+
+    private static RocketFlightPathCalculator.FlightPath maintainForecast(
+            UUID segmentId, StaticRocketSegment segment, SpaceSimulation.SpaceObjectData earth, long rf,
+            SpaceSimulation.ActionAddon condition) {
+        var rocket = new ActiveRocketData(Map.of(segmentId, segment),
+                Map.of(segmentId, new DynamicRocketSegment(20_000, rf, 1_000, Set.of())));
+        var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION);
+        if (condition != null) maintain = maintain.withAddons(List.of(condition));
+        var empty = SpaceSimulation.FlightPlan.empty();
+        var plan = empty.withBranches(List.of(empty.root().withActions(List.of(maintain))));
+        return RocketFlightPathCalculator.calculate(rocket, List.of(earth), plan);
     }
 
     @Test
@@ -173,7 +269,7 @@ public final class RocketFlightPathTest {
         Bootstrap.bootStrap();
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
                 Map.of(segmentId, new DynamicRocketSegment(0, 100_000_000, 0, Set.of())));
@@ -245,10 +341,11 @@ public final class RocketFlightPathTest {
         var coreId = UUID.randomUUID();
         var boosterId = UUID.randomUUID();
         var core = new StaticRocketSegment(coreId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, Blocks.STONE.defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(boosterId, Set.of()), 100, 1);
         var booster = new StaticRocketSegment(boosterId,
-                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), Blocks.STONE.defaultBlockState())),
+                java.util.stream.IntStream.range(2, 6).mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                        rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())).collect(java.util.stream.Collectors.toSet()),
                 Map.of(coreId, Set.of()), 25, 4);
         var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
                 coreId, new DynamicRocketSegment(0, 40_000_000, 0, Set.of(boosterId)),
@@ -264,7 +361,12 @@ public final class RocketFlightPathTest {
         var plan = new SpaceSimulation.FlightPlan(List.of(base.root().withActions(List.of(action))), List.of(
                 new SpaceSimulation.SegmentConfiguration(SpaceSimulation.SegmentRef.of(core), "Core", false, List.of(2)),
                 new SpaceSimulation.SegmentConfiguration(SpaceSimulation.SegmentRef.of(booster), "Booster", true, List.of(1))));
-        var result = RocketFlightPathCalculator.calculate(rocket, objects, plan);
+        // This regression exercises vacuum braking across a booster burnout, independently of ascent.
+        var angle = Math.atan2(1_500_000, 8_000_000);
+        var start = new MissionState.Position(-3_000_000 + Math.cos(angle) * 70_000, Math.sin(angle) * 70_000,
+                0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.LOW, 0, 1,
+                SpaceSimulation.FlightPlanAction.NO_TARGET, new SpaceSimulation.SegmentRef(BlockPos.ZERO));
+        var result = RocketFlightPathCalculator.calculateFrom(rocket, objects, plan, start);
         var path = result.paths().getFirst();
         ready(path);
         var departure = path.samples().getFirst();

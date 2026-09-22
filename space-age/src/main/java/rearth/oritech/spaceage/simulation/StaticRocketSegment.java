@@ -15,7 +15,10 @@ import java.util.UUID;
 // everything is in local space relative to the origin of the entire rocket
 // this data does not change during the flight of a rocket segment
 public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> originalCouplings,
-                                  long staticWeight, int engineCount) {
+                                  long staticWeight, int engineCount, long initialRF, long initialFuel) {
+    public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines) {
+        this(id, blocks, couplings, weight, engines, 0, 0);
+    }
 
     private static final Codec<Set<BlockData>> BLOCKS_CODEC = BlockData.CODEC.listOf()
             .xmap(Set::copyOf, List::copyOf);
@@ -29,7 +32,9 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
             BLOCKS_CODEC.fieldOf("blocks").forGetter(StaticRocketSegment::blocks),
             COUPLING_MAP_CODEC.fieldOf("original_couplings").forGetter(StaticRocketSegment::originalCouplings),
             Codec.LONG.fieldOf("static_weight").forGetter(StaticRocketSegment::staticWeight),
-            Codec.INT.fieldOf("engine_count").forGetter(StaticRocketSegment::engineCount)
+            Codec.INT.fieldOf("engine_count").forGetter(StaticRocketSegment::engineCount),
+            Codec.LONG.optionalFieldOf("initial_rf", 0L).forGetter(StaticRocketSegment::initialRF),
+            Codec.LONG.optionalFieldOf("initial_fuel", 0L).forGetter(StaticRocketSegment::initialFuel)
     ).apply(instance, StaticRocketSegment::new));
 
     public StaticRocketSegment {
@@ -48,11 +53,13 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
         return originalCouplings.get(targetSegmentId);
     }
 
-    public record BlockData(BlockPos relativePos, BlockState state) {
+    public record BlockData(BlockPos relativePos, BlockState state, net.minecraft.nbt.CompoundTag entityData) {
+        public BlockData(BlockPos pos, BlockState state) { this(pos, state, new net.minecraft.nbt.CompoundTag()); }
 
         private static final Codec<BlockData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BlockPos.CODEC.fieldOf("position").forGetter(BlockData::relativePos),
-                BlockState.CODEC.fieldOf("state").forGetter(BlockData::state)
+                BlockState.CODEC.fieldOf("state").forGetter(BlockData::state),
+                net.minecraft.nbt.CompoundTag.CODEC.optionalFieldOf("entity", new net.minecraft.nbt.CompoundTag()).forGetter(BlockData::entityData)
         ).apply(instance, BlockData::new));
     }
 

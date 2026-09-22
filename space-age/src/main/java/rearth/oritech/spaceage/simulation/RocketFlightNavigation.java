@@ -33,16 +33,74 @@ final class RocketFlightNavigation {
     private RocketFlightNavigation() {
     }
 
-    static boolean navigate(SpaceSimulation.FlightPlanAction action, Craft craft,
-                            Context context) {
+    static boolean navigate(SpaceSimulation.FlightPlanAction action, Craft craft, Context context) {
         var target = context.objects.get(action.targetId());
-        if (target == null || craft.segments.isEmpty()) return false;
+        if (target == null) {
+            craft.blockedState = TerminalState.TARGET_UNAVAILABLE;
+            return false;
+        }
+        var destinationAngle = targetPointAngle(action, craft, target);
+        var earth = context.objects.get(SpaceObjects.EARTH_ID);
+        // Chemical thrust does not change at the atmosphere boundary.
+        boolean ionPowered = craft.segments.values().stream().anyMatch(segment -> segment.ionSeconds > BURN_TOLERANCE);
+        if (ionPowered && earth != null && earth.radius() > 0) {
+            var distance = Math.hypot(craft.x - earth.x(), craft.y - earth.y());
+            boolean leaving = distance < earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude() - 0.1
+                    && (!target.id().equals(earth.id()) || action.orbit().altitude() > SpaceSimulation.OrbitBand.LOW.altitude());
+            boolean returning = distance > earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude() + 0.1
+                    && target.id().equals(earth.id()) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE && action.addons().isEmpty();
+            if (leaving || returning) {
+                var boundary = action.withTarget(earth.id()).withOrbit(SpaceSimulation.OrbitBand.LOW)
+                        .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0).withAddons(List.of());
+                if (returning) {
+                    craft.atmosphere = true;
+                    var acceleration = craft.deltaVPerSecond(craft.activeSegments(context));
+                    // Enter with enough stopping distance for the weaker atmospheric engines.
+                    int entrySpeed = Math.max(1, (int) Math.sqrt(acceleration * SpaceSimulation.OrbitBand.LOW.altitude()));
+                    if (action.maxSpeed() > 0) entrySpeed = Math.min(entrySpeed, action.maxSpeed());
+                    boundary = boundary.withVelocity(SpaceSimulation.ArrivalVelocityMode.CUSTOM, entrySpeed);
+                }
+                double angle = destinationAngle;
+                if (leaving) {
+                    // Cross the atmosphere on the actual approach line, without adding a turn at LOW.
+                    var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
+                    var direction = Math.atan2(destination.y - craft.y, destination.x - craft.x);
+                    var dx = Math.cos(direction);
+                    var dy = Math.sin(direction);
+                    var offsetX = craft.x - earth.x();
+                    var offsetY = craft.y - earth.y();
+                    var along = offsetX * dx + offsetY * dy;
+                    var radius = earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude();
+                    var exit = -along + Math.sqrt(along * along + radius * radius - distance * distance);
+                    angle = Math.atan2(offsetY + dy * exit, offsetX + dx * exit);
+                }
+                if (!navigateLeg(boundary, craft, context, angle)) return false;
+            }
+        }
+        return navigateLeg(action, craft, context, destinationAngle);
+    }
+
+    private static boolean navigateLeg(SpaceSimulation.FlightPlanAction action, Craft craft,
+                            Context context, double destinationAngle) {
+        var target = context.objects.get(action.targetId());
+        if (craft.segments.isEmpty()) {
+            craft.blockedState = TerminalState.EMPTY_CRAFT;
+            return false;
+        }
+        if (target.type() == SpaceObjects.ObjectType.ASTEROID && action.orbit() == SpaceSimulation.OrbitBand.SURFACE
+                && target.detectionState() != SpaceObjects.DetectionState.PRECISE) {
+            craft.blockedState = TerminalState.PRECISE_POSITION_REQUIRED;
+            return false;
+        }
         while (RocketFlightPathCalculator.finishStage(action, craft, context)) {
             // Empty stages are valid when a saved plan is reused on a smaller rocket.
         }
 
-        var destinationAngle = targetPointAngle(action, craft, target);
-        var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), target.radius(),
+        var earth = context.objects.get(SpaceObjects.EARTH_ID);
+        craft.atmosphere = earth != null && earth.radius() > 0
+                && (Math.hypot(craft.x - earth.x(), craft.y - earth.y()) < earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude() - 0.1
+                || target.id().equals(earth.id()) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE);
+        var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target),
                 action.orbit(), destinationAngle);
         var startTime = craft.time;
         var approachX = destination.x - craft.x;
@@ -59,7 +117,7 @@ final class RocketFlightNavigation {
 
         var step = 0;
         for (; step < MAX_STEPS && craft.time - startTime < MAX_SECONDS; step++) {
-            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), target.radius(),
+            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target),
                     action.orbit(), destinationAngle);
             var offsetX = destination.x - craft.x;
             var offsetY = destination.y - craft.y;
@@ -107,15 +165,17 @@ final class RocketFlightNavigation {
             var stepSeconds = Math.min(command.sampleStepSeconds, command.stepLimitSeconds);
             if (command.burning) {
                 if (active.isEmpty() || acceleration <= 0.0001) {
+                    craft.blockedState = TerminalState.NO_ACTIVE_ENGINES;
                     appendSamples(craft, samples);
                     return false;
                 }
                 // Stop exactly at fuel boundaries so stage markers do not drift.
                 var nextEngineStop = active.stream().map(craft.segments::get)
-                        .mapToDouble(segment -> segment.remainingBurnSeconds).min().orElse(0);
+                        .mapToDouble(segment -> segment.seconds()).min().orElse(0);
                 stepSeconds = Math.min(stepSeconds, nextEngineStop);
             } else if (Math.hypot(craft.velocityX, craft.velocityY) <= 0.0001
                     && !Double.isFinite(command.stepLimitSeconds)) {
+                craft.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
                 appendSamples(craft, samples);
                 return false;
             }
@@ -144,11 +204,13 @@ final class RocketFlightNavigation {
                                          Point destination, TransferPlan transferPlan) {
         if (action.addons().isEmpty()) return null;
         var addon = action.addons().getFirst();
+        if (!addon.type().isNavigationCondition()) return null;
         var distance = Math.hypot(destination.x - craft.x, destination.y - craft.y);
         var actual = switch (addon.type()) {
             case DISTANCE_FROM_TARGET -> distance;
             case TIME_BEFORE_ARRIVAL -> Math.max(0, transferPlan.transfer.duration() - (craft.time - transferPlan.startTime));
             case DESIRED_UNCERTAINTY -> AsteroidImpactRules.landingUncertaintyBlocks(distance);
+            case LOW_RF, LOW_FUEL -> Double.POSITIVE_INFINITY;
         };
         return actual <= addon.value() ? new Abort(addon, actual) : null;
     }
@@ -172,7 +234,7 @@ final class RocketFlightNavigation {
         appendSamples(craft, samples);
         craft.currentTarget = target.id();
         craft.currentOrbit = action.orbit();
-        if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE) {
+        if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE && target.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
             if (target.id().equals(SpaceObjects.EARTH_ID)) craft.lastEarthSurfaceAction = action;
             var relativeSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
             var prediction = AsteroidImpactRules.predictArrival(craft.rocketMass(), target, relativeSpeed,
@@ -216,6 +278,8 @@ final class RocketFlightNavigation {
 
     private static double targetPointAngle(SpaceSimulation.FlightPlanAction action, Craft craft,
                                            SpaceSimulation.SpaceObjectData target) {
+        if (target.id().equals(SpaceObjects.EARTH_ID) && SpaceBalance.hasSlots(action.orbit())
+                && action.service().slot() >= 0) return Math.PI + Math.PI * 2 * action.service().slot() / SpaceBalance.slots(action.orbit());
         var nearestAngle = Math.atan2(craft.y - target.yAt(craft.time), craft.x - target.xAt(craft.time));
         return nearestAngle + targetPointOffset(action);
     }

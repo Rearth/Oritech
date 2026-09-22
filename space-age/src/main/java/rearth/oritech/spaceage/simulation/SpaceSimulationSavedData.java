@@ -30,6 +30,10 @@ public class SpaceSimulationSavedData extends SavedData {
         this.simulations.putAll(simulations);
     }
 
+    public static SpaceSimulationSavedData get(net.minecraft.server.MinecraftServer server) {
+        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
+    }
+
     private static SpaceSimulationSavedData get(ServerPlayer player) {
         return player.level().getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
     }
@@ -38,7 +42,7 @@ public class SpaceSimulationSavedData extends SavedData {
         return get(player).getOrCreate(player.getUUID());
     }
 
-    SpaceSimulation getOrCreate(UUID player) {
+    public SpaceSimulation getOrCreate(UUID player) {
         var simulation = simulations.get(player);
         if (simulation == null) {
             simulation = new SpaceSimulation();

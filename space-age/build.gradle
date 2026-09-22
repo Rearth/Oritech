@@ -119,17 +119,6 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.register('transferTest', JavaExec) {
-    group = 'verification'
-    description = 'Checks full-power transfers, fuel conservation, speed limits and arrivals.'
-    dependsOn testClasses
-    classpath = sourceSets.test.runtimeClasspath
-    mainClass = 'rearth.oritech.spaceage.simulation.FullPowerTransferTest'
-    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
-}
-
-tasks.named('check') { dependsOn 'transferTest' }
-
 tasks.named('test') {
     useJUnitPlatform()
     workingDir = layout.buildDirectory.get().asFile

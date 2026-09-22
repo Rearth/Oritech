@@ -24,6 +24,12 @@ final class SpaceAgeButtons {
         return colors(ButtonWidget.orangePanel(x, y, width, height, label, onPress));
     }
 
+    static ButtonWidget close(int x, int y, Consumer<ButtonWidget> onPress) {
+        var button = darkPanel(x, y, 18, 16, Component.literal("×"), onPress);
+        button.withTooltip(Component.translatable("gui.close"));
+        return button;
+    }
+
     private static ButtonWidget colors(ButtonWidget button) {
         return button.withDisabledTextColor(0xFFBBBBBB).withPressedTextColor(LabelWidget.BRIGHT_TEXT);
     }

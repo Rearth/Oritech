@@ -40,6 +40,9 @@ class SpaceSimulationPersistenceTest {
         assertTrue(data.isDirty());
         data.setDirty(false);
         var rocketId = UUID.randomUUID();
+        assertTrue(simulation.createObjectData().stream().noneMatch(o -> o.type() == SpaceObjects.ObjectType.ASTEROID));
+        for (var object : simulation.truth()) if (object.type() == SpaceObjects.ObjectType.ASTEROID)
+            simulation.earthKnowledge.scan(List.of(object), player, 0, -1, object.x(), object.y(), 8, SpaceBalance.DAY, SpaceBalance.SCAN_RANGE);
         var initial = simulation.createFlightPlannerSnapshot(assembler, rocketId);
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
@@ -75,7 +78,7 @@ class SpaceSimulationPersistenceTest {
                 List.of(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DISCARD_CRAFT)));
         var plan = new SpaceSimulation.FlightPlan(List.of(initial.plan().root().withActions(List.of(navigate, separate)), child),
                 List.of(new SpaceSimulation.SegmentConfiguration(coreRef, "Explorer", false, List.of(2)),
-                        new SpaceSimulation.SegmentConfiguration(boosterRef, "Booster", true, List.of(1))));
+                        new SpaceSimulation.SegmentConfiguration(boosterRef, "Booster", true, List.of(1))), "Wayfinder");
         data.updateFlightPlan(player, assembler, plan, rocket);
         assertTrue(data.isDirty());
         data.setDirty(false);

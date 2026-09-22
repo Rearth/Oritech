@@ -28,6 +28,13 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<RocketEngineBlock> BASIC_BOOSTER_ROCKET = registerRocketEngine("basic_booster_rocket", RocketEngineBlock.Type.BASIC);
     public static final DeferredBlock<RocketEngineBlock> ION_BOOSTER_ROCKET = registerRocketEngine("ion_booster_rocket", RocketEngineBlock.Type.ION);
 
+    public static final DeferredBlock<rearth.oritech.spaceage.block.MissionControlBlock> MISSION_CONTROL =
+            BLOCKS.registerBlock("mission_control", rearth.oritech.spaceage.block.MissionControlBlock::new, SpaceAgeBlocks::machineProperties);
+    public static final DeferredBlock<rearth.oritech.spaceage.block.SurveyModuleBlock> SPACE_SCANNER =
+            BLOCKS.registerBlock("space_scanner", rearth.oritech.spaceage.block.SurveyModuleBlock::new, SpaceAgeBlocks::machineProperties);
+    public static final DeferredBlock<rearth.oritech.spaceage.block.SurveyModuleBlock> ANTENNA =
+            BLOCKS.registerBlock("antenna", rearth.oritech.spaceage.block.SurveyModuleBlock::new, SpaceAgeBlocks::machineProperties);
+
     private SpaceAgeBlocks() {
     }
 
