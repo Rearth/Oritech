@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.BlockPos;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,14 +24,22 @@ public class ActiveRocketData {
             UUIDUtil.STRING_CODEC.fieldOf("rocket_id").forGetter(ActiveRocketData::getRocketId),
             STATIC_SEGMENTS_CODEC.fieldOf("static_segments").forGetter(ActiveRocketData::getStaticSegments),
             DYNAMIC_SEGMENTS_CODEC.fieldOf("dynamic_segments").forGetter(ActiveRocketData::getDynamicSegments),
+            BlockPos.CODEC.optionalFieldOf("launch_position", BlockPos.ZERO).forGetter(ActiveRocketData::getLaunchPosition),
             RocketFlight.CODEC.optionalFieldOf("flight").forGetter(rocket -> Optional.ofNullable(rocket.flight))
-    ).apply(instance, (rocketId, staticSegments, dynamicSegments, flight) ->
-            new ActiveRocketData(rocketId, staticSegments, dynamicSegments, flight.orElse(null))));
+    ).apply(instance, (rocketId, staticSegments, dynamicSegments, launch, flight) -> {
+                var rocket = new ActiveRocketData(rocketId, staticSegments, dynamicSegments, flight.orElse(null));
+                rocket.setLaunchPosition(launch);
+                return rocket;
+            }));
 
     private final UUID rocketId;
     private final Map<UUID, StaticRocketSegment> staticSegments = new HashMap<>();
     private final Map<UUID, DynamicRocketSegment> dynamicSegments = new HashMap<>();
     private RocketFlight flight;
+    private BlockPos launchPosition = BlockPos.ZERO;
+
+    public BlockPos getLaunchPosition() { return launchPosition; }
+    public void setLaunchPosition(BlockPos position) { launchPosition = position.immutable(); }
 
     public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {
         this(UUID.randomUUID(), staticSegments, dynamicSegments, null);

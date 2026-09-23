@@ -10,6 +10,13 @@ import java.util.*;
 /** Integration checks for the planner's stage/resource handling and editor branch rules. */
 public final class RocketFlightPathTest {
     @Test
+    void intentionalImpactDoesNotPreventLaunch() {
+        require(RocketFlightPathCalculator.TerminalState.DESTROYED.isFailure(), "impact remains a visible warning");
+        require(!RocketFlightPathCalculator.TerminalState.DESTROYED.preventsLaunch(), "intentional impact may launch");
+        require(RocketFlightPathCalculator.TerminalState.NOT_ENOUGH_DELTA_V.preventsLaunch(), "invalid path blocks launch");
+    }
+
+    @Test
     void flightPathsAndBranches() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
@@ -30,8 +37,9 @@ public final class RocketFlightPathTest {
         var plan = base.withBranches(List.of(base.root().withActions(List.of(action))));
         var path = RocketFlightPathCalculator.calculate(rocket, objects, plan).paths().getFirst();
         ready(path);
-        require(path.samples().stream().anyMatch(sample -> sample.phase() == RocketFlightPathCalculator.PathPhase.COAST
-                && sample.timeSeconds() > 100 && sample.timeSeconds() < path.durationSeconds() - 100), "middle coast");
+        require(java.util.stream.IntStream.range(1, path.samples().size()).anyMatch(i ->
+                path.samples().get(i).phase() == RocketFlightPathCalculator.PathPhase.COAST
+                && path.samples().get(i).timeSeconds() - path.samples().get(i - 1).timeSeconds() > 100), "middle coast");
         var capped = plan.withBranches(List.of(base.root().withActions(List.of(action.withMaxSpeed(100)))));
         var slower = RocketFlightPathCalculator.calculate(rocket, objects, capped).paths().getFirst();
         ready(slower);
@@ -264,15 +272,15 @@ public final class RocketFlightPathTest {
     }
 
     @Test
-    void allTargetPointsUseStableRandomOffsets() {
+    void targetPointsUseStableCoordinatesAndNarrowOrbitOffsets() {
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, rearth.oritech.spaceage.init.SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
-                Map.of(segmentId, new DynamicRocketSegment(0, 100_000_000, 0, Set.of())));
+                Map.of(segmentId, new DynamicRocketSegment(1_000_000, 0, 0, Set.of())));
         var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
                 0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
         var mars = new SpaceSimulation.SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
@@ -313,8 +321,11 @@ public final class RocketFlightPathTest {
                     arrival.x() - target.xAt(arrival.timeSeconds()));
             double difference = Math.abs(nearestAngle - arrivalAngle) % (Math.PI * 2);
             difference = Math.min(difference, Math.PI * 2 - difference);
-            require(difference <= Math.toRadians(70) + 0.000001,
-                    "target point exceeded the 70 degree range");
+            if (action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
+                require(Math.abs(arrivalAngle - SpaceBalance.surfaceAngle(action.landingX(), action.landingZ())) < 1e-6,
+                        "Earth arrival must use surface coordinates");
+            else require(difference <= SpaceBalance.TARGET_ANGLE_SPREAD + 0.000001,
+                    "target point exceeded the configured angular range");
             require(Math.abs(Math.hypot(arrival.x() - target.xAt(arrival.timeSeconds()),
                     arrival.y() - target.yAt(arrival.timeSeconds()))
                     - (target.radius() + action.orbit().altitude())) < 0.01,
@@ -387,8 +398,9 @@ public final class RocketFlightPathTest {
                 "arrival missed Mars high orbit");
         require(result.boosterEvents().size() == 1, "one booster separation");
         var eventTime = result.boosterEvents().getFirst().timeSeconds();
-        require(path.samples().stream().anyMatch(sample -> sample.timeSeconds() <= eventTime
-                && sample.phase() == RocketFlightPathCalculator.PathPhase.BRAKE), "braking before separation");
+        var boosterRef = SpaceSimulation.SegmentRef.of(booster);
+        require(path.samples().stream().anyMatch(sample -> Math.abs(sample.timeSeconds() - eventTime) < 1e-7
+                && sample.firingSegments().contains(boosterRef)), "booster burn ends exactly at separation");
         require(path.samples().stream().anyMatch(sample -> sample.timeSeconds() > eventTime
                 && sample.phase() == RocketFlightPathCalculator.PathPhase.BRAKE), "braking after separation");
         require(path.samples().getLast().speedMetersPerSecond() < 0.0001, "stopped at arrival");

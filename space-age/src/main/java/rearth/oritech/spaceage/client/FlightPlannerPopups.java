@@ -58,7 +58,7 @@ final class FlightPlannerPopups {
                 && rearth.oritech.spaceage.simulation.SpaceBalance.hasSlots(action.orbit());
         int settingCount = switch (action.type()) {
             case NAVIGATE_TO -> 4 + (survey ? 0 : 1) + (deployment ? 1 : 0);
-            case SCAN -> action.service().untilPrecise() ? 3 : 4;
+            case SCAN -> 2;
             case RELAY, TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE -> 2;
             case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
@@ -87,29 +87,19 @@ final class FlightPlannerPopups {
                 .withTooltip(FlightPlannerLabels.actionTooltip(action.type())).withZIndex(9_001));
         rowY += 25;
 
-        if (action.type() == SpaceSimulation.ActionType.SCAN || action.type() == SpaceSimulation.ActionType.RELAY
+        if (action.type() == SpaceSimulation.ActionType.RELAY
                 || action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION) {
             var settings = action.service();
             var text = action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION
                     ? settings.timeoutTicks() == 0 ? Component.translatable("screen.oritech_space_age.action.timeout_wait")
                     : Component.translatable("screen.oritech_space_age.action.timeout_seconds", settings.timeoutTicks() / 20)
                     : Component.translatable("screen.oritech_space_age.action.duration_seconds", settings.durationTicks() / 20);
-            if (action.type() != SpaceSimulation.ActionType.SCAN || !settings.untilPrecise()) {
-                editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18, text,
-                        ignored -> editors.editServiceNumber(action))
-                        .withTooltip(Component.translatable(action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION
-                                ? "screen.oritech_space_age.action.timeout_tooltip" : "screen.oritech_space_age.action.duration_tooltip"))
-                        .withZIndex(9_001));
-                rowY += 25;
-            }
-            if (action.type() == SpaceSimulation.ActionType.SCAN) {
-                editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
-                        Component.translatable(settings.untilPrecise() ? "screen.oritech_space_age.action.scan_until_precise"
-                                : "screen.oritech_space_age.action.scan_for_duration"), ignored -> editors.changeService(action,
-                                new SpaceSimulation.ServiceSettings(settings.durationTicks(), !settings.untilPrecise(), settings.timeoutTicks(), settings.slot())))
-                        .withTooltip(Component.translatable("screen.oritech_space_age.action.scan_mode_tooltip")).withZIndex(9_001));
-                rowY += 25;
-            }
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18, text,
+                    ignored -> editors.editServiceNumber(action))
+                    .withTooltip(Component.translatable(action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION
+                            ? "screen.oritech_space_age.action.timeout_tooltip" : "screen.oritech_space_age.action.duration_tooltip"))
+                    .withZIndex(9_001));
+            rowY += 25;
         }
         if (action.type() == SpaceSimulation.ActionType.SCAN) {
             var estimate = FlightPlannerLabels.scanEstimate(editors.calculatedFlight(), action.id());
@@ -157,7 +147,7 @@ final class FlightPlannerPopups {
                 editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                         Component.translatable("screen.oritech_space_age.action.deployment_slot",
                                 settings.slot() < 0 ? Component.translatable("screen.oritech_space_age.action.slot_auto") : settings.slot()), ignored -> editors.changeService(action,
-                                new SpaceSimulation.ServiceSettings(settings.durationTicks(), settings.untilPrecise(), settings.timeoutTicks(),
+                                new SpaceSimulation.ServiceSettings(settings.durationTicks(), settings.timeoutTicks(),
                                         settings.slot() + 1 >= rearth.oritech.spaceage.simulation.SpaceBalance.slots(action.orbit()) ? -1 : settings.slot() + 1)))
                         .withTooltip(Component.translatable("screen.oritech_space_age.action.slot_tooltip")).withZIndex(9_001));
                 rowY += 25;

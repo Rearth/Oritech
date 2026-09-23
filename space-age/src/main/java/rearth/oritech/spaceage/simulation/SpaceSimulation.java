@@ -95,7 +95,7 @@ public class SpaceSimulation {
         region.currentPosition = new Vector2f((float) x, (float) y);
         region.radius = (float) radius;
         region.name = "Survey region";
-        region.currentState = SpaceObjects.DetectionState.HINTED;
+        region.currentState = SpaceObjects.DetectionState.PRECISE;
         nonCelestialObjects.add(region);
         for (int index = 0; index < count; index++) {
             var angle = Math.random() * Math.PI * 2;
@@ -165,7 +165,9 @@ public class SpaceSimulation {
                     && Math.hypot(candidate.x() - object.x(), candidate.y() - object.y()) <= object.radius()
                     && knowledge.contact(candidate.id()) == null);
         }).toList());
-        visible.addAll(knowledge.contacts());
+        var existingAsteroids = truth.stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
+                .map(SpaceObjectData::id).collect(java.util.stream.Collectors.toSet());
+        visible.addAll(knowledge.contacts().stream().filter(contact -> existingAsteroids.contains(contact.id())).toList());
         visible.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
         return List.copyOf(visible);
     }
@@ -207,23 +209,44 @@ public class SpaceSimulation {
         });
     }
 
-    public void applyAsteroidImpact(UUID targetId, AsteroidImpactRules.ImpactPrediction impact) {
+    public UUID applyAsteroidImpact(UUID targetId, AsteroidImpactRules.ImpactPrediction impact) {
         var target = nonCelestialObjects.stream().filter(o -> o.id.equals(targetId)).findFirst().orElse(null);
-        if (!(target instanceof SpaceObjects.Asteroid asteroid) || impact.fragments().isEmpty()) return;
+        if (!(target instanceof SpaceObjects.Asteroid asteroid) || impact.fragments().isEmpty()) return null;
+        boolean destroyed = impact.remainingTargetMass() <= 0;
+        earthKnowledge.forget(targetId);
+        var targetPosition = new Vector2f(asteroid.currentPosition);
+        var targetName = asteroid.name.isBlank() ? "Unnamed asteroid" : asteroid.name;
+        // The old region was already surveyed to reveal this target. Replace it with the new debris field.
+        nonCelestialObjects.removeIf(object -> object.type == SpaceObjects.ObjectType.SURVEY_REGION
+                && Math.hypot(object.currentPosition.x - targetPosition.x,
+                object.currentPosition.y - targetPosition.y) <= object.radius);
+        float debrisRadius = 8_000;
         for (int index = 0; index < impact.fragments().size(); index++) {
             var fragment = impact.fragments().get(index);
             var child = new SpaceObjects.Asteroid();
             var angle = index * Math.PI * 2 / impact.fragments().size();
-            child.currentPosition = new Vector2f(asteroid.currentPosition).add((float) Math.cos(angle) * asteroid.radius, (float) Math.sin(angle) * asteroid.radius);
+            float offset = (asteroid.radius + fragment.radius()) * 1.25f;
+            child.currentPosition = new Vector2f(targetPosition).add((float) Math.cos(angle) * offset, (float) Math.sin(angle) * offset);
             child.weight = fragment.mass(); child.radius = fragment.radius(); child.materials = fragment.materials();
-            child.name = asteroid.name + " fragment " + (index + 1); nonCelestialObjects.add(child);
+            child.surfaceGravity = child.weight * 0.0002f;
+            child.name = destroyed ? "Fragment " + (index + 1) + " of destroyed " + targetName
+                    : targetName + " impact fragment " + (index + 1);
+            debrisRadius = Math.max(debrisRadius, offset + child.radius * 1.5f);
+            nonCelestialObjects.add(child);
         }
-        if (impact.remainingTargetMass() <= 0) nonCelestialObjects.remove(asteroid);
+        if (destroyed) nonCelestialObjects.remove(asteroid);
         else {
             double fraction = impact.remainingTargetMass() / asteroid.weight;
             asteroid.weight = impact.remainingTargetMass(); asteroid.radius *= (float) Math.cbrt(fraction);
             asteroid.materials = AsteroidImpactRules.scaleMaterials(asteroid.materials, fraction);
         }
+        var debris = new SpaceObjects.SimulatedObject(UUID.randomUUID(), SpaceObjects.ObjectType.SURVEY_REGION);
+        debris.currentPosition = targetPosition;
+        debris.radius = debrisRadius;
+        debris.name = destroyed ? "Debris field of destroyed " + targetName : "Impact debris near " + targetName;
+        debris.currentState = SpaceObjects.DetectionState.PRECISE;
+        nonCelestialObjects.add(debris);
+        return debris.id;
     }
 
     public void recoverAsteroid(net.minecraft.server.level.ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact) {
@@ -266,7 +289,7 @@ public class SpaceSimulation {
                                   float velocityX, float velocityY, float radius,
                                   float surfaceGravity, float mass,
                                   SpaceObjects.DetectionState detectionState, String name,
-                                  List<SpaceObjects.AsteroidMaterial> materials, float uncertainty, float compositionConfidence) {
+                                  List<SpaceObjects.AsteroidMaterial> materials) {
         public static final Codec<SpaceObjectData> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(SpaceObjectData::id),
                 SpaceObjects.ObjectType.CODEC.fieldOf("type").forGetter(SpaceObjectData::type),
@@ -276,15 +299,8 @@ public class SpaceSimulation {
                 Codec.FLOAT.fieldOf("mass").forGetter(SpaceObjectData::mass),
                 SpaceObjects.DetectionState.CODEC.fieldOf("detection").forGetter(SpaceObjectData::detectionState),
                 Codec.STRING.fieldOf("name").forGetter(SpaceObjectData::name),
-                SpaceObjects.AsteroidMaterial.CODEC.listOf().fieldOf("materials").forGetter(SpaceObjectData::materials),
-                Codec.FLOAT.fieldOf("uncertainty").forGetter(SpaceObjectData::uncertainty),
-                Codec.FLOAT.fieldOf("composition").forGetter(SpaceObjectData::compositionConfidence)
+                SpaceObjects.AsteroidMaterial.CODEC.listOf().fieldOf("materials").forGetter(SpaceObjectData::materials)
         ).apply(i, SpaceObjectData::new));
-        public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float vx, float vy,
-                               float radius, float gravity, float mass, SpaceObjects.DetectionState state, String name,
-                               List<SpaceObjects.AsteroidMaterial> materials) {
-            this(id, type, x, y, vx, vy, radius, gravity, mass, state, name, materials, 0, 1);
-        }
         public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y, float radius,
                                float surfaceGravity, SpaceObjects.DetectionState detectionState) {
             this(id, type, x, y, 0, 0, radius, surfaceGravity, 0, detectionState, "", List.of());
@@ -533,11 +549,10 @@ public class SpaceSimulation {
         }
     }
 
-    public record ServiceSettings(int durationTicks, boolean untilPrecise, int timeoutTicks, int slot) {
-        public static final ServiceSettings DEFAULT = new ServiceSettings(SpaceBalance.DAY, false, 0, -1);
+    public record ServiceSettings(int durationTicks, int timeoutTicks, int slot) {
+        public static final ServiceSettings DEFAULT = new ServiceSettings(SpaceBalance.DAY, 0, -1);
         public static final Codec<ServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.intRange(1, 24_000_000).fieldOf("duration").forGetter(ServiceSettings::durationTicks),
-                Codec.BOOL.fieldOf("until_precise").forGetter(ServiceSettings::untilPrecise),
                 Codec.intRange(0, 24_000_000).fieldOf("timeout").forGetter(ServiceSettings::timeoutTicks),
                 Codec.intRange(-1, 35).fieldOf("slot").forGetter(ServiceSettings::slot)
         ).apply(i, ServiceSettings::new));

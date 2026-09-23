@@ -10,6 +10,7 @@ import static rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 /** Tick actual missions; predictions use the same transfer compiler but never execute service effects. */
 public final class MissionController {
     public static void launch(ServerLevel level, UUID owner, ActiveRocketData rocket, FlightPlan plan, BlockPos launch) {
+        rocket.setLaunchPosition(launch);
         var system = SpaceSimulationSavedData.get(level.getServer()).getOrCreate(owner);
         plan = resolveOrbitSlots(plan, MissionSavedData.get(level.getServer()), owner, rocket.getRocketId());
         var objects = new HashMap<UUID, SpaceObjectData>(); system.createObjectData().forEach(o -> objects.put(o.id(), o));
@@ -66,7 +67,7 @@ public final class MissionController {
         if (action == null || action.type() != ActionType.NAVIGATE_TO && action.type() != ActionType.MAINTAIN_POSITION) {
             var p = state.position;
             state.position = new MissionState.Position(p.x() + p.vx() / 20, p.y() + p.vy() / 20, p.vx(), p.vy(),
-                    p.target(), p.orbit(), p.slot(), p.stage(), p.asteroid(), p.anchor());
+                    p.target(), p.orbit(), p.slot(), p.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
         }
         if (action == null) { state.status = MissionState.STATUS_COMPLETE; return; }
         switch (action.type()) {
@@ -83,40 +84,39 @@ public final class MissionController {
     }
 
     private static void scan(MissionState state, SpaceSimulation system, FlightPlanAction action, long tick) {
-        int scanners = 0;
-        for (var entry : state.rocket.getStaticSegments().entrySet()) {
-            var hardware = RocketHardware.of(entry.getValue());
-            var resources = state.rocket.getDynamicSegments().get(entry.getKey());
-            var active = (int) Math.min(hardware.scanners(), resources.availableRF / SpaceBalance.SCANNER_RF);
-            resources.availableRF -= active * SpaceBalance.SCANNER_RF;
-            scanners += active;
-        }
-        if (scanners == 0) {
+        var objects = system.truth();
+        var targetId = action.targetId().equals(FlightPlanAction.NO_TARGET)
+                ? state.position.target() : action.targetId();
+        var target = objects.stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
+        if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION
+                || SurveyRules.surveyDistance(target, state.position.x(), state.position.y()) > SpaceBalance.SCAN_RANGE) {
             state.status = MissionState.STATUS_SCAN_WAITING;
             return;
         }
-        var viewpoint = state.position.slot() < 0 ? -1
-                : state.position.orbit().ordinal() * 36 + state.position.slot();
-        var objects = system.truth();
-        state.knowledge.scan(objects, state.rocket.getRocketId(), tick, viewpoint,
-                state.position.x(), state.position.y(), scanners, 1, SpaceBalance.SCAN_RANGE);
-        state.actionTicks++;
+        long available = 0;
+        boolean scannerInstalled = false;
+        for (var entry : state.rocket.getStaticSegments().entrySet()) {
+            var hardware = RocketHardware.of(entry.getValue());
+            if (hardware.scanners() == 0) continue;
+            scannerInstalled = true;
+            available += state.rocket.getDynamicSegments().get(entry.getKey()).availableRF;
+        }
+        if (!scannerInstalled || available < SpaceBalance.SCAN_RF) {
+            state.status = MissionState.STATUS_SCAN_WAITING;
+            return;
+        }
+        long remaining = SpaceBalance.SCAN_RF;
+        for (var entry : state.rocket.getStaticSegments().entrySet()) {
+            if (RocketHardware.of(entry.getValue()).scanners() == 0) continue;
+            var resources = state.rocket.getDynamicSegments().get(entry.getKey());
+            var spent = Math.min(remaining, resources.availableRF);
+            resources.availableRF -= spent;
+            remaining -= spent;
+            if (remaining == 0) break;
+        }
+        state.knowledge.scanRegion(objects, target, tick, state.position.x(), state.position.y(), SpaceBalance.SCAN_RANGE);
         state.status = MissionState.STATUS_SCANNING;
-        var target = action.targetId().equals(FlightPlanAction.NO_TARGET)
-                ? state.position.target() : action.targetId();
-        var region = objects.stream().filter(object -> object.id().equals(target)
-                && object.type() == SpaceObjects.ObjectType.SURVEY_REGION).findFirst().orElse(null);
-        boolean precise = state.knowledge.precise(target);
-        if (region != null) {
-            // The region itself is not an asteroid contact. Complete once its contents are precise.
-            var contacts = objects.stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
-                    && Math.hypot(object.x() - region.x(), object.y() - region.y()) <= region.radius()).toList();
-            precise = contacts.isEmpty() ? state.actionTicks >= SpaceBalance.DAY
-                    : contacts.stream().allMatch(object -> state.knowledge.precise(object.id()));
-        }
-        if (action.service().untilPrecise() ? precise : state.actionTicks >= action.service().durationTicks()) {
-            state.complete();
-        }
+        state.complete();
     }
 
     private static void transmit(MinecraftServer server, MissionState state, SpaceSimulation system,
@@ -165,7 +165,7 @@ public final class MissionController {
         var position = state.position;
         state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(),
                 position.target(), position.orbit(), position.slot(), position.stage(), target.id(),
-                action.segments().getFirst());
+                action.segments().getFirst(), position.headingX(), position.headingY());
         state.complete();
     }
 
@@ -180,7 +180,7 @@ public final class MissionController {
             system.releaseAsteroid(position.asteroid(), position.x(), position.y(), position.vx(), position.vy(), landing);
             state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(),
                     position.target(), position.orbit(), position.slot(), position.stage(),
-                    FlightPlanAction.NO_TARGET, position.anchor());
+                    FlightPlanAction.NO_TARGET, position.anchor(), position.headingX(), position.headingY());
         } else if (action.segments().size() == 2) {
             var ids = new HashMap<SegmentRef, UUID>();
             state.rocket.getStaticSegments().forEach((id, segment) -> ids.put(SegmentRef.of(segment), id));
@@ -266,7 +266,7 @@ public final class MissionController {
             state.leg = new MissionState.Telemetry(MissionState.copyRocket(state.rocket), state.plan, state.position, tick, MissionState.STATUS_TRANSFER);
             state.legObjects = system.knownObjects(state.knowledge);
             var p = state.position;
-            state.position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), -1, p.stage(), p.asteroid(), p.anchor());
+            state.position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), -1, p.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
         }
         if (state.path == null) {
             if (state.legObjects.isEmpty()) state.legObjects = system.knownObjects(state.knowledge);
@@ -333,7 +333,7 @@ public final class MissionController {
             px = -3_000_000 + Math.cos(angle) * (60_000 + action.orbit().altitude());
             py = Math.sin(angle) * (60_000 + action.orbit().altitude());
         }
-        state.position = new MissionState.Position(px, py, p.vx(), p.vy(), action.targetId(), action.orbit(), slot, p.stage(), p.asteroid(), p.anchor());
+        state.position = new MissionState.Position(px, py, p.vx(), p.vy(), action.targetId(), action.orbit(), slot, p.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
         if (earthLanding) {
             var visual = state.rocket.getFlight();
             if (server != null && state.landing != null && visual != null
@@ -355,7 +355,17 @@ public final class MissionController {
         }
         if (path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED && !earthLanding) {
             state.ended = true; state.status = MissionState.STATUS_DESTROYED;
-            for (var arrival : state.path.arrivalPredictions()) system.applyAsteroidImpact(arrival.targetId(), arrival.impact());
+            UUID debrisRegion = null;
+            for (var arrival : state.path.arrivalPredictions()) {
+                var created = system.applyAsteroidImpact(arrival.targetId(), arrival.impact());
+                if (created != null) debrisRegion = created;
+            }
+            if (debrisRegion != null) {
+                var position = state.position;
+                state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(),
+                        debrisRegion, OrbitBand.SURFACE, -1, position.stage(), position.asteroid(), position.anchor(),
+                        position.headingX(), position.headingY());
+            }
         }
         if (earthLanding && state.ended && !p.asteroid().equals(FlightPlanAction.NO_TARGET)) {
             state.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID)).findFirst()
@@ -364,22 +374,26 @@ public final class MissionController {
         state.complete();
     }
     public static MissionState.Position sample(List<RocketFlightPathCalculator.PathSample> samples, double time, MissionState.Position previous) {
-        var last = samples.getLast();
-        if (time > last.timeSeconds()) {
-            var extra = time - last.timeSeconds();
-            return new MissionState.Position(last.x() + last.velocityX() * extra, last.y() + last.velocityY() * extra,
-                    last.velocityX(), last.velocityY(), previous.target(), previous.orbit(), previous.slot(), last.stage(), last.attachedAsteroidId(), previous.anchor());
+        int index = FlightMotion.endIndex(samples, time);
+        var sample = samples.get(index);
+        var motion = FlightMotion.sample(samples, time);
+        double hx = motion.vx(), hy = motion.vy();
+        if (Math.hypot(hx, hy) < .001) {
+            hx = previous.headingX(); hy = previous.headingY();
+            // Recover an arrival direction even when a tick jumps directly to a stopped endpoint.
+            for (int i = index; i > 0; i--) {
+                var interval = new FlightMotion(samples.get(i - 1), samples.get(i));
+                if (interval.duration() <= 0) continue;
+                var incoming = interval.at(.999);
+                if (Math.hypot(incoming.vx(), incoming.vy()) < .000001) continue;
+                hx = incoming.vx(); hy = incoming.vy();
+                break;
+            }
         }
-        var a = samples.getFirst(); var b = a;
-        for (var candidate : samples) { b = candidate; if (b.timeSeconds() >= time) break; a = candidate; }
-        var duration = b.timeSeconds() - a.timeSeconds();
-        var fraction = duration <= 0 ? 1 : Math.clamp((time - a.timeSeconds()) / duration, 0, 1);
-        var elapsed = duration * fraction;
-        var x = duration <= 0 ? b.x() : a.x() + a.velocityX() * elapsed + (b.velocityX() - a.velocityX()) / duration * elapsed * elapsed * .5;
-        var y = duration <= 0 ? b.y() : a.y() + a.velocityY() * elapsed + (b.velocityY() - a.velocityY()) / duration * elapsed * elapsed * .5;
-        return new MissionState.Position(x, y,
-                a.velocityX() + (b.velocityX() - a.velocityX()) * fraction, a.velocityY() + (b.velocityY() - a.velocityY()) * fraction,
-                previous.target(), previous.orbit(), previous.slot(), b.stage(), b.attachedAsteroidId(), previous.anchor());
+        var length = Math.max(1e-12, Math.hypot(hx, hy));
+        return new MissionState.Position(motion.x(), motion.y(), motion.vx(), motion.vy(),
+                previous.target(), previous.orbit(), previous.slot(), sample.stage(), sample.attachedAsteroidId(), previous.anchor(),
+                hx / length, hy / length);
     }
     private static void split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
         var childStatic = new HashMap<UUID, StaticRocketSegment>(); var childDynamic = new HashMap<UUID, DynamicRocketSegment>();
@@ -394,9 +408,9 @@ public final class MissionController {
         var attachment = state.leg == null ? position : state.leg.position();
         boolean takesAsteroid = childStatic.values().stream().anyMatch(s -> SegmentRef.of(s).equals(attachment.anchor()));
         var childPosition = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(), position.target(), position.orbit(),
-                position.slot(), position.stage(), takesAsteroid ? attachment.asteroid() : FlightPlanAction.NO_TARGET, attachment.anchor());
+                position.slot(), position.stage(), takesAsteroid ? attachment.asteroid() : FlightPlanAction.NO_TARGET, attachment.anchor(), position.headingX(), position.headingY());
         if (takesAsteroid) state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(), position.target(), position.orbit(),
-                position.slot(), position.stage(), FlightPlanAction.NO_TARGET, attachment.anchor());
+                position.slot(), position.stage(), FlightPlanAction.NO_TARGET, attachment.anchor(), position.headingX(), position.headingY());
         var rocket = new ActiveRocketData(child.id(), childStatic, childDynamic, null);
         var childRefs = childStatic.values().stream().map(SegmentRef::of).toList();
         var childSettings = state.plan.segmentConfigurations().stream().filter(c -> childRefs.contains(c.segment())).toList();
@@ -426,7 +440,7 @@ public final class MissionController {
             while (used.contains(slot) && slot < SpaceBalance.slots(action.orbit()) - 1) slot++;
             used.add(slot);
             var settings = action.service();
-            return action.withService(new ServiceSettings(settings.durationTicks(), settings.untilPrecise(), settings.timeoutTicks(), slot));
+            return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
         }).toList())).toList());
     }
 

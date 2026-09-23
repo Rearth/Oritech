@@ -26,12 +26,16 @@ public class GroundStationBlockEntity extends BlockEntity implements MenuProvide
     @Override protected void loadAdditional(ValueInput input) { super.loadAdditional(input); owner = input.read("owner", UUIDUtil.CODEC).orElse(new UUID(0, 0)); }
     public void tick() {
         if (!(level instanceof ServerLevel server) || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return;
-        if (getBlockState().is(SpaceAgeBlocks.SPACE_SCANNER) && draw(worldPosition, SpaceBalance.SCANNER_RF)) {
+        if (getBlockState().is(SpaceAgeBlocks.SPACE_SCANNER)) {
             var data = SpaceSimulationSavedData.get(server.getServer());
             var system = data.getOrCreate(owner);
-            system.earthKnowledge.scan(system.truth(), UUID.nameUUIDFromBytes((owner + ":" + worldPosition).getBytes(java.nio.charset.StandardCharsets.UTF_8)),
-                    MissionController.missionTime(level.getServer()), -1, -3_060_000, 0, 1, 1, 180_000);
-            data.setDirty();
+            boolean undiscovered = system.truth().stream().anyMatch(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
+                    && Math.hypot(object.x() + 3_060_000, object.y()) <= 180_000
+                    && system.earthKnowledge.contact(object.id()) == null);
+            if (undiscovered && draw(worldPosition, SpaceBalance.SCAN_RF)) {
+                system.earthKnowledge.scan(system.truth(), MissionController.missionTime(level.getServer()), -3_060_000, 0, 180_000);
+                data.setDirty();
+            }
         }
         if (!getBlockState().is(SpaceAgeBlocks.MISSION_CONTROL)) return;
         if (level.getGameTime() % 20 == 0) findAntennas();

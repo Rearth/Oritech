@@ -124,6 +124,9 @@ final class RocketStarMapWidget extends UIComponent {
     void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
                           RocketFlightPathCalculator.FlightPath flightPath,
                           UUID selectedBranch) {
+        if (flightPath.equals(this.flightPath) && java.util.Objects.equals(selectedBranch, this.selectedBranch)
+                && this.snapshot != null && snapshot.objects().equals(this.snapshot.objects())
+                && snapshot.plan().equals(this.snapshot.plan())) return;
         this.snapshot = snapshot;
         mapObjects.setSnapshot(snapshot);
         this.flightPath = flightPath;
@@ -191,8 +194,15 @@ final class RocketStarMapWidget extends UIComponent {
         var points = new ArrayList<StarMapCamera.Point>();
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()) continue;
-            var first = path.samples().getFirst();
-            points.add(new StarMapCamera.Point(first.x(), first.y()));
+            for (int i = 0; i < path.samples().size(); i++) {
+                var sample = path.samples().get(i);
+                points.add(new StarMapCamera.Point(sample.x(), sample.y()));
+                if (i + 1 < path.samples().size()) {
+                    var duration = path.samples().get(i + 1).timeSeconds() - sample.timeSeconds();
+                    points.add(new StarMapCamera.Point(sample.x() + sample.velocityX() * duration * .5,
+                            sample.y() + sample.velocityY() * duration * .5));
+                }
+            }
             for (var moment : path.actionMoments()) {
                 var action = actionsById.get(moment.actionId());
                 if (action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
@@ -295,10 +305,10 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     void setCoverage(List<rearth.oritech.spaceage.simulation.SpaceCommunications.Node> nodes) {
-        coverageNodes = List.copyOf(nodes); cachedView = null;
+        if (!coverageNodes.equals(nodes)) { coverageNodes = List.copyOf(nodes); cachedView = null; }
     }
     private double commandAltitude = -2;
-    void setCommandCoverage(double altitude) { commandAltitude = altitude; cachedView = null; }
+    void setCommandCoverage(double altitude) { if (commandAltitude != altitude) { commandAltitude = altitude; cachedView = null; } }
 
     private void addCoverage(List<StarMapLineRenderer.Line> lines, StarMapObjects.Viewport viewport) {
         if (commandAltitude >= 0) {
@@ -337,6 +347,7 @@ final class RocketStarMapWidget extends UIComponent {
         for (var path : flightPath.paths()) {
             var renderedSegments = renderedPathSegments(path);
             renderedPathsByBranch.put(path.branchId(), renderedSegments);
+            var arrowActions = new java.util.HashSet<UUID>();
             for (var segment : renderedSegments) {
                 var second = segment.secondSample;
                 int color = switch (second.phase()) {
@@ -348,6 +359,29 @@ final class RocketStarMapWidget extends UIComponent {
                 if (!path.branchId().equals(selectedBranch)) color = color & 0x00FFFFFF | 0x66000000;
                 lines.add(new StarMapLineRenderer.Line(segment.from.x, segment.from.y, segment.to.x, segment.to.y, color,
                         path.branchId().equals(selectedBranch) ? 1.3f : 0.8f, true));
+                double dx = segment.to.x - segment.from.x, dy = segment.to.y - segment.from.y;
+                double length = Math.hypot(dx, dy);
+                if (length >= 12 && arrowActions.add(second.actionId())) {
+                    double x = (segment.from.x + segment.to.x) * .5, y = (segment.from.y + segment.to.y) * .5;
+                    double ux = dx / length, uy = dy / length;
+                    lines.add(new StarMapLineRenderer.Line(x - ux * 4 - uy * 2.5, y - uy * 4 + ux * 2.5, x, y, color, 1, true));
+                    lines.add(new StarMapLineRenderer.Line(x - ux * 4 + uy * 2.5, y - uy * 4 - ux * 2.5, x, y, color, 1, true));
+                }
+            }
+        }
+        // Navigation boundaries remain visible even when the following turn happens inside the target region.
+        for (var path : flightPath.paths()) {
+            int color = path.branchId().equals(selectedBranch) ? 0xFFE2E8F0 : 0x88E2E8F0;
+            for (var moment : path.actionMoments()) {
+                var action = actionsById.get(moment.actionId());
+                if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
+                var point = project(moment.x(), moment.y());
+                if (!StarMapLineSimplifier.intersects(point.x, point.y, point.x, point.y,
+                        viewportX(), viewportY(), viewportWidth(), viewportHeight(), 4)) continue;
+                lines.add(new StarMapLineRenderer.Line(point.x, point.y - 3, point.x + 3, point.y, color, 1, true));
+                lines.add(new StarMapLineRenderer.Line(point.x + 3, point.y, point.x, point.y + 3, color, 1, true));
+                lines.add(new StarMapLineRenderer.Line(point.x, point.y + 3, point.x - 3, point.y, color, 1, true));
+                lines.add(new StarMapLineRenderer.Line(point.x - 3, point.y, point.x, point.y - 3, color, 1, true));
             }
         }
         for (var path : flightPath.asteroidPaths()) {
@@ -360,13 +394,12 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
-        // All map consumers use the same curve. Only projection changes when the camera moves.
-        return mapPaths.renderedPathSegments(path).stream().map(segment -> new RenderedPathSegment(
-                project(segment.from().x(), segment.from().y()), project(segment.to().x(), segment.to().y()),
-                segment.firstSample(), segment.secondSample(),
-                segment.sampleProgressFrom(), segment.sampleProgressTo()))
-                .filter(segment -> StarMapLineSimplifier.intersects(segment.from.x, segment.from.y, segment.to.x, segment.to.y,
-                        viewportX(), viewportY(), viewportWidth(), viewportHeight(), 6)).toList();
+        return mapPaths.renderedPathSegments(path, point -> {
+            var projected = project(point.x(), point.y());
+            return new RocketMapPaths.Point(projected.x, projected.y);
+        }, viewportX(), viewportY(), viewportWidth(), viewportHeight()).stream().map(segment -> new RenderedPathSegment(
+                new Point(segment.from().x(), segment.from().y()), new Point(segment.to().x(), segment.to().y()),
+                segment.firstSample(), segment.secondSample(), segment.sampleProgressFrom(), segment.sampleProgressTo())).toList();
     }
 
     private void renderRocket(GuiGraphicsExtractor graphics, BranchMarker marker,

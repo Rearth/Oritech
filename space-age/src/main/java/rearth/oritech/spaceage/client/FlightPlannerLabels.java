@@ -57,20 +57,20 @@ final class FlightPlannerLabels {
     }
 
     static Component scanEnergyLabel(RocketFlightPathCalculator.ScanEstimate estimate) {
-        return estimate == null || !Double.isFinite(estimate.requiredRF())
+        return estimate == null
                 ? Component.translatable("screen.oritech_space_age.scan.energy_unknown")
                 : Component.translatable("screen.oritech_space_age.scan.energy_estimate",
-                        TooltipHelper.getEnergyText((long) estimate.requiredRF()));
+                        TooltipHelper.getEnergyText(SpaceBalance.SCAN_RF));
     }
 
     static List<Component> scanEnergyTooltip(RocketFlightPathCalculator.ScanEstimate estimate) {
         var lines = new ArrayList<Component>();
         lines.add(scanEnergyLabel(estimate));
         if (estimate != null) {
-            if (Double.isFinite(estimate.requiredRF())) lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
-                    String.format(Locale.ROOT, "%,d", (long) estimate.requiredRF())));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
+                    String.format(Locale.ROOT, "%,d", SpaceBalance.SCAN_RF)));
             lines.add(Component.translatable("screen.oritech_space_age.scan.energy_available", String.format(Locale.ROOT, "%,d", estimate.availableRF())));
-            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_rate", SpaceBalance.SCANNER_RF, estimate.scanners()));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.scanners", estimate.scanners()));
         }
         lines.add(Component.translatable("screen.oritech_space_age.scan.energy_help"));
         return lines;

@@ -37,6 +37,15 @@ final class StarMapTooltip {
         var lines = new ArrayList<Component>();
         lines.add(Component.translatable("screen.oritech_space_age.path_state", sample.stage(), pathPhaseName(sample.phase())).withStyle(ChatFormatting.BOLD));
         lines.add(Component.translatable("screen.oritech_space_age.path_speed", formatSpeed(pathPoint.speedMetersPerSecond())));
+        for (var branch : plan.branches()) {
+            for (int i = 0; i < branch.actions().size(); i++) {
+                var action = branch.actions().get(i);
+                if (!action.id().equals(sample.actionId())) continue;
+                var target = objectById.apply(action.targetId());
+                if (target != null) lines.add(Component.translatable("screen.oritech_space_age.path_action", i + 1,
+                        RocketStarMapWidget.objectName(target)));
+            }
+        }
         lines.add(Component.translatable("screen.oritech_space_age.path_connected"));
         addSegmentNames(lines, sample.connectedSegments(), plan, defaultSegmentNames);
         if (!sample.attachedAsteroidId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
@@ -76,8 +85,6 @@ final class StarMapTooltip {
             lines.add(Component.translatable("screen.oritech_space_age.object.unsurveyed_help"));
         }
         if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
-            lines.add(Component.translatable("screen.oritech_space_age.object.position_uncertainty", Math.round(object.uncertainty())));
-            lines.add(Component.translatable("screen.oritech_space_age.object.composition_confidence", Math.round(object.compositionConfidence() * 100)));
             lines.add(Component.translatable("screen.oritech_space_age.object.mass", format(object.mass() * 1_000)));
             lines.add(Component.translatable("screen.oritech_space_age.object.velocity",
                     formatSpeed(Math.hypot(object.velocityX(), object.velocityY()))));
@@ -88,8 +95,6 @@ final class StarMapTooltip {
                     : Component.translatable("screen.oritech_space_age.object.material_unknown",
                             material.block().toString())));
         }
-        lines.add(Component.translatable("screen.oritech_space_age.object.detection",
-                Component.translatable("screen.oritech_space_age.object.detection." + object.detectionState().getSerializedName())));
         return lines;
     }
 

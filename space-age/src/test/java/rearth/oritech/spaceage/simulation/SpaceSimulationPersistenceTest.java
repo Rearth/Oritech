@@ -42,7 +42,7 @@ class SpaceSimulationPersistenceTest {
         var rocketId = UUID.randomUUID();
         assertTrue(simulation.createObjectData().stream().noneMatch(o -> o.type() == SpaceObjects.ObjectType.ASTEROID));
         for (var object : simulation.truth()) if (object.type() == SpaceObjects.ObjectType.ASTEROID)
-            simulation.earthKnowledge.scan(List.of(object), player, 0, -1, object.x(), object.y(), 8, SpaceBalance.DAY, SpaceBalance.SCAN_RANGE);
+            simulation.earthKnowledge.scan(List.of(object), 0, object.x(), object.y(), SpaceBalance.SCAN_RANGE);
         var initial = simulation.createFlightPlannerSnapshot(assembler, rocketId);
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();

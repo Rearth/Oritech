@@ -19,16 +19,12 @@ final class RocketFlightNavigation {
 
     // Limits keep one invalid card from locking up the planner.
     private static final int MAX_STEPS = 10_000;
-    // Keep enough samples for smooth lines without growing paths without limit.
-    private static final int MAX_SAMPLES = 1_000;
     // The preview does not need to simulate routes lasting more than a thousand Minecraft days.
     private static final double MAX_SECONDS = 1_200_000;
-    // Tiny phases still need a useful time step.
-    private static final double MIN_STEP_SECONDS = 0.05;
     // Arrival tolerances absorb normal floating-point integration leftovers.
     private static final double POSITION_TOLERANCE = 0.01;
     private static final double VELOCITY_TOLERANCE = 0.00001;
-    private static final double MAX_TARGET_POINT_OFFSET = Math.toRadians(70);
+
 
     private RocketFlightNavigation() {
     }
@@ -39,45 +35,7 @@ final class RocketFlightNavigation {
             craft.blockedState = TerminalState.TARGET_UNAVAILABLE;
             return false;
         }
-        var destinationAngle = targetPointAngle(action, craft, target);
-        var earth = context.objects.get(SpaceObjects.EARTH_ID);
-        // Chemical thrust does not change at the atmosphere boundary.
-        boolean ionPowered = craft.segments.values().stream().anyMatch(segment -> segment.ionSeconds > BURN_TOLERANCE);
-        if (ionPowered && earth != null && earth.radius() > 0) {
-            var distance = Math.hypot(craft.x - earth.x(), craft.y - earth.y());
-            boolean leaving = distance < earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude() - 0.1
-                    && (!target.id().equals(earth.id()) || action.orbit().altitude() > SpaceSimulation.OrbitBand.LOW.altitude());
-            boolean returning = distance > earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude() + 0.1
-                    && target.id().equals(earth.id()) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE && action.addons().isEmpty();
-            if (leaving || returning) {
-                var boundary = action.withTarget(earth.id()).withOrbit(SpaceSimulation.OrbitBand.LOW)
-                        .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0).withAddons(List.of());
-                if (returning) {
-                    craft.atmosphere = true;
-                    var acceleration = craft.deltaVPerSecond(craft.activeSegments(context));
-                    // Enter with enough stopping distance for the weaker atmospheric engines.
-                    int entrySpeed = Math.max(1, (int) Math.sqrt(acceleration * SpaceSimulation.OrbitBand.LOW.altitude()));
-                    if (action.maxSpeed() > 0) entrySpeed = Math.min(entrySpeed, action.maxSpeed());
-                    boundary = boundary.withVelocity(SpaceSimulation.ArrivalVelocityMode.CUSTOM, entrySpeed);
-                }
-                double angle = destinationAngle;
-                if (leaving) {
-                    // Cross the atmosphere on the actual approach line, without adding a turn at LOW.
-                    var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
-                    var direction = Math.atan2(destination.y - craft.y, destination.x - craft.x);
-                    var dx = Math.cos(direction);
-                    var dy = Math.sin(direction);
-                    var offsetX = craft.x - earth.x();
-                    var offsetY = craft.y - earth.y();
-                    var along = offsetX * dx + offsetY * dy;
-                    var radius = earth.radius() + SpaceSimulation.OrbitBand.LOW.altitude();
-                    var exit = -along + Math.sqrt(along * along + radius * radius - distance * distance);
-                    angle = Math.atan2(offsetY + dy * exit, offsetX + dx * exit);
-                }
-                if (!navigateLeg(boundary, craft, context, angle)) return false;
-            }
-        }
-        return navigateLeg(action, craft, context, destinationAngle);
+        return navigateLeg(action, craft, context, targetPointAngle(action, craft, target));
     }
 
     private static boolean navigateLeg(SpaceSimulation.FlightPlanAction action, Craft craft,
@@ -112,15 +70,19 @@ final class RocketFlightNavigation {
                 ? action.targetVelocity() : 0;
         var targetVelocityX = target.velocityX() + approachX * targetSpeed;
         var targetVelocityY = target.velocityY() + approachY * targetSpeed;
+        if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE && RocketTransferRoute.hasSurface(target)) {
+            targetVelocityX = target.velocityX() - Math.cos(destinationAngle) * targetSpeed;
+            targetVelocityY = target.velocityY() - Math.sin(destinationAngle) * targetSpeed;
+        }
         var samples = new ArrayList<PathSample>();
         TransferPlan transferPlan = null;
+        double travelled = 0;
+        double speed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
 
         var step = 0;
         for (; step < MAX_STEPS && craft.time - startTime < MAX_SECONDS; step++) {
             destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target),
                     action.orbit(), destinationAngle);
-            var offsetX = destination.x - craft.x;
-            var offsetY = destination.y - craft.y;
             if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context)) {
                 return true;
             }
@@ -129,12 +91,7 @@ final class RocketFlightNavigation {
             // Delta-v burns at the same rate it changes velocity, so resources and movement stay in sync.
             var acceleration = craft.deltaVPerSecond(active);
             if (transferPlan == null) {
-                var transfer = FullPowerTransfer.solve(offsetX, offsetY, craft.velocityX - target.velocityX(),
-                        craft.velocityY - target.velocityY(), targetVelocityX - target.velocityX(),
-                        targetVelocityY - target.velocityY(),
-                        action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM, craft.burnProfile(context),
-                        action.maxSpeed() == 0 ? Double.POSITIVE_INFINITY : action.maxSpeed(),
-                        MAX_SECONDS - (craft.time - startTime));
+                var transfer = RocketTransferRoute.solve(craft, context, action, target, destination.x, destination.y);
                 if (transfer == null) {
                     craft.blockedState = acceleration <= 0.0001
                             ? TerminalState.NO_ACTIVE_ENGINES
@@ -143,6 +100,9 @@ final class RocketFlightNavigation {
                     return false;
                 }
                 transferPlan = new TransferPlan(craft.time, transfer);
+                var end = transfer.curve().atDistance(transfer.curve().length(), targetSpeed);
+                targetVelocityX = target.velocityX() + end.vx();
+                targetVelocityY = target.velocityY() + end.vy();
             }
             var abort = navigationAbort(action, craft, destination, transferPlan);
             if (abort != null) {
@@ -156,13 +116,19 @@ final class RocketFlightNavigation {
                         abort.addon.id(), abort.actualValue, craft.time, craft.x, craft.y, destination.x, destination.y));
                 return true;
             }
-            var command = transferPlan.commandAt(craft, acceleration);
+            craft.atmosphere = transferPlan.atmosphereAt(craft.time);
+            acceleration = craft.deltaVPerSecond(active) * transferPlan.transfer.efficiency();
+            var command = transferPlan.commandAt(craft);
             if (command.stepLimitSeconds <= BURN_TOLERANCE) {
                 craft.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
                 appendSamples(craft, samples);
                 return false;
             }
-            var stepSeconds = Math.min(command.sampleStepSeconds, command.stepLimitSeconds);
+            var stepSeconds = Math.min(command.stepLimitSeconds, transferPlan.transfer.duration() / 96);
+            var distanceStep = transferPlan.transfer.curve().length() / 96;
+            if (speed > .001) stepSeconds = Math.min(stepSeconds, distanceStep / speed);
+            if (command.burning && command.directionX > 0)
+                stepSeconds = Math.min(stepSeconds, Math.sqrt(2 * distanceStep / acceleration));
             if (command.burning) {
                 if (active.isEmpty() || acceleration <= 0.0001) {
                     craft.blockedState = TerminalState.NO_ACTIVE_ENGINES;
@@ -182,8 +148,24 @@ final class RocketFlightNavigation {
             stepSeconds = Math.min(stepSeconds, MAX_SECONDS - (craft.time - startTime));
             if (stepSeconds <= BURN_TOLERANCE) break;
 
-            craft.advance(command.burning, command.directionX, command.directionY, command.acceleration, active, stepSeconds);
-            samples.add(craft.createSample(command.phase, action.targetId(), action.id(),
+            var phase = !command.burning ? PathPhase.COAST
+                    : command.directionX > 0 ? PathPhase.ACCELERATE : PathPhase.BRAKE;
+            var gravity = command.directionX > 0 ? transferPlan.transfer.departureGravity()
+                    : command.directionX < 0 ? transferPlan.transfer.arrivalGravity() : 0;
+            var signedAcceleration = command.burning ? command.directionX * acceleration + gravity : 0;
+            travelled += speed * stepSeconds + .5 * signedAcceleration * stepSeconds * stepSeconds;
+            speed = Math.max(0, speed + signedAcceleration * stepSeconds);
+            craft.time += stepSeconds;
+            if (command.burning) craft.consumeBurnTime(active, stepSeconds);
+            var curve = transferPlan.transfer.curve();
+            var position = curve.atDistance(travelled, speed);
+            craft.x = position.x() + target.velocityX() * (craft.time - startTime);
+            craft.y = position.y() + target.velocityY() * (craft.time - startTime);
+            craft.velocityX = position.vx() + target.velocityX();
+            craft.velocityY = position.vy() + target.velocityY();
+            var heading = curve.atDistance(travelled, 1);
+            craft.headingX = heading.vx(); craft.headingY = heading.vy();
+            samples.add(craft.createSample(phase, action.targetId(), action.id(),
                     command.burning ? Set.copyOf(active) : Set.of()));
             if (RocketFlightPathCalculator.finishStage(action, craft, context)) {
                 samples.add(craft.createSample(PathPhase.COAST, action.targetId(), action.id(),
@@ -249,35 +231,35 @@ final class RocketFlightNavigation {
     private static void appendSamples(Craft craft,
                                       List<PathSample> samples) {
         if (samples.isEmpty()) return;
-        var stride = Math.max(1, (int) Math.ceil(samples.size() / (double) MAX_SAMPLES));
-        PathSample previous = null;
-        for (var index = 0; index < samples.size(); index++) {
-            var sample = samples.get(index);
-            var changed = previous == null || sample.phase() != previous.phase() || sample.stage() != previous.stage()
-                    || !sample.connectedSegments().equals(previous.connectedSegments())
-                    || !sample.firingSegments().equals(previous.firingSegments());
-            // Keep both sides of a state boundary so downsampling never paints a burn as a long coast.
-            if (changed && previous != null && craft.samples.getLast() != previous) craft.samples.add(previous);
-            if (changed || index % stride == 0 || index == samples.size() - 1) craft.samples.add(sample);
-            previous = sample;
+        for (var sample : samples) {
+            int size = craft.samples.size();
+            if (size >= 2) {
+                var a = craft.samples.get(size - 2);
+                var b = craft.samples.get(size - 1);
+                double first = b.timeSeconds() - a.timeSeconds();
+                double second = sample.timeSeconds() - b.timeSeconds();
+                if (first > 0 && second > 0 && b.phase() == sample.phase() && b.stage() == sample.stage()
+                        && b.actionId().equals(sample.actionId()) && b.connectedSegments().equals(sample.connectedSegments())
+                        && b.firingSegments().equals(sample.firingSegments()) && b.attachedAsteroidId().equals(sample.attachedAsteroidId())
+                        && sameMotion(a, b, sample)) {
+                    craft.samples.removeLast();
+                }
+            }
+            craft.samples.add(sample);
         }
     }
 
-    private static double sampleStep(double seconds) {
-        // Constant acceleration integrates exactly, so this fixed spacing remains smooth on long transfers.
-        return Math.max(MIN_STEP_SECONDS, seconds / 160);
-    }
-
-    private static PathPhase phaseFor(Craft craft, double x, double y) {
-        var speed = Math.hypot(craft.velocityX, craft.velocityY);
-        var speedChange = speed < 0.0001 ? 1 : (x * craft.velocityX + y * craft.velocityY) / speed;
-        return speedChange > 0.2 ? PathPhase.ACCELERATE
-                : speedChange < -0.2 ? PathPhase.BRAKE
-                : PathPhase.REDIRECT;
+    private static boolean sameMotion(PathSample a, PathSample b, PathSample c) {
+        var state = new FlightMotion(a, c).at((b.timeSeconds() - a.timeSeconds()) / (c.timeSeconds() - a.timeSeconds()));
+        return Math.hypot(state.x() - b.x(), state.y() - b.y()) < 1e-5
+                && Math.hypot(state.vx() - b.velocityX(), state.vy() - b.velocityY()) < 1e-7;
     }
 
     private static double targetPointAngle(SpaceSimulation.FlightPlanAction action, Craft craft,
                                            SpaceSimulation.SpaceObjectData target) {
+        if (target.id().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
+            return SpaceBalance.surfaceAngle((double) action.landingX() + action.landingOffsetX(),
+                    (double) action.landingZ() + action.landingOffsetZ());
         if (target.id().equals(SpaceObjects.EARTH_ID) && SpaceBalance.hasSlots(action.orbit())
                 && action.service().slot() >= 0) return Math.PI + Math.PI * 2 * action.service().slot() / SpaceBalance.slots(action.orbit());
         var nearestAngle = Math.atan2(craft.y - target.yAt(craft.time), craft.x - target.xAt(craft.time));
@@ -287,7 +269,7 @@ final class RocketFlightNavigation {
     /** Stable per-card offset keeps each approach point in the same place after recalculation. */
     static double targetPointOffset(SpaceSimulation.FlightPlanAction action) {
         var seed = action.id().getMostSignificantBits() ^ Long.rotateLeft(action.id().getLeastSignificantBits(), 32);
-        return (new Random(seed).nextDouble() * 2 - 1) * MAX_TARGET_POINT_OFFSET;
+        return (new Random(seed).nextDouble() * 2 - 1) * SpaceBalance.TARGET_ANGLE_SPREAD;
     }
 
     private static Point targetPoint(double x, double y, double radius, SpaceSimulation.OrbitBand orbit, double angle) {
@@ -295,39 +277,32 @@ final class RocketFlightNavigation {
         return new Point(x + Math.cos(angle) * orbitRadius, y + Math.sin(angle) * orbitRadius);
     }
 
-    /** A solved burn/coast/burn route anchored to the shared preview clock. */
-    private record TransferPlan(double startTime, FullPowerTransfer transfer) {
-        GuidanceCommand commandAt(Craft craft, double acceleration) {
-            var elapsed = Math.max(0, craft.time - startTime);
-            var endFirst = transfer.firstSeconds();
-            var endCoast = endFirst + transfer.coastSeconds();
-            double x, y, remaining;
-            if (elapsed < endFirst - 1e-7) {
-                x = transfer.firstDirectionX();
-                y = transfer.firstDirectionY();
-                remaining = endFirst - elapsed;
-            } else if (elapsed < endCoast - 1e-7) {
-                return GuidanceCommand.coast(endCoast - elapsed, sampleStep(transfer.coastSeconds()));
-            } else {
-                x = transfer.lastDirectionX();
-                y = transfer.lastDirectionY();
-                remaining = Math.max(0, transfer.duration() - elapsed);
+    /** The complete card is solved before any fuel is consumed. */
+    private record TransferPlan(double startTime, RocketTransferRoute.Route transfer) {
+        boolean atmosphereAt(double time) {
+            double elapsed = Math.max(0, time - startTime);
+            for (var burn : transfer.burns()) {
+                if (elapsed < burn.seconds() - 1e-7) return burn.atmosphere();
+                elapsed -= burn.seconds();
             }
-            if (x == 0 && y == 0) return GuidanceCommand.coast(remaining, sampleStep(remaining));
-            return new GuidanceCommand(true, x, y, acceleration, remaining,
-                    sampleStep(Math.max(transfer.firstSeconds(), transfer.lastSeconds())), phaseFor(craft, x, y));
+            return false;
+        }
+        GuidanceCommand commandAt(Craft craft) {
+            double elapsed = Math.max(0, craft.time - startTime);
+            for (var burn : transfer.burns()) {
+                if (elapsed < burn.seconds() - 1e-7) {
+                    var remaining = burn.seconds() - elapsed;
+                    if (!burn.firing()) return new GuidanceCommand(false, 0, remaining);
+                    return new GuidanceCommand(true, burn.x(), remaining);
+                }
+                elapsed -= burn.seconds();
+            }
+            return new GuidanceCommand(false, 0, 0);
         }
     }
 
-    /** One constant-acceleration integration step from the solved route. */
-    private record GuidanceCommand(boolean burning, double directionX, double directionY, double acceleration,
-                                   double stepLimitSeconds, double sampleStepSeconds,
-                                   PathPhase phase) {
-        static GuidanceCommand coast(double seconds, double stepSeconds) {
-            return new GuidanceCommand(false, 0, 0, 0, seconds, stepSeconds,
-                    PathPhase.COAST);
-        }
-    }
+    /** Longitudinal thrust sign and time remaining in the current engine phase. */
+    private record GuidanceCommand(boolean burning, double directionX, double stepLimitSeconds) { }
 
     private record Abort(SpaceSimulation.ActionAddon addon, double actualValue) {
     }

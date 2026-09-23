@@ -14,6 +14,9 @@ import rearth.oritech.client.renderers.util.RenderHelpers;
  * Renders block models and block entities into the GUI picture-in-picture target.
  */
 public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPreviewRenderState> {
+    private BlockPreviewRenderState cachedState;
+    private Object cachedModel;
+
     private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
 
     public BlockPreviewPipRenderer(MultiBufferSource.BufferSource bufferSource) {
@@ -23,6 +26,17 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
     @Override
     public Class<BlockPreviewRenderState> getRenderStateClass() {
         return BlockPreviewRenderState.class;
+    }
+
+    @Override
+    protected boolean textureIsReadyToBlit(BlockPreviewRenderState state) {
+        var previous = cachedState;
+        return state.cacheTexture() && previous != null
+                && state.blocks().equals(previous.blocks())
+                && state.rotationX() == previous.rotationX() && state.rotationY() == previous.rotationY()
+                && state.centerX() == previous.centerX() && state.centerY() == previous.centerY()
+                && state.centerZ() == previous.centerZ() && state.scale() == previous.scale()
+                && cachedModel == Minecraft.getInstance().getModelManager().getBlockModelSet();
     }
 
     @Override
@@ -70,6 +84,8 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
         }
 
         featureDispatcher.renderAllFeatures();
+        cachedState = state.cacheTexture() ? state : null;
+        cachedModel = minecraft.getModelManager().getBlockModelSet();
     }
 
     @Override

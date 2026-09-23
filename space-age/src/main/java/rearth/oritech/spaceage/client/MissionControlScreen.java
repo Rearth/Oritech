@@ -271,8 +271,9 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             var telemetry = entry.telemetry();
             labels.put(entry.id(), craftTitle(telemetry, ++craftNumber));
             var forecast = MissionForecast.remainingServices(telemetry.plan(), telemetry.actionTicks());
-            var prediction = RocketFlightPathCalculator.calculateFrom(telemetry.rocket(),
-                    menu.fleetSnapshot.objects(), forecast, telemetry.position());
+            var prediction = entry.navigation().paths().isEmpty()
+                    ? RocketFlightPathCalculator.calculateFrom(telemetry.rocket(), menu.fleetSnapshot.objects(), forecast, telemetry.position())
+                    : entry.navigation().flight();
             var path = prediction.paths().stream()
                     .filter(item -> item.branchId().equals(telemetry.plan().root().id()))
                     .findFirst().orElse(null);
@@ -282,7 +283,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                     path.actionMoments(), path.durationSeconds(), path.remainingDeltaV(), path.terminalState()));
             branches.add(new SpaceSimulation.FlightPlanBranch(entry.id(),
                     SpaceSimulation.FlightPlanBranch.NO_PARENT, telemetry.plan().root().actions()));
-            times.put(entry.id(), 0.0);
+            times.put(entry.id(), entry.navigation().paths().isEmpty() ? 0.0 : telemetry.actionTicks() / 20.0);
             prediction.navigationAborts().stream().filter(abort -> abort.branchId().equals(path.branchId()))
                     .forEach(abort -> aborts.add(new RocketFlightPathCalculator.NavigationAbortMoment(
                             abort.actionId(), entry.id(), abort.addonId(), abort.actualValue(), abort.timeSeconds(),
@@ -353,7 +354,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         var times = new HashMap<UUID, Double>();
         for (var entry : menu.fleet) {
             var path = fleetPaths.get(entry.id());
-            if (path != null) times.put(entry.id(), Math.min(elapsedSeconds, path.durationSeconds()));
+            if (path != null) times.put(entry.id(), Math.min(elapsedSeconds + (entry.navigation().paths().isEmpty() ? 0 : entry.telemetry().actionTicks() / 20.0), path.durationSeconds()));
             var row = fleetRows.get(entry.id());
             if (row != null) row.status().setText(status(entry.telemetry(), path, elapsedTicks));
         }

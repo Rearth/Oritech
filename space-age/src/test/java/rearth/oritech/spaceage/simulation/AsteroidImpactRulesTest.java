@@ -63,10 +63,10 @@ class AsteroidImpactRulesTest {
     void attachedAsteroidMassReducesAvailableAcceleration() {
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
-                Map.of(segmentId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of())));
+                Map.of(segmentId, new DynamicRocketSegment(100_000, 0, 0, Set.of())));
         var segmentRef = SpaceSimulation.SegmentRef.of(segment);
         var asteroidId = UUID.randomUUID();
         var objects = List.of(
@@ -97,10 +97,10 @@ class AsteroidImpactRulesTest {
     void releasedAsteroidStopsAtEarthAndConnectsFromEitherCloseOrbit() {
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(), 25, 1);
         var rocket = new ActiveRocketData(Map.of(segmentId, segment),
-                Map.of(segmentId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of())));
+                Map.of(segmentId, new DynamicRocketSegment(100_000, 0, 0, Set.of())));
         var segmentRef = SpaceSimulation.SegmentRef.of(segment);
         var asteroidId = UUID.randomUUID();
         var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
@@ -116,6 +116,7 @@ class AsteroidImpactRulesTest {
                 .withSegments(List.of(segmentRef));
         var returnToEarth = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
                 .withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE)
+                .withLanding(1000, 0, 0, 0)
                 .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0)
                 .withAddons(List.of(new SpaceSimulation.ActionAddon(UUID.randomUUID(),
                         SpaceSimulation.ActionAddonType.DISTANCE_FROM_TARGET, 150_000)));
@@ -155,14 +156,14 @@ class AsteroidImpactRulesTest {
         var anchorId = UUID.randomUUID();
         var coreId = UUID.randomUUID();
         var anchor = new StaticRocketSegment(anchorId,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(coreId, Set.of()), 25, 1);
         var core = new StaticRocketSegment(coreId,
-                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
+                Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
                 Map.of(anchorId, Set.of()), 25, 1);
         var rocket = new ActiveRocketData(Map.of(anchorId, anchor, coreId, core), Map.of(
-                anchorId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of(coreId)),
-                coreId, new DynamicRocketSegment(0, 60_000_000, 0, Set.of(anchorId))));
+                anchorId, new DynamicRocketSegment(100_000, 0, 0, Set.of(coreId)),
+                coreId, new DynamicRocketSegment(100_000, 0, 0, Set.of(anchorId))));
         var anchorRef = SpaceSimulation.SegmentRef.of(anchor);
         var coreRef = SpaceSimulation.SegmentRef.of(core);
         var asteroidId = UUID.randomUUID();

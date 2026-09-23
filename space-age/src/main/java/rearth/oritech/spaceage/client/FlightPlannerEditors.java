@@ -197,7 +197,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             var settings = action.service();
             edited = action.withService(new SpaceSimulation.ServiceSettings(
                     action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION ? settings.durationTicks() : Math.max(20, value * 20),
-                    settings.untilPrecise(), action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION ? value * 20 : settings.timeoutTicks(), settings.slot()));
+                    action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION ? value * 20 : settings.timeoutTicks(), settings.slot()));
         } else edited = action.withMaxSpeed(value);
         replaceAction(branch.id(), action.id(), edited, flightPlanRocket());
         rebuildComponents();

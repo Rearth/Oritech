@@ -3,6 +3,8 @@ package rearth.oritech.spaceage.client;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.Identifier;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -15,6 +17,9 @@ import java.util.List;
 /** Batches the star map's flat discs and icons into one untextured GUI submission. */
 final class StarMapObjectRenderer {
 
+    private static final Identifier FOG_TEXTURE = Identifier.fromNamespaceAndPath(
+            "oritech_space_age", "textures/gui/map_fog.png");
+
     private StarMapObjectRenderer() {
     }
 
@@ -24,12 +29,42 @@ final class StarMapObjectRenderer {
         var scissor = graphics.peekScissorStack();
         var bounds = new ScreenRectangle(viewport.x(), viewport.y(), viewport.width(), viewport.height()).transformMaxBounds(pose);
         var clippedBounds = scissor == null ? bounds : scissor.intersection(bounds);
-        graphics.submitGuiElementRenderState(new RenderState(List.copyOf(discs), pose, scissor, clippedBounds));
+        var fog = discs.stream().filter(disc -> disc.color() != disc.edgeColor()).toList();
+        var solid = discs.stream().filter(disc -> disc.color() == disc.edgeColor()).toList();
+        if (!fog.isEmpty()) {
+            var texture = Minecraft.getInstance().getTextureManager().getTexture(FOG_TEXTURE);
+            graphics.submitGuiElementRenderState(new FogState(fog, pose,
+                    TextureSetup.singleTexture(texture.getTextureView(), texture.getSampler()), scissor, clippedBounds));
+        }
+        if (!solid.isEmpty()) graphics.submitGuiElementRenderState(new RenderState(solid, pose, scissor, clippedBounds));
     }
 
     record Disc(double x, double y, double radiusX, double radiusY, int color, int edgeColor, int sides) {
         Disc(double x, double y, double radiusX, double radiusY, int color, int sides) {
             this(x, y, radiusX, radiusY, color, color, sides);
+        }
+    }
+
+    // The texture contains the same linear radial alpha falloff as the old triangle fans.
+    // Each puff now costs four vertices, independent of its radius and the zoom level.
+    private record FogState(List<Disc> discs, Matrix3x2f pose, TextureSetup textureSetup,
+                            @Nullable ScreenRectangle scissorArea,
+                            @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+        @Override
+        public void buildVertices(VertexConsumer vertices) {
+            for (var disc : discs) {
+                float left = (float) (disc.x() - disc.radiusX()), right = (float) (disc.x() + disc.radiusX());
+                float top = (float) (disc.y() - disc.radiusY()), bottom = (float) (disc.y() + disc.radiusY());
+                vertices.addVertexWith2DPose(pose, left, top).setUv(0, 0).setColor(disc.color());
+                vertices.addVertexWith2DPose(pose, left, bottom).setUv(0, 1).setColor(disc.color());
+                vertices.addVertexWith2DPose(pose, right, bottom).setUv(1, 1).setColor(disc.color());
+                vertices.addVertexWith2DPose(pose, right, top).setUv(1, 0).setColor(disc.color());
+            }
+        }
+
+        @Override
+        public RenderPipeline pipeline() {
+            return RenderPipelines.GUI_TEXTURED;
         }
     }
 

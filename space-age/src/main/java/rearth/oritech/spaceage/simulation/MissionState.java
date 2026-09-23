@@ -38,7 +38,11 @@ public final class MissionState {
     public static final String STATUS_PLANNED_SEPARATION = "status.oritech_space_age.planned_separation";
     public static final String STATUS_UPDATE_ACCEPTED = "status.oritech_space_age.update_accepted";
     public record Position(double x, double y, double vx, double vy, UUID target, SpaceSimulation.OrbitBand orbit,
-                           int slot, int stage, UUID asteroid, SpaceSimulation.SegmentRef anchor) {
+                           int slot, int stage, UUID asteroid, SpaceSimulation.SegmentRef anchor, double headingX, double headingY) {
+        public Position(double x, double y, double vx, double vy, UUID target, SpaceSimulation.OrbitBand orbit,
+                        int slot, int stage, UUID asteroid, SpaceSimulation.SegmentRef anchor) {
+            this(x, y, vx, vy, target, orbit, slot, stage, asteroid, anchor, vx, vy);
+        }
         public static final Codec<Position> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(Position::x), Codec.DOUBLE.fieldOf("y").forGetter(Position::y),
                 Codec.DOUBLE.fieldOf("vx").forGetter(Position::vx), Codec.DOUBLE.fieldOf("vy").forGetter(Position::vy),
@@ -46,7 +50,9 @@ public final class MissionState {
                 SpaceSimulation.OrbitBand.CODEC.fieldOf("orbit").forGetter(Position::orbit),
                 Codec.INT.fieldOf("slot").forGetter(Position::slot), Codec.INT.fieldOf("stage").forGetter(Position::stage),
                 UUIDUtil.STRING_CODEC.fieldOf("asteroid").forGetter(Position::asteroid),
-                SpaceSimulation.SegmentRef.CODEC.fieldOf("anchor").forGetter(Position::anchor)
+                SpaceSimulation.SegmentRef.CODEC.fieldOf("anchor").forGetter(Position::anchor),
+                Codec.DOUBLE.optionalFieldOf("headingX", 0.0).forGetter(Position::headingX),
+                Codec.DOUBLE.optionalFieldOf("headingY", 0.0).forGetter(Position::headingY)
         ).apply(i, Position::new));
         public static Position surface() {
             return new Position(-3_060_000, 0, 0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.SURFACE,
@@ -106,6 +112,21 @@ public final class MissionState {
     public List<SpaceSimulation.SpaceObjectData> legObjects = List.of();
     public final List<SpaceSimulation.FlightPlanAction> completed = new ArrayList<>();
     RocketFlightPathCalculator.FlightPath path;
+    private Telemetry forecastLeg;
+    private SpaceSimulation.FlightPlan forecastPlan;
+    private MissionForecast.Navigation navigationForecast = MissionForecast.Navigation.EMPTY;
+
+    public MissionForecast.Navigation navigationForecast() {
+        if (leg == null || action() == null || action().type() != SpaceSimulation.ActionType.NAVIGATE_TO || ended)
+            return MissionForecast.Navigation.EMPTY;
+        if (forecastLeg != leg || !plan.equals(forecastPlan)) {
+            var flight = RocketFlightPathCalculator.calculateFrom(leg.rocket(), legObjects, plan, leg.position());
+            navigationForecast = MissionForecast.Navigation.forClient(flight);
+            forecastLeg = leg;
+            forecastPlan = plan;
+        }
+        return navigationForecast;
+    }
     public String route = "communication.oritech_space_age.no_route";
     public boolean connected;
     public boolean canTransmit;
@@ -175,8 +196,7 @@ public final class MissionState {
     private long actionDurationTicks() {
         var action = action();
         if (action == null) return 0;
-        if (action.type() == SpaceSimulation.ActionType.SCAN && !action.service().untilPrecise()
-                || action.type() == SpaceSimulation.ActionType.RELAY) return action.service().durationTicks();
+        if (action.type() == SpaceSimulation.ActionType.RELAY) return action.service().durationTicks();
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION) return action.service().timeoutTicks();
         if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || path == null) return 0;
         return path.paths().stream().filter(item -> item.branchId().equals(plan.root().id())).findFirst()
@@ -187,6 +207,8 @@ public final class MissionState {
         var dynamic = new HashMap<UUID, DynamicRocketSegment>();
         rocket.getDynamicSegments().forEach((id, r) -> dynamic.put(id, new DynamicRocketSegment(
                 r.availableFuelBurnTimeTicks, r.availableRF, r.currentFuelWeight, r.getConnectedSegments())));
-        return new ActiveRocketData(rocket.getRocketId(), rocket.getStaticSegments(), dynamic, rocket.getFlight());
+        var copy = new ActiveRocketData(rocket.getRocketId(), rocket.getStaticSegments(), dynamic, rocket.getFlight());
+        copy.setLaunchPosition(rocket.getLaunchPosition());
+        return copy;
     }
 }

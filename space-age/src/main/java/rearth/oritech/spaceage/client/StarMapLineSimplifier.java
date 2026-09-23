@@ -43,6 +43,10 @@ final class StarMapLineSimplifier {
         // Keep long segments intact, even when their next point happens to turn back near the start.
         double previousX = first.toX() - first.fromX();
         double previousY = first.toY() - first.fromY();
+        double nextX = next.toX() - next.fromX(), nextY = next.toY() - next.fromY();
+        double length = Math.hypot(dx, dy);
+        if (previousX * nextX + previousY * nextY < 0 || length == 0
+                || Math.abs(previousX * dy - previousY * dx) / length > .25) return false;
         return dx * dx + dy * dy <= MAX_CHORD_SQUARED
                 && previousX * previousX + previousY * previousY <= MAX_CHORD_SQUARED;
     }

@@ -49,35 +49,43 @@ class MissionSystemsTest {
     }
 
     @Test
-    void surveyKnowledgeStaysPrivateAndCombinesIndependentObservations() {
+    void surveyKnowledgeStaysPrivateUntilMerged() {
         var system = new SpaceSimulation();
         var target = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
         assertTrue(system.createObjectData().stream().noneMatch(o -> o.type() == SpaceObjects.ObjectType.ASTEROID));
 
         var first = new SurveyKnowledge();
-        var second = new SurveyKnowledge();
-        first.scan(List.of(target), new UUID(2, 1), 0, 0,
-                target.x() + 100_000, target.y(), 1, 100, SpaceBalance.SCAN_RANGE);
-        second.scan(List.of(target), new UUID(2, 2), 0, 1,
-                target.x() - 100_000, target.y(), 1, 100, SpaceBalance.SCAN_RANGE);
-        double oneView = first.precision(target.id());
-        first.merge(second);
-        assertTrue(first.precision(target.id()) > oneView);
-        assertEquals(0, system.earthKnowledge.exposure(target.id()));
+        first.scan(List.of(target), 0, target.x() + 100_000, target.y(), SpaceBalance.SCAN_RANGE);
+        assertTrue(first.precise(target.id()));
+        assertFalse(system.earthKnowledge.precise(target.id()));
 
-        first.scan(List.of(target), new UUID(2, 3), 200, 2,
-                target.x(), target.y(), 8, SpaceBalance.DAY, SpaceBalance.SCAN_RANGE);
         system.earthKnowledge.merge(first);
-        double exposure = system.earthKnowledge.exposure(target.id());
+        assertTrue(system.earthKnowledge.precise(target.id()));
         system.earthKnowledge.merge(first.copy());
-        assertEquals(exposure, system.earthKnowledge.exposure(target.id()));
+        assertEquals(1, system.earthKnowledge.contacts().size());
 
         var received = system.createObjectData().stream().filter(o -> o.id().equals(target.id()))
                 .findFirst().orElseThrow();
         system.moveAttached(target.id(), target.x() + 1_000_000, target.y());
         assertEquals(received, system.createObjectData().stream().filter(o -> o.id().equals(target.id()))
                 .findFirst().orElseThrow());
+    }
+
+    @Test
+    void regionScanReachesTheWholeRegionFromInsideItsBoundary() {
+        var region = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.SURVEY_REGION,
+                0, 0, 310_000, 0, SpaceObjects.DetectionState.PRECISE);
+        var asteroid = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
+                -300_000, 0, 2_000, 0, SpaceObjects.DetectionState.HIDDEN);
+        var knowledge = new SurveyKnowledge();
+        var craftX = region.radius() * 0.72;
+
+        knowledge.scan(List.of(asteroid), 0, craftX, 0, SpaceBalance.SCAN_RANGE);
+        assertNull(knowledge.contact(asteroid.id()));
+
+        knowledge.scanRegion(List.of(asteroid), region, 0, craftX, 0, SpaceBalance.SCAN_RANGE);
+        assertTrue(knowledge.precise(asteroid.id()));
     }
 
     @Test
@@ -91,8 +99,8 @@ class MissionSystemsTest {
         assertTrue(system.createObjectData().stream().anyMatch(o -> o.id().equals(region.id())));
 
         var delivered = new SurveyKnowledge();
-        for (var asteroid : asteroids) delivered.scan(List.of(asteroid), OWNER, 0, 0,
-                asteroid.x(), asteroid.y(), 8, SpaceBalance.DAY, SpaceBalance.SCAN_RANGE);
+        for (var asteroid : asteroids)
+            delivered.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), SpaceBalance.SCAN_RANGE);
         system.earthKnowledge.merge(delivered);
 
         assertTrue(system.createObjectData().stream().noneMatch(o -> o.id().equals(region.id())));
@@ -101,38 +109,73 @@ class MissionSystemsTest {
     }
 
     @Test
+    void catastrophicImpactReplacesAsteroidWithNamedLocalDebrisField() {
+        var system = new SpaceSimulation();
+        var asteroid = system.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
+                .findFirst().orElseThrow();
+        system.earthKnowledge.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), SpaceBalance.SCAN_RANGE);
+        var oldRegions = system.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.SURVEY_REGION
+                && Math.hypot(object.x() - asteroid.x(), object.y() - asteroid.y()) <= object.radius())
+                .map(SpaceObjectData::id).toList();
+        var action = FlightPlanAction.create(ActionType.NAVIGATE_TO)
+                .withTarget(asteroid.id()).withOrbit(OrbitBand.SURFACE);
+        var impact = AsteroidImpactRules.predictArrival(asteroid.mass() * 1_000,
+                asteroid, 1_000, null, action);
+        assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, impact.fragmentationMode());
+
+        var debrisId = system.applyAsteroidImpact(asteroid.id(), impact);
+        var truth = system.truth();
+        var debris = truth.stream().filter(object -> object.id().equals(debrisId)).findFirst().orElseThrow();
+        var fragments = truth.stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
+                && object.name().contains("destroyed " + asteroid.name())).toList();
+
+        assertTrue(truth.stream().noneMatch(object -> object.id().equals(asteroid.id())));
+        assertFalse(system.earthKnowledge.precise(asteroid.id()));
+        assertTrue(system.createObjectData().stream().noneMatch(object -> object.id().equals(asteroid.id())),
+                "stale survey knowledge must not resurrect a destroyed asteroid");
+        assertEquals(impact.fragmentCount(), fragments.size());
+        assertTrue(fragments.stream().allMatch(fragment -> fragment.detectionState() == SpaceObjects.DetectionState.HIDDEN));
+        assertEquals(asteroid.x(), debris.x());
+        assertEquals(asteroid.y(), debris.y());
+        assertTrue(debris.radius() < 30_000);
+        assertEquals("Debris field of destroyed " + asteroid.name(), debris.name());
+        assertTrue(oldRegions.stream().noneMatch(regionId -> truth.stream().anyMatch(object -> object.id().equals(regionId))));
+    }
+
+    @Test
     void missionExecutionKeepsSciencePrivateUntilUpload() {
         var system = new SpaceSimulation();
-        var asteroid = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID)
+        var region = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION)
                 .findFirst().orElseThrow();
+        var asteroid = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID
+                && Math.hypot(o.x() - region.x(), o.y() - region.y()) <= region.radius()).findFirst().orElseThrow();
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id, Set.of(
                 new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.SPACE_SCANNER.get().defaultBlockState()),
                 new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState())),
                 Map.of(), 8, 0);
         var resources = new DynamicRocketSegment(0, 1_000_000, 0, Set.of());
-        var scan = FlightPlanAction.create(ActionType.SCAN)
-                .withService(new ServiceSettings(20, false, 0, -1));
+        var scan = FlightPlanAction.create(ActionType.SCAN);
         var transmit = FlightPlanAction.create(ActionType.TRANSMIT_INFORMATION);
         var mission = new MissionState(OWNER,
                 new ActiveRocketData(Map.of(id, segment), Map.of(id, resources)), plan(scan, transmit),
-                new MissionState.Position(asteroid.x(), asteroid.y(), 0, 0, asteroid.id(), OrbitBand.TIGHT,
+                new MissionState.Position(region.x(), region.y(), 500, 0, region.id(), OrbitBand.SURFACE,
                         -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO)),
                 new SurveyKnowledge(), BlockPos.ZERO, 0);
         var data = new MissionSavedData();
 
         for (int tick = 0; tick < 20; tick++) MissionController.step(null, data, mission, system, tick);
         assertEquals(transmit, mission.action());
-        assertTrue(mission.knowledge.exposure(asteroid.id()) > 0);
-        assertEquals(0, system.earthKnowledge.exposure(asteroid.id()));
-        assertEquals(1_000_000 - 20 * SpaceBalance.SCANNER_RF, resources.availableRF);
+        assertTrue(mission.knowledge.precise(asteroid.id()));
+        assertFalse(system.earthKnowledge.precise(asteroid.id()));
+        assertEquals(1_000_000 - SpaceBalance.SCAN_RF, resources.availableRF);
 
         MissionController.step(null, data, mission, system, 20);
         assertEquals(transmit, mission.action());
         mission.canTransmit = true;
         MissionController.step(null, data, mission, system, 21);
         assertNull(mission.action());
-        assertEquals(mission.knowledge.exposure(asteroid.id()), system.earthKnowledge.exposure(asteroid.id()));
+        assertTrue(system.earthKnowledge.precise(asteroid.id()));
     }
 
     @Test

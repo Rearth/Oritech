@@ -146,7 +146,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         calculatedFlight = calculateDraft(currentDraftSnapshot());
         flightPlanMap.updateFlightPath(currentDraftSnapshot(), calculatedFlight, activeBranchId);
         if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu) {
-            flightPlanMap.setFleetTimes(java.util.Map.of(draftPlan.root().id(), 0.0));
+            flightPlanMap.setFleetTimes(java.util.Map.of(draftPlan.root().id(), livePathTime()));
             flightPlanMap.setCraftLabels(java.util.Map.of(draftPlan.root().id(),
                     Component.translatable("screen.oritech_space_age.mission.current_position")));
         }
@@ -358,7 +358,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         flightPlanMap.copyViewFrom(previousMap);
         if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu) {
             flightPlanMap.setShowSummary(false);
-            flightPlanMap.setFleetTimes(java.util.Map.of(draftPlan.root().id(), 0.0));
+            flightPlanMap.setFleetTimes(java.util.Map.of(draftPlan.root().id(), livePathTime()));
             flightPlanMap.setCraftLabels(java.util.Map.of(draftPlan.root().id(),
                     Component.translatable("screen.oritech_space_age.mission.current_position")));
         }
@@ -366,9 +366,20 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         addFlightPlanEditor(rocket);
     }
 
+    private double livePathTime() {
+        if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu control && control.selectedTelemetry != null
+                && draftPlan.equals(control.selectedTelemetry.plan())
+                && control.fleet.stream().anyMatch(entry -> entry.id().equals(control.selected) && !entry.navigation().paths().isEmpty()))
+            return control.selectedTelemetry.actionTicks() / 20.0;
+        return 0;
+    }
+
     private RocketFlightPathCalculator.FlightPath calculateDraft(SpaceSimulation.FlightPlannerSnapshot snapshot) {
         if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu control) {
             var report = control.selectedTelemetry;
+            var fleetEntry = control.fleet.stream().filter(entry -> entry.id().equals(control.selected)).findFirst().orElse(null);
+            if (report != null && draftPlan.equals(report.plan()) && fleetEntry != null && !fleetEntry.navigation().paths().isEmpty())
+                return fleetEntry.navigation().flight();
             var current = draftPlan.root().actions().stream().filter(action -> !action.isGenerated()).findFirst();
             var reported = report == null ? java.util.Optional.<SpaceSimulation.FlightPlanAction>empty()
                     : report.plan().root().actions().stream().filter(action -> !action.isGenerated()).findFirst();
@@ -574,10 +585,10 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     @Override
     protected Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket) {
-        if (action.type() == SpaceSimulation.ActionType.SCAN || action.type() == SpaceSimulation.ActionType.RELAY) {
-            return action.service().untilPrecise() ? Component.translatable("screen.oritech_space_age.action.until_precise")
-                    : Component.translatable("screen.oritech_space_age.action.duration_seconds", action.service().durationTicks() / 20);
-        }
+        if (action.type() == SpaceSimulation.ActionType.SCAN)
+            return Component.translatable("screen.oritech_space_age.action.scan_instant");
+        if (action.type() == SpaceSimulation.ActionType.RELAY)
+            return Component.translatable("screen.oritech_space_age.action.duration_seconds", action.service().durationTicks() / 20);
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
             return Component.translatable("screen.oritech_space_age.action.upload_survey_data");
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {

@@ -5,6 +5,9 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Segment;
 
 import java.nio.charset.StandardCharsets;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.UUIDUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -19,6 +22,8 @@ import java.util.UUID;
  * The guidance simulation is deliberately small, but it keeps velocity continuous between navigation actions.
  */
 public final class RocketFlightPathCalculator {
+
+    private static final Codec<Set<SpaceSimulation.SegmentRef>> SEGMENT_SET_CODEC = SpaceSimulation.SegmentRef.CODEC.listOf().xmap(Set::copyOf, List::copyOf);
 
     private RocketFlightPathCalculator() {
     }
@@ -48,6 +53,7 @@ public final class RocketFlightPathCalculator {
         var initial = createInitialCraft(rocket, earth, plan.root(), objectsById);
         if (position != null) {
             initial.x = position.x(); initial.y = position.y();
+            initial.headingX = position.headingX(); initial.headingY = position.headingY();
             initial.velocityX = position.vx(); initial.velocityY = position.vy();
             initial.currentTarget = position.target(); initial.currentOrbit = position.orbit();
             initial.currentStage = position.stage();
@@ -100,21 +106,13 @@ public final class RocketFlightPathCalculator {
             connections.put(ref, neighbours);
         }
 
-        double initialX = earth.x();
-        double initialY = earth.y();
-        var firstAction = root.actions().stream().filter(action -> !action.isGenerated()).findFirst().orElse(null);
-        if (firstAction != null && firstAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
-            var target = objects.get(firstAction.targetId());
-            if (target != null) {
-                double offsetX = target.x() - earth.x();
-                double offsetY = target.y() - earth.y();
-                double angle = Math.hypot(offsetX, offsetY) < 1
-                        ? RocketFlightNavigation.targetPointOffset(firstAction) : Math.atan2(offsetY, offsetX);
-                initialX += Math.cos(angle) * earth.radius();
-                initialY += Math.sin(angle) * earth.radius();
-            }
-        }
-        return new Craft(segments, connections, initialX, initialY, 0);
+        var launch = rocket.getLaunchPosition();
+        var angle = SpaceBalance.surfaceAngle(launch.getX(), launch.getZ());
+        var craft = new Craft(segments, connections, earth.x() + Math.cos(angle) * earth.radius(),
+                earth.y() + Math.sin(angle) * earth.radius(), 0);
+        craft.currentTarget = earth.id();
+        craft.currentOrbit = SpaceSimulation.OrbitBand.SURFACE;
+        return craft;
     }
 
     private static void simulateBranch(SpaceSimulation.FlightPlanBranch branch, Craft state,
@@ -158,39 +156,22 @@ public final class RocketFlightPathCalculator {
     }
 
     private static boolean service(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
-        boolean scanning = action.type() == SpaceSimulation.ActionType.SCAN;
-        var target = context.objects.get(action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)
-                ? state.currentTarget : action.targetId());
-        boolean conditional = scanning && action.service().untilPrecise();
-        if (scanning) context.scanEstimates.add(estimateScan(action, state, target));
-        double remainingExposure = 0;
-        double remainingPrecision = 0;
-        if (conditional) {
-            if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID && target.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
-                state.blockedState = TerminalState.NO_SCAN_TARGET;
-                return false;
-            }
-            if (target.detectionState() != SpaceObjects.DetectionState.PRECISE) {
-                remainingExposure = 1;
-                remainingPrecision = 16;
-            }
-        }
+        if (action.type() == SpaceSimulation.ActionType.SCAN) return scan(action, state, context);
         double remainingTicks = action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION
                 ? Math.max(1, action.service().timeoutTicks()) : action.service().durationTicks();
-        var cost = scanning ? SpaceBalance.SCANNER_RF : SpaceBalance.ANTENNA_RF;
-        boolean installed = state.segments.values().stream().anyMatch(segment ->
-                (scanning ? segment.hardware.scanners() : segment.hardware.antennas()) > 0);
+        var cost = SpaceBalance.ANTENNA_RF;
+        boolean installed = state.segments.values().stream().anyMatch(segment -> segment.hardware.antennas() > 0);
         if (!installed) {
-            state.blockedState = scanning ? TerminalState.NO_SCANNER : TerminalState.NO_ANTENNA;
+            state.blockedState = TerminalState.NO_ANTENNA;
             return false;
         }
         // Spend local RF until the action finishes or the next module bank runs out.
         // Different banks may run for different durations; a short-lived bank still contributes.
-        while (conditional ? remainingExposure > 1e-9 || remainingPrecision > 1e-9 : remainingTicks > 0.0001) {
+        while (remainingTicks > 0.0001) {
             int modules = 0;
             double step = Double.POSITIVE_INFINITY;
             for (var segment : state.segments.values()) {
-                var count = scanning ? segment.hardware.scanners() : segment.hardware.antennas();
+                var count = segment.hardware.antennas();
                 if (count == 0 || segment.rf < cost) continue;
                 modules += count;
                 step = Math.min(step, segment.rf / (count * (double) cost));
@@ -199,22 +180,9 @@ public final class RocketFlightPathCalculator {
                 state.blockedState = TerminalState.NOT_ENOUGH_SERVICE_RF;
                 return false;
             }
-            if (conditional) {
-                var distance = SurveyRules.surveyDistance(target, state.x, state.y);
-                if (distance > SpaceBalance.SCAN_RANGE) {
-                    state.blockedState = TerminalState.SCAN_OUT_OF_RANGE;
-                    return false;
-                }
-                var exposureRate = modules * SurveyRules.exposurePerScannerTick(distance, SpaceBalance.SCAN_RANGE);
-                var precisionRate = exposureRate * SurveyRules.precisionPerExposure(distance, SpaceBalance.SCAN_RANGE);
-                step = Math.min(step, Math.max(remainingExposure / exposureRate, remainingPrecision / precisionRate));
-                // Moving scans update distance each second; stationary scans can be solved in one step.
-                if (Math.hypot(state.velocityX, state.velocityY) > 0.01) step = Math.min(step, 20);
-                remainingExposure -= exposureRate * step;
-                remainingPrecision -= precisionRate * step;
-            } else step = Math.min(step, remainingTicks);
+            step = Math.min(step, remainingTicks);
             for (var segment : state.segments.values()) {
-                var count = scanning ? segment.hardware.scanners() : segment.hardware.antennas();
+                var count = segment.hardware.antennas();
                 if (count > 0 && segment.rf >= cost) segment.spendRF(count * cost * step);
             }
             remainingTicks -= step;
@@ -223,39 +191,41 @@ public final class RocketFlightPathCalculator {
             state.y += state.velocityY * step / 20;
         }
         state.addSample(PathPhase.COAST, state.currentTarget, action.id());
-        if (action.type() == SpaceSimulation.ActionType.SCAN && action.service().untilPrecise()) {
-            if (target != null && target.type() == SpaceObjects.ObjectType.ASTEROID) {
-                // A conditional forecast; only the live scanner can produce a real measurement.
-                context.objects.put(target.id(), new SpaceSimulation.SpaceObjectData(target.id(), target.type(), target.x(), target.y(),
-                        target.velocityX(), target.velocityY(), target.radius(), target.surfaceGravity(), target.mass(),
-                        SpaceObjects.DetectionState.PRECISE, target.name(), target.materials()));
-            }
-        }
         return true;
     }
 
-    private static ScanEstimate estimateScan(SpaceSimulation.FlightPlanAction action, Craft state,
-                                             SpaceSimulation.SpaceObjectData target) {
+    private static boolean scan(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
+        var target = context.objects.get(action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)
+                ? state.currentTarget : action.targetId());
         int scanners = state.segments.values().stream().mapToInt(segment -> segment.hardware.scanners()).sum();
         var available = state.segments.values().stream().filter(segment -> segment.hardware.scanners() > 0)
                 .mapToDouble(segment -> segment.rf).sum();
-        double required = Double.NaN;
-        if (scanners > 0) {
-            if (!action.service().untilPrecise()) {
-                required = scanners * (double) action.service().durationTicks() * SpaceBalance.SCANNER_RF;
-            } else if (target != null && (target.type() == SpaceObjects.ObjectType.ASTEROID
-                    || target.type() == SpaceObjects.ObjectType.SURVEY_REGION)) {
-                var distance = SurveyRules.surveyDistance(target, state.x, state.y);
-                if (target.detectionState() == SpaceObjects.DetectionState.PRECISE) required = 0;
-                else if (distance <= SpaceBalance.SCAN_RANGE) {
-                    var exposure = SurveyRules.exposurePerScannerTick(distance, SpaceBalance.SCAN_RANGE);
-                    var precision = exposure * SurveyRules.precisionPerExposure(distance, SpaceBalance.SCAN_RANGE);
-                    // Extra scanners finish sooner; the total work needed for precision stays the same.
-                    required = Math.max(1 / exposure, 16 / precision) * SpaceBalance.SCANNER_RF;
-                }
-            }
+        context.scanEstimates.add(new ScanEstimate(action.id(), (long) Math.floor(available), scanners));
+        if (scanners == 0) {
+            state.blockedState = TerminalState.NO_SCANNER;
+            return false;
         }
-        return new ScanEstimate(action.id(), Math.ceil(required), (long) Math.floor(available), scanners);
+        if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
+            state.blockedState = TerminalState.NO_SCAN_TARGET;
+            return false;
+        }
+        if (SurveyRules.surveyDistance(target, state.x, state.y) > SpaceBalance.SCAN_RANGE) {
+            state.blockedState = TerminalState.SCAN_OUT_OF_RANGE;
+            return false;
+        }
+        if (available < SpaceBalance.SCAN_RF) {
+            state.blockedState = TerminalState.NOT_ENOUGH_SERVICE_RF;
+            return false;
+        }
+        double remaining = SpaceBalance.SCAN_RF;
+        for (var segment : state.segments.values()) {
+            if (segment.hardware.scanners() == 0) continue;
+            var spent = Math.min(remaining, segment.rf);
+            segment.spendRF(spent);
+            remaining -= spent;
+            if (remaining <= 0) break;
+        }
+        return true;
     }
 
     private static void maintainPosition(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
@@ -296,6 +266,7 @@ public final class RocketFlightPathCalculator {
         context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, end));
         state.velocityX = 0;
         state.velocityY = 0;
+        state.addSample(PathPhase.COAST, state.currentTarget, action.id());
         if (duration > 0 && Double.isFinite(duration)) {
             state.time += duration;
             state.addSample(PathPhase.COAST, state.currentTarget, action.id());
@@ -466,6 +437,22 @@ public final class RocketFlightPathCalculator {
                              double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
                              int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
                              Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
+        public static final Codec<PathSample> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.DOUBLE.fieldOf("timeSeconds").forGetter(PathSample::timeSeconds),
+                Codec.DOUBLE.fieldOf("x").forGetter(PathSample::x),
+                Codec.DOUBLE.fieldOf("y").forGetter(PathSample::y),
+                Codec.DOUBLE.fieldOf("speedMetersPerSecond").forGetter(PathSample::speedMetersPerSecond),
+                Codec.DOUBLE.fieldOf("velocityX").forGetter(PathSample::velocityX),
+                Codec.DOUBLE.fieldOf("velocityY").forGetter(PathSample::velocityY),
+                Codec.STRING.xmap(PathPhase::valueOf, PathPhase::name).fieldOf("phase").forGetter(PathSample::phase),
+                UUIDUtil.STRING_CODEC.fieldOf("targetId").forGetter(PathSample::targetId),
+                UUIDUtil.STRING_CODEC.fieldOf("actionId").forGetter(PathSample::actionId),
+                Codec.INT.fieldOf("stage").forGetter(PathSample::stage),
+                SEGMENT_SET_CODEC.fieldOf("connectedSegments").forGetter(PathSample::connectedSegments),
+                SEGMENT_SET_CODEC.fieldOf("firingSegments").forGetter(PathSample::firingSegments),
+                UUIDUtil.STRING_CODEC.fieldOf("attachedAsteroidId").forGetter(PathSample::attachedAsteroidId)
+        ).apply(i, PathSample::new));
+
     }
 
     /**
@@ -482,6 +469,18 @@ public final class RocketFlightPathCalculator {
     public record ActionMoment(UUID branchId, int actionIndex, UUID actionId, double timeSeconds,
                                double x, double y, boolean completed,
                                Set<SpaceSimulation.SegmentRef> connectedSegments, UUID attachedAsteroidId) {
+        public static final Codec<ActionMoment> CODEC = RecordCodecBuilder.create(i -> i.group(
+                UUIDUtil.STRING_CODEC.fieldOf("branchId").forGetter(ActionMoment::branchId),
+                Codec.INT.fieldOf("actionIndex").forGetter(ActionMoment::actionIndex),
+                UUIDUtil.STRING_CODEC.fieldOf("actionId").forGetter(ActionMoment::actionId),
+                Codec.DOUBLE.fieldOf("timeSeconds").forGetter(ActionMoment::timeSeconds),
+                Codec.DOUBLE.fieldOf("x").forGetter(ActionMoment::x),
+                Codec.DOUBLE.fieldOf("y").forGetter(ActionMoment::y),
+                Codec.BOOL.fieldOf("completed").forGetter(ActionMoment::completed),
+                SEGMENT_SET_CODEC.fieldOf("connectedSegments").forGetter(ActionMoment::connectedSegments),
+                UUIDUtil.STRING_CODEC.fieldOf("attachedAsteroidId").forGetter(ActionMoment::attachedAsteroidId)
+        ).apply(i, ActionMoment::new));
+
     }
 
     /**
@@ -512,6 +511,16 @@ public final class RocketFlightPathCalculator {
     public record CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments,
                             List<PathSample> samples, List<ActionMoment> actionMoments,
                             double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
+        public static final Codec<CraftPath> CODEC = RecordCodecBuilder.create(i -> i.group(
+                UUIDUtil.STRING_CODEC.fieldOf("branchId").forGetter(CraftPath::branchId),
+                SEGMENT_SET_CODEC.fieldOf("segments").forGetter(CraftPath::segments),
+                PathSample.CODEC.listOf().fieldOf("samples").forGetter(CraftPath::samples),
+                ActionMoment.CODEC.listOf().fieldOf("actionMoments").forGetter(CraftPath::actionMoments),
+                Codec.DOUBLE.fieldOf("durationSeconds").forGetter(CraftPath::durationSeconds),
+                Codec.DOUBLE.fieldOf("remainingDeltaV").forGetter(CraftPath::remainingDeltaV),
+                Codec.STRING.xmap(TerminalState::valueOf, TerminalState::name).fieldOf("terminalState").forGetter(CraftPath::terminalState)
+        ).apply(i, CraftPath::new));
+
     }
 
     /**
@@ -544,9 +553,8 @@ public final class RocketFlightPathCalculator {
         }
     }
 
-    /** Scan-start budget, independent of stored RF so blocked cards still show the requirement.
-     * Required RF is NaN when the target/range/hardware does not permit an estimate. */
-    public record ScanEstimate(UUID actionId, double requiredRF, long availableRF, int scanners) {
+    /** Scanner hardware and its local RF at the instant this action runs. */
+    public record ScanEstimate(UUID actionId, long availableRF, int scanners) {
     }
 
     public record StationKeepingEstimate(UUID actionId, double durationSeconds, StationKeepingEnd end) {
@@ -637,6 +645,11 @@ public final class RocketFlightPathCalculator {
 
         public boolean isFailure() {
             return this != READY && this != STATION_KEEPING_EXHAUSTED && this != DISCARDED;
+        }
+
+        /** Destruction may be the requested result of an impact mission. */
+        public boolean preventsLaunch() {
+            return isFailure() && this != DESTROYED;
         }
     }
 }

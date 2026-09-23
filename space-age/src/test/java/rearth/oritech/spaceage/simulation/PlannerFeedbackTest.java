@@ -16,7 +16,7 @@ class PlannerFeedbackTest {
             SpaceObjects.ObjectType.EARTH, 0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
     private static final SpaceObjectData REGION = new SpaceObjectData(REGION_ID,
             SpaceObjects.ObjectType.SURVEY_REGION, 160_000, 0, 55_000, 0,
-            SpaceObjects.DetectionState.HINTED);
+            SpaceObjects.DetectionState.PRECISE);
 
     private static ActiveRocketData rocket(boolean ion, boolean scanner, long rf) {
         var id = new UUID(1, 1);
@@ -46,50 +46,49 @@ class PlannerFeedbackTest {
     }
 
     private static MissionState.Position atRegion() {
-        return new MissionState.Position(105_000, 0, 0, 0, REGION_ID, OrbitBand.SURFACE,
+        return new MissionState.Position(105_000, 0, 800, 0, REGION_ID, OrbitBand.SURFACE,
                 -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
     }
 
     @Test
-    void surveyRoundTripsArePlannableWithEitherEngineType() {
-        var scan = FlightPlanAction.create(ActionType.SCAN)
-                .withService(new ServiceSettings(20, true, 0, -1));
+    void surveyRoundTripsRequireEnoughAtmosphericThrust() {
+        var scan = FlightPlanAction.create(ActionType.SCAN);
         for (boolean ion : List.of(false, true)) {
             var result = RocketFlightPathCalculator.calculate(rocket(ion, true, 50_000_000),
                     List.of(EARTH, REGION), plan(navigate(REGION_ID), scan, navigate(SpaceObjects.EARTH_ID)));
             var path = result.paths().getFirst();
-            assertEquals(READY, path.terminalState(), "ion=" + ion);
-            assertEquals(3, path.actionMoments().size());
-            assertTrue(path.actionMoments().stream().allMatch(RocketFlightPathCalculator.ActionMoment::completed));
-            assertTrue(result.arrivalPredictions().stream().noneMatch(arrival -> arrival.targetId().equals(REGION_ID)),
-                    "Survey regions are navigation areas, not impact surfaces");
+            if (ion) assertEquals(NO_FEASIBLE_TRANSFER, path.terminalState());
+            else {
+                assertEquals(READY, path.terminalState());
+                assertEquals(3, path.actionMoments().size());
+                assertTrue(path.actionMoments().stream().allMatch(RocketFlightPathCalculator.ActionMoment::completed));
+                assertTrue(result.arrivalPredictions().stream().noneMatch(arrival -> arrival.targetId().equals(REGION_ID)),
+                        "Survey regions are navigation areas, not impact surfaces");
+            }
         }
     }
 
     @Test
-    void scanPlanningReflectsModeHardwareRangeAndEnergy() {
-        var oneDay = FlightPlanAction.create(ActionType.SCAN)
-                .withService(new ServiceSettings(SpaceBalance.DAY, false, 0, -1));
-        var timed = RocketFlightPathCalculator.calculateFrom(rocket(false, true, 1_000_000),
-                List.of(EARTH, REGION), plan(oneDay), atRegion());
-        assertEquals(READY, timed.paths().getFirst().terminalState());
-        assertEquals(SpaceBalance.DAY * SpaceBalance.SCANNER_RF,
-                timed.scanEstimates().getFirst().requiredRF());
+    void scanPlanningReflectsHardwareRangeAndFixedEnergy() {
+        var scan = FlightPlanAction.create(ActionType.SCAN);
+        var result = RocketFlightPathCalculator.calculateFrom(rocket(false, true, 1_000_000),
+                List.of(EARTH, REGION), plan(scan), atRegion());
+        assertEquals(READY, result.paths().getFirst().terminalState());
+        assertEquals(1_000_000, result.scanEstimates().getFirst().availableRF());
+        assertEquals(0, result.paths().getFirst().durationSeconds(), 1e-9);
+        assertEquals(800, result.paths().getFirst().samples().getLast().speedMetersPerSecond(), 1e-9);
 
-        var precise = oneDay.withService(new ServiceSettings(20, true, 0, -1));
         assertEquals(NO_SCANNER, RocketFlightPathCalculator.calculateFrom(rocket(false, false, 1_000_000),
-                List.of(EARTH, REGION), plan(precise), atRegion()).paths().getFirst().terminalState());
+                List.of(EARTH, REGION), plan(scan), atRegion()).paths().getFirst().terminalState());
         assertEquals(NOT_ENOUGH_SERVICE_RF,
                 RocketFlightPathCalculator.calculateFrom(rocket(false, true, 100),
-                        List.of(EARTH, REGION), plan(precise), atRegion()).paths().getFirst().terminalState());
+                        List.of(EARTH, REGION), plan(scan), atRegion()).paths().getFirst().terminalState());
 
         var oversized = new SpaceObjectData(REGION_ID, SpaceObjects.ObjectType.SURVEY_REGION,
-                160_000, 0, 310_000, 0, SpaceObjects.DetectionState.HINTED);
-        assertEquals(SCAN_OUT_OF_RANGE,
+                160_000, 0, 310_000, 0, SpaceObjects.DetectionState.PRECISE);
+        assertEquals(READY,
                 RocketFlightPathCalculator.calculateFrom(rocket(false, true, 5_000_000),
-                        List.of(EARTH, oversized), plan(precise), atRegion()).paths().getFirst().terminalState());
-        assertEquals(READY, RocketFlightPathCalculator.calculateFrom(rocket(false, true, 5_000_000),
-                List.of(EARTH, oversized), plan(oneDay), atRegion()).paths().getFirst().terminalState());
+                        List.of(EARTH, oversized), plan(scan), atRegion()).paths().getFirst().terminalState());
     }
 
 }

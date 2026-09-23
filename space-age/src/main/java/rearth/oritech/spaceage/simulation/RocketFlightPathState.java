@@ -121,6 +121,7 @@ final class RocketFlightPathState {
         double x;
         double y;
         double time;
+        double headingX, headingY;
         double velocityX;
         double velocityY;
         // One-based stage selects which configured engines may fire.
@@ -286,6 +287,7 @@ final class RocketFlightPathState {
             }
             var copy = new Craft(copiedSegments, copiedConnections, x, y, time);
             copy.atmosphere = atmosphere;
+            copy.headingX = headingX; copy.headingY = headingY;
             copy.velocityX = velocityX;
             copy.velocityY = velocityY;
             copy.currentStage = currentStage;

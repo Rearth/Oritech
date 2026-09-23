@@ -13,6 +13,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -33,7 +34,7 @@ final class StarMapObjects {
         objects.clear();
         for (var object : snapshot.objects()) {
             int size = object.type() == SpaceObjects.ObjectType.ASTEROID ? 12 : 18;
-            objects.add(new Entry(object, new BlockWidget(0, 0, size, placeholderBlock(object.type()))));
+            objects.add(new Entry(object, new BlockWidget(0, 0, size, placeholderBlock(object.type())).withCachedRendering()));
         }
         connectFog();
     }
@@ -169,6 +170,7 @@ final class StarMapObjects {
                       RocketStarMapWidget.NavigationSelection selectedTarget, int mouseX, int mouseY, float delta,
                       boolean pointerInViewport) {
         Entry hovered = null;
+        var drawnIcons = new HashSet<IconKey>();
         for (var object : objects) {
             var position = project(camera, viewport, x(object), y(object));
             if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
@@ -185,7 +187,11 @@ final class StarMapObjects {
             if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
             object.widget.setPosition((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius));
             object.widget.setSize(size, size);
-            if (object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION) object.widget.render(graphics, mouseX, mouseY, delta);
+            // Zoomed-out contacts can land on exactly the same pixel. Submit identical PIP states only once:
+            // NeoForge pools them by equality, so duplicate states can overwrite a renderer in the pool.
+            var icon = new IconKey((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius),
+                    size, object.widget.getState());
+            if (drawnIcons.add(icon)) object.widget.render(graphics, mouseX, mouseY, delta);
             if (pointerInViewport && object.widget.isMouseOver(mouseX, mouseY)) hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
@@ -303,6 +309,8 @@ final class StarMapObjects {
         var position = displayedPositions.get(object.data.id());
         return position == null ? object.data.y() : position.y();
     }
+
+    private record IconKey(int x, int y, int size, BlockState state) { }
 
     /** Visible map bounds in GUI pixels. */
     record Viewport(int x, int y, int width, int height) {

@@ -18,8 +18,19 @@ import rearth.oritech.spaceage.simulation.*;
 import java.util.*;
 
 public final class MissionNetworking {
+    /** An empty impact list represents a coast that never hits Earth. */
+    public record AsteroidForecast(UUID asteroid, List<RocketFlightPathCalculator.MotionSample> samples,
+                                  List<AsteroidImpactRules.ImpactPrediction> impacts, int uncertainty) {
+        static AsteroidForecast of(RocketFlightPathCalculator.AsteroidPath path) {
+            return new AsteroidForecast(path.asteroidId(), path.samples(),
+                    path.earthImpact() == null ? List.of() : List.of(path.earthImpact()), path.landingUncertaintyBlocks());
+        }
+        RocketFlightPathCalculator.AsteroidPath path() {
+            return new RocketFlightPathCalculator.AsteroidPath(asteroid, samples, impacts.isEmpty() ? null : impacts.getFirst(), uncertainty);
+        }
+    }
     public record FleetEntry(UUID id, MissionState.Telemetry telemetry, boolean connected, boolean dismissible,
-                             String route, SpaceCommunications.Connection communication) { }
+                             String route, SpaceCommunications.Connection communication, MissionForecast.Navigation navigation) { }
     public record FleetPayload(List<FleetEntry> fleet, UUID system, List<SpaceSimulation.SpaceObjectData> objects, long simulationTick, int debugSpeed, SpaceCommunications.NetworkStatus network, List<SpaceCommunications.Node> nodes) implements CustomPacketPayload {
         public static final Type<FleetPayload> TYPE = new Type<>(OritechSpaceAge.id("fleet"));
         public Type<? extends CustomPacketPayload> type() { return TYPE; }
@@ -55,6 +66,7 @@ public final class MissionNetworking {
         NetworkManager.getAutoCodec(SpaceCommunications.Connection.class);
         NetworkManager.getAutoCodec(SpaceCommunications.NetworkStatus.class);
         NetworkManager.getAutoCodec(SpaceCommunications.Node.class);
+        registerForecastCodecs();
         NetworkManager.getAutoCodec(FleetEntry.class);
         registrar.playToClient(FleetPayload.TYPE, NetworkManager.getAutoCodec(FleetPayload.class), (payload, context) -> context.enqueueWork(() ->
                 rearth.oritech.spaceage.client.MissionControlScreen.receive(payload)));
@@ -80,12 +92,19 @@ public final class MissionNetworking {
         });
         registrar.playToServer(CardRequest.TYPE, NetworkManager.getAutoCodec(CardRequest.class), MissionNetworking::card);
     }
+    @SuppressWarnings("unchecked")
+    public static void registerForecastCodecs() {
+        NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(RocketFlightPathCalculator.CraftPath.CODEC), RocketFlightPathCalculator.CraftPath.class);
+        NetworkManager.registerCodec(((net.minecraft.network.codec.StreamCodec<net.minecraft.network.RegistryFriendlyByteBuf, AsteroidForecast>) NetworkManager.getAutoCodec(AsteroidForecast.class)).map(
+                AsteroidForecast::path, AsteroidForecast::of), RocketFlightPathCalculator.AsteroidPath.class);
+    }
+
     public static void sendFleet(ServerPlayer player) {
         var data = MissionSavedData.get(player.level().getServer());
         var tick = MissionController.missionTime(player.level().getServer());
         var entries = data.craft.values().stream().filter(m -> m.owner.equals(player.getUUID())).map(mission ->
                 new FleetEntry(mission.rocket.getRocketId(), mission.telemetry(tick), mission.canUpdateMission(), mission.canDismiss(),
-                        mission.route, mission.communication)).toList();
+                        mission.route, mission.communication, mission.navigationForecast())).toList();
         var nodes = data.networkNodes.stream().filter(n -> n.owner().equals(player.getUUID())).toList();
         PacketDistributor.sendToPlayer(player, new FleetPayload(entries, SpaceSimulationSavedData.getForPlayer(player).id(),
                 SpaceSimulationSavedData.getForPlayer(player).createObjectData(), tick, data.debugSpeed,

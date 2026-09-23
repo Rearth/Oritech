@@ -137,12 +137,14 @@ public final class RocketFlightPlanRules {
                     var target = objectsById.get(action.targetId());
                     if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID) continue;
                     validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
+                } else if (action.type() == SpaceSimulation.ActionType.SCAN) {
+                    validatedAction = action.withService(SpaceSimulation.ServiceSettings.DEFAULT);
                 }
                 if (validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && (!validatedAction.targetId().equals(SpaceObjects.EARTH_ID) || !SpaceBalance.hasSlots(validatedAction.orbit()))) {
                     var settings = validatedAction.service();
                     validatedAction = validatedAction.withService(new SpaceSimulation.ServiceSettings(settings.durationTicks(),
-                            settings.untilPrecise(), settings.timeoutTicks(), -1));
+                            settings.timeoutTicks(), -1));
                 }
                 var validatedType = validatedAction.type();
                 var addons = validatedType == SpaceSimulation.ActionType.NAVIGATE_TO

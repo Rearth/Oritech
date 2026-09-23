@@ -27,7 +27,7 @@ public class SpaceObjects {
     }
 
     public enum DetectionState implements StringRepresentable {
-        HIDDEN, HINTED, ROUGH, PRECISE;
+        HIDDEN, PRECISE;
 
         public static final Codec<DetectionState> CODEC = StringRepresentable.fromEnum(DetectionState::values);
 

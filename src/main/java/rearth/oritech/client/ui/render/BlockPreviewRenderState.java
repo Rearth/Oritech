@@ -22,6 +22,7 @@ public record BlockPreviewRenderState(
         float centerY,
         float centerZ,
         float partialTick,
+        boolean cacheTexture,
         int x0,
         int y0,
         int x1,
@@ -38,7 +39,16 @@ public record BlockPreviewRenderState(
                                    int x0, int y0, int x1, int y1, float scale,
                                    Matrix3x2f pose,
                                    @Nullable ScreenRectangle scissorArea) {
-        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick,
+        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick, false,
+                x0, y0, x1, y1, scale, pose, scissorArea);
+    }
+
+    public BlockPreviewRenderState(List<Entry> blocks, float rotationX, float rotationY,
+                                   float centerX, float centerY, float centerZ,
+                                   float partialTick, boolean cacheTexture,
+                                   int x0, int y0, int x1, int y1, float scale,
+                                   Matrix3x2f pose, @Nullable ScreenRectangle scissorArea) {
+        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick, cacheTexture,
                 x0, y0, x1, y1, scale, new Matrix3x2f(pose), scissorArea,
                 calculateBounds(x0, y0, x1, y1, pose, scissorArea));
     }

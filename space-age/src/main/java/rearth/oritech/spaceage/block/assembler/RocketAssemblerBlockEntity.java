@@ -59,7 +59,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         if (first.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return false;
         var firstPlan = validated.withBranches(java.util.List.of(validated.root().withActions(java.util.List.of(first))));
         var predicted = RocketFlightPathCalculator.calculate(preview, system.createObjectData(), firstPlan);
-        if (predicted.paths().isEmpty() || predicted.paths().getFirst().terminalState().isFailure()) return false;
+        if (predicted.paths().isEmpty() || predicted.paths().getFirst().terminalState().preventsLaunch()) return false;
         var result = gatherRocketData(start, true);
         if (result == null) {
             OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
@@ -303,6 +303,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         }
 
         var rocketData = new ActiveRocketData(staticSegments, dynamicSegments);
+        rocketData.setLaunchPosition(origin);
 
         if (removeBlocks) {
             var blocksToRemove = new HashSet<BlockPos>();
