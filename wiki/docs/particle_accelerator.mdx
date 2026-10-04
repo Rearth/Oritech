@@ -74,6 +74,10 @@ and destroys blocks until momentum is depleted. When two particles collide, they
 
 Passing through an accelerator motor speeds up the particle by 1 m/s, requiring the motor to be powered.
 The power requirement increases with speed. Each time a motor speeds up a particle, it consumes the particle's current speed * 10 RF.
+The total RF needed to achieve a certain speed can be approximated with the following formula:
+
+> power = 5 * (speed+0.5)^2
+
 Both particle motors and sensors can be used as straight guides.
 
 ---
