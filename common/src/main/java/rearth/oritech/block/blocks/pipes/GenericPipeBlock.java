@@ -177,6 +177,19 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
         
         return state;
     }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
+        if (world.isClientSide) return;
+
+        var direction = Direction.fromDelta(sourcePos.getX() - pos.getX(), sourcePos.getY() - pos.getY(), sourcePos.getZ() - pos.getZ());
+        if (direction == null) return;
+
+        var updated = updateShape(state, direction, world.getBlockState(sourcePos), world, pos, sourcePos);
+        if (updated != state)
+            world.setBlock(pos, updated, Block.UPDATE_CLIENTS, 0);
+    }
     
     @Override
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {

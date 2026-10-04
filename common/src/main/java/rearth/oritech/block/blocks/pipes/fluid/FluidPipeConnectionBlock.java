@@ -17,7 +17,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -54,14 +53,6 @@ public class FluidPipeConnectionBlock extends ExtractablePipeConnectionBlock {
         return "fluid";
     }
 
-    // to disconnect when a neighboring block emits a block update (e.g. the centrifuge losing a fluid addon)
-    @Override
-    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
-        super.neighborChanged(state, world, pos, sourceBlock, sourcePos, notify);
-
-        world.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), world.getBlockState(sourcePos), world, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
-    }
-    
     @Override
     public boolean connectToOwnBlockType(Block block) {
         return block instanceof FluidPipeBlock || block instanceof FluidPipeConnectionBlock || block instanceof FluidPipeDuctBlock;

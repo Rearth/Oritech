@@ -2,6 +2,7 @@ package rearth.oritech.util;
 
 import rearth.oritech.api.energy.EnergyApi;
 import rearth.oritech.api.item.ItemApi;
+import rearth.oritech.OritechPlatform;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -17,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -174,6 +176,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             setCoreQuality(quality);
             
             Objects.requireNonNull(world).setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, true));
+            refreshMultiblockCapabilities();
             return true;
         } else {
             // invalid
@@ -233,6 +236,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
 
         // Preserve controller-specific refresh work without cycling any block states.
         initMultiblock(world.getBlockState(pos));
+        refreshMultiblockCapabilities();
     }
 
     private void resetInvalidMultiblock() {
@@ -240,6 +244,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
         var pos = getPosForMultiblock();
         if (world == null) return;
 
+        var resetCores = new ArrayList<BlockPos>();
         for (var targetMachinePosition : getCorePositions()) {
             var corePos = pos.offset(Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock()));
             var coreState = world.getBlockState(corePos);
@@ -248,14 +253,17 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
                 continue;
 
             var linkedController = world.getBlockEntity(coreEntity.getControllerPos());
-            if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController))
+            if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController)) {
                 world.setBlockAndUpdate(corePos, coreState.setValue(MachineCoreBlock.USED, false));
+                resetCores.add(corePos);
+            }
         }
 
         getConnectedCores().clear();
         var state = world.getBlockState(pos);
         if (state.hasProperty(MultiblockMachine.ASSEMBLED) && state.getValue(MultiblockMachine.ASSEMBLED))
             world.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, false));
+        refreshMultiblockCapabilities(resetCores);
     }
     
     default void onCoreBroken(BlockPos corePos) {
@@ -275,6 +283,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             }
         }
         
+        refreshMultiblockCapabilities();
         coreBlocksConnected.clear();
     }
     
@@ -290,7 +299,27 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             }
         }
         
+        refreshMultiblockCapabilities();
         coreBlocksConnected.clear();
+    }
+
+    private void refreshMultiblockCapabilities() {
+        refreshMultiblockCapabilities(getConnectedCores());
+    }
+
+    private void refreshMultiblockCapabilities(List<BlockPos> corePositions) {
+        if (!(getWorldForMultiblock() instanceof ServerLevel world)) return;
+
+        for (var corePos : corePositions) {
+            if (world.getBlockEntity(corePos) instanceof MachineCoreEntity core)
+                core.resetCaches();
+            OritechPlatform.INSTANCE.resetCapabilities(world, corePos);
+            world.blockUpdated(corePos, world.getBlockState(corePos).getBlock());
+        }
+
+        var controllerPos = getPosForMultiblock();
+        OritechPlatform.INSTANCE.resetCapabilities(world, controllerPos);
+        world.blockUpdated(controllerPos, world.getBlockState(controllerPos).getBlock());
     }
     
     private void highlightBlock(BlockPos block, Level world) {
