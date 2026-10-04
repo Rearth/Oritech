@@ -7,6 +7,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -29,9 +31,7 @@ import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatPipeBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatVentBlock;
 import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
-import rearth.oritech.block.entity.reactor.ReactorAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.ReactorControllerBlockEntity;
-import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.TooltipHelper;
 
@@ -242,10 +242,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         var stats = getStatsAtPosition(pos);
         if (stats.storedHeat() == -1) return tooltip;
 
-        int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
-        var portPosition = pos.offset(0, stackHeight, 0);
-        var portEntity = menu.world.getBlockEntity(portPosition);
-        if (portEntity != null && portEntity.isRemoved()) return tooltip;
+        var reactorMin = menu.reactorEntity.areaMin;
+        var localPos = new Vector2i(pos.getX() - reactorMin.getX() - 1, pos.getZ() - reactorMin.getZ() - 1);
+        var fuel = menu.reactorEntity.componentFuel.get(localPos);
 
         if (state.getBlock() instanceof ReactorRodBlock rodBlock) {
             int rodCount = rodBlock.getRodCount();
@@ -256,14 +255,14 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int generatedHeat = stats.heatChanged();
             int heat = stats.storedHeat();
 
-            if (portEntity instanceof ReactorFuelPortEntity fuelPortEntity) {
+            if (fuel != null) {
                 tooltip.add(Component.translatable("text.oritech.reactor.rod_count", rodCount));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses));
                 tooltip.add(Component.translatable("text.oritech.reactor.received_pulses", externalPulses));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy));
                 tooltip.add(Component.translatable("text.oritech.reactor.heat", heat));
-                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuelPortEntity.availableFuel, fuelPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuel.available(), fuel.capacity()));
             }
         } else if (state.getBlock() instanceof ReactorHeatPipeBlock) {
             tooltip.add(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()));
@@ -271,9 +270,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         } else if (state.getBlock() instanceof ReactorHeatVentBlock) {
             tooltip.add(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
         } else if (state.getBlock() instanceof ReactorAbsorberBlock) {
-            if (portEntity instanceof ReactorAbsorberPortEntity absorberPortEntity) {
+            if (fuel != null) {
                 tooltip.add(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
-                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", fuel.available(), fuel.capacity()));
             }
         }
 
@@ -286,13 +285,11 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         }
 
         var reactorMin = menu.reactorEntity.areaMin;
-        for (var entry : menu.reactorEntity.componentStats.entrySet()) {
-            var localPos = entry.getKey();
-            var worldPos = reactorMin.offset(localPos.x + 1, 1, localPos.y + 1);
-            if (worldPos.equals(pos)) return entry.getValue();
+        if (reactorMin == null || pos.getY() != reactorMin.getY() + 1) {
+            return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
         }
-
-        return ReactorControllerBlockEntity.ComponentStatistics.EMPTY;
+        var localPos = new Vector2i(pos.getX() - reactorMin.getX() - 1, pos.getZ() - reactorMin.getZ() - 1);
+        return menu.reactorEntity.componentStats.getOrDefault(localPos, ReactorControllerBlockEntity.ComponentStatistics.EMPTY);
     }
 
     @Override
@@ -353,21 +350,37 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         @Override
         protected void renderContent(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
             hoveredEntry = findHoveredEntry(mouseX, mouseY);
+            // Finish the GUI background before changing lighting or submitting preview geometry.
+            graphics.flush();
+            var buffers = Minecraft.getInstance().renderBuffers().bufferSource();
+            RenderSystem.runAsFancy(() -> {
+                setPreviewLighting();
+                try {
+                    for (var entry : blockEntries) {
+                        renderBlock(graphics, buffers, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), null, entry.blockEntity(), entry.pos(), delta);
+                    }
+                    buffers.endBatch();
 
-            for (var entry : blockEntries) {
-                renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), null, entry.blockEntity(), entry.pos(), delta);
-            }
+                    // Keep transparent heat and selection overlays in separate passes.
+                    for (var entry : heatEntries) {
+                        var state = resolveHeatState(entry.pos());
+                        if (!state.isAir()) {
+                            renderBlock(graphics, buffers, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), state, null, entry.pos(), delta);
+                        }
+                    }
+                    buffers.endBatch();
 
-            for (var entry : heatEntries) {
-                var state = resolveHeatState(entry.pos());
-                if (!state.isAir()) {
-                    renderBlock(graphics, entry.drawX(), entry.drawY(), blockSize, entry.zIndex(), state, null, entry.pos(), delta);
+                    if (hoveredEntry != null) {
+                        renderBlock(graphics, buffers, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
+                            BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, hoveredEntry.pos(), delta);
+                        buffers.endBatch();
+                    }
+                } finally {
+                    Lighting.setupFor3DItems();
                 }
-            }
+            });
 
             if (hoveredEntry != null) {
-                renderBlock(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), blockSize, hoveredEntry.zIndex() + 0.6f,
-                    BlockContent.ADDON_INDICATOR_BLOCK.defaultBlockState(), null, hoveredEntry.pos(), delta);
                 renderTooltipPanel(graphics, hoveredEntry.drawX(), hoveredEntry.drawY(), getStatsTooltip(hoveredEntry.pos(), menu.world.getBlockState(hoveredEntry.pos())));
             }
         }
@@ -460,12 +473,18 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             graphics.pose().popPose();
         }
 
-        private void renderBlock(GuiGraphics graphics, int drawX, int drawY, int size, float zIndex,
+        private void setPreviewLighting() {
+            RenderSystem.setShaderLights(new Vector3f(-1.5f, -0.5f, 0), new Vector3f(0, -1, 0));
+        }
+
+        private void renderBlock(GuiGraphics graphics, MultiBufferSource.BufferSource buffers, int drawX, int drawY, int size, float zIndex,
                                  @Nullable BlockState overrideState, @Nullable BlockEntity overrideEntity,
                                  BlockPos worldPos, float delta) {
             var client = Minecraft.getInstance();
             var usedState = overrideState != null ? overrideState : menu.world.getBlockState(worldPos);
-            var usedEntity = overrideEntity;
+            var entityRenderer = overrideEntity == null ? null : client.getBlockEntityRenderDispatcher().getRenderer(overrideEntity);
+            // Custom block entity renderers can change render state; isolate them from the static batches.
+            if (entityRenderer != null) buffers.endBatch();
 
             graphics.pose().pushPose();
             graphics.pose().translate(x + drawX + size / 2f, y + drawY + size / 2f, zIndex * 25 + 1000);
@@ -474,29 +493,23 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             graphics.pose().mulPose(Axis.YP.rotationDegrees(225));
             graphics.pose().translate(-0.5f, -0.5f, -0.5f);
 
-            RenderSystem.runAsFancy(() -> {
-                var vertexConsumers = client.renderBuffers().bufferSource();
+            try {
                 if (usedState.getRenderShape() != RenderShape.ENTITYBLOCK_ANIMATED) {
                     client.getBlockRenderer().renderSingleBlock(
-                        usedState, graphics.pose(), vertexConsumers,
+                        usedState, graphics.pose(), buffers,
                         LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY
                     );
                 }
 
-                if (usedEntity != null) {
-                    var renderer = client.getBlockEntityRenderDispatcher().getRenderer(usedEntity);
-                    if (renderer != null) {
-                        renderer.render(usedEntity, delta, graphics.pose(), vertexConsumers,
-                            LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-                    }
+                if (entityRenderer != null) {
+                    entityRenderer.render(overrideEntity, delta, graphics.pose(), buffers,
+                        LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                    setPreviewLighting();
+                    buffers.endBatch();
                 }
-
-                RenderSystem.setShaderLights(new Vector3f(-1.5f, -0.5f, 0), new Vector3f(0, -1, 0));
-                vertexConsumers.endBatch();
-                Lighting.setupFor3DItems();
-            });
-
-            graphics.pose().popPose();
+            } finally {
+                graphics.pose().popPose();
+            }
         }
     }
 
