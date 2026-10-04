@@ -25,7 +25,7 @@ final class OritechJeiTaintedRefineryCreation
 
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, CreationInfo recipe, IFocusGroup focuses) {
-        builder.addAnimatedRecipeArrow(40).setPosition(50, 22);
+        builder.addAnimatedRecipeArrowWidget(40).setPosition(50, 22);
         builder.addText(Component.translatable("emi.title.oritech.tainted_creation_hint"), 156, 10)
                 .setPosition(2, 62);
         builder.addText(Component.translatable("emi.title.oritech.tainted_creation_hint2"), 156, 10)

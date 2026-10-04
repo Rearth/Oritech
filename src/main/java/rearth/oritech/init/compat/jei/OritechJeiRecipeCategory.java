@@ -98,7 +98,7 @@ final class OritechJeiRecipeCategory extends AbstractRecipeCategory<RecipeHolder
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OritechRecipe> holder,
                                    IFocusGroup focuses) {
         var recipe = holder.value();
-        builder.addAnimatedRecipeArrow(40)
+        builder.addAnimatedRecipeArrowWidget(40)
                 .setPosition(indicator.x() - GUI_SLOT_OFFSET_X, indicator.y() - GUI_SLOT_OFFSET_Y);
 
         var seconds = String.format("%.0f", recipe.time() / 20f);

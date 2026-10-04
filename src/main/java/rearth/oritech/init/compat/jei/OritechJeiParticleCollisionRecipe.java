@@ -29,7 +29,7 @@ final class OritechJeiParticleCollisionRecipe extends AbstractRecipeCategory<Rec
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OritechRecipe> holder,
                                    IFocusGroup focuses) {
-        builder.addAnimatedRecipeArrow(40).setPosition(57, 24);
+        builder.addAnimatedRecipeArrowWidget(40).setPosition(57, 24);
         builder.addText(
                         Component.translatable("emi.title.oritech.collisionspeed", holder.value().time()),
                         WIDTH - 4, 10
