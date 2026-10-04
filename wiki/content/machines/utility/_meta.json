@@ -1,10 +1,10 @@
 {
-  "charger_block.mdx": "Equipment Charger",
-  "deep_drill_block.mdx": "Bedrock Extractor",
-  "drone_port_block.mdx": "Drone Port",
-  "laser_arm_block.mdx": "Enderic Laser",
-  "pipe_booster_block.mdx": "Pipe Booster",
-  "pump_block.mdx": "Pump",
-  "shrinker_block.mdx": "Addon Splicer",
-  "treefeller_block.mdx": "Tree Cutter"
+  "equipment_charger.mdx": "Equipment Charger",
+  "bedrock_extractor.mdx": "Bedrock Extractor",
+  "drone_port.mdx": "Drone Port",
+  "enderic_laser.mdx": "Enderic Laser",
+  "pipe_booster.mdx": "Pipe Booster",
+  "pump.mdx": "Pump",
+  "addon_splicer.mdx": "Addon Splicer",
+  "tree_cutter.mdx": "Tree Cutter"
 }

@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -34,6 +33,7 @@ import rearth.oritech.api.transfer.fluid.SimpleFluidStorage;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.util.ColorableMachine;
 
 import java.util.*;
@@ -124,7 +124,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
             }
 
             var targetState = serverLevel.getFluidState(targetBlock);
-            if (!targetState.getType().isSame(Fluids.WATER)) {
+            if (!targetState.is(TagContent.PUMP_INFINITE_FLUIDS)) {
                 drainSourceBlock(targetBlock);
                 pendingLiquidPositions.pollLast();
             }
@@ -352,7 +352,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
         }
 
         private boolean checkForEarlyStop(BlockPos target) {
-            return level.getFluidState(target).getType().isSame(Fluids.WATER);
+            return level.getFluidState(target).is(TagContent.PUMP_INFINITE_FLUIDS);
         }
 
         private boolean cutoffSearch() {

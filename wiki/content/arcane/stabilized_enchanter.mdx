@@ -1,0 +1,38 @@
+---
+id: oritech:stabilized_enchanter
+type: block
+title: Stabilized Enchanter
+custom:
+    RF/t: "512"
+    Cost multiplier: "5x enchantment level"
+    Catalyst range: "16 blocks"
+---
+
+The Stabilized Enchanter is used to apply standard enchantments to equipment and tools. 
+Unlike a standard enchanting table, it allows you to select the specific enchantment 
+you want from its interface.
+
+## Requirements
+
+To operate, the enchanter needs both energy and souls from nearby 
+[arcane catalysts](@oritech:arcane_catalyst).
+
+- **Energy**: Consumes **512 RF/t** while active.
+- **Souls**: The enchanter does not store souls. It must be within **16 blocks** of 
+one or more catalysts that contain souls.
+- **Catalyst Count**: Higher level enchantments require more active catalysts nearby, and consume more souls. 
+The number of catalysts required is the enchantment's base cost plus the target level.
+
+<center>
+<ModAsset location="oritech:area/enchanting" width={640} />
+</center>
+
+## Operation
+
+1. Place the item to be enchanted in the left slot.
+2. Open the GUI and select the desired enchantment.
+3. If enough energy and nearby catalysts are available, the process will begin.
+4. Once finished, the enchanted item will move to the right output slot.
+
+The time required to complete an enchantment increases with the enchantment's level 
+and rarity.

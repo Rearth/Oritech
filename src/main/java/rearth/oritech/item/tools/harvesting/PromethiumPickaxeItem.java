@@ -132,7 +132,10 @@ public class PromethiumPickaxeItem extends Item implements GeoItem {
                     }
                 }
 
-                return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> level.getBlockState(p).is(TagContent.DRILL_MINEABLE)));
+                return ImmutableList.copyOf(Iterables.filter(breakBlocks, p -> {
+                    var targetState = level.getBlockState(p);
+                    return targetState.is(TagContent.DRILL_MINEABLE) && targetState.getDestroySpeed(level, p) >= 0;
+                }));
             }
         }
 

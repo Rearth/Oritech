@@ -262,6 +262,7 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
             var inserted = 0;
 
             for (var stack : dropped) {
+                if (stack.isEmpty()) continue;
                 inserted += this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction);
             }
 

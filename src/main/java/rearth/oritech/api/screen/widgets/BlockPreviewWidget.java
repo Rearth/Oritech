@@ -1,7 +1,9 @@
 package rearth.oritech.api.screen.widgets;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3f;
@@ -28,8 +30,17 @@ public class BlockPreviewWidget extends UIComponent {
     private static final float DEFAULT_Y_ROTATION = 225f;
     private static final float SCALE_MARGIN = 0.98f;
     private static final float PICK_RAY_DISTANCE = 1_000_000f;
+    private static final float DRAG_SENSITIVITY = 0.45f;
+    private static final float MOMENTUM_SMOOTHING = 0.35f;
+    private static final float MOMENTUM_DAMPING = 0.86f;
+    private static final float MIN_PITCH = -85f;
+    private static final float MAX_PITCH = 85f;
 
     public record BlockEntry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
+    }
+
+    /** Camera values which can be carried over when a screen has to rebuild its widgets. */
+    public record ViewState(float pitch, float yaw, float yawVelocity, float pitchVelocity) {
     }
 
     private final List<BlockEntry> blocks = new ArrayList<>();
@@ -37,6 +48,9 @@ public class BlockPreviewWidget extends UIComponent {
     private float rotationY = DEFAULT_Y_ROTATION;
     private float rotation;
     private float rotationSpeed;
+    private float yawVelocity;
+    private float pitchVelocity;
+    private long lastMomentumNanos;
     private float maxHorizontalRadius;
     private float maxVerticalRadius;
     private float centerX;
@@ -44,7 +58,10 @@ public class BlockPreviewWidget extends UIComponent {
     private float centerZ;
     private boolean scaleDirty = true;
     private float lastScale;
+    private float lastRenderedRotationX = DEFAULT_X_ROTATION;
     private float lastRenderedRotation = DEFAULT_Y_ROTATION;
+    private boolean dragRotationEnabled;
+    private boolean draggingRotation;
     private @Nullable BlockEntry hoveredBlock;
 
     public BlockPreviewWidget(int x, int y, int width, int height) {
@@ -60,10 +77,37 @@ public class BlockPreviewWidget extends UIComponent {
     }
 
     public BlockPreviewWidget withRotation(float xRotation, float yRotation) {
-        this.rotationX = xRotation;
+        this.rotationX = Mth.clamp(xRotation, MIN_PITCH, MAX_PITCH);
         this.rotationY = yRotation;
+        this.lastRenderedRotationX = this.rotationX;
         this.lastRenderedRotation = yRotation + rotation;
         scaleDirty = true;
+        return this;
+    }
+
+    public ViewState getViewState() {
+        return new ViewState(rotationX, wrapDegrees(rotationY + rotation), yawVelocity, pitchVelocity);
+    }
+
+    public BlockPreviewWidget withViewState(ViewState state) {
+        if (state == null) return this;
+        rotationX = Mth.clamp(state.pitch(), MIN_PITCH, MAX_PITCH);
+        rotationY = state.yaw();
+        rotation = 0;
+        yawVelocity = state.yawVelocity();
+        pitchVelocity = state.pitchVelocity();
+        lastRenderedRotationX = rotationX;
+        lastRenderedRotation = rotationY;
+        scaleDirty = true;
+        return this;
+    }
+
+    /**
+     * Enables orbit-style mouse dragging with inertial rotation after release.
+     */
+    public BlockPreviewWidget withDragRotation() {
+        this.dragRotationEnabled = true;
+        this.scaleDirty = true;
         return this;
     }
 
@@ -102,7 +146,7 @@ public class BlockPreviewWidget extends UIComponent {
         float screenX = ((float) mouseX - (contentX() + contentWidth() * 0.5f)) / scale;
         float screenY = -((float) mouseY - (contentY() + contentHeight() * 0.5f)) / scale;
 
-        var inverseRotation = createRotationMatrix(lastRenderedRotation).invert();
+        var inverseRotation = createRotationMatrix(lastRenderedRotationX, lastRenderedRotation).invert();
         var rayOrigin = inverseRotation.transform(new Vector3f(screenX, screenY, PICK_RAY_DISTANCE));
         var rayDirection = inverseRotation.transform(new Vector3f(0f, 0f, -1f));
 
@@ -124,11 +168,46 @@ public class BlockPreviewWidget extends UIComponent {
     }
 
     @Override
+    public boolean handleClick(double mouseX, double mouseY, int button) {
+        if (!dragRotationEnabled || button != 0 || !isMouseOver(mouseX, mouseY)) return false;
+
+        draggingRotation = true;
+        yawVelocity = 0f;
+        pitchVelocity = 0f;
+        lastMomentumNanos = System.nanoTime();
+        return true;
+    }
+
+    @Override
+    public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+        if (!dragRotationEnabled || !draggingRotation || button != 0) return false;
+
+        var yawDelta = (float) deltaX * DRAG_SENSITIVITY;
+        var pitchDelta = (float) deltaY * DRAG_SENSITIVITY;
+        rotation = wrapDegrees(rotation + yawDelta);
+        rotationX = Mth.clamp(rotationX + pitchDelta, MIN_PITCH, MAX_PITCH);
+
+        yawVelocity = Mth.lerp(MOMENTUM_SMOOTHING, yawVelocity, yawDelta);
+        pitchVelocity = Mth.lerp(MOMENTUM_SMOOTHING, pitchVelocity, pitchDelta);
+        return true;
+    }
+
+    @Override
+    public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+        if (button != 0 || !draggingRotation) return false;
+
+        draggingRotation = false;
+        lastMomentumNanos = System.nanoTime();
+        return true;
+    }
+
+    @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (blocks.isEmpty()) {
             hoveredBlock = null;
             return;
         }
+        advanceMomentum();
 
         int cx = contentX();
         int cy = contentY();
@@ -140,18 +219,20 @@ public class BlockPreviewWidget extends UIComponent {
             return;
         }
 
+        lastRenderedRotationX = rotationX;
         lastRenderedRotation = rotationY + rotation + rotationSpeed * delta;
         hoveredBlock = findBlockAt(mouseX, mouseY);
 
         var entries = new ArrayList<BlockPreviewRenderState.Entry>(blocks.size());
         for (var entry : blocks) {
-            entries.add(new BlockPreviewRenderState.Entry(entry.state(), entry.entity(), entry.offset()));
+            entries.add(new BlockPreviewRenderState.Entry(
+                    entry.state(), entry.entity(), entry.offset(), 1f, getOverlayCoords(entry)));
         }
         appendRenderEntries(entries);
 
         graphics.submitPictureInPictureRenderState(new BlockPreviewRenderState(
                 List.copyOf(entries),
-                rotationX,
+                lastRenderedRotationX,
                 lastRenderedRotation,
                 centerX, centerY, centerZ,
                 delta,
@@ -167,6 +248,13 @@ public class BlockPreviewWidget extends UIComponent {
      * fitting or mouse picking.
      */
     protected void appendRenderEntries(List<BlockPreviewRenderState.Entry> entries) {
+    }
+
+    /**
+     * Allows specialized previews to brighten or tint existing blocks without adding replacement models.
+     */
+    protected int getOverlayCoords(BlockEntry entry) {
+        return OverlayTexture.NO_OVERLAY;
     }
 
     private float getScale(float availableWidth, float availableHeight) {
@@ -226,8 +314,10 @@ public class BlockPreviewWidget extends UIComponent {
                 );
                 float verticalDistance = Math.abs(position.getY() - centerY) + 0.5f;
                 maxHorizontalRadius = Math.max(maxHorizontalRadius, horizontalDistance);
-                maxVerticalRadius = Math.max(maxVerticalRadius,
-                        verticalDistance * xCos + horizontalDistance * xSin);
+                var projectedVerticalRadius = dragRotationEnabled
+                        ? (float) Math.hypot(verticalDistance, horizontalDistance)
+                        : verticalDistance * xCos + horizontalDistance * xSin;
+                maxVerticalRadius = Math.max(maxVerticalRadius, projectedVerticalRadius);
             }
         }
         scaleDirty = false;
@@ -246,10 +336,32 @@ public class BlockPreviewWidget extends UIComponent {
         return positions;
     }
 
-    private Matrix3f createRotationMatrix(float yRotation) {
+    private Matrix3f createRotationMatrix(float xRotation, float yRotation) {
         return new Matrix3f()
-                .rotateX((float) Math.toRadians(rotationX))
+                .rotateX((float) Math.toRadians(xRotation))
                 .rotateY((float) Math.toRadians(yRotation));
+    }
+
+    private void advanceMomentum() {
+        long now = System.nanoTime();
+        if (lastMomentumNanos == 0) {
+            lastMomentumNanos = now;
+            return;
+        }
+        double elapsedTicks = Math.min(1, (now - lastMomentumNanos) / 50_000_000d);
+        lastMomentumNanos = now;
+        if (!dragRotationEnabled || draggingRotation || elapsedTicks <= 0) return;
+        rotation = wrapDegrees(rotation + (float) (yawVelocity * elapsedTicks));
+        rotationX = Mth.clamp(rotationX + (float) (pitchVelocity * elapsedTicks), MIN_PITCH, MAX_PITCH);
+        if (rotationX == MIN_PITCH || rotationX == MAX_PITCH) pitchVelocity = 0f;
+        float damping = (float) Math.pow(MOMENTUM_DAMPING, elapsedTicks);
+        yawVelocity = damp(yawVelocity, damping);
+        pitchVelocity = damp(pitchVelocity, damping);
+    }
+
+    private static float damp(float velocity, float damping) {
+        var damped = velocity * damping;
+        return Math.abs(damped) < 0.001f ? 0f : damped;
     }
 
     private float intersectUnitCube(Vector3f origin, Vector3f direction, Vec3i offset) {

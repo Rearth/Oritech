@@ -2,9 +2,15 @@ package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
@@ -12,50 +18,73 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.*;
 
 import java.util.*;
 
-public class RocketAssemblerBlockEntity extends BlockEntity {
+public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvider {
 
     public RocketAssemblerBlockEntity(BlockPos pos, BlockState state) {
         super(SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get(), pos, state);
     }
 
-    public void assemble() {
+    public boolean assemble(net.minecraft.server.level.ServerPlayer player, SpaceSimulation.FlightPlan plan) {
 
         OritechSpaceAge.LOGGER.debug("Starting assembling process");
 
-        collectRocketSegments();
+        if (!(level instanceof ServerLevel) || level.dimension() != net.minecraft.world.level.Level.OVERWORLD) return false;
 
-    }
+        var start = findRocketStart();
+        if (start == null) return false;
 
-    private void collectRocketSegments() {
-
-        // start at first found block above connected pads
-        // todo offset by assembler orientation (once assembler has orientation)
-
-        var padBlocks = padFloodFill(worldPosition.north());
-        var start = worldPosition;
-
-        for (var padBlock : padBlocks) {
-
-            var above = padBlock.above();
-
-            var checkedState = level.getBlockState(above);
-            if (checkedState.isAir() || isCoupling(checkedState)) continue;
-
-            OritechSpaceAge.LOGGER.debug("Found start: " + above);
-            start = above;
-
-            break;
+        // Launch readiness must be checked before fluids are committed and blocks are removed. The second scan is
+        // intentional: previews are side-effect free, while only a launch that passed validation may consume data.
+        var preview = gatherRocketData(start, false);
+        if (preview == null) return false;
+        var readiness = RocketPerformanceCalculator.getLaunchReadiness(preview, plan);
+        if (readiness != RocketPerformanceCalculator.LaunchReadiness.READY) {
+            OritechSpaceAge.LOGGER.warn("Rocket launch at {} failed: {}", worldPosition, readiness.failureReason());
+            return false;
         }
 
-        if (start.equals(worldPosition)) return;
+        var system = SpaceSimulationSavedData.getForPlayer(player);
+        var validated = RocketFlightPlanRules.validate(plan, preview, system.createObjectData());
+        if (validated == null || validated.root().actions().isEmpty()
+                || validated.branches().stream().mapToInt(b -> b.actions().size()).sum() != plan.branches().stream().mapToInt(b -> b.actions().size()).sum()) return false;
+        validated = MissionController.resolveOrbitSlots(validated, MissionSavedData.get(player.level().getServer()), player.getUUID(), preview.getRocketId());
+        var first = validated.root().actions().getFirst();
+        if (first.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return false;
+        var firstPlan = validated.withBranches(java.util.List.of(validated.root().withActions(java.util.List.of(first))));
+        var predicted = RocketFlightPathCalculator.calculate(preview, system.createObjectData(), firstPlan);
+        if (predicted.paths().isEmpty() || predicted.paths().getFirst().terminalState().preventsLaunch()) return false;
+        var result = gatherRocketData(start, true);
+        if (result == null) {
+            OritechSpaceAge.LOGGER.warn("Rocket Assembly Failed");
+            return false;
+        }
+
+        MissionController.launch((ServerLevel) level, player.getUUID(), result, validated, start);
+        return true;
+    }
+
+    public ActiveRocketData createPreview() {
+        if (!(level instanceof ServerLevel)) return null;
+
+        var start = findRocketStart();
+        return start == null ? null : gatherRocketData(start, false);
+    }
+
+    private ActiveRocketData gatherRocketData(BlockPos start, boolean consumeResources) {
 
 
         var startSegment = segmentFloodFill(start);
+        if (!startSegment.fullyScanned || startSegment.blocks.isEmpty() || !segmentCouplingsValid(startSegment)) {
+            OritechSpaceAge.LOGGER.warn("Unable to assemble invalid rocket at {}", worldPosition);
+            return null;
+        }
 
         var segments = new HashMap<UUID, RocketFloodSegment>();
         segments.put(startSegment.id, startSegment);
@@ -75,10 +104,10 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
             var segment = segmentFloodFill(candidate);
             if (segment.blocks.isEmpty()) continue;
 
-            var couplingsValid = segmentCouplingsValid(segment);
+            var couplingsValid = segment.fullyScanned && segmentCouplingsValid(segment);
             if (!couplingsValid) {
-                OritechSpaceAge.LOGGER.warn("Couplings invalid! " + worldPosition);
-                continue;
+                OritechSpaceAge.LOGGER.warn("Unable to assemble rocket with invalid couplings at {}", worldPosition);
+                return null;
             }
 
             segments.put(segment.id, segment);
@@ -89,18 +118,51 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         }
 
-        System.out.println("Segments: " + segments.size());
+        if (!openCouplings.isEmpty()) {
+            OritechSpaceAge.LOGGER.warn("Unable to assemble rocket at {}: coupling traversal limit reached", worldPosition);
+            return null;
+        }
 
         connectRocketSegments(segments);
 
-        segments.values().forEach(this::scanSegmentContent);
-
-        for (var segment : segments.values()) {
-            System.out.println(segment);
-            System.out.println("block count: " + segment.blocks.size() + " couplings: " + segment.couplings.size());
-            System.out.println("connected segment count: " + segment.connectedSegments.size());
+        if (!rocketConnectionsValid(segments)) {
+            OritechSpaceAge.LOGGER.warn("Unable to assemble rocket with unconnected couplings at {}", worldPosition);
+            return null;
         }
 
+        var scannedSegments = new HashMap<UUID, ScannedSegmentData>();
+        for (var segment : segments.values()) {
+            scannedSegments.put(segment.id, scanSegmentContent(segment, false));
+        }
+
+        var rocketData = createRocket(start, segments, scannedSegments, consumeResources);
+        OritechSpaceAge.LOGGER.debug("Assembled rocket with {} segments at {}", segments.size(), worldPosition);
+        return rocketData;
+
+    }
+
+    private BlockPos findRocketStart() {
+
+        // start at first found block above connected pads
+        var facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        var padBlocks = padFloodFill(worldPosition.relative(facing));
+        var start = worldPosition;
+
+        for (var padBlock : padBlocks) {
+
+            var above = padBlock.above();
+
+            var checkedState = level.getBlockState(above);
+            if (checkedState.isAir() || isCoupling(checkedState)) continue;
+
+            OritechSpaceAge.LOGGER.debug("Found start: " + above);
+            start = above;
+
+            break;
+        }
+
+        if (start.equals(worldPosition)) return null;
+        return start;
     }
 
     // this is called after all segments are discovered, and connects them based on their couplings
@@ -127,7 +189,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
     }
 
     // searches and calculates engines, weight, fuel, energy, etc.
-    private void scanSegmentContent(RocketFloodSegment segment) {
+    private ScannedSegmentData scanSegmentContent(RocketFloodSegment segment, boolean consumeResources) {
 
         // value is the burn time of the fuel type (per ml)
         var fuelTypes = new HashMap<FluidIngredient, Float>();
@@ -137,7 +199,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
         var detectedRF = 0L;
         var detectedFuels = new HashMap<FluidType, Long>(); // value is the total burn time available for the type on the segment
         var detectedEngines = 0;
-        var staticWeight = 0;
+        var staticWeight = 0L;
         var fuelWeight = 0f;
 
         for (var blockData : segment.blocks) {
@@ -171,7 +233,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                         }
                     }
 
-                    if (totalTaken > 0) {
+                    if (consumeResources && totalTaken > 0) {
                         transaction.commit();
                     }
 
@@ -184,20 +246,106 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
                 detectedRF += energyCandidate.getAmountAsLong();
             }
 
+            if (worldState.getBlock() instanceof RocketEngineBlock) {
+                detectedEngines++;
+            }
+
             // weight scan
-            staticWeight += (int) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
+            staticWeight += (long) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
 
         }
 
         OritechSpaceAge.LOGGER.debug(
                 "Collected stats for rocket segment {}: weight={}, fuelWeight={}, fuels={}, energy={}, engines={}",
                 segment.id, staticWeight, detectedFuels, fuelWeight, detectedRF, detectedEngines);
+
+        var availableFuelBurnTime = detectedFuels.values().stream().mapToLong(Long::longValue).sum();
+        return new ScannedSegmentData(availableFuelBurnTime, detectedRF, (long) Math.ceil(fuelWeight), staticWeight, detectedEngines);
+    }
+
+    // removes the blocks from the world, and create the actual ActiveRocketData, along with its segment data instances
+    private ActiveRocketData createRocket(BlockPos origin, Map<UUID, RocketFloodSegment> segments,
+                                          Map<UUID, ScannedSegmentData> scannedSegments, boolean removeBlocks) {
+
+        var staticSegments = new HashMap<UUID, StaticRocketSegment>();
+        var dynamicSegments = new HashMap<UUID, DynamicRocketSegment>();
+
+        for (var segment : segments.values()) {
+            var scannedData = scannedSegments.get(segment.id);
+            if (scannedData == null) {
+                throw new IllegalStateException("Missing scanned data for rocket segment " + segment.id);
+            }
+
+            var blocks = new HashSet<StaticRocketSegment.BlockData>();
+            for (var block : segment.blocks) {
+                var entity = level.getBlockEntity(block.pos);
+                blocks.add(new StaticRocketSegment.BlockData(block.pos.subtract(origin), block.state,
+                        entity == null ? new net.minecraft.nbt.CompoundTag() : entity.saveWithFullMetadata(level.registryAccess())));
+            }
+
+            var couplings = new HashMap<UUID, Set<StaticRocketSegment.CouplingData>>();
+            segment.connectedSegments.forEach((connectedSegmentId, foundCouplings) -> {
+                var couplingData = new HashSet<StaticRocketSegment.CouplingData>();
+                for (var coupling : foundCouplings) {
+                    couplingData.add(new StaticRocketSegment.CouplingData(
+                            coupling.pos.subtract(origin), coupling.oppositeSide.subtract(origin)));
+                }
+                couplings.put(connectedSegmentId, couplingData);
+            });
+
+            staticSegments.put(segment.id, new StaticRocketSegment(
+                    segment.id, blocks, couplings, scannedData.staticWeight, scannedData.engineCount, scannedData.availableRF, scannedData.availableFuelBurnTimeTicks));
+            dynamicSegments.put(segment.id, new DynamicRocketSegment(
+                    scannedData.availableFuelBurnTimeTicks,
+                    scannedData.availableRF,
+                    scannedData.currentFuelWeight,
+                    segment.connectedSegments.keySet()));
+        }
+
+        var rocketData = new ActiveRocketData(staticSegments, dynamicSegments);
+        rocketData.setLaunchPosition(origin);
+
+        if (removeBlocks) {
+            var blocksToRemove = new HashSet<BlockPos>();
+            for (var segment : segments.values()) {
+                segment.blocks.forEach(block -> blocksToRemove.add(block.pos));
+                segment.couplings.forEach(coupling -> blocksToRemove.add(coupling.pos));
+            }
+            blocksToRemove.forEach(pos -> { level.removeBlockEntity(pos); level.removeBlock(pos, false); });
+        }
+
+        return rocketData;
+    }
+
+    @Override
+    public Component getDisplayName() {
+        return getBlockState().getBlock().getName();
+    }
+
+    @Override
+    public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
+        return new RocketAssemblerMenu(syncId, playerInventory, this, createPreview());
     }
 
     // ensures no couples connect to the segment itself
     private boolean segmentCouplingsValid(RocketFloodSegment segment) {
         for (var coupling : segment.couplings) {
             if (segment.blocks.stream().anyMatch(block -> block.pos.equals(coupling.oppositeSide))) return false;
+        }
+
+        return true;
+    }
+
+    private boolean rocketConnectionsValid(Map<UUID, RocketFloodSegment> segments) {
+        for (var segment : segments.values()) {
+            var connectedCouplingCount = segment.connectedSegments.values().stream().mapToInt(Set::size).sum();
+            if (connectedCouplingCount != segment.couplings.size()) return false;
+
+            for (var connectedSegmentId : segment.connectedSegments.keySet()) {
+                var connectedSegment = segments.get(connectedSegmentId);
+                if (connectedSegment == null || !connectedSegment.connectedSegments.containsKey(segment.id))
+                    return false;
+            }
         }
 
         return true;
@@ -214,7 +362,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         var visited = new HashSet<BlockPos>();
         visited.add(start);
-        var results = new HashSet<BlockPos>();
+        var results = new LinkedHashSet<BlockPos>();
 
         while (!openPositions.isEmpty() && limit-- > 0) {
 
@@ -283,7 +431,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
 
         }
 
-        return new RocketFloodSegment(results, couplings, UUID.randomUUID());
+        return new RocketFloodSegment(results, couplings, UUID.randomUUID(), openPositions.isEmpty());
 
     }
 
@@ -298,17 +446,23 @@ public class RocketAssemblerBlockEntity extends BlockEntity {
     private record FloodFillElement(BlockPos self, BlockPos source) {
     }
 
+    private record ScannedSegmentData(long availableFuelBurnTimeTicks, long availableRF, long currentFuelWeight,
+                                      long staticWeight, int engineCount) {
+    }
+
     private static final class RocketFloodSegment {
 
         private final Set<FoundBlock> blocks;
         private final Set<FoundCoupling> couplings;
         private final UUID id;
+        private final boolean fullyScanned;
         private final Map<UUID, Set<FoundCoupling>> connectedSegments = new HashMap<>();    // contains all connected segments via segmentId and the couplings (on itself) that connect to it.
 
-        private RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings, UUID id) {
+        private RocketFloodSegment(Set<FoundBlock> blocks, Set<FoundCoupling> couplings, UUID id, boolean fullyScanned) {
             this.blocks = blocks;
             this.couplings = couplings;
             this.id = id;
+            this.fullyScanned = fullyScanned;
         }
 
         private Set<FoundCoupling> couplings() {

@@ -5,6 +5,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import rearth.oritech.Oritech;
+import rearth.oritech.client.renderers.StrangeMatterFluidRenderer;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.util.ColorHelper;
 
@@ -16,7 +17,7 @@ public final class FluidModelContent {
     private static final Material MOLTEN = new Material(Oritech.id("block/fluid/fluid_molten"));
     private static final Material MOLTEN_METAL = new Material(Oritech.id("block/fluid/molten_metal"));
     private static final Material ROILING_PLASMA = new Material(Oritech.id("block/fluid/fluid_roiling_plasma"));
-    private static final Material STRANGE_MIXTURE = new Material(Oritech.id("block/fluid/fluid_strange_mixture"));
+    private static final Material STRANGE_MIXTURE = new Material(Oritech.id("block/fluid/fluid_strange_mixture"), true);
 
     private FluidModelContent() {
     }
@@ -33,6 +34,8 @@ public final class FluidModelContent {
         event.register(new FluidModel.Unbaked(STEAM, STEAM, null, FluidTintSources.constant(ColorHelper.argb(0.7f, 1f, 0.7f))), FluidContent.STILL_SILICON_WASH, FluidContent.FLOWING_SILICON_WASH);
         event.register(new FluidModel.Unbaked(MOLTEN_METAL, MOLTEN_METAL, null, FluidTintSources.constant(ColorHelper.argb(0.627f, 0.849f, 1f))), FluidContent.STILL_MINERAL_SLURRY, FluidContent.FLOWING_MINERAL_SLURRY);
         event.register(new FluidModel.Unbaked(ROILING_PLASMA, ROILING_PLASMA, null, FluidTintSources.constant(ColorHelper.argb(1f, 0.7f, 0.7f))), FluidContent.STILL_SHEOL_FIRE, FluidContent.FLOWING_SHEOL_FIRE);
-        event.register(new FluidModel.Unbaked(STRANGE_MIXTURE, STRANGE_MIXTURE, null, FluidTintSources.constant(ColorHelper.argb(1f, 1f, 1f))), FluidContent.STILL_STRANGE_MATTER, FluidContent.FLOWING_STRANGE_MATTER);
+        event.register(new FluidModel.Unbaked(STRANGE_MIXTURE, STRANGE_MIXTURE, null,
+            FluidTintSources.constant(ColorHelper.argb(1f, 1f, 1f)), StrangeMatterFluidRenderer.INSTANCE),
+            FluidContent.STILL_STRANGE_MATTER, FluidContent.FLOWING_STRANGE_MATTER);
     }
 }

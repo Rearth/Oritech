@@ -235,6 +235,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
             try (var transaction = Transaction.openRoot()) {
                 for (var stack : dropped) {
+                    if (stack.isEmpty()) continue;
                     if (this.inventory.insert(ItemResource.of(stack), stack.getCount(), transaction) != stack.getCount())
                         return;
                 }

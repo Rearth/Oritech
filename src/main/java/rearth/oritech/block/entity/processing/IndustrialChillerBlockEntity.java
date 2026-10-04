@@ -95,8 +95,11 @@ public class IndustrialChillerBlockEntity extends MultiblockMachineEntity implem
 
         var fluidInput = currentRecipe.fluidInput();
         if (fluidInput.isPresent()) {
-            // we assume that the fluid content matches here, as this was checked in earlier steps already
-            var extracted = fluidStorage.extract(FluidResource.of(fluidStorage.getInStack()), fluidInput.get().amount(), transaction);
+            // An auxiliary chamber may have consumed the remaining fluid earlier in this transaction.
+            var inputResource = fluidStorage.getResource(0);
+            if (inputResource.isEmpty()) return false;
+
+            var extracted = fluidStorage.extract(0, inputResource, fluidInput.get().amount(), transaction);
             if (extracted != fluidInput.get().amount()) return false;
         }
 

@@ -829,7 +829,7 @@ public class RecipeGenerator extends RecipeProvider {
         new MetalProcessingChainBuilder("copper", registries)
                 .ore(ItemTags.COPPER_ORES)
                 .rawOre(cItemTag("raw_materials/copper"), Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
-                .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
+                .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(Items.COPPER_NUGGET)
                 .clump(TagContent.COPPER_CLUMPS, ItemContent.COPPER_CLUMP).smallClump(ItemContent.SMALL_COPPER_CLUMP).clumpByproduct(ItemContent.SMALL_GOLD_CLUMP)
                 .dust(ItemContent.COPPER_DUST).smallDust(ItemContent.SMALL_COPPER_DUST).dustByproduct(ItemContent.SMALL_GOLD_DUST)
                 .gem(ItemContent.COPPER_GEM).gemCatalyst(ItemContent.FLUXITE)

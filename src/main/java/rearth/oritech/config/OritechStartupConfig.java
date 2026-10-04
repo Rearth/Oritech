@@ -76,8 +76,8 @@ public class OritechStartupConfig {
             b.push(name);
             energyCapacity = b.defineInRange("energyCapacity", defCap, 0, Integer.MAX_VALUE);
             fuelCapacity = b.defineInRange("fuelCapacity", defFuelCap, 0, Integer.MAX_VALUE);
-            energyUsage = b.defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
-            fuelUsage = b.defineInRange("fuelUsage", defFuelUsage, 0, Integer.MAX_VALUE);
+            energyUsage = b.comment("RF consumed per tick while flying").defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
+            fuelUsage = b.comment("Fuel consumed per tick while flying").defineInRange("fuelUsage", defFuelUsage, 0, Integer.MAX_VALUE);
             chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
             speed = b.comment("Flight speed multiplier").defineInRange("speed", defSpeed, 0.0, 100.0);
             b.pop();

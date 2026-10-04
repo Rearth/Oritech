@@ -27,7 +27,6 @@ import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
-import rearth.oritech.block.blocks.processing.RefineryBlock;
 import rearth.oritech.block.entity.accelerator.AcceleratorParticleLogic;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.EnergyTransmissionPoleEntity;
@@ -137,7 +136,6 @@ public final class Oritech {
 
     private void onServerTickPost(ServerTickEvent.Post event) {
         AcceleratorParticleLogic.onTickEnd();
-        RefineryBlock.updateTaintEvents();
     }
 
     private void onLevelTickPos(LevelTickEvent.Post event) {

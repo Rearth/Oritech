@@ -68,9 +68,9 @@ import rearth.oritech.util.MachineSoundHandler;
 import rearth.oritech.util.PermissionHelpers;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
@@ -89,7 +89,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
 
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
 
-    private static final Map<Player, Tuple<BlockPos, Integer>> blockBreakStats = new HashMap<>();
+    private static final Map<Player, Tuple<BlockPos, Integer>> blockBreakStats = new WeakHashMap<>();
 
     public EndericRailgunItem(Properties settings) {
         super(settings);
@@ -338,6 +338,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
 
         // add stack to player inv, or spawn at block pos
         for (var stack : dropped) {
+            if (stack.isEmpty()) continue;
             if (!player.getInventory().add(stack))
                 level.addFreshEntity(new ItemEntity(level, targetPos.getCenter().x, targetPos.getCenter().y, targetPos.getCenter().z, stack));
         }

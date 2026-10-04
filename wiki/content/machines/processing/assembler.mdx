@@ -1,0 +1,36 @@
+---
+title: Assembler
+id: oritech:assembler
+type: block
+custom:
+    RF Capacity: "50,000"
+    RF/t: "128"
+    Cores required: "3"
+    Addon slots: "3"
+---
+
+The assembler features a 2x2 crafting grid and will automatically 
+assemble items as long as it has energy, items in the input slots, 
+and space for the finished product in the output slot.
+
+Some machine components can be crafted without an assembler,
+but doing so uses significantly more resources.
+
+The order of the components in the input slots does not matter. If a machine needs 2 of the same item, it can also take both
+from the same slot.
+
+## Automation
+
+For fine-tuned item input, an inventory proxy addon can be used to control which items go where. Alternatively,
+the assembler also has different input modes. The "Fill-Evenly" or "Sided" variants can make automation much easier for some setups.
+
+Automation can also be done via AE2 / RS2. Pattern providers work out of the box with the assembler.
+
+
+## Efficiency
+
+Using the assembler is the recommended way to produce complex
+components like [motors](@oritech:motor) or
+[magnetic coils](@oritech:magnetic_coil).
+Crafting these components manually is possible but consumes more 
+resources than using the assembler.

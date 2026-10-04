@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_processor": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:processing_unit"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech_space_age:mission_card"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_processor"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech_space_age:mission_card"
+    ]
+  }
+}

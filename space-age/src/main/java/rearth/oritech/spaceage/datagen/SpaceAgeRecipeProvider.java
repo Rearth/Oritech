@@ -19,6 +19,18 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes() {
+        for (var block : java.util.List.of(SpaceAgeBlocks.MISSION_CONTROL, SpaceAgeBlocks.SPACE_SCANNER, SpaceAgeBlocks.ANTENNA)) {
+            shaped(net.minecraft.data.recipes.RecipeCategory.MISC, block)
+                    .pattern("sss").pattern("pcp").pattern("sfs")
+                    .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.PROCESSING_UNIT)
+                    .define('c', block == SpaceAgeBlocks.ANTENNA ? Items.COPPER_INGOT : Items.ENDER_PEARL)
+                    .define('f', BlockContent.MACHINE_FRAME)
+                    .unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
+        }
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, rearth.oritech.spaceage.init.SpaceAgeItems.MISSION_CARD)
+                .pattern("pp").pattern("sc").define('p', Items.PAPER).define('s', ItemContent.STEEL_INGOT)
+                .define('c', ItemContent.PROCESSING_UNIT).unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
+
         shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ASSEMBLER)
                 .pattern("sas")
                 .pattern("mcm")
@@ -40,7 +52,7 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(ItemContent.STEEL_INGOT))
                 .save(output);
 
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_1)
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET)
                 .pattern("sms")
                 .pattern("pep")
                 .pattern(" s ")
@@ -51,24 +63,25 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_motor", has(ItemContent.MOTOR))
                 .save(output);
 
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_2)
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ASTEROID_ANCHOR)
+                .pattern("sis")
+                .pattern("ama")
+                .pattern("sis")
+                .define('s', ItemContent.STEEL_INGOT)
+                .define('i', Items.IRON_BLOCK)
+                .define('a', ItemContent.ADVANCED_COMPUTING_ENGINE)
+                .define('m', ItemContent.MOTOR)
+                .unlockedBy("has_advanced_computing_engine", has(ItemContent.ADVANCED_COMPUTING_ENGINE))
+                .save(output);
+
+        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ION_BOOSTER_ROCKET)
                 .pattern("ded")
                 .pattern("ete")
                 .pattern("ded")
                 .define('d', ItemContent.DURATIUM_INGOT)
                 .define('e', ItemContent.ENERGITE_INGOT)
-                .define('t', SpaceAgeBlocks.ROCKET_ENGINE_TIER_1)
-                .unlockedBy("has_tier_1_engine", has(SpaceAgeBlocks.ROCKET_ENGINE_TIER_1))
-                .save(output);
-
-        shaped(net.minecraft.data.recipes.RecipeCategory.MISC, SpaceAgeBlocks.ROCKET_ENGINE_TIER_3)
-                .pattern("fsf")
-                .pattern("ftf")
-                .pattern("fsf")
-                .define('f', ItemContent.FLUXITE)
-                .define('s', BlockContent.SUPERCONDUCTOR)
-                .define('t', SpaceAgeBlocks.ROCKET_ENGINE_TIER_2)
-                .unlockedBy("has_tier_2_engine", has(SpaceAgeBlocks.ROCKET_ENGINE_TIER_2))
+                .define('t', SpaceAgeBlocks.BASIC_BOOSTER_ROCKET)
+                .unlockedBy("has_basic_booster_rocket", has(SpaceAgeBlocks.BASIC_BOOSTER_ROCKET))
                 .save(output);
     }
 

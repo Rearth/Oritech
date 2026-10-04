@@ -30,6 +30,9 @@ sourceSets.main.resources {
 
 repositories {
 
+    // ModdedMC Wiki data and item render exporter
+    maven { url = 'https://maven.sinytra.org' }
+
     // ModMaven
     maven { url = "https://modmaven.dev" }
 
@@ -107,6 +110,13 @@ neoForge {
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
+        wikiExport {
+            client()
+            gameDirectory = project.file('run-wiki-export')
+            systemProperty 'wiki_exporter.enabled', 'true'
+            systemProperty 'wiki_exporter.config.path', file('wiki-exporter.json').getAbsolutePath()
+        }
+
         // applies to all the run configs above
         configureEach {
             // Recommended logging data for a userdev environment
@@ -177,6 +187,9 @@ dependencies {
 
     // runtime testing mode
     localRuntime "curse.maven:jade-324717:8326300"  // jade
+
+    // ModdedMC Wiki inventory render and metadata exporter
+    localRuntime "org.sinytra:wiki-exporter-neoforge:${wiki_exporter_version}"
 
 }
 

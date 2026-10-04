@@ -86,7 +86,7 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
         }
     };
 
-    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(10_000, 50_000, 0, 0, this::setChanged, false);
+    public final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(10_000_000, 10_000_000, 0, 0, this::setChanged, false);
 
     public ArcaneCatalystBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ARCANE_CATALYST_BLOCK.get(), pos, state);

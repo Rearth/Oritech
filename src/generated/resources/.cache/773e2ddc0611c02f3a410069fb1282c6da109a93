@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-07T12:53:18.2768712	Model Definitions - oritech
+// 26.1.2	2026-08-27T21:55:44.3468284	Model Definitions - oritech
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
 a0801733923625bd92b1a26db46a868174771600 assets/oritech/blockstates/accelerator_sensor.json
@@ -222,7 +222,6 @@ f6ffd9429bf82a54f84cba98518bc7039ed2105a assets/oritech/items/biosteel_ingot.jso
 04b5293fcce2e909af90462a52b299469887e891 assets/oritech/items/copper_clump.json
 b263eec2d7dc1722018047e724424dfa2a84a504 assets/oritech/items/copper_dust.json
 1cb1e9da2d2eaf7d5b2cc0523d9062cc3e2c690d assets/oritech/items/copper_gem.json
-61ce18f8eae95f0c74818a0b7a03a9349c780bf7 assets/oritech/items/copper_nugget.json
 ce076f4d73bc84a483ef25610ff57fbc436af863 assets/oritech/items/copper_reinforced_plating.json
 bc25709c9bb7c63d067b9ee22ae629dcc6e7d06b assets/oritech/items/copper_reinforced_plating_pressure_plate.json
 c81d8e00f5f9ac32edcd6a50c7847cfaf5c476fd assets/oritech/items/copper_reinforced_plating_slab.json
@@ -583,7 +582,6 @@ fef5c7ed807b2400d2dda0c2f1ad839f160e27f9 assets/oritech/models/item/coal_dust.js
 f8de6b758be35393ad3b7498d87dcf647eb83ae0 assets/oritech/models/item/copper_clump.json
 fec5280fe44efeefb44946be9ac4d9626b060ce6 assets/oritech/models/item/copper_dust.json
 2e964d91a46577bf6a179afb1ded52a0d5deaaaa assets/oritech/models/item/copper_gem.json
-84bc2922b2e7b64a95ec3160df10688923726be8 assets/oritech/models/item/copper_nugget.json
 b2128098777a7b793a8c83d3f5f3fdb1a93116c9 assets/oritech/models/item/diamond_paint.json
 fdf9a0446976d80f32eb852f18915e4ac6064aaa assets/oritech/models/item/dubious_container.json
 1a1a2b1ff79d6a7d432f6842f63c36ec04632223 assets/oritech/models/item/duratium_dust.json

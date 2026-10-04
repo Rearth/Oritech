@@ -20,14 +20,10 @@ import rearth.oritech.block.entity.processing.TaintedRefineryBlockEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class RefineryBlock extends MultiblockMachine {
-
-    public static Queue<Runnable> DELAYED_TAINT_EVENTS = new ArrayDeque<>();
 
     public RefineryBlock(Properties settings) {
         super(settings);
@@ -77,8 +73,9 @@ public class RefineryBlock extends MultiblockMachine {
 
         var targetPos = pos.immutable();
 
-        // run in next tick to avoid explosion block weirdness
-        DELAYED_TAINT_EVENTS.add(() -> {
+        // schedule work as we want to do this after the whole explosion has been processed
+        var server = level.getServer();
+        server.schedule(server.wrapRunnable(() -> {
             // create + init refinery
             level.setBlockAndUpdate(targetPos,
                     BlockContent.TAINTED_REFINERY.get().defaultBlockState()
@@ -89,16 +86,8 @@ public class RefineryBlock extends MultiblockMachine {
                 taintedRefinery.afterCreation();
                 taintedRefinery.assignColor(color);
             }
-        });
+        }));
 
         // idea / potential todo: particles released from catalyst to refinery (along random offset paths?)
-    }
-
-    // todo maybe this can be cleaned up using server.execute or something similar()?
-    public static void updateTaintEvents() {
-        for (var elem : DELAYED_TAINT_EVENTS) {
-            elem.run();
-        }
-        DELAYED_TAINT_EVENTS.clear();
     }
 }

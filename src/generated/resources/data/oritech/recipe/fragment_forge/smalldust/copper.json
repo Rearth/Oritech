@@ -1,7 +1,7 @@
 {
   "type": "oritech:fragment_forge",
   "itemInputs": [
-    "#c:nuggets/copper"
+    "minecraft:copper_nugget"
   ],
   "itemResults": [
     {

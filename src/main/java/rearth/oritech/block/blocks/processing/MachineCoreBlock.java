@@ -95,13 +95,14 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
         if (state.getValue(USED)) {
             var controller = getControllerPos(level, pos);
             var controllerState = level.getBlockState(controller);
-            onBlockRemoved(state, level, pos);
 
             // forward explosion to refinery
             if (controllerState.getBlock() instanceof RefineryBlock refinery) {
                 refinery.onExplosionHit(controllerState, level, controller, explosion, onHit);
                 return;
             }
+
+            onBlockRemoved(state, level, pos);
         }
         super.onExplosionHit(state, level, pos, explosion, onHit);
     }

@@ -30,8 +30,14 @@ public class ScrollWidget extends UIComponent {
     private boolean verticalScroll = true;
     private boolean horizontalScroll = false;
     private boolean dragScrolling = false;
+    // Opt in only when children describe their drawing area with accurate bounds.
+    private boolean renderCulling = false;
+    // Small effects outside a child's surface should still appear near a viewport edge.
+    private int renderCullOverflow = 0;
     private int scrollSpeed = 10;
     private final int innerMargin = 4;
+    // Reuse the sorting buffer instead of copying every child on every frame.
+    private final List<UIComponent> renderCandidates = new ArrayList<>();
 
     public ScrollWidget(int x, int y, int width, int height) {
         super(x, y, width, height);
@@ -58,6 +64,16 @@ public class ScrollWidget extends UIComponent {
         return this;
     }
 
+    /**
+     * Skips children outside the viewport before sorting and rendering them.
+     * The overflow allowance keeps effects that extend slightly past a component's bounds visible at an edge.
+     */
+    public ScrollWidget withRenderCulling(int overflow) {
+        this.renderCulling = true;
+        this.renderCullOverflow = Math.max(0, overflow);
+        return this;
+    }
+
     public void addChild(UIComponent child) {
         children.add(child);
     }
@@ -70,6 +86,16 @@ public class ScrollWidget extends UIComponent {
     public void setContentDimensions(int totalWidth, int totalHeight) {
         this.contentTotalWidth = totalWidth;
         this.contentTotalHeight = totalHeight;
+    }
+
+    /** Restores a previously saved scroll position without replaying the smoothing animation. */
+    public void setScrollPosition(float x, float y) {
+        int viewW = width - innerMargin * 2;
+        int viewH = height - innerMargin * 2;
+        scrollX = Mth.clamp(Math.round(x), 0, Math.max(0, contentTotalWidth - viewW));
+        scrollY = Mth.clamp(Math.round(y), 0, Math.max(0, contentTotalHeight - viewH));
+        renderedX = scrollX;
+        renderedY = scrollY;
     }
 
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta, boolean shiftHeld) {
@@ -160,9 +186,6 @@ public class ScrollWidget extends UIComponent {
         var pose = graphics.pose();
         graphics.enableScissor(cx, cy, cx + cw, cy + ch);
 
-        var sorted = new ArrayList<>(children);
-        sorted.sort(Comparator.comparingInt(UIComponent::getZIndex));
-
         // Translate so children at (0,0) render at the content origin
         pose.pushMatrix();
         pose.translate(cx - renderedX, cy - renderedY);
@@ -171,9 +194,16 @@ public class ScrollWidget extends UIComponent {
         float childMouseX = mouseX - cx + renderedX;
         float childMouseY = mouseY - cy + renderedY;
 
-        for (var child : sorted) {
-            if (child.isVisible())
-                child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
+        renderCandidates.clear();
+        for (var child : children) {
+            if (child.isVisible() && (!renderCulling || isChildInViewport(child, renderedX, renderedY, cw, ch))) {
+                renderCandidates.add(child);
+            }
+        }
+        renderCandidates.sort(Comparator.comparingInt(UIComponent::getZIndex));
+
+        for (var child : renderCandidates) {
+            child.render(graphics, (int) childMouseX, (int) childMouseY, delta);
         }
 
         pose.popMatrix();
@@ -181,11 +211,28 @@ public class ScrollWidget extends UIComponent {
 
         // Scrollbar indicator
         if (verticalScroll && contentTotalHeight > ch) {
-            renderScrollbar(graphics, cx + cw, cy, 2, ch, renderedY, contentTotalHeight, ch);
+            renderVerticalScrollbar(graphics, cx + cw, cy, 2, ch, renderedY, contentTotalHeight, ch);
+        }
+        if (horizontalScroll && contentTotalWidth > cw) {
+            renderHorizontalScrollbar(graphics, cx, cy + ch, cw, 2, renderedX, contentTotalWidth, cw);
         }
     }
 
-    private void renderScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH, float scroll, int totalContent, int viewportH) {
+    /**
+     * Uses padded bounds because a component surface may extend past its content area.
+     * Subclasses can widen this for components that draw beyond their declared bounds.
+     */
+    protected boolean isChildInViewport(UIComponent child, float viewportX, float viewportY, int viewportWidth, int viewportHeight) {
+        int left = child.paddedX();
+        int top = child.paddedY();
+        int right = left + child.paddedWidth();
+        int bottom = top + child.paddedHeight();
+        return right > viewportX - renderCullOverflow && left < viewportX + viewportWidth + renderCullOverflow
+                && bottom > viewportY - renderCullOverflow && top < viewportY + viewportHeight + renderCullOverflow;
+    }
+
+    private void renderVerticalScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int barW, int trackH,
+                                         float scroll, int totalContent, int viewportH) {
         float thumbRatio = (float) viewportH / totalContent;
         int thumbH = Math.max(8, (int) (trackH * thumbRatio));
         float scrollRatio = scroll / (totalContent - viewportH);
@@ -193,6 +240,17 @@ public class ScrollWidget extends UIComponent {
 
         graphics.fill(barX, barY, barX + barW, barY + trackH, SCROLLBAR_TRACK);
         graphics.fill(barX, thumbY, barX + barW, thumbY + thumbH, SCROLLBAR_THUMB);
+    }
+
+    private void renderHorizontalScrollbar(GuiGraphicsExtractor graphics, int barX, int barY, int trackW, int barH,
+                                           float scroll, int totalContent, int viewportW) {
+        float thumbRatio = (float) viewportW / totalContent;
+        int thumbW = Math.max(8, (int) (trackW * thumbRatio));
+        float scrollRatio = scroll / (totalContent - viewportW);
+        int thumbX = barX + (int) ((trackW - thumbW) * scrollRatio);
+
+        graphics.fill(barX, barY, barX + trackW, barY + barH, SCROLLBAR_TRACK);
+        graphics.fill(thumbX, barY, thumbX + thumbW, barY + barH, SCROLLBAR_THUMB);
     }
 
     @Override

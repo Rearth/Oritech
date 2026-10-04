@@ -2,6 +2,7 @@ package rearth.oritech.client.ui.render;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -21,6 +22,7 @@ public record BlockPreviewRenderState(
         float centerY,
         float centerZ,
         float partialTick,
+        boolean cacheTexture,
         int x0,
         int y0,
         int x1,
@@ -37,7 +39,16 @@ public record BlockPreviewRenderState(
                                    int x0, int y0, int x1, int y1, float scale,
                                    Matrix3x2f pose,
                                    @Nullable ScreenRectangle scissorArea) {
-        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick,
+        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick, false,
+                x0, y0, x1, y1, scale, pose, scissorArea);
+    }
+
+    public BlockPreviewRenderState(List<Entry> blocks, float rotationX, float rotationY,
+                                   float centerX, float centerY, float centerZ,
+                                   float partialTick, boolean cacheTexture,
+                                   int x0, int y0, int x1, int y1, float scale,
+                                   Matrix3x2f pose, @Nullable ScreenRectangle scissorArea) {
+        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick, cacheTexture,
                 x0, y0, x1, y1, scale, new Matrix3x2f(pose), scissorArea,
                 calculateBounds(x0, y0, x1, y1, pose, scissorArea));
     }
@@ -51,9 +62,13 @@ public record BlockPreviewRenderState(
         return scissorArea != null ? scissorArea.intersection(bounds) : bounds;
     }
 
-    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale) {
+    public record Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale, int overlayCoords) {
         public Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset) {
-            this(state, entity, offset, 1f);
+            this(state, entity, offset, 1f, OverlayTexture.NO_OVERLAY);
+        }
+
+        public Entry(BlockState state, @Nullable BlockEntity entity, Vec3i offset, float scale) {
+            this(state, entity, offset, scale, OverlayTexture.NO_OVERLAY);
         }
     }
 }

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:processing_unit",
+    "p": "minecraft:paper",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "pp",
+    "sc"
+  ],
+  "result": {
+    "id": "oritech_space_age:mission_card"
+  }
+}

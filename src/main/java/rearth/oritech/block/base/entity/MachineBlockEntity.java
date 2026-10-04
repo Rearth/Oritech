@@ -254,26 +254,17 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
         var recipeIngredients = currentRecipe.itemInputs();
         var inputInv = inventory.getInputContainer();
 
-        // remove inputs. Each input is 1 ingredient.
-        var startOffset = 0;    // used so when multiple matching itemStacks are available, they're drained somewhat evenly
-        for (var removedIng : recipeIngredients) {
-            // try to find current ingredient
+        // Use the same assignment as recipe matching. A separate greedy pass can choose differently for
+        // overlapping ingredients and fail even though the recipe was previously verified as craftable.
+        var matchedSlots = OritechRecipe.findMatchingInputSlots(recipeIngredients, getInputView());
+        if (matchedSlots == null) return false;
 
-            var found = false;
+        for (var slot : matchedSlots) {
+            var inputResource = inputInv.getResource(slot);
+            if (inputResource.isEmpty()) return false;
 
-            for (int i = 0; i < inputInv.size(); i++) {
-                var index = (i + startOffset) % inputInv.size();
-                var inputResource = inputInv.getResource(index);
-                if (removedIng.test(inputResource.toStack())) {
-                    var taken = inputInv.extract(index, inputResource, 1, transaction);
-                    if (taken != 1) return false;
-                    startOffset++;
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found) return false;
+            var taken = inputInv.extract(slot, inputResource, 1, transaction);
+            if (taken != 1) return false;
         }
 
         return true;

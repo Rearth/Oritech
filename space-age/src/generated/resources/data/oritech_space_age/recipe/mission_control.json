@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "minecraft:ender_pearl",
+    "f": "oritech:machine_frame",
+    "p": "oritech:processing_unit",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sss",
+    "pcp",
+    "sfs"
+  ],
+  "result": {
+    "id": "oritech_space_age:mission_control"
+  }
+}

@@ -20,7 +20,6 @@ import rearth.oritech.block.entity.generators.FuelGeneratorEntity;
 import rearth.oritech.block.entity.generators.LavaGeneratorEntity;
 import rearth.oritech.block.entity.generators.SteamEngineEntity;
 import rearth.oritech.block.entity.processing.AssemblerBlockEntity;
-import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.block.entity.processing.IndustrialChillerBlockEntity;
 import rearth.oritech.block.entity.processing.FoundryBlockEntity;
@@ -79,9 +78,6 @@ public final class OritechJeiPlugin implements IModPlugin {
                 CentrifugeBlockEntity.class);
         registerMachineCategory(registration, OritechJeiRecipeTypes.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE.get(),
                 CentrifugeBlockEntity.class);
-        registerMachineCategory(registration, OritechJeiRecipeTypes.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE.get(),
-                AtomicForgeBlockEntity.class);
-
         registerMachineCategory(registration, OritechJeiRecipeTypes.BIO_GENERATOR, BlockContent.BIO_GENERATOR.get(),
                 BioGeneratorEntity.class);
         registerMachineCategory(registration, OritechJeiRecipeTypes.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR.get(),
@@ -100,6 +96,7 @@ public final class OritechJeiPlugin implements IModPlugin {
         ));
         registration.addRecipeCategories(new OritechJeiParticleCollisionRecipe(guiHelper));
         registration.addRecipeCategories(new OritechJeiLaserRecipe(guiHelper));
+        registration.addRecipeCategories(new OritechJeiAtomicForgeRecipe(guiHelper));
         registration.addRecipeCategories(new OritechJeiBedrockExtractorRecipe(guiHelper));
         registration.addRecipeCategories(new OritechJeiTaintedRefineryCreation(guiHelper));
         registration.addRecipeCategories(new OritechJeiTaintedRefineryBonuses(guiHelper));
@@ -200,7 +197,8 @@ public final class OritechJeiPlugin implements IModPlugin {
         registerCraftingStations(registration, OritechJeiRecipeTypes.INDUSTRIAL_CHILLER, BlockContent.INDUSTRIAL_CHILLER.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.CENTRIFUGE, BlockContent.CENTRIFUGE.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.CENTRIFUGE_FLUID, BlockContent.CENTRIFUGE.get());
-        registerCraftingStations(registration, OritechJeiRecipeTypes.ATOMIC_FORGE, BlockContent.ATOMIC_FORGE.get());
+        registerCraftingStations(registration, OritechJeiRecipeTypes.ATOMIC_FORGE,
+                BlockContent.ATOMIC_FORGE.get(), BlockContent.ENDERIC_LASER.get());
 
         registerCraftingStations(registration, OritechJeiRecipeTypes.BIO_GENERATOR, BlockContent.BIO_GENERATOR.get());
         registerCraftingStations(registration, OritechJeiRecipeTypes.FUEL_GENERATOR, BlockContent.FUEL_GENERATOR.get());

@@ -96,8 +96,12 @@ public class CentrifugeBlockEntity extends MultiblockMachineEntity implements Fl
 
         var fluidInput = currentRecipe.fluidInput();
         if (fluidInput.isPresent()) {
-            // we assume that the fluid content matches here, as this was checked in earlier steps already
-            var extracted = fluidContainer.getInputContainer().extract(FluidResource.of(fluidContainer.getInStack()), fluidInput.get().amount(), transaction);
+            // An auxiliary chamber may have consumed the remaining fluid earlier in this transaction.
+            var inputContainer = fluidContainer.getInputContainer();
+            var inputResource = inputContainer.getResource(0);
+            if (inputResource.isEmpty()) return false;
+
+            var extracted = inputContainer.extract(inputResource, fluidInput.get().amount(), transaction);
             if (extracted != fluidInput.get().amount()) return false;
         }
 

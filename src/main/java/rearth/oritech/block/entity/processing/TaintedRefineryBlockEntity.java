@@ -38,6 +38,7 @@ import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.api.transfer.fluid.InOutFluidStorage;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.TaintedRefineryScreenHandler;
@@ -281,11 +282,12 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
             var checkPos = worldPosition.offset(rotatedPos);
             var checkState = level.getBlockState(checkPos);
 
-            if (checkState.hasBlockEntity()) {
-                if (checkState.hasProperty(MachineCoreBlock.USED) && checkState.getValue(MachineCoreBlock.USED)) {
-                    Oritech.LOGGER.warn("Unable to auto-create tainted refinery, blocked by block entity. This should never happen");
-                    continue;
-                }
+            if (checkState.getBlock() instanceof MachineCoreBlock
+                    && checkState.getValue(MachineCoreBlock.USED)
+                    && level.getBlockEntity(checkPos) instanceof MachineCoreEntity coreEntity
+                    && !coreEntity.getControllerPos().equals(worldPosition)) {
+                Oritech.LOGGER.warn("Unable to auto-create tainted refinery core at {}, claimed by controller at {}", checkPos, coreEntity.getControllerPos());
+                continue;
             }
 
             level.setBlockAndUpdate(checkPos, BlockContent.COMPLEX_PLATING.get().defaultBlockState());

@@ -1,0 +1,89 @@
+{
+  "format_version": "1.21.11",
+  "credit": "Made with Blockbench",
+  "textures": {
+    "0": "oritech_space_age:block/basic_booster_rocket",
+    "particle": "oritech:block/machine_particle_texture"
+  },
+  "elements": [
+    {
+      "name": "mounting_frame",
+      "from": [1, 11, 1],
+      "to": [15, 16, 15],
+      "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+      "faces": {
+        "north": {"uv": [1, 0, 15, 5], "texture": "#0"},
+        "east": {"uv": [1, 0, 15, 5], "texture": "#0"},
+        "south": {"uv": [1, 0, 15, 5], "texture": "#0"},
+        "west": {"uv": [1, 0, 15, 5], "texture": "#0"},
+        "up": {"uv": [1, 1, 15, 15], "texture": "#0"},
+        "down": {"uv": [1, 1, 15, 15], "texture": "#0"}
+      }
+    },
+    {
+      "name": "combustion_housing",
+      "from": [3, 7, 3],
+      "to": [13, 12, 13],
+      "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+      "faces": {
+        "north": {"uv": [3, 3, 13, 8], "texture": "#0"},
+        "east": {"uv": [3, 3, 13, 8], "texture": "#0"},
+        "south": {"uv": [3, 3, 13, 8], "texture": "#0"},
+        "west": {"uv": [3, 3, 13, 8], "texture": "#0"},
+        "up": {"uv": [3, 3, 13, 13], "texture": "#0"},
+        "down": {"uv": [3, 3, 13, 13], "texture": "#0"}
+      }
+    },
+    {
+      "name": "nozzle_collar",
+      "from": [2, 5, 2],
+      "to": [14, 8, 14],
+      "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+      "faces": {
+        "north": {"uv": [2, 11, 14, 14], "texture": "#0"},
+        "east": {"uv": [2, 11, 14, 14], "texture": "#0"},
+        "south": {"uv": [2, 11, 14, 14], "texture": "#0"},
+        "west": {"uv": [2, 11, 14, 14], "texture": "#0"},
+        "up": {"uv": [2, 2, 14, 14], "texture": "#0"},
+        "down": {"uv": [2, 2, 14, 14], "texture": "#0"}
+      }
+    },
+    {
+      "name": "nozzle_body",
+      "from": [4, 2, 4],
+      "to": [12, 5, 12],
+      "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+      "faces": {
+        "north": {"uv": [4, 0, 12, 3], "texture": "#0"},
+        "east": {"uv": [4, 0, 12, 3], "texture": "#0"},
+        "south": {"uv": [4, 0, 12, 3], "texture": "#0"},
+        "west": {"uv": [4, 0, 12, 3], "texture": "#0"},
+        "up": {"uv": [4, 4, 12, 12], "texture": "#0"},
+        "down": {"uv": [4, 4, 12, 12], "texture": "#0"}
+      }
+    },
+    {
+      "name": "exhaust_throat",
+      "from": [5, 0, 5],
+      "to": [11, 2, 11],
+      "rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+      "faces": {
+        "north": {"uv": [5, 14, 11, 16], "texture": "#0"},
+        "east": {"uv": [5, 14, 11, 16], "texture": "#0"},
+        "south": {"uv": [5, 14, 11, 16], "texture": "#0"},
+        "west": {"uv": [5, 14, 11, 16], "texture": "#0"},
+        "up": {"uv": [5, 9, 11, 15], "texture": "#0"},
+        "down": {"uv": [5, 9, 11, 15], "texture": "#0"}
+      }
+    }
+  ],
+  "groups": [
+    {
+      "name": "rocket_engine",
+      "origin": [8, 8, 8],
+      "scope": 0,
+      "color": 0,
+      "children": [0, 1, 2, 3, 4]
+    }
+  ]
+}
