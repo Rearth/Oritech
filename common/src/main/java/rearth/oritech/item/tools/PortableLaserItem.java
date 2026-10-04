@@ -66,9 +66,9 @@ import software.bernie.geckolib.animation.PlayState;
 import software.bernie.geckolib.animation.RawAnimation;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 import static rearth.oritech.item.tools.harvesting.DrillItem.BAR_STEP_COUNT;
@@ -87,7 +87,7 @@ public class PortableLaserItem extends Item implements OritechEnergyItem, GeoIte
     
     private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     
-    private static final Map<Player, Tuple<BlockPos, Integer>> blockBreakStats = new HashMap<>();
+    private static final Map<Player, Tuple<BlockPos, Integer>> blockBreakStats = new WeakHashMap<>();
     
     public PortableLaserItem(Properties settings) {
         super(settings);
