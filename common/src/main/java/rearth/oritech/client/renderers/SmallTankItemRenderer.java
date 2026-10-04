@@ -72,11 +72,10 @@ public class SmallTankItemRenderer {
             return;
         }
         
-        var fluid = storage.getFluid();
         var fill = storage.getAmount() / (float) (OritechConfig.portableTankCapacityBuckets.get() * FluidStackHooks.bucketAmount());
-        
-        var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
+
+        var sprite = FluidStackHooks.getStillTexture(storage);
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(storage));
         var consumer = vertexConsumers.getBuffer(RenderType.translucent());
         
         matrices.pushPose();

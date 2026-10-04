@@ -21,11 +21,11 @@ public class SmallTankRenderer implements BlockEntityRenderer<SmallTankEntity> {
         var storage = entity.fluidStorage;
         if (storage.getAmount() <= 0 || storage.getFluid().equals(Fluids.EMPTY)) return;
         
-        var fluid = storage.getFluid();
+        var fluidStack = storage.getStack();
         var fill = storage.getAmount() / (float) storage.getCapacity();
-        
-        var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
+
+        var sprite = FluidStackHooks.getStillTexture(fluidStack);
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluidStack));
         var consumer = vertexConsumers.getBuffer(RenderType.translucent());
         
         matrices.pushPose();

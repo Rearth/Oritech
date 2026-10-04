@@ -75,9 +75,8 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
     }
     
     private static void renderFluidCube(Vector3f min, Vector3f size, FluidStack drawnStack, Long tankCapacity, VertexConsumer consumer, PoseStack matrices, int light, int overlay, int index, VisualTankHeights lastHeight) {
-        var fluid = drawnStack.getFluid();
         var fill = drawnStack.getAmount() / (float) tankCapacity;
-        
+
         var lastFill = index == -1 ? lastHeight.input : lastHeight.outputs[index];
         var newFill = Mth.lerp(0.003f, lastFill, fill);
         if (index == -1) {
@@ -85,9 +84,9 @@ public class RefineryRenderer<T extends RefineryBlockEntity & GeoAnimatable> ext
         } else {
             lastHeight.outputs[index] = newFill;
         }
-        
-        var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
+
+        var sprite = FluidStackHooks.getStillTexture(drawnStack);
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(drawnStack));
         
         matrices.pushPose();
         matrices.translate(min.x + 0.01f, min.y + 0.01f, min.z + 0.01f);

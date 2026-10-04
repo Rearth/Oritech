@@ -59,11 +59,10 @@ public class TaintedRefineryRenderer<T extends TaintedRefineryBlockEntity & GeoA
     }
     
     private static void renderFluidCube(Vector3f min, Vector3f size, FluidStack drawnStack, Long tankCapacity, VertexConsumer consumer, PoseStack matrices, int light, int overlay) {
-        var fluid = drawnStack.getFluid();
         var fill = drawnStack.getAmount() / (float) tankCapacity;
-        
-        var sprite = FluidStackHooks.getStillTexture(fluid);
-        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(fluid));
+
+        var sprite = FluidStackHooks.getStillTexture(drawnStack);
+        var spriteColor = ColorHelper.makeOpaque(FluidStackHooks.getColor(drawnStack));
         
         matrices.pushPose();
         matrices.translate(min.x + 0.01f, min.y + 0.01f, min.z + 0.01f);
