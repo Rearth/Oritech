@@ -17,6 +17,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.blocks.pipes.AbstractPipeBlock;
 import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.interaction.PipeBoosterBlockEntity;
+import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
 
@@ -30,6 +31,9 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
     public BlockPos connectedBooster = BlockPos.ZERO;
 
     private PipeBoosterBlockEntity cachedBooster;
+
+    protected final PipeTransferBackoff transferBackoff = new PipeTransferBackoff(
+            OritechConfig.pipeIdleThresholdTicks.get(), OritechConfig.pipeMaxIdleIntervalTicks.get());
 
     public GenericPipeInterfaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);

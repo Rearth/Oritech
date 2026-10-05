@@ -85,6 +85,16 @@ public class OritechConfig {
             .worldRestart()
             .defineInRange("fluidPipeExtractIntervalDuration", 3, 1, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.IntValue pipeIdleThresholdTicks = COMMON
+            .comment("Ticks without a successful item, fluid or energy pipe transfer before retry intervals start doubling")
+            .worldRestart()
+            .defineInRange("pipeIdleThresholdTicks", 100, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue pipeMaxIdleIntervalTicks = COMMON
+            .comment("Maximum ticks between idle pipe retries; never shorter than the normal transfer interval. Also applies to boosted pipes.")
+            .worldRestart()
+            .defineInRange("pipeMaxIdleIntervalTicks", 40, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.LongValue energyPipeTransferRate = COMMON
             .comment("Energy pipe transfer rate in RF/t")
             .defineInRange("energyPipeTransferRate", 25_000L, 0L, Long.MAX_VALUE);

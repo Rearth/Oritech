@@ -61,8 +61,8 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         var boosted = isBoostAvailable();
 
-        // boosted pipe works every tick, otherwise only every N tick
-        if (level.getGameTime() % TRANSFER_PERIOD != 0 && !boosted)
+        var transferPeriod = boosted ? 1 : TRANSFER_PERIOD;
+        if (!transferBackoff.shouldAttempt(level.getGameTime(), transferPeriod))
             return;
 
         var data = ItemPipeBlock.ITEM_PIPE_DATA.get(level.dimension().identifier());
@@ -78,6 +78,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
         refreshTargetCaches(level, targets);
 
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
+        var transferred = false;
 
         // do the whole thing for each direction (neighboring item container) items are taken from (usually just 1, but could be multiple)
         // tries to extract from each side (for each slot on that source machine) and then tries to insert it to any matching containers
@@ -140,6 +141,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                         if (taken != inserted) {
                             Oritech.LOGGER.warn("Item Pipe Insertion Error! Handler Misbehaving. At: {}, inserted: {}, extracted: {},  amount: {}. From pipe at: {}",
                                     cachedTarget.pos(), inserted, taken, availableAmount, worldPosition);
+                            transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, transferred);
                             return;  // this should never happen
                         }
 
@@ -161,6 +163,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 }
                 if (moved > 0) {
                     transaction.commit();
+                    transferred = true;
                     onBoostUsed();
                 } else if (windowedExtraction) {
                     extractionWindowStarts.put(machineDirection, lastSlot >= sourceSlotCount ? 0 : lastSlot);
@@ -169,6 +172,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
             }
         }
 
+        transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, transferred);
     }
 
     private void refreshTargetCaches(Level level, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {

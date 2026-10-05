@@ -69,7 +69,12 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         // rotate starting target each tick
         // insert until no more energy is available
 
-        if (level.isClientSide() || energyStorage.getAmountAsInt() <= 0) return;
+        if (level.isClientSide()) return;
+        if (energyStorage.getAmountAsInt() <= 0) {
+            transferBackoff.reset();
+            return;
+        }
+        if (!transferBackoff.shouldAttempt(level.getGameTime(), 1)) return;
 
         var dataSource = isSuperConductor ? SuperConductorBlock.SUPERCONDUCTOR_DATA : EnergyPipeBlock.ENERGY_PIPE_DATA;
 
@@ -87,7 +92,10 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
             this.cacheHash = targetHash;
         }
 
-        if (this.cachedTargets.isEmpty()) return;
+        if (this.cachedTargets.isEmpty()) {
+            transferBackoff.recordAttempt(level.getGameTime(), 1, false);
+            return;
+        }
 
         var totalMoved = 0;
         try (var transaction = Transaction.openRoot()) {
@@ -112,6 +120,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
                 if (inserted != extracted) {
                     Oritech.LOGGER.warn("Energy Pipe Insertion Error! Handler Misbehaving. At: {}, inserted: {}, extracted: {},  amount: {}. From pipe at: {}",
                             cachedTarget.pos(), inserted, extracted, prev, worldPosition);
+                    transferBackoff.recordAttempt(level.getGameTime(), 1, false);
                     return;  // this should never happen
                 }
 
@@ -120,6 +129,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
             if (totalMoved > 0) transaction.commit();
         }
 
+        transferBackoff.recordAttempt(level.getGameTime(), 1, totalMoved > 0);
     }
 
     @Override

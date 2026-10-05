@@ -19,5 +19,6 @@ public abstract class ExtractablePipeInterfaceEntity extends GenericPipeInterfac
      */
     public void invalidateTargetCache() {
         filteredTargetsNetHash = 0;
+        transferBackoff.reset();
     }
 }
