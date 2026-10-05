@@ -7,7 +7,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -52,15 +51,6 @@ public class FluidPipeConnectionBlock extends ExtractablePipeConnectionBlock {
     @Override
     public SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType() {
         return GenericPipeInterfaceEntity.PipeNetworkData.FLUID_TYPE;
-    }
-
-    // to disconnect when a neighboring block emits a block update (e.g. the centrifuge losing a fluid addon)
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
-
-        // todo
-        // level.setBlock(pos, updateShape(state, Direction.getNearest(Vec3.atLowerCornerOf(sourcePos.subtract(pos))), level.getBlockState(sourcePos), level, pos, sourcePos), Block.UPDATE_CLIENTS, 0);
     }
 
     @Override

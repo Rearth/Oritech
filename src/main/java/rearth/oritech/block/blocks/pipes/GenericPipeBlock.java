@@ -23,12 +23,14 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.TagContent;
@@ -175,6 +177,23 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
             getNetworkData(serverLevel).machinePipeNeighbors.remove(neighbourPos);
 
         return state;
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block sourceBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, sourceBlock, orientation, movedByPiston);
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        // Neighbor notifications no longer include a source position, so recheck all six sides.
+        for (var direction : Direction.values()) {
+            var currentState = level.getBlockState(pos);
+            if (!(currentState.getBlock() instanceof GenericPipeBlock pipe)) return;
+            var neighborPos = pos.relative(direction);
+            var updated = pipe.updateShape(currentState, serverLevel, serverLevel, pos, direction, neighborPos,
+                    level.getBlockState(neighborPos), serverLevel.getRandom());
+            if (updated != currentState)
+                level.setBlock(pos, updated, Block.UPDATE_CLIENTS, 0);
+        }
     }
 
     @Override

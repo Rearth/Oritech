@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -164,6 +165,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             setCoreQuality(quality);
 
             Objects.requireNonNull(level).setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, true));
+            refreshMultiblockCapabilities();
             return true;
         } else {
             // invalid
@@ -223,6 +225,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
 
         // Preserve controller-specific refresh work without cycling any block states.
         initMultiblock(level.getBlockState(pos));
+        refreshMultiblockCapabilities();
     }
 
     private void resetInvalidMultiblock() {
@@ -230,6 +233,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
         var pos = getPosForMultiblock();
         if (level == null) return;
 
+        var resetCores = new ArrayList<BlockPos>();
         for (var targetMachinePosition : getCorePositions()) {
             var corePos = pos.offset(Geometry.rotatePosition(targetMachinePosition, getFacingForMultiblock()));
             var coreState = level.getBlockState(corePos);
@@ -238,14 +242,17 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
                 continue;
 
             var linkedController = level.getBlockEntity(coreEntity.getControllerPos());
-            if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController))
+            if (coreEntity.getControllerPos().equals(pos) || !(linkedController instanceof MultiblockMachineController)) {
                 level.setBlockAndUpdate(corePos, coreState.setValue(MachineCoreBlock.USED, false));
+                resetCores.add(corePos);
+            }
         }
 
         getConnectedCores().clear();
         var state = level.getBlockState(pos);
         if (state.hasProperty(MultiblockMachine.ASSEMBLED) && state.getValue(MultiblockMachine.ASSEMBLED))
             level.setBlockAndUpdate(pos, state.setValue(MultiblockMachine.ASSEMBLED, false));
+        refreshMultiblockCapabilities(resetCores);
     }
 
     default void onCoreBroken(BlockPos corePos) {
@@ -265,6 +272,7 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             }
         }
 
+        refreshMultiblockCapabilities();
         coreBlocksConnected.clear();
     }
 
@@ -280,7 +288,27 @@ public interface MultiblockMachineController extends MachineControllerLifecycle 
             }
         }
 
+        refreshMultiblockCapabilities();
         coreBlocksConnected.clear();
+    }
+
+    private void refreshMultiblockCapabilities() {
+        refreshMultiblockCapabilities(getConnectedCores());
+    }
+
+    private void refreshMultiblockCapabilities(List<BlockPos> corePositions) {
+        if (!(getWorldForMultiblock() instanceof ServerLevel level)) return;
+
+        for (var corePos : corePositions) {
+            if (level.getBlockEntity(corePos) instanceof MachineCoreEntity core)
+                core.resetCaches();
+            level.invalidateCapabilities(corePos);
+            level.updateNeighborsAt(corePos, level.getBlockState(corePos).getBlock());
+        }
+
+        var controllerPos = getPosForMultiblock();
+        level.invalidateCapabilities(controllerPos);
+        level.updateNeighborsAt(controllerPos, level.getBlockState(controllerPos).getBlock());
     }
 
     private void highlightBlock(BlockPos block, Level level) {
