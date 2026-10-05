@@ -1085,7 +1085,6 @@
   "oritech.configuration.poleConfig": "Power Pole",
   "oritech.configuration.fertilizerConfig": "Fertilizer Config",
   "oritech.configuration.exoChestplate": "Exo Brustplatte",
-  "oritech.configuration.fluidPipeInternalStorageBuckets": "Fluid Pipe Internal Storage Buckets",
   "oritech.configuration.pullTimeMultiplier": "Black Hole Pull Time Multiplier",
   "oritech.configuration.steamBoilerCapacityBuckets": "Steam Boiler Capacity Buckets",
   "oritech.configuration.maxRange": "Maximum Range",

@@ -41,7 +41,7 @@ import java.util.Set;
 // progress is abused to sync active speed.
 public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements FluidProvider {
 
-    private static final int MAX_SPEED = 10;
+    private static final int MAX_SPEED = 25;
     private static final int MAX_CHAIN_SIZE = 20;
     private static final float WATER_RATIO = 0.9f;
 
