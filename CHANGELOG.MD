@@ -1,0 +1,5 @@
+- Fix portable laser memory leaks
+- Improve machine capability handling and resets (specifically for machine cores)
+- Add approximation for particle accelerator consumption to wiki (@Tors-0)
+- Improve handling of custom fluids in tank renderers (@matelemons)
+- Major reactor performance improvements
