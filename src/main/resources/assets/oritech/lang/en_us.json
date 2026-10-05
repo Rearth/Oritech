@@ -1154,6 +1154,8 @@
   "oritech.configuration.catalystRFPerSoul": "RF/t per catalyst soul capacity level increase",
   "oritech.configuration.fuelCapacity": "Fuel Capacity",
   "oritech.configuration.fluidPipeExtractIntervalDuration": "Fluid Pipe Extract Interval Duration",
+  "oritech.configuration.pipeIdleThresholdTicks": "Pipe Idle Threshold (Ticks)",
+  "oritech.configuration.pipeMaxIdleIntervalTicks": "Pipe Maximum Idle Retry Interval (Ticks)",
   "oritech.configuration.lightningCostMultiplier": "Electric Mace Lightning Attack RF Usage Factor",
   "oritech.configuration.startup": "Startup",
   "oritech.configuration.maxEnergyInsertion": "Max Energy Insertion",

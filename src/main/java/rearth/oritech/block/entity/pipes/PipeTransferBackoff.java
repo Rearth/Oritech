@@ -7,18 +7,20 @@ public class PipeTransferBackoff {
 
     private final int idleThreshold;
     private final int maxInterval;
+    private final int tickOffset;
     private long idleSinceTick = -1;
     private long nextAttemptTick;
     private int retryInterval;
 
-    PipeTransferBackoff(int idleThreshold, int maxInterval) {
+    PipeTransferBackoff(int idleThreshold, int maxInterval, int tickOffset) {
         this.idleThreshold = idleThreshold;
         this.maxInterval = maxInterval;
+        this.tickOffset = tickOffset;
     }
 
     boolean shouldAttempt(long gameTime, int normalInterval) {
         if (retryInterval > 0) return gameTime >= nextAttemptTick;
-        return gameTime % normalInterval == 0;
+        return Math.floorMod(gameTime, normalInterval) == Math.floorMod(tickOffset, normalInterval);
     }
 
     void recordAttempt(long gameTime, int normalInterval, boolean transferred) {

@@ -32,11 +32,16 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
 
     private PipeBoosterBlockEntity cachedBooster;
 
-    protected final PipeTransferBackoff transferBackoff = new PipeTransferBackoff(
-            OritechConfig.pipeIdleThresholdTicks.get(), OritechConfig.pipeMaxIdleIntervalTicks.get());
+    protected final PipeTransferBackoff transferBackoff;
+
+    // Network rebuilds replace the target set, so reference equality is enough to detect changes.
+    @Nullable
+    protected Set<PipeNetworkTarget> cachedNetworkTargets;
 
     public GenericPipeInterfaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+        transferBackoff = new PipeTransferBackoff(OritechConfig.pipeIdleThresholdTicks.get(),
+                OritechConfig.pipeMaxIdleIntervalTicks.get(), pos.hashCode());
     }
 
     public boolean isBoostAvailable() {

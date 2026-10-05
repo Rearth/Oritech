@@ -77,6 +77,11 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         refreshTargetCaches(level, targets);
 
+        if (filteredItemTargetsCached.isEmpty()) {
+            transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, false);
+            return;
+        }
+
         var moveCapacity = isBoostAvailable() ? 64 : TRANSFER_AMOUNT;
         var transferred = false;
 
@@ -119,8 +124,9 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 var moved = 0;
                 // do the whole thing for each slot in the source container
                 for (int i = firstSlot; i < lastSlot; i++) {
+                    if (machineMoveCapacity <= 0) break;
                     var extractedResource = sourceContainer.getResource(i);
-                    if (extractedResource.isEmpty() || machineMoveCapacity <= 0) continue;
+                    if (extractedResource.isEmpty()) continue;
 
                     // with directly canceled transaction just to figure out how much can be moved / extracted
                     var availableAmount = 0;
@@ -176,8 +182,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     }
 
     private void refreshTargetCaches(Level level, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {
-        var netHash = targets.hashCode();
-        if (netHash == filteredTargetsNetHash && filteredItemTargetsCached != null) {
+        if (targets == cachedNetworkTargets) {
             return;
         }
 
@@ -193,7 +198,7 @@ public class ItemPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 .sorted(Comparator.comparingInt(target -> target.pos().distManhattan(worldPosition)))
                 .toList();
 
-        filteredTargetsNetHash = netHash;
+        cachedNetworkTargets = targets;
         cachedTransferPaths.clear();
     }
 

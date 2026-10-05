@@ -30,7 +30,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     private final boolean isSuperConductor;
 
     private final List<BlockCapabilityCache<EnergyHandler, Direction>> cachedTargets = new ArrayList<>();
-    private int cacheHash;
+    private int nextTargetIndex;
 
     public EnergyPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENERGY_PIPE.get(), pos, state);
@@ -66,7 +66,7 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
     public void tick(Level level, BlockPos pos, BlockState state, GenericPipeInterfaceEntity blockEntity) {
         // if energy is available
         // gather all connection targets supporting insertion
-        // rotate starting target each tick
+        // rotate starting target each transfer attempt
         // insert until no more energy is available
 
         if (level.isClientSide()) return;
@@ -82,14 +82,13 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
         if (data == null) return;   // this should also never happen
         var targets = findNetworkTargets(pos, data);    // list of connected machine positions
 
-        var targetHash = targets.hashCode();
-
-        if (this.cacheHash != targetHash) {
+        if (targets != cachedNetworkTargets) {
             cachedTargets.clear();
             for (var target : targets) {
                 cachedTargets.add(BlockCapabilityCache.create(Capabilities.Energy.BLOCK, (ServerLevel) level, target.machinePos(), target.insertedFrom()));
             }
-            this.cacheHash = targetHash;
+            cachedNetworkTargets = targets;
+            nextTargetIndex = cachedTargets.isEmpty() ? 0 : Math.floorMod(worldPosition.hashCode(), cachedTargets.size());
         }
 
         if (this.cachedTargets.isEmpty()) {
@@ -97,15 +96,18 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
             return;
         }
 
+        var targetCount = this.cachedTargets.size();
+        var startTargetIndex = nextTargetIndex;
+        // If nobody accepts energy, still rotate the starting target for the next attempt.
+        nextTargetIndex = (nextTargetIndex + 1) % targetCount;
+        var lastSuccessfulTargetIndex = -1;
         var totalMoved = 0;
         try (var transaction = Transaction.openRoot()) {
 
-            var targetCount = this.cachedTargets.size();
             for (int i = 0; i < targetCount; i++) {
                 if (energyStorage.getAmountAsLong() <= 0) break;
 
-                // offset for round-robin (offset by world-time + blockpos to avoid all pipes starting at the same spot)
-                var targetIndex = Math.floorMod(level.getGameTime() + getBlockPos().asLong() + i, targetCount);
+                var targetIndex = (startTargetIndex + i) % targetCount;
                 var cachedTarget = this.cachedTargets.get(targetIndex);
 
                 var targetStorage = cachedTarget.getCapability();
@@ -124,9 +126,15 @@ public class EnergyPipeInterfaceEntity extends GenericPipeInterfaceEntity implem
                     return;  // this should never happen
                 }
 
+                if (extracted > 0) lastSuccessfulTargetIndex = targetIndex;
+
             }
 
-            if (totalMoved > 0) transaction.commit();
+            if (totalMoved > 0) {
+                transaction.commit();
+                // Rejected targets must not give the following receiver an extra turn.
+                nextTargetIndex = (lastSuccessfulTargetIndex + 1) % targetCount;
+            }
         }
 
         transferBackoff.recordAttempt(level.getGameTime(), 1, totalMoved > 0);
