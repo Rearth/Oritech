@@ -1087,7 +1087,6 @@
   "oritech.configuration.poleConfig": "Poste de Energia",
   "oritech.configuration.fertilizerConfig": "Configuração do Fertilizador",
   "oritech.configuration.exoChestplate": "Exo-Peitoral",
-  "oritech.configuration.fluidPipeInternalStorageBuckets": "Baldes de Armazenamento Interno do Tubo de Fluido",
   "oritech.configuration.pullTimeMultiplier": "Multiplicador de Tempo de Puxão do Buraco Negro",
   "oritech.configuration.steamBoilerCapacityBuckets": "Baldes de Capacidade da Caldeira a Vapor",
   "oritech.configuration.maxRange": "Alcance Máximo",
