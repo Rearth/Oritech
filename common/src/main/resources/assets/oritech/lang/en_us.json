@@ -1066,6 +1066,7 @@
   "oritech.configuration.foundryData": "Foundry Config",
   "oritech.configuration.basicDrill": "Basic Drill",
   "oritech.configuration.stepsPerOre": "Steps Per Ore",
+  "oritech.configuration.interaction": "Interaction Settings",
   "oritech.configuration.collectorEnergyStorage": "Tachyon Collector Energy Capacity",
   "oritech.configuration.furnaceData": "Furnace Config",
   "oritech.configuration.addonConfig": "Addon Config",
