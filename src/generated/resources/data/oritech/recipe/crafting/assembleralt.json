@@ -9,9 +9,9 @@
     "s": "oritech:motor"
   },
   "pattern": [
-    "fff",
-    "mcm",
-    "sbs"
+    "f f",
+    "mbc",
+    " s "
   ],
   "result": {
     "id": "oritech:assembler"

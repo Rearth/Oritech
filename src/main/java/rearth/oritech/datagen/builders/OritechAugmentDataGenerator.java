@@ -74,12 +74,12 @@ public class OritechAugmentDataGenerator implements DataProvider {
         var ARCANE_AUGMENT_STATION_ID = BuiltInRegistries.BLOCK.getKey(BlockContent.ARCANE_AUGMENT_STATION.get());
 
         new AugmentRecipeBuilder(registries)
-                .researchCost(TagContent.PLATING_BLOCKS, 64)
-                .researchCost(TagContent.COAL_DUSTS, 32)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
+                .researchCost(TagContent.PLATING_BLOCKS, 16)
+                .researchCost(TagContent.COAL_DUSTS, 16)
+                .researchCost(ItemContent.BIOSTEEL_INGOT, 4)
                 .applyCost(TagContent.PLATING_BLOCKS, 8)
                 .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
-                .uiX(5).uiY(70).time(400).rfCost(10_000_000)
+                .uiX(5).uiY(70).time(400).rfCost(5_000_000)
                 .modifierDefinition(Attributes.MAX_HEALTH, 6, AttributeModifier.Operation.ADD_VALUE)
                 .export(exporter, "hpboost");
 
@@ -119,12 +119,12 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .export(exporter, "hpboostultimate");
 
         new AugmentRecipeBuilder(registries)
-                .researchCost(ItemContent.MOTOR, 16)
-                .researchCost(ItemContent.BIOSTEEL_INGOT, 32)
-                .researchCost(Items.REDSTONE, 64)
-                .applyCost(ItemContent.MOTOR, 4)
+                .researchCost(ItemContent.MOTOR, 4)
+                .researchCost(ItemContent.BIOSTEEL_INGOT, 8)
+                .researchCost(Items.REDSTONE, 32)
+                .applyCost(ItemContent.MOTOR, 1)
                 .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
-                .uiX(5).uiY(30).time(600).rfCost(30_000_000)
+                .uiX(5).uiY(30).time(600).rfCost(15_000_000)
                 .modifierDefinition(Attributes.MOVEMENT_SPEED, 0.25f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .export(exporter, "speedboost");
 
@@ -222,12 +222,12 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .export(exporter, "weaponreach");
 
         new AugmentRecipeBuilder(registries)
-                .researchCost(ItemContent.MOTOR, 64)
-                .researchCost(TagContent.STEEL_INGOTS, 48)
+                .researchCost(ItemContent.MOTOR, 8)
+                .researchCost(TagContent.STEEL_INGOTS, 24)
                 .researchCost(Items.ENDER_PEARL, 4)
-                .applyCost(ItemContent.MOTOR, 4)
+                .applyCost(ItemContent.MOTOR, 1)
                 .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
-                .uiX(115).uiY(90).time(900).rfCost(100_000_000)
+                .uiX(115).uiY(90).time(900).rfCost(50_000_000)
                 .modifierDefinition(Attributes.BLOCK_INTERACTION_RANGE, 0.3f, AttributeModifier.Operation.ADD_MULTIPLIED_BASE)
                 .export(exporter, "blockreach");
 
@@ -243,14 +243,14 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .export(exporter, "farblockreach");
 
         new AugmentRecipeBuilder(registries)
-                .researchCost(ItemContent.MAGNETIC_COIL, 48)
-                .researchCost(Items.QUARTZ, 64)
-                .researchCost(ItemContent.BASIC_BATTERY, 32)
+                .researchCost(ItemContent.MAGNETIC_COIL, 16)
+                .researchCost(Items.QUARTZ, 32)
+                .researchCost(ItemContent.BASIC_BATTERY, 8)
                 .applyCost(ItemContent.MAGNETIC_COIL, 4)
                 .requirement(Oritech.id("augment/attackdamage"))
                 .requirement(Oritech.id("augment/speedboost"))
                 .requiredStation(CYBERNETIC_RESEARCH_STATION_ID)
-                .uiX(30).uiY(10).time(1200).rfCost(50_000_000)
+                .uiX(30).uiY(10).time(1200).rfCost(25_000_000)
                 .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                 .export(exporter, "miningspeed");
 

@@ -431,19 +431,19 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addMachines(RecipeOutput exporter) {
-        // basic generator
-        offerGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen");
-        // pulverizer
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(cItemTag("storage_blocks/copper")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizer");
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizeralt");
-        // electric furnace
-        offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnace");
-        offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLATINUM_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnacealt");
-        // assembler
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(Blocks.BLAST_FURNACE.asItem()), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembler");
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembleralt");
-        // foundry
-        offerGeneratorRecipe(exporter, BlockContent.FOUNDRY.asItem(), of(Blocks.CAULDRON.asItem()), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "foundry");
+        // basic generator: coil above the furnace, nickel housing, copper contact below
+        offerEarlyGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen", " s ", "fbf", " c ");
+        // pulverizer: iron grinding head, central housing, motor underneath
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(cItemTag("storage_blocks/copper")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizer", "fcf", " b ", " s ");
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizeralt", "fcf", " b ", " s ");
+        // electric furnace: furnace and circuitry on copper feet, coil above
+        offerEarlyFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnace", " s ", "mbc", "f f");
+        offerEarlyFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLATINUM_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnacealt", " s ", "mbc", "f f");
+        // assembler: copper gantry above the crafting chamber, motor underneath
+        offerEarlyFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(Blocks.BLAST_FURNACE.asItem()), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembler", "f f", "mbc", " s ");
+        offerEarlyFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembleralt", "f f", "mbc", " s ");
+        // foundry: copper rim around the cauldron, mixer and electrical contact below
+        offerEarlyGeneratorRecipe(exporter, BlockContent.FOUNDRY.asItem(), of(Blocks.CAULDRON.asItem()), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "foundry", "fbf", " c ", " s ");
         // refinery
         offerParticleMotorRecipe(exporter, BlockContent.REFINERY.asItem(), of(BlockContent.REFINERY_CHAMBER_MODULE.asItem()), of(ItemContent.MOTOR), of(Items.CAULDRON), of(cItemTag("ingots/steel")), "refinery");
         // refinery module
@@ -456,8 +456,8 @@ public class RecipeGenerator extends RecipeProvider {
         offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE.asItem(), of(ItemContent.MOTOR), of(cItemTag("storage_blocks/iron")), of(cItemTag("ingots/copper")), of(ItemContent.MOTOR), of(Items.GLASS_BOTTLE), "centrifugealt");
         // laser arm
         offerAtomicForgeRecipe(exporter, BlockContent.ENDERIC_LASER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENDERIC_LENS), of(TagContent.CARBON_FIBRE), "laserarm");
-        // crusher
-        offerGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.FLUX_GATE), of(TagContent.PLASTIC_PLATES), "crusher");
+        // crusher: flux control above the motor and plastic-clad base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.FLUX_GATE), of(TagContent.PLASTIC_PLATES), "crusher", " c ", " s ", "fbf");
         // atomic forge
         offerAtomicForgeRecipe(exporter, BlockContent.ATOMIC_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.PLASTIC_PLATES), of(ItemContent.ENDERIC_COMPOUND), of(ItemContent.DURATIUM_INGOT), of(ItemContent.FLUX_GATE), "atomicforge");
 
@@ -476,8 +476,8 @@ public class RecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentcharger");
         offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentchargeralt");
 
-        // small storage
-        offerAtomicForgeRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage");
+        // small storage: nickel enclosure around the battery, silicon and coil alongside
+        offerEarlyFurnaceRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage", "f f", "mbs", " c ");
         // large storage
         offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOUS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
         // unstable container
@@ -485,16 +485,16 @@ public class RecipeGenerator extends RecipeProvider {
 
         // fluid tank
         offerTankRecipe(exporter, BlockContent.PORTABLE_TANK.asItem(), of(cItemTag("ingots/copper")), of(cItemTag("glass_blocks")), of(BlockContent.FLUID_PIPE.asItem()), "stank");
-        // pump
-        offerGeneratorRecipe(exporter, BlockContent.PUMP.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.SILICON), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "pump");
+        // pump: copper intake around the motor, controller and housing to the right
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PUMP.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.SILICON), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "pump", "f  ", "csb", "f  ");
         // block placer
         offerFurnaceRecipe(exporter, BlockContent.PLACER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.PROCESSING_UNIT), of(BlockContent.MACHINE_FRAME.asItem()), of(cItemTag("ingots/copper")), "placer");
         // block destroyer
         offerAtomicForgeRecipe(exporter, BlockContent.DESTROYER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(BlockContent.PULVERIZER), of(BlockContent.ENDERIC_LASER), of(ItemContent.MOTOR), "destroyer");
         // fertilizer
         offerFurnaceRecipe(exporter, BlockContent.FERTILIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.SILICON), of(ItemContent.PROCESSING_UNIT), of(cItemTag("ingots/copper")), "fertilizer");
-        // tree feller
-        offerGeneratorRecipe(exporter, BlockContent.TREE_CUTTER.asItem(), of(TagContent.PLATING_BLOCKS), of(Items.IRON_AXE), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), "tree_cutter");
+        // tree feller: axe above the motor, electrum supports around the base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.TREE_CUTTER.asItem(), of(TagContent.PLATING_BLOCKS), of(Items.IRON_AXE), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), "tree_cutter", " s ", " c ", "fbf");
         // pipe booster
         offerTankRecipe(exporter, BlockContent.PIPE_BOOSTER.asItem(), of(BlockContent.ITEM_PIPE), of(ItemContent.MOTOR), of(BlockContent.FLUID_PIPE), "booster");
 
@@ -621,10 +621,20 @@ public class RecipeGenerator extends RecipeProvider {
         offerCopperReinforcedPlatingRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), of(TagContent.PLATING_BLOCKS), of(BlockContent.MACHINE_CORE_2.asItem()), of(ItemContent.DURATIUM_INGOT), 1, "extender");
 
         // augmenter
-        // machine itself
-        offerAtomicForgeRecipe(exporter, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CHEST), of(TagContent.CARBON_FIBRE), of(ItemContent.DUBIOUS_CONTAINER), "augment/applicator");
-        // basic station
-        offerGeneratorRecipe(exporter, BlockContent.CYBERNETIC_RESEARCH_STATION.asItem(), of(Items.BREWING_STAND), of(TagContent.PLATING_BLOCKS), of(cItemTag("storage_blocks/redstone")), of(TagContent.ELECTRUM_INGOTS), "augment/basic");
+        // machine itself: motor above the chest, components alongside, plating feet
+        this.shaped(RecipeCategory.MISC, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), 1)
+                .define('b', of(TagContent.PLATING_BLOCKS))
+                .define('m', of(ItemContent.MOTOR))
+                .define('c', of(Items.CHEST))
+                .define('s', of(TagContent.CARBON_FIBRE))
+                .define('f', of(ItemContent.DUBIOUS_CONTAINER))
+                .pattern(" m ")
+                .pattern("scf")
+                .pattern("b b")
+                .unlockedBy(getHasName(BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem()), has(BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem()))
+                .save(exporter, recipeKey("crafting/augment/applicator"));
+        // basic station: brewing stand above the wired core, plating base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.CYBERNETIC_RESEARCH_STATION.asItem(), of(Items.BREWING_STAND), of(TagContent.PLATING_BLOCKS), of(cItemTag("storage_blocks/redstone")), of(TagContent.ELECTRUM_INGOTS), "augment/basic", " b ", "fcf", " s ");
         // adv station
         offerGeneratorRecipe(exporter, BlockContent.QUANTUM_RESEARCH_STATION.asItem(), of(BlockContent.CENTRIFUGE), of(TagContent.PLATING_BLOCKS), of(ItemContent.FLUX_GATE), of(ItemContent.DURATIUM_INGOT), "augment/advanced");
         // arcane station
@@ -1142,6 +1152,23 @@ public class RecipeGenerator extends RecipeProvider {
     public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, count).define('a', A).define('b', B).pattern("aa ").pattern("bb ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter);
+    }
+
+    // Starter recipes specify their own layout while keeping the reduced component costs.
+    private void offerEarlyGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix, String... pattern) {
+        var builder = this.shaped(RecipeCategory.MISC, output, 1).define('s', sides).define('c', core).define('f', frame).define('b', base);
+        for (var row : pattern) {
+            builder.pattern(row);
+        }
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
+    }
+
+    private void offerEarlyFurnaceRecipe(RecipeOutput exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix, String... pattern) {
+        var builder = this.shaped(RecipeCategory.MISC, output, 1).define('s', botSides).define('c', core).define('f', top).define('b', bottom).define('m', middleSides);
+        for (var row : pattern) {
+            builder.pattern(row);
+        }
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {
