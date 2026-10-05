@@ -191,7 +191,7 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
 
     private void buildEnergyPanel(int x, int y) {
         int panelWidth = 30;
-        int panelHeight = 140;
+        int panelHeight = 120;
 
         var panel = new SurfaceWidget(x, y, panelWidth, panelHeight);
         panel.withSurface(OritechSurface.PANEL);
