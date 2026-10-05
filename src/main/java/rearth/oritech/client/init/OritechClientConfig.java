@@ -1,10 +1,43 @@
 package rearth.oritech.client.init;
 
+import net.minecraft.util.RandomSource;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class OritechClientConfig {
+    public enum VisualEffects { FULL, REDUCED, NONE }
+
     // Client config
     private static final ModConfigSpec.Builder CLIENT = new ModConfigSpec.Builder();
+
+    public static final ModConfigSpec.EnumValue<VisualEffects> visualEffects = CLIENT
+            .comment("Oritech visual effects: FULL keeps all effects; REDUCED keeps about a quarter of particles,"
+                    + " removes beam outer layers and centrifuge splashes; NONE disables particles and beams.",
+                    "Client-only: also filters Oritech particles sent by the server.")
+            .defineEnum("visualEffects", VisualEffects.FULL);
+
+    public static boolean renderBeams() {
+        return visualEffects.get() != VisualEffects.NONE;
+    }
+
+    public static boolean renderFullEffects() {
+        return visualEffects.get() == VisualEffects.FULL;
+    }
+
+    public static int particleCount(int count, RandomSource random) {
+        return switch (visualEffects.get()) {
+            case FULL -> count;
+            case REDUCED -> count / 4 + (random.nextInt(4) < count % 4 ? 1 : 0);
+            case NONE -> 0;
+        };
+    }
+
+    public static boolean spawnParticle(RandomSource random) {
+        return switch (visualEffects.get()) {
+            case FULL -> true;
+            case REDUCED -> random.nextInt(4) == 0;
+            case NONE -> false;
+        };
+    }
 
     public static final ModConfigSpec.BooleanValue showMachinePreview = OritechClientConfig.CLIENT
             .comment("Render multiblock placement preview")

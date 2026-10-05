@@ -15,6 +15,8 @@ import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.ParticleAcceleratorBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
+import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +44,7 @@ public class ParticleAcceleratorRenderer implements BlockEntityRenderer<Particle
         var line = entity.displayTrail;
 
         // nothing to render this frame
-        if (line == null || line.size() < 2) {
+        if (!OritechClientConfig.renderBeams() || line == null || line.size() < 2) {
             state.particleLine = List.of();
             return;
         }
@@ -52,7 +54,7 @@ public class ParticleAcceleratorRenderer implements BlockEntityRenderer<Particle
         var head = line.getLast();
 
         if (level.getRandom().nextFloat() > 0.7f)
-            level.addParticle(ParticleTypes.REVERSE_PORTAL,
+            ParticleContent.addParticle(level, ParticleTypes.REVERSE_PORTAL,
                     head.x + (level.getRandom().nextDouble() - 0.5) * 0.4,
                     head.y + (level.getRandom().nextDouble() - 0.5) * 0.6,
                     head.z + (level.getRandom().nextDouble() - 0.5) * 0.4,
@@ -65,7 +67,7 @@ public class ParticleAcceleratorRenderer implements BlockEntityRenderer<Particle
     public void submit(ParticleRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState cameraRenderState) {
 
         var line = state.particleLine;
-        if (line == null || line.size() < 2) return;
+        if (!OritechClientConfig.renderBeams() || line == null || line.size() < 2) return;
 
         // convert world to local space
         var origin = Vec3.atLowerCornerOf(state.blockPos);
@@ -88,7 +90,7 @@ public class ParticleAcceleratorRenderer implements BlockEntityRenderer<Particle
                 );
 
                 // outer glow
-                BeamRenderer.renderStraightBeam(
+                BeamRenderer.renderOuterBeam(
                         pose, consumer, startLocal, delta,
                         baseThickness,
                         RenderHelpers.FULL_BRIGHT,

@@ -1125,6 +1125,8 @@
   "oritech.configuration.minRange": "Minimum Range",
   "oritech.configuration.blockBreakSpeed": "Block Break Speed",
   "oritech.configuration.equipmentCharger": "Equipment Charger",
+  "oritech.configuration.visualEffects": "Eye candy",
+  "oritech.configuration.visualEffects.tooltip": "Full: all effects. Reduced: fewer particles, core-only beams, no centrifuge splashes. None: no Oritech particles or beams.",
   "oritech.configuration.showMachinePreview": "Render Multiblock Placement Preview",
   "oritech.configuration.chainSaw": "Chain Saw",
   "oritech.configuration.catalystCostMultiplier": "Catalyst Soul Cost Multiplier",

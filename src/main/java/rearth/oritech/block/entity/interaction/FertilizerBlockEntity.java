@@ -33,6 +33,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 import java.util.Objects;
@@ -152,7 +153,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             }
             super.finishBlockWork(processed);
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.HAPPY_VILLAGER, targetPosition.getX() + 0.5, targetPosition.getY() + 0.5, targetPosition.getZ() + 0.5, fertilizerStrength * 3 + 2, 0.5, 0.5, 0.5, 0);
             level.playSound(null, targetPosition, SoundEvents.BONE_MEAL_USE, SoundSource.BLOCKS, 1f, 1f);
         }
     }
@@ -179,7 +180,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
             }
             if (level instanceof ServerLevel sl) {
                 var bp = getCurrentTarget().below();
-                sl.sendParticles(ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.FALLING_WATER, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 2, 0.6, 0.6, 0.6, 0);
             }
         }
     }

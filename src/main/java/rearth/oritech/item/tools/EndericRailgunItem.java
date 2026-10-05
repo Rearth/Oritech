@@ -174,7 +174,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
         var startPos = player.getEyePosition().add(endPos.subtract(player.getEyePosition()).scale(0.4f)).add(0, -0.5f, 0).add(rightDir.scale(0.3f));
         ParticleContent.LaserBoom(level, startPos, endPos);
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.LAVA, endPos.x, endPos.y, endPos.z, 6, 1, 1, 1, 0);
 
         return InteractionResult.CONSUME;
     }
@@ -219,7 +219,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
         if (finalHit != null && finalHit.getType() != HitResult.Type.MISS && laserItem.isMiningEnabled(stack)) {
             if (level instanceof ServerLevel sl) {
                 var loc = finalHit.getLocation();
-                sl.sendParticles(ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SMALL_FLAME, loc.x, loc.y, loc.z, 1, 0.4, 0.3, 0.4, 0);
             }
         }
 
@@ -333,7 +333,7 @@ public class EndericRailgunItem extends Item implements OritechEnergyItem, GeoIt
             var farmedCount = 1;
             dropped = List.of(new ItemStack(recipe.itemResults().get(0).item(), farmedCount));
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
 
         // add stack to player inv, or spawn at block pos

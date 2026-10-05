@@ -25,6 +25,7 @@ import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -186,7 +187,7 @@ public abstract class UpgradableMachineBlockEntity extends MachineBlockEntity im
         }
 
         var smokePos = worldPosition.getCenter().add(0, 0.35, 0);
-        serverLevel.sendParticles(ParticleTypes.SMOKE, smokePos.x, smokePos.y, smokePos.z, 5, 0.15, 0.1, 0.15, 0.01);
+        ParticleContent.sendParticles(serverLevel, ParticleTypes.SMOKE, smokePos.x, smokePos.y, smokePos.z, 5, 0.15, 0.1, 0.15, 0.01);
     }
 
     public float getBurstBonus() {

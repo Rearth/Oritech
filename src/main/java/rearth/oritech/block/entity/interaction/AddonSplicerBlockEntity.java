@@ -56,6 +56,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.*;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,7 +138,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
 
             if (level instanceof ServerLevel serverLevel) {
                 var spawnAt = addonPos.getCenter();
-                serverLevel.sendParticles(ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
+                ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
                 serverLevel.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
             }
         }

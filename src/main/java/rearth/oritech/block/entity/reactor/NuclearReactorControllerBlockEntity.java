@@ -44,6 +44,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 
@@ -353,7 +354,7 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
     private void playMeltdownAnimation(BlockPos port) {
         if (level instanceof ServerLevel sl) {
             var c = port.getCenter().add(0, 0.3, 0);
-            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0);
         }
     }
 

@@ -33,6 +33,7 @@ import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.HashSet;
 import java.util.List;
@@ -212,7 +213,7 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
 
     private float getSteamEnergyEfficiency(float x) {

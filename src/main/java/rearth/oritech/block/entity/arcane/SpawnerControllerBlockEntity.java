@@ -115,7 +115,7 @@ public class SpawnerControllerBlockEntity extends BaseSoulCollectionEntity imple
 
             if (level instanceof ServerLevel sl) {
                 var c = targetPosition.getCenter();
-                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, maxSouls, 1.2, 1.2, 1.2, 0);
             }
 
             return entity;

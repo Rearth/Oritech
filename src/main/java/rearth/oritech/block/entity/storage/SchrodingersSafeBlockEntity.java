@@ -51,6 +51,7 @@ import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.*;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,7 +137,7 @@ public class SchrodingersSafeBlockEntity extends NetworkedBlockEntity implements
             // growing, spawn particles
             if (level instanceof ServerLevel sl) {
                 var c = worldPosition.getCenter();
-                sl.sendParticles(ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, c.x, c.y, c.z, 2, 2, 2, 2, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.TRIAL_SPAWNER_DETECTED_PLAYER, c.x, c.y, c.z, 2, 2, 2, 2, 0);
             }
         }
 

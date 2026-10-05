@@ -117,6 +117,7 @@ public class NetworkManager {
     public static void initClientBound(PayloadRegistrar registrar) {
         registrar.playToClient(NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_ID, NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_CODEC, NuclearReactorControllerBlockEntity::handleGuiUpdate);
         registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+        registrar.playToClient(ParticleContent.ParticleBatchPayload.PACKET_ID, ParticleContent.ParticleBatchPayload.PACKET_CODEC, ParticleContent::handleParticleBatch);
         registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
         registrar.playToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registrar.playToClient(ArcaneCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(ArcaneCatalystBlockEntity.CatalystSyncPacket.class), ArcaneCatalystBlockEntity::receiveUpdatePacket);

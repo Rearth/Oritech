@@ -410,7 +410,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
 
         if (level instanceof ServerLevel sl) {
-            sl.sendParticles(ParticleTypes.SOUL, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.5, 0.5, 0.5, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SOUL, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.5, 0.5, 0.5, 0);
         }
 
         var spawnFromCandidates = new ArrayList<>(sculkFactor.sources);

@@ -13,6 +13,7 @@ import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.AttachmentContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.ServerZiplineHandler;
+import rearth.oritech.client.init.ParticleContent;
 
 public class ClientZiplineHandler {
 
@@ -260,7 +261,7 @@ public class ClientZiplineHandler {
             var gustPos = player.getPosition(0);
             var random = player.level().getRandom();
             var gustVel = player.getDeltaMovement();
-            player.level().addParticle(
+            ParticleContent.addParticle(player.level(),
                     ParticleTypes.GUST,
                     gustPos.x, gustPos.y + 0.3, gustPos.z,
                     gustVel.x + random.nextFloat() * 0.3, gustVel.y + random.nextFloat() * 0.3, gustVel.z + random.nextFloat() * 0.3

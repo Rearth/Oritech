@@ -20,6 +20,7 @@ import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.client.init.ParticleContent;
 
 import static rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity.getOutputPosition;
 
@@ -87,7 +88,7 @@ public class TachyonAbsorberBlockEntity extends BlockEntity implements BlockEnti
         if (level instanceof ServerLevel serverLevel) {
             var forward = getBlockState().getValue(DirectionalBlock.FACING).getUnitVec3i();
             var at = worldPosition.getCenter().add(Vec3.atCenterOf(forward));
-            serverLevel.sendParticles(ParticleTypes.SWEEP_ATTACK, at.x, at.y, at.z, 2, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
+            ParticleContent.sendParticles(serverLevel, ParticleTypes.SWEEP_ATTACK, at.x, at.y, at.z, 2, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
         }
     }
 }

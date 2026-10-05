@@ -175,7 +175,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         createCollisionParticles((int) relativeSpeed, collision, (int) particleCount);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.GUST, collision.x, collision.y, collision.z, 1, 0, 0, 0, 0);
         this.setChanged();
     }
 
@@ -349,7 +349,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         var position = mob.getBoundingBox().getCenter();
         position = new Vec3(position.x, particle.position.y, position.z);
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SONIC_BOOM, position.x, position.y, position.z, 1, 0.3, 0.3, 0.3, 0);
 
         return inflictedDamage;
     }
@@ -379,7 +379,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
     private void createBlackHole(BlockPos checkPos) {
         if (level instanceof ServerLevel sl) {
             var c = checkPos.getCenter();
-            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.LAVA, c.x, c.y, c.z, 30, 1, 1, 1, 0);
         }
 
         var center = checkPos.getCenter();

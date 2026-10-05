@@ -1,10 +1,9 @@
 package rearth.oritech.client.init;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -14,8 +13,6 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkManager;
-
-import java.util.concurrent.CompletableFuture;
 
 public class ParticleContent {
 
@@ -72,110 +69,48 @@ public class ParticleContent {
         }
     }
 
+    /** Keep vanilla particle encoding and spawn semantics, but identify these as Oritech effects. */
+    public static void sendParticles(ServerLevel level, ParticleOptions particle, double x, double y, double z,
+                                     int count, double xDist, double yDist, double zDist, double speed) {
+        var payload = new ParticleBatchPayload(new ClientboundLevelParticlesPacket(particle, false, false,
+                x, y, z, (float) xDist, (float) yDist, (float) zDist, (float) speed, count));
+        var position = new Vec3(x, y, z);
+        for (var player : level.players()) {
+            // Match ServerLevel.sendParticles' normal delivery radius.
+            if (player.blockPosition().closerToCenterThan(position, 32)) {
+                PacketDistributor.sendToPlayer(player, payload);
+            }
+        }
+    }
+
+    public record ParticleBatchPayload(ClientboundLevelParticlesPacket particles) implements CustomPacketPayload {
+        public static final Type<ParticleBatchPayload> PACKET_ID = new Type<>(Oritech.id("particle_batch"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, ParticleBatchPayload> PACKET_CODEC =
+                ClientboundLevelParticlesPacket.STREAM_CODEC.map(ParticleBatchPayload::new, ParticleBatchPayload::particles);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
+    }
+
+    public static void addParticle(Level level, ParticleOptions particle, double x, double y, double z,
+                                   double xSpeed, double ySpeed, double zSpeed) {
+        if (level.isClientSide()) ClientParticleEffects.addParticle(level, particle, x, y, z, xSpeed, ySpeed, zSpeed);
+    }
+
+    public static void handleParticleBatch(ParticleBatchPayload payload, IPayloadContext context) {
+        ClientParticleEffects.handleParticleBatch(payload, context);
+    }
+
+    public static void handleOnClient(Payload payload, Level level, RegistryAccess access) {
+        if (level.isClientSide()) ClientParticleEffects.handleOnClient(payload, level, access);
+    }
+
     // client handler
 
     public static void handleOnClient(Payload payload, IPayloadContext context) {
         context.enqueueWork(() -> handleOnClient(payload, context.player().level(), context.player().registryAccess()));
-    }
-
-    public static void handleOnClient(Payload payload, Level level, RegistryAccess access) {
-        var type = EffectType.values()[payload.effectId];
-        switch (type) {
-            case HIGHLIGHT_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos, 1, 120, 6);
-            case DEBUG_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos, 1, 120, 2);
-            case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos, 1, 5, 3);
-            case WEED_KILLER -> {
-                var dist = (int) payload.data2.distanceTo(payload.data1);
-                spawnLine(ParticleTypes.LANDING_HONEY, level, payload.data1, payload.data2, dist * 4 + level.getRandom().nextInt(3), 0.2f);
-            }
-            case WANDERING_SOUL -> {
-                var velocity = payload.data1.scale((1f / payload.extraInt) * 1.5f);
-                spawnWithVelocityAndMaxAge(ParticleTypes.SCULK_SOUL, payload.pos, velocity, payload.extraInt);
-            }
-            case LASER_BOOM -> {
-                var count = Math.min((int) (payload.pos.distanceTo(payload.data1) * 0.6f + 1), 12);
-                spawnLineStaggered(ParticleTypes.SONIC_BOOM, level, payload.pos, payload.data1, count, 20);
-            }
-            case CATALYST_CONNECTION ->
-                    spawnEnchantParticles(level, payload.data2, payload.data1.add(0, 0.3f, 0), 0.3f);
-            case BLACK_HOLE_EMISSION -> {
-                var dist = (int) payload.data1.distanceTo(payload.pos);
-                spawnLine(ParticleTypes.SCULK_CHARGE_POP, level, payload.pos, payload.data1, dist + level.getRandom().nextInt(3), 0.2f);
-            }
-        }
-    }
-
-    // client utilities
-
-    private static void spawnCubeOutline(ParticleOptions particle, Vec3 origin, float size, int duration, int segments) {
-        spawnLineWithAge(particle, origin, origin.add(size, 0, 0), segments, duration);
-        spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
-        spawnLineWithAge(particle, origin, origin.add(0, 0, size), segments, duration);
-        spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(size, 0, size), segments, duration);
-
-        origin = origin.add(0, size, 0);
-
-        spawnLineWithAge(particle, origin, origin.add(size, 0, 0), segments, duration);
-        spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, 0, size), segments, duration);
-        spawnLineWithAge(particle, origin, origin.add(0, 0, size), segments, duration);
-        spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(size, 0, size), segments, duration);
-
-        spawnLineWithAge(particle, origin, origin.add(0, -size, 0), segments, duration);
-        spawnLineWithAge(particle, origin.add(size, 0, 0), origin.add(size, -size, 0), segments, duration);
-        spawnLineWithAge(particle, origin.add(0, 0, size), origin.add(0, -size, size), segments, duration);
-        spawnLineWithAge(particle, origin.add(size, 0, size), origin.add(size, -size, size), segments, duration);
-    }
-
-    private static void spawnLineWithAge(ParticleOptions particle, Vec3 start, Vec3 end, float count, int maxAge) {
-        var mc = Minecraft.getInstance();
-        Vec3 step = end.subtract(start).scale(1f / count);
-        for (int i = 0; i < count; i++) {
-            var p = mc.particleEngine.createParticle(particle, start.x, start.y, start.z, 0, 0, 0);
-            if (p != null) p.setLifetime(maxAge);
-            start = start.add(step);
-        }
-    }
-
-    private static void spawnWithVelocityAndMaxAge(ParticleOptions particle, Vec3 pos, Vec3 velocity, int maxAge) {
-        var p = Minecraft.getInstance().particleEngine.createParticle(particle, pos.x, pos.y, pos.z, velocity.x, velocity.y, velocity.z);
-        if (p != null) p.setLifetime(maxAge);
-    }
-
-    private static void spawnLine(ParticleOptions particle, Level level, Vec3 start, Vec3 end, int count, float spread) {
-        Vec3 diff = end.subtract(start);
-        for (int i = 0; i < count; i++) {
-            double t = count > 1 ? (double) i / (count - 1) : 0;
-            Vec3 pos = start.add(diff.scale(t));
-            level.addParticle(particle,
-                    pos.x + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
-                    pos.y + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
-                    pos.z + (level.getRandom().nextDouble() - 0.5) * 2 * spread,
-                    0, 0, 0);
-        }
-    }
-
-    private static void spawnEnchantParticles(Level level, Vec3 source, Vec3 dest, float spread) {
-        Vec3 diff = dest.subtract(source);
-        level.addParticle(ParticleTypes.ENCHANT,
-                source.x + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
-                source.y + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
-                source.z + (level.getRandom().nextDouble() - 0.3) * 2 * spread,
-                diff.x, diff.y, diff.z);
-    }
-
-    private static void spawnLineStaggered(ParticleOptions particle, Level level, Vec3 start, Vec3 end, float count, long pauseMillis) {
-        var step = end.subtract(start).scale(1f / count);
-        CompletableFuture.runAsync(() -> {
-            for (int i = 0; i < count; i++) {
-                var pos = start.add(step.scale(i));
-                level.addParticle(particle, pos.x(), pos.y(), pos.z(), 0, 0, 0);
-                try {
-                    Thread.sleep(pauseMillis);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        });
     }
 
     // Network payload

@@ -21,6 +21,7 @@ import rearth.oritech.block.entity.processing.CentrifugeBlockEntity;
 import rearth.oritech.client.renderers.blocks.PortableTankRenderer.FluidCube;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.ColorHelper;
+import rearth.oritech.client.init.OritechClientConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,7 @@ public class CentrifugeRenderer<R extends BlockEntityRenderState & GeoRenderStat
 
         @Override
         public void preRender(RenderPassInfo<R> renderPassInfo, SubmitNodeCollector renderTasks) {
+            if (!OritechClientConfig.renderFullEffects()) return;
             var data = renderPassInfo.getGeckolibData(FLUID_DATA);
             var level = Minecraft.getInstance().level;
             if (data == null || data.cubes().isEmpty() || !data.active() || level == null) return;
@@ -110,6 +112,7 @@ public class CentrifugeRenderer<R extends BlockEntityRenderState & GeoRenderStat
         }
 
         private static void spawnDroplet(ClientLevel level, Vec3 position, Vec3 machineCenter, FluidCube cube) {
+            if (!OritechClientConfig.renderFullEffects()) return;
             var random = level.getRandom();
             var radial = position.subtract(machineCenter).multiply(1, 0, 1).normalize();
             var tangent = new Vec3(-radial.z, 0, radial.x);

@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.client.fluid.CustomFluidRenderer;
 import net.neoforged.neoforge.client.model.pipeline.VertexConsumerWrapper;
+import rearth.oritech.client.init.OritechClientConfig;
 
 /** Glowing interference bands on the actual fluid surface, including slopes and waterfalls. */
 public final class StrangeMatterFluidRenderer implements CustomFluidRenderer {
@@ -21,6 +22,7 @@ public final class StrangeMatterFluidRenderer implements CustomFluidRenderer {
     @Override
     public boolean renderFluid(FluidRenderer fluidRenderer, FluidState fluidState, BlockAndTintGetter level,
                                BlockPos pos, FluidRenderer.Output output, BlockState blockState) {
+        if (!OritechClientConfig.renderFullEffects()) return false;
         var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluidState);
         var sprite = model.stillMaterial().sprite();
         // Tint and mirror the existing animated texture on one mesh. Extra horizontal quads cannot
