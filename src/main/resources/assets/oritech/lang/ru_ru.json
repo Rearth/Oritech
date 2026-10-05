@@ -1087,7 +1087,6 @@
   "oritech.configuration.poleConfig": "ЛЭП",
   "oritech.configuration.fertilizerConfig": "Настройки удобрителя",
   "oritech.configuration.exoChestplate": "Экзо-нагрудник",
-  "oritech.configuration.fluidPipeInternalStorageBuckets": "Внутреннее хранилище жидкостной трубы (в вёдрах)",
   "oritech.configuration.pullTimeMultiplier": "Множитель времени притяжения чёрной дыры",
   "oritech.configuration.steamBoilerCapacityBuckets": "Ёмкость парового бойлера (в вёдрах)",
   "oritech.configuration.maxRange": "Максимальная дистанция",
