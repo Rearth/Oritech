@@ -1,0 +1,21 @@
+---
+id: oritech:item_filter_block
+type: block
+title: 아이템 필터
+---
+
+아이템 필터로 어떤 아이템이 어디로 가는지 제어할 수 있습니다. 대상 인벤토리 옆에 설치하는 블록입니다.
+입력 면이 다섯 개이고, 출력은 항상 바라보는 면으로 나갑니다.
+
+UI에서 설정한 필터와 일치하는 아이템만 받아서 대상 인벤토리로 자동으로 내보냅니다.
+인접한 인벤토리에서 아이템을 자동으로 꺼내지는 않습니다. 내부 인벤토리는 1칸입니다.
+
+<center>
+<ModAsset location="oritech:area/item_filters" width={512} />
+</center>
+
+설치할 때는 서로 다른 한 출력 면이 필터링된 아이템을 보낼 방향을 향하게 하세요.
+
+<Callout variant="info">
+"FTB Filters" 모드가 설치되어 있다면, 그 모드의 스마트 필터를 아이템 필터 블록 안에서 사용할 수 있습니다.
+</Callout>

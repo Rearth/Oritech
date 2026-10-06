@@ -1,0 +1,8 @@
+{
+  "basic_generator_block.mdx": "기본 발전기",
+  "big_solar_panel_block.mdx": "태양광 패널",
+  "bio_generator_block.mdx": "바이오 발전기",
+  "fuel_generator_block.mdx": "연료 발전기",
+  "lava_generator_block.mdx": "용암 발전기",
+  "steam_engine_block.mdx": "증기 엔진"
+}

@@ -1,0 +1,21 @@
+{
+  "capacitor_addon_extender.mdx": "보조 배터리 애드온 확장기",
+  "machine_extender.mdx": "기계 애드온 확장기",
+  "machine_capacitor_addon.mdx": "축전기 애드온",
+  "machine_acceptor_addon.mdx": "수용기 애드온",
+  "machine_speed_addon.mdx": "속도 애드온",
+  "machine_efficiency_addon.mdx": "효율 애드온",
+  "machine_ultimate_addon.mdx": "시너지 매트릭스 애드온",
+  "machine_burst_addon.mdx": "버스트 애드온",
+  "machine_processing_addon.mdx": "보조 처리 챔버 애드온",
+  "machine_fluid_addon.mdx": "유체 애드온",
+  "machine_inventory_proxy_addon.mdx": "인벤토리 프록시 애드온",
+  "machine_redstone_addon.mdx": "제어 유닛 애드온",
+  "steam_boiler_addon.mdx": "증기 보일러 애드온",
+  "machine_hunter_addon.mdx": "헌터 애드온",
+  "quarry_addon.mdx": "채석장 애드온",
+  "crop_filter_addon.mdx": "작물 필터 애드온",
+  "machine_yield_addon.mdx": "수확량 애드온",
+  "machine_silk_touch_addon.mdx": "섬세한 손길 애드온",
+  "machine_combi_addon.mdx": "기계의 심장"
+}
