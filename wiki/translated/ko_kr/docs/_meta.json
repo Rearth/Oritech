@@ -1,0 +1,13 @@
+{
+  "getting_started": {
+    "name": "📕 시작하기",
+    "icon": null
+  },
+  "multiblocks.mdx": "멀티블록",
+  "addons.mdx": "애드온",
+  "particle_accelerator.mdx": "입자 가속기",
+  "reactor": {
+    "name": "☢ 원자로",
+    "icon": null
+  }
+}
