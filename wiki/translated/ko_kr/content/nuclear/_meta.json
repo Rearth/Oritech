@@ -1,0 +1,18 @@
+{
+  "nuke.mdx": "맨해튼 모듈",
+  "low_yield_nuke.mdx": "저출력 핵폭발 장치",
+  "uranium_pellet.mdx": "우라늄 가공",
+  "reactor_controller.mdx": "원자로 컨트롤러",
+  "reactor_wall.mdx": "원자로 벽",
+  "reactor_absorber_port.mdx": "원자로 냉각수 흡열기 포트",
+  "reactor_condenser.mdx": "원자로 흡열기",
+  "reactor_heat_pipe.mdx": "원자로 열 파이프",
+  "reactor_vent.mdx": "원자로 방열구",
+  "reactor_reflector.mdx": "중성자 반사체",
+  "reactor_rod.mdx": "원자로 연료봉",
+  "reactor_double_rod.mdx": "원자로 이중 연료봉",
+  "reactor_quad_rod.mdx": "원자로 사중 연료봉",
+  "reactor_fuel_port.mdx": "원자로 연료 포트",
+  "reactor_energy_port.mdx": "원자로 에너지 포트",
+  "reactor_redstone_port.mdx": "원자로 레드스톤 포트"
+}

@@ -1,0 +1,39 @@
+---
+title: 파괴 블록
+id: oritech:destroyer_block
+type: block
+custom:
+    RF 용량: "100,000"
+    최대 RF 입력: "5,000"
+    이동 비용: "8 RF"
+    작업 비용: "기본 128 RF"
+    필요 코어: "2"
+    애드온 슬롯: "4"
+---
+
+블록 파괴기는 아래 영역의 블록을 부수는 갠트리 부품입니다. [기계 프레임](@oritech:machine_frame_block) 위에서 작동하는 멀티블록이며, 프레임 바로 아래 층의 블록을 대상으로 합니다.
+
+블록을 부수는 데 걸리는 시간과 에너지는 블록의 경도에 따라 달라집니다.
+
+### 농사
+
+농사에 쓰려면 [작물 필터 애드온](@oritech:crop_filter_addon)을 설치하세요. 그러면 블록 파괴기가 다 자라지 않은 작물을 모두 건너뛰므로 자동 수확이 가능합니다.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_farming" width={1000} />
+</center>
+
+### 채석장
+
+[채석장 애드온](@oritech:quarry_addon)을 추가하면 블록 파괴기를 채석장으로도 쓸 수 있습니다.
+채석장 애드온 하나마다 아래쪽 범위가 8배가 됩니다:
+
+*   **애드온 1개**: 범위 8블록
+*   **애드온 2개**: 범위 64블록
+*   **애드온 3개**: 범위 512블록
+
+채석장으로 쓸 때 기본 속도는 꽤 느리므로 [속도](@oritech:machine_speed_addon) 애드온과 [효율](@oritech:machine_efficiency_addon) 애드온을 몇 개 추가하는 것을 권장합니다.
+
+<center>
+<ModAsset location="oritech:area/block_destroyer_quarry" width={1000} />
+</center>

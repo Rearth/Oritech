@@ -1,0 +1,14 @@
+{
+  "creative_storage_block.mdx": "크리에이티브 에너지 저장소",
+  "creative_tank_block.mdx": "크리에이티브 유체 탱크",
+  "energy_pipe.mdx": "에너지 파이프",
+  "fluid_pipe.mdx": "유체 파이프",
+  "item_pipe.mdx": "아이템 파이프",
+  "item_filter_block.mdx": "아이템 필터",
+  "large_storage_block.mdx": "대형 에너지 저장소",
+  "power_pole_block.mdx": "전봇대",
+  "small_storage_block.mdx": "휴대용 에너지 저장소",
+  "small_tank_block.mdx": "휴대용 유체 탱크",
+  "superconductor.mdx": "초전도체",
+  "unstable_container.mdx": "슈뢰딩거의 금고"
+}
