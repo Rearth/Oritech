@@ -45,8 +45,8 @@ public class OritechConfig {
         COMMON.push("storageBlocks");
     }
 
-    public static final BasicMachineConfig smallEnergyStorage = new BasicMachineConfig(COMMON, "smallEnergyStorage", 1_000_000, 5_000, 5_000, 0);
-    public static final BasicMachineConfig largeEnergyStorage = new BasicMachineConfig(COMMON, "largeEnergyStorage", 20_000_000, 10_000, 10_000, 0);
+    public static final BasicMachineConfig smallEnergyStorage = new BasicMachineConfig(COMMON, "smallEnergyStorage", 1_000_000, 10_000, 10_000, 0);
+    public static final BasicMachineConfig largeEnergyStorage = new BasicMachineConfig(COMMON, "largeEnergyStorage", 20_000_000, 25_000, 25_000, 0);
 
     public static final ModConfigSpec.IntValue portableTankCapacityBuckets = COMMON
             .comment("Portable tank fluid capacity in buckets")
@@ -85,13 +85,19 @@ public class OritechConfig {
             .worldRestart()
             .defineInRange("fluidPipeExtractIntervalDuration", 3, 1, Integer.MAX_VALUE);
 
-    public static final ModConfigSpec.DoubleValue fluidPipeInternalStorageBuckets = COMMON
-            .comment("Fluid pipe internal buffer size in buckets")
-            .defineInRange("fluidPipeInternalStorageBuckets", 2.0, 0.0, 1000.0);
+    public static final ModConfigSpec.IntValue pipeIdleThresholdTicks = COMMON
+            .comment("Ticks without a successful item, fluid or energy pipe transfer before retry intervals start doubling")
+            .worldRestart()
+            .defineInRange("pipeIdleThresholdTicks", 100, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue pipeMaxIdleIntervalTicks = COMMON
+            .comment("Maximum ticks between idle pipe retries; never shorter than the normal transfer interval. Also applies to boosted pipes.")
+            .worldRestart()
+            .defineInRange("pipeMaxIdleIntervalTicks", 40, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.LongValue energyPipeTransferRate = COMMON
             .comment("Energy pipe transfer rate in RF/t")
-            .defineInRange("energyPipeTransferRate", 10_000L, 0L, Long.MAX_VALUE);
+            .defineInRange("energyPipeTransferRate", 25_000L, 0L, Long.MAX_VALUE);
 
     public static final ModConfigSpec.LongValue superConductorTransferRate = COMMON
             .comment("Superconductor cable transfer rate in RF/t")
@@ -147,7 +153,7 @@ public class OritechConfig {
     public static final ModConfigSpec.IntValue maxSize = COMMON
             .comment("Maximum reactor multiblock size")
             .worldRestart()
-            .defineInRange("maxSize", 64, 1, Integer.MAX_VALUE);
+            .defineInRange("maxSize", 66, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue reactorMaxEnergyStored = COMMON
             .comment("Maximum energy stored in the reactor in RF")
@@ -162,7 +168,7 @@ public class OritechConfig {
     public static final ModConfigSpec.IntValue rfPerPulse = COMMON
             .comment("RF generated per reactor pulse")
             .worldRestart()
-            .defineInRange("rfPerPulse", 64, 0, Integer.MAX_VALUE);
+            .defineInRange("rfPerPulse", 128, 0, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue absorberRate = COMMON
             .comment("Neutron absorber heat reduction rate")
@@ -410,12 +416,12 @@ public class OritechConfig {
             b.push("generators");
             animationSpeedMultiplier = b.comment("Generator animation speed multiplier").defineInRange("animationSpeedMultiplier", 10.0, 0.0, 1000.0);
             steamId = b.comment("Fluid ID for steam produced by the steam boiler. Only this is accepted by steam engines.").define("steamId", "oritech:still_steam");
-            basicGeneratorData = new BasicMachineConfig(b, "basicGeneratorData", 50_000, 0, 32 * 8, 32);
-            bioGeneratorData = new BasicMachineConfig(b, "bioGeneratorData", 100_000, 0, 64 * 8, 64);
-            lavaGeneratorData = new BasicMachineConfig(b, "lavaGeneratorData", 100_000, 0, 64 * 8, 64);
-            fuelGeneratorData = new BasicMachineConfig(b, "fuelGeneratorData", 250_000, 0, 256 * 8, 256);
+            basicGeneratorData = new BasicMachineConfig(b, "basicGeneratorData", 100_000, 0, 64 * 8, 64);
+            bioGeneratorData = new BasicMachineConfig(b, "bioGeneratorData", 250_000, 0, 128 * 8, 128);
+            lavaGeneratorData = new BasicMachineConfig(b, "lavaGeneratorData", 250_000, 0, 128 * 8, 128);
+            fuelGeneratorData = new BasicMachineConfig(b, "fuelGeneratorData", 1_000_000, 0, 512 * 8, 512);
             steamEngineData = new SteamEngineConfig(b);
-            solarGeneratorData = new BasicMachineConfig(b, "solarGeneratorData", 100_000, 0, 32 * 8, 32);
+            solarGeneratorData = new BasicMachineConfig(b, "solarGeneratorData", 250_000, 0, 64 * 8, 64);
             b.pop();
         }
     }
@@ -475,7 +481,7 @@ public class OritechConfig {
 
         EnergyTransmissionPoleConfig(ModConfigSpec.Builder b) {
             b.push("poleConfig");
-            energyCapacity = b.comment("Energy transmission rate and capacity in RF/t").defineInRange("energyCapacity", 1_000_000L, 0L, Long.MAX_VALUE);
+            energyCapacity = b.comment("Energy transmission rate and capacity in RF/t").defineInRange("energyCapacity", 5_000_000L, 0L, Long.MAX_VALUE);
             minRange = b.comment("Minimum separation distance between poles").defineInRange("minRange", 50, 0, Integer.MAX_VALUE);
             maxRange = b.comment("Maximum separation distance between poles").defineInRange("maxRange", 1000, 0, Integer.MAX_VALUE);
             b.pop();
@@ -555,7 +561,7 @@ public class OritechConfig {
 
         SteamEngineConfig(ModConfigSpec.Builder b) {
             b.push("steamEngineData");
-            energyCapacity = b.defineInRange("energyCapacity", 100_000L, 0L, Long.MAX_VALUE);
+            energyCapacity = b.defineInRange("energyCapacity", 250_000L, 0L, Long.MAX_VALUE);
             maxEnergyExtraction = b.defineInRange("maxEnergyExtraction", 50_000L, 0L, Long.MAX_VALUE);
             rfToSteamRatio = b.comment("Applies to generators with the steam addon. Droplets of steam produced per the usual RF.").defineInRange("rfToSteamRatio", 2.0, 0.0, 1000.0);
             steamToRfRatio = b.comment("Energy per steam unit in the steam engine").defineInRange("steamToRfRatio", 1, 0, Integer.MAX_VALUE);

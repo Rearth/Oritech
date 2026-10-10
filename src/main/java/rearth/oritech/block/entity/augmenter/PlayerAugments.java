@@ -82,15 +82,6 @@ public class PlayerAugments {
         }
     }
 
-    public static void receivePlayerLoadMachine(LoadPlayerAugmentsToMachinePacket packet, IPayloadContext context) {
-        var player = context.player();
-        var entity = player.level().getBlockEntity(packet.position);
-
-        if (entity instanceof CyberneticAugmentationCenterEntity modifierEntity) {
-            modifierEntity.loadResearchesFromPlayer(player);
-        }
-    }
-
     public static void receiveOpenAugmentScreen(OpenAugmentScreenPacket packet, IPayloadContext context) {
         var player = context.player();
         var entity = player.level().getBlockEntity(packet.position);
@@ -113,16 +104,6 @@ public class PlayerAugments {
                                               int operationId) implements CustomPacketPayload {
 
         public static final Type<AugmentInstallTriggerPacket> PACKET_ID = new Type<>(Oritech.id("aug_install"));
-
-        @Override
-        public Type<? extends CustomPacketPayload> type() {
-            return PACKET_ID;
-        }
-    }
-
-    public record LoadPlayerAugmentsToMachinePacket(BlockPos position) implements CustomPacketPayload {
-
-        public static final Type<LoadPlayerAugmentsToMachinePacket> PACKET_ID = new Type<>(Oritech.id("aug_loadtomachine"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

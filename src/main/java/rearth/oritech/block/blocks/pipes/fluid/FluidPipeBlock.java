@@ -7,7 +7,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -18,7 +17,6 @@ import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.block.entity.pipes.GenericPipeInterfaceEntity;
 import rearth.oritech.init.BlockContent;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class FluidPipeBlock extends GenericPipeBlock {
@@ -47,15 +45,6 @@ public class FluidPipeBlock extends GenericPipeBlock {
     @Override
     public SavedDataType<GenericPipeInterfaceEntity.PipeNetworkData> getNetworkDataType() {
         return GenericPipeInterfaceEntity.PipeNetworkData.FLUID_TYPE;
-    }
-
-    // to connect when a neighboring block emits a block update (e.g. the centrifuge getting a fluid addon)
-    @Override
-    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
-        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
-
-        // todo:
-        // level.setBlock(pos, updateShape(state, level, Direction.getNearest(Vec3.atLowerCornerOf(pos.subtract(pos))), level.getBlockState(pos), level, pos, pos), Block.UPDATE_CLIENTS, 0);
     }
 
     @Override

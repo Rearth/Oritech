@@ -55,6 +55,7 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 
@@ -108,7 +109,7 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
 
             if (moved > 10) {
                 var at = worldPosition.getCenter().add(serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4, serverLevel.getRandom().nextFloat() * 0.4);
-                serverLevel.sendParticles(ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), 0.15f);
+                ParticleContent.sendParticles(serverLevel, ParticleTypes.ELECTRIC_SPARK, at.x, at.y, at.z, 2, serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), serverLevel.getRandom().nextFloat(), 0.15f);
             }
         }
 

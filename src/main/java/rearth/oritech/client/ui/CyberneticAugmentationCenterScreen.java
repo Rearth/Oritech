@@ -191,7 +191,7 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
 
     private void buildEnergyPanel(int x, int y) {
         int panelWidth = 30;
-        int panelHeight = 140;
+        int panelHeight = 120;
 
         var panel = new SurfaceWidget(x, y, panelWidth, panelHeight);
         panel.withSurface(OritechSurface.PANEL);
@@ -203,12 +203,7 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
                 new ScreenProvider.BarConfiguration(x + 7, y + 8, 17, 80),
                 this.menu.blockEntity)).withSurface(OritechSurface.PANEL_INSET).withPadding(Insets.of(1)));
 
-        var loadButton = ButtonWidget.darkPanel(x + 6, y + 93, 19, 18,
-                Component.literal("\uD83D\uDD2C"), btn -> onLoadAugmentsClick()).withTextColor(LabelWidget.BRIGHT_TEXT);
-        loadButton.withTooltip(Component.translatable("text.oritech.load_augments.tooltip"));
-        addComponent(loadButton);
-
-        var invButton = ButtonWidget.darkPanel(x + 6, y + 93 + 18 + 3, 19, 18,
+        var invButton = ButtonWidget.darkPanel(x + 6, y + 93, 19, 18,
                 Component.literal("\uD83E\uDDF0"), btn -> onOpenInvClicked()).withTextColor(LabelWidget.BRIGHT_TEXT);
         invButton.withTooltip(Component.translatable("text.oritech.open_inv.tooltip"));
         addComponent(invButton);
@@ -337,24 +332,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         }
 
         ClientPacketDistributor.sendToServer(new PlayerAugments.AugmentInstallTriggerPacket(this.menu.blockPos, id, operation.ordinal()));
-    }
-
-    private void onLoadAugmentsClick() {
-        ClientPacketDistributor.sendToServer(new PlayerAugments.LoadPlayerAugmentsToMachinePacket(this.menu.blockPos));
-
-        int loadedAugmentsCount = 0;
-        for (var entry : PlayerAugments.getAllAugments(registryAccess()).entrySet()) {
-            var augment = entry.getValue();
-            var isResearched = this.menu.blockEntity.researchedAugments.contains(entry.getKey());
-            var isInstalled = augment.isInstalled(menu.player);
-
-            if (isInstalled && !isResearched) {
-                loadedAugmentsCount++;
-            }
-        }
-
-        this.menu.player.sendSystemMessage(Component.translatable("text.oritech.loaded_augments", loadedAugmentsCount));
-        this.onClose();
     }
 
     private void onOpenInvClicked() {

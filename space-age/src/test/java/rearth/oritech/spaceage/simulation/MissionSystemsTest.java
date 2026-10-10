@@ -5,16 +5,33 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MissionSystemsTest {
+
     private static final UUID OWNER = new UUID(1, 1);
 
     private static ActiveRocketData rocket(boolean ion, long fuel, long rf) {
+
         var id = UUID.randomUUID();
         var block = ion ? SpaceAgeBlocks.ION_BOOSTER_ROCKET : SpaceAgeBlocks.BASIC_BOOSTER_ROCKET;
         var segment = new StaticRocketSegment(id,
@@ -25,12 +42,26 @@ class MissionSystemsTest {
     }
 
     private static FlightPlan plan(FlightPlanAction... actions) {
+
         var plan = FlightPlan.empty();
         return plan.withBranches(List.of(plan.root().withActions(List.of(actions))));
     }
 
+    private static ActiveRocketData stationKeepingRocket(int engines) {
+
+        var id = UUID.randomUUID();
+        var blocks = IntStream.range(0, engines)
+                .mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                        SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()))
+                .collect(Collectors.toSet());
+        var segment = new StaticRocketSegment(id, blocks, Map.of(), 25, engines, 0, 20_000);
+        return new ActiveRocketData(Map.of(id, segment),
+                Map.of(id, new DynamicRocketSegment(20_000, 0, 1_000, Set.of())));
+    }
+
     @Test
     void engineTypesConsumeTheirOwnResourceAndIonIsWeakInAtmosphere() {
+
         assertEquals(0, RocketPerformanceCalculator.calculate(rocket(false, 0, 1_000_000))
                 .availableDeltaVMetersPerSecond());
         assertEquals(0, RocketPerformanceCalculator.calculate(rocket(true, 1_000_000, 0))
@@ -50,6 +81,7 @@ class MissionSystemsTest {
 
     @Test
     void surveyKnowledgeStaysPrivateUntilMerged() {
+
         var system = new SpaceSimulation();
         var target = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
@@ -74,6 +106,7 @@ class MissionSystemsTest {
 
     @Test
     void regionScanReachesTheWholeRegionFromInsideItsBoundary() {
+
         var region = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.SURVEY_REGION,
                 0, 0, 310_000, 0, SpaceObjects.DetectionState.PRECISE);
         var asteroid = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
@@ -90,6 +123,7 @@ class MissionSystemsTest {
 
     @Test
     void completedSurveyRegionsDisappearAfterTheirContactsReachEarth() {
+
         var system = new SpaceSimulation();
         var region = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION)
                 .findFirst().orElseThrow();
@@ -110,12 +144,13 @@ class MissionSystemsTest {
 
     @Test
     void catastrophicImpactReplacesAsteroidWithNamedLocalDebrisField() {
+
         var system = new SpaceSimulation();
         var asteroid = system.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();
         system.earthKnowledge.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), SpaceBalance.SCAN_RANGE);
         var oldRegions = system.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.SURVEY_REGION
-                && Math.hypot(object.x() - asteroid.x(), object.y() - asteroid.y()) <= object.radius())
+                        && Math.hypot(object.x() - asteroid.x(), object.y() - asteroid.y()) <= object.radius())
                 .map(SpaceObjectData::id).toList();
         var action = FlightPlanAction.create(ActionType.NAVIGATE_TO)
                 .withTarget(asteroid.id()).withOrbit(OrbitBand.SURFACE);
@@ -144,6 +179,7 @@ class MissionSystemsTest {
 
     @Test
     void missionExecutionKeepsSciencePrivateUntilUpload() {
+
         var system = new SpaceSimulation();
         var region = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION)
                 .findFirst().orElseThrow();
@@ -180,6 +216,7 @@ class MissionSystemsTest {
 
     @Test
     void missionUpdatesRequireCommandsAndPreserveExecutionState() {
+
         var system = new SpaceSimulation();
         var current = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
         var completed = FlightPlanAction.create(ActionType.SCAN);
@@ -202,11 +239,12 @@ class MissionSystemsTest {
 
     @Test
     void maintainPositionResourceConditionsAdvanceTheLiveMission() {
+
         var system = new SpaceSimulation();
         var data = new MissionSavedData();
         for (var type : ActionAddonType.values()) {
             if (!type.isMaintainPositionCondition()) continue;
-            boolean rfCondition = type == ActionAddonType.LOW_RF;
+            var rfCondition = type == ActionAddonType.LOW_RF;
             var craft = rocket(rfCondition, rfCondition ? 0 : 1_000, rfCondition ? 1_000 : 0);
             var resources = craft.getDynamicSegments().values().iterator().next();
             if (type == ActionAddonType.LOW_RF) resources.availableRF = 500;
@@ -226,6 +264,7 @@ class MissionSystemsTest {
 
     @Test
     void maintainPositionCompletesWhenFuelOrCommunicationRfIsUnavailable() {
+
         var system = new SpaceSimulation();
         var data = new MissionSavedData();
         var maintain = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
@@ -251,6 +290,7 @@ class MissionSystemsTest {
 
     @Test
     void liveStationKeepingCostDoesNotIncreaseWithEngineCount() {
+
         var maintain = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
         var oneEngine = stationKeepingRocket(1);
         var fourEngines = stationKeepingRocket(4);
@@ -273,19 +313,9 @@ class MissionSystemsTest {
                 "station keeping must charge delta-v rather than full-power time per engine");
     }
 
-    private static ActiveRocketData stationKeepingRocket(int engines) {
-        var id = UUID.randomUUID();
-        var blocks = java.util.stream.IntStream.range(0, engines)
-                .mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
-                        SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()))
-                .collect(java.util.stream.Collectors.toSet());
-        var segment = new StaticRocketSegment(id, blocks, Map.of(), 25, engines, 0, 20_000);
-        return new ActiveRocketData(Map.of(id, segment),
-                Map.of(id, new DynamicRocketSegment(20_000, 0, 1_000, Set.of())));
-    }
-
     @Test
     void activeNavigationContinuesDeterministicallyAfterSerialization() {
+
         var system = new SpaceSimulation();
         var data = new MissionSavedData();
         var craft = rocket(true, 0, 20_000_000);
@@ -312,6 +342,7 @@ class MissionSystemsTest {
 
     @Test
     void recoveryHeightClearsTheCraftFootprint() {
+
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id, Set.of(
                 new StaticRocketSegment.BlockData(new BlockPos(0, -2, 0), Blocks.IRON_BLOCK.defaultBlockState()),
@@ -321,12 +352,12 @@ class MissionSystemsTest {
         var craft = new ActiveRocketData(Map.of(id, segment),
                 Map.of(id, new DynamicRocketSegment(0, 0, 0, Set.of())));
 
-        int originY = RocketRecovery.landingOriginY(craft, 100, 200,
+        var originY = RocketRecovery.landingOriginY(craft, 100, 200,
                 (x, z) -> x == 100 && z == 200 ? 70 : x == 102 ? 75 : 68);
 
         for (var block : segment.blocks()) {
             var relative = block.relativePos();
-            int surface = relative.getX() == 0 && relative.getZ() == 0 ? 70
+            var surface = relative.getX() == 0 && relative.getZ() == 0 ? 70
                     : relative.getX() == 2 ? 75 : 68;
             assertTrue(originY + relative.getY() >= surface);
         }

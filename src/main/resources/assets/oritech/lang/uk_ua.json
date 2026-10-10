@@ -1085,7 +1085,6 @@
   "oritech.configuration.poleConfig": "Лінія електропередач",
   "oritech.configuration.fertilizerConfig": "Конфігурація удобрювача",
   "oritech.configuration.exoChestplate": "Екзонагрудник",
-  "oritech.configuration.fluidPipeInternalStorageBuckets": "Внутрішня місткість рідинної труби у відрах",
   "oritech.configuration.pullTimeMultiplier": "Множник часу тяжіння чорної діри",
   "oritech.configuration.steamBoilerCapacityBuckets": "Місткість бойлерів парового котла",
   "oritech.configuration.maxRange": "Максимальна дальність",

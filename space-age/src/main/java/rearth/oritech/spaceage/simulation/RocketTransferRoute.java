@@ -1,29 +1,32 @@
 package rearth.oritech.spaceage.simulation;
 
+import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
+import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
+
 import java.util.List;
 import java.util.Random;
-import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
-import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
 
-/** One geometric curve and one longitudinal engine schedule per card. No obstacle routing. */
+/**
+ * One geometric curve and one longitudinal engine schedule per card. No obstacle routing.
+ */
 final class RocketTransferRoute {
-    record Burn(double seconds, double x, double y, boolean atmosphere) {
-        boolean firing() { return x != 0; }
-    }
-    record Route(List<Burn> burns, double duration, FlightCurve curve, double efficiency,
-                 double departureGravity, double arrivalGravity) { }
 
     static boolean hasSurface(SpaceSimulation.SpaceObjectData object) {
+
         return object.radius() > 0 && (object.type() == SpaceObjects.ObjectType.EARTH
                 || object.type() == SpaceObjects.ObjectType.MARS || object.type() == SpaceObjects.ObjectType.SUN);
     }
 
     static Route solve(Craft craft, Context context, SpaceSimulation.FlightPlanAction action,
                        SpaceSimulation.SpaceObjectData target, double endX, double endY) {
-        var dx = endX - craft.x; var dy = endY - craft.y;
+
+        var dx = endX - craft.x;
+        var dy = endY - craft.y;
         var distance = Math.max(1e-6, Math.hypot(dx, dy));
-        var ex = dx / distance; var ey = dy / distance;
-        var vx = craft.velocityX - target.velocityX(); var vy = craft.velocityY - target.velocityY();
+        var ex = dx / distance;
+        var ey = dy / distance;
+        var vx = craft.velocityX - target.velocityX();
+        var vy = craft.velocityY - target.velocityY();
         var speed = Math.hypot(vx, vy);
         var sx = speed > .001 ? vx / speed : ex;
         var sy = speed > .001 ? vy / speed : ey;
@@ -33,7 +36,7 @@ final class RocketTransferRoute {
         if (departure != null && speed < .001) {
             sx = (craft.x - departure.x()) / departure.radius();
             sy = (craft.y - departure.y()) / departure.radius();
-        } else if (speed < .001 && Math.hypot(craft.headingX, craft.headingY) > .001) {
+        } else if (target.type() != SpaceObjects.ObjectType.CRAFT && speed < .001 && Math.hypot(craft.headingX, craft.headingY) > .001) {
             // Stable per-card jitter bends away from the previous arrival rather than retracing it.
             var random = new Random(action.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits());
             var cross = ex * craft.headingY - ey * craft.headingX;
@@ -96,14 +99,19 @@ final class RocketTransferRoute {
                 departureGravity, arrivalGravity);
     }
 
-    /** Positive gravity accelerates movement along the curve; negative gravity resists it. */
+    /**
+     * Positive gravity accelerates movement along the curve; negative gravity resists it.
+     */
     static double gravityAlong(Context context, FlightCurve curve, double distance, double time) {
+
         var position = curve.atDistance(distance, 1);
         var gravity = 0d;
         for (var body : context.objects.values()) {
             if (body.radius() <= 0 || body.surfaceGravity() <= 0) continue;
-            var bodyX = body.xAt(time); var bodyY = body.yAt(time);
-            var dx = bodyX - position.x(); var dy = bodyY - position.y();
+            var bodyX = body.xAt(time);
+            var bodyY = body.yAt(time);
+            var dx = bodyX - position.x();
+            var dy = bodyY - position.y();
             var actualDistance = Math.hypot(dx, dy);
             if (actualDistance < 1e-6) continue;
             var boundedDistance = Math.max(body.radius(), actualDistance);
@@ -112,5 +120,18 @@ final class RocketTransferRoute {
             gravity += acceleration * (dx * position.vx() + dy * position.vy()) / actualDistance;
         }
         return gravity;
+    }
+
+    record Burn(double seconds, double x, double y, boolean atmosphere) {
+
+        boolean firing() {
+
+            return x != 0;
+        }
+    }
+
+    record Route(List<Burn> burns, double duration, FlightCurve curve, double efficiency,
+                 double departureGravity, double arrivalGravity) {
+
     }
 }

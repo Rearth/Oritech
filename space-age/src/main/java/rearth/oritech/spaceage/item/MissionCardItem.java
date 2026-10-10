@@ -7,14 +7,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
+
 import java.util.function.Consumer;
 
 public final class MissionCardItem extends Item {
-    public MissionCardItem(Properties properties) { super(properties); }
+
+    public MissionCardItem(Properties properties) {
+
+        super(properties);
+    }
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
                                 Consumer<Component> tooltip, TooltipFlag flag) {
+
         super.appendHoverText(stack, context, display, tooltip, flag);
         var mission = stack.get(SpaceAgeComponents.MISSION.get());
         if (mission == null) {

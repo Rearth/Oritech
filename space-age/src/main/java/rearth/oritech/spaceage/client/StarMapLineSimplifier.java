@@ -3,8 +3,11 @@ package rearth.oritech.spaceage.client;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Drops offscreen lines and combines tiny trajectory pieces before they reach the GUI renderer. */
+/**
+ * Drops offscreen lines and combines tiny trajectory pieces before they reach the GUI renderer.
+ */
 final class StarMapLineSimplifier {
+
     // Four GUI pixels are enough to follow a smooth transfer at the current zoom.
     private static final double MAX_CHORD_SQUARED = 16;
 
@@ -12,7 +15,8 @@ final class StarMapLineSimplifier {
     }
 
     static List<StarMapLineRenderer.Line> simplify(List<StarMapLineRenderer.Line> lines,
-                                                  int x, int y, int width, int height) {
+                                                   int x, int y, int width, int height) {
+
         var result = new ArrayList<StarMapLineRenderer.Line>();
         StarMapLineRenderer.Line pending = null;
         for (var line : lines) {
@@ -36,15 +40,18 @@ final class StarMapLineSimplifier {
     }
 
     private static boolean canCombine(StarMapLineRenderer.Line first, StarMapLineRenderer.Line next) {
+
         if (!first.antialiased() || !next.antialiased() || first.color() != next.color()
-                || first.width() != next.width() || first.toX() != next.fromX() || first.toY() != next.fromY()) return false;
-        double dx = next.toX() - first.fromX();
-        double dy = next.toY() - first.fromY();
+                || first.width() != next.width() || first.toX() != next.fromX() || first.toY() != next.fromY())
+            return false;
+        var dx = next.toX() - first.fromX();
+        var dy = next.toY() - first.fromY();
         // Keep long segments intact, even when their next point happens to turn back near the start.
-        double previousX = first.toX() - first.fromX();
-        double previousY = first.toY() - first.fromY();
-        double nextX = next.toX() - next.fromX(), nextY = next.toY() - next.fromY();
-        double length = Math.hypot(dx, dy);
+        var previousX = first.toX() - first.fromX();
+        var previousY = first.toY() - first.fromY();
+        var nextX = next.toX() - next.fromX();
+        var nextY = next.toY() - next.fromY();
+        var length = Math.hypot(dx, dy);
         if (previousX * nextX + previousY * nextY < 0 || length == 0
                 || Math.abs(previousX * dy - previousY * dx) / length > .25) return false;
         return dx * dx + dy * dy <= MAX_CHORD_SQUARED
@@ -53,6 +60,7 @@ final class StarMapLineSimplifier {
 
     static boolean intersects(double fromX, double fromY, double toX, double toY,
                               int x, int y, int width, int height, double margin) {
+
         // Bounding-box rejection also keeps crossing lines whose endpoints are both outside the map.
         return Math.max(fromX, toX) >= x - margin && Math.min(fromX, toX) <= x + width + margin
                 && Math.max(fromY, toY) >= y - margin && Math.min(fromY, toY) <= y + height + margin;

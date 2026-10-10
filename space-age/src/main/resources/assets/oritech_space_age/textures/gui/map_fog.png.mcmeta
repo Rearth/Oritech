@@ -1,1 +1,6 @@
-{"texture":{"blur":true,"clamp":true}}
+{
+  "texture": {
+    "blur": true,
+    "clamp": true
+  }
+}

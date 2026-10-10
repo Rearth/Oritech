@@ -9,21 +9,21 @@ description = '''
 A deeply integrated space-age expansion for Oritech.
 '''
 
-[[dependencies.${space_age_mod_id}]]
+[[dependencies.${ space_age_mod_id }]]
 modId = "neoforge"
 type = "required"
 versionRange = "[${neo_version},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${space_age_mod_id}]]
+[[dependencies.${ space_age_mod_id }]]
 modId = "minecraft"
 type = "required"
 versionRange = "${minecraft_version_range}"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${space_age_mod_id}]]
+[[dependencies.${ space_age_mod_id }]]
 modId = "oritech"
 type = "required"
 versionRange = "[${oritech_version},)"

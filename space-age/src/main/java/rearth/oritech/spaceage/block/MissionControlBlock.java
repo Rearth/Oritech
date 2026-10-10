@@ -9,8 +9,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class MissionControlBlock extends SurveyModuleBlock {
-    public MissionControlBlock(Properties properties) { super(properties); }
-    @Override protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+
+    public MissionControlBlock(Properties properties) {
+
+        super(properties);
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+
         if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof GroundStationBlockEntity station) {
             serverPlayer.openMenu(station, pos);
         }

@@ -19,10 +19,8 @@ import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
@@ -30,6 +28,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
     private static final int TRANSFER_PERIOD = OritechConfig.fluidPipeExtractIntervalDuration.get();
 
     private List<BlockCapabilityCache<ResourceHandler<FluidResource>, Direction>> filteredFluidTargetsCached;
+    private int nextTargetIndex;
 
     public FluidPipeInterfaceEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.FLUID_PIPE.get(), pos, state);
@@ -42,8 +41,8 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         var boosted = isBoostAvailable();
 
-        // boosted pipe works every tick, otherwise only every N tick
-        if (level.getGameTime() % TRANSFER_PERIOD != 0 && !boosted)
+        var transferPeriod = boosted ? 1 : TRANSFER_PERIOD;
+        if (!transferBackoff.shouldAttempt(level.getGameTime(), transferPeriod))
             return;
 
         var data = FluidPipeBlock.FLUID_PIPE_DATA.get(level.dimension().identifier());
@@ -58,7 +57,16 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
         refreshTargetCaches(level, targets);
 
-        Collections.shuffle(filteredFluidTargetsCached);
+        if (filteredFluidTargetsCached.isEmpty()) {
+            transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, false);
+            return;
+        }
+
+        var targetCount = filteredFluidTargetsCached.size();
+        var startTargetIndex = nextTargetIndex;
+        // Advance per attempt so every target gets a turn even while backing off.
+        nextTargetIndex = (nextTargetIndex + 1) % targetCount;
+        var transferred = false;
 
         // do the whole thing for each direction (neighboring fluid container) fluid is taken from (usually just 1, but could be multiple)
         // tries to extract from each side (for each slot on that source machine) and then tries to insert it to any matching containers
@@ -94,7 +102,8 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
 
 
                     // go through all targets and try to insert
-                    for (var cachedTarget : filteredFluidTargetsCached) {
+                    for (int targetOffset = 0; targetOffset < targetCount; targetOffset++) {
+                        var cachedTarget = filteredFluidTargetsCached.get((startTargetIndex + targetOffset) % targetCount);
                         var targetContainer = cachedTarget.getCapability();
                         if (targetContainer == null) continue;
 
@@ -104,6 +113,7 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                         if (taken != inserted) {
                             Oritech.LOGGER.warn("Fluid Pipe Insertion Error! Handler Misbehaving. At: {}, inserted: {}, extracted: {},  amount: {}. From pipe at: {}",
                                     cachedTarget.pos(), inserted, taken, availableAmount, worldPosition);
+                            transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, transferred);
                             return;  // this should never happen
                         }
 
@@ -116,17 +126,18 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                 }
                 if (moved > 0) {
                     transaction.commit();
+                    transferred = true;
                     onBoostUsed();
                 }
 
             }
         }
+        transferBackoff.recordAttempt(level.getGameTime(), transferPeriod, transferred);
     }
 
     private void refreshTargetCaches(Level level, Set<GenericPipeInterfaceEntity.PipeNetworkTarget> targets) {
 
-        var netHash = targets.hashCode();
-        if (netHash == filteredTargetsNetHash && filteredFluidTargetsCached != null) {
+        if (targets == cachedNetworkTargets) {
             return;
         }
 
@@ -142,8 +153,10 @@ public class FluidPipeInterfaceEntity extends ExtractablePipeInterfaceEntity {
                     return !extracting;
                 })
                 .map(target -> BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, (ServerLevel) level, target.machinePos(), target.insertedFrom()))
-                .collect(Collectors.toList());
+                .toList();
 
-        filteredTargetsNetHash = netHash;
+        cachedNetworkTargets = targets;
+        nextTargetIndex = filteredFluidTargetsCached.isEmpty() ? 0
+                : Math.floorMod(worldPosition.hashCode(), filteredFluidTargetsCached.size());
     }
 }

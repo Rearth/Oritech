@@ -6,8 +6,12 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.MissionControlMenu;
+import rearth.oritech.spaceage.block.VacuumCrafterMenu;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
+import rearth.oritech.spaceage.client.MissionControlScreen;
 import rearth.oritech.spaceage.client.RocketAssemblerScreen;
+import rearth.oritech.spaceage.client.VacuumCrafterScreen;
 
 import java.util.function.Supplier;
 
@@ -19,14 +23,20 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
             MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
 
-    public static final Supplier<MenuType<rearth.oritech.spaceage.block.MissionControlMenu>> MISSION_CONTROL =
-            MENUS.register("mission_control", () -> IMenuTypeExtension.create(rearth.oritech.spaceage.block.MissionControlMenu::new));
+    public static final Supplier<MenuType<MissionControlMenu>> MISSION_CONTROL =
+            MENUS.register("mission_control", () -> IMenuTypeExtension.create(MissionControlMenu::new));
+
+    public static final Supplier<MenuType<VacuumCrafterMenu>> VACUUM_CRAFTER =
+            MENUS.register("vacuum_crafter", () -> IMenuTypeExtension.create(VacuumCrafterMenu::new));
 
     private SpaceAgeMenus() {
     }
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
+
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
-        event.register(MISSION_CONTROL.get(), rearth.oritech.spaceage.client.MissionControlScreen::new);
+        event.register(VACUUM_CRAFTER.get(), VacuumCrafterScreen::new);
+        event.register(MISSION_CONTROL.get(), MissionControlScreen::new);
     }
+
 }

@@ -1,7 +1,13 @@
 package rearth.oritech.spaceage.simulation;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.recipe.VacuumRecipe;
+
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -9,9 +15,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
-/** Keeps the client editor and server storage on the same small set of mission-plan rules. */
+/**
+ * Keeps the client editor and server storage on the same small set of mission-plan rules.
+ */
 public final class RocketFlightPlanRules {
 
     public static final int MAX_BRANCHES = 16;
@@ -27,7 +34,88 @@ public final class RocketFlightPlanRules {
     private RocketFlightPlanRules() {
     }
 
+    public static Validation inspect(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                     List<SpaceSimulation.SpaceObjectData> objects, boolean launch,
+                                     MissionState.Position position) {
+
+        return inspect(plan, rocket, objects, launch, position, List.of(), List.of());
+    }
+
+    public static Validation inspect(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                     List<SpaceSimulation.SpaceObjectData> objects, boolean launch, MissionState.Position position,
+                                     Collection<RecipeHolder<VacuumRecipe>> recipes,
+                                     List<DockingTarget> stations) {
+
+        return inspect(plan, rocket, objects, launch, position, recipes, stations, null);
+    }
+
+    public static Validation inspect(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                     List<SpaceSimulation.SpaceObjectData> objects, boolean launch, MissionState.Position position,
+                                     Collection<RecipeHolder<VacuumRecipe>> recipes,
+                                     List<DockingTarget> stations, RocketFlightPathCalculator.FlightPath forecast) {
+
+        var navigationObjects = new ArrayList<>(objects);
+        stations.stream().filter(target -> !target.id().equals(rocket.getRocketId()))
+                .map(DockingTarget::point).forEach(navigationObjects::add);
+        var normalized = normalizeAndValidate(plan, rocket, navigationObjects, launch);
+        var issues = new ArrayList<Issue>();
+        if (normalized == null) {
+            issues.add(new Issue(plan.root().id(), SpaceSimulation.FlightPlanAction.NO_TARGET, "invalid_plan", 0, 0));
+            return new Validation(plan, issues);
+        }
+        var actions = new HashMap<UUID, SpaceSimulation.FlightPlanAction>();
+        normalized.branches().forEach(b -> b.actions().forEach(a -> actions.put(a.id(), a)));
+        var seen = new HashSet<UUID>();
+        for (var branch : plan.branches())
+            for (var action : branch.actions()) {
+                var accepted = actions.get(action.id());
+                if (action.type() == SpaceSimulation.ActionType.PROCESS) {
+                    var modules = action.settings().processing().modules();
+                    if (modules.isEmpty() || new HashSet<>(modules).size() != modules.size()
+                            || action.settings().processing().host().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)
+                            && modules.stream().anyMatch(ref -> RocketProcessingService.controller(rocket, ref) == null))
+                        issues.add(new Issue(branch.id(), action.id(), "invalid_action", 0, 0));
+                }
+                var serviceIssue = serviceIssue(action, rocket, stations);
+                if (!serviceIssue.isEmpty()) issues.add(new Issue(branch.id(), action.id(), serviceIssue, 0, 0));
+                if (!seen.add(action.id()) || accepted == null || !accepted.addons().equals(action.addons()))
+                    issues.add(new Issue(branch.id(), action.id(), "invalid_action", 0, 0));
+            }
+        if (normalized.branches().size() < plan.branches().size())
+            issues.add(new Issue(plan.root().id(), SpaceSimulation.FlightPlanAction.NO_TARGET, "invalid_plan", 0, 0));
+        if (forecast == null)
+            forecast = RocketFlightPathCalculator.calculateFrom(rocket, objects, normalized, position, recipes, stations);
+        issues.addAll(NavigationComputerRules.issues(normalized, rocket, forecast));
+        // Preserve invalid instructions in editable drafts; callers decide whether to accept them.
+        return new Validation(issues.isEmpty() ? normalized : plan, issues);
+    }
+
+    private static String serviceIssue(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket, List<DockingTarget> stations) {
+
+        var hostId = switch (action.type()) {
+            case DOCK, NAVIGATE_TO -> action.settings().docking().host();
+            case PROCESS -> action.settings().processing().host();
+            default -> SpaceSimulation.FlightPlanAction.NO_TARGET;
+        };
+        if (hostId.equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
+            return action.type() == SpaceSimulation.ActionType.DOCK ? "dock_target_missing" : "";
+        }
+        var host = stations.stream().filter(t -> t.id().equals(hostId)).findFirst().orElse(null);
+        if (host == null || host.id().equals(rocket.getRocketId())) return "dock_target_missing";
+        if (action.type() == SpaceSimulation.ActionType.DOCK || action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            var d = action.settings().docking();
+            if (host.revision() != d.revision() || Math.hypot(host.position().x() - d.x(), host.position().y() - d.y()) > .001)
+                return "dock_target_moved";
+            if (action.type() == SpaceSimulation.ActionType.DOCK
+                    && (!host.ports().contains(d.hostPort()) || !RocketDocking.ports(rocket).contains(d.localPort())))
+                return "dock_port_missing";
+        } else if (action.settings().processing().modules().stream().anyMatch(ref -> RocketProcessingService.controller(host.rocket(), ref) == null))
+            return "invalid_action";
+        return "";
+    }
+
     public static SpaceSimulation.FlightPlan normalize(SpaceSimulation.FlightPlan plan) {
+
         var root = plan.root();
         var byParentAction = new HashMap<UUID, SpaceSimulation.FlightPlanBranch>();
         plan.branches().stream().filter(branch -> !branch.isRoot())
@@ -38,9 +126,12 @@ public final class RocketFlightPlanRules {
         return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations(), plan.name());
     }
 
-    /** Keep generated links until recalculation can decide which booster events still exist. */
+    /**
+     * Keep generated links until recalculation can decide which booster events still exist.
+     */
     public static List<SpaceSimulation.FlightPlanAction> preserveBoosterLinks(
             SpaceSimulation.FlightPlanBranch previous, List<SpaceSimulation.FlightPlanAction> edited) {
+
         var result = new ArrayList<SpaceSimulation.FlightPlanAction>();
         for (var action : edited) {
             if (action.isGenerated()) continue;
@@ -59,10 +150,11 @@ public final class RocketFlightPlanRules {
      */
     public static SpaceSimulation.FlightPlan synchronizeBoosterEvents(
             SpaceSimulation.FlightPlan plan, List<RocketFlightPathCalculator.BoosterEvent> events) {
+
         var eventsByNavigation = new HashMap<UUID, List<RocketFlightPathCalculator.BoosterEvent>>();
         events.forEach(event -> eventsByNavigation.computeIfAbsent(event.navigationActionId(), ignored -> new ArrayList<>())
                 .add(event));
-        eventsByNavigation.values().forEach(items -> items.sort(java.util.Comparator
+        eventsByNavigation.values().forEach(items -> items.sort(Comparator
                 .comparingDouble(RocketFlightPathCalculator.BoosterEvent::timeSeconds)));
 
         var branches = new ArrayList<SpaceSimulation.FlightPlanBranch>();
@@ -82,20 +174,25 @@ public final class RocketFlightPlanRules {
     }
 
     public static SpaceSimulation.FlightPlan validate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
-                                                       List<SpaceSimulation.SpaceObjectData> objects) {
-        return validate(plan, rocket, objects, true);
+                                                      List<SpaceSimulation.SpaceObjectData> objects) {
+
+        var result = inspect(plan, rocket, objects, true, null);
+        return result.valid() ? result.plan() : null;
     }
 
     public static SpaceSimulation.FlightPlan validateInFlight(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
-                                                             List<SpaceSimulation.SpaceObjectData> objects) {
-        return validate(plan, rocket, objects, false);
+                                                              List<SpaceSimulation.SpaceObjectData> objects) {
+
+        var result = inspect(plan, rocket, objects, false, null);
+        return result.valid() ? result.plan() : null;
     }
 
-    private static SpaceSimulation.FlightPlan validate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
-                                                       List<SpaceSimulation.SpaceObjectData> objects, boolean launch) {
+    private static SpaceSimulation.FlightPlan normalizeAndValidate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
+                                                                   List<SpaceSimulation.SpaceObjectData> objects, boolean launch) {
+
         if (plan.branches().size() > MAX_BRANCHES
                 || plan.branches().stream().flatMap(branch -> branch.actions().stream())
-                        .filter(action -> !action.isGenerated()).count() > MAX_ACTIONS
+                .filter(action -> !action.isGenerated()).count() > MAX_ACTIONS
                 || plan.branches().stream().noneMatch(SpaceSimulation.FlightPlanBranch::isRoot)) return null;
 
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
@@ -105,12 +202,12 @@ public final class RocketFlightPlanRules {
 
         var configurations = new ArrayList<SpaceSimulation.SegmentConfiguration>();
         var configuredSegments = new HashSet<SpaceSimulation.SegmentRef>();
-        int segmentCount = segmentIds.size();
+        var segmentCount = segmentIds.size();
         for (var configuration : plan.segmentConfigurations()) {
             if (!segmentIds.containsKey(configuration.segment()) || !configuredSegments.add(configuration.segment())) {
                 continue;
             }
-            String name = configuration.name().strip();
+            var name = configuration.name().strip();
             if (name.length() > MAX_SEGMENT_NAME_LENGTH) name = name.substring(0, MAX_SEGMENT_NAME_LENGTH);
             var stages = configuration.engineStages().stream()
                     .mapToInt(Integer::intValue)
@@ -151,12 +248,12 @@ public final class RocketFlightPlanRules {
                         || validatedType == SpaceSimulation.ActionType.MAINTAIN_POSITION
                         ? validatedAction.addons().stream()
                         .filter(addon -> validatedType == SpaceSimulation.ActionType.NAVIGATE_TO
-                                ? addon.type().isNavigationCondition()
-                                : addon.type().isMaintainPositionCondition())
+                                         ? addon.type().isNavigationCondition()
+                                         : addon.type().isMaintainPositionCondition())
                         .limit(1)
                         .map(addon -> addon.withValue(clampAddonValue(addon.type(), addon.value()))).toList()
                         : List.<SpaceSimulation.ActionAddon>of();
-                int targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                var targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && validatedAction.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                         ? Math.clamp(validatedAction.targetVelocity(), 0, 100_000) : 0;
                 var boundedAction = validatedAction.withVelocity(validatedAction.velocityMode(), targetVelocity)
@@ -166,7 +263,7 @@ public final class RocketFlightPlanRules {
             validatedBranches.add(branch.withActions(actions));
         }
 
-        String rocketName = plan.name().strip();
+        var rocketName = plan.name().strip();
         if (rocketName.length() > MAX_ROCKET_NAME_LENGTH) rocketName = rocketName.substring(0, MAX_ROCKET_NAME_LENGTH);
         var normalized = normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations, rocketName));
         if (launch) normalized = trimEngineStageGaps(normalized, segmentIds.keySet());
@@ -175,23 +272,27 @@ public final class RocketFlightPlanRules {
 
     public static SpaceSimulation.FlightPlanAction applyLandingUncertainty(
             SpaceSimulation.FlightPlanAction action) {
+
         if (!action.targetId().equals(SpaceObjects.EARTH_ID)
                 || action.orbit() != SpaceSimulation.OrbitBand.SURFACE) return action;
-        int uncertainty = action.addons().stream()
+        var uncertainty = action.addons().stream()
                 .filter(addon -> addon.type() == SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY)
                 .mapToInt(SpaceSimulation.ActionAddon::value).findFirst().orElse(0);
         if (uncertainty <= 0) return action.withLanding(action.landingX(), action.landingZ(), 0, 0);
         var random = new Random(action.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits());
-        double angle = random.nextDouble() * Math.PI * 2;
-        double radius = Math.sqrt(random.nextDouble()) * uncertainty;
+        var angle = random.nextDouble() * Math.PI * 2;
+        var radius = Math.sqrt(random.nextDouble()) * uncertainty;
         return action.withLanding(action.landingX(), action.landingZ(),
                 (int) Math.round(Math.cos(angle) * radius), (int) Math.round(Math.sin(angle) * radius));
     }
 
-    /** A booster creates the stage after its final enabled stage; ordinary engine selections do not. */
+    /**
+     * A booster creates the stage after its final enabled stage; ordinary engine selections do not.
+     */
     public static int stageCount(SpaceSimulation.FlightPlan plan, int segmentCount) {
+
         if (segmentCount <= 0) return 1;
-        int result = plan.segmentConfigurations().stream().anyMatch(SpaceSimulation.SegmentConfiguration::booster)
+        var result = plan.segmentConfigurations().stream().anyMatch(SpaceSimulation.SegmentConfiguration::booster)
                 ? 2 : 1;
         for (var configuration : plan.segmentConfigurations()) {
             if (configuration.booster()) result = Math.max(result, configuration.lastEngineStage() + 1);
@@ -199,11 +300,14 @@ public final class RocketFlightPlanRules {
         return Math.clamp(result, 1, segmentCount);
     }
 
-    /** A new stage only becomes available after at least one segment has been assigned to its predecessor. */
+    /**
+     * A new stage only becomes available after at least one segment has been assigned to its predecessor.
+     */
     public static int editableStageCount(SpaceSimulation.FlightPlan plan,
                                          Collection<SpaceSimulation.SegmentRef> segments) {
+
         if (segments.isEmpty()) return 1;
-        int lastUsedStage = lastContiguousUsedStage(plan, segments);
+        var lastUsedStage = lastContiguousUsedStage(plan, segments);
         return Math.min(segments.size(), Math.max(1, lastUsedStage + 1));
     }
 
@@ -213,7 +317,8 @@ public final class RocketFlightPlanRules {
      */
     public static SpaceSimulation.FlightPlan trimEngineStageGaps(
             SpaceSimulation.FlightPlan plan, Collection<SpaceSimulation.SegmentRef> segments) {
-        int highestAllowedStage = Math.min(segments.size(), lastContiguousUsedStage(plan, segments) + 1);
+
+        var highestAllowedStage = Math.min(segments.size(), lastContiguousUsedStage(plan, segments) + 1);
         var configurations = plan.segmentConfigurations().stream().map(configuration ->
                 configuration.withEngineStages(configuration.engineStages().stream()
                         .filter(stage -> stage <= highestAllowedStage).toList())).toList();
@@ -222,10 +327,11 @@ public final class RocketFlightPlanRules {
 
     private static int lastContiguousUsedStage(SpaceSimulation.FlightPlan plan,
                                                Collection<SpaceSimulation.SegmentRef> segments) {
-        int lastUsedStage = 0;
+
+        var lastUsedStage = 0;
         for (int stage = 1; stage <= segments.size(); stage++) {
-            int checkedStage = stage;
-            boolean used = segments.stream().map(plan::configurationFor)
+            var checkedStage = stage;
+            var used = segments.stream().map(plan::configurationFor)
                     .anyMatch(configuration -> configuration.usesEnginesDuring(checkedStage));
             if (!used) break;
             lastUsedStage = stage;
@@ -234,15 +340,21 @@ public final class RocketFlightPlanRules {
     }
 
     public static List<SpaceSimulation.OrbitBand> availableOrbits(SpaceObjects.ObjectType type) {
-        if (type == SpaceObjects.ObjectType.SURVEY_REGION) return List.of(SpaceSimulation.OrbitBand.SURFACE);
+
+        if (type == SpaceObjects.ObjectType.SURVEY_REGION || type == SpaceObjects.ObjectType.CRAFT)
+            return List.of(SpaceSimulation.OrbitBand.SURFACE);
         return type == SpaceObjects.ObjectType.ASTEROID ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
     }
 
-    /** Keeps a destination useful when a card changes between an asteroid and a larger celestial object. */
+    /**
+     * Keeps a destination useful when a card changes between an asteroid and a larger celestial object.
+     */
     public static SpaceSimulation.OrbitBand compatibleOrbit(SpaceObjects.ObjectType type,
-                                                             SpaceSimulation.OrbitBand requested) {
+                                                            SpaceSimulation.OrbitBand requested) {
+
         var available = availableOrbits(type);
         if (available.contains(requested)) return requested;
+        if (available.size() == 1) return available.getFirst();
         return type == SpaceObjects.ObjectType.ASTEROID
                 ? SpaceSimulation.OrbitBand.TIGHT : SpaceSimulation.OrbitBand.LOW;
     }
@@ -250,6 +362,7 @@ public final class RocketFlightPlanRules {
     private static boolean segmentsValid(SpaceSimulation.FlightPlanAction action,
                                          Map<SpaceSimulation.SegmentRef, UUID> segmentIds,
                                          ActiveRocketData rocket) {
+
         if (!action.segments().stream().allMatch(segmentIds::containsKey)) return false;
         if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) return action.segments().size() == 1;
         if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
@@ -266,6 +379,7 @@ public final class RocketFlightPlanRules {
     }
 
     public static int clampAddonValue(SpaceSimulation.ActionAddonType type, int value) {
+
         return switch (type) {
             case DISTANCE_FROM_TARGET -> Math.clamp(value, 1, 10_000_000);
             case TIME_BEFORE_ARRIVAL -> Math.clamp(value, 1, 1_000_000);
@@ -275,13 +389,15 @@ public final class RocketFlightPlanRules {
     }
 
     public static List<SpaceSimulation.SegmentRef> asteroidAnchorSegments(ActiveRocketData rocket) {
+
         return rocket.getStaticSegments().values().stream()
                 .filter(segment -> segment.blocks().stream().anyMatch(block -> block.state().is(SpaceAgeBlocks.ASTEROID_ANCHOR)))
-                .map(SpaceSimulation.SegmentRef::of).sorted(java.util.Comparator.comparingLong(ref -> ref.anchor().asLong()))
+                .map(SpaceSimulation.SegmentRef::of).sorted(Comparator.comparingLong(ref -> ref.anchor().asLong()))
                 .toList();
     }
 
     private static boolean containsAsteroidAnchor(ActiveRocketData rocket, UUID segmentId) {
+
         var segment = rocket.getStaticSegments().get(segmentId);
         return segment != null && segment.blocks().stream()
                 .anyMatch(block -> block.state().is(SpaceAgeBlocks.ASTEROID_ANCHOR));
@@ -290,17 +406,39 @@ public final class RocketFlightPlanRules {
     private static void addBranchAndChildren(SpaceSimulation.FlightPlanBranch branch,
                                              Map<UUID, SpaceSimulation.FlightPlanBranch> byParentAction,
                                              List<SpaceSimulation.FlightPlanBranch> result, Set<UUID> visited) {
+
         if (!visited.add(branch.id())) return;
         result.add(branch);
         for (var action : branch.actions()) {
-            boolean separatesCraft = action.type() == SpaceSimulation.ActionType.DECOUPLE
+            var separatesCraft = action.type() == SpaceSimulation.ActionType.DECOUPLE
                     && action.segments().size() == 2;
-            boolean generatedBooster = action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER
+            var generatedBooster = action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER
                     && action.segments().size() == 1;
             if (!separatesCraft && !generatedBooster) continue;
             var child = byParentAction.get(action.id());
             if (child == null) child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), action.id(), List.of());
             addBranchAndChildren(child, byParentAction, result, visited);
+        }
+    }
+
+    public record Issue(UUID branchId, UUID actionId, String code, int required, int available) {
+
+        public Component description() {
+
+            return Component.translatable("screen.oritech_space_age.validation." + code, required, available);
+        }
+    }
+
+    public record Validation(SpaceSimulation.FlightPlan plan, List<Issue> issues) {
+
+        public Validation {
+
+            issues = List.copyOf(issues);
+        }
+
+        public boolean valid() {
+
+            return issues.isEmpty();
         }
     }
 }

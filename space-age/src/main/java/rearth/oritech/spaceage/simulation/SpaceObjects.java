@@ -6,9 +6,10 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.StringRepresentable;
 import org.joml.Vector2f;
+
 import java.util.List;
 import java.util.Locale;
-
+import java.util.Optional;
 import java.util.UUID;
 
 public class SpaceObjects {
@@ -16,28 +17,33 @@ public class SpaceObjects {
     public static final UUID EARTH_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
 
     public enum ObjectType implements StringRepresentable {
-        EARTH, SUN, MARS, SURVEY_REGION, ASTEROID;
+
+        EARTH, SUN, MARS, SURVEY_REGION, ASTEROID, CRAFT;
 
         public static final Codec<ObjectType> CODEC = StringRepresentable.fromEnum(ObjectType::values);
 
         @Override
         public String getSerializedName() {
+
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
     public enum DetectionState implements StringRepresentable {
+
         HIDDEN, PRECISE;
 
         public static final Codec<DetectionState> CODEC = StringRepresentable.fromEnum(DetectionState::values);
 
         @Override
         public String getSerializedName() {
+
             return name().toLowerCase(Locale.ROOT);
         }
     }
 
     public static class SimulatedObject {
+
         public static final Codec<SimulatedObject> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(object -> object.id),
                 ObjectType.CODEC.fieldOf("type").forGetter(object -> object.type),
@@ -55,7 +61,7 @@ public class SpaceObjects {
                         .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.velocity.y : 0F),
                 AsteroidMaterial.CODEC.listOf().optionalFieldOf("materials", List.of())
                         .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of()),
-                SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> java.util.Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null))
+                SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null))
         ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
@@ -67,7 +73,10 @@ public class SpaceObjects {
                 movable.weight = weight;
                 movable.velocity = new Vector2f(velocityX, velocityY);
             }
-            if (object instanceof Asteroid asteroid) { asteroid.materials = List.copyOf(materials); asteroid.landing = landing.orElse(null); }
+            if (object instanceof Asteroid asteroid) {
+                asteroid.materials = List.copyOf(materials);
+                asteroid.landing = landing.orElse(null);
+            }
             return object;
         }));
 
@@ -80,10 +89,12 @@ public class SpaceObjects {
         public DetectionState currentState = DetectionState.HIDDEN;
 
         public SimulatedObject(ObjectType type) {
+
             this(UUID.randomUUID(), type);
         }
 
         public SimulatedObject(UUID id, ObjectType type) {
+
             this.id = id;
             this.type = type;
         }
@@ -92,28 +103,34 @@ public class SpaceObjects {
 
     // Things like asteroids. Movement itsn't applied per tick, instead events / future positions are calculated during each interaction / event
     public static class MovableSimulatedObject extends SimulatedObject {
+
         public float weight;
         public Vector2f velocity = new Vector2f();
 
         public MovableSimulatedObject(UUID id, ObjectType type) {
+
             super(id, type);
         }
     }
 
     public static class Asteroid extends MovableSimulatedObject {
+
         public List<AsteroidMaterial> materials = List.of();
         public SpaceSimulation.FlightPlanAction landing;
 
         public Asteroid() {
+
             this(UUID.randomUUID());
         }
 
         private Asteroid(UUID id) {
+
             super(id, ObjectType.ASTEROID);
         }
     }
 
     public record AsteroidMaterial(Identifier block, int amount) {
+
         public static final Codec<AsteroidMaterial> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Identifier.CODEC.fieldOf("block").forGetter(AsteroidMaterial::block),
                 Codec.INT.fieldOf("amount").forGetter(AsteroidMaterial::amount)

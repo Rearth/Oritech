@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-27T21:53:30.930016	Oritech Recipes
+// 26.1.2	2026-10-05T19:16:21.9924637	Oritech Recipes
 42f4dd49255f7cc579d92d894e61bb9a046bd666 data/oritech/advancement/recipes/building_blocks/carbon_plating_slab.json
 494b346be668357a3d9d9a4a8117dc607e02d964 data/oritech/advancement/recipes/building_blocks/carbon_plating_stairs.json
 2d4b9e39996d34c420265532b715611757f1b014 data/oritech/advancement/recipes/building_blocks/copper_reinforced_plating_slab.json
@@ -442,14 +442,14 @@ c886b84bf3f169d8dabdc51d08c70d8674998989 data/oritech/recipe/crafting/addon/silk
 abf2417b6a8fe63a1ce915a566a7192c492a52e0 data/oritech/recipe/crafting/addon/steamboileralt.json
 a92bba235c824c73cb73cd93208ba4258a2c7666 data/oritech/recipe/crafting/addon/ultimate.json
 7b03b8a13c2211907f2b6625266c7be79379d098 data/oritech/recipe/crafting/addon/yield.json
-5e3359334c8d74d1da6c9f67359d39be1939d39e data/oritech/recipe/crafting/assembler.json
-a919e7ecae9b4551d9603222005e0e13d0f9acc5 data/oritech/recipe/crafting/assembleralt.json
+4ecd2c1b79e0db660cd9b1cae65443a9455c78f7 data/oritech/recipe/crafting/assembler.json
+92e9c0db62fcb6394ebcbb54d36121a30ac50d7b data/oritech/recipe/crafting/assembleralt.json
 74798c941a6f5b1f697101bb0ef1a2f4d207d135 data/oritech/recipe/crafting/atomicforge.json
 b395784cd560dc46eac748204d2e1ccec5b1a3e2 data/oritech/recipe/crafting/augment/advanced.json
-a1eb798667f536dd90bdfb6f95f268331ea646b7 data/oritech/recipe/crafting/augment/applicator.json
+a9824d93617dd9c0f620f2c5bce31b09cdb91415 data/oritech/recipe/crafting/augment/applicator.json
 aabd9ed05ee196c2f57bc8fd2322b51997b1c250 data/oritech/recipe/crafting/augment/arcane.json
-653c99aa021a088c875676b7a861ca786cd7626f data/oritech/recipe/crafting/augment/basic.json
-99bfbd8ed46bdd452b6aec980c11c5012d4fb687 data/oritech/recipe/crafting/basicgen.json
+b7d679a380254c5f50d96d96f7f68ceda61493a0 data/oritech/recipe/crafting/augment/basic.json
+d78414f8f298e0e27a233cab6d177f0f94547a0b data/oritech/recipe/crafting/basicgen.json
 3193f4511c5cc49c03c758e03ef8a8c6b7e380cc data/oritech/recipe/crafting/basicjetpack.json
 d041dcfacc480fe8b987e00160969f0d0a7a28d1 data/oritech/recipe/crafting/basicjetpackalt.json
 c2bfceb970ec885cbf73892dbc179036d7ea689f data/oritech/recipe/crafting/bigstorage.json
@@ -470,13 +470,13 @@ cc75461083094ec4e271a0a655b62873c23f11c1 data/oritech/recipe/crafting/core3alt.j
 f6c23b2c31f0e61c57caa4e2ecabe201c27a6a5d data/oritech/recipe/crafting/core5.json
 bb9323be6f8efd6eaf0f3cb03c941b5ec4632c03 data/oritech/recipe/crafting/core6.json
 aff4aafdf737c4fcdd1e5e7209423ec564df69a9 data/oritech/recipe/crafting/core7.json
-65ca32b5cf71309f2395b88cd6cf47175f810bd0 data/oritech/recipe/crafting/crusher.json
+596e7b8ae519e7db8e93fb10e76ff9fbe0efce2e data/oritech/recipe/crafting/crusher.json
 6a62d5b815ab16035d76fecdc6106a9a9827b419 data/oritech/recipe/crafting/deepdrill.json
 0f5303b1667e5c2fe143c31b0f646fdfb987137d data/oritech/recipe/crafting/destroyer.json
 939c6175257eda01d7d54d0838f9b1fd4a0bef7d data/oritech/recipe/crafting/droneport.json
 5b3a79ad55694bbe93d5c139aff4a9078629e5a1 data/oritech/recipe/crafting/droneportalt.json
-b84f8ca5cd6c231d9aa8217ea589c29ff8a42cd2 data/oritech/recipe/crafting/electricfurnace.json
-f9268adeb3ee93f42407cbadbbe3f6265c8726bd data/oritech/recipe/crafting/electricfurnacealt.json
+08a09a24ef9fe4d7fbac2b78a368d54ecf41f378 data/oritech/recipe/crafting/electricfurnace.json
+5ebbbba72e27d6333095e2a6c2ee9841b88dc76d data/oritech/recipe/crafting/electricfurnacealt.json
 a4f7f11b3ba3a22a667fafd745819b2dac148d60 data/oritech/recipe/crafting/energy.json
 98090451aade069e538afeb6768877f34706af8d data/oritech/recipe/crafting/energyport.json
 a6c96267d133fe25fdc24c887cde461683d2ab34 data/oritech/recipe/crafting/equipmentcharger.json
@@ -485,7 +485,7 @@ a9d73bb12539f6e53c128334ceba00d5f1131c9a data/oritech/recipe/crafting/exoboosted
 edd220b1ec83ebdf8789cda1b32857a602390acd data/oritech/recipe/crafting/exoboostedelytraalt.json
 a007060d3a7bb7b68d83aee68cc4e2a0deea98b1 data/oritech/recipe/crafting/exojetpack.json
 c6c6d441144f9b906bdfe88558185f84027b5aa6 data/oritech/recipe/crafting/fertilizer.json
-320eaded663dcfd05e88d9ad4176160300912532 data/oritech/recipe/crafting/foundry.json
+ab545a56073a56254b39c8700fa6e9708941f1d8 data/oritech/recipe/crafting/foundry.json
 d002d959fa66c6dc7cbb9934b0e52035caa1d7aa data/oritech/recipe/crafting/fromtransparent.json
 047b2dbbc2b4133217b8434236a9ac896d08c021 data/oritech/recipe/crafting/fuelgen.json
 41278e40041948786d44070136e2fa5273ae233f data/oritech/recipe/crafting/fuelport.json
@@ -509,14 +509,14 @@ b470cd6aaf0f8c1cddca4412e8aacd262a48d69e data/oritech/recipe/crafting/platinum_c
 51fc1f30f0c769e5d9156a408cc47da094953365 data/oritech/recipe/crafting/platinum_dust_from_packing.json
 4a1fd860d540d4f3fadb8f034a09d42f14a0387f data/oritech/recipe/crafting/platinum_ingot_from_packing.json
 e7eb11c331e8d0e51ac0889c45fe58db5c5128b8 data/oritech/recipe/crafting/platinum_nugget_from_unpacking.json
-665831d1105ed1e297b15926e046803448fe85a5 data/oritech/recipe/crafting/pulverizer.json
-e051ac8bd8304015b19138e3c7ffd65e501bd86d data/oritech/recipe/crafting/pulverizeralt.json
-67e6af555ee8495f7bf45ad380f4439a750a0510 data/oritech/recipe/crafting/pump.json
+486c4016d369448a89360fbd2430d49685c0131e data/oritech/recipe/crafting/pulverizer.json
+ec02b7c45322ee00d7298c44a99e06d512908aec data/oritech/recipe/crafting/pulverizeralt.json
+a63564abc9cb8418e9ebba792e132e210a1b7427 data/oritech/recipe/crafting/pump.json
 287fa56075930e5490eb72e54fa08e0fb6ec6d47 data/oritech/recipe/crafting/redstoneport.json
 39d2ce8aee877e91a2634c8fedf4b43d41303902 data/oritech/recipe/crafting/refinery.json
 209b1c879521117e3ba00b9b20dcb1fad271c548 data/oritech/recipe/crafting/refinerymodule.json
 48e713007563e27c27f23d869b7d9011090a6272 data/oritech/recipe/crafting/refinerymodulealt.json
-c0461a13aae2d606dca76ca8da03b75e10b3a138 data/oritech/recipe/crafting/smallstorage.json
+13c7b9b7532366c45d67837161c9517739d2737e data/oritech/recipe/crafting/smallstorage.json
 21bc4bc8a9423a516ddc3436419110563a37f3cb data/oritech/recipe/crafting/small_copper_clump_from_unpacking.json
 4057b72302400dcfe7179723de15af747085ce34 data/oritech/recipe/crafting/small_copper_dust_from_unpacking.json
 71640305eb70acc7c0ec69a4dc8c2601b5b7a023 data/oritech/recipe/crafting/small_gold_clump_from_unpacking.json
@@ -532,7 +532,7 @@ cd1987f67c8496a2b31f1230be51122196d1749b data/oritech/recipe/crafting/solar.json
 8d6b4d385154a0162d99c6e9266a15fede83b5ec data/oritech/recipe/crafting/stabilized_enchanter.json
 2afbee5477ab0c584ee635a8150f0c8cf020377f data/oritech/recipe/crafting/steamgen.json
 5b308d22c70f162e4d422fdb1e280e094e1626c9 data/oritech/recipe/crafting/totransparent.json
-ecace1f1c6acf84e753eddfa026a8c541d5caa97 data/oritech/recipe/crafting/tree_cutter.json
+c6a7e7291ec5c10e4d9a075f012f2763ed0e8a92 data/oritech/recipe/crafting/tree_cutter.json
 2ab5709a0f7ccddbd4230ed7faa93db100f21c5b data/oritech/recipe/crafting/unduct_energy.json
 38d4026a72563cd8fe8aee48a81aa9e8a34516bc data/oritech/recipe/crafting/unduct_fluid.json
 675644565057f548ceb7dec0a56ebf51186be899 data/oritech/recipe/crafting/unduct_item.json

@@ -2,7 +2,9 @@ package rearth.oritech.spaceage.client;
 
 import java.util.List;
 
-/** Converts between the solar-system plane and the visible map viewport. */
+/**
+ * Converts between the solar-system plane and the visible map viewport.
+ */
 final class StarMapCamera {
 
     // Vertical squash gives the shared solar-system plane its tilted appearance.
@@ -34,7 +36,21 @@ final class StarMapCamera {
     // Cached screen geometry only needs rebuilding when the camera changes.
     private long revision;
 
+    private static Frame frame(List<Point> points, int viewportWidth, int viewportHeight, double padding) {
+
+        var minX = points.stream().mapToDouble(Point::x).min().orElse(-1);
+        var maxX = points.stream().mapToDouble(Point::x).max().orElse(1);
+        var minY = points.stream().mapToDouble(Point::y).min().orElse(-1);
+        var maxY = points.stream().mapToDouble(Point::y).max().orElse(1);
+        var fitX = Math.max(1, maxX - minX) * padding;
+        var fitY = Math.max(1, maxY - minY) * PLANE_TILT * padding;
+        var zoom = Math.min(Math.max(1, viewportWidth - 20) / fitX,
+                Math.max(1, viewportHeight - 13) / fitY);
+        return new Frame((minX + maxX) * 0.5, (minY + maxY) * 0.5, zoom);
+    }
+
     void fit(List<Point> points, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
         revision++;
         if (points.isEmpty()) {
             zoom = minimumZoom = 0.0001;
@@ -49,6 +65,7 @@ final class StarMapCamera {
     }
 
     void focus(List<Point> points, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
         if (points.isEmpty()) return;
         revision++;
         var frame = frame(points, viewportWidth, viewportHeight, 1.35);
@@ -58,19 +75,8 @@ final class StarMapCamera {
         stopAnimations();
     }
 
-    private static Frame frame(List<Point> points, int viewportWidth, int viewportHeight, double padding) {
-        var minX = points.stream().mapToDouble(Point::x).min().orElse(-1);
-        var maxX = points.stream().mapToDouble(Point::x).max().orElse(1);
-        var minY = points.stream().mapToDouble(Point::y).min().orElse(-1);
-        var maxY = points.stream().mapToDouble(Point::y).max().orElse(1);
-        var fitX = Math.max(1, maxX - minX) * padding;
-        var fitY = Math.max(1, maxY - minY) * PLANE_TILT * padding;
-        var zoom = Math.min(Math.max(1, viewportWidth - 20) / fitX,
-                Math.max(1, viewportHeight - 13) / fitY);
-        return new Frame((minX + maxX) * 0.5, (minY + maxY) * 0.5, zoom);
-    }
-
     void copyFrom(StarMapCamera previous) {
+
         revision++;
         centerX = previous.centerX;
         centerY = previous.centerY;
@@ -80,6 +86,7 @@ final class StarMapCamera {
 
     void zoomAt(double screenX, double screenY, double scrollDelta,
                 int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
         if (scrollDelta == 0) return;
         revision++;
         stopPanning();
@@ -94,6 +101,7 @@ final class StarMapCamera {
     }
 
     void advanceZoom() {
+
         if (!zooming) return;
         var difference = targetZoom - zoom;
         zoom += difference * 0.22;
@@ -107,6 +115,7 @@ final class StarMapCamera {
     }
 
     void pan(double deltaX, double deltaY) {
+
         if (deltaX == 0 && deltaY == 0) return;
         revision++;
         stopAnimations();
@@ -114,6 +123,7 @@ final class StarMapCamera {
     }
 
     void beginDrag() {
+
         dragging = true;
         stopZooming();
         panVelocityX = 0;
@@ -121,6 +131,7 @@ final class StarMapCamera {
     }
 
     void dragBy(double deltaX, double deltaY) {
+
         if (!dragging || deltaX == 0 && deltaY == 0) return;
         revision++;
         applyPan(deltaX, deltaY);
@@ -129,10 +140,12 @@ final class StarMapCamera {
     }
 
     void endDrag() {
+
         dragging = false;
     }
 
     void advancePan() {
+
         if (dragging || Math.abs(panVelocityX) + Math.abs(panVelocityY) < 0.05) {
             if (!dragging) stopPanning();
             return;
@@ -144,48 +157,58 @@ final class StarMapCamera {
     }
 
     private void applyPan(double deltaX, double deltaY) {
+
         centerX -= deltaX / zoom;
         centerY -= deltaY / (zoom * PLANE_TILT);
     }
 
     Point project(double worldX, double worldY, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
         return new Point(viewportX + viewportWidth * 0.5 + (worldX - centerX) * zoom,
                 viewportY + viewportHeight * 0.5 + (worldY - centerY) * zoom * PLANE_TILT);
     }
 
     Point unproject(double screenX, double screenY, int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
         return new Point(centerX + (screenX - (viewportX + viewportWidth * 0.5)) / zoom,
                 centerY + (screenY - (viewportY + viewportHeight * 0.5)) / (zoom * PLANE_TILT));
     }
 
     double zoom() {
+
         return zoom;
     }
 
     long revision() {
+
         return revision;
     }
 
     private void stopZooming() {
+
         targetZoom = zoom;
         zooming = false;
     }
 
     private void stopPanning() {
+
         dragging = false;
         panVelocityX = 0;
         panVelocityY = 0;
     }
 
     private void stopAnimations() {
+
         stopZooming();
         stopPanning();
     }
 
     // Coordinates returned by projection or its inverse.
     record Point(double x, double y) {
+
     }
 
     private record Frame(double centerX, double centerY, double zoom) {
+
     }
 }

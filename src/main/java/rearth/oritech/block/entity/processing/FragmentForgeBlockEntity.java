@@ -26,6 +26,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,7 @@ public class FragmentForgeBlockEntity extends MultiblockMachineEntity {
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.DUST_PLUME, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.8, 0.8, 0.8, 0);
     }
 
     @Override

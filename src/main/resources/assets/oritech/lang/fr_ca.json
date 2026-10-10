@@ -746,7 +746,6 @@
   "text.config.oritech-config.option.itemPipeIntervalDuration": "Durée de l'intervalle de transfert du conduit d'objet",
   "text.config.oritech-config.option.fluidPipeExtractAmountBuckets": "Quantité d'extraction du tuyau de liquide en seaux",
   "text.config.oritech-config.option.fluidPipeExtractIntervalDuration": "Durée de l'intervalle d'extraction du tuyau de liquide",
-  "text.config.oritech-config.option.fluidPipeInternalStorageBuckets": "Stockage interne du tuyau de liquide en seaux",
   "text.config.oritech-config.option.energyPipeTransferRate": "Taux de transfert du câble d'énergie",
   "text.config.oritech-config.option.superConductorTransferRate": "Taux de transfert du superconducteur",
   "text.config.oritech-config.section.clientSettings": "Client uniquement",

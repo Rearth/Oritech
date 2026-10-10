@@ -79,6 +79,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -253,7 +254,7 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
             var farmedCount = 1 + yieldAddons;
             dropped = List.of(new ItemStack(recipe.itemResults().getFirst().item(), farmedCount));
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SONIC_BOOM, targetPos.getX() + 0.5, targetPos.getY() + 0.5, targetPos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
         }
 
         // yes, this will discard items that wont fit anymore

@@ -6,8 +6,15 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import rearth.oritech.client.init.OritechClientConfig;
 
 public class BeamRenderer {
+
+    public static void renderOuterBeam(PoseStack.Pose snapshot, VertexConsumer consumer, Vec3 startPos, Vec3 delta,
+                                       float thickness, int packedLight, int startColor, int endColor) {
+        if (OritechClientConfig.renderFullEffects())
+            renderStraightBeam(snapshot, consumer, startPos, delta, thickness, packedLight, startColor, endColor);
+    }
 
     public static int color(int r, int g, int b, int a) {
         return (a * 255) << 24
@@ -37,6 +44,7 @@ public class BeamRenderer {
      * @param endColor    The ARGB color integer for the end of the beam.
      */
     public static void renderStraightBeam(PoseStack.Pose snapshot, VertexConsumer consumer, Vec3 startPos, Vec3 delta, float thickness, int packedLight, int startColor, int endColor) {
+        if (!OritechClientConfig.renderBeams()) return;
         var poseStack = new PoseStack();
         poseStack.last().pose().set(snapshot.pose());
         poseStack.last().normal().set(snapshot.normal());

@@ -1085,7 +1085,6 @@
   "oritech.configuration.poleConfig": "Power Pole",
   "oritech.configuration.fertilizerConfig": "施肥器设置",
   "oritech.configuration.exoChestplate": "外骨骼胸甲",
-  "oritech.configuration.fluidPipeInternalStorageBuckets": "流体管道内部储量（以桶计）",
   "oritech.configuration.pullTimeMultiplier": "黑洞撕扯频率",
   "oritech.configuration.steamBoilerCapacityBuckets": "蒸汽锅炉容量（以桶计）",
   "oritech.configuration.maxRange": "最大范围",

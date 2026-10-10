@@ -12,6 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
+import rearth.oritech.client.init.ParticleContent;
 
 public class SheolFireFluidBlock extends LiquidBlock {
 
@@ -37,7 +38,7 @@ public class SheolFireFluidBlock extends LiquidBlock {
                 double d0 = (double) pos.getX() + random.nextDouble();
                 double d1 = (double) pos.getY() + 1.0;
                 double d2 = (double) pos.getZ() + random.nextDouble();
-                level.addParticle(ParticleTypes.LAVA, d0, d1, d2, 0.0, 0.0, 0.0);
+                ParticleContent.addParticle(level, ParticleTypes.LAVA, d0, d1, d2, 0.0, 0.0, 0.0);
                 level.playLocalSound(
                         d0, d1, d2, SoundEvents.LAVA_POP, SoundSource.BLOCKS, 0.2F + random.nextFloat() * 0.2F, 0.9F + random.nextFloat() * 0.15F, false
                 );

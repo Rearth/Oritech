@@ -6,10 +6,87 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-/** Numerical regression coverage for full-power transfers. */
+/**
+ * Numerical regression coverage for full-power transfers.
+ */
 public final class FullPowerTransferTest {
+
+    private static FullPowerTransfer check(double dx, double dy, double vx, double vy,
+                                           double fx, double fy, boolean free, double a, double budget, double cap) {
+
+        var intervals = a > 0 && budget > 0 ? List.of(new RocketBurnProfile.Interval(a, budget / a))
+                : List.<RocketBurnProfile.Interval>of();
+        return check(dx, dy, vx, vy, fx, fy, free, new RocketBurnProfile(intervals), cap);
+    }
+
+    private static FullPowerTransfer check(double dx, double dy, double vx, double vy,
+                                           double fx, double fy, boolean free, RocketBurnProfile profile, double cap) {
+
+        var plan = FullPowerTransfer.solve(dx, dy, vx, vy, fx, fy, free, profile, cap, 1_200_000);
+        require(plan != null, "expected feasible transfer for " + dx + ", " + dy);
+        var x = 0d;
+        var y = 0d;
+        var durations = new double[]{plan.firstSeconds(), plan.coastSeconds(), plan.lastSeconds()};
+        var directionsX = new double[]{plan.firstDirectionX(), 0, plan.lastDirectionX()};
+        var directionsY = new double[]{plan.firstDirectionY(), 0, plan.lastDirectionY()};
+        var spent = 0d;
+        var intervalIndex = 0;
+        var intervalElapsed = 0d;
+        // Integrate by engine-on time independently of the solver's delta-v integrals.
+        for (var phase = 0; phase < 3; phase++) {
+            var remaining = durations[phase];
+            require(remaining >= 0 && Double.isFinite(remaining), "finite nonnegative phase duration");
+            if (phase == 1) {
+                x += vx * remaining;
+                y += vy * remaining;
+                continue;
+            }
+            if (remaining > 0)
+                close(Math.hypot(directionsX[phase], directionsY[phase]), 1, 1e-8, "full power direction");
+            while (remaining > 1e-9) {
+                if (intervalIndex >= profile.intervals().size() && remaining < 1e-6) break;
+                require(intervalIndex < profile.intervals().size(), "no burning beyond available engine time");
+                var interval = profile.intervals().get(intervalIndex);
+                var t = Math.min(remaining, interval.seconds() - intervalElapsed);
+                var ax = directionsX[phase] * interval.acceleration();
+                var ay = directionsY[phase] * interval.acceleration();
+                spent += interval.acceleration() * t;
+                x += vx * t + ax * t * t / 2;
+                y += vy * t + ay * t * t / 2;
+                vx += ax * t;
+                vy += ay * t;
+                remaining -= t;
+                intervalElapsed += t;
+                if (intervalElapsed >= interval.seconds() - 1e-9) {
+                    intervalIndex++;
+                    intervalElapsed = 0;
+                }
+            }
+            if (phase == 0) require(Math.hypot(vx, vy) <= cap + 1e-6, "cruise speed limit");
+        }
+        close(x, dx, 1e-3, "arrival x");
+        close(y, dy, 1e-3, "arrival y");
+        require(spent <= profile.deltaV() + 1e-6, "fuel conservation");
+        if (!free) {
+            close(vx, fx, 1e-6, "arrival velocity x");
+            close(vy, fy, 1e-6, "arrival velocity y");
+        }
+        return plan;
+    }
+
+    private static void close(double actual, double expected, double tolerance, String message) {
+
+        require(Math.abs(actual - expected) <= tolerance, message + ": " + actual + " != " + expected);
+    }
+
+    private static void require(boolean condition, String message) {
+
+        if (!condition) throw new AssertionError(message);
+    }
+
     @Test
     void fullPowerTransfersRespectFuelSpeedAndArrivalConstraints() {
+
         var longTrip = check(8_000_000, 0, 0, 0, 0, 0, false, 10, 1000, Double.POSITIVE_INFINITY);
         close(longTrip.firstSeconds(), 50, 1e-5, "full fuel acceleration burn");
         close(longTrip.coastSeconds(), 15950, 1e-3, "long trip coast");
@@ -65,73 +142,5 @@ public final class FullPowerTransferTest {
             check(cap * 10_000 * Math.cos(angle), cap * 10_000 * Math.sin(angle),
                     0, 0, 0, 0, false, profile, cap);
         }
-    }
-
-    private static FullPowerTransfer check(double dx, double dy, double vx, double vy,
-                                           double fx, double fy, boolean free, double a, double budget, double cap) {
-        var intervals = a > 0 && budget > 0 ? List.of(new RocketBurnProfile.Interval(a, budget / a))
-                : List.<RocketBurnProfile.Interval>of();
-        return check(dx, dy, vx, vy, fx, fy, free, new RocketBurnProfile(intervals), cap);
-    }
-
-    private static FullPowerTransfer check(double dx, double dy, double vx, double vy,
-                                           double fx, double fy, boolean free, RocketBurnProfile profile, double cap) {
-        var plan = FullPowerTransfer.solve(dx, dy, vx, vy, fx, fy, free, profile, cap, 1_200_000);
-        require(plan != null, "expected feasible transfer for " + dx + ", " + dy);
-        var x = 0d;
-        var y = 0d;
-        var durations = new double[]{plan.firstSeconds(), plan.coastSeconds(), plan.lastSeconds()};
-        var directionsX = new double[]{plan.firstDirectionX(), 0, plan.lastDirectionX()};
-        var directionsY = new double[]{plan.firstDirectionY(), 0, plan.lastDirectionY()};
-        var spent = 0d;
-        var intervalIndex = 0;
-        var intervalElapsed = 0d;
-        // Integrate by engine-on time independently of the solver's delta-v integrals.
-        for (var phase = 0; phase < 3; phase++) {
-            var remaining = durations[phase];
-            require(remaining >= 0 && Double.isFinite(remaining), "finite nonnegative phase duration");
-            if (phase == 1) {
-                x += vx * remaining;
-                y += vy * remaining;
-                continue;
-            }
-            if (remaining > 0) close(Math.hypot(directionsX[phase], directionsY[phase]), 1, 1e-8, "full power direction");
-            while (remaining > 1e-9) {
-                if (intervalIndex >= profile.intervals().size() && remaining < 1e-6) break;
-                require(intervalIndex < profile.intervals().size(), "no burning beyond available engine time");
-                var interval = profile.intervals().get(intervalIndex);
-                var t = Math.min(remaining, interval.seconds() - intervalElapsed);
-                var ax = directionsX[phase] * interval.acceleration();
-                var ay = directionsY[phase] * interval.acceleration();
-                spent += interval.acceleration() * t;
-                x += vx * t + ax * t * t / 2;
-                y += vy * t + ay * t * t / 2;
-                vx += ax * t;
-                vy += ay * t;
-                remaining -= t;
-                intervalElapsed += t;
-                if (intervalElapsed >= interval.seconds() - 1e-9) {
-                    intervalIndex++;
-                    intervalElapsed = 0;
-                }
-            }
-            if (phase == 0) require(Math.hypot(vx, vy) <= cap + 1e-6, "cruise speed limit");
-        }
-        close(x, dx, 1e-3, "arrival x");
-        close(y, dy, 1e-3, "arrival y");
-        require(spent <= profile.deltaV() + 1e-6, "fuel conservation");
-        if (!free) {
-            close(vx, fx, 1e-6, "arrival velocity x");
-            close(vy, fy, 1e-6, "arrival velocity y");
-        }
-        return plan;
-    }
-
-    private static void close(double actual, double expected, double tolerance, String message) {
-        require(Math.abs(actual - expected) <= tolerance, message + ": " + actual + " != " + expected);
-    }
-
-    private static void require(boolean condition, String message) {
-        if (!condition) throw new AssertionError(message);
     }
 }

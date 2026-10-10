@@ -43,6 +43,7 @@ import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 import java.util.Optional;
@@ -252,7 +253,7 @@ public class RefineryBlockEntity extends MultiblockMachineEntity implements Flui
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 1, 1.2, 1.2, 1.2, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 1, 1.2, 1.2, 1.2, 0);
 
     }
 

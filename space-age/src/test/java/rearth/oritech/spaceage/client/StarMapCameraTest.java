@@ -6,11 +6,22 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-/** Keep pan, zoom and rebuilt-screen placement unchanged after extracting the camera. */
+/**
+ * Keep pan, zoom and rebuilt-screen placement unchanged after extracting the camera.
+ */
 class StarMapCameraTest {
+
+    private static StarMapCamera camera() {
+
+        var camera = new StarMapCamera();
+        camera.fit(List.of(new StarMapCamera.Point(-3_000, 0), new StarMapCamera.Point(5_000, 6_000)),
+                15, 42, 590, 373);
+        return camera;
+    }
 
     @Test
     void projectionAndFitMatchTheOriginalViewport() {
+
         var camera = camera();
         var center = camera.project(1_000, 3_000, 15, 42, 590, 373);
         assertEquals(310, center.x(), 1e-9);
@@ -26,6 +37,7 @@ class StarMapCameraTest {
 
     @Test
     void zoomKeepsThePointUnderThePointerFixed() {
+
         var camera = camera();
         var originalZoom = camera.zoom();
         var before = camera.unproject(123, 234, 15, 42, 590, 373);
@@ -44,6 +56,7 @@ class StarMapCameraTest {
 
     @Test
     void draggingMovesTheMapByThePointerDelta() {
+
         var camera = camera();
         var before = camera.project(500, 700, 15, 42, 590, 373);
         camera.pan(31, -17);
@@ -54,6 +67,7 @@ class StarMapCameraTest {
 
     @Test
     void releasedDragContinuesWithDecayingInertia() {
+
         var camera = camera();
         var before = camera.project(500, 700, 15, 42, 590, 373);
         camera.beginDrag();
@@ -72,6 +86,7 @@ class StarMapCameraTest {
 
     @Test
     void rebuildingTheScreenPreservesItsCamera() {
+
         var previous = camera();
         previous.zoomAt(123, 234, -2, 15, 42, 590, 373);
         previous.pan(31, -17);
@@ -83,6 +98,7 @@ class StarMapCameraTest {
 
     @Test
     void focusFramesLocalPointsWithoutChangingSystemZoomLimit() {
+
         var camera = camera();
         camera.focus(List.of(new StarMapCamera.Point(900, 2_900), new StarMapCamera.Point(1_100, 3_100)),
                 15, 42, 590, 373);
@@ -99,8 +115,9 @@ class StarMapCameraTest {
 
     @Test
     void viewChangesInvalidateProjectedGeometryButIdleInputDoesNot() {
+
         var camera = camera();
-        long revision = camera.revision();
+        var revision = camera.revision();
         camera.pan(0, 0);
         camera.zoomAt(123, 234, 0, 15, 42, 590, 373);
         assertEquals(revision, camera.revision());
@@ -112,12 +129,5 @@ class StarMapCameraTest {
         assertEquals(++revision, camera.revision());
         camera.fit(List.of(), 15, 42, 590, 373);
         assertEquals(++revision, camera.revision());
-    }
-
-    private static StarMapCamera camera() {
-        var camera = new StarMapCamera();
-        camera.fit(List.of(new StarMapCamera.Point(-3_000, 0), new StarMapCamera.Point(5_000, 6_000)),
-                15, 42, 590, 373);
-        return camera;
     }
 }

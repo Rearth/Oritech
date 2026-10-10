@@ -30,6 +30,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class IndustrialChillerBlockEntity extends MultiblockMachineEntity implem
         var emitPosition = Vec3.atCenterOf(worldPosition);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 2, 1.2, 1.2, 1.2, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 2, 1.2, 1.2, 1.2, 0);
 
     }
 

@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -21,23 +22,27 @@ import rearth.oritech.spaceage.network.RocketNetworking;
 public class RocketAssemblerBlock extends Block implements EntityBlock {
 
     public RocketAssemblerBlock(Properties properties) {
+
         super(properties);
         registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext context) {
+
         return defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+
         return new RocketAssemblerBlockEntity(pos, state);
     }
 
@@ -50,6 +55,8 @@ public class RocketAssemblerBlock extends Block implements EntityBlock {
                 serverPlayer.openMenu(assembler, pos);
                 if (serverPlayer.containerMenu instanceof RocketAssemblerMenu menu) {
                     RocketNetworking.sendAssemblerPreview(serverPlayer, pos, menu.getRocket());
+                    if (menu.getRocket() == null && !assembler.scanIssue().isEmpty())
+                        serverPlayer.sendOverlayMessage(Component.translatable(assembler.scanIssue()));
                 }
             });
         }

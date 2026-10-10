@@ -114,7 +114,7 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
 
             if (level instanceof ServerLevel sl) {
                 var c = pos.getCenter();
-                sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, unstableTicks / 4, 1, 1, 1, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.LAVA, c.x, c.y, c.z, unstableTicks / 4, 1, 1, 1, 0);
             }
 
             if (unstableTicks > 60)
@@ -133,14 +133,14 @@ public class ArcaneCatalystBlockEntity extends BaseSoulCollectionEntity
 
             if (level instanceof ServerLevel sl) {
                 var c = pos.getCenter().add(0, 0.3, 0);
-                sl.sendParticles(ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, isHyperEnchanting ? 15 : 3, 1.2, 1.2, 1.2, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.HAPPY_VILLAGER, c.x, c.y, c.z, isHyperEnchanting ? 15 : 3, 1.2, 1.2, 1.2, 0);
             }
 
             if (progress >= maxProgress) {
                 enchantInput();
                 if (level instanceof ServerLevel sl) {
                     var c = pos.getCenter();
-                    sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
+                    ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
                 }
 
                 progress = 0;

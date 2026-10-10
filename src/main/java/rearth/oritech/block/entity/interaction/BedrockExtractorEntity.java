@@ -126,7 +126,7 @@ public class BedrockExtractorEntity extends NetworkedBlockEntity implements Ener
                 lastWorkTime = serverLevel.getGameTime();
 
                 var particlePos = getCenter(0);
-                serverLevel.sendParticles(ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(serverLevel, ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
 
             }
         }

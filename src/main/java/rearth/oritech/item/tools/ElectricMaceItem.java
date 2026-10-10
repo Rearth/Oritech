@@ -30,6 +30,7 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,7 +228,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
 
         if (totalDistance < 0.1) { // Too short to draw
             // Optional: just spawn a particle at the point or do nothing
-            level.sendParticles(particleEffect, startPos.x, startPos.y, startPos.z, 5, 0.1, 0.1, 0.1, 0.05);
+            ParticleContent.sendParticles(level, particleEffect, startPos.x, startPos.y, startPos.z, 5, 0.1, 0.1, 0.1, 0.05);
             return;
         }
 
@@ -286,7 +287,7 @@ public class ElectricMaceItem extends MaceItem implements OritechEnergyItem {
         for (int i = 0; i < numParticles; i++) {
             double progress = (double) i / (double) numParticles;
             var particlePos = p1.add(unit.scale(length * progress));
-            level.sendParticles(particleEffect, particlePos.x, particlePos.y, particlePos.z,
+            ParticleContent.sendParticles(level, particleEffect, particlePos.x, particlePos.y, particlePos.z,
                     1, 0, 0, 0, 0.0D); // count, dx, dy, dz, speed
         }
     }

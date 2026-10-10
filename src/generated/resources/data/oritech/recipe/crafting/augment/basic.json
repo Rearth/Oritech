@@ -8,9 +8,9 @@
     "s": "#oritech:plating"
   },
   "pattern": [
-    "fff",
+    " b ",
     "fcf",
-    "sbs"
+    " s "
   ],
   "result": {
     "id": "oritech:cybernetic_research_station"

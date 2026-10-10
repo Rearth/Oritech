@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "oritech_space_age:block/vacuum_crafter",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "oritech_space_age:block/vacuum_crafter",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/vacuum_crafter"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/vacuum_crafter",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "oritech_space_age:block/vacuum_crafter",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/vacuum_crafter",
+      "y": 270
+    }
+  }
+}

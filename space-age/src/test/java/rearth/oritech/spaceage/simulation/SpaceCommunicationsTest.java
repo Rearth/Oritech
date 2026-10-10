@@ -2,33 +2,47 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpaceCommunicationsTest {
+
     private static final UUID OWNER = new UUID(1, 2);
 
     private static SpaceCommunications.Node node(double altitude, int antennas, OrbitBand band,
-                                                  int slot, boolean relay, boolean ground) {
+                                                 int slot, boolean relay, boolean ground) {
+
         return new SpaceCommunications.Node(UUID.randomUUID(), OWNER, -3_060_000 - altitude, 0,
                 antennas, band, slot, relay, ground);
     }
 
     private static ArrayList<SpaceCommunications.Node> ground() {
+
         return new ArrayList<>(List.of(node(0, 1, OrbitBand.SURFACE, -1, true, true)));
     }
 
     private static void addRing(List<SpaceCommunications.Node> nodes, OrbitBand band) {
+
         for (int slot = 0; slot < SpaceBalance.slots(band); slot++) {
             nodes.add(node(band.altitude(), 1, band, slot, true, false));
         }
     }
 
     private static SpaceCommunications.Connection link(SpaceCommunications.Node craft,
-                                                        List<SpaceCommunications.Node> network) {
+                                                       List<SpaceCommunications.Node> network) {
+
         var nodes = new ArrayList<>(network);
         nodes.add(craft);
         return SpaceCommunications.connection(craft, nodes, SpaceCommunications.routes(nodes));
@@ -36,6 +50,7 @@ class SpaceCommunicationsTest {
 
     @Test
     void constellationTiersExtendCommandCoverage() {
+
         var nodes = ground();
         assertEquals(SpaceBalance.GROUND_COMMAND_ALTITUDE,
                 SpaceCommunications.network(OWNER, nodes).commandAltitude());
@@ -57,6 +72,7 @@ class SpaceCommunicationsTest {
 
     @Test
     void receptionUploadAndForwardingFollowDifferentAntennaRules() {
+
         var systemWide = ground();
         addRing(systemWide, OrbitBand.LOW);
         addRing(systemWide, OrbitBand.HIGH);
@@ -78,6 +94,7 @@ class SpaceCommunicationsTest {
 
     @Test
     void maintainingAnEarthDeploymentSlotEnablesRelayService() {
+
         var maintain = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
         var plan = FlightPlan.empty();
         plan = plan.withBranches(List.of(plan.root().withActions(List.of(maintain))));
@@ -89,7 +106,7 @@ class SpaceCommunicationsTest {
         assertTrue(SpaceCommunications.isRelay(mission));
 
         mission.plan = plan.withBranches(List.of(plan.root().withActions(
-                List.of(FlightPlanAction.create(ActionType.RELAY)))));
+                List.of(FlightPlanAction.create(ActionType.TRANSMIT_INFORMATION)))));
         assertFalse(SpaceCommunications.isRelay(mission));
 
         mission.plan = plan;

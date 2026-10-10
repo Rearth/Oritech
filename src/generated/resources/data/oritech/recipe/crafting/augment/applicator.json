@@ -9,9 +9,9 @@
     "s": "#c:carbon_fibre"
   },
   "pattern": [
-    "fsf",
-    "mcm",
-    "bbb"
+    " m ",
+    "scf",
+    "b b"
   ],
   "result": {
     "id": "oritech:cybernetic_augmentation_center"

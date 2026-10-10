@@ -19,6 +19,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.base.block.PassiveGeneratorBlock;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.TooltipHelper;
 
@@ -105,7 +106,10 @@ public class BigSolarPanelBlock extends PassiveGeneratorBlock {
     @Override
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         TooltipHelper.addMachineTooltip(consumer, this, this);
-        if (Minecraft.getInstance().hasControlDown())
+        if (Minecraft.getInstance().hasControlDown()) {
+            consumer.accept(Component.translatable("tooltip.oritech.generator_rate_desc").withStyle(ChatFormatting.GRAY)
+                    .append(Component.translatable("tooltip.oritech.energy_transfer_rate", OritechConfig.generators.solarGeneratorData.energyPerTick.get()).withStyle(ChatFormatting.GOLD)));
             consumer.accept(Component.translatable("tooltip.oritech.solar_generation").withStyle(ChatFormatting.GRAY));
+        }
     }
 }

@@ -38,6 +38,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 import java.util.Objects;
@@ -287,11 +288,11 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
         if (range > 1 && quarryTarget != BlockPos.ZERO) {
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SOUL_FIRE_FLAME, quarryTarget.getX() + 0.5, quarryTarget.getY() + 1.0, quarryTarget.getZ() + 0.5, 3, 0.4, 0.4, 0.4, 0);
         } else if (hasWorkAvailable(getCurrentTarget())) {
             var bp = getCurrentTarget().below();
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SOUL_FIRE_FLAME, bp.getX() + 0.5, bp.getY() + 0.5, bp.getZ() + 0.5, 1, 0.2, 0.2, 0.2, 0);
         }
     }
 

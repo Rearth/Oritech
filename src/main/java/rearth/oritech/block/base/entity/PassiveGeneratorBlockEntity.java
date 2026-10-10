@@ -24,11 +24,12 @@ import java.util.Set;
 
 public abstract class PassiveGeneratorBlockEntity extends BlockEntity implements EnergyProvider, BlockEntityTicker<PassiveGeneratorBlockEntity> {
 
-    protected final DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(200_000, 0, 10_000, 0, this::setChanged, false);
+    protected final DynamicEnergyStorage energyStorage;
     private List<BlockCapabilityCache<EnergyHandler, Direction>> cachedOutputTargets = List.of();
 
-    public PassiveGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+    public PassiveGeneratorBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, long energyCapacity, long maxEnergyExtraction) {
         super(type, pos, state);
+        energyStorage = new DynamicEnergyStorage(energyCapacity, 0, maxEnergyExtraction, 0, this::setChanged, false);
     }
 
     @Override

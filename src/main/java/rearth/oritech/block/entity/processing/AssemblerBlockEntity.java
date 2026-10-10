@@ -16,6 +16,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 
@@ -66,7 +67,7 @@ public class AssemblerBlockEntity extends MultiblockMachineEntity {
         var emitPosition = Vec3.atCenterOf(worldPosition).add(offsetLocal);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
 
     @Override

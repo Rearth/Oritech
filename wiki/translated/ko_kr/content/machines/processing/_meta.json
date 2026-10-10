@@ -1,0 +1,12 @@
+{
+  "assembler.mdx": "조립기",
+  "atomic_forge.mdx": "원자 단조기",
+  "centrifuge.mdx": "원심분리기",
+  "industrial_chiller.mdx": "산업용 냉각기",
+  "foundry.mdx": "주조기",
+  "fragment_forge.mdx": "파편 단조기",
+  "powered_furnace.mdx": "전기 화로",
+  "pulverizer.mdx": "분쇄기",
+  "refinery.mdx": "정제소",
+  "refinery_chamber_module.mdx": "정제소 챔버 모듈"
+}

@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +16,8 @@ import java.util.UUID;
 // everything is in local space relative to the origin of the entire rocket
 // this data does not change during the flight of a rocket segment
 public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> originalCouplings,
-                                  long staticWeight, int engineCount, long initialRF, long initialFuel) {
-    public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines) {
-        this(id, blocks, couplings, weight, engines, 0, 0);
-    }
+                                  long staticWeight, int engineCount, long initialRF, long initialFuel,
+                                  double payloadEnergyJoules) {
 
     private static final Codec<Set<BlockData>> BLOCKS_CODEC = BlockData.CODEC.listOf()
             .xmap(Set::copyOf, List::copyOf);
@@ -26,7 +25,6 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
             .xmap(Set::copyOf, List::copyOf);
     private static final Codec<Map<UUID, Set<CouplingData>>> COUPLING_MAP_CODEC =
             Codec.unboundedMap(UUIDUtil.STRING_CODEC, COUPLINGS_CODEC);
-
     public static final Codec<StaticRocketSegment> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             UUIDUtil.STRING_CODEC.fieldOf("segment_id").forGetter(StaticRocketSegment::segmentId),
             BLOCKS_CODEC.fieldOf("blocks").forGetter(StaticRocketSegment::blocks),
@@ -34,10 +32,21 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
             Codec.LONG.fieldOf("static_weight").forGetter(StaticRocketSegment::staticWeight),
             Codec.INT.fieldOf("engine_count").forGetter(StaticRocketSegment::engineCount),
             Codec.LONG.optionalFieldOf("initial_rf", 0L).forGetter(StaticRocketSegment::initialRF),
-            Codec.LONG.optionalFieldOf("initial_fuel", 0L).forGetter(StaticRocketSegment::initialFuel)
+            Codec.LONG.optionalFieldOf("initial_fuel", 0L).forGetter(StaticRocketSegment::initialFuel),
+            Codec.DOUBLE.fieldOf("payload_energy").forGetter(StaticRocketSegment::payloadEnergyJoules)
     ).apply(instance, StaticRocketSegment::new));
+    public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines, long rf, long fuel) {
+
+        this(id, blocks, couplings, weight, engines, rf, fuel, 0);
+    }
+
+    public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines) {
+
+        this(id, blocks, couplings, weight, engines, 0, 0);
+    }
 
     public StaticRocketSegment {
+
         blocks = Set.copyOf(blocks);
 
         var copiedCouplings = new HashMap<UUID, Set<CouplingData>>();
@@ -46,28 +55,34 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
     }
 
     public Set<UUID> getConnectedSegments() {
+
         return originalCouplings.keySet();
     }
 
     public Set<CouplingData> getCouplingsToSegment(UUID targetSegmentId) {
+
         return originalCouplings.get(targetSegmentId);
     }
 
-    public record BlockData(BlockPos relativePos, BlockState state, net.minecraft.nbt.CompoundTag entityData) {
-        public BlockData(BlockPos pos, BlockState state) { this(pos, state, new net.minecraft.nbt.CompoundTag()); }
+    public record BlockData(BlockPos relativePos, BlockState state) {
 
-        private static final Codec<BlockData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        public static final Codec<BlockData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BlockPos.CODEC.fieldOf("position").forGetter(BlockData::relativePos),
-                BlockState.CODEC.fieldOf("state").forGetter(BlockData::state),
-                net.minecraft.nbt.CompoundTag.CODEC.optionalFieldOf("entity", new net.minecraft.nbt.CompoundTag()).forGetter(BlockData::entityData)
+                BlockState.CODEC.fieldOf("state").forGetter(BlockData::state)
         ).apply(instance, BlockData::new));
     }
 
-    public record CouplingData(BlockPos relativePos, BlockPos oppositeSide) {
+    public record CouplingData(BlockPos relativePos, BlockPos oppositeSide, BlockState state) {
 
         private static final Codec<CouplingData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BlockPos.CODEC.fieldOf("position").forGetter(CouplingData::relativePos),
-                BlockPos.CODEC.fieldOf("opposite_position").forGetter(CouplingData::oppositeSide)
+                BlockPos.CODEC.fieldOf("opposite_position").forGetter(CouplingData::oppositeSide),
+                BlockState.CODEC.fieldOf("state").forGetter(CouplingData::state)
         ).apply(instance, CouplingData::new));
+
+        public CouplingData(BlockPos relativePos, BlockPos oppositeSide) {
+
+            this(relativePos, oppositeSide, SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState());
+        }
     }
 }

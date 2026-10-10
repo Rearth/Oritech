@@ -1,22 +1,26 @@
 package rearth.oritech.spaceage.simulation;
 
-import static rearth.oritech.spaceage.simulation.RocketFlightPathState.BURN_TOLERANCE;
-import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
-import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPath;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.MotionSample;
+import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
+import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
 
 import java.util.ArrayList;
 import java.util.List;
 
-/** Predicts where an asteroid coasts after its rocket releases it. */
+import static rearth.oritech.spaceage.simulation.RocketFlightPathState.BURN_TOLERANCE;
+
+/**
+ * Predicts where an asteroid coasts after its rocket releases it.
+ */
 final class ReleasedAsteroidPrediction {
 
     private ReleasedAsteroidPrediction() {
     }
 
     static AsteroidPath predict(Craft craft,
-                                                            Context context) {
+                                Context context) {
+
         var asteroid = craft.attachedAsteroid;
         var earth = context.objects.get(SpaceObjects.EARTH_ID);
         var samples = new ArrayList<MotionSample>();
@@ -68,8 +72,9 @@ final class ReleasedAsteroidPrediction {
     }
 
     private static AsteroidImpactRules.ImpactPrediction impact(Craft craft,
-                                                                SpaceSimulation.SpaceObjectData earth,
-                                                                double velocityX, double velocityY) {
+                                                               SpaceSimulation.SpaceObjectData earth,
+                                                               double velocityX, double velocityY) {
+
         // The landing card defines the impact settings even after the rocket has gone away.
         var landing = craft.lastEarthSurfaceAction == null
                 ? SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
@@ -80,6 +85,7 @@ final class ReleasedAsteroidPrediction {
     }
 
     private static double hitFraction(double startX, double startY, double endX, double endY, double radius) {
+
         var deltaX = endX - startX;
         var deltaY = endY - startY;
         var a = deltaX * deltaX + deltaY * deltaY;

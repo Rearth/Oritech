@@ -1,0 +1,16 @@
+{
+  "world": "월드 생성",
+  "biomass.mdx": "바이오매스",
+  "silicon.mdx": "실리콘",
+  "plastic_sheet.mdx": "플라스틱",
+  "steel_ingot.mdx": "강철",
+  "nickel_ingot.mdx": "니켈",
+  "electrum_ingot.mdx": "일렉트럼",
+  "platinum_ingot.mdx": "백금",
+  "duratium_ingot.mdx": "듀라튬",
+  "adamant_ingot.mdx": "아다만트",
+  "biosteel_ingot.mdx": "바이오강",
+  "energite_ingot.mdx": "에너자이트",
+  "fluxite.mdx": "플럭사이트",
+  "prometheum_ingot.mdx": "프로메테움"
+}

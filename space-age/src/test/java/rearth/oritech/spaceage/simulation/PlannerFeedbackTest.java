@@ -3,14 +3,28 @@ package rearth.oritech.spaceage.simulation;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.*;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NOT_ENOUGH_SERVICE_RF;
+import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NO_FEASIBLE_TRANSFER;
+import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NO_SCANNER;
+import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.READY;
 
 class PlannerFeedbackTest {
+
     private static final UUID REGION_ID = new UUID(10, 20);
     private static final SpaceObjectData EARTH = new SpaceObjectData(SpaceObjects.EARTH_ID,
             SpaceObjects.ObjectType.EARTH, 0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
@@ -19,6 +33,7 @@ class PlannerFeedbackTest {
             SpaceObjects.DetectionState.PRECISE);
 
     private static ActiveRocketData rocket(boolean ion, boolean scanner, long rf) {
+
         var id = new UUID(1, 1);
         var blocks = new HashSet<StaticRocketSegment.BlockData>();
         blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO,
@@ -32,11 +47,13 @@ class PlannerFeedbackTest {
     }
 
     private static FlightPlan plan(FlightPlanAction... actions) {
+
         var plan = FlightPlan.empty();
         return plan.withBranches(List.of(plan.root().withActions(List.of(actions))));
     }
 
     private static FlightPlanAction navigate(UUID target) {
+
         var action = FlightPlanAction.create(ActionType.NAVIGATE_TO)
                 .withTarget(target).withOrbit(OrbitBand.SURFACE);
         return new FlightPlanAction(new UUID(3, target.getLeastSignificantBits() ^ 4), action.type(),
@@ -46,12 +63,14 @@ class PlannerFeedbackTest {
     }
 
     private static MissionState.Position atRegion() {
+
         return new MissionState.Position(105_000, 0, 800, 0, REGION_ID, OrbitBand.SURFACE,
                 -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
     }
 
     @Test
     void surveyRoundTripsRequireEnoughAtmosphericThrust() {
+
         var scan = FlightPlanAction.create(ActionType.SCAN);
         for (boolean ion : List.of(false, true)) {
             var result = RocketFlightPathCalculator.calculate(rocket(ion, true, 50_000_000),
@@ -70,6 +89,7 @@ class PlannerFeedbackTest {
 
     @Test
     void scanPlanningReflectsHardwareRangeAndFixedEnergy() {
+
         var scan = FlightPlanAction.create(ActionType.SCAN);
         var result = RocketFlightPathCalculator.calculateFrom(rocket(false, true, 1_000_000),
                 List.of(EARTH, REGION), plan(scan), atRegion());

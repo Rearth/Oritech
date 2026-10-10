@@ -1,0 +1,7 @@
+{
+  "particle_accelerator.mdx": "가속기 컨트롤러",
+  "accelerator_motor.mdx": "가속기 모터",
+  "accelerator_ring.mdx": "가속기 가이드 링",
+  "accelerator_sensor.mdx": "가속기 속도 센서",
+  "tachyon_absorber.mdx": "타키온 수집기"
+}

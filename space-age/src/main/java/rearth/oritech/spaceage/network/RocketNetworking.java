@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.network;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -10,14 +11,18 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.client.RocketClientController;
+import rearth.oritech.spaceage.block.MissionControlMenu;
+import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
+import rearth.oritech.spaceage.block.VacuumCrafterMenu;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.client.RocketAssemblerClientController;
+import rearth.oritech.spaceage.client.RocketClientController;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.RocketSimulationController;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.MissionSavedData;
+import rearth.oritech.spaceage.simulation.RocketDocking;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 
 import java.util.UUID;
@@ -29,6 +34,7 @@ public final class RocketNetworking {
 
     @SuppressWarnings("unchecked")
     public static void register(PayloadRegistrar registrar) {
+
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
         NetworkManager.getAutoCodec(SpaceObjects.AsteroidMaterial.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
@@ -41,6 +47,12 @@ public final class RocketNetworking {
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlannerSnapshot.class);
 
+        registrar.playToServer(NameControllerPayload.TYPE, NetworkManager.getAutoCodec(NameControllerPayload.class), (payload, context) -> context.enqueueWork(() -> {
+            var player = context.player();
+            if (player.containerMenu instanceof VacuumCrafterMenu menu && menu.pos.equals(payload.position()) && menu.stillValid(player)
+                    && player.level().getBlockEntity(menu.pos) instanceof VacuumCrafterBlockEntity controller)
+                controller.setName(payload.name());
+        }));
         registrar.playToClient(SyncRocketPayload.TYPE, NetworkManager.getAutoCodec(SyncRocketPayload.class),
                 RocketNetworking::receiveRocket);
         registrar.playToClient(UnloadRocketPayload.TYPE, NetworkManager.getAutoCodec(UnloadRocketPayload.class),
@@ -64,24 +76,29 @@ public final class RocketNetworking {
     }
 
     public static void sendRocket(ServerPlayer player, ActiveRocketData rocket) {
+
         PacketDistributor.sendToPlayer(player, new SyncRocketPayload(rocket));
     }
 
     public static void unloadRocket(ServerPlayer player, UUID rocketId) {
+
         PacketDistributor.sendToPlayer(player, new UnloadRocketPayload(rocketId));
     }
 
     public static void sendCollision(ServerPlayer player, UUID rocketId, BlockPos position,
                                      double speedMetersPerSecond, float explosionStrength, boolean nuclearExplosion) {
+
         PacketDistributor.sendToPlayer(player,
                 new CollisionPayload(rocketId, position, speedMetersPerSecond, explosionStrength, nuclearExplosion));
     }
 
     public static void clearRockets(ServerPlayer player) {
+
         PacketDistributor.sendToPlayer(player, ClearRocketsPayload.INSTANCE);
     }
 
     public static void sendAssemblerPreview(ServerPlayer player, BlockPos position, ActiveRocketData rocket) {
+
         if (rocket == null) {
             PacketDistributor.sendToPlayer(player, new InvalidAssemblerPreviewPayload(position));
         } else {
@@ -90,10 +107,12 @@ public final class RocketNetworking {
     }
 
     private static void receiveRocket(SyncRocketPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> RocketClientController.receiveRocket(payload.rocket()));
     }
 
     private static void unloadRocket(UnloadRocketPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> {
             RocketClientController.removeRocket(payload.rocketId());
             OritechSpaceAge.LOGGER.debug("Unloaded orbiting rocket {} from the client", payload.rocketId());
@@ -101,6 +120,7 @@ public final class RocketNetworking {
     }
 
     private static void receiveCollision(CollisionPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> {
             RocketClientController.removeRocket(payload.rocketId());
             OritechSpaceAge.LOGGER.debug("Received rocket collision {} at {}: speed={}m/s, strength={}, nuclear={}",
@@ -110,22 +130,27 @@ public final class RocketNetworking {
     }
 
     private static void clearRockets(ClearRocketsPayload payload, IPayloadContext context) {
+
         context.enqueueWork(RocketClientController::clearRockets);
     }
 
     private static void receiveAssemblerPreview(AssemblerPreviewPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> RocketAssemblerClientController.receivePreview(payload.position(), payload.rocket()));
     }
 
     private static void receiveInvalidAssemblerPreview(InvalidAssemblerPreviewPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> RocketAssemblerClientController.receivePreview(payload.position(), null));
     }
 
     private static void receiveFlightPlanner(FlightPlannerPayload payload, IPayloadContext context) {
+
         context.enqueueWork(() -> RocketAssemblerClientController.receiveFlightPlanner(payload.position(), payload.snapshot()));
     }
 
     private static void requestFlightPlanner(RequestFlightPlannerPayload payload, IPayloadContext context) {
+
         if (!validAssemblerMenu(context, payload.position())) return;
         var player = (ServerPlayer) context.player();
         var menu = (RocketAssemblerMenu) player.containerMenu;
@@ -133,14 +158,16 @@ public final class RocketNetworking {
     }
 
     private static void submitFlightPlan(SubmitFlightPlanPayload payload, IPayloadContext context) {
+
         if (!validAssemblerMenu(context, payload.position())) return;
         var player = (ServerPlayer) context.player();
         var menu = (RocketAssemblerMenu) player.containerMenu;
         var rocket = menu.getRocket();
         if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
 
-        if (menu instanceof rearth.oritech.spaceage.block.MissionControlMenu control) {
-            MissionNetworking.submit(player, control, payload.plan()); return;
+        if (menu instanceof MissionControlMenu control) {
+            MissionNetworking.submit(player, control, payload.plan());
+            return;
         }
         // Only complete drafts cross the network. SpaceSimulation sanitizes the client-authored plan before storing it.
         SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), menu.blockPos),
@@ -148,14 +175,17 @@ public final class RocketNetworking {
     }
 
     private static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
+
         var rocket = menu.getRocket();
         if (rocket == null) return;
         var snapshot = SpaceSimulationSavedData.getForPlayer(player)
-                .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), menu.blockPos), rocket.getRocketId());
+                .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), menu.blockPos), rocket.getRocketId())
+                .withStations(RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()));
         PacketDistributor.sendToPlayer(player, new FlightPlannerPayload(menu.blockPos, snapshot));
     }
 
     private static boolean validAssemblerMenu(IPayloadContext context, BlockPos position) {
+
         return context.player() instanceof ServerPlayer player
                 && player.containerMenu instanceof RocketAssemblerMenu menu
                 && menu.blockPos.equals(position)
@@ -163,6 +193,7 @@ public final class RocketNetworking {
     }
 
     private static void launchRocket(LaunchRocketPayload payload, IPayloadContext context) {
+
         var player = context.player();
         if (!(player instanceof ServerPlayer serverPlayer)
                 || !(serverPlayer.containerMenu instanceof RocketAssemblerMenu menu)
@@ -175,7 +206,18 @@ public final class RocketNetworking {
         if (assembler.isPresent() && assembler.get().assemble(serverPlayer, payload.plan())) {
             serverPlayer.closeContainer();
         } else {
-            serverPlayer.sendOverlayMessage(net.minecraft.network.chat.Component.translatable("message.oritech_space_age.rocket_invalid"));
+            serverPlayer.sendOverlayMessage(Component.translatable("message.oritech_space_age.rocket_invalid"));
+        }
+    }
+
+    public record NameControllerPayload(BlockPos position, String name) implements CustomPacketPayload {
+
+        public static final Type<NameControllerPayload> TYPE = new Type<>(OritechSpaceAge.id("name_controller"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
         }
     }
 
@@ -185,6 +227,7 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
@@ -195,6 +238,7 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
@@ -206,6 +250,7 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
@@ -217,6 +262,7 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
@@ -227,6 +273,7 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
@@ -237,45 +284,54 @@ public final class RocketNetworking {
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
 
-    public record LaunchRocketPayload(BlockPos position, SpaceSimulation.FlightPlan plan) implements CustomPacketPayload {
+    public record LaunchRocketPayload(BlockPos position,
+                                      SpaceSimulation.FlightPlan plan) implements CustomPacketPayload {
 
         public static final Type<LaunchRocketPayload> TYPE = new Type<>(OritechSpaceAge.id("launch_rocket"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
 
     public record RequestFlightPlannerPayload(BlockPos position) implements CustomPacketPayload {
+
         public static final Type<RequestFlightPlannerPayload> TYPE = new Type<>(OritechSpaceAge.id("request_flight_planner"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
 
     public record SubmitFlightPlanPayload(BlockPos position, UUID rocketId,
                                           SpaceSimulation.FlightPlan plan) implements CustomPacketPayload {
+
         public static final Type<SubmitFlightPlanPayload> TYPE = new Type<>(OritechSpaceAge.id("submit_flight_plan"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }
 
     public record FlightPlannerPayload(BlockPos position,
                                        SpaceSimulation.FlightPlannerSnapshot snapshot) implements CustomPacketPayload {
+
         public static final Type<FlightPlannerPayload> TYPE = new Type<>(OritechSpaceAge.id("flight_planner"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {
+
             return TYPE;
         }
     }

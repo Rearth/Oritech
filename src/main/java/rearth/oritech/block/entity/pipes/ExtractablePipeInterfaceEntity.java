@@ -6,8 +6,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class ExtractablePipeInterfaceEntity extends GenericPipeInterfaceEntity {
 
-    protected int filteredTargetsNetHash;
-
     public ExtractablePipeInterfaceEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
     }
@@ -18,6 +16,7 @@ public abstract class ExtractablePipeInterfaceEntity extends GenericPipeInterfac
      * Used when extraction is toggled
      */
     public void invalidateTargetCache() {
-        filteredTargetsNetHash = 0;
+        cachedNetworkTargets = null;
+        transferBackoff.reset();
     }
 }

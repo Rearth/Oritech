@@ -104,7 +104,6 @@ public class NetworkManager {
         registrar.playToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);
         registrar.playToServer(JetpackItem.JetpackUsageUpdatePacket.PACKET_ID, getAutoCodec(JetpackItem.JetpackUsageUpdatePacket.class), JetpackItem::receiveUsagePacket);
         registrar.playToServer(PlayerAugments.AugmentInstallTriggerPacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentInstallTriggerPacket.class), PlayerAugments::receiveInstallTrigger);
-        registrar.playToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
         registrar.playToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
         registrar.playToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
         registrar.playToServer(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.PACKET_ID, getAutoCodec(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.class), AddonSplicerBlockEntity::onPlayerUse);
@@ -116,7 +115,9 @@ public class NetworkManager {
     }
 
     public static void initClientBound(PayloadRegistrar registrar) {
+        registrar.playToClient(NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_ID, NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_CODEC, NuclearReactorControllerBlockEntity::handleGuiUpdate);
         registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+        registrar.playToClient(ParticleContent.ParticleBatchPayload.PACKET_ID, ParticleContent.ParticleBatchPayload.PACKET_CODEC, ParticleContent::handleParticleBatch);
         registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
         registrar.playToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registrar.playToClient(ArcaneCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(ArcaneCatalystBlockEntity.CatalystSyncPacket.class), ArcaneCatalystBlockEntity::receiveUpdatePacket);

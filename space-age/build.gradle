@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.moddev' version '2.0.148'
     id 'idea'
+    id 'checkstyle'
 }
 
 version = space_age_mod_version
@@ -122,6 +123,12 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('test') {
     useJUnitPlatform()
     workingDir = layout.buildDirectory.get().asFile
+}
+
+// Keep the readability checks small; IntelliJ remains responsible for full formatting.
+checkstyle {
+    toolVersion = '12.3.0'
+    configFile = file('config/checkstyle/checkstyle.xml')
 }
 
 tasks.withType(ProcessResources).configureEach {

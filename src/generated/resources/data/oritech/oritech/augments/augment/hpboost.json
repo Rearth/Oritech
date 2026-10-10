@@ -15,19 +15,19 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 64,
+      "count": 16,
       "ingredient": "#oritech:plating"
     },
     {
-      "count": 32,
+      "count": 16,
       "ingredient": "#c:dusts/coal"
     },
     {
-      "count": 8,
+      "count": 4,
       "ingredient": "oritech:biosteel_ingot"
     }
   ],
-  "rfCost": 10000000,
+  "rfCost": 5000000,
   "time": 400,
   "toggleable": false,
   "uiX": 5,

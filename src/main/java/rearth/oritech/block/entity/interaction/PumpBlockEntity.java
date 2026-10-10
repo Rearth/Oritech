@@ -35,6 +35,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.util.ColorableMachine;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -139,7 +140,7 @@ public class PumpBlockEntity extends NetworkedBlockEntity implements FluidProvid
             var targetType = targetState.getDripParticle();
 
             if (targetType != null)
-                serverLevel.sendParticles(targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
+                ParticleContent.sendParticles(serverLevel, targetType, targetPos.x(), targetPos.y(), targetPos.z(), 1, 0, 0, 0, 1);
         }
 
     }

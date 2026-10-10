@@ -22,6 +22,7 @@ import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.item.tools.EndericRailgunItem;
+import rearth.oritech.client.init.OritechClientConfig;
 
 import static rearth.oritech.client.renderers.blocks.EndericLaserRenderer.BEAM_TEXTURE;
 
@@ -84,7 +85,7 @@ public class EndericRailgunRenderer extends GeoItemRenderer<EndericRailgunItem> 
         super.postRenderPass(renderPassInfo, renderTasks);
 
         var data = renderPassInfo.getGeckolibData(BEAM_DATA);
-        if (data == null) return;
+        if (data == null || !OritechClientConfig.renderBeams()) return;
 
         renderTasks.submitCustomGeometry(renderPassInfo.poseStack(), RenderTypes.eyes(BEAM_TEXTURE), (pose, consumer) -> {
             // core
@@ -97,7 +98,7 @@ public class EndericRailgunRenderer extends GeoItemRenderer<EndericRailgunItem> 
             );
 
             // outer glow
-            BeamRenderer.renderStraightBeam(
+            BeamRenderer.renderOuterBeam(
                     pose, consumer, data.startOffset(), data.deltaVec(),
                     data.thickness(),
                     RenderHelpers.FULL_BRIGHT,

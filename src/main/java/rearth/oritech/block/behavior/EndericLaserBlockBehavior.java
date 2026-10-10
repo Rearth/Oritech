@@ -117,7 +117,9 @@ public class EndericLaserBlockBehavior {
                 if (blockState.isAir() || !blockState.getFluidState().isEmpty()) return false;
 
                 blockState.randomTick((ServerLevel) level, blockPos, level.getRandom());
-                ParticleContent.Accelerating(level, Vec3.atLowerCornerOf(blockPos));
+
+                if (level.getGameTime() % 8 == 0)
+                    ParticleContent.Accelerating(level, Vec3.atLowerCornerOf(blockPos));
 
                 return true;
             }
