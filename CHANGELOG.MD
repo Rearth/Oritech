@@ -1,0 +1,13 @@
+- Add / improve oritech in-world fluid interactions, make steam flow upwards, add interactions for strange matter
+- Add config settings to reduce or disable most oritech visual effects / extra eye candy
+- Rebalance early machine and augment costs, mosts are now cheaper
+- Rebalance oritech generators. Most generators now produce double the RF. Transfer capacity of most pipes has been increased.
+- Fix prom pickaxe able to destroy indestructible blocks
+- Add tag to configure dubious container targets (@Hiiragi283)
+- Add (configurable) exponential backoff behaviour to fluid and item pipes
+- Port reactor performance improvements to 26.1.2
+- Multiblock neoforge capability handling improvements
+- Player augments are now auto-loaded to augment stations, the button for it has been removed
+- Small pipe performance and consistency improvements
+- Add korean translations for mod and wiki (@Strawberry-sushi)
+- Lots of small bugfixes
