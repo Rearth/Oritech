@@ -13,11 +13,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.Bootstrap;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.ReflectiveCodecBuilder;
-import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -25,12 +25,16 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpaceSimulationPersistenceTest {
 
     @Test
     void savesSettingsTargetsAndBranches(@TempDir Path directory) throws Exception {
+
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
         var data = new SpaceSimulationSavedData();
@@ -41,8 +45,9 @@ class SpaceSimulationPersistenceTest {
         data.setDirty(false);
         var rocketId = UUID.randomUUID();
         assertTrue(simulation.createObjectData().stream().noneMatch(o -> o.type() == SpaceObjects.ObjectType.ASTEROID));
-        for (var object : simulation.truth()) if (object.type() == SpaceObjects.ObjectType.ASTEROID)
-            simulation.earthKnowledge.scan(List.of(object), 0, object.x(), object.y(), SpaceBalance.SCAN_RANGE);
+        for (var object : simulation.truth())
+            if (object.type() == SpaceObjects.ObjectType.ASTEROID)
+                simulation.earthKnowledge.scan(List.of(object), 0, object.x(), object.y(), SpaceBalance.SCAN_RANGE);
         var initial = simulation.createFlightPlannerSnapshot(assembler, rocketId);
         var target = initial.objects().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .findFirst().orElseThrow();

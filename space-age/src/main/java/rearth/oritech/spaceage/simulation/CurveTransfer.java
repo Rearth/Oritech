@@ -1,17 +1,17 @@
 package rearth.oritech.spaceage.simulation;
 
-/** Scalar burn/coast/burn timing along a curve, with constant endpoint gravity projections. */
+/**
+ * Scalar burn/coast/burn timing along a curve, with constant endpoint gravity projections.
+ */
 final class CurveTransfer {
 
-    record Plan(double firstSeconds, double coastSeconds, double lastSeconds) { }
-    private record Burn(double seconds, double distance, double gained) { }
-    private record Candidate(double peak, Burn first, Burn last, double distance) { }
-
-    private CurveTransfer() { }
+    private CurveTransfer() {
+    }
 
     static Plan solve(double distance, double initial, double arrival, boolean freeArrival,
                       double speedLimit, RocketBurnProfile profile, double engineEfficiency,
                       double departureGravity, double arrivalGravity) {
+
         if (distance <= 0 || profile.intervals().isEmpty() || !(speedLimit > 0)) return null;
         var minimum = Math.max(initial, freeArrival ? 0 : arrival);
         if (minimum > speedLimit) return null;
@@ -38,6 +38,7 @@ final class CurveTransfer {
     private static Candidate candidate(double peak, double initial, double arrival, boolean freeArrival,
                                        RocketBurnProfile profile, double efficiency,
                                        double departureGravity, double arrivalGravity) {
+
         var first = burn(profile, 0, Math.max(0, peak - initial), efficiency, departureGravity);
         if (first == null) return null;
         var last = freeArrival ? new Burn(0, 0, 0)
@@ -48,9 +49,12 @@ final class CurveTransfer {
         return new Candidate(peak, first, last, distance);
     }
 
-    /** Integrates full-power engine time after an earlier burn, including stage-rate changes. */
+    /**
+     * Integrates full-power engine time after an earlier burn, including stage-rate changes.
+     */
     private static Burn burn(RocketBurnProfile profile, double elapsed, double wanted,
                              double efficiency, double gravity) {
+
         if (wanted <= 1e-9) return new Burn(0, 0, 0);
         var remainingOffset = elapsed;
         var gained = 0d;
@@ -72,5 +76,17 @@ final class CurveTransfer {
             if (gained >= wanted - 1e-8) return new Burn(seconds, distance, gained);
         }
         return null;
+    }
+
+    record Plan(double firstSeconds, double coastSeconds, double lastSeconds) {
+
+    }
+
+    private record Burn(double seconds, double distance, double gained) {
+
+    }
+
+    private record Candidate(double peak, Burn first, Burn last, double distance) {
+
     }
 }

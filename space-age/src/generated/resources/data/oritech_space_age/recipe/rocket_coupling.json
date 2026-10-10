@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "m": "oritech:motor",
+    "p": "minecraft:piston",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sis",
+    "pmp",
+    "sis"
+  ],
+  "result": {
+    "id": "oritech_space_age:rocket_coupling"
+  }
+}

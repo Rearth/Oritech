@@ -8,7 +8,9 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 
 import java.util.Locale;
 
-/** Draws the fixed map controls, compact flight summary, and collapsible path legend. */
+/**
+ * Draws the fixed map controls, compact flight summary, and collapsible path legend.
+ */
 final class StarMapOverlay {
 
     private static final int COLLAPSED_LEGEND_WIDTH = 112;
@@ -23,14 +25,15 @@ final class StarMapOverlay {
                        Component selectedTarget, Component selectedBranch,
                        RocketFlightPathCalculator.CraftPath selectedPath, boolean legendExpanded, boolean showSummary,
                        boolean showCommandCoverage) {
+
         var font = Minecraft.getInstance().font;
         graphics.fill(x + 6, y + 6, x + width - 6, y + 21, 0xDD080D18);
         graphics.text(font, Component.translatable("screen.oritech_space_age.star_system"), x + 10, y + 9, 0xFFCAD8E5, true);
         if (selectedTarget != null) graphics.text(font, selectedTarget, x + 82, y + 9, 0xFFF6C65B, false);
 
         if (showSummary) {
-            int statsRight = x + width - 9;
-            int statsX = Math.max(x + 195, statsRight - 470);
+            var statsRight = x + width - 9;
+            var statsX = Math.max(x + 195, statsRight - 470);
             OritechSurface.PANEL_DARK.render(graphics, statsX, y - 30, statsRight - statsX, 20);
             var deltaV = selectedPath == null ? "–" : String.format(Locale.ROOT, "%.0f", selectedPath.remainingDeltaV());
             var status = selectedPath == null ? Component.literal("–") : Component.translatable(
@@ -43,10 +46,10 @@ final class StarMapOverlay {
                     selectedPath != null && selectedPath.terminalState().isFailure() ? 0xFFFF9999 : 0xFFCAD8E5, false);
         }
 
-        int legendWidth = legendExpanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
-        int legendHeight = legendExpanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
-        int legendX = x + width - legendWidth - 9;
-        int legendY = y + height - legendHeight - 8;
+        var legendWidth = legendExpanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
+        var legendHeight = legendExpanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
+        var legendX = x + width - legendWidth - 9;
+        var legendY = y + height - legendHeight - 8;
         OritechSurface.PANEL_DARK.render(graphics, legendX, legendY, legendWidth, legendHeight);
         graphics.text(font, Component.translatable("screen.oritech_space_age.path_legend"),
                 legendX + 7, legendY + 5, 0xFFF2F6FA, true);
@@ -64,21 +67,24 @@ final class StarMapOverlay {
 
     static boolean isOverLegend(double mouseX, double mouseY, int x, int y, int width, int height,
                                 boolean expanded) {
-        int legendWidth = expanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
-        int legendHeight = expanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
-        int legendX = x + width - legendWidth - 9;
-        int legendY = y + height - legendHeight - 8;
+
+        var legendWidth = expanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
+        var legendHeight = expanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
+        var legendX = x + width - legendWidth - 9;
+        var legendY = y + height - legendHeight - 8;
         return mouseX >= legendX && mouseX < legendX + legendWidth
                 && mouseY >= legendY && mouseY < legendY + legendHeight;
     }
 
     private static void entry(GuiGraphicsExtractor graphics, int x, int y, int color, String key) {
+
         graphics.fill(x, y + 3, x + 13, y + 5, color);
         graphics.text(Minecraft.getInstance().font, Component.translatable("screen.oritech_space_age.path." + key),
                 x + 18, y, 0xFFCAD8E5, false);
     }
 
     private static void dashedEntry(GuiGraphicsExtractor graphics, int x, int y, int color, String key) {
+
         for (int part = 0; part < 3; part++) graphics.fill(x + part * 5, y + 3, x + part * 5 + 3, y + 5, color);
         graphics.text(Minecraft.getInstance().font, Component.translatable(key), x + 18, y, 0xFFCAD8E5, false);
     }

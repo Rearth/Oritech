@@ -4,10 +4,14 @@
     "oritech_space_age:rocket_pad",
     "oritech_space_age:rocket_coupling",
     "oritech_space_age:asteroid_anchor",
+    "oritech_space_age:navigation_computer",
+    "oritech_space_age:parachute",
     "oritech_space_age:basic_booster_rocket",
     "oritech_space_age:ion_booster_rocket",
     "oritech_space_age:mission_control",
     "oritech_space_age:space_scanner",
-    "oritech_space_age:antenna"
+    "oritech_space_age:antenna",
+    "oritech_space_age:vacuum_crafter",
+    "oritech_space_age:cargo"
   ]
 }

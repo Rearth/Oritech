@@ -2,19 +2,21 @@ package rearth.oritech.spaceage.client;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.Identifier;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.resources.Identifier;
 import org.joml.Matrix3x2f;
 import org.jspecify.annotations.Nullable;
 
 import java.util.List;
 
-/** Batches the star map's flat discs and icons into one untextured GUI submission. */
+/**
+ * Batches the star map's flat discs and icons into one untextured GUI submission.
+ */
 final class StarMapObjectRenderer {
 
     private static final Identifier FOG_TEXTURE = Identifier.fromNamespaceAndPath(
@@ -24,6 +26,7 @@ final class StarMapObjectRenderer {
     }
 
     static void submit(GuiGraphicsExtractor graphics, List<Disc> discs, StarMapObjects.Viewport viewport) {
+
         if (discs.isEmpty()) return;
         var pose = new Matrix3x2f(graphics.pose());
         var scissor = graphics.peekScissorStack();
@@ -36,11 +39,14 @@ final class StarMapObjectRenderer {
             graphics.submitGuiElementRenderState(new FogState(fog, pose,
                     TextureSetup.singleTexture(texture.getTextureView(), texture.getSampler()), scissor, clippedBounds));
         }
-        if (!solid.isEmpty()) graphics.submitGuiElementRenderState(new RenderState(solid, pose, scissor, clippedBounds));
+        if (!solid.isEmpty())
+            graphics.submitGuiElementRenderState(new RenderState(solid, pose, scissor, clippedBounds));
     }
 
     record Disc(double x, double y, double radiusX, double radiusY, int color, int edgeColor, int sides) {
+
         Disc(double x, double y, double radiusX, double radiusY, int color, int sides) {
+
             this(x, y, radiusX, radiusY, color, color, sides);
         }
     }
@@ -50,11 +56,15 @@ final class StarMapObjectRenderer {
     private record FogState(List<Disc> discs, Matrix3x2f pose, TextureSetup textureSetup,
                             @Nullable ScreenRectangle scissorArea,
                             @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+
         @Override
         public void buildVertices(VertexConsumer vertices) {
+
             for (var disc : discs) {
-                float left = (float) (disc.x() - disc.radiusX()), right = (float) (disc.x() + disc.radiusX());
-                float top = (float) (disc.y() - disc.radiusY()), bottom = (float) (disc.y() + disc.radiusY());
+                var left = (float) (disc.x() - disc.radiusX());
+                var right = (float) (disc.x() + disc.radiusX());
+                var top = (float) (disc.y() - disc.radiusY());
+                var bottom = (float) (disc.y() + disc.radiusY());
                 vertices.addVertexWith2DPose(pose, left, top).setUv(0, 0).setColor(disc.color());
                 vertices.addVertexWith2DPose(pose, left, bottom).setUv(0, 1).setColor(disc.color());
                 vertices.addVertexWith2DPose(pose, right, bottom).setUv(1, 1).setColor(disc.color());
@@ -64,6 +74,7 @@ final class StarMapObjectRenderer {
 
         @Override
         public RenderPipeline pipeline() {
+
             return RenderPipelines.GUI_TEXTURED;
         }
     }
@@ -71,8 +82,10 @@ final class StarMapObjectRenderer {
     private record RenderState(List<Disc> discs, Matrix3x2f pose,
                                @Nullable ScreenRectangle scissorArea,
                                @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+
         @Override
         public void buildVertices(VertexConsumer vertices) {
+
             for (var disc : discs) {
                 var previousX = disc.x() + disc.radiusX();
                 var previousY = disc.y();
@@ -93,11 +106,13 @@ final class StarMapObjectRenderer {
 
         @Override
         public RenderPipeline pipeline() {
+
             return RenderPipelines.GUI;
         }
 
         @Override
         public TextureSetup textureSetup() {
+
             return TextureSetup.noTexture();
         }
     }

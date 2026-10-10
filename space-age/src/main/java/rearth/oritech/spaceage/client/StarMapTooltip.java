@@ -7,12 +7,17 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Function;
 
-/** Builds the map's object, route, and stage tooltips from immutable display data. */
+/**
+ * Builds the map's object, route, and stage tooltips from immutable display data.
+ */
 final class StarMapTooltip {
 
     private StarMapTooltip() {
@@ -22,7 +27,8 @@ final class StarMapTooltip {
                                  RocketStarMapWidget.NavigationSelection selection, ArrivalPosition arrival,
                                  PathPoint pathPoint, SpaceSimulation.FlightPlan plan,
                                  Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames,
-                                 Function<java.util.UUID, SpaceSimulation.SpaceObjectData> objectById) {
+                                 Function<UUID, SpaceSimulation.SpaceObjectData> objectById) {
+
         if (separation != null) {
             var lines = new ArrayList<Component>();
             lines.add(Component.translatable("screen.oritech_space_age.separation_stage", separation.stage()).withStyle(ChatFormatting.BOLD));
@@ -60,8 +66,9 @@ final class StarMapTooltip {
     }
 
     private static List<Component> objectTooltip(SpaceSimulation.SpaceObjectData object,
-                                                  RocketStarMapWidget.NavigationSelection selection,
-                                                  ArrivalPosition arrival) {
+                                                 RocketStarMapWidget.NavigationSelection selection,
+                                                 ArrivalPosition arrival) {
+
         var lines = new ArrayList<Component>();
         lines.add(RocketStarMapWidget.objectName(object).copy().withStyle(ChatFormatting.BOLD));
         if (selection != null && selection.orbit() != SpaceSimulation.OrbitBand.SURFACE) {
@@ -91,26 +98,29 @@ final class StarMapTooltip {
             lines.add(Component.translatable("screen.oritech_space_age.object.materials"));
             object.materials().forEach(material -> lines.add(material.amount() > 0
                     ? Component.translatable("screen.oritech_space_age.object.material_known",
-                            material.block().toString(), material.amount())
+                    material.block().toString(), material.amount())
                     : Component.translatable("screen.oritech_space_age.object.material_unknown",
-                            material.block().toString())));
+                    material.block().toString())));
         }
         return lines;
     }
 
-    private static void addSegmentNames(List<Component> lines, java.util.Set<SpaceSimulation.SegmentRef> segments,
+    private static void addSegmentNames(List<Component> lines, Set<SpaceSimulation.SegmentRef> segments,
                                         SpaceSimulation.FlightPlan plan, Map<SpaceSimulation.SegmentRef, String> defaults) {
-        segments.stream().sorted(java.util.Comparator.comparingLong(ref -> ref.anchor().asLong()))
+
+        segments.stream().sorted(Comparator.comparingLong(ref -> ref.anchor().asLong()))
                 .map(segment -> segmentName(plan, defaults, segment)).map(name -> Component.literal("• " + name)).forEach(lines::add);
     }
 
     private static String segmentName(SpaceSimulation.FlightPlan plan, Map<SpaceSimulation.SegmentRef, String> defaults,
                                       SpaceSimulation.SegmentRef segment) {
+
         var name = plan.configurationFor(segment).name();
         return name.isBlank() ? defaults.getOrDefault(segment, "Unknown segment") : name;
     }
 
     private static double gravityAtOrbit(SpaceSimulation.SpaceObjectData object, SpaceSimulation.OrbitBand orbit) {
+
         var distance = object.radius() + orbit.altitude();
         if (distance <= 0) return 0;
         var relativeDistance = object.radius() / distance;
@@ -118,26 +128,38 @@ final class StarMapTooltip {
     }
 
     private static Component pathPhaseName(RocketFlightPathCalculator.PathPhase phase) {
+
         return Component.translatable("screen.oritech_space_age.path." + phase.name().toLowerCase(Locale.ROOT));
     }
 
     private static String format(double value) {
+
         return String.format(Locale.ROOT, "%,.0f", value);
     }
 
     private static String formatSpeed(double value) {
+
         return String.format(Locale.ROOT, "%,.1f", value);
     }
 
-    /** Stage, shared-clock release time and boosters grouped at this marker. */
+    /**
+     * Stage, shared-clock release time and boosters grouped at this marker.
+     */
     record Separation(int stage, double timeSeconds, List<SpaceSimulation.SegmentRef> segments) {
+
     }
 
-    /** Displayed object position in world units, with its arrival time. */
+    /**
+     * Displayed object position in world units, with its arrival time.
+     */
     record ArrivalPosition(double x, double y, double timeSeconds) {
+
     }
 
-    /** Original sample state and interpolated speed at the hovered point. */
+    /**
+     * Original sample state and interpolated speed at the hovered point.
+     */
     record PathPoint(RocketFlightPathCalculator.PathSample sample, double speedMetersPerSecond) {
+
     }
 }

@@ -5,12 +5,15 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+
+import java.util.UUID;
 
 public class RocketAssemblerMenu extends AbstractContainerMenu {
 
@@ -21,20 +24,24 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     private @Nullable SpaceSimulation.FlightPlannerSnapshot flightPlannerSnapshot;
     private int flightPlannerRevision;
     private @Nullable SpaceSimulation.FlightPlan draftFlightPlan;
-    private @Nullable java.util.UUID draftRocketId;
+    private @Nullable UUID draftRocketId;
     private boolean draftFlightPlanDirty;
 
-    protected RocketAssemblerMenu(net.minecraft.world.inventory.MenuType<?> type, int id, BlockPos pos) {
-        super(type, id); this.blockPos = pos;
+    protected RocketAssemblerMenu(MenuType<?> type, int id, BlockPos pos) {
+
+        super(type, id);
+        this.blockPos = pos;
     }
 
     public RocketAssemblerMenu(int syncId, Inventory inventory, RegistryFriendlyByteBuf buffer) {
+
         super(SpaceAgeMenus.ROCKET_ASSEMBLER.get(), syncId);
         this.blockPos = buffer.readBlockPos();
     }
 
     public RocketAssemblerMenu(int syncId, Inventory inventory, RocketAssemblerBlockEntity assembler,
                                @Nullable ActiveRocketData rocket) {
+
         super(SpaceAgeMenus.ROCKET_ASSEMBLER.get(), syncId);
         this.blockPos = assembler.getBlockPos();
         this.rocket = rocket;
@@ -42,19 +49,23 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     }
 
     public @Nullable ActiveRocketData getRocket() {
+
         return rocket;
     }
 
     public boolean isPreviewLoaded() {
+
         return previewLoaded;
     }
 
     public int getPreviewRevision() {
+
         return previewRevision;
     }
 
     public void setPreview(@Nullable ActiveRocketData rocket) {
-        boolean changedRocket = this.rocket == null || rocket == null
+
+        var changedRocket = this.rocket == null || rocket == null
                 || !this.rocket.getRocketId().equals(rocket.getRocketId());
         this.rocket = rocket;
         this.previewLoaded = true;
@@ -68,21 +79,22 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
         }
     }
 
-    /** Replaces changing resources/flight state without treating the same rocket as a new preview. */
+    /**
+     * Replaces changing resources/flight state without treating the same rocket as a new preview.
+     */
     public void updatePreviewData(ActiveRocketData rocket) {
+
         this.rocket = rocket;
         this.previewLoaded = true;
     }
 
     public @Nullable SpaceSimulation.FlightPlannerSnapshot getFlightPlannerSnapshot() {
+
         return flightPlannerSnapshot;
     }
 
-    public int getFlightPlannerRevision() {
-        return flightPlannerRevision;
-    }
-
     public void setFlightPlannerSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
+
         this.flightPlannerSnapshot = snapshot;
         if (draftFlightPlan == null || !snapshot.rocketId().equals(draftRocketId) || !draftFlightPlanDirty) {
             draftFlightPlan = snapshot.plan();
@@ -92,36 +104,50 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
         this.flightPlannerRevision++;
     }
 
-    /** Replaces live mission inputs without rebuilding an open editor. */
+    public int getFlightPlannerRevision() {
+
+        return flightPlannerRevision;
+    }
+
+    /**
+     * Replaces live mission inputs without rebuilding an open editor.
+     */
     public void updateFlightPlannerSnapshotData(SpaceSimulation.FlightPlannerSnapshot snapshot) {
+
         this.flightPlannerSnapshot = snapshot;
     }
 
     public @Nullable SpaceSimulation.FlightPlan getDraftFlightPlan() {
+
         return draftFlightPlan;
     }
 
     public void setDraftFlightPlan(SpaceSimulation.FlightPlan plan) {
+
         draftFlightPlan = plan;
         draftRocketId = rocket == null ? null : rocket.getRocketId();
         draftFlightPlanDirty = true;
     }
 
     public boolean isDraftFlightPlanDirty() {
+
         return draftFlightPlanDirty;
     }
 
     public void markDraftFlightPlanSaved() {
+
         draftFlightPlanDirty = false;
     }
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {
+
         return ItemStack.EMPTY;
     }
 
     @Override
     public boolean stillValid(Player player) {
+
         return player.level().getBlockState(blockPos).is(SpaceAgeBlocks.ROCKET_ASSEMBLER)
                 && player.distanceToSqr(blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5) <= 64.0;
     }

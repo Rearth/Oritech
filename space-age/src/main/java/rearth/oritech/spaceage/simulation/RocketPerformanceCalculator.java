@@ -1,13 +1,15 @@
 package rearth.oritech.spaceage.simulation;
 
-/** Calculates the shared performance values used by launch checks and flight previews. */
+/**
+ * Calculates the shared performance values used by launch checks and flight previews.
+ */
 public final class RocketPerformanceCalculator {
 
     public static final double STANDARD_GRAVITY = 9.80665;
     public static final int TICKS_PER_SECOND = 20;
     public static final int LAUNCH_ORBIT_HEIGHT_BLOCKS = 1_000;
 
-    private static final double KILOGRAMS_PER_WEIGHT_UNIT = 1_000;
+    static final double KILOGRAMS_PER_WEIGHT_UNIT = 1_000;
     static final double ENGINE_THRUST_NEWTONS = 250_000;
 
     private RocketPerformanceCalculator() {
@@ -16,15 +18,20 @@ public final class RocketPerformanceCalculator {
     // The overview calls this for the complete rocket, while the path calculator calls it once per segment so
     // resources cannot move between stages. Supporting both keeps the underlying engine rules identical.
     public static RocketPerformance calculate(ActiveRocketData rocket) {
-        double dryMass = 0, fuelMass = 0, thrust = 0, launchThrust = 0, deltaV = 0, duration = 0;
-        int engines = 0;
+
+        double dryMass = 0;
+        double fuelMass = 0;
+        double thrust = 0;
+        double launchThrust = 0;
+        double deltaV = 0;
+        double duration = 0;
+        var engines = 0;
         for (var entry : rocket.getStaticSegments().entrySet()) {
             var segment = entry.getValue();
             var resources = rocket.getDynamicSegments().get(entry.getKey());
             var hardware = RocketHardware.of(segment);
             var dry = segment.staticWeight() * KILOGRAMS_PER_WEIGHT_UNIT;
             var fuel = resources.currentFuelWeight * KILOGRAMS_PER_WEIGHT_UNIT;
-            var wet = Math.max(1, dry + fuel);
             var chemicalTime = hardware.chemicalSeconds(resources);
             var ionTime = hardware.ionSeconds(resources);
             var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * ENGINE_THRUST_NEWTONS : 0;
@@ -43,9 +50,12 @@ public final class RocketPerformanceCalculator {
     }
 
     public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan) {
+
         var all = calculate(rocket);
-        double thrust = 0, burnSeconds = 0, deltaV = 0;
-        int engines = 0;
+        double thrust = 0;
+        double burnSeconds = 0;
+        double deltaV = 0;
+        var engines = 0;
         for (var entry : rocket.getStaticSegments().entrySet()) {
             if (!plan.configurationFor(SpaceSimulation.SegmentRef.of(entry.getValue())).usesEnginesDuring(1)) continue;
             var resources = rocket.getDynamicSegments().get(entry.getKey());
@@ -65,10 +75,12 @@ public final class RocketPerformanceCalculator {
     }
 
     public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket) {
+
         return getLaunchReadiness(calculate(rocket));
     }
 
     public static LaunchReadiness getLaunchReadiness(RocketPerformance performance) {
+
         if (performance.engineCount() == 0) return LaunchReadiness.NO_ENGINES;
         if (performance.wetMassKilograms() <= 0) return LaunchReadiness.NO_MASS;
         if (performance.liftoffAccelerationMetersPerSecondSquared() <= STANDARD_GRAVITY) {
@@ -86,6 +98,7 @@ public final class RocketPerformanceCalculator {
     }
 
     public enum LaunchReadiness {
+
         READY(null),
         NO_ENGINES("Rocket has no engines"),
         NO_MASS("Rocket has no measurable mass"),
@@ -95,10 +108,12 @@ public final class RocketPerformanceCalculator {
         private final String failureReason;
 
         LaunchReadiness(String failureReason) {
+
             this.failureReason = failureReason;
         }
 
         public String failureReason() {
+
             return failureReason;
         }
     }

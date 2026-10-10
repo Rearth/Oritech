@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -12,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-/** Saves each player's system and assembler plans together so asteroid targets keep their IDs. */
+/**
+ * Saves each player's system and assembler plans together so asteroid targets keep their IDs.
+ */
 public class SpaceSimulationSavedData extends SavedData {
 
     public static final Codec<SpaceSimulationSavedData> CODEC =
@@ -27,22 +30,33 @@ public class SpaceSimulationSavedData extends SavedData {
     }
 
     private SpaceSimulationSavedData(Map<UUID, SpaceSimulation> simulations) {
+
         this.simulations.putAll(simulations);
     }
 
-    public static SpaceSimulationSavedData get(net.minecraft.server.MinecraftServer server) {
+    public static SpaceSimulationSavedData get(MinecraftServer server) {
+
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
     private static SpaceSimulationSavedData get(ServerPlayer player) {
+
         return player.level().getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
     public static SpaceSimulation getForPlayer(ServerPlayer player) {
+
         return get(player).getOrCreate(player.getUUID());
     }
 
+    public static void updateFlightPlan(ServerPlayer player, GlobalPos assembler,
+                                        SpaceSimulation.FlightPlan plan, ActiveRocketData rocket) {
+
+        get(player).updateFlightPlan(player.getUUID(), assembler, plan, rocket);
+    }
+
     public SpaceSimulation getOrCreate(UUID player) {
+
         var simulation = simulations.get(player);
         if (simulation == null) {
             simulation = new SpaceSimulation();
@@ -52,12 +66,8 @@ public class SpaceSimulationSavedData extends SavedData {
         return simulation;
     }
 
-    public static void updateFlightPlan(ServerPlayer player, GlobalPos assembler,
-                                       SpaceSimulation.FlightPlan plan, ActiveRocketData rocket) {
-        get(player).updateFlightPlan(player.getUUID(), assembler, plan, rocket);
-    }
-
     void updateFlightPlan(UUID player, GlobalPos assembler, SpaceSimulation.FlightPlan plan, ActiveRocketData rocket) {
+
         if (getOrCreate(player).updateFlightPlan(assembler, plan, rocket)) setDirty();
     }
 }

@@ -4,34 +4,51 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
+import rearth.oritech.client.ui.render.BlockPreviewRenderState;
+import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.RocketPerformanceCalculator;
+import rearth.oritech.spaceage.simulation.NavigationComputerRules;
+import rearth.oritech.spaceage.simulation.PhysicalCrafting;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.RocketLayout;
+import rearth.oritech.spaceage.simulation.RocketPerformanceCalculator;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.StaticRocketSegment;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-/** Shows the assembled rocket. The flight planner uses a separate screen class to keep both screens manageable. */
+/**
+ * Shows the assembled rocket. The flight planner uses a separate screen class to keep both screens manageable.
+ */
 public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMenu> {
 
     private static final int WINDOW_PADDING = 6;
@@ -54,13 +71,36 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     private BlockPreviewWidget.ViewState previewViewState;
 
     public RocketAssemblerScreen(RocketAssemblerMenu menu, Inventory inventory, Component title) {
+
         super(menu, inventory, title, 0, 0);
         this.screenInventory = inventory;
         this.screenTitle = title;
     }
 
+    private static String defaultSegmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket) {
+
+        var refs = rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
+                .sorted(Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
+                        .thenComparingInt(item -> item.anchor().getX())
+                        .thenComparingInt(item -> item.anchor().getZ()))
+                .toList();
+        var index = refs.indexOf(ref);
+        return index < 0 ? "?" : "S" + (index + 1);
+    }
+
+    private static Component stat(String name, Object value) {
+
+        return Component.translatable("screen.oritech_space_age.stat." + name, value);
+    }
+
+    private static String format(double value) {
+
+        return String.format(Locale.ROOT, "%,.1f", value);
+    }
+
     @Override
     protected void buildComponents() {
+
         segmentNameField = null;
         rocketNameField = null;
         panelWidth = width - WINDOW_PADDING * 2;
@@ -75,14 +115,15 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
 
         var rocketTab = SpaceAgeButtons.panel(9, 9, 92, 20,
-                Component.translatable("screen.oritech_space_age.rocket"), ignored -> {});
+                Component.translatable("screen.oritech_space_age.rocket"), ignored -> {
+                });
         rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
         rocketTab.setActive(false);
         addComponent(rocketTab);
 
         var flightPlanTab = SpaceAgeButtons.panel(101, 9, 92, 20,
                 Component.translatable("screen.oritech_space_age.flight_plan"), ignored -> openFlightPlanner());
-        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
+        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT);
         addComponent(flightPlanTab);
 
         buildRocketPanel();
@@ -90,6 +131,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void buildRocketPanel() {
+
         if (!menu.isPreviewLoaded()) {
             addMessagePanel(Component.translatable("screen.oritech_space_age.scanning"));
             return;
@@ -101,7 +143,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             return;
         }
 
-        int nameWidth = Math.max(60, Math.min(220, panelWidth - 217));
+        var nameWidth = Math.max(60, Math.min(220, panelWidth - 217));
         rocketNameField = addRenderableWidget(new EditBox(font, leftPos + 205, topPos + 10,
                 nameWidth, 18, Component.translatable("screen.oritech_space_age.rocket_name")));
         rocketNameField.setMaxLength(RocketFlightPlanRules.MAX_ROCKET_NAME_LENGTH);
@@ -109,15 +151,14 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         rocketNameField.setValue(currentPlan().name());
         rocketNameField.setResponder(name -> menu.setDraftFlightPlan(currentPlan().withName(name)));
 
-        int contentTop = 39;
-        int contentHeight = panelHeight - contentTop - 12;
-        int statsWidth = Math.clamp(panelWidth / 3, 130, 240);
-        int statsX = panelWidth - statsWidth - 12;
-        int previewWidth = statsX - 19;
+        var contentTop = 39;
+        var contentHeight = panelHeight - contentTop - 12;
+        var statsWidth = Math.clamp(panelWidth / 3, 130, 240);
+        var statsX = panelWidth - statsWidth - 12;
+        var previewWidth = statsX - 19;
 
         var preview = new RocketPreviewWidget(12, contentTop, previewWidth, contentHeight, rocket);
         preview.withSurface(OritechSurface.PANEL_INSET);
-        preview.withPadding(Insets.of(3));
         preview.withRotationSpeed(0.18f);
         preview.withDragRotation();
         preview.withViewState(previewViewState);
@@ -129,12 +170,23 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 Component.translatable("screen.oritech_space_age.general_stats").withStyle(ChatFormatting.BOLD)));
 
         var performance = RocketPerformanceCalculator.calculate(rocket);
-        var blockCount = rocket.getStaticSegments().values().stream().mapToInt(segment -> segment.blocks().size()).sum();
-        int statsSpacing = Math.clamp((contentHeight - 115) / 8, 9, 15);
+        var blockCount = rocket.getStaticSegments().values().stream().mapToInt(segment -> (int) segment.blocks().stream().filter(b -> !b.state().isAir()).count()).sum();
+        var statsSpacing = Math.clamp((contentHeight - 100) / 13, 8, 15);
+        var resources = rocket.getDynamicSegments().values();
+        var storedRF = resources.stream().mapToLong(segment -> segment.availableRF).sum();
+        var rfCapacity = resources.stream().mapToLong(segment -> segment.rfCapacity).sum();
+        var storedFuel = resources.stream().mapToLong(segment -> segment.availableFuelBurnTimeTicks).sum();
+        var fuelCapacity = resources.stream().mapToLong(segment -> segment.fuelCapacity).sum();
         addStatLines(statsX + 11, contentTop + 32, statsWidth - 19, statsSpacing, List.of(
+                Component.translatable("screen.oritech_space_age.resource_pool", "RF", format(storedRF), format(rfCapacity)),
+                Component.translatable("screen.oritech_space_age.resource_pool", "Fuel", format(storedFuel), format(fuelCapacity)),
                 stat("segments", rocket.getStaticSegments().size()),
                 stat("stages", RocketFlightPlanRules.stageCount(currentPlan(), rocket.getStaticSegments().size())),
                 stat("blocks", blockCount),
+                stat("computers", NavigationComputerRules.computers(rocket,
+                        NavigationComputerRules.allSegments(rocket))),
+                stat("parachutes", rocket.getStaticSegments().values().stream().flatMap(s -> s.blocks().stream())
+                        .filter(b -> b.state().is(SpaceAgeBlocks.PARACHUTE)).count()),
                 stat("wet_mass", format(performance.wetMassKilograms())),
                 stat("engines", performance.engineCount()),
                 stat("thrust", format(performance.thrustNewtons())),
@@ -149,12 +201,20 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                     statsWidth - 32, 40,
                     Component.translatable("screen.oritech_space_age.launch").withStyle(ChatFormatting.BOLD),
                     ignored -> launch());
+            var snapshot = menu.getFlightPlannerSnapshot();
+            if (snapshot != null) {
+                var validation = RocketFlightPlanRules.inspect(currentPlan(), rocket, snapshot.objects(), true, null, SpaceAgeClientRecipes.vacuum(), snapshot.stations());
+                launchButton.setActive(validation.valid());
+                launchButton.withTooltip(validation.valid() ? List.of(Component.translatable("screen.oritech_space_age.recovery.reset"))
+                        : validation.issues().stream().map(RocketFlightPlanRules.Issue::description).toList());
+            }
             addComponent(launchButton);
         } else {
-            int warningX = statsX + 11;
-            int warningY = contentTop + contentHeight - 74;
+            var warningX = statsX + 11;
+            var warningY = contentTop + contentHeight - 74;
             var warningPanel = SpaceAgeButtons.panel(warningX, warningY, statsWidth - 22, 61,
-                    Component.empty(), ignored -> {});
+                    Component.empty(), ignored -> {
+                    });
             warningPanel.setActive(false);
             addComponent(warningPanel);
             addComponent(new LabelWidget(warningX + 8, warningY + 7, statsWidth - 38,
@@ -168,6 +228,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void openFlightPlanner() {
+
         if (menu.getFlightPlannerSnapshot() == null) {
             ClientPacketDistributor.sendToServer(new RocketNetworking.RequestFlightPlannerPayload(menu.blockPos));
         }
@@ -175,6 +236,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void addSegmentConfigurationPopup() {
+
         var rocket = menu.getRocket();
         if (rocket == null || menu.getFlightPlannerSnapshot() == null) return;
         var segment = rocket.getStaticSegments().get(selectedSegment);
@@ -185,21 +247,19 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         var ref = SpaceSimulation.SegmentRef.of(segment);
         var configuration = currentPlan().configurationFor(ref);
-        int popupWidth = Math.min(330, panelWidth - 36);
+        var popupWidth = Math.min(330, panelWidth - 36);
         var segmentRefs = rocket.getStaticSegments().values().stream()
                 .map(SpaceSimulation.SegmentRef::of).toList();
-        int stageCount = RocketFlightPlanRules.editableStageCount(currentPlan(), segmentRefs);
-        int stageRows = Math.max(1, (stageCount + 4) / 5);
-        int popupHeight = segmentStagesExpanded ? 143 + stageRows * 23 : 143;
-        int popupX = (panelWidth - popupWidth) / 2;
-        int popupY = Math.max(34, (panelHeight - popupHeight) / 2);
+        var stageCount = RocketFlightPlanRules.editableStageCount(currentPlan(), segmentRefs);
+        var stageRows = Math.max(1, (stageCount + 4) / 5);
+        var popupHeight = segmentStagesExpanded ? 143 + stageRows * 23 : 143;
+        var popupX = (panelWidth - popupWidth) / 2;
+        var popupY = Math.max(34, (panelHeight - popupHeight) / 2);
 
         addComponent(new SegmentPopupPanel(panelWidth, panelHeight, popupX, popupY, popupWidth, popupHeight,
                 this::closeSegmentConfiguration));
         addPopupComponent(new LabelWidget(popupX + 10, popupY + 9, popupWidth - 20, 14,
                 Component.translatable("screen.oritech_space_age.segment_configuration").withStyle(ChatFormatting.BOLD)));
-        addPopupComponent(SpaceAgeButtons.close(popupX + popupWidth - 27, popupY + 7,
-                ignored -> closeSegmentConfiguration()));
 
         segmentNameField = addRenderableWidget(new EditBox(font, leftPos + popupX + 56, topPos + popupY + 27,
                 popupWidth - 67, 18, Component.translatable("screen.oritech_space_age.segment_name")));
@@ -212,7 +272,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         addPopupComponent(new LabelWidget(popupX + 10, popupY + 31, 42, 12,
                 Component.translatable("screen.oritech_space_age.name")));
 
-        int presetY = popupY + 51;
+        var presetY = popupY + 51;
         addPopupComponent(SpaceAgeButtons.darkPanel(popupX + 10, presetY, 64, 18,
                 Component.translatable("screen.oritech_space_age.segment_preset.core"), ignored -> setSegmentNamePreset("Core")));
         addPopupComponent(SpaceAgeButtons.darkPanel(popupX + 78, presetY, 76, 18,
@@ -237,16 +297,17 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         if (segmentStagesExpanded) {
             addPopupComponent(new LabelWidget(popupX + 10, popupY + 103, popupWidth - 20, 12,
                     Component.translatable("screen.oritech_space_age.engine_stages")));
-            boolean hasEngines = segment.engineCount() > 0;
+            var hasEngines = segment.engineCount() > 0;
             for (int stage = 1; stage <= stageCount; stage++) {
-                int currentStage = stage;
-                int stageX = popupX + 10 + ((stage - 1) % 5) * 61;
-                int stageY = popupY + 117 + ((stage - 1) / 5) * 23;
+                var currentStage = stage;
+                var stageX = popupX + 10 + ((stage - 1) % 5) * 61;
+                var stageY = popupY + 117 + ((stage - 1) / 5) * 23;
                 var stageButton = SpaceAgeButtons.darkPanel(stageX, stageY, 56, 18,
                         checkboxLabel("screen.oritech_space_age.stage_short", configuration.usesEnginesDuring(stage), stage),
                         ignored -> toggleEngineStage(ref, currentStage));
                 stageButton.setActive(hasEngines);
-                if (!hasEngines) stageButton.withTooltip(Component.translatable("screen.oritech_space_age.segment_no_engines"));
+                if (!hasEngines)
+                    stageButton.withTooltip(Component.translatable("screen.oritech_space_age.segment_no_engines"));
                 addPopupComponent(stageButton);
             }
         }
@@ -255,19 +316,23 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void addPopupComponent(UIComponent component) {
+
         component.withZIndex(9_001);
         addComponent(component);
     }
 
     private Component checkboxLabel(String key, boolean checked, Object... arguments) {
+
         return Component.literal(checked ? "☑ " : "☐ ").append(Component.translatable(key, arguments));
     }
 
     private void setSegmentNamePreset(String name) {
+
         if (segmentNameField != null) segmentNameField.setValue(name);
     }
 
     private void toggleEngineStage(SpaceSimulation.SegmentRef segment, int stage) {
+
         var configuration = currentPlan().configurationFor(segment);
         var stages = new ArrayList<>(configuration.engineStages());
         if (!stages.remove(Integer.valueOf(stage))) stages.add(stage);
@@ -276,6 +341,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void updateSegmentConfiguration(SpaceSimulation.SegmentConfiguration configuration, boolean rebuild) {
+
         var plan = currentPlan();
         var configurations = new ArrayList<>(plan.segmentConfigurations());
         configurations.removeIf(existing -> existing.segment().equals(configuration.segment()));
@@ -293,23 +359,27 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void closeSegmentConfiguration() {
+
         selectedSegment = null;
         segmentStagesExpanded = false;
         rebuildComponents();
     }
 
     private SpaceSimulation.FlightPlan currentPlan() {
+
         var draft = menu.getDraftFlightPlan();
         return draft == null ? SpaceSimulation.FlightPlan.empty() : draft;
     }
 
     private void launch() {
+
         RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
         ClientPacketDistributor.sendToServer(new RocketNetworking.LaunchRocketPayload(menu.blockPos, currentPlan()));
     }
 
     private void addMessagePanel(Component message) {
-        int contentHeight = panelHeight - 51;
+
+        var contentHeight = panelHeight - 51;
         addComponent(new SurfaceWidget(12, 39, panelWidth - 24, contentHeight, OritechSurface.PANEL_INSET));
         var label = new LabelWidget(32, 39 + contentHeight / 2 - 15, panelWidth - 64, 30, message);
         label.withAlignment(LabelWidget.Alignment.CENTER).withBrightColor().withWrap(true);
@@ -317,12 +387,14 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     }
 
     private void addStatLines(int x, int y, int width, int spacing, List<Component> lines) {
+
         for (int i = 0; i < lines.size(); i++) {
             addComponent(new LabelWidget(x, y + i * spacing, width, lines.get(i)));
         }
     }
 
     private List<Component> getSegmentStats(UUID segmentId, ActiveRocketData rocket) {
+
         var staticSegment = rocket.getStaticSegments().get(segmentId);
         var dynamicSegment = rocket.getDynamicSegments().get(segmentId);
         if (staticSegment == null || dynamicSegment == null) return List.of();
@@ -330,10 +402,10 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         var segmentRocket = new ActiveRocketData(Map.of(segmentId, staticSegment), Map.of(segmentId, dynamicSegment));
         var performance = RocketPerformanceCalculator.calculate(segmentRocket);
         var configuration = currentPlan().configurationFor(SpaceSimulation.SegmentRef.of(staticSegment));
-        String engineStages = configuration.engineStages().isEmpty()
+        var engineStages = configuration.engineStages().isEmpty()
                 ? Component.translatable("screen.oritech_space_age.segment_engine_stages.none").getString()
                 : configuration.engineStages().stream().sorted()
-                .map(stage -> "S" + stage).collect(java.util.stream.Collectors.joining(", "));
+                .map(stage -> "S" + stage).collect(Collectors.joining(", "));
         return List.of(
                 Component.translatable("screen.oritech_space_age.segment_stats",
                         segmentName(SpaceSimulation.SegmentRef.of(staticSegment), rocket)).withStyle(ChatFormatting.BOLD),
@@ -342,41 +414,26 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                                 ? "screen.oritech_space_age.segment_role.booster"
                                 : "screen.oritech_space_age.segment_role.attached")),
                 Component.translatable("screen.oritech_space_age.segment_engine_stages", engineStages),
-                stat("blocks", staticSegment.blocks().size()),
+                stat("blocks", staticSegment.blocks().stream().filter(b -> !b.state().isAir()).count()),
                 stat("dry_mass", format(performance.dryMassKilograms())),
                 stat("fuel_mass", format(performance.fuelMassKilograms())),
-                stat("energy", format(dynamicSegment.availableRF)),
+                Component.translatable("screen.oritech_space_age.resource_pool", "RF", format(dynamicSegment.availableRF), format(dynamicSegment.rfCapacity)),
+                Component.translatable("screen.oritech_space_age.resource_pool", "Fuel", format(dynamicSegment.availableFuelBurnTimeTicks), format(dynamicSegment.fuelCapacity)),
                 stat("engines", staticSegment.engineCount()),
                 stat("burn_time", format(performance.availableBurnSeconds()))
         );
     }
 
     private String segmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket) {
-        String customName = currentPlan().configurationFor(ref).name();
+
+        var customName = currentPlan().configurationFor(ref).name();
         if (!customName.isBlank()) return customName;
         return defaultSegmentName(ref, rocket);
     }
 
-    private static String defaultSegmentName(SpaceSimulation.SegmentRef ref, ActiveRocketData rocket) {
-        var refs = rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
-                .sorted(Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
-                        .thenComparingInt(item -> item.anchor().getX())
-                        .thenComparingInt(item -> item.anchor().getZ()))
-                .toList();
-        int index = refs.indexOf(ref);
-        return index < 0 ? "?" : "S" + (index + 1);
-    }
-
-    private static Component stat(String name, Object value) {
-        return Component.translatable("screen.oritech_space_age.stat." + name, value);
-    }
-
-    private static String format(double value) {
-        return String.format(Locale.ROOT, "%,.1f", value);
-    }
-
     @Override
     protected void rebuildComponents() {
+
         // Segment controls rebuild the popup because their stage count can change. Keep the preview camera separate
         // from that short-lived widget tree so editing a segment does not snap the rocket back to its default view.
         if (rocketPreview != null) previewViewState = rocketPreview.getViewState();
@@ -386,6 +443,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     @Override
     protected void containerTick() {
+
         super.containerTick();
         components.forEach(component -> component.tick());
         if (previewRevision != menu.getPreviewRevision()
@@ -403,6 +461,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+
         for (var field : new EditBox[]{rocketNameField, segmentNameField}) {
             if (field != null && field.isMouseOver(event.x(), event.y())) {
                 setFocused(field);
@@ -415,6 +474,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     @Override
     public boolean keyPressed(KeyEvent event) {
+
         if (selectedSegment != null && event.isEscape()) {
             closeSegmentConfiguration();
             return true;
@@ -434,18 +494,61 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
     @Override
     public void onClose() {
+
         RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
         super.onClose();
     }
 
     @Override
     public boolean shouldCreateTitle() {
+
         return false;
     }
 
     @Override
     public BlockState getTitleState() {
+
         return SpaceAgeBlocks.ROCKET_ASSEMBLER.get().defaultBlockState();
+    }
+
+    /**
+     * Blocks the preview while the compact editor is open without requiring a separate screen class.
+     */
+    private static final class SegmentPopupPanel extends UIComponent {
+
+        private final int popupX;
+        private final int popupY;
+        private final int popupWidth;
+        private final int popupHeight;
+        private final Runnable dismiss;
+
+        private SegmentPopupPanel(int screenWidth, int screenHeight, int popupX, int popupY,
+                                  int popupWidth, int popupHeight, Runnable dismiss) {
+
+            super(0, 0, screenWidth, screenHeight);
+            this.popupX = popupX;
+            this.popupY = popupY;
+            this.popupWidth = popupWidth;
+            this.popupHeight = popupHeight;
+            this.dismiss = dismiss;
+            this.zIndex = 9_000;
+        }
+
+        @Override
+        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+            graphics.fill(0, 0, width, height, 0x66000000);
+            OritechSurface.PANEL_DARK.render(graphics, popupX, popupY, popupWidth, popupHeight);
+        }
+
+        @Override
+        public boolean handleClick(double mouseX, double mouseY, int button) {
+
+            var inside = mouseX >= popupX && mouseX < popupX + popupWidth
+                    && mouseY >= popupY && mouseY < popupY + popupHeight;
+            if (!inside && button == 0) dismiss.run();
+            return true;
+        }
     }
 
     private final class RocketPreviewWidget extends BlockPreviewWidget {
@@ -457,6 +560,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         private boolean draggedSinceClick;
 
         private RocketPreviewWidget(int x, int y, int width, int height, ActiveRocketData rocket) {
+
             super(x, y, width, height);
             this.rocket = rocket;
             var addedPositions = new HashSet<BlockPos>();
@@ -464,11 +568,13 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
                 var segmentId = entry.getKey();
                 var segmentPositions = positionsBySegment.computeIfAbsent(segmentId, ignored -> new HashSet<>());
                 for (var block : entry.getValue().blocks()) {
-                    addPreviewBlock(block.relativePos(), block.state(), segmentId, segmentPositions, addedPositions);
+                    var reserved = rocket.getDynamicSegments().get(segmentId).reserved.get(block.relativePos());
+                    if (!block.state().isAir() || reserved != null)
+                        addPreviewBlock(block.relativePos(), reserved == null ? block.state() : reserved, segmentId, segmentPositions, addedPositions);
                 }
                 for (var couplings : entry.getValue().originalCouplings().values()) {
                     for (StaticRocketSegment.CouplingData coupling : couplings) {
-                        addPreviewBlock(coupling.relativePos(), SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState(),
+                        addPreviewBlock(coupling.relativePos(), coupling.state(),
                                 segmentId, segmentPositions, addedPositions);
                     }
                 }
@@ -477,6 +583,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         private void addPreviewBlock(BlockPos position, BlockState state, UUID segmentId,
                                      Set<BlockPos> segmentPositions, Set<BlockPos> addedPositions) {
+
             var immutablePosition = position.immutable();
             segmentPositions.add(immutablePosition);
             segmentsByPosition.putIfAbsent(immutablePosition, segmentId);
@@ -485,20 +592,46 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         @Override
         protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
             super.renderContent(graphics, mouseX, mouseY, delta);
             var hovered = getHoveredBlock();
             var hoveredSegment = hovered == null ? null : segmentsByPosition.get(asBlockPos(hovered.offset()));
             if (hoveredSegment != null) {
-                renderTooltipPanel(graphics, mouseX - x, mouseY - y, getSegmentStats(hoveredSegment, rocket));
+                var tooltip = new ArrayList<>(getSegmentStats(hoveredSegment, rocket));
+                var position = asBlockPos(hovered.offset());
+                var ref = new RocketServiceSettings.HardwareRef(SpaceSimulation.SegmentRef.of(rocket.getOriginalSegments().get(hoveredSegment)), position);
+                var resources = rocket.getDynamicSegments().get(hoveredSegment);
+                var controller = resources.crafters.get(position);
+                if (controller != null) {
+                    if (!controller.name.isBlank())
+                        tooltip.add(Component.literal(controller.name + " (" + position.toShortString() + ")"));
+                    tooltip.add(Component.translatable("screen.oritech_space_age.pair.faces"));
+                    var pair = RocketLayout.pair(rocket, ref);
+                    var match = PhysicalCrafting.match(rocket, pair, SpaceAgeClientRecipes.vacuum());
+                    tooltip.add(match.valid()
+                            ? Component.translatable("screen.oritech_space_age.pair.result", match.recipe().resultState().getBlock().getName())
+                            : Component.translatable("status.oritech_space_age." + match.issue()));
+                    if (controller.job != null)
+                        tooltip.add(Component.translatable("screen.oritech_space_age.pair.job",
+                                controller.job.elapsed() * 100 / controller.job.duration(),
+                                controller.job.source().controller().position().toShortString()));
+                }
+                if (resources.reserved.containsKey(position))
+                    tooltip.add(Component.translatable("status.oritech_space_age.cargo_working"));
+                renderTooltipPanel(graphics, mouseX - x, mouseY - y, tooltip);
             }
         }
 
         @Override
         protected int getOverlayCoords(BlockEntry entry) {
+
             var hovered = getHoveredBlock();
             if (hovered == null) return OverlayTexture.NO_OVERLAY;
             var segmentId = segmentsByPosition.get(asBlockPos(hovered.offset()));
             if (segmentId == null) return OverlayTexture.NO_OVERLAY;
+            if (hovered.state().getBlock() instanceof BlockPairController
+                    && BlockPairController.cells(asBlockPos(hovered.offset()), hovered.state()).contains(asBlockPos(entry.offset())))
+                return OverlayTexture.pack(BLOCK_HIGHLIGHT, false);
             if (entry.offset().equals(hovered.offset())) return OverlayTexture.pack(BLOCK_HIGHLIGHT, false);
             if (positionsBySegment.getOrDefault(segmentId, Set.of()).contains(asBlockPos(entry.offset()))) {
                 return OverlayTexture.pack(SEGMENT_HIGHLIGHT, false);
@@ -507,7 +640,26 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
 
         @Override
+        protected void appendRenderEntries(List<BlockPreviewRenderState.Entry> entries) {
+
+            for (int index = 0; index < entries.size(); index++) {
+                var entry = entries.get(index);
+                var id = segmentsByPosition.get(asBlockPos(entry.offset()));
+                if (id != null && rocket.getDynamicSegments().get(id).reserved.containsKey(asBlockPos(entry.offset())))
+                    entries.set(index, new BlockPreviewRenderState.Entry(entry.state(), entry.entity(), entry.offset(), .8f, OverlayTexture.pack(BLOCK_HIGHLIGHT, false)));
+            }
+            var hovered = getHoveredBlock();
+            if (hovered == null || !(hovered.state().getBlock() instanceof BlockPairController))
+                return;
+            for (var cell : BlockPairController.cells(asBlockPos(hovered.offset()), hovered.state()))
+                if (entries.stream().noneMatch(e -> e.offset().equals(cell)))
+                    entries.add(new BlockPreviewRenderState.Entry(
+                            Blocks.LIGHT_BLUE_STAINED_GLASS.defaultBlockState(), null, cell, .9f, OverlayTexture.NO_OVERLAY));
+        }
+
+        @Override
         public boolean handleClick(double mouseX, double mouseY, int button) {
+
             if (!super.handleClick(mouseX, mouseY, button)) return false;
             var clicked = findBlockAt(mouseX, mouseY);
             clickedSegment = clicked == null ? null : segmentsByPosition.get(asBlockPos(clicked.offset()));
@@ -517,13 +669,15 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         @Override
         public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+
             if (Math.abs(deltaX) + Math.abs(deltaY) > 0.5) draggedSinceClick = true;
             return super.handleDrag(mouseX, mouseY, deltaX, deltaY, button);
         }
 
         @Override
         public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
-            boolean handled = super.handleMouseRelease(mouseX, mouseY, button);
+
+            var handled = super.handleMouseRelease(mouseX, mouseY, button);
             if (button == 0 && clickedSegment != null && !draggedSinceClick) {
                 // Rebuilding here would mutate the screen's component list while it dispatches mouse release.
                 pendingSegment = clickedSegment;
@@ -533,13 +687,14 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
 
         private void renderTooltipPanel(GuiGraphicsExtractor graphics, int blockX, int blockY, List<Component> tooltip) {
+
             if (tooltip.isEmpty()) return;
             var font = Minecraft.getInstance().font;
-            int maxWidth = tooltip.stream().mapToInt(font::width).max().orElse(0);
-            int panelWidth = maxWidth + 12;
-            int panelHeight = tooltip.size() * font.lineHeight + 10;
-            int tooltipX = Math.max(5, Math.min(width - panelWidth - 5, blockX + 12));
-            int tooltipY = Math.max(5, Math.min(height - panelHeight - 5, blockY - panelHeight - 8));
+            var maxWidth = tooltip.stream().mapToInt(font::width).max().orElse(0);
+            var panelWidth = maxWidth + 12;
+            var panelHeight = tooltip.size() * font.lineHeight + 10;
+            var tooltipX = Math.max(5, Math.min(width - panelWidth - 5, blockX + 12));
+            var tooltipY = Math.max(5, Math.min(height - panelHeight - 5, blockY - panelHeight - 8));
             graphics.nextStratum();
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + panelHeight, 0xE0101418);
             graphics.fill(tooltipX, tooltipY, tooltipX + panelWidth, tooltipY + 1, 0xFF9DB4C7);
@@ -553,41 +708,8 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
 
         private BlockPos asBlockPos(Vec3i position) {
+
             return new BlockPos(position.getX(), position.getY(), position.getZ());
-        }
-    }
-
-    /** Blocks the preview while the compact editor is open without requiring a separate screen class. */
-    private static final class SegmentPopupPanel extends UIComponent {
-        private final int popupX;
-        private final int popupY;
-        private final int popupWidth;
-        private final int popupHeight;
-        private final Runnable dismiss;
-
-        private SegmentPopupPanel(int screenWidth, int screenHeight, int popupX, int popupY,
-                                  int popupWidth, int popupHeight, Runnable dismiss) {
-            super(0, 0, screenWidth, screenHeight);
-            this.popupX = popupX;
-            this.popupY = popupY;
-            this.popupWidth = popupWidth;
-            this.popupHeight = popupHeight;
-            this.dismiss = dismiss;
-            this.zIndex = 9_000;
-        }
-
-        @Override
-        protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-            graphics.fill(0, 0, width, height, 0x66000000);
-            OritechSurface.PANEL_DARK.render(graphics, popupX, popupY, popupWidth, popupHeight);
-        }
-
-        @Override
-        public boolean handleClick(double mouseX, double mouseY, int button) {
-            boolean inside = mouseX >= popupX && mouseX < popupX + popupWidth
-                    && mouseY >= popupY && mouseY < popupY + popupHeight;
-            if (!inside && button == 0) dismiss.run();
-            return true;
         }
     }
 }

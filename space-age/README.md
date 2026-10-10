@@ -41,3 +41,14 @@ coordinates are captured with the assembler scan.
 
 Run `gradlew :space-age:check` for transfer, routing, rendering and packet regressions.
 In-game visual and FPS testing uses `runSpaceAgeClient`.
+
+## Rocket hardware and stations
+
+Navigation computers extend unfinished program memory from three cards by one per block.
+Automatic Earth parachute landings, explosive payloads and the vacuum crafter use the same
+simulation rules in previews and missions. Exposed couplings also serve as docking ports.
+Docking preserves separate rocket identities. Station machines process visitor Cargo pairs
+in place; optional Dock/Undock exchanges supply or collect whole pairs, fuel and RF.
+
+Ordinary blocks land freshly placed without NBT or contents. Current physical product blocks and controller names survive; energy/fluid storage resets.
+Dock/Undock can exchange whole Cargo pairs and finite fuel/RF pools instantly.

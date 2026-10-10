@@ -11,12 +11,37 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AsteroidImpactRulesTest {
 
+    private static void assertAsteroidOwnerAfterSplit(ActiveRocketData rocket,
+                                                      List<SpaceSimulation.SpaceObjectData> objects,
+                                                      SpaceSimulation.FlightPlanAction arrive,
+                                                      SpaceSimulation.FlightPlanAction connect,
+                                                      SpaceSimulation.SegmentRef retained,
+                                                      SpaceSimulation.SegmentRef detached,
+                                                      boolean parentKeepsAsteroid) {
+
+        var split = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
+                .withSegments(List.of(retained, detached));
+        var base = SpaceSimulation.FlightPlan.empty();
+        var root = base.root().withActions(List.of(arrive, connect, split));
+        var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), split.id(), List.of());
+        var result = RocketFlightPathCalculator.calculate(rocket, objects,
+                base.withBranches(List.of(root, child)));
+        var parentPath = result.paths().stream().filter(path -> path.branchId().equals(root.id())).findFirst().orElseThrow();
+        var childPath = result.paths().stream().filter(path -> path.branchId().equals(child.id())).findFirst().orElseThrow();
+        UUID asteroidId = connect.targetId();
+        assertEquals(parentKeepsAsteroid, parentPath.actionMoments().getLast().attachedAsteroidId().equals(asteroidId));
+        assertEquals(!parentKeepsAsteroid, childPath.samples().getFirst().attachedAsteroidId().equals(asteroidId));
+    }
+
     @Test
     void predictsSafeLandingsFragmentsAndRecoverableBlocks() {
+
         var materials = List.of(
                 new SpaceObjects.AsteroidMaterial(Identifier.parse("minecraft:stone"), 80),
                 new SpaceObjects.AsteroidMaterial(Identifier.parse("minecraft:iron_ore"), 20));
@@ -61,6 +86,7 @@ class AsteroidImpactRulesTest {
 
     @Test
     void attachedAsteroidMassReducesAvailableAcceleration() {
+
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
                 Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
@@ -89,12 +115,13 @@ class AsteroidImpactRulesTest {
 
         assertTrue(attached.samples().stream().anyMatch(sample -> sample.attachedAsteroidId().equals(asteroidId)));
         assertTrue(attached.remainingDeltaV() < RocketFlightPathCalculator.calculate(rocket, objects,
-                base.withBranches(List.of(base.root().withActions(List.of(arrive, returnToEarth)))))
+                        base.withBranches(List.of(base.root().withActions(List.of(arrive, returnToEarth)))))
                 .paths().getFirst().remainingDeltaV());
     }
 
     @Test
     void releasedAsteroidStopsAtEarthAndConnectsFromEitherCloseOrbit() {
+
         var segmentId = UUID.randomUUID();
         var segment = new StaticRocketSegment(segmentId,
                 Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
@@ -134,10 +161,10 @@ class AsteroidImpactRulesTest {
         assertTrue(moments.stream().allMatch(RocketFlightPathCalculator.ActionMoment::completed));
         assertEquals(1, result.asteroidPaths().size());
         var asteroidPath = result.asteroidPaths().getFirst();
-        assertTrue(asteroidPath.earthImpact() != null, "the released asteroid should intersect Earth");
+        assertNotNull(asteroidPath.earthImpact(), "the released asteroid should intersect Earth");
         var last = asteroidPath.samples().getLast();
         assertEquals(earth.radius(), Math.hypot(last.x() - earth.xAt(last.timeSeconds()),
-                last.y() - earth.yAt(last.timeSeconds())), 0.01,
+                        last.y() - earth.yAt(last.timeSeconds())), 0.01,
                 "the projected path should end on Earth's surface");
 
         var flyby = arrive.withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
@@ -145,14 +172,14 @@ class AsteroidImpactRulesTest {
         var invalidPath = RocketFlightPathCalculator.calculate(rocket, List.of(earth, asteroid), invalidPlan)
                 .paths().getFirst();
         assertEquals(RocketFlightPathCalculator.TerminalState.UNSAFE_ASTEROID_APPROACH, invalidPath.terminalState());
-        assertTrue(!invalidPath.actionMoments().getLast().completed(),
-                "a maximum-speed asteroid flyby must not attach the asteroid");
+        assertFalse(invalidPath.actionMoments().getLast().completed(), "a maximum-speed asteroid flyby must not attach the asteroid");
         assertEquals(SpaceSimulation.FlightPlanAction.NO_TARGET,
                 invalidPath.actionMoments().getLast().attachedAsteroidId());
     }
 
     @Test
     void anchoredAsteroidFollowsItsSegmentWhenTheRocketSplits() {
+
         var anchorId = UUID.randomUUID();
         var coreId = UUID.randomUUID();
         var anchor = new StaticRocketSegment(anchorId,
@@ -181,26 +208,5 @@ class AsteroidImpactRulesTest {
                 coreRef, anchorRef, false);
         assertAsteroidOwnerAfterSplit(rocket, List.of(earth, asteroid), arrive, connect,
                 anchorRef, coreRef, true);
-    }
-
-    private static void assertAsteroidOwnerAfterSplit(ActiveRocketData rocket,
-                                                       List<SpaceSimulation.SpaceObjectData> objects,
-                                                       SpaceSimulation.FlightPlanAction arrive,
-                                                       SpaceSimulation.FlightPlanAction connect,
-                                                       SpaceSimulation.SegmentRef retained,
-                                                       SpaceSimulation.SegmentRef detached,
-                                                       boolean parentKeepsAsteroid) {
-        var split = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
-                .withSegments(List.of(retained, detached));
-        var base = SpaceSimulation.FlightPlan.empty();
-        var root = base.root().withActions(List.of(arrive, connect, split));
-        var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), split.id(), List.of());
-        var result = RocketFlightPathCalculator.calculate(rocket, objects,
-                base.withBranches(List.of(root, child)));
-        var parentPath = result.paths().stream().filter(path -> path.branchId().equals(root.id())).findFirst().orElseThrow();
-        var childPath = result.paths().stream().filter(path -> path.branchId().equals(child.id())).findFirst().orElseThrow();
-        UUID asteroidId = connect.targetId();
-        assertEquals(parentKeepsAsteroid, parentPath.actionMoments().getLast().attachedAsteroidId().equals(asteroidId));
-        assertEquals(!parentKeepsAsteroid, childPath.samples().getFirst().attachedAsteroidId().equals(asteroidId));
     }
 }

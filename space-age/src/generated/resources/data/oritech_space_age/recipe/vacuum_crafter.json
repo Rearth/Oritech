@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:energite_ingot",
+    "b": "oritech:advanced_battery",
+    "c": "oritech:assembler",
+    "p": "oritech:advanced_computing_engine",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sps",
+    "aca",
+    "sbs"
+  ],
+  "result": {
+    "id": "oritech_space_age:vacuum_crafter"
+  }
+}

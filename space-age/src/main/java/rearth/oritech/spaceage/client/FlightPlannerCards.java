@@ -8,17 +8,21 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
-import java.util.HashMap;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
 
-/** Lays out branch rows, action cards and their connectors; edits remain owned by the screen. */
+/**
+ * Lays out branch rows, action cards and their connectors; edits remain owned by the screen.
+ */
 final class FlightPlannerCards {
+
     // Space reserved by each card, including its gap to the next card.
     private static final int NORMAL_CARD_WIDTH = 142;
     private static final int GENERATED_CARD_WIDTH = 98;
@@ -28,16 +32,72 @@ final class FlightPlannerCards {
     private final RocketFlightPlannerScreen screen;
 
     FlightPlannerCards(RocketFlightPlannerScreen screen) {
+
         this.screen = screen;
+    }
+
+    private static int cardWidth(SpaceSimulation.FlightPlanAction action) {
+
+        return action != null && action.isGenerated() ? GENERATED_CARD_WIDTH : NORMAL_CARD_WIDTH;
+    }
+
+    private static UIComponent blockedBorder(int x, int y, int width, int height, List<Component> reason) {
+
+        return cardBorder(x, y, width, height, reason, 0xFFFF6565).withZIndex(3);
+    }
+
+    private static UIComponent cardBorder(int x, int y, int width, int height, List<Component> reason, int color) {
+
+        return new UIComponent(x, y, width, height) {
+
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                graphics.fill(x, y, x + width, y + 2, color);
+                graphics.fill(x, y + height - 2, x + width, y + height, color);
+                graphics.fill(x, y, x + 2, y + height, color);
+                graphics.fill(x + width - 2, y, x + width, y + height, color);
+            }
+        }.withTooltip(reason).withZIndex(2);
+    }
+
+    static UIComponent branchConnector(int startX, int startY, int endX, int endY) {
+
+        return new UIComponent(Math.min(startX, endX), Math.min(startY, endY),
+                Math.max(1, Math.abs(endX - startX)), Math.max(1, Math.abs(endY - startY))) {
+
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                var cornerY = Math.min(endY, startY + 7);
+                var color = 0xFFD58A32;
+                graphics.fill(startX - 1, startY, startX + 1, cornerY + 1, color);
+                graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX) + 1, cornerY + 1, color);
+                graphics.fill(endX - 1, cornerY, endX + 1, endY, color);
+            }
+        };
+    }
+
+    static UIComponent addonConnector(int lineX, int startY, int endY) {
+
+        return new UIComponent(lineX - 1, startY, 2, Math.max(1, endY - startY)) {
+
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                graphics.fill(lineX - 1, startY, lineX + 1, endY, 0xFFD58A32);
+            }
+        };
     }
 
     ScrollWidget build(ActiveRocketData rocket, int editorY, int panelWidth, int editorHeight,
                        float scrollX, float scrollY) {
+
         var scroll = new ScrollWidget(12, editorY, panelWidth - 24, editorHeight)
                 .withVerticalScroll(true).withHorizontalScroll(true)
                 .withScrollSpeed(24).withDragScrolling(true).withRenderCulling(4);
 
-        int contentWidth = 8;
+        var contentWidth = 8;
         var actionOwners = new HashMap<UUID, SpaceSimulation.FlightPlanBranch>();
         var displayXByAction = new HashMap<UUID, Integer>();
         screen.draftPlan().branches().forEach(branch -> branch.actions()
@@ -45,22 +105,22 @@ final class FlightPlannerCards {
         var rowByBranch = new HashMap<UUID, Integer>();
         var xByBranch = new HashMap<UUID, Integer>();
         var rowHeight = 132;
-        int branchStartY = 8;
+        var branchStartY = 8;
 
         for (int row = 0; row < screen.draftPlan().branches().size(); row++) {
             var branch = screen.draftPlan().branches().get(row);
             rowByBranch.put(branch.id(), row);
-            int rowY = branchStartY + row * rowHeight;
-            int branchX = 5;
+            var rowY = branchStartY + row * rowHeight;
+            var branchX = 5;
             if (!branch.isRoot()) {
                 var parent = actionOwners.get(branch.parentSeparationAction());
-                int parentRow = parent == null ? Math.max(0, row - 1) : rowByBranch.getOrDefault(parent.id(), row - 1);
+                var parentRow = parent == null ? Math.max(0, row - 1) : rowByBranch.getOrDefault(parent.id(), row - 1);
                 int parentX = displayXByAction.getOrDefault(branch.parentSeparationAction(),
                         xByBranch.getOrDefault(parent == null ? null : parent.id(), 5) + BRANCH_CARD_WIDTH + 8);
                 var parentAction = screen.findAction(branch.parentSeparationAction());
-                int connectorX = parentX + cardWidth(parentAction) / 2;
+                var connectorX = parentX + cardWidth(parentAction) / 2;
                 branchX = connectorX + 18;
-                int guideY = branchStartY + parentRow * rowHeight
+                var guideY = branchStartY + parentRow * rowHeight
                         + (parentAction != null && parentAction.isGenerated() ? 68 : CARD_HEIGHT);
                 scroll.addChild(FlightPlannerCards.branchConnector(connectorX, guideY, branchX, rowY + 17));
             }
@@ -69,7 +129,7 @@ final class FlightPlannerCards {
             Component branchName = branch.isRoot()
                     ? Component.translatable("screen.oritech_space_age.branch.root")
                     : Component.translatable("screen.oritech_space_age.branch.number", row + 1);
-            boolean selectedBranch = branch.id().equals(screen.activeBranchId());
+            var selectedBranch = branch.id().equals(screen.activeBranchId());
             var branchButton = SpaceAgeButtons.panel(branchX, rowY + 5, BRANCH_CARD_WIDTH, 58, Component.empty(),
                     ignored -> screen.selectBranch(branch.id()));
             branchButton.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
@@ -88,9 +148,9 @@ final class FlightPlannerCards {
             scroll.addChild(new LabelWidget(branchX + 7, rowY + 29, BRANCH_CARD_WIDTH - 14, 27,
                     branchSegments(branch, rocket)).withColor(branchColor).withWrap(true));
 
-            int cursorX = branchX + BRANCH_CARD_WIDTH + 8;
+            var cursorX = branchX + BRANCH_CARD_WIDTH + 8;
             if (branch.isRoot()) {
-                int completedIndex = 0;
+                var completedIndex = 0;
                 for (var action : screen.completedActions()) {
                     addCompletedCard(scroll, action, ++completedIndex, rocket, cursorX, rowY);
                     cursorX += NORMAL_CARD_WIDTH;
@@ -106,17 +166,20 @@ final class FlightPlannerCards {
                     addEditableCard(scroll, branch, action, index, rocket, cursorX, rowY);
                     if ((action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                             || action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION)
-                            && (!action.addons().isEmpty() || !screen.isReadOnly() && screen.canAddNavigationAddon(branch, action))) {
+                            && (!action.addons().isEmpty() || !screen.isReadOnly())) {
                         addNavigationAddonCard(scroll, branch, action, rocket, cursorX, rowY);
                     }
                     cursorX += NORMAL_CARD_WIDTH;
                 }
             }
             if (!screen.isReadOnly()) {
-                int addActionX = cursorX + 2;
-                scroll.addChild(SpaceAgeButtons.orangePanel(addActionX, rowY + 27, 64, 32,
+                var addActionX = cursorX + 2;
+                var addButton = SpaceAgeButtons.orangePanel(addActionX, rowY + 27, 64, 32,
                         Component.translatable("screen.oritech_space_age.action.add"),
-                        ignored -> screen.openAddActionMenu(branch.id(), addActionX, rowY + 61)));
+                        ignored -> screen.openAddActionMenu(branch.id(), addActionX, rowY + 61));
+                addButton.setActive(screen.canAddStep());
+                addButton.withTooltip(screen.capacityText());
+                scroll.addChild(addButton);
             }
             contentWidth = Math.max(contentWidth, cursorX + 74);
         }
@@ -128,6 +191,7 @@ final class FlightPlannerCards {
     }
 
     private Component branchSegments(SpaceSimulation.FlightPlanBranch branch, ActiveRocketData rocket) {
+
         Set<SpaceSimulation.SegmentRef> segments = screen.calculatedFlight().paths().stream()
                 .filter(path -> path.branchId().equals(branch.id())).findFirst()
                 .map(path -> path.samples().isEmpty() ? path.segments() : path.samples().getFirst().connectedSegments())
@@ -139,6 +203,7 @@ final class FlightPlannerCards {
 
     private void addCompletedCard(ScrollWidget scroll, SpaceSimulation.FlightPlanAction action, int number,
                                   ActiveRocketData rocket, int x, int y) {
+
         scroll.addChild(new SurfaceWidget(x, y, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, OritechSurface.PANEL_DARK)
                 .withTooltip(Component.translatable("screen.oritech_space_age.mission.completed_read_only")));
         scroll.addChild(new LabelWidget(x + 6, y + 7, NORMAL_CARD_WIDTH - 20, 22,
@@ -151,10 +216,12 @@ final class FlightPlannerCards {
 
     private void addGeneratedCard(ScrollWidget scroll, SpaceSimulation.FlightPlanAction action,
                                   ActiveRocketData rocket, int cursorX, int rowY) {
+
         var panel = new SurfaceWidget(cursorX, rowY + 13, GENERATED_CARD_WIDTH - 8, 54, OritechSurface.PANEL_DARK);
         var event = screen.calculatedFlight().boosterEvents().stream().filter(item -> item.id().equals(action.id())).findFirst().orElse(null);
-        if (event != null) panel.withTooltip(Component.translatable("screen.oritech_space_age.mission.automatic_separation",
-                String.format(Locale.ROOT, "%.1f", event.timeSeconds())));
+        if (event != null)
+            panel.withTooltip(Component.translatable("screen.oritech_space_age.mission.automatic_separation",
+                    String.format(Locale.ROOT, "%.1f", event.timeSeconds())));
         scroll.addChild(panel);
         var label = new LabelWidget(cursorX + 5, rowY + 21, GENERATED_CARD_WIDTH - 18, 34,
                 Component.translatable("screen.oritech_space_age.action.disconnect_booster",
@@ -166,9 +233,14 @@ final class FlightPlannerCards {
     private void addEditableCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
                                  SpaceSimulation.FlightPlanAction action, int index,
                                  ActiveRocketData rocket, int cursorX, int rowY) {
+
         var card = SpaceAgeButtons.darkPanel(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
-                Component.empty(), ignored -> { if (!screen.isReadOnly()) screen.openActionEditor(action.id()); });
+                Component.empty(), ignored -> {
+                    if (!screen.isReadOnly()) screen.openActionEditor(action.id());
+                });
         card.withTooltip(FlightPlannerLabels.actionTooltip(action.type()));
+        screen.calculatedFlight().arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id())).findFirst()
+                .ifPresent(a -> FlightPlannerLabels.parachuteTooltip(a.parachutes()).forEach(card::addTooltipLine));
         if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
             card.addTooltipLine(stationKeepingEstimate(action));
         }
@@ -182,8 +254,14 @@ final class FlightPlannerCards {
         if (action.type() == SpaceSimulation.ActionType.SCAN) {
             FlightPlannerLabels.scanEnergyTooltip(scanEstimate).forEach(card::addTooltipLine);
         }
-        if (screen.isReadOnly()) card.addTooltipLine(Component.translatable("screen.oritech_space_age.mission.accepted_read_only"));
+        if (screen.isReadOnly())
+            card.addTooltipLine(Component.translatable("screen.oritech_space_age.mission.accepted_read_only"));
+        var issues = screen.computerIssues().stream().filter(issue -> issue.branchId().equals(branch.id())
+                && (issue.actionId().equals(action.id()) || issue.actionId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET))).toList();
+        issues.forEach(issue -> card.addTooltipLine(issue.description()));
         scroll.addChild(card);
+        if (!issues.isEmpty()) scroll.addChild(blockedBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
+                issues.stream().map(RocketFlightPlanRules.Issue::description).toList()));
         if (screen.isCurrentAction(action.id())) {
             scroll.addChild(cardBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
                     currentActionTooltip(card.getTooltip(), screen.currentActionLabel()), 0xFF5AD6EB));
@@ -198,12 +276,12 @@ final class FlightPlannerCards {
                         && (!moment.completed() || path.actionMoments().getLast().equals(moment))))
                 .findFirst().orElse(null);
         if (blockedPath != null) {
-            var reason = FlightPlannerLabels.blockedTooltip(blockedPath.terminalState());
+            var reason = FlightPlannerLabels.blockedTooltip(screen.calculatedFlight(), action.id(), blockedPath.terminalState());
             card.addTooltipLine(reason);
             scroll.addChild(blockedBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, action.type() == SpaceSimulation.ActionType.SCAN
                     ? card.getTooltip() : List.of(reason)));
         }
-        int textColor = LabelWidget.BRIGHT_TEXT;
+        var textColor = LabelWidget.BRIGHT_TEXT;
         scroll.addChild(new LabelWidget(cursorX + 6, rowY + 7, NORMAL_CARD_WIDTH - 20,
                 Component.literal((index + 1 + (branch.isRoot() ? screen.completedActions().size() : 0)) + ". ").append(FlightPlannerLabels.actionName(action.type())))
                 .withColor(textColor).withShadow(true));
@@ -239,7 +317,7 @@ final class FlightPlannerCards {
 
         if (screen.isReadOnly()) return;
         var editable = branch.actions().stream().filter(item -> !item.isGenerated()).toList();
-        int editableIndex = editable.indexOf(action);
+        var editableIndex = editable.indexOf(action);
         var earlier = SpaceAgeButtons.panel(cursorX + 5, rowY + 65, 35, 14, Component.literal("←"),
                 ignored -> screen.moveAction(branch.id(), index, -1, rocket));
         earlier.setActive(editableIndex > 0);
@@ -257,6 +335,7 @@ final class FlightPlannerCards {
     }
 
     private Component stationKeepingEstimate(SpaceSimulation.FlightPlanAction action) {
+
         return FlightPlannerLabels.stationKeepingDuration(
                 FlightPlannerLabels.stationKeepingEstimate(screen.calculatedFlight(), action.id()));
     }
@@ -264,12 +343,18 @@ final class FlightPlannerCards {
     private void addNavigationAddonCard(ScrollWidget scroll, SpaceSimulation.FlightPlanBranch branch,
                                         SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
                                         int cursorX, int rowY) {
+
         scroll.addChild(addonConnector(cursorX + 66, rowY + CARD_HEIGHT, rowY + 89));
         if (action.addons().isEmpty()) {
-            scroll.addChild(SpaceAgeButtons.orangePanel(cursorX + 18, rowY + 89, 96, 20,
-                    Component.translatable("screen.oritech_space_age.action.add_abort"),
-                    ignored -> screen.addNavigationAddon(branch.id(), action.id(), rocket))
-                    .withTooltip(Component.translatable("screen.oritech_space_age.action.add_abort_tooltip")));
+            var button = SpaceAgeButtons.orangePanel(cursorX + 18, rowY + 89, 96, 20,
+                            Component.translatable("screen.oritech_space_age.action.add_abort"),
+                            ignored -> screen.addNavigationAddon(branch.id(), action.id(), rocket));
+            var available = screen.canAddNavigationAddon(branch, action);
+            button.setActive(available);
+            button.withTooltip(Component.translatable(available
+                    ? "screen.oritech_space_age.action.add_abort_tooltip"
+                    : "screen.oritech_space_age.validation.computer_required"));
+            scroll.addChild(button);
             return;
         }
         var addon = action.addons().getFirst();
@@ -287,60 +372,18 @@ final class FlightPlannerCards {
                 "screen.oritech_space_age.action.condition_reached",
                 FlightPlannerLabels.formatAddonValue(addon.type(), moment.actualValue())));
         scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 5, rowY + 89, 106, 20,
-                FlightPlannerLabels.addonSummary(addon), ignored -> screen.openAddonEditor(action.id()))
+                        FlightPlannerLabels.addonSummary(addon), ignored -> screen.openAddonEditor(action.id()))
                 .withTooltip(tooltip));
         scroll.addChild(SpaceAgeButtons.darkPanel(cursorX + 114, rowY + 89, 16, 20,
-                Component.literal("×"), ignored -> screen.removeNavigationAddon(branch.id(), action.id(), rocket))
+                        Component.literal("×"), ignored -> screen.removeNavigationAddon(branch.id(), action.id(), rocket))
                 .withTooltip(Component.translatable("screen.oritech_space_age.action.remove_condition")));
     }
 
-    private static int cardWidth(SpaceSimulation.FlightPlanAction action) {
-        return action != null && action.isGenerated() ? GENERATED_CARD_WIDTH : NORMAL_CARD_WIDTH;
-    }
-
     private List<Component> currentActionTooltip(List<Component> tooltip, Component progress) {
+
         var result = new ArrayList<>(tooltip);
         result.add(Component.translatable("screen.oritech_space_age.mission.executing", progress));
         return result;
-    }
-
-    private static UIComponent blockedBorder(int x, int y, int width, int height, List<Component> reason) {
-        return cardBorder(x, y, width, height, reason, 0xFFFF6565).withZIndex(3);
-    }
-
-    private static UIComponent cardBorder(int x, int y, int width, int height, List<Component> reason, int color) {
-        return new UIComponent(x, y, width, height) {
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                graphics.fill(x, y, x + width, y + 2, color);
-                graphics.fill(x, y + height - 2, x + width, y + height, color);
-                graphics.fill(x, y, x + 2, y + height, color);
-                graphics.fill(x + width - 2, y, x + width, y + height, color);
-            }
-        }.withTooltip(reason).withZIndex(2);
-    }
-
-    static UIComponent branchConnector(int startX, int startY, int endX, int endY) {
-        return new UIComponent(Math.min(startX, endX), Math.min(startY, endY),
-                Math.max(1, Math.abs(endX - startX)), Math.max(1, Math.abs(endY - startY))) {
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                int cornerY = Math.min(endY, startY + 7);
-                int color = 0xFFD58A32;
-                graphics.fill(startX - 1, startY, startX + 1, cornerY + 1, color);
-                graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX) + 1, cornerY + 1, color);
-                graphics.fill(endX - 1, cornerY, endX + 1, endY, color);
-            }
-        };
-    }
-
-    static UIComponent addonConnector(int lineX, int startY, int endY) {
-        return new UIComponent(lineX - 1, startY, 2, Math.max(1, endY - startY)) {
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-                graphics.fill(lineX - 1, startY, lineX + 1, endY, 0xFFD58A32);
-            }
-        };
     }
 
 }

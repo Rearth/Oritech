@@ -14,19 +14,29 @@ import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.MissionController;
+import rearth.oritech.spaceage.simulation.MissionState;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceCommunications;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-/** A pannable and zoomable view of the shared solar-system plane. */
+/**
+ * A pannable and zoomable view of the shared solar-system plane.
+ */
 final class RocketStarMapWidget extends UIComponent {
 
     // Celestial object state, orbit geometry, and object hover detection.
@@ -37,13 +47,9 @@ final class RocketStarMapWidget extends UIComponent {
     private final List<SeparationMarker> separationMarkers = new ArrayList<>();
     // Find a branch preview for selection and statistics.
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> pathsByBranch = new HashMap<>();
+    private Set<UUID> hiddenBranches = Set.of();
     // Full visible path detail for tooltips, rebuilt only when the view or flight changes.
     private final Map<UUID, List<RenderedPathSegment>> renderedPathsByBranch = new HashMap<>();
-    // Simplified draw geometry is reused while the player is looking at a stationary map.
-    private List<StarMapLineRenderer.Line> cachedLines = List.of();
-    private View cachedView;
-    // A stationary pointer does not need another search through all trajectory samples every frame.
-    private PathHover cachedPathHover;
     // Find the card behind a sample or arrival event.
     private final Map<UUID, SpaceSimulation.FlightPlanAction> actionsById = new HashMap<>();
     // Stable fallback labels shared with the assembler's segment ordering.
@@ -52,6 +58,15 @@ final class RocketStarMapWidget extends UIComponent {
     private final Consumer<NavigationSelection> selectionListener;
     // Ask the planner to open the target's right-click menu.
     private final Consumer<NavigationContextRequest> contextMenuListener;
+    private final StarMapCamera camera = new StarMapCamera();
+    // Header controls restore useful views after manual panning and zooming.
+    private final ButtonWidget fitSystemButton;
+    private final ButtonWidget fitRouteButton;
+    // Simplified draw geometry is reused while the player is looking at a stationary map.
+    private List<StarMapLineRenderer.Line> cachedLines = List.of();
+    private View cachedView;
+    // A stationary pointer does not need another search through all trajectory samples every frame.
+    private PathHover cachedPathHover;
     // World-space curves rebuilt only when the flight preview changes.
     private RocketMapPaths mapPaths;
     // Current solar system and draft plan used for labels and selection.
@@ -71,8 +86,7 @@ final class RocketStarMapWidget extends UIComponent {
     // Path state under the pointer, including interpolated speed.
     private StarMapTooltip.PathPoint hoveredPathPoint;
     // View conversion and zoom limits for this map instance.
-    private List<rearth.oritech.spaceage.simulation.SpaceCommunications.Node> coverageNodes = List.of();
-    private final StarMapCamera camera = new StarMapCamera();
+    private List<SpaceCommunications.Node> coverageNodes = List.of();
     // A left-button press is active inside the map.
     private boolean dragging;
     // Prevent a pan from also selecting the target under the pointer.
@@ -81,10 +95,10 @@ final class RocketStarMapWidget extends UIComponent {
     private boolean tooltipsEnabled = true;
     // The compact trajectory key expands only when requested.
     private boolean legendExpanded;
-    // Header controls restore useful views after manual panning and zooming.
-    private final ButtonWidget fitSystemButton;
-    private final ButtonWidget fitRouteButton;
     private UIComponent hoveredMapControl;
+    private boolean showSummary = true;
+    private Map<UUID, Component> craftLabels = Map.of();
+    private double commandAltitude = -2;
 
     RocketStarMapWidget(int x, int y, int width, int height,
                         SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -93,6 +107,7 @@ final class RocketStarMapWidget extends UIComponent {
                         UUID selectedBranch, NavigationSelection selectedTarget,
                         Consumer<NavigationSelection> selectionListener,
                         Consumer<NavigationContextRequest> contextMenuListener) {
+
         super(x, y, width, height);
         surface = OritechSurface.PANEL_INSET;
         this.selectionListener = selectionListener;
@@ -109,7 +124,7 @@ final class RocketStarMapWidget extends UIComponent {
                 Component.translatable("screen.oritech_space_age.map.fit_route_tooltip"),
                 Component.translatable("screen.oritech_space_age.map_controls"));
         var segments = rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
-                .sorted(java.util.Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
+                .sorted(Comparator.comparingInt((SpaceSimulation.SegmentRef item) -> item.anchor().getY())
                         .thenComparingInt(item -> item.anchor().getX())
                         .thenComparingInt(item -> item.anchor().getZ()))
                 .toList();
@@ -121,10 +136,36 @@ final class RocketStarMapWidget extends UIComponent {
         fitFlightPath();
     }
 
+    private static double interpolatePathSpeed(RocketFlightPathCalculator.PathSample first,
+                                               RocketFlightPathCalculator.PathSample second,
+                                               double progress) {
+
+        // Approximate speed along the short displayed chord between two trajectory samples.
+        var velocityX = first.velocityX() + (second.velocityX() - first.velocityX()) * progress;
+        var velocityY = first.velocityY() + (second.velocityY() - first.velocityY()) * progress;
+        return Math.hypot(velocityX, velocityY);
+    }
+
+    static Component objectName(SpaceObjects.ObjectType type) {
+
+        return Component.translatable("screen.oritech_space_age.object." + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component objectName(SpaceSimulation.SpaceObjectData object) {
+
+        return object.name().isBlank() ? objectName(object.type()) : Component.literal(object.name());
+    }
+
+    static Component orbitName(SpaceSimulation.OrbitBand orbit) {
+
+        return Component.translatable("screen.oritech_space_age.orbit." + orbit.name().toLowerCase(Locale.ROOT));
+    }
+
     void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
                           RocketFlightPathCalculator.FlightPath flightPath,
                           UUID selectedBranch) {
-        if (flightPath.equals(this.flightPath) && java.util.Objects.equals(selectedBranch, this.selectedBranch)
+
+        if (flightPath.equals(this.flightPath) && Objects.equals(selectedBranch, this.selectedBranch)
                 && this.snapshot != null && snapshot.objects().equals(this.snapshot.objects())
                 && snapshot.plan().equals(this.snapshot.plan())) return;
         this.snapshot = snapshot;
@@ -147,6 +188,7 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private void updateRocketMarkers() {
+
         rocketMarkers.clear();
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()
@@ -161,6 +203,7 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private void updateSeparationMarkers() {
+
         // Several boosters can detach at once; list them together instead of drawing overlapping crosses.
         separationMarkers.clear();
         for (var event : flightPath.boosterEvents()) {
@@ -176,21 +219,25 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     void setSelectedTarget(NavigationSelection selection) {
+
         selectedTarget = selection;
     }
 
     void copyViewFrom(RocketStarMapWidget previous) {
+
         if (previous == null || !previous.snapshot.simulationId().equals(snapshot.simulationId())) return;
         camera.copyFrom(previous.camera);
         legendExpanded = previous.legendExpanded;
     }
 
     private void fitSystem() {
+
         camera.fit(mapObjects.positions(),
                 viewportX(), viewportY(), viewportWidth(), viewportHeight());
     }
 
     private void fitFlightPath() {
+
         var points = new ArrayList<StarMapCamera.Point>();
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()) continue;
@@ -212,7 +259,7 @@ final class RocketStarMapWidget extends UIComponent {
         }
         if (points.size() > 1) {
             var first = points.getFirst();
-            boolean hasRoute = points.stream().anyMatch(point -> Math.hypot(
+            var hasRoute = points.stream().anyMatch(point -> Math.hypot(
                     point.x() - first.x(), point.y() - first.y()) > 1);
             if (hasRoute) camera.focus(points,
                     viewportX(), viewportY(), viewportWidth(), viewportHeight());
@@ -221,12 +268,13 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
         camera.advanceZoom();
         camera.advancePan();
-        int viewportX = x + 5;
-        int viewportY = y + 22;
-        int viewportWidth = width - 10;
-        int viewportHeight = height - 27;
+        var viewportX = x + 5;
+        var viewportY = y + 22;
+        var viewportWidth = width - 10;
+        var viewportHeight = height - 27;
         graphics.enableScissor(viewportX, viewportY, viewportX + viewportWidth, viewportY + viewportHeight);
         // Keep the animated portal backdrop; a dark veil preserves path and label contrast above it.
         var textures = Minecraft.getInstance().getTextureManager();
@@ -250,7 +298,8 @@ final class RocketStarMapWidget extends UIComponent {
         findHoveredPath(mouseX, mouseY);
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
                 isInsideViewport(mouseX, mouseY));
-        if (isInsideViewport(mouseX, mouseY)) hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
+        if (isInsideViewport(mouseX, mouseY))
+            hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
         if (hoveredPathPoint != null && hoveredObject != null
                 && hoveredObject.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             hoveredObject = null;
@@ -269,6 +318,7 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private void prepareLines(StarMapObjects.Viewport viewport) {
+
         var view = new View(camera.revision(), x, y, width, height, selectedTarget);
         if (view.equals(cachedView)) return;
         var lines = new ArrayList<StarMapLineRenderer.Line>();
@@ -280,41 +330,67 @@ final class RocketStarMapWidget extends UIComponent {
         cachedPathHover = null;
     }
 
-    void showOnlyCraftMarkers(java.util.Set<UUID> craftIds) {
+    void showOnlyCraftMarkers(Set<UUID> craftIds) {
+
         rocketMarkers.removeIf(marker -> !craftIds.contains(marker.branchId()));
     }
 
-    private boolean showSummary = true;
-    private Map<UUID, Component> craftLabels = Map.of();
+    void setCraftLabels(Map<UUID, Component> labels) {
 
-    void setCraftLabels(Map<UUID, Component> labels) { craftLabels = Map.copyOf(labels); }
+        craftLabels = Map.copyOf(labels);
+    }
 
-    void setShowSummary(boolean show) { showSummary = show; }
+    void setShowSummary(boolean show) {
+
+        showSummary = show;
+    }
 
     void setFleetTimes(Map<UUID, Double> times) {
+
         rocketMarkers.clear();
+        mapObjects.setFleetMarkers(times.keySet());
         times.forEach((id, time) -> {
             var path = pathsByBranch.get(id);
             if (path == null || path.samples().isEmpty()) return;
-            var sample = rearth.oritech.spaceage.simulation.MissionController.sample(path.samples(), time,
-                    rearth.oritech.spaceage.simulation.MissionState.Position.surface());
+            var sample = MissionController.sample(path.samples(), time,
+                    MissionState.Position.surface());
             var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
             marker.withShowOverlay(false).withTooltipFromStack(false);
             rocketMarkers.add(new BranchMarker(id, time, sample.x(), sample.y(), marker));
         });
     }
 
-    void setCoverage(List<rearth.oritech.spaceage.simulation.SpaceCommunications.Node> nodes) {
-        if (!coverageNodes.equals(nodes)) { coverageNodes = List.copyOf(nodes); cachedView = null; }
+    void setHiddenBranches(Set<UUID> branches) {
+
+        if (hiddenBranches.equals(branches)) return;
+        hiddenBranches = Set.copyOf(branches);
+        cachedView = null;
+        cachedPathHover = null;
     }
-    private double commandAltitude = -2;
-    void setCommandCoverage(double altitude) { if (commandAltitude != altitude) { commandAltitude = altitude; cachedView = null; } }
+
+    void setCoverage(List<SpaceCommunications.Node> nodes) {
+
+        if (!coverageNodes.equals(nodes)) {
+            coverageNodes = List.copyOf(nodes);
+            cachedView = null;
+        }
+    }
+
+    void setCommandCoverage(double altitude) {
+
+        if (commandAltitude != altitude) {
+            commandAltitude = altitude;
+            cachedView = null;
+        }
+    }
 
     private void addCoverage(List<StarMapLineRenderer.Line> lines, StarMapObjects.Viewport viewport) {
+
         if (commandAltitude >= 0) {
-            double radius = 60_000 + commandAltitude;
+            var radius = 60_000 + commandAltitude;
             for (int part = 0; part < 128; part += 2) {
-                double start = part * Math.PI * 2 / 128, end = (part + 1) * Math.PI * 2 / 128;
+                var start = part * Math.PI * 2 / 128;
+                var end = (part + 1) * Math.PI * 2 / 128;
                 var first = camera.project(-3_000_000 + Math.cos(start) * radius, Math.sin(start) * radius,
                         viewport.x(), viewport.y(), viewport.width(), viewport.height());
                 var last = camera.project(-3_000_000 + Math.cos(end) * radius, Math.sin(end) * radius,
@@ -323,47 +399,54 @@ final class RocketStarMapWidget extends UIComponent {
             }
         }
         for (var band : List.of(SpaceSimulation.OrbitBand.LOW, SpaceSimulation.OrbitBand.HIGH)) {
-            int count = rearth.oritech.spaceage.simulation.SpaceBalance.slots(band);
-            var covered = new java.util.HashSet<Integer>();
+            var count = SpaceBalance.slots(band);
+            var covered = new HashSet<Integer>();
             coverageNodes.stream().filter(n -> n.orbit() == band && n.relay() && n.slot() >= 0 && n.antennas() > 0).forEach(n -> {
                 covered.add(n.slot());
             });
-            for (int slot = 0; slot < count; slot++) for (int part = 0; part < 8; part++) {
-                double start = Math.PI + (slot - .45 + part * .9 / 8) * Math.PI * 2 / count;
-                double end = start + .9 / 8 * Math.PI * 2 / count;
-                double radius = 60_000 + band.altitude();
-                var a = camera.project(-3_000_000 + Math.cos(start) * radius, Math.sin(start) * radius,
-                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
-                var b = camera.project(-3_000_000 + Math.cos(end) * radius, Math.sin(end) * radius,
-                        viewport.x(), viewport.y(), viewport.width(), viewport.height());
-                lines.add(new StarMapLineRenderer.Line(a.x(), a.y(), b.x(), b.y(), covered.contains(slot) ? 0xFF69CE95 : 0x88535B68, 1.8f));
-            }
+            for (int slot = 0; slot < count; slot++)
+                for (int part = 0; part < 8; part++) {
+                    var start = Math.PI + (slot - .45 + part * .9 / 8) * Math.PI * 2 / count;
+                    var end = start + .9 / 8 * Math.PI * 2 / count;
+                    var radius = 60_000 + band.altitude();
+                    var a = camera.project(-3_000_000 + Math.cos(start) * radius, Math.sin(start) * radius,
+                            viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                    var b = camera.project(-3_000_000 + Math.cos(end) * radius, Math.sin(end) * radius,
+                            viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                    lines.add(new StarMapLineRenderer.Line(a.x(), a.y(), b.x(), b.y(), covered.contains(slot) ? 0xFF69CE95 : 0x88535B68, 1.8f));
+                }
         }
     }
 
     private void addFlightPaths(List<StarMapLineRenderer.Line> lines) {
+
         if (flightPath == null) return;
         renderedPathsByBranch.clear();
         for (var path : flightPath.paths()) {
+            if (hiddenBranches.contains(path.branchId())) continue;
             var renderedSegments = renderedPathSegments(path);
             renderedPathsByBranch.put(path.branchId(), renderedSegments);
-            var arrowActions = new java.util.HashSet<UUID>();
+            var arrowActions = new HashSet<UUID>();
             for (var segment : renderedSegments) {
                 var second = segment.secondSample;
-                int color = switch (second.phase()) {
+                var color = switch (second.phase()) {
                     case ACCELERATE -> 0xFFFF8A20;
                     case REDIRECT -> 0xFF8FDB68;
                     case COAST -> 0xFF66B9D5;
                     case BRAKE -> 0xFFB68CFF;
+                    case PARACHUTE -> 0xFF80E0CA;
                 };
                 if (!path.branchId().equals(selectedBranch)) color = color & 0x00FFFFFF | 0x66000000;
                 lines.add(new StarMapLineRenderer.Line(segment.from.x, segment.from.y, segment.to.x, segment.to.y, color,
                         path.branchId().equals(selectedBranch) ? 1.3f : 0.8f, true));
-                double dx = segment.to.x - segment.from.x, dy = segment.to.y - segment.from.y;
-                double length = Math.hypot(dx, dy);
+                var dx = segment.to.x - segment.from.x;
+                var dy = segment.to.y - segment.from.y;
+                var length = Math.hypot(dx, dy);
                 if (length >= 12 && arrowActions.add(second.actionId())) {
-                    double x = (segment.from.x + segment.to.x) * .5, y = (segment.from.y + segment.to.y) * .5;
-                    double ux = dx / length, uy = dy / length;
+                    var x = (segment.from.x + segment.to.x) * .5;
+                    var y = (segment.from.y + segment.to.y) * .5;
+                    var ux = dx / length;
+                    var uy = dy / length;
                     lines.add(new StarMapLineRenderer.Line(x - ux * 4 - uy * 2.5, y - uy * 4 + ux * 2.5, x, y, color, 1, true));
                     lines.add(new StarMapLineRenderer.Line(x - ux * 4 + uy * 2.5, y - uy * 4 - ux * 2.5, x, y, color, 1, true));
                 }
@@ -371,10 +454,12 @@ final class RocketStarMapWidget extends UIComponent {
         }
         // Navigation boundaries remain visible even when the following turn happens inside the target region.
         for (var path : flightPath.paths()) {
-            int color = path.branchId().equals(selectedBranch) ? 0xFFE2E8F0 : 0x88E2E8F0;
+            if (hiddenBranches.contains(path.branchId())) continue;
+            var color = path.branchId().equals(selectedBranch) ? 0xFFE2E8F0 : 0x88E2E8F0;
             for (var moment : path.actionMoments()) {
                 var action = actionsById.get(moment.actionId());
-                if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
+                if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO)
+                    continue;
                 var point = project(moment.x(), moment.y());
                 if (!StarMapLineSimplifier.intersects(point.x, point.y, point.x, point.y,
                         viewportX(), viewportY(), viewportWidth(), viewportHeight(), 4)) continue;
@@ -394,6 +479,7 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
+
         return mapPaths.renderedPathSegments(path, point -> {
             var projected = project(point.x(), point.y());
             return new RocketMapPaths.Point(projected.x, projected.y);
@@ -404,31 +490,33 @@ final class RocketStarMapWidget extends UIComponent {
 
     private void renderRocket(GuiGraphicsExtractor graphics, BranchMarker marker,
                               int mouseX, int mouseY, float delta) {
+
         var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
         if (!StarMapLineSimplifier.intersects(position.x, position.y, position.x, position.y,
                 viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) return;
         marker.widget.setPosition((int) Math.round(position.x - 6), (int) Math.round(position.y - 6));
         marker.widget.render(graphics, mouseX, mouseY, delta);
         var label = craftLabels.get(marker.branchId);
-        if (label != null) {
-            var font = net.minecraft.client.Minecraft.getInstance().font;
-            int labelWidth = font.width(label);
-            int labelX = (int) Math.clamp(position.x + 9, viewportX() + 3, Math.max(viewportX() + 3, viewportX() + viewportWidth() - labelWidth - 3));
-            int labelY = (int) Math.max(viewportY() + 3, position.y - 15);
+        if (label != null && camera.zoom() >= StarMapObjects.CRAFT_NAME_ZOOM) {
+            var font = Minecraft.getInstance().font;
+            var labelWidth = font.width(label);
+            var labelX = (int) Math.clamp(position.x + 9, viewportX() + 3, Math.max(viewportX() + 3, viewportX() + viewportWidth() - labelWidth - 3));
+            var labelY = (int) Math.max(viewportY() + 3, position.y - 15);
             graphics.fill(labelX - 2, labelY - 2, labelX + labelWidth + 2, labelY + 10, 0xCC080D18);
             graphics.text(font, label, labelX, labelY, 0xFF5AD6EB, true);
         }
     }
 
     private void renderSeparations(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
+
         for (var marker : separationMarkers) {
             var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
             if (!StarMapLineSimplifier.intersects(position.x, position.y, position.x, position.y,
                     viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) continue;
-            int markerX = (int) Math.round(position.x);
-            int markerY = (int) Math.round(position.y);
-            boolean selected = marker.branchId.equals(selectedBranch) || marker.childBranches.contains(selectedBranch);
-            int color = selected ? 0xFFFFD45C : 0xAAFFD45C;
+            var markerX = (int) Math.round(position.x);
+            var markerY = (int) Math.round(position.y);
+            var selected = marker.branchId.equals(selectedBranch) || marker.childBranches.contains(selectedBranch);
+            var color = selected ? 0xFFFFD45C : 0xAAFFD45C;
             graphics.fill(markerX - 1, markerY - 5, markerX + 2, markerY + 6, color);
             graphics.fill(markerX - 5, markerY - 1, markerX + 6, markerY + 2, color);
             if (isInsideViewport(mouseX, mouseY) && Math.hypot(mouseX - position.x, mouseY - position.y) <= 7) {
@@ -438,11 +526,13 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private Point renderedPosition(UUID branchId, double timeSeconds, double worldX, double worldY) {
+
         var position = mapPaths.renderedWorldPosition(branchId, timeSeconds, worldX, worldY);
         return project(position.x(), position.y());
     }
 
     private void findHoveredPath(double mouseX, double mouseY) {
+
         if (flightPath == null || !isInsideViewport(mouseX, mouseY)) return;
         if (cachedPathHover != null && cachedPathHover.x == mouseX && cachedPathHover.y == mouseY) {
             hoveredPathPoint = cachedPathHover.point;
@@ -451,24 +541,26 @@ final class RocketStarMapWidget extends UIComponent {
         double closestDistance = 6;
         for (var path : flightPath.paths()) {
             var renderedSegments = renderedPathsByBranch.get(path.branchId());
+            if (hiddenBranches.contains(path.branchId())) continue;
             if (renderedSegments == null) renderedSegments = renderedPathSegments(path);
             for (var segment : renderedSegments) {
                 var from = segment.from;
                 var to = segment.to;
                 if (mouseX < Math.min(from.x, to.x) - closestDistance || mouseX > Math.max(from.x, to.x) + closestDistance
-                        || mouseY < Math.min(from.y, to.y) - closestDistance || mouseY > Math.max(from.y, to.y) + closestDistance) continue;
-                double lineX = to.x - from.x;
-                double lineY = to.y - from.y;
-                double lengthSquared = lineX * lineX + lineY * lineY;
-                double progress = lengthSquared <= 0 ? 0 : Math.clamp(
+                        || mouseY < Math.min(from.y, to.y) - closestDistance || mouseY > Math.max(from.y, to.y) + closestDistance)
+                    continue;
+                var lineX = to.x - from.x;
+                var lineY = to.y - from.y;
+                var lengthSquared = lineX * lineX + lineY * lineY;
+                var progress = lengthSquared <= 0 ? 0 : Math.clamp(
                         ((mouseX - from.x) * lineX + (mouseY - from.y) * lineY) / lengthSquared, 0, 1);
-                double nearestX = from.x + lineX * progress;
-                double nearestY = from.y + lineY * progress;
-                double distance = Math.hypot(mouseX - nearestX, mouseY - nearestY);
+                var nearestX = from.x + lineX * progress;
+                var nearestY = from.y + lineY * progress;
+                var distance = Math.hypot(mouseX - nearestX, mouseY - nearestY);
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     // Samples describe the interval ending at that sample, matching the path's colour.
-                    double sampleProgress = segment.sampleProgressFrom
+                    var sampleProgress = segment.sampleProgressFrom
                             + (segment.sampleProgressTo - segment.sampleProgressFrom) * progress;
                     hoveredPathPoint = new StarMapTooltip.PathPoint(segment.secondSample,
                             interpolatePathSpeed(segment.firstSample, segment.secondSample, sampleProgress));
@@ -478,24 +570,18 @@ final class RocketStarMapWidget extends UIComponent {
         cachedPathHover = new PathHover(mouseX, mouseY, hoveredPathPoint);
     }
 
-    private static double interpolatePathSpeed(RocketFlightPathCalculator.PathSample first,
-                                               RocketFlightPathCalculator.PathSample second,
-                                               double progress) {
-        // Approximate speed along the short displayed chord between two trajectory samples.
-        double velocityX = first.velocityX() + (second.velocityX() - first.velocityX()) * progress;
-        double velocityY = first.velocityY() + (second.velocityY() - first.velocityY()) * progress;
-        return Math.hypot(velocityX, velocityY);
-    }
-
     private Component selectedTargetLabel() {
+
         if (selectedTarget == null) return null;
         var object = mapObjects.byId(selectedTarget.objectId);
-        if (object != null && object.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) return objectName(object.data());
+        if (object != null && object.data().type() == SpaceObjects.ObjectType.SURVEY_REGION)
+            return objectName(object.data());
         return object == null ? null : Component.translatable("screen.oritech_space_age.selected_target",
                 objectName(object.data()), orbitName(selectedTarget.orbit));
     }
 
     private Component selectedBranchLabel() {
+
         var branches = snapshot.plan().branches();
         for (int index = 0; index < branches.size(); index++) {
             var branch = branches.get(index);
@@ -508,6 +594,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleMouseScroll(double mouseX, double mouseY, double scrollDelta) {
+
         if (!isInsideViewport(mouseX, mouseY)) return false;
         camera.zoomAt(mouseX, mouseY, scrollDelta, viewportX(), viewportY(), viewportWidth(), viewportHeight());
         return true;
@@ -515,6 +602,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
+
         if (fitSystemButton.isMouseOver(mouseX, mouseY)
                 && fitSystemButton.handleClick(mouseX, mouseY, button)) return true;
         if (fitRouteButton.isMouseOver(mouseX, mouseY)
@@ -538,6 +626,7 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     boolean handleDoubleClick(double mouseX, double mouseY, int button) {
+
         if (button != 0 || !isInsideViewport(mouseX, mouseY)) return false;
         var focus = hoveredSelection;
         if (hoveredObject != null && (focus == null || focus.orbit() == SpaceSimulation.OrbitBand.SURFACE)) {
@@ -554,6 +643,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+
         if (!dragging || button != 0) return false;
         camera.dragBy(deltaX, deltaY);
         movedWhileDragging |= Math.abs(deltaX) + Math.abs(deltaY) > 0.5;
@@ -562,6 +652,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+
         if (fitSystemButton.handleMouseRelease(mouseX, mouseY, button)
                 || fitRouteButton.handleMouseRelease(mouseX, mouseY, button)) return true;
         if (!dragging || button != 0) return false;
@@ -576,6 +667,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public boolean hasTooltip() {
+
         return tooltipsEnabled && (hoveredMapControl != null || hoveredSeparation != null
                 || hoveredObject != null || hoveredSelection != null
                 || hoveredPathPoint != null);
@@ -583,6 +675,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     @Override
     public List<Component> getTooltip() {
+
         if (!tooltipsEnabled) return List.of();
         if (hoveredMapControl != null) return hoveredMapControl.getTooltip();
         StarMapObjects.Entry object = hoveredSelection == null ? hoveredObject : mapObjects.byId(hoveredSelection.objectId);
@@ -597,95 +690,101 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     private boolean isInsideViewport(double mouseX, double mouseY) {
-        boolean insideMap = mouseX >= viewportX() && mouseX < viewportX() + viewportWidth()
+
+        var insideMap = mouseX >= viewportX() && mouseX < viewportX() + viewportWidth()
                 && mouseY >= viewportY() && mouseY < viewportY() + viewportHeight();
         return insideMap && !StarMapOverlay.isOverLegend(mouseX, mouseY, x, y, width, height, legendExpanded);
     }
 
     private Point project(double worldX, double worldY) {
+
         var point = camera.project(worldX, worldY, viewportX(), viewportY(), viewportWidth(), viewportHeight());
         return new Point(point.x(), point.y());
     }
 
     private int viewportX() {
+
         return x + 5;
     }
 
     private int viewportY() {
+
         return y + 22;
     }
 
     private int viewportWidth() {
+
         return width - 10;
     }
 
     private int viewportHeight() {
+
         return height - 27;
     }
 
     void setTooltipsEnabled(boolean enabled) {
+
         tooltipsEnabled = enabled;
-    }
-
-    static Component objectName(SpaceObjects.ObjectType type) {
-        return Component.translatable("screen.oritech_space_age.object." + type.name().toLowerCase(Locale.ROOT));
-    }
-
-    static Component objectName(SpaceSimulation.SpaceObjectData object) {
-        return object.name().isBlank() ? objectName(object.type()) : Component.literal(object.name());
-    }
-
-    static Component orbitName(SpaceSimulation.OrbitBand orbit) {
-        return Component.translatable("screen.oritech_space_age.orbit." + orbit.name().toLowerCase(Locale.ROOT));
     }
 
     /**
      * @param objectId Selected celestial object.
-     * @param orbit Selected surface or orbit band.
+     * @param orbit    Selected surface or orbit band.
      */
     record NavigationSelection(UUID objectId, SpaceSimulation.OrbitBand orbit) {
+
     }
 
     /**
      * @param selection Target for the context menu.
-     * @param mouseX Pointer X in screen pixels.
-     * @param mouseY Pointer Y in screen pixels.
+     * @param mouseX    Pointer X in screen pixels.
+     * @param mouseY    Pointer Y in screen pixels.
      */
     record NavigationContextRequest(NavigationSelection selection, int mouseX, int mouseY) {
-    }
 
-    /** Camera revision, panel bounds and selected ring determine all projected line geometry. */
-    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target) {
-    }
-
-    /** Pointer position and its last path hit; a null point means nothing was close enough. */
-    private record PathHover(double x, double y, StarMapTooltip.PathPoint point) {
     }
 
     /**
-     * @param branchId Branch owning this result.
+     * Camera revision, panel bounds and selected ring determine all projected line geometry.
+     */
+    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target) {
+
+    }
+
+    /**
+     * Pointer position and its last path hit; a null point means nothing was close enough.
+     */
+    private record PathHover(double x, double y, StarMapTooltip.PathPoint point) {
+
+    }
+
+    /**
+     * @param branchId    Branch owning this result.
      * @param timeSeconds Seconds since the root branch started.
-     * @param worldX Unmodified simulation X used as a fallback.
-     * @param worldY Unmodified simulation Y used as a fallback.
-     * @param widget Icon drawn at this position.
+     * @param worldX      Unmodified simulation X used as a fallback.
+     * @param worldY      Unmodified simulation Y used as a fallback.
+     * @param widget      Icon drawn at this position.
      */
     private record BranchMarker(UUID branchId, double timeSeconds,
                                 double worldX, double worldY, ItemWidget widget) {
+
     }
 
     /**
-     * @param branchId Branch owning this result.
-     * @param stage One-based engine stage.
-     * @param timeSeconds Seconds since the root branch started.
-     * @param worldX Unmodified simulation X used as a fallback.
-     * @param worldY Unmodified simulation Y used as a fallback.
-     * @param segments Boosters grouped at this marker.
+     * @param branchId      Branch owning this result.
+     * @param stage         One-based engine stage.
+     * @param timeSeconds   Seconds since the root branch started.
+     * @param worldX        Unmodified simulation X used as a fallback.
+     * @param worldY        Unmodified simulation Y used as a fallback.
+     * @param segments      Boosters grouped at this marker.
      * @param childBranches Branches released together at this marker.
      */
     private record SeparationMarker(UUID branchId, int stage, double timeSeconds,
                                     double worldX, double worldY,
                                     List<SpaceSimulation.SegmentRef> segments, List<UUID> childBranches) {
+
         private boolean matches(RocketFlightPathCalculator.BoosterEvent event) {
+
             return branchId.equals(event.branchId()) && stage == event.stage()
                     && Math.abs(timeSeconds - event.timeSeconds()) < 0.01
                     && Math.hypot(worldX - event.x(), worldY - event.y()) < 1;
@@ -693,18 +792,20 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     // Projected geometry keeps the original samples and interpolation range for hover details.
+
     /**
-     * @param from Start of this line piece.
-     * @param to End of this line piece.
-     * @param firstSample Simulation state before this piece.
-     * @param secondSample State after this piece, including phase and firing engines.
+     * @param from               Start of this line piece.
+     * @param to                 End of this line piece.
+     * @param firstSample        Simulation state before this piece.
+     * @param secondSample       State after this piece, including phase and firing engines.
      * @param sampleProgressFrom Fraction of the original sample interval where this piece starts.
-     * @param sampleProgressTo Fraction of the original sample interval where this piece ends.
+     * @param sampleProgressTo   Fraction of the original sample interval where this piece ends.
      */
     private record RenderedPathSegment(Point from, Point to,
                                        RocketFlightPathCalculator.PathSample firstSample,
                                        RocketFlightPathCalculator.PathSample secondSample,
                                        double sampleProgressFrom, double sampleProgressTo) {
+
     }
 
     /**
@@ -712,6 +813,7 @@ final class RocketStarMapWidget extends UIComponent {
      * @param y Y coordinate; projection converts between world and screen space.
      */
     private record Point(double x, double y) {
+
     }
 
 }

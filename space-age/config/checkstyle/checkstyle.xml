@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <module name="TreeWalker">
+        <module name="AvoidStarImport"/>
+        <module name="RedundantImport"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="OneStatementPerLine"/>
+        <module name="EmptyLineSeparator">
+            <property name="tokens" value="CLASS_DEF,INTERFACE_DEF,ENUM_DEF,RECORD_DEF,CTOR_DEF,COMPACT_CTOR_DEF,METHOD_DEF"/>
+            <property name="allowMultipleEmptyLines" value="false"/>
+        </module>
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^(?!\s*(?:import|package)\b).*\b(?:net|org|com|io|mezz|java|rearth)\.(?:[a-z]\w*\.)*[A-Z]\w*"/>
+            <property name="ignoreComments" value="true"/>
+            <message key="regexp.exceeded" value="Import class names instead of qualifying them in the code."/>
+        </module>
+    </module>
+</module>

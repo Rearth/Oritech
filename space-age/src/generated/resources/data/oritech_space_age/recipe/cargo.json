@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "i": "minecraft:iron_ingot",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sis",
+    "s s",
+    "sis"
+  ],
+  "result": {
+    "id": "oritech_space_age:cargo"
+  }
+}

@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.context.ContextKey;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -22,7 +23,11 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 
 public final class RocketRenderer {
 
@@ -48,6 +53,26 @@ public final class RocketRenderer {
 
             var position = RocketSimulationController.getRocketPosition(flight, gameTime);
             var blocks = collectBlocks(rocket, position, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
+            if (!flight.parachuteDescent().isEmpty() && gameTime >= flight.reentryTick()) {
+                // Placeholder folded hardware opens into a broad white canopy with four ropes.
+                var seen = new HashSet<BlockPos>();
+                for (var segment : rocket.getStaticSegments().values())
+                    for (var block : segment.blocks()) {
+                        if (!block.state().is(SpaceAgeBlocks.PARACHUTE)) continue;
+                        var canopy = block.relativePos().above(5);
+                        for (int x = -2; x <= 2; x++)
+                            for (int z = -2; z <= 2; z++)
+                                addBlock(blocks, seen, canopy.offset(x, Math.abs(x) == 2 || Math.abs(z) == 2 ? 0 : 1, z),
+                                        Blocks.WHITE_CARPET.defaultBlockState(), BlockPos.containing(position), partialTick,
+                                        level, modelResolver, blockEntityDispatcher, modelCache);
+                        for (int y = 1; y < 5; y++)
+                            for (int x : new int[]{-1, 1})
+                                for (int z : new int[]{-1, 1})
+                                    addBlock(blocks, seen, block.relativePos().offset(x, y, z),
+                                            Blocks.IRON_CHAIN.defaultBlockState(), BlockPos.containing(position), partialTick,
+                                            level, modelResolver, blockEntityDispatcher, modelCache);
+                    }
+            }
             var light = LevelRenderer.getLightCoords(level, BlockPos.containing(position));
             rockets.add(new RenderedRocket(position, light, blocks));
         }
@@ -58,6 +83,7 @@ public final class RocketRenderer {
     }
 
     public static void onSubmitGeometry(SubmitCustomGeometryEvent event) {
+
         var data = event.getLevelRenderState().getRenderData(ROCKET_DATA);
         if (data == null) return;
 
@@ -85,7 +111,11 @@ public final class RocketRenderer {
         }
     }
 
-    private static List<RenderedBlock> collectBlocks(ActiveRocketData rocket, Vec3 rocketPosition, float partialTick, ClientLevel level, BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher, Map<BlockState, BlockModelRenderState> modelCache) {
+    private static List<RenderedBlock> collectBlocks(ActiveRocketData rocket, Vec3 rocketPosition, float partialTick,
+                                                     ClientLevel level, BlockModelResolver modelResolver,
+                                                     BlockEntityRenderDispatcher blockEntityDispatcher,
+                                                     Map<BlockState, BlockModelRenderState> modelCache) {
+
         var blocks = new ArrayList<RenderedBlock>();
         var renderedPositions = new HashSet<BlockPos>();
         var rocketBlockPosition = BlockPos.containing(rocketPosition);
@@ -102,7 +132,8 @@ public final class RocketRenderer {
                 var couplings = segment.getCouplingsToSegment(connectedSegment);
                 if (couplings == null) continue;
                 for (var coupling : couplings) {
-                    addBlock(blocks, renderedPositions, coupling.relativePos(), SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState(), rocketBlockPosition, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
+                    addBlock(blocks, renderedPositions, coupling.relativePos(), coupling.state(), rocketBlockPosition, partialTick, level, modelResolver,
+                            blockEntityDispatcher, modelCache);
                 }
             }
         }
@@ -110,7 +141,11 @@ public final class RocketRenderer {
         return blocks;
     }
 
-    private static void addBlock(List<RenderedBlock> blocks, HashSet<BlockPos> renderedPositions, BlockPos position, BlockState state, BlockPos rocketBlockPosition, float partialTick, ClientLevel level, BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher, Map<BlockState, BlockModelRenderState> modelCache) {
+    private static void addBlock(List<RenderedBlock> blocks, HashSet<BlockPos> renderedPositions, BlockPos position,
+                                  BlockState state, BlockPos rocketBlockPosition, float partialTick, ClientLevel level,
+                                  BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher,
+                                  Map<BlockState, BlockModelRenderState> modelCache) {
+
         if (state.isAir() || !renderedPositions.add(position)) return;
 
         var model = modelCache.computeIfAbsent(state, ignored -> {
@@ -132,12 +167,15 @@ public final class RocketRenderer {
     }
 
     private record RocketRenderData(List<RenderedRocket> rockets, Vec3 cameraPosition) {
+
     }
 
     private record RenderedRocket(Vec3 position, int light, List<RenderedBlock> blocks) {
+
     }
 
     private record RenderedBlock(BlockPos relativePosition, BlockModelRenderState model,
                                  @Nullable BlockEntityRenderState blockEntity) {
+
     }
 }

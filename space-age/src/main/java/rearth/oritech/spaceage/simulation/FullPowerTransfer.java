@@ -2,17 +2,17 @@ package rearth.oritech.spaceage.simulation;
 
 import java.util.List;
 
-/** Burn/coast/burn timing and directions, accounting for the full sequence of engine power changes. */
+/**
+ * Burn/coast/burn timing and directions, accounting for the full sequence of engine power changes.
+ */
 public record FullPowerTransfer(double firstSeconds, double coastSeconds, double lastSeconds,
-                                double firstDirectionX, double firstDirectionY, double lastDirectionX, double lastDirectionY) {
-
-    public double duration() {
-        return firstSeconds + coastSeconds + lastSeconds;
-    }
+                                double firstDirectionX, double firstDirectionY, double lastDirectionX,
+                                double lastDirectionY) {
 
     public static FullPowerTransfer solve(double dx, double dy, double vx, double vy,
                                           double arrivalX, double arrivalY, boolean freeArrival,
                                           double acceleration, double deltaV, double speedLimit, double timeLimit) {
+
         var intervals = acceleration > 0 && deltaV > 0
                 ? List.of(new RocketBurnProfile.Interval(acceleration, deltaV / acceleration)) : List.<RocketBurnProfile.Interval>of();
         return solve(dx, dy, vx, vy, arrivalX, arrivalY, freeArrival,
@@ -22,6 +22,7 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
     public static FullPowerTransfer solve(double dx, double dy, double vx, double vy,
                                           double arrivalX, double arrivalY, boolean freeArrival,
                                           RocketBurnProfile profile, double speedLimit, double timeLimit) {
+
         var deltaV = profile.deltaV();
         if (!(speedLimit > 0) || !(timeLimit > 0)) return null;
         var speed = Math.hypot(vx, vy);
@@ -73,10 +74,13 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
         return result;
     }
 
-    /** Along a straight approach, distance grows monotonically with peak speed even across stage changes.
-     * Prefer continuous burns when the available stages can cover the distance; coast only for fuel or speed limits. */
+    /**
+     * Along a straight approach, distance grows monotonically with peak speed even across stage changes.
+     * Prefer continuous burns when the available stages can cover the distance; coast only for fuel or speed limits.
+     */
     private static FullPowerTransfer straightTransfer(double distance, double initial, double arrival, boolean freeArrival,
                                                       RocketBurnProfile profile, double cap, double x, double y) {
+
         var low = Math.max(initial, freeArrival ? 0 : arrival);
         var high = Math.min(cap, freeArrival ? initial + profile.deltaV() : (profile.deltaV() + initial + arrival) / 2);
         if (high < low || burnDistance(profile, low, initial, arrival, freeArrival) > distance + 1e-7) return null;
@@ -98,6 +102,7 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
     }
 
     private static double burnDistance(RocketBurnProfile profile, double peak, double initial, double arrival, boolean freeArrival) {
+
         var first = profile.burn(0, peak - initial);
         var last = profile.burn(peak - initial, freeArrival ? 0 : peak - arrival);
         return initial * first.seconds() + first.distance() + peak * last.seconds() - last.distance();
@@ -106,6 +111,7 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
     private static FullPowerTransfer atDuration(double dx, double dy, double vx, double vy,
                                                 double fx, double fy, boolean freeArrival,
                                                 RocketBurnProfile profile, double budget, double cap, double time) {
+
         var cx = dx / time;
         var cy = dy / time;
         // Solve for cruise velocity. Each burn integrates the engine intervals it will actually use,
@@ -132,6 +138,7 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
                         w == 0 ? 0 : -wx / w, w == 0 ? 0 : -wy / w);
             }
             var jxx = time - firstScale - lastScale;
+            // Jacobian of the position error with respect to cruise velocity; solve its 2x2 Newton step below.
             var jyy = jxx;
             var jxy = 0d;
             var jyx = 0d;
@@ -164,5 +171,10 @@ public record FullPowerTransfer(double firstSeconds, double coastSeconds, double
             if (!Double.isFinite(cx) || !Double.isFinite(cy)) return null;
         }
         return null;
+    }
+
+    public double duration() {
+
+        return firstSeconds + coastSeconds + lastSeconds;
     }
 }

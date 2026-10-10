@@ -4,6 +4,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.GroundStationBlockEntity;
+import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 
 import java.util.function.Supplier;
@@ -19,11 +21,16 @@ public final class SpaceAgeBlockEntities {
                     SpaceAgeBlocks.ROCKET_ASSEMBLER.get()
             ));
 
-    public static final Supplier<BlockEntityType<rearth.oritech.spaceage.block.GroundStationBlockEntity>> GROUND_STATION =
+    public static final Supplier<BlockEntityType<GroundStationBlockEntity>> GROUND_STATION =
             BLOCK_ENTITY_TYPES.register("ground_station", () -> new BlockEntityType<>(
-                    rearth.oritech.spaceage.block.GroundStationBlockEntity::new,
+                    GroundStationBlockEntity::new,
                     SpaceAgeBlocks.MISSION_CONTROL.get(), SpaceAgeBlocks.SPACE_SCANNER.get(), SpaceAgeBlocks.ANTENNA.get()));
+
+    public static final Supplier<BlockEntityType<VacuumCrafterBlockEntity>> VACUUM_CRAFTER =
+            BLOCK_ENTITY_TYPES.register("vacuum_crafter", () -> new BlockEntityType<>(
+                    VacuumCrafterBlockEntity::new, SpaceAgeBlocks.VACUUM_CRAFTER.get(), SpaceAgeBlocks.CARGO.get()));
 
     private SpaceAgeBlockEntities() {
     }
+
 }
