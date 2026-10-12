@@ -8,10 +8,6 @@ public class OritechStartupConfig {
     public static final ModConfigSpec.Builder STARTUP = new ModConfigSpec.Builder();
 
 
-    public static final ModConfigSpec.BooleanValue generateOresFabricOnly = STARTUP
-            .comment("[Fabric Only] Whether ores are generated. On NeoForge, use a datapack instead.")
-            .define("generateOresFabricOnly", true);
-
     public static final ModConfigSpec.DoubleValue speedAddonSpeed = STARTUP
             .comment("Speed addon processing speed multiplier")
             .defineInRange("speedAddonSpeed", 0.5, 0.0, 100.0);
