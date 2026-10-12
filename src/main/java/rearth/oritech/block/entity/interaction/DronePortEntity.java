@@ -186,7 +186,6 @@ public class DronePortEntity extends NetworkedBlockEntity
 
         if (targetPosition != null) {
             output.store("target_pos", GlobalPos.CODEC, targetPosition);
-
         }
     }
 
@@ -319,7 +318,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.energy < calculateEnergyUsage() || incomingPacket != null)
             return false;
         var targetPort = getTargetPort();
-        if (targetPort == null || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getStacks(), fluidStorage.getContent()))
+        if (targetPort == null || !targetPort.level.shouldTickBlocksAt(targetPort.worldPosition) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getStacks(), fluidStorage.getContent()))
             return false;
 
 
