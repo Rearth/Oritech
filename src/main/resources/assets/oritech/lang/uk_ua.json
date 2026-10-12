@@ -2,7 +2,7 @@
   "oracle_index.title.oritech": "Oritech",
   "message.oritech.oracle_index_missing": "Oracle Index не встановлено. Він не обов’язковий для гри з Oritech, а уся його інформація доступна онлайн на moddedmc.wiki. Проте Oracle Index все ж є дуже корисним внутрішньоігровим помічником.",
   "advancements.oritech.begin": "Oritech",
-  "key.oritech.hotkey_category": "Oritech",
+  "key.category.oritech.keys": "Oritech",
   "advancements.oritech.begin.description": "Нікель та діамант — почніть свою технологічну пригоду, отримавши трохи необробленого нікелю. Засяй-но, гірниче!",
   "advancements.oritech.generator": "Потужність на повну!",
   "advancements.oritech.generator.description": "Генеруйте значну потужність за допомогою простого генератора. Захопливо, чи не так?",
@@ -1194,7 +1194,6 @@
   "oritech.configuration.superConductorTransferRate": "Швидкість передачі надпровідника",
   "oritech.configuration.steamToRfRatio": "Співвідношення пари до RF",
   "oritech.configuration.smallEnergyStorage": "Мале сховище енергії",
-  "oritech.configuration.generateOresFabricOnly": "[Тільки Fabric] Згенерувати руди",
   "oritech.configuration.ultimateAddonSpeed": "Швидкість доповнювача синергетичної матриці",
   "oritech.configuration.additiveAddons": "Додаткові доповнювачі",
   "oritech.configuration.exoJetpack": "Екзореактивний ранець",
@@ -1350,5 +1349,10 @@
   "tag.item.oritech.recyclable.small_iron_dust": "Перероблюється у залізну крихту",
   "tag.item.oritech.recyclable.string": "Перероблюється у нитки",
   "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
-  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility",
+  "oritech.configuration.baseEnergyUsage": "Base Energy Usage per Trip",
+  "oritech.configuration.distanceEnergyUsage": "Travel Distance Energy Multiplier",
+  "oritech.configuration.dronePortConfig": "Депо дронів",
+  "oritech.configuration.interaction": "Interaction Machines",
+  "oritech.configuration.showOracleIndexWarning": "Show Oracle Index Warning"
 }
