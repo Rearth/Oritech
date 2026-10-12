@@ -22,8 +22,12 @@ import java.util.function.Predicate;
 public final class ResonatorSearch {
     private static final ArrayDeque<Search> SEARCHES = new ArrayDeque<>();
 
+    public static boolean isSearching(ServerPlayer player) {
+        return SEARCHES.stream().anyMatch(search -> search.player == player);
+    }
+
     public static boolean start(ServerPlayer player, ItemStack stack, Predicate<BlockState> targets, String translationKey, int particleColor) {
-        if (SEARCHES.stream().anyMatch(search -> search.player == player)) return false;
+        if (isSearching(player)) return false;
         SEARCHES.addLast(new Search(player, stack, targets, translationKey, particleColor));
         player.sendSystemMessage(Component.translatable("message.oritech.resonator.searching"), true);
         PacketDistributor.sendToPlayer(player, new ParticleContent.Payload(

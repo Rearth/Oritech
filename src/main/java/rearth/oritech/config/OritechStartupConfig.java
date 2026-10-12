@@ -43,6 +43,7 @@ public class OritechStartupConfig {
     public static final ToolConfig exoChestplate = new ToolConfig(OritechStartupConfig.STARTUP, "exoChestplate", 5_000_000, 10_000, 10_000);
     public static final ToolConfig basicDrill = new ToolConfig(OritechStartupConfig.STARTUP, "basicDrill", 10_000, 10, 512);
     public static final ToolConfig chainSaw = new ToolConfig(OritechStartupConfig.STARTUP, "chainSaw", 10_000, 10, 512);
+    public static final ResonatorConfig resonator = new ResonatorConfig(STARTUP);
     public static final ElectricMaceConfig electricMace = new ElectricMaceConfig(OritechStartupConfig.STARTUP);
     public static final PortableLaserConfig portableLaserConfig = new PortableLaserConfig(OritechStartupConfig.STARTUP);
 
@@ -90,6 +91,22 @@ public class OritechStartupConfig {
             energyCapacity = b.defineInRange("energyCapacity", defCap, 0, Integer.MAX_VALUE);
             energyUsage = b.defineInRange("energyUsage", defUsage, 0, Integer.MAX_VALUE);
             chargeSpeed = b.defineInRange("chargeSpeed", defCharge, 0, Integer.MAX_VALUE);
+            b.pop();
+        }
+    }
+
+    public static class ResonatorConfig {
+        public final ModConfigSpec.IntValue energyCapacity;
+        public final ModConfigSpec.IntValue chargeSpeed;
+        public final ModConfigSpec.IntValue searchEnergyUsage;
+        public final ModConfigSpec.IntValue guidanceEnergyUsage;
+
+        ResonatorConfig(ModConfigSpec.Builder b) {
+            b.push("resonator");
+            energyCapacity = b.comment("RF storage capacity of all resonators").defineInRange("energyCapacity", 10_000, 1, Integer.MAX_VALUE);
+            chargeSpeed = b.comment("Resonator charging rate in RF/t").defineInRange("chargeSpeed", 512, 0, Integer.MAX_VALUE);
+            searchEnergyUsage = b.comment("RF consumed per new search, including its initial result display").defineInRange("searchEnergyUsage", 1000, 0, Integer.MAX_VALUE);
+            guidanceEnergyUsage = b.comment("RF consumed when showing a saved search result").defineInRange("guidanceEnergyUsage", 100, 0, Integer.MAX_VALUE);
             b.pop();
         }
     }

@@ -80,6 +80,12 @@ public class ItemGroups {
                 if (fieldGroup.equals(targetGroup)) {
                     output.accept(value.value());
 
+                    if (value.value() instanceof OritechEnergyItem energyItem) {
+                        var stack = new ItemStack(value.value());
+                        stack.set(ComponentContent.ENERGY, energyItem.getEnergyCapacity());
+                        output.accept(stack);
+                    }
+
                     if (value.equals(ItemContent.PORTABLE_ENERGY_STORAGE_ITEM)) {
                         var stack = new ItemStack(value.value());
                         stack.set(ComponentContent.ENERGY, ((SmallEnergyStorageBlockItem) value.value()).getEnergyCapacity());
