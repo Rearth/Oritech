@@ -33,6 +33,9 @@ sourceSets.main.resources {
 
 repositories {
 
+    // ModdedMC Wiki data and item render exporter
+    maven { url = 'https://maven.sinytra.org' }
+
     // ModMaven
     maven { url = "https://modmaven.dev" }
 
@@ -63,7 +66,14 @@ base {
 }
 
 // Mojang ships Java 25 to end users in 26.1.2, so mods should target Java 25.
-java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(25)
+    withSourcesJar()
+}
+
+tasks.named('sourcesJar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
 
 // Internal compat datagen module
 // This source set is only included by runCompatData and is not packaged into Oritech
@@ -162,6 +172,13 @@ neoForge {
             loadedMods = [mods."${mod_id}", mods.oritech_compat]
         }
 
+        wikiExport {
+            client()
+            gameDirectory = project.file('run-wiki-export')
+            systemProperty 'wiki_exporter.enabled', 'true'
+            systemProperty 'wiki_exporter.config.path', file('wiki-exporter.json').getAbsolutePath()
+        }
+
         // applies to all the run configs above
         configureEach {
             // Recommended logging data for a userdev environment
@@ -256,6 +273,9 @@ dependencies {
 
     // Productive Metalworks 1.16.4 (6/22/2026)
     compatImplementation "curse.maven:productive-metalworks-1184570:8303948"
+
+    // ModdedMC Wiki inventory render and metadata exporter
+    localRuntime "org.sinytra:wiki-exporter-neoforge:${wiki_exporter_version}"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
@@ -281,16 +301,17 @@ sourceSets.main.resources.srcDir generateModMetadata
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
 neoForge.ideSyncTask generateModMetadata
 
-// Example configuration to allow publishing using the maven-publish plugin
+// configure Maven publishing for blamejared ci / maven
 publishing {
     publications {
-        register('mavenJava', MavenPublication) {
+        mavenJava(MavenPublication) {
+            artifactId = base.archivesName.get()
             from components.java
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            url System.getenv('local_maven_url')
         }
     }
 }

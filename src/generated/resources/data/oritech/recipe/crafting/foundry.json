@@ -8,9 +8,9 @@
     "s": "#c:ingots/electrum"
   },
   "pattern": [
-    "fff",
-    "fcf",
-    "sbs"
+    "fbf",
+    " c ",
+    " s "
   ],
   "result": {
     "id": "oritech:foundry"

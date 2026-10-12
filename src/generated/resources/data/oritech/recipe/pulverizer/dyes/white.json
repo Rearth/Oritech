@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:raw_materials/dyes/white"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:white_dye"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

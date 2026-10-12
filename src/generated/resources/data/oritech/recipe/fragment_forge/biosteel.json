@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "oritech:biosteel_ingot"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:biosteel_dust"
+    }
+  ],
+  "time": 40
+}

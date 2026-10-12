@@ -1,6 +1,6 @@
 {
-  "augment_application_block.mdx": "Cybernetic Augmentation Center",
-  "simple_augment_station.mdx": "Basic Research Station",
-  "advanced_augment_station.mdx": "Quantum Research Station",
+  "cybernetic_augmentation_center.mdx": "Cybernetic Augmentation Center",
+  "cybernetic_research_station.mdx": "Basic Research Station",
+  "quantum_research_station.mdx": "Quantum Research Station",
   "arcane_augment_station.mdx": "Arcane Research Station"
 }

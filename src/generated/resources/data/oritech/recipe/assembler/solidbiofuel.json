@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#c:fuels/bio",
     "#c:fuels/bio",
@@ -11,6 +11,5 @@
       "id": "oritech:solid_biofuel"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

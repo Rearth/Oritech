@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "oritech:processing_unit",
     "oritech:fluxite",
@@ -11,6 +11,5 @@
       "id": "oritech:flux_gate"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 144
 }

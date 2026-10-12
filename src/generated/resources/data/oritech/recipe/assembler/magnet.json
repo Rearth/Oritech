@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#c:ingots/steel",
     "#c:ingots/nickel",
@@ -12,6 +12,5 @@
       "id": "oritech:magnetic_coil"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 48
 }

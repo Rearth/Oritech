@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:ender_pearls"
+  ],
+  "itemResults": [
+    {
+      "count": 12,
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "time": 40
+}

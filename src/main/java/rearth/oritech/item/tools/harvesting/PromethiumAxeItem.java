@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.NonNull;
 import rearth.oritech.block.entity.interaction.TreeCutterBlockEntity;
 import rearth.oritech.client.renderers.PromethiumToolRenderer;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -88,7 +89,7 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
             level.addDestroyBlockEffect(candidatePos, candidateState);
 
             if (level instanceof ServerLevel sl)
-                sl.sendParticles(ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.SOUL_FIRE_FLAME, candidatePos.getX() + 0.5, candidatePos.getY() + 0.5, candidatePos.getZ() + 0.5, 4, 0.6, 0.6, 0.6, 0);
 
             if (candidateState.is(BlockTags.LOGS)) break;
         }

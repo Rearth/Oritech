@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "minecraft:water"
@@ -13,6 +13,5 @@
       "id": "oritech:nickel_gem"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 150
 }

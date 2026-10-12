@@ -2,7 +2,6 @@ package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.animatable.GeoAnimatable;
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
@@ -14,12 +13,12 @@ import rearth.oritech.client.renderers.models.EndericLaserModel;
 import rearth.oritech.util.Geometry;
 import org.jspecify.annotations.Nullable;
 
-public class SolarPanelRenderer<T extends BigSolarPanelEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<T, R> {
+public class SolarPanelRenderer<T extends BigSolarPanelEntity & GeoAnimatable, R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<T, R> {
 
     public static final DataTicket<Float> TARGET_ANGLE_TICKET = DataTicket.create("solar_target_angle", Float.class);
 
     public SolarPanelRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
-        super(context, new SolarPanelModel<>(modelPath));
+        super(context, new SolarPanelModel<>(modelPath), modelPath);
     }
 
     @Override

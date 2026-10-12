@@ -1,0 +1,10 @@
+{
+  "type": "oritech_space_age:vacuum_crafting",
+  "first": "minecraft:redstone_block",
+  "result": {
+    "Name": "oritech:energite"
+  },
+  "rf_per_tick": 4000,
+  "second": "minecraft:end_stone",
+  "ticks": 2400
+}

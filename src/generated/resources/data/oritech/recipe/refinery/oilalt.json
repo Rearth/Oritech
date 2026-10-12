@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "#c:oil"
@@ -22,6 +22,5 @@
     "oritech:clay_catalyst_beads"
   ],
   "itemResults": [],
-  "recipeType": "oritech:refinery",
   "time": 128
 }

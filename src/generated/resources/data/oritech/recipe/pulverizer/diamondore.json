@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#minecraft:diamond_ores"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:diamond"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

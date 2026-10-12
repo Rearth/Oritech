@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#oritech:recyclable/iron_dust"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:iron_dust"
+    }
+  ],
+  "time": 120
+}

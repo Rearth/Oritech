@@ -16,6 +16,7 @@ import java.util.List;
 public class BlockWidget extends UIComponent {
 
     private BlockState state;
+    private boolean cacheTexture;
     private float rotationY = 225f; // isometric-ish default
     private float rotationX = 30f;
     private float mouseRotationSpeed = 0f;
@@ -24,6 +25,12 @@ public class BlockWidget extends UIComponent {
     public BlockWidget(int x, int y, int size, BlockState state) {
         super(x, y, size, size);
         this.state = state;
+    }
+
+    /** Opt in only for static block models without animated textures. */
+    public BlockWidget withCachedRendering() {
+        cacheTexture = true;
+        return this;
     }
 
     public BlockState getState() {
@@ -65,7 +72,7 @@ public class BlockWidget extends UIComponent {
                 rotationX,
                 rotationY + currentMouseRotation,
                 0f, 0f, 0f,
-                delta,
+                cacheTexture ? 0 : delta, cacheTexture,
                 cx, cy, cx + cw, cy + ch,
                 scale,
                 graphics.pose(),

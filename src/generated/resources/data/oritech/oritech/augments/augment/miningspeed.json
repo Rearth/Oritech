@@ -18,19 +18,19 @@
   ],
   "researchCost": [
     {
-      "count": 48,
+      "count": 16,
       "ingredient": "oritech:magnetic_coil"
     },
     {
-      "count": 64,
+      "count": 32,
       "ingredient": "minecraft:quartz"
     },
     {
-      "count": 32,
+      "count": 8,
       "ingredient": "oritech:basic_battery"
     }
   ],
-  "rfCost": 50000000,
+  "rfCost": 25000000,
   "time": 1200,
   "toggleable": false,
   "uiX": 30,

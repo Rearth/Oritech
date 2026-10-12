@@ -1,0 +1,16 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:raw_materials/uranium"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "oritech:uranium_dust"
+    },
+    {
+      "id": "oritech:small_plutonium_dust"
+    }
+  ],
+  "time": 40
+}

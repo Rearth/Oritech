@@ -8,9 +8,9 @@
     "s": "oritech:motor"
   },
   "pattern": [
-    "fff",
     "fcf",
-    "sbs"
+    " b ",
+    " s "
   ],
   "result": {
     "id": "oritech:pulverizer"

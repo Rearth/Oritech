@@ -33,7 +33,7 @@ import rearth.oritech.api.transfer.fluid.FluidProvider;
 import rearth.oritech.item.other.PortableTankFluidHandler;
 import rearth.oritech.item.other.SmallFluidTankBlockItem;
 import rearth.oritech.item.tools.ElectricMaceItem;
-import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.EndericRailgunItem;
 import rearth.oritech.item.tools.armor.*;
 import rearth.oritech.item.tools.harvesting.ChainsawItem;
 import rearth.oritech.item.tools.harvesting.DrillItem;
@@ -145,9 +145,9 @@ public class ToolsContent {
                 .component(DataComponents.UNBREAKABLE, Unit.INSTANCE);
     }
 
-    public static final DeferredItem<Item> PORTABLE_LASER = EQUIPMENT.registerItem(
-            "portable_laser",
-            props -> new PortableLaserItem(props
+    public static final DeferredItem<Item> ENDERIC_RAILGUN = EQUIPMENT.registerItem(
+            "enderic_railgun",
+            props -> new EndericRailgunItem(props
                     .stacksTo(1)
                     .rarity(Rarity.EPIC)
                     .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
@@ -212,7 +212,7 @@ public class ToolsContent {
                     var tool = (EnergyProvider.Item) stack.getItem();
                     return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getEnergyCapacity(), tool.getMaxRFInputRate(), tool.getMaxRFOutputRate());
                 },
-                HAND_DRILL, CHAINSAW, ELECTRIC_MACE, PORTABLE_LASER, EXO_CHESTPLATE,
+                HAND_DRILL, CHAINSAW, ELECTRIC_MACE, ENDERIC_RAILGUN, EXO_CHESTPLATE,
                 JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_ENERGY_STORAGE_ITEM
         );
 

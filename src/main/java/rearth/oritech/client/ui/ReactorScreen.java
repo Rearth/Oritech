@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.BlockPos;
+import org.joml.Vector2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
@@ -20,9 +21,7 @@ import rearth.oritech.block.blocks.reactor.ReactorAbsorberBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatPipeBlock;
 import rearth.oritech.block.blocks.reactor.ReactorHeatVentBlock;
 import rearth.oritech.block.blocks.reactor.ReactorRodBlock;
-import rearth.oritech.block.entity.reactor.ReactorCoolantAbsorberPortEntity;
 import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
-import rearth.oritech.block.entity.reactor.ReactorFuelPortEntity;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.util.TooltipHelper;
@@ -225,10 +224,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         var stats = getStatsAtPosition(pos);
         if (stats.storedHeat() == -1) return tooltip;
 
-        int stackHeight = menu.reactorEntity.areaMax.getY() - menu.reactorEntity.areaMin.getY() - 1;
-        var portPosition = pos.offset(0, stackHeight, 0);
-        var portEntity = menu.level.getBlockEntity(portPosition);
-        if (portEntity != null && portEntity.isRemoved()) return tooltip;
+        var reactorMin = menu.reactorEntity.areaMin;
+        var localPos = new Vector2i(pos.getX() - reactorMin.getX() - 1, pos.getZ() - reactorMin.getZ() - 1);
+        var fuel = menu.reactorEntity.componentFuel.get(localPos);
 
         if (state.getBlock() instanceof ReactorRodBlock rodBlock) {
             int rodCount = rodBlock.getRodCount();
@@ -239,14 +237,14 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
             int generatedHeat = stats.heatChanged();
             int heat = stats.storedHeat();
 
-            if (portEntity instanceof ReactorFuelPortEntity fuelPortEntity) {
+            if (fuel != null) {
                 tooltip.add(Component.translatable("text.oritech.reactor.rod_count", rodCount));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_pulses", createdPulses));
                 tooltip.add(Component.translatable("text.oritech.reactor.received_pulses", externalPulses));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_heat", generatedHeat));
                 tooltip.add(Component.translatable("text.oritech.reactor.generated_energy", generatedEnergy));
                 tooltip.add(Component.translatable("text.oritech.reactor.heat", heat));
-                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuelPortEntity.availableFuel, fuelPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.fuel", fuel.available(), fuel.capacity()));
             }
         } else if (state.getBlock() instanceof ReactorHeatPipeBlock) {
             tooltip.add(Component.translatable("text.oritech.reactor.collected_heat", stats.heatChanged()));
@@ -254,9 +252,9 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
         } else if (state.getBlock() instanceof ReactorHeatVentBlock) {
             tooltip.add(Component.translatable("text.oritech.reactor.removed_heat", stats.heatChanged()));
         } else if (state.getBlock() instanceof ReactorAbsorberBlock) {
-            if (portEntity instanceof ReactorCoolantAbsorberPortEntity absorberPortEntity) {
+            if (fuel != null) {
                 tooltip.add(Component.translatable("text.oritech.reactor.absorbed_heat", stats.heatChanged()));
-                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", absorberPortEntity.availableFuel, absorberPortEntity.currentFuelOriginalCapacity));
+                tooltip.add(Component.translatable("text.oritech.reactor.absorbant", fuel.available(), fuel.capacity()));
             }
         }
 
@@ -264,18 +262,12 @@ public class ReactorScreen extends OritechWidgetScreen<ReactorScreenHandler> {
     }
 
     public NuclearReactorControllerBlockEntity.ComponentStatistics getStatsAtPosition(BlockPos pos) {
-        if (menu.reactorEntity.componentStats.isEmpty()) {
+        var reactorMin = menu.reactorEntity.areaMin;
+        if (reactorMin == null || pos.getY() != reactorMin.getY() + 1) {
             return NuclearReactorControllerBlockEntity.ComponentStatistics.EMPTY;
         }
-
-        var reactorMin = menu.reactorEntity.areaMin;
-        for (var entry : menu.reactorEntity.componentStats.entrySet()) {
-            var localPos = entry.getKey();
-            var worldPos = reactorMin.offset(localPos.x + 1, 1, localPos.y + 1);
-            if (worldPos.equals(pos)) return entry.getValue();
-        }
-
-        return NuclearReactorControllerBlockEntity.ComponentStatistics.EMPTY;
+        var localPos = new Vector2i(pos.getX() - reactorMin.getX() - 1, pos.getZ() - reactorMin.getZ() - 1);
+        return menu.reactorEntity.componentStats.getOrDefault(localPos, NuclearReactorControllerBlockEntity.ComponentStatistics.EMPTY);
     }
 
     @Override

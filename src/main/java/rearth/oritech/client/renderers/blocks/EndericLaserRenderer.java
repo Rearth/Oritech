@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
@@ -28,11 +27,13 @@ import rearth.oritech.client.renderers.models.EndericLaserModel;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.OritechClientConfig;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.HashMap;
 import java.util.Objects;
 
-public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<EndericLaserBlockEntity, R> {
+public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<EndericLaserBlockEntity, R> {
 
     private Vec3 lastActivePlayerPos = Vec3.ZERO;
     private static final HashMap<Long, Vec3> drillOffsets = new HashMap<>();
@@ -86,7 +87,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
     public static final DataTicket<LaserBeamData> BEAM_DATA = DataTicket.create("laser_beam_data", LaserBeamData.class);
 
     public EndericLaserRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
-        super(context, new EndericLaserModel<>(modelPath));
+        super(context, new EndericLaserModel<>(modelPath), modelPath);
     }
 
     @Override
@@ -187,7 +188,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
         if (!laserEntity.isTargetingEnergyContainer() && !laserEntity.isTargetingBuddingAmethyst() && laserEntity.getLevel().getRandom().nextFloat() > 0.7) {
             var level = laserEntity.getLevel();
             var p = targetPos.add(0.5, 0, 0.5).subtract(forward.scale(0.6));
-            level.addParticle(ParticleTypes.SMALL_FLAME, p.x + (level.getRandom().nextDouble() - 0.5) * 0.8, p.y + (level.getRandom().nextDouble() - 0.5) * 0.6, p.z + (level.getRandom().nextDouble() - 0.5) * 0.8, 0, 0, 0);
+            ParticleContent.addParticle(level, ParticleTypes.SMALL_FLAME, p.x + (level.getRandom().nextDouble() - 0.5) * 0.8, p.y + (level.getRandom().nextDouble() - 0.5) * 0.6, p.z + (level.getRandom().nextDouble() - 0.5) * 0.8, 0, 0, 0);
         }
 
         float thickness = (float) (0.03f + Math.sin((laserEntity.getLevel().getGameTime() + partialTick) * 0.3) * 0.015f);
@@ -208,7 +209,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
         super.postRenderPass(renderPassInfo, renderTasks);
 
         var data = renderPassInfo.getGeckolibData(BEAM_DATA);
-        if (data == null) return;
+        if (data == null || !OritechClientConfig.renderBeams()) return;
 
         renderTasks.submitCustomGeometry(renderPassInfo.poseStack(), RenderTypes.eyes(BEAM_TEXTURE), (pose, consumer) -> {
             // glowing core
@@ -224,7 +225,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
             );
 
             // outer
-            BeamRenderer.renderStraightBeam(
+            BeamRenderer.renderOuterBeam(
                     pose,
                     consumer,
                     data.startOffset,

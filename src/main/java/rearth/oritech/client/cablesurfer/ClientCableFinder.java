@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.entity.interaction.EnergyTransmissionPoleEntity;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 
@@ -124,7 +125,7 @@ public class ClientCableFinder {
         }
 
         if (DEBUG_DRAW && debugHitPos != null) {
-            level.addParticle(ParticleTypes.HAPPY_VILLAGER, debugHitPos.x, debugHitPos.y, debugHitPos.z, 0, 0, 0);
+            ParticleContent.addParticle(level, ParticleTypes.HAPPY_VILLAGER, debugHitPos.x, debugHitPos.y, debugHitPos.z, 0, 0, 0);
         }
 
         return bestHit;
@@ -169,7 +170,7 @@ public class ClientCableFinder {
             if (DEBUG_DRAW) {
                 // Draw a flame every few ticks or segments to reduce lag,
                 // or just draw points.
-                level.addParticle(ParticleTypes.FLAME, nextPoint.x, nextPoint.y, nextPoint.z, 0, 0, 0);
+                ParticleContent.addParticle(level, ParticleTypes.FLAME, nextPoint.x, nextPoint.y, nextPoint.z, 0, 0, 0);
             }
 
             // Math: Closest point on this segment to the view ray

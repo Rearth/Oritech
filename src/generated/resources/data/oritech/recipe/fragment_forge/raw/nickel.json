@@ -1,0 +1,20 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:raw_materials/nickel"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:nickel_clump"
+    },
+    {
+      "count": 3,
+      "id": "oritech:small_nickel_clump"
+    },
+    {
+      "count": 2,
+      "id": "oritech:small_platinum_clump"
+    }
+  ],
+  "time": 40
+}

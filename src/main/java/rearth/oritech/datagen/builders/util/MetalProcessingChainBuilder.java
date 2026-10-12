@@ -354,7 +354,7 @@ public class MetalProcessingChainBuilder {
 
         // raw ores -> clumps (falling back to dusts) in grinder
         if (clumpItem != null || dustItem != null) {
-            new GrinderRecipeBuilder(registryAccess)
+            new FragmentForgeRecipeBuilder(registryAccess)
                     .input(rawOreIngredient)
                     .result(firstNonNull(clumpItem, dustItem))
                     .result(firstNonNullOptional(smallClumpItem, smallDustItem, nuggetItem), 3)

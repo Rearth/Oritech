@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:bedrock_extractor",
   "itemInputs": [
     "oritech:coal_resource_node"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:coal"
     }
   ],
-  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

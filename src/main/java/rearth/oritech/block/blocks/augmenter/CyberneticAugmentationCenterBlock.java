@@ -143,6 +143,7 @@ public class CyberneticAugmentationCenterBlock extends HorizontalDirectionalBloc
                 if (locked) {
                     var blockEntity = (CyberneticAugmentationCenterEntity) level.getBlockEntity(pos);
                     blockEntity.loadAvailableStations(player);
+                    blockEntity.loadResearchesFromPlayer(player);
 
                     player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
                 }

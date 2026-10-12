@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:dripstone_block"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "minecraft:pointed_dripstone"
+    }
+  ],
+  "time": 120
+}

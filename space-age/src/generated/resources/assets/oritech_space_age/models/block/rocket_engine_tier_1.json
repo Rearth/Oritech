@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "oritech_space_age:block/rocket_engine_tier_1"
-  }
-}

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "oritech:reinforced_carbon_sheet",
     "oritech:reinforced_carbon_sheet",
@@ -12,6 +12,5 @@
       "id": "oritech:ion_thruster"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 240
 }

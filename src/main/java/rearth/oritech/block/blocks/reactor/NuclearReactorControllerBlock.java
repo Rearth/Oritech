@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -73,7 +72,7 @@ public class NuclearReactorControllerBlock extends BaseReactorBlock implements E
             }
 
             if (nuclearReactorController.active) {
-                player.openMenu((MenuProvider) level.getBlockEntity(pos), pos);
+                player.openMenu(nuclearReactorController);
             }
         }
 

@@ -19,6 +19,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -80,7 +81,7 @@ public class ColorCartridgeItem extends Item {
             if (context.getLevel() instanceof ServerLevel serverLevel) {
                 for (var pos : targetBlocks) {
                     var at = pos.getCenter().add(level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1);
-                    serverLevel.sendParticles(ParticleTypes.GUST, at.x, at.y, at.z, 1, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
+                    ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, at.x, at.y, at.z, 1, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
                 }
             }
 

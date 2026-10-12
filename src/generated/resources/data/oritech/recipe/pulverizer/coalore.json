@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#minecraft:coal_ores"
   ],
@@ -9,6 +9,5 @@
       "id": "minecraft:coal"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

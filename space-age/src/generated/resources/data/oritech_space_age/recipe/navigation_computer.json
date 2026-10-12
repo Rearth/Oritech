@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "oritech:advanced_computing_engine",
+    "p": "oritech:processing_unit",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sss",
+    "pcp",
+    "sss"
+  ],
+  "result": {
+    "id": "oritech_space_age:navigation_computer"
+  }
+}

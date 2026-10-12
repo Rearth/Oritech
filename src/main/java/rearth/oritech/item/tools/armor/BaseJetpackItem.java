@@ -25,6 +25,7 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.item.tools.util.ClientTickableItem;
 import rearth.oritech.item.tools.util.OritechEnergyItem;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.function.Consumer;
 
@@ -123,12 +124,12 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, 
         var direction = new Vec3(0, -1, 0);
         if (forward) direction = playerForward.normalize().scale(-1).add(0, -1, 0);
 
-        level.addParticle(ParticleTypes.SMOKE,
+        ParticleContent.addParticle(level, ParticleTypes.SMOKE,
                 particlePosA.x + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 particlePosA.y + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 particlePosA.z + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 direction.x, direction.y, direction.z);
-        level.addParticle(ParticleTypes.SMOKE,
+        ParticleContent.addParticle(level, ParticleTypes.SMOKE,
                 particlePosB.x + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 particlePosB.y + (level.getRandom().nextDouble() - 0.5) * 0.2,
                 particlePosB.z + (level.getRandom().nextDouble() - 0.5) * 0.2,

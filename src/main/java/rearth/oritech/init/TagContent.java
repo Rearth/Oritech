@@ -23,7 +23,6 @@ public class TagContent {
 
     public static final TagKey<Item> COPPER_CLUMPS = cItemTag("clumps/copper");
     public static final TagKey<Item> COPPER_DUSTS = cItemTag("dusts/copper");
-    public static final TagKey<Item> COPPER_NUGGETS = cItemTag("nuggets/copper");
 
     public static final TagKey<Item> IRON_CLUMPS = cItemTag("clumps/iron");
     public static final TagKey<Item> IRON_DUSTS = cItemTag("dusts/iron");
@@ -110,6 +109,9 @@ public class TagContent {
     public static final TagKey<Block> CUTTER_LOGS_MINEABLE = oritechBlockTag("mineable/cutter_logs");
     public static final TagKey<Block> CUTTER_LEAVES_MINEABLE = oritechBlockTag("mineable/cutter_leaves");
 
+    // pump
+    public static final TagKey<Fluid> PUMP_INFINITE_FLUIDS = oritechFluidTag("pump/infinite");
+
     // c stuff
     public static final TagKey<Block> CONVENTIONAL_ORES = cBlockTag("ores");
     public static final TagKey<Item> CONVENTIONAL_FERTILIZER = cItemTag("fertilizers");
@@ -139,6 +141,7 @@ public class TagContent {
 
     // spawner blacklist
     public static final TagKey<EntityType<?>> SPAWNER_BLACKLIST = TagKey.create(Registries.ENTITY_TYPE, Oritech.id("spawner_blacklist"));
+    public static final TagKey<EntityType<?>> FLYING_MOBS = TagKey.create(Registries.ENTITY_TYPE, Oritech.id("flying_mobs"));
 
     public static final TagKey<Block> BLACK_HOLE_BLACKLIST = TagKey.create(Registries.BLOCK, Oritech.id("blackhole_blacklist"));
 

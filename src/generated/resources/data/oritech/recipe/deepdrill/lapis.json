@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:bedrock_extractor",
   "itemInputs": [
     "oritech:resource_node_lapis"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:lapis_lazuli"
     }
   ],
-  "recipeType": "oritech:bedrock_extractor",
   "time": 1
 }

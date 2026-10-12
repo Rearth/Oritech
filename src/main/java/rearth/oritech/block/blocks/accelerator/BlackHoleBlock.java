@@ -25,6 +25,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.accelerator.BlackHoleBlockEntity;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.function.Consumer;
 
@@ -73,7 +74,7 @@ public class BlackHoleBlock extends Block implements EntityBlock, TooltipProvide
         double d = (double) pos.getX() + random.nextDouble();
         double e = (double) pos.getY() + 0.8;
         double f = (double) pos.getZ() + random.nextDouble();
-        level.addParticle(ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
+        ParticleContent.addParticle(level, ParticleTypes.SMOKE, d, e, f, 0.0, 0.0, 0.0);
     }
 
     @Override

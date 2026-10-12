@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:foundry",
   "itemInputs": [
     "oritech:platinum_gem",
     "oritech:platinum_gem"
@@ -10,6 +10,5 @@
       "id": "oritech:platinum_ingot"
     }
   ],
-  "recipeType": "oritech:foundry",
   "time": 80
 }

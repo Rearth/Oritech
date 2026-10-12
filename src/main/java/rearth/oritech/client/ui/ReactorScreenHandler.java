@@ -7,7 +7,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import rearth.oritech.api.networking.SyncType;
+import net.minecraft.server.level.ServerPlayer;
 import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 
@@ -17,10 +17,14 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
 
     public final NuclearReactorControllerBlockEntity reactorEntity;
     public final Level level;
+    private final Player player;
 
     // this calls the second version
     public ReactorScreenHandler(int syncId, Inventory inventory, FriendlyByteBuf buf) {
         this(syncId, inventory, Objects.requireNonNull(inventory.player.level().getBlockEntity(buf.readBlockPos())));
+        reactorEntity.areaMin = buf.readBlockPos();
+        reactorEntity.areaMax = buf.readBlockPos();
+        reactorEntity.warningHeatThreshold = buf.readInt();
     }
 
     // on server, also called from client constructor
@@ -29,6 +33,7 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
 
         reactorEntity = (NuclearReactorControllerBlockEntity) blockEntity;
         level = blockEntity.getLevel();
+        player = playerInventory.player;
     }
 
     @Override
@@ -43,6 +48,6 @@ public class ReactorScreenHandler extends AbstractContainerMenu {
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
-        reactorEntity.sendUpdate(SyncType.GUI_TICK);
+        if (player instanceof ServerPlayer serverPlayer) reactorEntity.sendGuiUpdate(serverPlayer);
     }
 }

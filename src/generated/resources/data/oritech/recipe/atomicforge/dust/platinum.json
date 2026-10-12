@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:atomic_forge",
   "itemInputs": [
     "oritech:platinum_gem",
     "oritech:fluxite",
@@ -11,6 +11,5 @@
       "id": "oritech:platinum_dust"
     }
   ],
-  "recipeType": "oritech:atomic_forge",
   "time": 20
 }

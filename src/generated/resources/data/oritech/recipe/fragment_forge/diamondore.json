@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:diamond_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:diamond"
+    }
+  ],
+  "time": 40
+}

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import rearth.oritech.client.init.ParticleContent;
 
 public class ZiplineFxHandler {
 
@@ -66,7 +67,7 @@ public class ZiplineFxHandler {
 
             var vel = player.getDeltaMovement().scale(1.0);
 
-            player.level().addParticle(
+            ParticleContent.addParticle(player.level(),
                     ParticleTypes.ELECTRIC_SPARK,
                     player.getX(), wireY, player.getZ(),
                     vel.x + (random.nextFloat() - 0.5) * 0.2,

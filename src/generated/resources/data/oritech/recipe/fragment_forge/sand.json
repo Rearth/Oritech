@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:gravel"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:sand"
+    }
+  ],
+  "time": 120
+}

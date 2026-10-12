@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "oritech:uranite_crystal"
   ],
@@ -9,6 +9,5 @@
       "id": "oritech:raw_uranium"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

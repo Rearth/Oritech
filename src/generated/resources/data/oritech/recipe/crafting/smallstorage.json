@@ -3,15 +3,15 @@
   "category": "misc",
   "key": {
     "b": "oritech:basic_battery",
-    "c": "oritech:magnetic_coil",
+    "c": "#c:ingots/nickel",
     "f": "#c:ingots/nickel",
     "m": "#c:silicon",
-    "s": "#c:ingots/nickel"
+    "s": "oritech:magnetic_coil"
   },
   "pattern": [
-    "fsf",
-    "mcm",
-    "bbb"
+    "f f",
+    "mbs",
+    " c "
   ],
   "result": {
     "id": "oritech:portable_energy_storage"

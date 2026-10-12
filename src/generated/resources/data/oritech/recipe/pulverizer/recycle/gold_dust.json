@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#oritech:recyclable/gold_dust"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:gold_dust"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

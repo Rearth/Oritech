@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "#c:ingots/steel",
     "#c:ingots/steel",
@@ -12,6 +12,5 @@
       "id": "oritech:copper_reinforced_plating"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

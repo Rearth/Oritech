@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:atomic_forge",
   "itemInputs": [
     "#c:dusts/copper",
     "#c:dusts/uranium",
@@ -10,6 +10,5 @@
       "id": "oritech:uranium_gem"
     }
   ],
-  "recipeType": "oritech:atomic_forge",
   "time": 5
 }

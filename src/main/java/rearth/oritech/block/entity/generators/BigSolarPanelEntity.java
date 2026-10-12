@@ -52,7 +52,9 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     private boolean isFolded;
 
     public BigSolarPanelEntity(BlockPos pos, BlockState state) {
-        super(BlockEntitiesContent.BIG_SOLAR.get(), pos, state);
+        super(BlockEntitiesContent.BIG_SOLAR.get(), pos, state,
+                OritechConfig.generators.solarGeneratorData.energyCapacity.get(),
+                OritechConfig.generators.solarGeneratorData.maxEnergyExtraction.get());
     }
 
     @Override

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:refinery",
   "fluidInput": {
     "amount": 250,
     "ingredient": "oritech:still_mineral_slurry"
@@ -12,6 +12,5 @@
       "id": "minecraft:quartz"
     }
   ],
-  "recipeType": "oritech:refinery",
   "time": 160
 }

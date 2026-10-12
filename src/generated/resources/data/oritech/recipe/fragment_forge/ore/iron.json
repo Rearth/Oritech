@@ -1,0 +1,16 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:iron_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:raw_iron"
+    },
+    {
+      "id": "oritech:raw_nickel"
+    }
+  ],
+  "time": 40
+}

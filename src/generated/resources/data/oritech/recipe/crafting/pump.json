@@ -8,9 +8,9 @@
     "s": "#c:silicon"
   },
   "pattern": [
-    "fff",
-    "fcf",
-    "sbs"
+    "f  ",
+    "csb",
+    "f  "
   ],
   "result": {
     "id": "oritech:pump"

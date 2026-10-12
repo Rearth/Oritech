@@ -6,7 +6,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -15,17 +14,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public class MobCaptureItem extends Item {
-
-    public final List<EntityType<?>> targets;
-
-    public MobCaptureItem(Properties settings, List<EntityType<?>> targets) {
+    
+    public MobCaptureItem(Properties settings) {
         super(settings);
-        this.targets = targets;
     }
 
     @Override
@@ -34,21 +30,19 @@ public class MobCaptureItem extends Item {
         var resultingItem = ItemContent.UNHOLY_INTELLIGENCE.asItem();
         if (entity.isDeadOrDying() || user.level().isClientSide()) return InteractionResult.PASS;
 
-        for (var target : targets) {
-            if (entity.getType().equals(target)) {
-                stack.shrink(1);
-                if (stack.isEmpty()) {
-                    user.setItemInHand(hand, ItemStack.EMPTY);
-                } else {
-                    user.setItemInHand(hand, stack);
-                }
-
-                entity.kill((ServerLevel) user.level());
-
-                user.level().addFreshEntity(new ItemEntity(user.level(), entity.getX(), entity.getY(), entity.getZ(), new ItemStack(resultingItem)));
-
-                return InteractionResult.CONSUME;
+        if (entity.is(TagContent.FLYING_MOBS)) {
+            stack.shrink(1);
+            if (stack.isEmpty()) {
+                user.setItemInHand(hand, ItemStack.EMPTY);
+            } else {
+                user.setItemInHand(hand, stack);
             }
+
+            entity.kill((ServerLevel) user.level());
+
+            user.level().addFreshEntity(new ItemEntity(user.level(), entity.getX(), entity.getY(), entity.getZ(), new ItemStack(resultingItem)));
+
+            return InteractionResult.CONSUME;
         }
 
         return InteractionResult.PASS;

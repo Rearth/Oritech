@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:raw_materials/dyes/cyan"
   ],
@@ -8,6 +8,5 @@
       "id": "minecraft:cyan_dye"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "minecraft:honeycomb",
     "#c:fuels/bio",
@@ -11,6 +11,5 @@
       "id": "minecraft:slime_ball"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

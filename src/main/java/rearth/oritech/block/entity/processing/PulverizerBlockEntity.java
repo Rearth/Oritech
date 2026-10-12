@@ -21,6 +21,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +124,7 @@ public class PulverizerBlockEntity extends UpgradableMachineBlockEntity {
             var offsetX = (level.getRandom().nextFloat() - 0.5) * 0.1;
             var offsetY = (level.getRandom().nextFloat()) * 0.1;
             var offsetZ = (level.getRandom().nextFloat() - 0.5) * 0.1;
-            ((ServerLevel) level).sendParticles(effect, spawnAt.x(), spawnAt.y(), spawnAt.z(), 3, offsetX, offsetY, offsetZ, 0.08);
+            ParticleContent.sendParticles((ServerLevel) level, effect, spawnAt.x(), spawnAt.y(), spawnAt.z(), 3, offsetX, offsetY, offsetZ, 0.08);
         }
     }
 

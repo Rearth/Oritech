@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "minecraft:clay_ball",
     "minecraft:clay_ball",
@@ -12,6 +12,5 @@
       "id": "oritech:clay_catalyst_beads"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 120
 }

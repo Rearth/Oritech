@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:ancient_debris"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:netherite_scrap"
+    }
+  ],
+  "time": 40
+}

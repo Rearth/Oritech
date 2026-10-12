@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:prismarine_shard"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:prismarine_crystals"
+    }
+  ],
+  "time": 120
+}

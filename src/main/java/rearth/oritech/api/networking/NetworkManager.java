@@ -3,6 +3,7 @@ package rearth.oritech.api.networking;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +15,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -44,7 +46,7 @@ import rearth.oritech.block.entity.reactor.NuclearReactorControllerBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.init.recipes.OritechRecipe;
-import rearth.oritech.item.tools.PortableLaserItem;
+import rearth.oritech.item.tools.EndericRailgunItem;
 import rearth.oritech.item.tools.armor.JetpackItem;
 import rearth.oritech.util.ProgressStorage;
 import rearth.oritech.util.ServerZiplineHandler;
@@ -71,6 +73,7 @@ public class NetworkManager {
         registerCodec(ByteBufCodecs.SHORT, Short.class, short.class);
         registerCodec(ByteBufCodecs.STRING_UTF8, String.class);
         registerCodec(Identifier.STREAM_CODEC, Identifier.class);
+        registerCodec(UUIDUtil.STREAM_CODEC, UUID.class);
         registerCodec(BlockPos.STREAM_CODEC, BlockPos.class);
         registerCodec(ItemStack.OPTIONAL_STREAM_CODEC, ItemStack.class);
         registerCodec(VEC2I_PACKED_CODEC, Vector2i.class);
@@ -80,7 +83,7 @@ public class NetworkManager {
         registerCodec(FluidStack.OPTIONAL_STREAM_CODEC, FluidStack.class);
         registerCodec(ByteBufCodecs.COMPOUND_TAG, CompoundTag.class);
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
-        registerCodec(OritechRecipe.STREAM_CODEC, OritechRecipe.class);
+        registerCodec(Recipe.STREAM_CODEC.map(recipe -> (OritechRecipe) recipe, recipe -> recipe), OritechRecipe.class);
         registerCodec(EndericLaserBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
         registerCodec(CyberneticAugmentationCenterEntity.ResearchState.PACKET_CODEC, CyberneticAugmentationCenterEntity.ResearchState.class);
 
@@ -95,13 +98,12 @@ public class NetworkManager {
         registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registrar.playToServer(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.class), StabilizedEnchanterBlockEntity::receiveEnchantmentSelection);
         registrar.playToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);
-        registrar.playToServer(PortableLaserItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(PortableLaserItem.LaserPlayerUsePacket.class), PortableLaserItem::receiveUsePacket);
+        registrar.playToServer(EndericRailgunItem.LaserPlayerUsePacket.PACKET_ID, getAutoCodec(EndericRailgunItem.LaserPlayerUsePacket.class), EndericRailgunItem::receiveUsePacket);
         registrar.playToServer(ServerZiplineHandler.ZiplinePlayerUsePacket.PACKET_ID, getAutoCodec(ServerZiplineHandler.ZiplinePlayerUsePacket.class), ServerZiplineHandler::onZipLineTickUseEvent);
         registrar.playToServer(MachineBlockEntity.InventoryInputModeSelectorPacket.PACKET_ID, getAutoCodec(MachineBlockEntity.InventoryInputModeSelectorPacket.class), MachineBlockEntity::receiveCycleModePacket);
         registrar.playToServer(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.PACKET_ID, getAutoCodec(InventoryProxyAddonBlockEntity.InventoryProxySlotSelectorPacket.class), InventoryProxyAddonBlockEntity::receiveSlotSelection);
         registrar.playToServer(JetpackItem.JetpackUsageUpdatePacket.PACKET_ID, getAutoCodec(JetpackItem.JetpackUsageUpdatePacket.class), JetpackItem::receiveUsagePacket);
         registrar.playToServer(PlayerAugments.AugmentInstallTriggerPacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentInstallTriggerPacket.class), PlayerAugments::receiveInstallTrigger);
-        registrar.playToServer(PlayerAugments.LoadPlayerAugmentsToMachinePacket.PACKET_ID, getAutoCodec(PlayerAugments.LoadPlayerAugmentsToMachinePacket.class), PlayerAugments::receivePlayerLoadMachine);
         registrar.playToServer(PlayerAugments.OpenAugmentScreenPacket.PACKET_ID, getAutoCodec(PlayerAugments.OpenAugmentScreenPacket.class), PlayerAugments::receiveOpenAugmentScreen);
         registrar.playToServer(PlayerAugments.AugmentPlayerTogglePacket.PACKET_ID, getAutoCodec(PlayerAugments.AugmentPlayerTogglePacket.class), PlayerAugments::receiveToggleAugment);
         registrar.playToServer(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.PACKET_ID, getAutoCodec(AddonSplicerBlockEntity.AddonSplicerPlayerUsePacket.class), AddonSplicerBlockEntity::onPlayerUse);
@@ -113,7 +115,9 @@ public class NetworkManager {
     }
 
     public static void initClientBound(PayloadRegistrar registrar) {
+        registrar.playToClient(NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_ID, NuclearReactorControllerBlockEntity.GuiUpdatePacket.PACKET_CODEC, NuclearReactorControllerBlockEntity::handleGuiUpdate);
         registrar.playToClient(MessagePayload.GENERIC_PACKET_ID, MessagePayload.PACKET_CODEC, NetworkManager::receiveMessage);
+        registrar.playToClient(ParticleContent.ParticleBatchPayload.PACKET_ID, ParticleContent.ParticleBatchPayload.PACKET_CODEC, ParticleContent::handleParticleBatch);
         registrar.playToClient(ParticleContent.Payload.PACKET_ID, ParticleContent.Payload.PACKET_CODEC, ParticleContent::handleOnClient);
         registrar.playToClient(ItemPipeInterfaceEntity.RenderStackData.PIPE_ITEMS_ID, getAutoCodec(ItemPipeInterfaceEntity.RenderStackData.class), ItemPipeInterfaceEntity::receiveVisualItemsPacket);
         registrar.playToClient(ArcaneCatalystBlockEntity.CatalystSyncPacket.PACKET_ID, getAutoCodec(ArcaneCatalystBlockEntity.CatalystSyncPacket.class), ArcaneCatalystBlockEntity::receiveUpdatePacket);

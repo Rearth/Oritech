@@ -8,9 +8,9 @@
     "s": "minecraft:iron_axe"
   },
   "pattern": [
-    "fff",
-    "fcf",
-    "sbs"
+    " s ",
+    " c ",
+    "fbf"
   ],
   "result": {
     "id": "oritech:tree_cutter"

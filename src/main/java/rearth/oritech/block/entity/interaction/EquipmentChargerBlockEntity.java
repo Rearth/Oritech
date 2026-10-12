@@ -41,6 +41,7 @@ import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 
@@ -90,7 +91,7 @@ public class EquipmentChargerBlockEntity extends NetworkedBlockEntity implements
         if (fluidStorage.getAmount() != startFluid || energyStorage.energy != startEnergy) {
             if (serverLevel instanceof ServerLevel sl) {
                 var c = pos.getCenter().add(0.1, 0.1, 0);
-                sl.sendParticles(ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
+                ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
             }
         }
 

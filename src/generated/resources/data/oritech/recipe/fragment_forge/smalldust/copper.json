@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:copper_nugget"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_copper_dust"
+    }
+  ],
+  "time": 40
+}

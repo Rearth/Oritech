@@ -30,6 +30,7 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.ContainerSlotAssignment;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 
@@ -81,7 +82,7 @@ public class IndustrialChillerBlockEntity extends MultiblockMachineEntity implem
         var emitPosition = Vec3.atCenterOf(worldPosition);
 
         if (level instanceof ServerLevel sl)
-            sl.sendParticles(ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 2, 1.2, 1.2, 1.2, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SNOWFLAKE, emitPosition.x, emitPosition.y, emitPosition.z, 2, 1.2, 1.2, 1.2, 0);
 
     }
 
@@ -95,8 +96,11 @@ public class IndustrialChillerBlockEntity extends MultiblockMachineEntity implem
 
         var fluidInput = currentRecipe.fluidInput();
         if (fluidInput.isPresent()) {
-            // we assume that the fluid content matches here, as this was checked in earlier steps already
-            var extracted = fluidStorage.extract(FluidResource.of(fluidStorage.getInStack()), fluidInput.get().amount(), transaction);
+            // An auxiliary chamber may have consumed the remaining fluid earlier in this transaction.
+            var inputResource = fluidStorage.getResource(0);
+            if (inputResource.isEmpty()) return false;
+
+            var extracted = fluidStorage.extract(0, inputResource, fluidInput.get().amount(), transaction);
             if (extracted != fluidInput.get().amount()) return false;
         }
 

@@ -9,9 +9,9 @@
     "s": "oritech:magnetic_coil"
   },
   "pattern": [
-    "fff",
-    "mcm",
-    "sbs"
+    " s ",
+    "mbc",
+    "f f"
   ],
   "result": {
     "id": "oritech:powered_furnace"

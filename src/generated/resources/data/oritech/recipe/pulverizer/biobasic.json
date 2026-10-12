@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#oritech:biomatter"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:biomass"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

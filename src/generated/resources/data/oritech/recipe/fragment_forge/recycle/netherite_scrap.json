@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#oritech:recyclable/netherite_scrap"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:netherite_scrap"
+    }
+  ],
+  "time": 120
+}

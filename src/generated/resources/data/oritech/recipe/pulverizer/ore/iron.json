@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#minecraft:iron_ores"
   ],
@@ -9,6 +9,5 @@
       "id": "minecraft:raw_iron"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

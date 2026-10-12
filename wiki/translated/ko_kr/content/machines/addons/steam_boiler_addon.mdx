@@ -1,0 +1,19 @@
+---
+title: 증기 보일러 애드온
+id: oritech:steam_boiler_addon
+type: block
+---
+
+증기 보일러 애드온은 발전기를 직접 전기를 만드는 방식에서 증기를 만드는 방식으로 바꾸는 데 쓰입니다.
+
+<center>
+<ModAsset location="oritech:area/steam_power" width={1000} />
+</center>
+
+---
+
+**증기 생성**
+
+발전기([연료 발전기](@oritech:fuel_generator) 등)에 붙이면, 기계가 RF 대신 연료와 물을 소비해 고압 증기를 만들도록 바꿉니다.
+
+보일러 애드온에는 물을 펌프로 넣어야 하며, 생성된 증기는 꺼내서 [증기 엔진](@oritech:steam_engine)이나 다른 증기 구동 시스템을 돌리는 데 쓸 수 있습니다. 대규모 에너지 네트워크에서는 이쪽이 더 효율적인 경우가 많습니다.

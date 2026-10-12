@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "oritech:advanced_computing_engine",
+    "i": "minecraft:iron_block",
+    "m": "oritech:motor",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sis",
+    "ama",
+    "sis"
+  ],
+  "result": {
+    "id": "oritech_space_age:asteroid_anchor"
+  }
+}

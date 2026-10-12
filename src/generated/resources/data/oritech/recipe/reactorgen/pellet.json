@@ -1,9 +1,8 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:reactor",
   "itemInputs": [
     "oritech:uranium_pellet"
   ],
   "itemResults": [],
-  "recipeType": "oritech:reactor",
   "time": 4000
 }

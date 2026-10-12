@@ -28,6 +28,7 @@ import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.client.init.OritechClientConfig;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity, MachineGantryRenderer.GantryRenderState> {
 
@@ -155,7 +156,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         }
 
         // 4. Submit Destroyer Quarry Beam
-        if (state.isDestroyerQuarry) {
+        if (state.isDestroyerQuarry && OritechClientConfig.renderBeams()) {
             var offset = state.destroyerBeamOffset;
             var baseThickness = 0.035f;
 
@@ -173,7 +174,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
                 );
 
                 // render glow overlay
-                BeamRenderer.renderStraightBeam(
+                BeamRenderer.renderOuterBeam(
                         pose, consumer, offset.add(0.5, 1, 0.5), new Vec3(0, -state.destroyerBeamHeight - 1, 0),
                         state.thickness,
                         RenderHelpers.FULL_BRIGHT,

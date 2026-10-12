@@ -1,9 +1,0 @@
-{
-  "model": {
-    "type": "minecraft:special",
-    "base": "oritech:item/portable_laser",
-    "model": {
-      "type": "geckolib:geckolib"
-    }
-  }
-}

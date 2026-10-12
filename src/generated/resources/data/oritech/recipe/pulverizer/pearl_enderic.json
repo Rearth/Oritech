@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:ender_pearls"
   ],
@@ -9,6 +9,5 @@
       "id": "oritech:enderic_compound"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

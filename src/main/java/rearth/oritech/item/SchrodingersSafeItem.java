@@ -4,7 +4,6 @@ import com.geckolib.animatable.GeoItem;
 import com.geckolib.animatable.client.GeoRenderProvider;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
-import com.geckolib.model.DefaultedBlockGeoModel;
 import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
@@ -23,6 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.entity.storage.SchrodingersSafeBlockEntity;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.client.renderers.models.OritechBlockGeoModel;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.datamap.DataMapContent;
@@ -53,7 +53,7 @@ public class SchrodingersSafeItem extends Item implements GeoItem {
             @Override
             public GeoItemRenderer<?> getGeoItemRenderer() {
                 if (this.renderer == null)
-                    this.renderer = new GeoItemRenderer<>(new DefaultedBlockGeoModel<>(Oritech.id("models/schrodingers_safe")));
+                    this.renderer = new GeoItemRenderer<>(new OritechBlockGeoModel<>(Oritech.id("models/schrodingers_safe")));
 
                 this.renderer.withScale(ITEM_RENDER_SCALE);
 

@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "oritech:adamant_ingot"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:adamant_dust"
+    }
+  ],
+  "time": 40
+}

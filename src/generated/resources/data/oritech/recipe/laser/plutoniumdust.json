@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:laser",
   "itemInputs": [
     "oritech:uranite_crystal"
   ],
@@ -8,6 +8,5 @@
       "id": "oritech:plutonium_dust"
     }
   ],
-  "recipeType": "oritech:laser",
   "time": 1
 }

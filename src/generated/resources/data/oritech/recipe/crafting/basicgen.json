@@ -8,9 +8,9 @@
     "s": "oritech:magnetic_coil"
   },
   "pattern": [
-    "fff",
-    "fcf",
-    "sbs"
+    " s ",
+    "fbf",
+    " c "
   ],
   "result": {
     "id": "oritech:basic_generator"

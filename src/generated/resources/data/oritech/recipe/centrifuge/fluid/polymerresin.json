@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 100,
     "ingredient": "#c:biodiesel"
@@ -12,6 +12,5 @@
       "id": "oritech:polymer_resin"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 100
 }

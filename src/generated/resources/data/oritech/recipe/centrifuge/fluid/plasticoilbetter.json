@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 250,
     "ingredient": "oritech:still_mineral_slurry"
@@ -13,6 +13,5 @@
       "id": "oritech:plastic_sheet"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 120
 }

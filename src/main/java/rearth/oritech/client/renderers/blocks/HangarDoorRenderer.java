@@ -1,7 +1,6 @@
 package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.constant.dataticket.DataTicket;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -9,19 +8,18 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.core.Direction;
-import net.minecraft.world.phys.AABB;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.block.blocks.decorative.HangarDoorBlock;
 import rearth.oritech.block.entity.decorative.HangarDoorBlockEntity;
 import rearth.oritech.client.renderers.models.MachineModel;
 
-public class HangarDoorRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<HangarDoorBlockEntity, R> {
+public class HangarDoorRenderer<R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<HangarDoorBlockEntity, R> {
 
     public static final DataTicket<Direction> SURFACE_TICKET = DataTicket.create("hangar_door_surface", Direction.class);
     public static final DataTicket<Boolean> ROTATED_TICKET = DataTicket.create("hangar_door_rotated", Boolean.class);
 
     public HangarDoorRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
-        super(context, new MachineModel<>(modelPath));
+        super(context, new MachineModel<>(modelPath), modelPath);
     }
 
     @Override
@@ -70,7 +68,4 @@ public class HangarDoorRenderer<R extends BlockEntityRenderState & GeoRenderStat
             poseStack.mulPose(Axis.YP.rotationDegrees(90));
     }
 
-    public AABB getRenderBoundingBox(HangarDoorBlockEntity blockEntity) {
-        return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
-    }
 }

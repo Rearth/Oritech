@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:cobblestones"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:gravel"
+    }
+  ],
+  "time": 120
+}

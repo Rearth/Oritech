@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#oritech:recyclable/quartz_dust_4"
   ],
@@ -9,6 +9,5 @@
       "id": "oritech:quartz_dust"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

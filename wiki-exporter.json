@@ -1,0 +1,14 @@
+{
+  "enabled": [
+    "render"
+  ],
+  "namespaces": [
+    "oritech"
+  ],
+  "modules": {
+    "render": {
+      "resolution": 128,
+      "png": true
+    }
+  }
+}

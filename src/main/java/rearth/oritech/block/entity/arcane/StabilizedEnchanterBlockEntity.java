@@ -139,7 +139,7 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
                 finishEnchanting();
                 if (serverLevel instanceof ServerLevel sl) {
                     var target = pos.getCenter();
-                    sl.sendParticles(ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
+                    ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
                 }
                 activeAnimation = "idle";
             }

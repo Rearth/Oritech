@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:particle_collision",
   "itemInputs": [
     "#c:dusts/redstone",
     "minecraft:rotten_flesh"
@@ -9,6 +9,5 @@
       "id": "oritech:enderic_compound"
     }
   ],
-  "recipeType": "oritech:particle_collision",
   "time": 500
 }

@@ -98,28 +98,28 @@ public class RecipeGenerator extends RecipeProvider {
         // reinforced deepslate
         new AtomicForgeRecipeBuilder(this.registries).input(Items.DEEPSLATE).input(ItemContent.DURATIUM_INGOT).input(ItemContent.DURATIUM_INGOT).result(Items.REINFORCED_DEEPSLATE).time(100).export(exporter, "reinfdeepslate");
         // cobblestone to gravel
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("cobblestones")).result(Items.GRAVEL).addToGrinder().export(exporter, "gravel");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("cobblestones")).result(Items.GRAVEL).addToFragmentForge().export(exporter, "gravel");
         // gravel to sand
-        new PulverizerRecipeBuilder(this.registries).input(Items.GRAVEL).result(Items.SAND).addToGrinder().export(exporter, "sand");
+        new PulverizerRecipeBuilder(this.registries).input(Items.GRAVEL).result(Items.SAND).addToFragmentForge().export(exporter, "sand");
         // sandstone to sand
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/blocks")).result(Items.SAND).addToGrinder().export(exporter, "sand_from_sandstone");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/blocks")).result(Items.SAND).addToFragmentForge().export(exporter, "sand_from_sandstone");
         // red sandstone to red sand
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/red_blocks")).result(Items.RED_SAND).addToGrinder().export(exporter, "red_sand");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("sandstone/red_blocks")).result(Items.RED_SAND).addToFragmentForge().export(exporter, "red_sand");
         // centrifuge dirt into clay
         new CentrifugeFluidRecipeBuilder(this.registries).input(ItemTags.DIRT).result(Items.CLAY).fluidInput(Fluids.WATER, 0.25f).export(exporter, "clay");
         // create dirt from sand + biomass
         this.shaped(RecipeCategory.MISC, Items.DIRT, 2).define('s', ItemTags.SAND).define('b', TagContent.BIOMASS).pattern("sb").pattern("bs").unlockedBy("has_biomass", has(TagContent.BIOMASS)).save(exporter, recipeKey("dirt_from_sand_and_biomass"));
         // dripstone from dripstone block
-        new PulverizerRecipeBuilder(this.registries).input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToGrinder().export(exporter, "dripstone");
+        new PulverizerRecipeBuilder(this.registries).input(Items.DRIPSTONE_BLOCK).result(Items.POINTED_DRIPSTONE, 4).addToFragmentForge().export(exporter, "dripstone");
         // shroomlight from logs and 3 glowstone
         new AssemblerRecipeBuilder(this.registries).input(ItemTags.LOGS).input(Items.GLOWSTONE).input(Items.GLOWSTONE).input(Items.GLOWSTONE).result(Items.SHROOMLIGHT).timeMultiplier(0.8f).export(exporter, "shroomlight");
         // prismarine shards to crystals
-        new PulverizerRecipeBuilder(this.registries).input(Items.PRISMARINE_SHARD).result(Items.PRISMARINE_CRYSTALS, 2).addToGrinder().export(exporter, "prismarine");
+        new PulverizerRecipeBuilder(this.registries).input(Items.PRISMARINE_SHARD).result(Items.PRISMARINE_CRYSTALS, 2).addToFragmentForge().export(exporter, "prismarine");
 
         // recyclables
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToGrinder().export(exporter, "recycle/netherite_scrap");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToGrinder().export(exporter, "recycle/diamond");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_IRON_DUST).result(ItemContent.IRON_DUST).addToGrinder().export(exporter, "recycle/iron_dust");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_NETHERITE_SCRAP).result(Items.NETHERITE_SCRAP).addToFragmentForge().export(exporter, "recycle/netherite_scrap");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_DIAMOND).result(Items.DIAMOND).addToFragmentForge().export(exporter, "recycle/diamond");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_IRON_DUST).result(ItemContent.IRON_DUST).addToFragmentForge().export(exporter, "recycle/iron_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_SMALL_IRON_DUST).result(ItemContent.SMALL_IRON_DUST).export(exporter, "recycle/small_iron_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_GOLD_DUST).result(ItemContent.GOLD_DUST).export(exporter, "recycle/gold_dust");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.RECYCLES_TO_SMALL_GOLD_DUST).result(ItemContent.SMALL_GOLD_DUST).export(exporter, "recycle/small_gold_dust");
@@ -136,16 +136,16 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addDyes(RecipeOutput exporter) {
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_WHITE_DYE).result(Items.WHITE_DYE).addToGrinder().export(exporter, "dyes/white");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_LIGHT_GRAY_DYE).result(Items.LIGHT_GRAY_DYE).addToGrinder().export(exporter, "dyes/light_gray");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLACK_DYE).result(Items.BLACK_DYE).addToGrinder().export(exporter, "dyes/black");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_RED_DYE).result(Items.RED_DYE).addToGrinder().export(exporter, "dyes/red");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_ORANGE_DYE).result(Items.ORANGE_DYE).addToGrinder().export(exporter, "dyes/orange");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_YELLOW_DYE).result(Items.YELLOW_DYE).addToGrinder().export(exporter, "dyes/yellow");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_CYAN_DYE).result(Items.CYAN_DYE).addToGrinder().export(exporter, "dyes/cyan");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLUE_DYE).result(Items.BLUE_DYE).addToGrinder().export(exporter, "dyes/blue");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_MAGENTA_DYE).result(Items.MAGENTA_DYE).addToGrinder().export(exporter, "dyes/magenta");
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_PINK_DYE).result(Items.PINK_DYE).addToGrinder().export(exporter, "dyes/pink");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_WHITE_DYE).result(Items.WHITE_DYE).addToFragmentForge().export(exporter, "dyes/white");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_LIGHT_GRAY_DYE).result(Items.LIGHT_GRAY_DYE).addToFragmentForge().export(exporter, "dyes/light_gray");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLACK_DYE).result(Items.BLACK_DYE).addToFragmentForge().export(exporter, "dyes/black");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_RED_DYE).result(Items.RED_DYE).addToFragmentForge().export(exporter, "dyes/red");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_ORANGE_DYE).result(Items.ORANGE_DYE).addToFragmentForge().export(exporter, "dyes/orange");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_YELLOW_DYE).result(Items.YELLOW_DYE).addToFragmentForge().export(exporter, "dyes/yellow");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_CYAN_DYE).result(Items.CYAN_DYE).addToFragmentForge().export(exporter, "dyes/cyan");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_BLUE_DYE).result(Items.BLUE_DYE).addToFragmentForge().export(exporter, "dyes/blue");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_MAGENTA_DYE).result(Items.MAGENTA_DYE).addToFragmentForge().export(exporter, "dyes/magenta");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.RAW_PINK_DYE).result(Items.PINK_DYE).addToFragmentForge().export(exporter, "dyes/pink");
     }
 
     private void addBedrockExtractorOres(RecipeOutput exporter) {
@@ -288,7 +288,7 @@ public class RecipeGenerator extends RecipeProvider {
 
         // adv battery in centrifuge with sulfuric acid
         new CentrifugeFluidRecipeBuilder(this.registries)
-                .input(ItemContent.DUBIOS_CONTAINER)
+                .input(ItemContent.DUBIOUS_CONTAINER)
                 .fluidInput(TagContent.SULFURIC_ACID)
                 .result(ItemContent.ADVANCED_BATTERY, 8)
                 .timeMultiplier(2f)
@@ -328,7 +328,7 @@ public class RecipeGenerator extends RecipeProvider {
 
         // dubious container and strange matter in centrifuge
         new CentrifugeFluidRecipeBuilder(this.registries)
-                .input(ItemContent.DUBIOS_CONTAINER)
+                .input(ItemContent.DUBIOUS_CONTAINER)
                 .fluidInput(FluidContent.STILL_STRANGE_MATTER.get())
                 .result(ItemContent.UNHOLY_INTELLIGENCE, 1)
                 .timeMultiplier(8f)
@@ -337,9 +337,9 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addBiomass(RecipeOutput exporter) {
         // biomass
-        new PulverizerRecipeBuilder(this.registries).input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToGrinder().export(exporter, "biobasic");
-        new PulverizerRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "packagedwheatbio");
-        new PulverizerRecipeBuilder(this.registries).input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToGrinder().export(exporter, "hay_block");
+        new PulverizerRecipeBuilder(this.registries).input(TagContent.BIOMATTER).result(ItemContent.BIOMASS).addToFragmentForge().export(exporter, "biobasic");
+        new PulverizerRecipeBuilder(this.registries).input(ItemContent.PACKED_WHEAT).result(ItemContent.BIOMASS, 16).addToFragmentForge().export(exporter, "packagedwheatbio");
+        new PulverizerRecipeBuilder(this.registries).input(cItemTag("storage_blocks/wheat")).result(ItemContent.BIOMASS, 16).addToFragmentForge().export(exporter, "hay_block");
         new AssemblerRecipeBuilder(this.registries).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(ItemTags.PLANKS).result(ItemContent.SOLID_BIOFUEL).timeMultiplier(0.8f).export(exporter, "solidbiofuel");
     }
 
@@ -350,7 +350,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerPickaxeRecipe(exporter, ToolsContent.PROMETHIUM_PICKAXE.get(), of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.DESTROYER.asItem()), "prompick");
 
         // enderic laser / portable laser
-        offerChainsawRecipe(exporter, ToolsContent.PORTABLE_LASER.get(), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.ENDERIC_LASER), "portablelaser");
+        offerChainsawRecipe(exporter, ToolsContent.ENDERIC_RAILGUN.get(), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.ACCELERATOR_MOTOR), of(ItemContent.ADAMANT_INGOT), of(BlockContent.ENDERIC_LASER), "portablelaser");
 
         // electric mace
         offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE.get(), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
@@ -431,19 +431,19 @@ public class RecipeGenerator extends RecipeProvider {
     }
 
     private void addMachines(RecipeOutput exporter) {
-        // basic generator
-        offerGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen");
-        // pulverizer
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(cItemTag("storage_blocks/copper")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizer");
-        offerGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizeralt");
-        // electric furnace
-        offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnace");
-        offerFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLATINUM_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnacealt");
-        // assembler
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(Blocks.BLAST_FURNACE.asItem()), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembler");
-        offerFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembleralt");
-        // foundry
-        offerGeneratorRecipe(exporter, BlockContent.FOUNDRY.asItem(), of(Blocks.CAULDRON.asItem()), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "foundry");
+        // basic generator: coil above the furnace, nickel housing, copper contact below
+        offerEarlyGeneratorRecipe(exporter, BlockContent.BASIC_GENERATOR.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(cItemTag("ingots/copper")), of(TagContent.NICKEL_INGOTS), "basicgen", " s ", "fbf", " c ");
+        // pulverizer: iron grinding head, central housing, motor underneath
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(cItemTag("storage_blocks/copper")), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizer", "fcf", " b ", " s ");
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PULVERIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.NICKEL_INGOTS), of(Items.IRON_INGOT), "pulverizeralt", "fcf", " b ", " s ");
+        // electric furnace: furnace and circuitry on copper feet, coil above
+        offerEarlyFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnace", " s ", "mbc", "f f");
+        offerEarlyFurnaceRecipe(exporter, BlockContent.POWERED_FURNACE.asItem(), of(cItemTag("player_workstations/furnaces")), of(ItemContent.MAGNETIC_COIL), of(TagContent.PLATINUM_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/copper")), "electricfurnacealt", " s ", "mbc", "f f");
+        // assembler: copper gantry above the crafting chamber, motor underneath
+        offerEarlyFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(Blocks.BLAST_FURNACE.asItem()), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembler", "f f", "mbc", " s ");
+        offerEarlyFurnaceRecipe(exporter, BlockContent.ASSEMBLER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CRAFTER), of(ItemContent.ADAMANT_INGOT), of(cItemTag("ingots/copper")), "assembleralt", "f f", "mbc", " s ");
+        // foundry: copper rim around the cauldron, mixer and electrical contact below
+        offerEarlyGeneratorRecipe(exporter, BlockContent.FOUNDRY.asItem(), of(Blocks.CAULDRON.asItem()), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "foundry", "fbf", " c ", " s ");
         // refinery
         offerParticleMotorRecipe(exporter, BlockContent.REFINERY.asItem(), of(BlockContent.REFINERY_CHAMBER_MODULE.asItem()), of(ItemContent.MOTOR), of(Items.CAULDRON), of(cItemTag("ingots/steel")), "refinery");
         // refinery module
@@ -456,8 +456,8 @@ public class RecipeGenerator extends RecipeProvider {
         offerFurnaceRecipe(exporter, BlockContent.CENTRIFUGE.asItem(), of(ItemContent.MOTOR), of(cItemTag("storage_blocks/iron")), of(cItemTag("ingots/copper")), of(ItemContent.MOTOR), of(Items.GLASS_BOTTLE), "centrifugealt");
         // laser arm
         offerAtomicForgeRecipe(exporter, BlockContent.ENDERIC_LASER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENDERIC_LENS), of(TagContent.CARBON_FIBRE), "laserarm");
-        // crusher
-        offerGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.FLUX_GATE), of(TagContent.PLASTIC_PLATES), "crusher");
+        // crusher: flux control above the motor and plastic-clad base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.FRAGMENT_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.FLUX_GATE), of(TagContent.PLASTIC_PLATES), "crusher", " c ", " s ", "fbf");
         // atomic forge
         offerAtomicForgeRecipe(exporter, BlockContent.ATOMIC_FORGE.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.PLASTIC_PLATES), of(ItemContent.ENDERIC_COMPOUND), of(ItemContent.DURATIUM_INGOT), of(ItemContent.FLUX_GATE), "atomicforge");
 
@@ -476,25 +476,25 @@ public class RecipeGenerator extends RecipeProvider {
         offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentcharger");
         offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentchargeralt");
 
-        // small storage
-        offerAtomicForgeRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(TagContent.SILICON), of(ItemContent.MAGNETIC_COIL), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage");
+        // small storage: nickel enclosure around the battery, silicon and coil alongside
+        offerEarlyFurnaceRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage", "f f", "mbs", " c ");
         // large storage
-        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
+        offerAtomicForgeRecipe(exporter, BlockContent.LARGE_STORAGE.asItem(), of(ItemContent.ADVANCED_BATTERY), of(TagContent.STEEL_INGOTS), of(ItemContent.DUBIOUS_CONTAINER), of(ItemContent.FLUX_GATE), of(ItemContent.MAGNETIC_COIL), "bigstorage");
         // unstable container
         offerAtomicForgeRecipe(exporter, ItemContent.SCHRODINGERS_SAFE.asItem(), of(ItemContent.FLUXITE), of(ItemContent.DURATIUM_INGOT), of(BlockContent.LARGE_STORAGE), of(ItemContent.FLUX_GATE), of(ItemContent.SUPER_AI_CHIP), "unstablecontainer");
 
         // fluid tank
         offerTankRecipe(exporter, BlockContent.PORTABLE_TANK.asItem(), of(cItemTag("ingots/copper")), of(cItemTag("glass_blocks")), of(BlockContent.FLUID_PIPE.asItem()), "stank");
-        // pump
-        offerGeneratorRecipe(exporter, BlockContent.PUMP.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.SILICON), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "pump");
+        // pump: copper intake around the motor, controller and housing to the right
+        offerEarlyGeneratorRecipe(exporter, BlockContent.PUMP.asItem(), of(TagContent.PLATING_BLOCKS), of(TagContent.SILICON), of(ItemContent.MOTOR), of(cItemTag("ingots/copper")), "pump", "f  ", "csb", "f  ");
         // block placer
         offerFurnaceRecipe(exporter, BlockContent.PLACER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(ItemContent.PROCESSING_UNIT), of(BlockContent.MACHINE_FRAME.asItem()), of(cItemTag("ingots/copper")), "placer");
         // block destroyer
         offerAtomicForgeRecipe(exporter, BlockContent.DESTROYER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(BlockContent.PULVERIZER), of(BlockContent.ENDERIC_LASER), of(ItemContent.MOTOR), "destroyer");
         // fertilizer
         offerFurnaceRecipe(exporter, BlockContent.FERTILIZER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(TagContent.SILICON), of(ItemContent.PROCESSING_UNIT), of(cItemTag("ingots/copper")), "fertilizer");
-        // tree feller
-        offerGeneratorRecipe(exporter, BlockContent.TREE_CUTTER.asItem(), of(TagContent.PLATING_BLOCKS), of(Items.IRON_AXE), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), "tree_cutter");
+        // tree feller: axe above the motor, electrum supports around the base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.TREE_CUTTER.asItem(), of(TagContent.PLATING_BLOCKS), of(Items.IRON_AXE), of(ItemContent.MOTOR), of(TagContent.ELECTRUM_INGOTS), "tree_cutter", " s ", " c ", "fbf");
         // pipe booster
         offerTankRecipe(exporter, BlockContent.PIPE_BOOSTER.asItem(), of(BlockContent.ITEM_PIPE), of(ItemContent.MOTOR), of(BlockContent.FLUID_PIPE), "booster");
 
@@ -571,7 +571,7 @@ public class RecipeGenerator extends RecipeProvider {
         offerEnergyTransmissionPoleRecipe(exporter, BlockContent.ENERGY_TRANSMISSION_POLE.asItem(), of(ItemContent.MAGNETIC_COIL), of(TagContent.ELECTRUM_INGOTS), of(BlockContent.PORTABLE_ENERGY_STORAGE), of(ItemContent.CARBON_FIBRE_STRANDS), "_pole");
 
         // addon_splicer
-        offerTankRecipe(exporter, BlockContent.ADDON_SPLICER.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "addon_splicer");
+        offerTankRecipe(exporter, BlockContent.ADDON_SPLICER.asItem(), of(ItemContent.DUBIOUS_CONTAINER), of(FluidContent.STILL_STRANGE_MATTER_BUCKET.get()), of(BlockContent.SUPERCONDUCTOR), "addon_splicer");
 
         // particle accelerator
         // motor
@@ -614,17 +614,27 @@ public class RecipeGenerator extends RecipeProvider {
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_3.asItem(), of(TagContent.NICKEL_INGOTS), of(cItemTag("dusts/redstone")), "core3alt");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_4.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.ENDERIC_COMPOUND), "core4");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_5.asItem(), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ADVANCED_COMPUTING_ENGINE), "core5");
-        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), of(ItemContent.DURATIUM_INGOT), of(ItemContent.DUBIOS_CONTAINER), "core6");
+        offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_6.asItem(), of(ItemContent.DURATIUM_INGOT), of(ItemContent.DUBIOUS_CONTAINER), "core6");
         offerMachineCoreRecipe(exporter, BlockContent.MACHINE_CORE_7.asItem(), of(ItemContent.PROMETHEUM_INGOT), of(BlockContent.SUPERCONDUCTOR.asItem()), "core7");
 
         // machine extender
         offerCopperReinforcedPlatingRecipe(exporter, BlockContent.MACHINE_EXTENDER.asItem(), of(TagContent.PLATING_BLOCKS), of(BlockContent.MACHINE_CORE_2.asItem()), of(ItemContent.DURATIUM_INGOT), 1, "extender");
 
         // augmenter
-        // machine itself
-        offerAtomicForgeRecipe(exporter, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), of(TagContent.PLATING_BLOCKS), of(ItemContent.MOTOR), of(Items.CHEST), of(TagContent.CARBON_FIBRE), of(ItemContent.DUBIOS_CONTAINER), "augment/applicator");
-        // basic station
-        offerGeneratorRecipe(exporter, BlockContent.CYBERNETIC_RESEARCH_STATION.asItem(), of(Items.BREWING_STAND), of(TagContent.PLATING_BLOCKS), of(cItemTag("storage_blocks/redstone")), of(TagContent.ELECTRUM_INGOTS), "augment/basic");
+        // machine itself: motor above the chest, components alongside, plating feet
+        this.shaped(RecipeCategory.MISC, BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem(), 1)
+                .define('b', of(TagContent.PLATING_BLOCKS))
+                .define('m', of(ItemContent.MOTOR))
+                .define('c', of(Items.CHEST))
+                .define('s', of(TagContent.CARBON_FIBRE))
+                .define('f', of(ItemContent.DUBIOUS_CONTAINER))
+                .pattern(" m ")
+                .pattern("scf")
+                .pattern("b b")
+                .unlockedBy(getHasName(BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem()), has(BlockContent.CYBERNETIC_AUGMENTATION_CENTER.asItem()))
+                .save(exporter, recipeKey("crafting/augment/applicator"));
+        // basic station: brewing stand above the wired core, plating base
+        offerEarlyGeneratorRecipe(exporter, BlockContent.CYBERNETIC_RESEARCH_STATION.asItem(), of(Items.BREWING_STAND), of(TagContent.PLATING_BLOCKS), of(cItemTag("storage_blocks/redstone")), of(TagContent.ELECTRUM_INGOTS), "augment/basic", " b ", "fcf", " s ");
         // adv station
         offerGeneratorRecipe(exporter, BlockContent.QUANTUM_RESEARCH_STATION.asItem(), of(BlockContent.CENTRIFUGE), of(TagContent.PLATING_BLOCKS), of(ItemContent.FLUX_GATE), of(ItemContent.DURATIUM_INGOT), "augment/advanced");
         // arcane station
@@ -643,8 +653,8 @@ public class RecipeGenerator extends RecipeProvider {
 
         // enderic entry
         new PulverizerRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 8).export(exporter, "pearl_enderic");
-        new GrinderRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 12).export(exporter, "pearl_enderic");
-        new GrinderRecipeBuilder(this.registries).input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
+        new FragmentForgeRecipeBuilder(this.registries).input(cItemTag("ender_pearls")).result(ItemContent.ENDERIC_COMPOUND, 12).export(exporter, "pearl_enderic");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.END_STONE).result(ItemContent.ENDERIC_COMPOUND).export(exporter, "stone_enderic");
 
         // clay beads
         offerBeadsRecipe(exporter, ItemContent.CLAY_CATALYST_BEADS.get(), 8, of(Items.CLAY_BALL), of(ItemTags.SAND), of(Items.REDSTONE), "claybeads");
@@ -702,8 +712,8 @@ public class RecipeGenerator extends RecipeProvider {
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.PROCESSING_UNIT).input(ItemContent.SILICON_WAFER).input(ItemContent.SILICON_WAFER).result(ItemContent.ADVANCED_COMPUTING_ENGINE).time(5).export(exporter, "advcomputer");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.DURATIUM_INGOT).input(ItemContent.ADVANCED_COMPUTING_ENGINE).input(ItemContent.ADVANCED_COMPUTING_ENGINE).result(ItemContent.SUPER_AI_CHIP).time(50).export(exporter, "aicomputer");
 
-        // dubios container
-        offerMotorRecipe(exporter, ItemContent.DUBIOS_CONTAINER.get(), of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubios");
+        // dubious container
+        offerMotorRecipe(exporter, ItemContent.DUBIOUS_CONTAINER.get(), of(TagContent.PLASTIC_PLATES), of(ItemContent.ADAMANT_INGOT), of(ItemContent.ENDERIC_COMPOUND), "dubious");
         // adv battery
         offerMotorRecipe(exporter, ItemContent.ADVANCED_BATTERY.get(), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.ENERGITE_INGOT), of(TagContent.STEEL_INGOTS), "advbattery");
 
@@ -717,7 +727,7 @@ public class RecipeGenerator extends RecipeProvider {
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.SUPER_AI_CHIP).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensator");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.UNHOLY_INTELLIGENCE).input(ItemContent.ADAMANT_INGOT).input(ItemContent.ADAMANT_INGOT).result(ItemContent.HEISENBERG_COMPENSATOR).time(60).export(exporter, "compensatoralt");
         offerMotorRecipe(exporter, ItemContent.OVERCHARGED_CRYSTAL.get(), of(Items.AMETHYST_BLOCK), of(ItemContent.ADVANCED_BATTERY), of(BlockContent.SUPERCONDUCTOR.asItem()), "overchargedcrystal");
-        new AssemblerRecipeBuilder(this.registries).input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
+        new AssemblerRecipeBuilder(this.registries).input(ItemContent.FLUX_GATE).input(TagContent.ELECTRUM_INGOTS).input(ItemContent.DUBIOUS_CONTAINER).input(ItemContent.ENERGITE_INGOT).result(BlockContent.SUPERCONDUCTOR.asItem(), 4).timeMultiplier(1.6f).export(exporter, "superconductor");
         new AtomicForgeRecipeBuilder(this.registries).input(ItemContent.HEISENBERG_COMPENSATOR).input(ItemContent.OVERCHARGED_CRYSTAL).input(ItemContent.OVERCHARGED_CRYSTAL).result(ItemContent.PROMETHEUM_INGOT).time(240).export(exporter, "prometheum");
 
         // ice in industrial_chiller
@@ -829,7 +839,7 @@ public class RecipeGenerator extends RecipeProvider {
         new MetalProcessingChainBuilder("copper", registries)
                 .ore(ItemTags.COPPER_ORES)
                 .rawOre(cItemTag("raw_materials/copper"), Items.RAW_COPPER).rawOreByproduct(Items.RAW_GOLD)
-                .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(TagContent.COPPER_NUGGETS, ItemContent.COPPER_NUGGET)
+                .ingot(cItemTag("ingots/copper"), Items.COPPER_INGOT).nugget(Items.COPPER_NUGGET)
                 .clump(TagContent.COPPER_CLUMPS, ItemContent.COPPER_CLUMP).smallClump(ItemContent.SMALL_COPPER_CLUMP).clumpByproduct(ItemContent.SMALL_GOLD_CLUMP)
                 .dust(ItemContent.COPPER_DUST).smallDust(ItemContent.SMALL_COPPER_DUST).dustByproduct(ItemContent.SMALL_GOLD_DUST)
                 .gem(ItemContent.COPPER_GEM).gemCatalyst(ItemContent.FLUXITE)
@@ -917,34 +927,34 @@ public class RecipeGenerator extends RecipeProvider {
 
         // raw ores without processing chains
         // coal
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 3).export(exporter, "coalore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 3).export(exporter, "coalore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.COAL_ORES).result(Items.COAL, 2).export(exporter, "coalore");
         // redstone
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 12).export(exporter, "redstoneore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 12).export(exporter, "redstoneore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.REDSTONE_ORES).result(Items.REDSTONE, 8).export(exporter, "redstoneore");
         // diamond
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND, 2).export(exporter, "diamondore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND, 2).export(exporter, "diamondore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.DIAMOND_ORES).result(Items.DIAMOND).export(exporter, "diamondore");
         // quartz
-        new GrinderRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 3).export(exporter, "quartzore");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 3).export(exporter, "quartzore");
         new PulverizerRecipeBuilder(this.registries).input(Blocks.NETHER_QUARTZ_ORE).result(Items.QUARTZ, 2).export(exporter, "quartzore");
         // glowstone
-        new GrinderRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 4).export(exporter, "glowstoneore");
+        new FragmentForgeRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 4).export(exporter, "glowstoneore");
         new PulverizerRecipeBuilder(this.registries).input(Blocks.GLOWSTONE).result(Items.GLOWSTONE_DUST, 3).export(exporter, "glowstoneore");
         // lapis
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 8).export(exporter, "lapisore");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 8).export(exporter, "lapisore");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.LAPIS_ORES).result(Items.LAPIS_LAZULI, 6).export(exporter, "lapisore");
         // bone
-        new GrinderRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 8).export(exporter, "bone");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 8).export(exporter, "bone");
         new PulverizerRecipeBuilder(this.registries).input(Items.BONE).result(Items.BONE_MEAL, 6).export(exporter, "bone");
         // blaze powder
-        new GrinderRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 4).export(exporter, "blaze");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 4).export(exporter, "blaze");
         new PulverizerRecipeBuilder(this.registries).input(Items.BLAZE_ROD).result(Items.BLAZE_POWDER, 3).export(exporter, "blaze");
         // wool
-        new GrinderRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 4).export(exporter, "string");
+        new FragmentForgeRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 4).export(exporter, "string");
         new PulverizerRecipeBuilder(this.registries).input(ItemTags.WOOL).result(Items.STRING, 3).export(exporter, "string");
         // ancient debris
-        new GrinderRecipeBuilder(this.registries).input(Items.ANCIENT_DEBRIS).result(Items.NETHERITE_SCRAP, 2).export(exporter, "netheritescrap");
+        new FragmentForgeRecipeBuilder(this.registries).input(Items.ANCIENT_DEBRIS).result(Items.NETHERITE_SCRAP, 2).export(exporter, "netheritescrap");
     }
 
     private void addUraniumProcessing(RecipeOutput exporter) {
@@ -958,15 +968,15 @@ public class RecipeGenerator extends RecipeProvider {
         new CentrifugeRecipeBuilder(this.registries).input(cItemTag("dusts/redstone")).result(ItemContent.SMALL_URANIUM_DUST).export(exporter, "redstoneuran");
 
         // uranium ore blocks
-        new GrinderRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 3).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumore");
+        new FragmentForgeRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 3).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumore");
         new PulverizerRecipeBuilder(this.registries).input(BlockContent.DEEPSLATE_URANIUM_ORE).result(ItemContent.RAW_URANIUM, 2).export(exporter, "uraniumore");
 
         // uranium crystal blocks
-        new GrinderRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 5).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumcrystal");
+        new FragmentForgeRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 5).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uraniumcrystal");
         new PulverizerRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.RAW_URANIUM, 4).export(exporter, "uraniumcrystal");
 
         // raw uranium in grinder
-        new GrinderRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uranium");
+        new FragmentForgeRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).result(ItemContent.SMALL_PLUTONIUM_DUST).export(exporter, "uranium");
         new PulverizerRecipeBuilder(this.registries).input(TagContent.URANIUM_RAW_MATERIALS).result(ItemContent.URANIUM_DUST, 2).export(exporter, "uranium");
 
         // uranium gem from raw uranium / uranium dust in atomic forge
@@ -1050,20 +1060,20 @@ public class RecipeGenerator extends RecipeProvider {
         offerStarRecipe(exporter, BlockContent.REACTOR_HEAT_PIPE.asItem(), of(TagContent.ELECTRUM_INGOTS), of(cItemTag("ingots/gold")), "reactorheatpipe");
 
         // explosives
-        offerCopperReinforcedPlatingRecipe(exporter, BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.asItem(), of(ItemContent.DUBIOS_CONTAINER), of(ItemContent.URANIUM_PELLET), of(Items.TNT), 1, "manhattan_module");
+        offerCopperReinforcedPlatingRecipe(exporter, BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.asItem(), of(ItemContent.DUBIOUS_CONTAINER), of(ItemContent.URANIUM_PELLET), of(Items.TNT), 1, "manhattan_module");
         offerCopperReinforcedPlatingRecipe(exporter, BlockContent.MANHATTAN_MODULE.asItem(), of(ItemContent.HEISENBERG_COMPENSATOR), of(ItemContent.PLUTONIUM_PELLET), of(Items.TNT), 1, "manhattan_modulebetter");
     }
 
     private void addReactorFuels(RecipeOutput exporter) {
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_URANIUM_PELLET).time(400).export(exporter, "smallpellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.URANIUM_PELLET).time(4000).export(exporter, "pellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_PLUTONIUM_PELLET).time(4000).export(exporter, "smallplutoniumpellet");
-        new ReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.PLUTONIUM_PELLET).time(40000).export(exporter, "plutoniumpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_URANIUM_PELLET).time(400).export(exporter, "smallpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.URANIUM_PELLET).time(4000).export(exporter, "pellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.SMALL_PLUTONIUM_PELLET).time(4000).export(exporter, "smallplutoniumpellet");
+        new NuclearReactorGeneratorRecipeBuilder(this.registries).input(ItemContent.PLUTONIUM_PELLET).time(40000).export(exporter, "plutoniumpellet");
     }
 
     private void addLaserTransformations(RecipeOutput exporter) {
-        new LaserRecipeBuilder(this.registries).input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE.get()).export(exporter, "fluxite");
-        new LaserRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.PLUTONIUM_DUST.get()).export(exporter, "plutoniumdust");
+        new EndericLaserRecipeBuilder(this.registries).input(Items.AMETHYST_CLUSTER).result(ItemContent.FLUXITE.get()).export(exporter, "fluxite");
+        new EndericLaserRecipeBuilder(this.registries).input(BlockContent.URANITE_CRYSTAL).result(ItemContent.PLUTONIUM_DUST.get()).export(exporter, "plutoniumdust");
     }
 
     private void addCompactingRecipe(RecipeOutput exporter, ItemLike resBlock, ItemLike resItem, Ingredient itemIng, Ingredient blockIng) {
@@ -1142,6 +1152,23 @@ public class RecipeGenerator extends RecipeProvider {
     public void offerManualAlloyRecipe(RecipeOutput exporter, Item output, Ingredient A, Ingredient B, int count, String suffix) {
         var builder = this.shaped(RecipeCategory.MISC, output, count).define('a', A).define('b', B).pattern("aa ").pattern("bb ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter);
+    }
+
+    // Starter recipes specify their own layout while keeping the reduced component costs.
+    private void offerEarlyGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix, String... pattern) {
+        var builder = this.shaped(RecipeCategory.MISC, output, 1).define('s', sides).define('c', core).define('f', frame).define('b', base);
+        for (var row : pattern) {
+            builder.pattern(row);
+        }
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
+    }
+
+    private void offerEarlyFurnaceRecipe(RecipeOutput exporter, Item output, Ingredient bottom, Ingredient botSides, Ingredient middleSides, Ingredient core, Ingredient top, String suffix, String... pattern) {
+        var builder = this.shaped(RecipeCategory.MISC, output, 1).define('s', botSides).define('c', core).define('f', top).define('b', bottom).define('m', middleSides);
+        for (var row : pattern) {
+            builder.pattern(row);
+        }
+        builder.unlockedBy(getHasName(output), has(output)).save(exporter, recipeKey("crafting/" + suffix));
     }
 
     public void offerGeneratorRecipe(RecipeOutput exporter, Item output, Ingredient base, Ingredient sides, Ingredient core, Ingredient frame, String suffix) {

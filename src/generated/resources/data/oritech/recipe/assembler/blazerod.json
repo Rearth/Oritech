@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "minecraft:blaze_powder",
     "minecraft:blaze_powder",
@@ -11,6 +11,5 @@
       "id": "minecraft:blaze_rod"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 96
 }

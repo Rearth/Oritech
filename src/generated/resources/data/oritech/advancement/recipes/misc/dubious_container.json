@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dubious_container": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech:dubious_container"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech:dubious_container"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_dubious_container"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech:dubious_container"
+    ]
+  }
+}

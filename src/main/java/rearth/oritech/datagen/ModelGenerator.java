@@ -88,7 +88,7 @@ public class ModelGenerator extends ModelProvider {
     );
 
     private static final Set<Item> GECKOLIB_ITEM_MODELS = Set.of(
-            ToolsContent.PORTABLE_LASER.get(),
+            ToolsContent.ENDERIC_RAILGUN.get(),
             ToolsContent.PROMETHIUM_AXE.get(),
             ToolsContent.PROMETHIUM_PICKAXE.get(),
             ItemContent.SCHRODINGERS_SAFE.get()

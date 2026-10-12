@@ -2,7 +2,6 @@ package rearth.oritech.client.renderers.blocks;
 
 import com.geckolib.cache.model.GeoQuad;
 import com.geckolib.cache.model.GeoVertex;
-import com.geckolib.renderer.GeoBlockRenderer;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.GeoRenderer;
 import com.geckolib.renderer.layer.builtin.CustomBoneTextureGeoLayer;
@@ -10,7 +9,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.phys.AABB;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -20,19 +18,14 @@ import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
 import rearth.oritech.client.renderers.models.MachineModel;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 
-public class AddonSplicerBlockRenderer<R extends BlockEntityRenderState & GeoRenderState> extends GeoBlockRenderer<AddonSplicerBlockEntity, R> {
+public class AddonSplicerBlockRenderer<R extends BlockEntityRenderState & GeoRenderState> extends ModelBoundedGeoBlockRenderer<AddonSplicerBlockEntity, R> {
 
     private static final Identifier STRANGE_MIXTURE_TEXTURE = Oritech.id("textures/block/fluid/fluid_strange_mixture.png");
 
     public AddonSplicerBlockRenderer(BlockEntityRendererProvider.Context context, String modelPath) {
-        super(context, new MachineModel<>(modelPath));
+        super(context, new MachineModel<>(modelPath), modelPath);
         withRenderLayer(new FullbrightFluidBoneLayer<>(this, "moving"));
         withRenderLayer(new FullbrightFluidBoneLayer<>(this, "moving2"));
-    }
-
-    @Override
-    public AABB getRenderBoundingBox(AddonSplicerBlockEntity blockEntity) {
-        return AABB.ofSize(blockEntity.getBlockPos().getCenter(), 4, 4, 4);
     }
 
     @Override

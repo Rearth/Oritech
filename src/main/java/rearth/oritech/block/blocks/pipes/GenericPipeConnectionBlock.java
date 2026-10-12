@@ -60,9 +60,10 @@ public abstract class GenericPipeConnectionBlock extends GenericPipeBlock implem
 
         var interfaceState = state;
         if (!(neighbourState.getBlock() instanceof AbstractPipeBlock)) {
-            // only update connection if neighbor is a new machine
+            // Refresh when a machine appears or loses its capability.
             var hasMachine = getNetworkData(serverLevel).machinePipeNeighbors.getOrDefault(neighbourPos, HashSet.newHashSet(0)).contains(directionToNeighbour.getOpposite());
-            if (neighbourState.is(Blocks.AIR) || !hasMachine) {
+            if (neighbourState.is(Blocks.AIR) || !hasMachine
+                    || !hasMachineInDirection(directionToNeighbour, serverLevel, pos, apiValidationFunction())) {
                 interfaceState = addConnectionStates(state, serverLevel, pos, directionToNeighbour);
             }
 

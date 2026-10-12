@@ -26,6 +26,9 @@ public class FluidTagGenerator extends FluidTagsProvider {
         
         tag(Tags.Fluids.GASEOUS)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());
+
+        tag(TagContent.PUMP_INFINITE_FLUIDS)
+            .addTag(Tags.Fluids.WATER);
         
         tag(TagContent.STEAM)
             .add(FluidContent.FLOWING_STEAM.get()).add(FluidContent.STILL_STEAM.get());

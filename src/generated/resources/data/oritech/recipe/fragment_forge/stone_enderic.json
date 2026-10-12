@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "minecraft:end_stone"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:enderic_compound"
+    }
+  ],
+  "time": 40
+}

@@ -35,6 +35,7 @@ import rearth.oritech.init.TagContent;
 import rearth.oritech.util.ContainerSlotAssignment;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.ScreenProvider;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.List;
 
@@ -104,7 +105,7 @@ public class ReactorCoolantAbsorberPortEntity extends BlockEntity implements Men
             if (level.getGameTime() % 5 == 0)
                 if (level instanceof ServerLevel sl) {
                     var c = worldPosition.getCenter().add(0, 0.5, 0);
-                    sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 1, 1.2, 1.2, 1.2, 0);
+                    ParticleContent.sendParticles(sl, ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 1, 1.2, 1.2, 1.2, 0);
                 }
         }
 
@@ -113,7 +114,7 @@ public class ReactorCoolantAbsorberPortEntity extends BlockEntity implements Men
     private void onFuelConsumed() {
         if (level instanceof ServerLevel sl) {
             var c = worldPosition.getCenter().add(0, 0.5, 0);
-            sl.sendParticles(ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 15, 1.2, 1.2, 1.2, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.SNOWFLAKE, c.x, c.y, c.z, 15, 1.2, 1.2, 1.2, 0);
         }
     }
 

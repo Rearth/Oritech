@@ -1,5 +1,5 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_sulfuric_acid"
@@ -19,6 +19,5 @@
       "id": "oritech:platinum_gem"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 225
 }

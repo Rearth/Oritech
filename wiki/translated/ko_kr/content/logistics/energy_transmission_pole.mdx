@@ -1,0 +1,31 @@
+---
+id: oritech:energy_transmission_pole
+type: block
+title: 전봇대
+custom:
+    RF 용량: "5,000,000"
+    범위: "50-1,000블록"
+---
+전봇대는 먼 거리로 전력을 보냅니다.
+보통 높은 구조물 위에 지으며 다른 전봇대와만 연결할 수 있습니다.
+<center>
+<ModAsset location="oritech:area/power_pole" width={512} />
+</center>
+
+연결하려면 [표적 지정기](@oritech:target_designator) 아이템으로 첫 번째 전봇대를 Shift + 클릭한 뒤, 두 번째 전봇대를 Shift + 클릭합니다. 전봇대 하나에 원하는 만큼 다른 전봇대를 연결할 수 있습니다.
+서로 연결된 전봇대는 에너지도 공유하므로 큰 네트워크를 만들 수 있습니다.
+
+에너지는 서로 연결된 전봇대 네트워크 안의 어느 전봇대로든 넣고 꺼낼 수 있습니다.
+에너지는 초록색 포트로 넣고 빨간색 포트로 꺼냅니다.
+네트워크 전체의 최대 전송 속도는 5M RF/t로 제한됩니다.
+
+<Callout variant="info">
+    전봇대는 장거리 에너지 수송 전용이지만 범위가 무한하지는 않습니다. 연결하려면 최소 50블록 떨어져 있어야 하며 최대 범위는 1000블록입니다.
+</Callout>
+
+[파이프 렌치](@oritech:wrench)로 전봇대 케이블을 따라 집라인을 탈 수 있습니다.
+렌치를 든 채 케이블을 클릭하세요.
+
+<center>
+<ModAsset location="oritech:area/cable_ziplining" width={800} />
+</center>

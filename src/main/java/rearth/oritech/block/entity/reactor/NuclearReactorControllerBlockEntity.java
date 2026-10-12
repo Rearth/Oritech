@@ -1,5 +1,12 @@
 package rearth.oritech.block.entity.reactor;
 
+import io.netty.buffer.Unpooled;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -28,8 +35,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector2i;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
-import rearth.oritech.api.networking.SyncField;
-import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.block.blocks.reactor.*;
@@ -39,6 +44,7 @@ import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 
@@ -53,27 +59,23 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
     public static final int MAX_UNSTABLE_TICKS = OritechConfig.maxUnstableTicks.get();
     public static final int DEFAULT_WARNING_HEAT_THRESHOLD = (int) (MAX_HEAT * 0.8f);
 
-    private final HashMap<Vector2i, BaseReactorBlock> activeComponents = new HashMap<>();   // 2d local position on the first layer containing the reactor blocks
+    private final HashMap<Vector2i, ReactorComponent> activeComponents = new HashMap<>(); // 2d local positions on the first interior layer, used to build neighbor references
+    private ReactorComponent[] simulationComponents = new ReactorComponent[0]; // same components in tick order, avoids map lookups during simulation
     private final HashMap<Vector2i, ReactorFuelPortEntity> fuelPorts = new HashMap<>();     // same grid, but contains a reference to the port at the ceiling
     private final HashMap<Vector2i, ReactorCoolantAbsorberPortEntity> absorberPorts = new HashMap<>(); // same
-    private final HashMap<Vector2i, Integer> componentHeats = new HashMap<>();              // same grid, contains the current heat of the component
     private final HashSet<Tuple<BlockPos, Direction>> energyPorts = new HashSet<>();   // list of all energy port outputs (e.g. the targets to output to)
     private final HashSet<BlockPos> redstonePorts = new HashSet<>();   // list of all redstone ports
 
-    @SyncField(SyncType.GUI_TICK)
-    public HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>(); // mainly for client displays, same grid
+    public final HashMap<Vector2i, ComponentStatistics> componentStats = new HashMap<>();
+    public final HashMap<Vector2i, ComponentFuel> componentFuel = new HashMap<>(); // mainly for client displays, same grid
 
-    @SyncField(SyncType.GUI_TICK)
     public DynamicEnergyStorage energyStorage = new DynamicEnergyStorage(OritechConfig.reactorMaxEnergyStored.get(), OritechConfig.reactorMaxEnergyStored.get(), 0, 0, this::setChanged, false);
 
-    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
     public int warningHeatThreshold = DEFAULT_WARNING_HEAT_THRESHOLD;
 
     public boolean active = false;
 
-    @SyncField(SyncType.GUI_OPEN)
     public BlockPos areaMin;
-    @SyncField(SyncType.GUI_OPEN)
     public BlockPos areaMax;
 
     private int reactorStackHeight;
@@ -101,22 +103,24 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
             init(null);
         }
 
-        if (!active || activeComponents.isEmpty()) return;
+        if (!active || simulationComponents.length == 0) return;
 
         var activeRods = 0;
         var hottestHeat = 0;
 
-        for (var entry : activeComponents.entrySet()) {
-            var localPos = entry.getKey();
-            var component = entry.getValue();
-            var componentHeat = componentHeats.get(localPos);
+        // process cached components in order; heat changes are visible to later components in this tick
+        for (var simulationComponent : simulationComponents) {
+            var localPos = simulationComponent.localPos;
+            var component = simulationComponent.block;
+            var componentHeat = simulationComponent.heat;
 
             if (component instanceof ReactorRodBlock rodBlock) {
 
                 var ownRodCount = rodBlock.getRodCount();
-                var receivedPulses = rodBlock.getInternalPulseCount();
+                // internal pulses plus neighbors / reflectors, calculated when the reactor is initialized
+                var receivedPulses = simulationComponent.receivedPulses;
 
-                var portEntity = fuelPorts.get(localPos);
+                var portEntity = simulationComponent.fuelPort;
                 if (portEntity == null || portEntity.isRemoved()) {
                     continue;
                 }
@@ -124,20 +128,9 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
                 var hasFuel = portEntity.tryConsumeFuel(ownRodCount * reactorStackHeight, isDisabled() || disabledViaRedstone);
                 var heatCreated = 0;
 
-                setRodBlockState(localPos, hasFuel);
+                setRodBlockState(portEntity.getBlockPos(), hasFuel);
 
                 if (hasFuel) {
-                    // check how many pulses are received from neighbors / reflectors
-                    for (var neighborPos : getNeighborsInBounds(localPos, activeComponents.keySet())) {
-
-                        var neighbor = activeComponents.get(neighborPos);
-                        if (neighbor instanceof ReactorRodBlock neighborRod) {
-                            receivedPulses += neighborRod.getRodCount();
-                        } else if (neighbor instanceof ReactorNeutronReflectorBlock reflectorBlock) {
-                            receivedPulses += rodBlock.getRodCount();
-                        }
-                    }
-
                     if (!isDisabled()) {
                         activeRods++;
                         try (var transaction = Transaction.openRoot()) {
@@ -165,13 +158,13 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
                 var sumGainedHeat = 0;
 
                 // take heat in from neighbors
-                for (var neighbor : getNeighborsInBounds(localPos, activeComponents.keySet())) {
-                    var neighborHeat = componentHeats.get(neighbor);
+                for (var neighbor : simulationComponent.neighbors) {
+                    var neighborHeat = neighbor.heat;
                     if (neighborHeat <= componentHeat) continue;
                     var diff = neighborHeat - componentHeat;
                     var gainedHeat = Math.min(diff / 4 + 10, diff);
                     neighborHeat -= gainedHeat;
-                    componentHeats.put(neighbor, neighborHeat);
+                    neighbor.heat = neighborHeat;
                     componentHeat += gainedHeat;
                     sumGainedHeat += gainedHeat;
                 }
@@ -181,7 +174,7 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
             } else if (component instanceof ReactorAbsorberBlock absorberBlock) {
 
                 var sumRemovedHeat = 0;
-                var portEntity = absorberPorts.get(localPos);
+                var portEntity = simulationComponent.absorberPort;
                 if (portEntity == null || portEntity.isRemoved()) {
                     continue;
                 }
@@ -189,12 +182,12 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
 
                 if (fuelAvailable >= reactorStackHeight) {
                     // take heat in from neighbors and remove it
-                    for (var neighbor : getNeighborsInBounds(localPos, activeComponents.keySet())) {
-                        var neighborHeat = componentHeats.get(neighbor);
+                    for (var neighbor : simulationComponent.neighbors) {
+                        var neighborHeat = neighbor.heat;
                         if (neighborHeat <= 0) continue;
                         neighborHeat -= ABSORBER_RATE;
                         sumRemovedHeat += ABSORBER_RATE;
-                        componentHeats.put(neighbor, neighborHeat);
+                        neighbor.heat = neighborHeat;
                     }
                 } else if (fuelAvailable > 0) {
                     // remove last small unusable part
@@ -210,12 +203,12 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
 
                 // remove heat from hottest neighbor
 
-                var hottestPos = localPos;
+                var hottestComponent = simulationComponent;
                 var max = 0;
-                for (var neighbor : getNeighborsInBounds(localPos, activeComponents.keySet())) {
-                    var neighborHeat = componentHeats.get(neighbor);
+                for (var neighbor : simulationComponent.neighbors) {
+                    var neighborHeat = neighbor.heat;
                     if (neighborHeat <= max) continue;
-                    hottestPos = neighbor;
+                    hottestComponent = neighbor;
                     max = neighborHeat;
                 }
 
@@ -224,14 +217,14 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
                     var neighborHeat = max;
                     removed = Math.min(neighborHeat / VENT_RELATIVE_RATE + VENT_BASE_RATE, neighborHeat);
                     neighborHeat -= removed;
-                    componentHeats.put(hottestPos, neighborHeat);
+                    hottestComponent.heat = neighborHeat;
                 }
 
                 componentStats.put(localPos, new ComponentStatistics((short) 0, 0, (short) removed));
 
             }
 
-            componentHeats.put(localPos, componentHeat);
+            simulationComponent.heat = componentHeat;
 
             if (componentHeat > hottestHeat)
                 hottestHeat = componentHeat;
@@ -258,13 +251,79 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
 
     }
 
-    @Override
-    public void preNetworkUpdate(SyncType type) {
-        super.preNetworkUpdate(type);
+    // called by each open controller menu; combine component and port data into one packet per viewer
+    public void sendGuiUpdate(ServerPlayer player) {
+        var buf = new FriendlyByteBuf(Unpooled.buffer());
+        try {
+            writeGuiData(buf);
+            // copy only the written bytes, not the unused capacity of the backing buffer
+            var data = new byte[buf.readableBytes()];
+            buf.readBytes(data);
+            // send only to the menu's viewer, rather than everyone tracking the reactor chunks
+            PacketDistributor.sendToPlayer(player, new GuiUpdatePacket(worldPosition, data));
+        } finally {
+            buf.release();
+        }
+    }
 
-        if (type != SyncType.GUI_TICK) return;
-        for (var port : fuelPorts.values()) port.updateNetwork();
-        for (var port : absorberPorts.values()) port.updateNetwork();
+    private void writeGuiData(FriendlyByteBuf buf) {
+        // reactor totals first, followed by local position, statistics and optional fuel data per component
+        // keep this layout in sync with readGuiData; explicit writes avoid reflective per-component encoding
+        buf.writeLong(energyStorage.getAmountAsLong());
+        buf.writeInt(warningHeatThreshold);
+        buf.writeVarInt(componentStats.size());
+        for (var entry : componentStats.entrySet()) {
+            var pos = entry.getKey();
+            var stats = entry.getValue();
+            buf.writeInt(pos.x);
+            buf.writeInt(pos.y);
+            buf.writeShort(stats.receivedPulses());
+            buf.writeInt(stats.storedHeat());
+            buf.writeShort(stats.heatChanged());
+
+            // include ceiling port values here so the GUI does not need a separate packet for each port
+            var fuelPort = fuelPorts.get(pos);
+            var absorberPort = absorberPorts.get(pos);
+            if (fuelPort != null && !fuelPort.isRemoved()) {
+                buf.writeBoolean(true);
+                buf.writeInt(fuelPort.availableFuel);
+                buf.writeInt(fuelPort.currentFuelOriginalCapacity);
+            } else if (absorberPort != null && !absorberPort.isRemoved()) {
+                buf.writeBoolean(true);
+                buf.writeInt(absorberPort.availableFuel);
+                buf.writeInt(absorberPort.currentFuelOriginalCapacity);
+            } else {
+                // no usable port: omit the fuel fields and let the client hide the corresponding tooltip
+                buf.writeBoolean(false);
+            }
+        }
+    }
+
+    private void readGuiData(FriendlyByteBuf buf) {
+        energyStorage.set(buf.readLong());
+        warningHeatThreshold = buf.readInt();
+        // every packet is a complete snapshot, so discard entries absent from the latest update
+        componentStats.clear();
+        componentFuel.clear();
+        var count = buf.readVarInt();
+        for (int i = 0; i < count; i++) {
+            var pos = new Vector2i(buf.readInt(), buf.readInt());
+            componentStats.put(pos, new ComponentStatistics(buf.readShort(), buf.readInt(), buf.readShort()));
+            if (buf.readBoolean()) {
+                componentFuel.put(pos, new ComponentFuel(buf.readInt(), buf.readInt()));
+            }
+        }
+    }
+
+    // apply the snapshot to the client controller; the screen reads these maps directly
+    public static void handleGuiUpdate(GuiUpdatePacket payload, IPayloadContext context) {
+        if (!(context.player().level().getBlockEntity(payload.position()) instanceof NuclearReactorControllerBlockEntity reactor)) return;
+        var buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(payload.data()));
+        try {
+            reactor.readGuiData(buf);
+        } finally {
+            buf.release();
+        }
     }
 
     private boolean isDisabled() {
@@ -295,7 +354,7 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
     private void playMeltdownAnimation(BlockPos port) {
         if (level instanceof ServerLevel sl) {
             var c = port.getCenter().add(0, 0.3, 0);
-            sl.sendParticles(ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0);
+            ParticleContent.sendParticles(sl, ParticleTypes.LAVA, c.x, c.y, c.z, 5, 1, 1, 1, 0);
         }
     }
 
@@ -434,8 +493,11 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
                 }
 
             }
-            activeComponents.put(localPos, reactorBlock);
-            componentHeats.putIfAbsent(localPos, 0);
+            // keep existing heat when rebuilding the same local position, e.g. when reopening the GUI
+            var previousComponent = activeComponents.get(localPos);
+            var component = new ReactorComponent(localPos, reactorBlock);
+            if (previousComponent != null) component.heat = previousComponent.heat;
+            activeComponents.put(localPos, component);
 
             return true;
         });
@@ -446,15 +508,58 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
             return;
         }
 
+        rebuildSimulation();
         areaMin = finalCornerA;
         areaMax = finalCornerB;
         active = true;
 
     }
 
-    private void setRodBlockState(Vector2i localPos, boolean on) {
+    private void rebuildSimulation() {
+        // heat transfer is sequential; preserve component order and neighbor order, including vent tie-breaking
+        simulationComponents = activeComponents.values().toArray(ReactorComponent[]::new);
+        for (var component : simulationComponents) {
+            // resolve positions once here; the tick loop uses direct port and neighbor references
+            component.fuelPort = fuelPorts.get(component.localPos);
+            component.absorberPort = absorberPorts.get(component.localPos);
+            component.neighbors = getNeighborsInBounds(component.localPos, activeComponents.keySet()).stream()
+                .map(activeComponents::get)
+                .toArray(ReactorComponent[]::new);
+
+            component.receivedPulses = 0;
+            if (component.block instanceof ReactorRodBlock rod) {
+                // count pulses from the rod itself, neighboring rods and reflectors
+                component.receivedPulses = rod.getInternalPulseCount();
+                // neighboring rods contribute regardless of their current fuel supply, so this can be cached
+                for (var neighbor : component.neighbors) {
+                    if (neighbor.block instanceof ReactorRodBlock neighborRod) {
+                        component.receivedPulses += neighborRod.getRodCount();
+                    } else if (neighbor.block instanceof ReactorNeutronReflectorBlock) {
+                        component.receivedPulses += rod.getRodCount();
+                    }
+                }
+            }
+        }
+    }
+
+    // server simulation state for one vertical component stack. Rebuilt on init, heat changes each tick
+    private static final class ReactorComponent {
+        private final Vector2i localPos;
+        private final BaseReactorBlock block;
+        private ReactorComponent[] neighbors;
+        private ReactorFuelPortEntity fuelPort;
+        private ReactorCoolantAbsorberPortEntity absorberPort;
+        private int heat; // shared mutable heat, also modified by neighboring cooling components
+        private int receivedPulses; // pulse count while fueled; the tick reports zero when fuel is unavailable
+
+        private ReactorComponent(Vector2i localPos, BaseReactorBlock block) {
+            this.localPos = localPos;
+            this.block = block;
+        }
+    }
+
+    private void setRodBlockState(BlockPos stackTop, boolean on) {
         if (level.getGameTime() % 10 != 0) return;
-        var stackTop = fuelPorts.get(localPos).getBlockPos();
 
         for (int i = 1; i <= reactorStackHeight; i++) {
             var candidatePos = stackTop.below(i);
@@ -600,11 +705,33 @@ public class NuclearReactorControllerBlockEntity extends NetworkedBlockEntity im
 
     @Override
     public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
-        sendUpdate(SyncType.GUI_OPEN);
+        // initial layout and slider value travel with the menu opening, only to the player opening it
+        // read in the same order by ReactorScreenHandler's buffer constructor
+        buffer.writeBlockPos(worldPosition);
+        buffer.writeBlockPos(areaMin);
+        buffer.writeBlockPos(areaMax);
+        buffer.writeInt(warningHeatThreshold);
     }
 
     public record ComponentStatistics(short receivedPulses, int storedHeat, short heatChanged) {
         public static final ComponentStatistics EMPTY = new ComponentStatistics((short) 0, -1, (short) 0);
+    }
+
+    // remaining internal fuel/coolant and the original capacity of the last consumed item
+    public record ComponentFuel(int available, int capacity) {}
+
+    // component and port data already encoded by writeGuiData for the receiving viewer
+    public record GuiUpdatePacket(BlockPos position, byte[] data) implements CustomPacketPayload {
+        public static final Type<GuiUpdatePacket> PACKET_ID = new Type<>(Oritech.id("reactor_gui"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, GuiUpdatePacket> PACKET_CODEC = StreamCodec.composite(
+            BlockPos.STREAM_CODEC, GuiUpdatePacket::position,
+            ByteBufCodecs.BYTE_ARRAY, GuiUpdatePacket::data,
+            GuiUpdatePacket::new);
+
+        @Override
+        public @NotNull Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
+        }
     }
 
     public static void handleWarningThresholdPacket(WarningThresholdPacket payload, IPayloadContext context) {

@@ -1,9 +1,8 @@
 {
-  "type": "oritech:machine_recipe",
+  "type": "oritech:bio_generator",
   "itemInputs": [
     "oritech:packed_wheat"
   ],
   "itemResults": [],
-  "recipeType": "oritech:bio_generator",
   "time": 4000
 }

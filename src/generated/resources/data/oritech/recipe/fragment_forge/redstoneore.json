@@ -1,0 +1,13 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#minecraft:redstone_ores"
+  ],
+  "itemResults": [
+    {
+      "count": 12,
+      "id": "minecraft:redstone"
+    }
+  ],
+  "time": 40
+}

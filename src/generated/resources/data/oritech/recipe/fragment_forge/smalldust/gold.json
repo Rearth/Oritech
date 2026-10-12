@@ -1,0 +1,12 @@
+{
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:nuggets/gold"
+  ],
+  "itemResults": [
+    {
+      "id": "oritech:small_gold_dust"
+    }
+  ],
+  "time": 40
+}

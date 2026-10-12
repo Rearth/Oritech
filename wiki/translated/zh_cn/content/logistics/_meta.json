@@ -1,14 +1,14 @@
 {
-  "creative_storage_block.mdx": "创造能量存储",
-  "creative_tank_block.mdx": "创造流体储罐",
+  "creative_storage.mdx": "创造能量存储",
+  "creative_tank.mdx": "创造流体储罐",
   "energy_pipe.mdx": "能量线缆",
   "fluid_pipe.mdx": "流体管道",
   "item_pipe.mdx": "物流管道",
-  "item_filter_block.mdx": "物品筛选器",
-  "large_storage_block.mdx": "大型能量存储",
-  "power_pole_block.mdx": "输能杆(Energy Transmission Pole)",
-  "small_storage_block.mdx": "便携能量存储",
-  "small_tank_block.mdx": "便携流体储罐",
+  "item_filter.mdx": "物品筛选器",
+  "large_storage.mdx": "大型能量存储",
+  "energy_transmission_pole.mdx": "输能杆(Energy Transmission Pole)",
+  "portable_energy_storage.mdx": "便携能量存储",
+  "portable_tank.mdx": "便携流体储罐",
   "superconductor.mdx": "超导体",
-  "unstable_container.mdx": "薛定谔保险柜"
+  "schrodingers_safe.mdx": "薛定谔保险柜"
 }
