@@ -3,8 +3,6 @@ package rearth.oritech.block.entity.processing;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -143,10 +141,6 @@ public class AtomicForgeBlockEntity extends MultiblockMachineEntity {
     @Override
     public List<Vec3i> getAddonSlots() {
         return new ArrayList<>();
-    }
-
-    @Override
-    public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buffer) {
     }
 
     @Override
