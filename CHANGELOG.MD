@@ -1,0 +1,20 @@
+- Add inter-mod compat recipes again (@jshipley / @amertune)
+- Add new resonator items that help finding features in the world
+- Add option to void fluids in destroyer working area
+- Add more vanilla recipe extensions to assembler
+- Add player charge pad functionality to equipment charger
+- Add atomic forge progress arrow tooltips
+- Add jade compat to show connected machine names and contents
+- Add/enable ftb filters compat again for item filter block
+- Add/enable oracle index help button in machines again
+- Allow drone ports to work across dimensions
+- Increase destroyer block in quarry mode default speed
+- Fix prom / exo equipment taking unbreaking enchantment
+- Fix/improve equipment charger UI
+- Fix pipes not connecting in some cases
+- Fix schroedings safe data map
+- Fix jetpacks accepting non-turbofuel fluids
+- Fix jetpacks using the wrong texture
+- Fix steam engine efficiency math being wrong after last balance changes
+- Cleanup unused old configs, fix some translations in them
+- Small bugfixes
