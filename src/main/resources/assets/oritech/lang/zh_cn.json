@@ -2,7 +2,7 @@
   "oracle_index.title.oritech": "Oritech",
   "message.oritech.oracle_index_missing": "Oracle Index未安装。这并不是Oritech所必须的，你也可以在线访问moddedmc.wiki获取相同的内容，但仍十分推荐用Oracle Index以在游戏内查询教程。",
   "advancements.oritech.begin": "Oritech",
-  "key.oritech.hotkey_category": "Oritech",
+  "key.category.oritech.keys": "Oritech",
   "advancements.oritech.begin.description": "“锱铢必掘” —— 从获取一些粗镍开始你的科技冒险之路。尽情闪耀吧，你这疯狂的矿工！",
   "advancements.oritech.generator": "蓄力待发！",
   "advancements.oritech.generator.description": "用基础发电机产生一些重要能量。很“机动”人心，不是吗？",
@@ -1194,7 +1194,6 @@
   "oritech.configuration.superConductorTransferRate": "超导体传输速率",
   "oritech.configuration.steamToRfRatio": "蒸汽至RF比率",
   "oritech.configuration.smallEnergyStorage": "小型能量存储",
-  "oritech.configuration.generateOresFabricOnly": "[仅Fabric端生效] 生成矿石",
   "oritech.configuration.ultimateAddonSpeed": "协同矩阵插件速度",
   "oritech.configuration.additiveAddons": "插件增益使用加法叠加",
   "oritech.configuration.exoJetpack": "外骨骼喷气背包",
@@ -1350,5 +1349,10 @@
   "tag.item.oritech.recyclable.small_iron_dust": "可回收为细铁粉",
   "tag.item.oritech.recyclable.string": "可回收为线",
   "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
-  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility",
+  "oritech.configuration.baseEnergyUsage": "Base Energy Usage per Trip",
+  "oritech.configuration.distanceEnergyUsage": "Travel Distance Energy Multiplier",
+  "oritech.configuration.dronePortConfig": "无人机港",
+  "oritech.configuration.interaction": "Interaction Machines",
+  "oritech.configuration.showOracleIndexWarning": "Show Oracle Index Warning"
 }
