@@ -13,17 +13,23 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.ResonatorSearch;
 
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class ResonatorItem extends Item {
-    private final TagKey<Block> targets;
+    private final Predicate<BlockState> targets;
     private final String translationKey;
     private final int particleColor;
 
     public ResonatorItem(Properties properties, TagKey<Block> targets, String translationKey, int particleColor) {
+        this(properties, state -> state.is(targets), translationKey, particleColor);
+    }
+
+    public ResonatorItem(Properties properties, Predicate<BlockState> targets, String translationKey, int particleColor) {
         super(properties);
         this.targets = targets;
         this.translationKey = translationKey;

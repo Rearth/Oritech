@@ -16,8 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModList;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.event.*;
@@ -38,13 +38,9 @@ import rearth.oritech.client.init.*;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.PortableTankItemRenderer;
+import rearth.oritech.client.renderers.ResonatorRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
-import rearth.oritech.datagen.AdvancementGenerator;
-import rearth.oritech.datagen.BlockLootGenerator;
-import rearth.oritech.datagen.GeoItemModelGenerator;
-import rearth.oritech.datagen.ModelGenerator;
-import rearth.oritech.datagen.OritechDataMapProvider;
-import rearth.oritech.datagen.RecipeGenerator;
+import rearth.oritech.datagen.*;
 import rearth.oritech.datagen.builders.OritechAugmentDataGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
 import rearth.oritech.datagen.tags.EntityTagGenerator;
@@ -88,6 +84,9 @@ public final class OritechClient {
         neoEventBus.addListener(ActiveCableRenderer::onSubmitGeometry);
 
         // ore-scanner highlight uses the same split-phase world-render flow
+        neoEventBus.addListener(ResonatorRenderer::onAfterLevel);
+        neoEventBus.addListener(ResonatorRenderer::onExtractRenderState);
+        neoEventBus.addListener(ResonatorRenderer::onLogout);
         neoEventBus.addListener(OreFinderRenderer::onFrameGraphSetup);
         neoEventBus.addListener(OreFinderRenderer::onExtractRenderState);
         neoEventBus.addListener(OreFinderRenderer::onSubmitGeometry);
@@ -101,6 +100,7 @@ public final class OritechClient {
         modEventBus.addListener(ClientGuiRenderers::registerPipRenderers);
         modEventBus.addListener(FluidModelContent::registerFluidModels);
         modEventBus.addListener(OreFinderRenderer::registerPipelines);
+        modEventBus.addListener(ResonatorRenderer::registerPipelines);
     }
 
     // client datagen

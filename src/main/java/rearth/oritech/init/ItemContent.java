@@ -39,6 +39,11 @@ public class ItemContent {
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> NETHERITE_RESONATOR = ITEMS.registerItem("netherite_resonator", props -> new ResonatorItem(props, TagContent.NETHERITE_ORE_BLOCKS, "netherite_resonator", 0xED9F60), props -> props.stacksTo(1));
     @ItemGroupTarget(Groups.EQUIPMENT)
+    public static final DeferredItem<Item> OIL_RESONATOR = ITEMS.registerItem("oil_resonator", props -> new ResonatorItem(props, state -> state.getFluidState().is(TagContent.OIL) && state.getFluidState().isSource(), "oil_resonator", 0x38352F), props -> props.stacksTo(1));
+    @ItemGroupTarget(Groups.EQUIPMENT)
+    public static final DeferredItem<Item> RESOURCE_NODE_RESONATOR = ITEMS.registerItem("resource_node_resonator", props -> new ResonatorItem(props, TagContent.RESOURCE_NODES, "resource_node_resonator", 0x8AF2DF), props -> props.stacksTo(1));
+
+    @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
 
     // region metals

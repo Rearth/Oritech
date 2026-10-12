@@ -55,8 +55,9 @@ public class LaserTargetDesignator extends Item {
                 if (!target.dimension().equals(context.getLevel().dimension()))
                     return InteractionResult.FAIL;
                 var success = laserEntity.setTargetFromDesignator(target.pos());
-                if (success)
+                if (success) {
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
+                }
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
         } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT.get())

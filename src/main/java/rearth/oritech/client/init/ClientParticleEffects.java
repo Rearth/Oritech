@@ -4,14 +4,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import rearth.oritech.client.init.ParticleContent.EffectType;
-import rearth.oritech.client.init.ParticleContent.Payload;
 import rearth.oritech.client.init.ParticleContent.ParticleBatchPayload;
+import rearth.oritech.client.init.ParticleContent.Payload;
+import rearth.oritech.client.renderers.ResonatorRenderer;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -51,7 +51,10 @@ public final class ClientParticleEffects {
         if (OritechClientConfig.visualEffects.get() == OritechClientConfig.VisualEffects.NONE) return;
         var type = EffectType.values()[payload.effectId()];
         switch (type) {
-            case RESONATOR_DIRECTION -> spawnLineWithAge(new DustParticleOptions(payload.extraInt(), 1.2f), payload.pos(), payload.data1(), 32, 160);
+            case RESONATOR_DIRECTION ->
+                    ResonatorRenderer.start(payload.pos(), payload.data1(), payload.extraInt(), (float) payload.data2().x, (float) payload.data2().y, false);
+            case RESONATOR_SCAN ->
+                    ResonatorRenderer.start(payload.pos(), Vec3.ZERO, payload.extraInt(), (float) payload.data2().x, 0, true);
             case HIGHLIGHT_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos(), 1, 120, 6);
             case DEBUG_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos(), 1, 120, 2);
             case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos(), 1, 5, 3);

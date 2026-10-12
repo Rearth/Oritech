@@ -367,6 +367,8 @@ public class RecipeGenerator extends RecipeProvider {
         offerResonatorRecipe(exporter, ItemContent.GEODE_RESONATOR.get(), of(cItemTag("ingots/copper")), Items.COPPER_INGOT);
         offerResonatorRecipe(exporter, ItemContent.PLATINUM_RESONATOR.get(), of(TagContent.NICKEL_INGOTS), ItemContent.NICKEL_INGOT.get());
         offerResonatorRecipe(exporter, ItemContent.NETHERITE_RESONATOR.get(), of(cItemTag("ingots/gold")), Items.GOLD_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.OIL_RESONATOR.get(), of(cItemTag("ingots/iron")), Items.IRON_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.RESOURCE_NODE_RESONATOR.get(), of(cItemTag("gems/diamond")), Items.DIAMOND);
 
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR.get(), of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");

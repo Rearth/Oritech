@@ -5,13 +5,12 @@ import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.ComponentContent;
 
 import java.util.ArrayDeque;
@@ -21,13 +20,15 @@ import java.util.function.Predicate;
  * Loaded-chunk searches, advanced only on the server thread with a shared per-tick budget.
  */
 public final class ResonatorSearch {
-    public static final int RANGE = 128;
     private static final ArrayDeque<Search> SEARCHES = new ArrayDeque<>();
 
-    public static boolean start(ServerPlayer player, ItemStack stack, TagKey<Block> targets, String translationKey, int particleColor) {
+    public static boolean start(ServerPlayer player, ItemStack stack, Predicate<BlockState> targets, String translationKey, int particleColor) {
         if (SEARCHES.stream().anyMatch(search -> search.player == player)) return false;
         SEARCHES.addLast(new Search(player, stack, targets, translationKey, particleColor));
         player.sendSystemMessage(Component.translatable("message.oritech.resonator.searching"), true);
+        PacketDistributor.sendToPlayer(player, new ParticleContent.Payload(
+                ParticleContent.EffectType.RESONATOR_SCAN.ordinal(), player.position(), Vec3.ZERO,
+                new Vec3(OritechConfig.resonatorRange.get(), 0, 0), particleColor));
         return true;
     }
 
@@ -39,17 +40,15 @@ public final class ResonatorSearch {
         }
         // Cached guidance only needs coordinates; it never loads or checks the target chunk.
         var target = result.pos().getCenter();
-        var origin = player.getEyePosition().add(0, -0.3, 0);
+        var origin = player.position();
         var direction = target.subtract(origin);
-        // Extend behind the target's bearing without raising the trail for underground targets.
-        var horizontalDirection = new Vec3(direction.x, 0, direction.z).normalize();
-        var start = origin.subtract(horizontalDirection.scale(3));
-        var end = origin.add(direction.normalize().scale(Math.min(8, direction.length())));
         PacketDistributor.sendToPlayer(player, new ParticleContent.Payload(
-                ParticleContent.EffectType.RESONATOR_DIRECTION.ordinal(), start, end, Vec3.ZERO, particleColor));
-        int distance = (int) Math.round(player.position().distanceTo(target));
+                ParticleContent.EffectType.RESONATOR_DIRECTION.ordinal(), origin, direction.normalize(),
+                new Vec3(Math.max(8, Math.min(OritechConfig.resonatorRange.get(), direction.length())), direction.horizontalDistance(), 0), particleColor));
+        int distance = (int) Math.round(direction.length());
+        int horizontalDistance = (int) Math.round(direction.horizontalDistance());
         player.sendSystemMessage(Component.translatable("message.oritech." + translationKey + ".found",
-                distance, result.pos().getY()), true);
+                distance, horizontalDistance, result.pos().getY()), true);
     }
 
     public static void tick() {
@@ -83,6 +82,7 @@ public final class ResonatorSearch {
         final Predicate<BlockState> targetPredicate;
         final String translationKey;
         final int particleColor;
+        final int range;
         final int minChunkX;
         final int minChunkZ;
         final int width;
@@ -93,19 +93,20 @@ public final class ResonatorSearch {
         BlockPos closest;
         double closestDistance = Double.POSITIVE_INFINITY;
 
-        Search(ServerPlayer player, ItemStack stack, TagKey<Block> targets, String translationKey, int particleColor) {
+        Search(ServerPlayer player, ItemStack stack, Predicate<BlockState> targets, String translationKey, int particleColor) {
             this.player = player;
             this.stack = stack;
-            targetPredicate = state -> state.is(targets);
+            targetPredicate = targets;
             this.translationKey = translationKey;
             this.particleColor = particleColor;
             level = player.level();
             origin = player.position();
+            range = OritechConfig.resonatorRange.get();
             var pos = player.blockPosition();
-            minChunkX = (pos.getX() - RANGE) >> 4;
-            minChunkZ = (pos.getZ() - RANGE) >> 4;
-            width = ((pos.getX() + RANGE) >> 4) - minChunkX + 1;
-            depth = ((pos.getZ() + RANGE) >> 4) - minChunkZ + 1;
+            minChunkX = (pos.getX() - range) >> 4;
+            minChunkZ = (pos.getZ() - range) >> 4;
+            width = ((pos.getX() + range) >> 4) - minChunkX + 1;
+            depth = ((pos.getZ() + range) >> 4) - minChunkZ + 1;
         }
 
         boolean advance(Budget budget) {
@@ -142,7 +143,7 @@ public final class ResonatorSearch {
                     double worldZ = (chunkZ << 4) + z + 0.5;
                     double dx = worldX - origin.x;
                     double dz = worldZ - origin.z;
-                    if (dx * dx + dz * dz > RANGE * RANGE) continue;
+                    if (dx * dx + dz * dz > range * range) continue;
                     double distance = origin.distanceToSqr(worldX, baseY + y + 0.5, worldZ);
                     if (distance < closestDistance) {
                         closestDistance = distance;
