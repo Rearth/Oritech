@@ -5,7 +5,7 @@
       "modid": "enderio"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:gems/lapis"
   ],
@@ -14,6 +14,5 @@
       "id": "enderio:powdered_lapis_lazuli"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 120
 }

@@ -5,7 +5,7 @@
       "modid": "enderio"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 250,
     "ingredient": "minecraft:water"
@@ -20,6 +20,5 @@
     "minecraft:sculk"
   ],
   "itemResults": [],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 100
 }

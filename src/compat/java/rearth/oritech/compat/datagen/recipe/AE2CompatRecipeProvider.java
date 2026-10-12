@@ -1,7 +1,5 @@
 package rearth.oritech.compat.datagen.recipe;
 
-import java.util.concurrent.CompletableFuture;
-
 import appeng.api.ids.AEConstants;
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
@@ -17,9 +15,11 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import rearth.oritech.Oritech;
-import rearth.oritech.datagen.builders.LaserRecipeBuilder;
+import rearth.oritech.datagen.builders.EndericLaserRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 import rearth.oritech.init.ItemContent;
+
+import java.util.concurrent.CompletableFuture;
 
 import static rearth.oritech.util.TagUtils.cItemTag;
 
@@ -36,17 +36,17 @@ public class AE2CompatRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes() {
         // enderic laser should yield charged certus crystals instead of regular certus crystals
-        new LaserRecipeBuilder(registries).input(AEBlocks.QUARTZ_CLUSTER).result(AEItems.CERTUS_QUARTZ_CRYSTAL_CHARGED.get()).export(this.modLoadedOutput, PATH, "charged_quartz", Oritech.MOD_ID);
+        new EndericLaserRecipeBuilder(registries).input(AEBlocks.QUARTZ_CLUSTER).result(AEItems.CERTUS_QUARTZ_CRYSTAL_CHARGED.get()).export(this.modLoadedOutput, PATH, "charged_quartz", Oritech.MOD_ID);
 
         new PulverizerRecipeBuilder(registries)
             .input(AEBlocks.SKY_STONE_BLOCK).result(AEItems.SKY_DUST.get())
-            .addToGrinder().export(this.modLoadedOutput, PATH, "sky_dust", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "sky_dust", Oritech.MOD_ID);
         new PulverizerRecipeBuilder(registries)
             .input(cItemTag("gems/certus_quartz")).result(AEItems.CERTUS_QUARTZ_DUST.get())
-            .addToGrinder().export(this.modLoadedOutput, PATH, "certus_dust", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "certus_dust", Oritech.MOD_ID);
         new PulverizerRecipeBuilder(registries)
             .input(cItemTag("gems/fluix")).result(AEItems.FLUIX_DUST.get())
-            .addToGrinder().export(this.modLoadedOutput, PATH, "fluix_dust", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "fluix_dust", Oritech.MOD_ID);
 
         // fluxite in AE2 charger
         this.modLoadedOutput.accept(ResourceKey.create(Registries.RECIPE, Oritech.id(PATH + "/charger/fluxite")),

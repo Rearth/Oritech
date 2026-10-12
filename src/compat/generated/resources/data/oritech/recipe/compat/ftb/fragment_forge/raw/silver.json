@@ -1,0 +1,26 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "ftbmaterials:silver_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:silver_clump"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:silver_tiny_dust"
+    },
+    {
+      "count": 3,
+      "id": "ftbmaterials:copper_tiny_dust"
+    }
+  ],
+  "time": 40
+}

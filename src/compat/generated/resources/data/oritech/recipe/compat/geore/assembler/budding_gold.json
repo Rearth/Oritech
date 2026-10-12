@@ -5,7 +5,7 @@
       "modid": "geore"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "geore:gold_shard",
     "geore:gold_shard",
@@ -17,6 +17,5 @@
       "id": "geore:budding_gold"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 120
 }

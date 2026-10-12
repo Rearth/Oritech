@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:ores/ruby"
   ],
@@ -15,6 +15,5 @@
       "id": "ftbmaterials:ruby_gem"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

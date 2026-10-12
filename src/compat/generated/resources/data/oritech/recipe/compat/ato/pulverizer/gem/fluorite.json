@@ -5,7 +5,7 @@
       "modid": "alltheores"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:ores/fluorite"
   ],
@@ -15,6 +15,5 @@
       "id": "alltheores:fluorite"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

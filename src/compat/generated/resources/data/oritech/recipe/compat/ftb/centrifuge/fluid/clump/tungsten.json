@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "minecraft:water"
@@ -19,6 +19,5 @@
       "id": "ftbmaterials:tungsten_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 150
 }

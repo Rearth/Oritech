@@ -1,6 +1,8 @@
-// 26.1.2	2026-08-07T12:15:22.1221795	Ender IO Oritech Compat
+// 26.1.2	2026-10-12T11:58:47.2397671	Ender IO Oritech Compat
 68043abfc8cd9136e4bb53a3baa1ffcd16ac8158 data/oritech/advancement/recipes/misc/compat/enderio/crafting/fluid_pipe.json
-8b2b1d15ef19a6c47b787b5ebf08ed005a99cbae data/oritech/recipe/compat/enderio/centrifuge/fluid/sculk_xp.json
+459ccf159073c406872ad7b42f3df5c0381886ea data/oritech/recipe/compat/enderio/centrifuge/fluid/sculk_xp.json
 1ea097d6fb71e927146d4b1298925f65f2980083 data/oritech/recipe/compat/enderio/crafting/fluid_pipe.json
-435b6fb8149639a560b2942af7390d6546bdcd8e data/oritech/recipe/compat/enderio/pulverizer/dust/lapis.json
-24b07113e1da5191cb733838842ba7bfc5e2997b data/oritech/recipe/compat/enderio/pulverizer/dust/obsidian.json
+7e5ddabcbc4937484894f7c0b94ffb4c439ff364 data/oritech/recipe/compat/enderio/fragment_forge/dust/lapis.json
+6bf1316b0b3b78271c5f41a304c8b63c48a02faf data/oritech/recipe/compat/enderio/fragment_forge/dust/obsidian.json
+14f8a77b5dd46752c12edd81cd95402d64898298 data/oritech/recipe/compat/enderio/pulverizer/dust/lapis.json
+ce7394c4cf7838143d601b9b336f44d155ec2467 data/oritech/recipe/compat/enderio/pulverizer/dust/obsidian.json

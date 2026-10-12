@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:ores/sapphire"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:sapphire_gem"
+    }
+  ],
+  "time": 120
+}

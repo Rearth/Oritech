@@ -136,7 +136,7 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.ingredient(resource, ResourceType.STONE_ORE))
             .result(resolver.stack(resource, ResourceType.GEM, 2))
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "gem/" + resource.name().toLowerCase(), Oritech.MOD_ID);
     }
 
@@ -144,7 +144,7 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.ingredient(resource, ResourceType.GEM))
             .result(resolver.stack(resource, ResourceType.DUST))
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "dust/" + resource.name().toLowerCase(), Oritech.MOD_ID);
     }
 
@@ -152,7 +152,7 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.ingredient(resource, ResourceType.STONE_ORE))
             .result(resolver.stack(resource, ResourceType.DUST))
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "dust/" + resource.name().toLowerCase(), Oritech.MOD_ID);
     }
 

@@ -336,7 +336,7 @@ public class MetalProcessingChainBuilder {
         // ore block -> raw ores
         if (ore != null) {
             new PulverizerRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier).export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);
-            var grinderOreRecipe = new GrinderRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
+            var grinderOreRecipe = new FragmentForgeRecipeBuilder(registryAccess).input(ore).result(rawOreItem, 2).timeMultiplier(timeMultiplier);
             if (rawOreByproduct != null)
                 grinderOreRecipe.result(rawOreByproduct);
             grinderOreRecipe.export(exporter, prefix, "ore/" + metalName, Oritech.MOD_ID);

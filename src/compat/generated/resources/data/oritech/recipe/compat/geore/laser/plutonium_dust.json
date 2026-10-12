@@ -5,7 +5,7 @@
       "modid": "geore"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:laser",
   "itemInputs": [
     "geore:uranium_cluster"
   ],
@@ -14,6 +14,5 @@
       "id": "oritech:plutonium_dust"
     }
   ],
-  "recipeType": "oritech:laser",
   "time": 1
 }

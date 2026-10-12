@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge",
   "itemInputs": [
     "ftbmaterials:tin_clump"
   ],
@@ -18,6 +18,5 @@
       "id": "ftbmaterials:copper_tiny_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge",
   "time": 100
 }

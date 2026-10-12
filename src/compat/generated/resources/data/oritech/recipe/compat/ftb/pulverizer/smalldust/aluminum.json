@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "ftbmaterials:aluminum_nugget"
   ],
@@ -14,6 +14,5 @@
       "id": "ftbmaterials:aluminum_tiny_dust"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

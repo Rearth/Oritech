@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:foundry",
   "itemInputs": [
     "#c:ingots/iron",
     "#c:ingots/iron"
@@ -16,6 +16,5 @@
       "id": "ftbmaterials:invar_ingot"
     }
   ],
-  "recipeType": "oritech:foundry",
   "time": 80
 }

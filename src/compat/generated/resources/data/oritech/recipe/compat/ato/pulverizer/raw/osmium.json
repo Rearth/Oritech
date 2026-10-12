@@ -5,7 +5,7 @@
       "modid": "alltheores"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:raw_materials/osmium"
   ],
@@ -18,6 +18,5 @@
       "id": "alltheores:osmium_nugget"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

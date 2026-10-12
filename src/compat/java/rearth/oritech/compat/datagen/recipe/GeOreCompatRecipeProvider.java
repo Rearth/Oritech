@@ -1,29 +1,20 @@
 package rearth.oritech.compat.datagen.recipe;
 
-import java.util.List;
-import java.util.concurrent.CompletableFuture;
-
 import com.shynieke.geore.Reference;
 import com.shynieke.geore.registry.GeOreBlockReg;
 import com.shynieke.geore.registry.GeOreRegistry;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.ItemStackTemplate;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import rearth.oritech.Oritech;
 import rearth.oritech.datagen.builders.AssemblerRecipeBuilder;
-import rearth.oritech.datagen.builders.CentrifugeRecipeBuilder;
-import rearth.oritech.datagen.builders.LaserRecipeBuilder;
+import rearth.oritech.datagen.builders.EndericLaserRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
-import rearth.oritech.init.TagContent;
+
+import java.util.concurrent.CompletableFuture;
 
 public class GeOreCompatRecipeProvider extends RecipeProvider {
     private static final String PATH = "compat/geore";
@@ -48,14 +39,14 @@ public class GeOreCompatRecipeProvider extends RecipeProvider {
         }
 
         // enderic laser should yield plutonium dust when harvesting uranium clusters
-        new LaserRecipeBuilder(registries)
+        new EndericLaserRecipeBuilder(registries)
             .input(GeOreRegistry.URANIUM_GEORE.getCluster().get()).result(ItemContent.PLUTONIUM_DUST)
             .export(this.modLoadedOutput, PATH, "plutonium_dust", Oritech.MOD_ID);
 
         // pulverize quartz shards into quartz dust, no need for intermediate smelting
         new PulverizerRecipeBuilder(registries)
             .input(GeOreRegistry.QUARTZ_GEORE.getShard().get()).result(ItemContent.QUARTZ_DUST)
-            .addToGrinder().export(this.modLoadedOutput, PATH, "quartz_dust", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "quartz_dust", Oritech.MOD_ID);
     }
 
     public static class Runner extends RecipeProvider.Runner {

@@ -5,7 +5,7 @@
       "modid": "geore"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "geore:topaz_shard",
     "geore:topaz_shard",
@@ -17,6 +17,5 @@
       "id": "geore:budding_topaz"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 120
 }

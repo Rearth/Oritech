@@ -5,7 +5,7 @@
       "modid": "alltheores"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:foundry",
   "itemInputs": [
     "#c:ingots/copper",
     "#c:ingots/zinc"
@@ -15,6 +15,5 @@
       "id": "alltheores:brass_ingot"
     }
   ],
-  "recipeType": "oritech:foundry",
   "time": 80
 }

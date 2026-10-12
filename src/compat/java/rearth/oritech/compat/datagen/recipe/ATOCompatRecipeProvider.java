@@ -118,7 +118,7 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.itemTag(material, BlockPartType.STONE_ORE))
             .result(resolver.item(material, ItemPartType.GEM), 2)
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "gem/" + material.getGroup(), Oritech.MOD_ID);
     }
 
@@ -126,7 +126,7 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.itemTag(material, ItemPartType.GEM))
             .result(resolver.item(material, ItemPartType.DUST))
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "dust/" + material.getGroup(), Oritech.MOD_ID);
     }
 
@@ -134,7 +134,7 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
         new PulverizerRecipeBuilder(this.registries)
             .input(resolver.itemTag(material, BlockPartType.STONE_ORE))
             .result(resolver.item(material, ItemPartType.DUST))
-            .addToGrinder()
+            .addToFragmentForge()
             .export(this.modLoadedOutput, PATH, "dust/" + material.getGroup(), Oritech.MOD_ID);
     }
 

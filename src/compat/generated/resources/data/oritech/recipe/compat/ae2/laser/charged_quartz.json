@@ -5,7 +5,7 @@
       "modid": "ae2"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:laser",
   "itemInputs": [
     "ae2:quartz_cluster"
   ],
@@ -14,6 +14,5 @@
       "id": "ae2:charged_certus_quartz_crystal"
     }
   ],
-  "recipeType": "oritech:laser",
   "time": 1
 }

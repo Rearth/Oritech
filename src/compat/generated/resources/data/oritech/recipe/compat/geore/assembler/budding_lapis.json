@@ -5,7 +5,7 @@
       "modid": "geore"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "geore:lapis_shard",
     "geore:lapis_shard",
@@ -17,6 +17,5 @@
       "id": "geore:budding_lapis"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 120
 }

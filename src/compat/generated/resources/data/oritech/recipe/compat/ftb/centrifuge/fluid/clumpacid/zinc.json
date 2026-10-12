@@ -5,7 +5,7 @@
       "modid": "ftbmaterials"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:centrifuge_fluid",
   "fluidInput": {
     "amount": 1000,
     "ingredient": "oritech:still_sulfuric_acid"
@@ -25,6 +25,5 @@
       "id": "ftbmaterials:zinc_dust"
     }
   ],
-  "recipeType": "oritech:centrifuge_fluid",
   "time": 150
 }

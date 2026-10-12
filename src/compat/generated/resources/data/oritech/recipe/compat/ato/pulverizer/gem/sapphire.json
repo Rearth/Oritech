@@ -5,7 +5,7 @@
       "modid": "alltheores"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:ores/sapphire"
   ],
@@ -15,6 +15,5 @@
       "id": "alltheores:sapphire"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

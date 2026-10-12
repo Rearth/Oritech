@@ -55,6 +55,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @SyncField({SyncType.GUI_OPEN, SyncType.SPARSE_TICK})
     public int range = 1;
 
+    private boolean removeFluids = true;
+
     // non-persistent
     @SyncField
     public BlockPos quarryTarget = BlockPos.ZERO;

@@ -45,10 +45,10 @@ public class EnderIOCompatRecipeProvider extends RecipeProvider {
         // EnderIO and Mekanism recipes are both equivalent, and both mods can use either obsidian dust. Loading both recipes shouldn't be a problem.
         new PulverizerRecipeBuilder(registries)
             .input(Tags.Items.OBSIDIANS).result(EIOItems.POWDERED_OBSIDIAN.get(), 4).time(140)
-            .addToGrinder().export(this.modLoadedOutput, PATH, "dust/obsidian", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "dust/obsidian", Oritech.MOD_ID);
         new PulverizerRecipeBuilder(registries)
             .input(Tags.Items.GEMS_LAPIS).result(EIOItems.POWDERED_LAPIS_LAZULI.get()).time(120)
-            .addToGrinder().export(this.modLoadedOutput, PATH, "dust/lapis", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "dust/lapis", Oritech.MOD_ID);
 
         var conduitBinder = EIOItems.CONDUIT_BINDER.get();
         RecipeHelpers.createInsulatedCableRecipe(RecipeCategory.MISC,

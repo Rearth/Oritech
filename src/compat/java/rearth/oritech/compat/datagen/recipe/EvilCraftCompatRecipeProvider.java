@@ -47,13 +47,13 @@ public class EvilCraftCompatRecipeProvider extends RecipeProvider {
         // crushing gem
         new PulverizerRecipeBuilder(registries)
             .input(RegistryEntries.ITEM_DARK_GEM.get()).result(RegistryEntries.ITEM_DARK_GEM_CRUSHED.get())
-            .addToGrinder().export(this.modLoadedOutput, PATH, "crushed_dark_gem", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "crushed_dark_gem", Oritech.MOD_ID);
         
         // dark ore processing
         new PulverizerRecipeBuilder(registries)
             .input(itemTag(Reference.MOD_ID, "dark_ores")).result(RegistryEntries.ITEM_DARK_GEM.get(), 2)
             .result(RegistryEntries.ITEM_DARK_GEM_CRUSHED.get())
-            .addToGrinder().export(this.modLoadedOutput, PATH, "dark_ores", Oritech.MOD_ID);
+            .addToFragmentForge().export(this.modLoadedOutput, PATH, "dark_ores", Oritech.MOD_ID);
     }
 
     public static class Runner extends RecipeProvider.Runner {

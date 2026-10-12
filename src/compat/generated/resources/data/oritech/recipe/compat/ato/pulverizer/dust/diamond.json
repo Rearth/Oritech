@@ -5,7 +5,7 @@
       "modid": "alltheores"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:pulverizer",
   "itemInputs": [
     "#c:gems/diamond"
   ],
@@ -14,6 +14,5 @@
       "id": "alltheores:diamond_dust"
     }
   ],
-  "recipeType": "oritech:pulverizer",
   "time": 100
 }

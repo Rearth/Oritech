@@ -5,7 +5,7 @@
       "modid": "geore"
     }
   ],
-  "type": "oritech:machine_recipe",
+  "type": "oritech:assembler",
   "itemInputs": [
     "geore:allthemodium_shard",
     "geore:allthemodium_shard",
@@ -17,6 +17,5 @@
       "id": "geore:budding_allthemodium"
     }
   ],
-  "recipeType": "oritech:assembler",
   "time": 120
 }

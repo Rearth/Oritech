@@ -17,7 +17,7 @@ import owmii.powah.Powah;
 import owmii.powah.block.energizing.EnergizingRecipe;
 import rearth.oritech.Oritech;
 import rearth.oritech.datagen.builders.CentrifugeRecipeBuilder;
-import rearth.oritech.datagen.builders.LaserRecipeBuilder;
+import rearth.oritech.datagen.builders.EndericLaserRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;

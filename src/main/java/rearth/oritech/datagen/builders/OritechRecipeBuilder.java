@@ -204,12 +204,10 @@ public abstract class OritechRecipeBuilder {
     }
 
     public void export(RecipeOutput exporter, String suffix, String namespace) {
-        var id = Identifier.fromNamespaceAndPath(namespace, String.join("/", resourcePath, suffix));
-        export(exporter, id);
+        export(exporter, null, suffix, namespace);
     }
 
     public void export(RecipeOutput exporter, String suffix) {
-        var id = Identifier.fromNamespaceAndPath(Oritech.MOD_ID, String.join("/", resourcePath, suffix));
-        export(exporter, id);
+        export(exporter, null, suffix, Oritech.MOD_ID);
     }
 }
