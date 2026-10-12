@@ -7,6 +7,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -216,9 +217,10 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
             ParticleContent.sendParticles(sl, ParticleTypes.CLOUD, emitPosition.x, emitPosition.y, emitPosition.z, 1, 0.6, 0.6, 0.6, 0);
     }
 
-    private float getSteamEnergyEfficiency(float x) {
-        // basically a curve that goes through 0:0.5, 7:1 and 10:0.2
-        return (float) (0.5f - 0.1966667f * x + 0.09166667f * Math.pow(x, 2) - 0.0075f * Math.pow(x, 3)) + 0.4f;
+    private float getSteamEnergyEfficiency(float speed) {
+        // Normalized to the old curve range: 90% at idle, ~144% at 70% speed, 60% at full speed.
+        var x = Mth.clamp(speed / MAX_SPEED, 0f, 1f) * 10f; // remap from 0 -> maxspeed to old range 0-10
+        return 0.9f + x * (-0.1966667f + x * (0.09166667f - 0.0075f * x));
     }
 
     @Override
