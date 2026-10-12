@@ -217,14 +217,6 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         for (int i = 0; i < slotCount; i++) {
             int y = i * 19;
             addComponent(new ItemSlotWidget(slotX, y));
-
-            var bgTexture = getEquipmentSlotTexture(i);
-            if (bgTexture != null) {
-                var bg = new TextureWidget(slotX + 1, y + 1, 16, 16,
-                        bgTexture, 0, 0, 16, 16, 16, 16);
-                bg.withZIndex(-1);
-                addComponent(bg);
-            }
         }
 
         equipmentBounds = new Rect2i(slotX - 6, -6, 30, (slotCount - 1) * 19 + 18 + 12);
@@ -234,17 +226,6 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         equipBg.withSurface(OritechSurface.PANEL);
         equipBg.withZIndex(-10);
         addComponent(equipBg);
-    }
-
-    protected Identifier getEquipmentSlotTexture(int armorSlot) {
-        return switch (armorSlot) {
-            case 0 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_boots.png");
-            case 1 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_leggings.png");
-            case 2 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_chestplate.png");
-            case 3 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_armor_slot_helmet.png");
-            case 4 -> Identifier.fromNamespaceAndPath("minecraft", "textures/item/empty_slot_axe.png");
-            default -> null;
-        };
     }
 
     // TODO: re-enable once Oracle Index is available for 26.1
