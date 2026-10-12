@@ -1,0 +1,17 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "powah"
+    }
+  ],
+  "type": "powah:energizing",
+  "energy": 20000,
+  "ingredients": [
+    "#c:ingots/nickel",
+    "oritech:fluxite"
+  ],
+  "result": {
+    "id": "oritech:energite_ingot"
+  }
+}

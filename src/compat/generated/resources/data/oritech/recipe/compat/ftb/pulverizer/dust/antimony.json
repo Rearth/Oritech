@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "#c:ingots/antimony"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:antimony_dust"
+    }
+  ],
+  "time": 100
+}

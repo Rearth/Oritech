@@ -36,7 +36,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected static final SpaceSimulation.ActionType[] EDITABLE_ACTION_TYPES = {
             SpaceSimulation.ActionType.NAVIGATE_TO, SpaceSimulation.ActionType.CONNECT_ASTEROID,
             SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.MAINTAIN_POSITION,
-            SpaceSimulation.ActionType.DISCARD_CRAFT, SpaceSimulation.ActionType.DETONATE, SpaceSimulation.ActionType.SCAN,
+            SpaceSimulation.ActionType.DISCARD_CRAFT, SpaceSimulation.ActionType.SCAN,
             SpaceSimulation.ActionType.PROCESS, SpaceSimulation.ActionType.DOCK,
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
     };

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:gems/diamond",
+    "r": "oritech:enderic_compound",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    " c ",
+    "rsr",
+    " c "
+  ],
+  "result": {
+    "id": "oritech:resource_node_resonator"
+  }
+}

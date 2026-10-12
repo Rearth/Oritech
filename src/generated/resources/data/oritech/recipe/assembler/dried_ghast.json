@@ -1,0 +1,15 @@
+{
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "minecraft:soul_sand",
+    "minecraft:ghast_tear",
+    "minecraft:ghast_tear",
+    "minecraft:ghast_tear"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:dried_ghast"
+    }
+  ],
+  "time": 96
+}

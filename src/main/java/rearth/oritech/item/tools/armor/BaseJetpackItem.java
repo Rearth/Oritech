@@ -233,7 +233,7 @@ public interface BaseJetpackItem extends OritechEnergyItem, FluidProvider.Item, 
         if (includeEnergy) builder.accept(text.withStyle(ChatFormatting.GOLD));
 
         var container = getStoredFluid(stack);
-        var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidType.BUCKET_VOLUME, getFuelCapacity() * 1000 / FluidType.BUCKET_VOLUME, container.getHoverName().getString());
+        var fluidText = Component.translatable("tooltip.oritech.jetpack_fuel", container.getAmount() * 1000 / FluidType.BUCKET_VOLUME, getFuelCapacity() * 1000 / FluidType.BUCKET_VOLUME);
         builder.accept(fluidText);
     }
 

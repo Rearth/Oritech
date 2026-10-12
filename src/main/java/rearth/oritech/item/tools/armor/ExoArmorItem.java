@@ -9,6 +9,9 @@ import com.geckolib.animation.object.PlayState;
 import com.geckolib.renderer.GeoArmorRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -48,6 +51,11 @@ public class ExoArmorItem extends Item implements GeoItem, ArmorEventHandler {
 
     public EquipmentSlot getEquipmentSlot() {
         return this.type.getSlot();
+    }
+
+    @Override
+    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
+        return (!enchantment.is(Enchantments.UNBREAKING) || this instanceof BaseJetpackItem) && super.supportsEnchantment(stack, enchantment);
     }
 
     @Override

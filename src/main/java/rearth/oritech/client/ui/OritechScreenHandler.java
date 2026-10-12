@@ -9,6 +9,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -45,9 +47,9 @@ import java.util.Objects;
  */
 public class OritechScreenHandler extends AbstractContainerMenu implements MachineMenuHandler {
 
-    /** Player-inventory armor slots, ordered to match the displayed equipment column (feet, legs, chest, head). */
+    /** Player-inventory armor slots, ordered to match the displayed equipment column (head, chest, legs, feet). */
     private static final EquipmentSlot[] ARMOR_EQUIPMENT_SLOTS = {
-            EquipmentSlot.FEET, EquipmentSlot.LEGS, EquipmentSlot.CHEST, EquipmentSlot.HEAD
+            EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET
     };
 
     @NotNull
@@ -156,7 +158,18 @@ public class OritechScreenHandler extends AbstractContainerMenu implements Machi
             armorSlots = new ArrayList<>(5);
             for (int i = 0; i < ARMOR_EQUIPMENT_SLOTS.length + 1; i++) {
                 final var armorIndex = i;
-                var slot = this.addSlot(new Slot(playerInventory, 36 + i, -20, i * 19) {
+                var slot = this.addSlot(new Slot(playerInventory, i < ARMOR_EQUIPMENT_SLOTS.length ? 39 - i : 40, -20, i * 19) {
+                    @Override
+                    public Identifier getNoItemIcon() {
+                        return switch (armorIndex) {
+                            case 0 -> InventoryMenu.EMPTY_ARMOR_SLOT_HELMET;
+                            case 1 -> InventoryMenu.EMPTY_ARMOR_SLOT_CHESTPLATE;
+                            case 2 -> InventoryMenu.EMPTY_ARMOR_SLOT_LEGGINGS;
+                            case 3 -> InventoryMenu.EMPTY_ARMOR_SLOT_BOOTS;
+                            default -> InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
+                        };
+                    }
+
                     @Override
                     public boolean mayPlace(ItemStack stack) {
                         if (armorIndex >= ARMOR_EQUIPMENT_SLOTS.length) return super.mayPlace(stack); // offhand slot

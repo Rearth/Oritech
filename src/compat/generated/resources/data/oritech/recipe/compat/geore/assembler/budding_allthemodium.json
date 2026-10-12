@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "geore:allthemodium_shard",
+    "geore:allthemodium_shard",
+    "oritech:enderic_compound",
+    "oritech:overcharged_crystal"
+  ],
+  "itemResults": [
+    {
+      "id": "geore:budding_allthemodium"
+    }
+  ],
+  "time": 120
+}

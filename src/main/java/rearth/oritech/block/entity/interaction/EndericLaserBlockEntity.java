@@ -70,6 +70,7 @@ import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
@@ -79,7 +80,6 @@ import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.util.*;
-import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 import java.util.stream.Collectors;

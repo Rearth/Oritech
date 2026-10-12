@@ -38,6 +38,7 @@ import rearth.oritech.item.tools.Wrench;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wrench.Wrenchable, SimpleWaterloggedBlock {
@@ -209,13 +210,19 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
      * @param neighborToggled Whether the neighbor was toggled
      */
     public void updateNeighbors(Level level, BlockPos pos, boolean neighborToggled) {
+        var previousStates = new LinkedHashMap<BlockPos, BlockState>();
         for (var direction : Direction.values()) {
             var neighborPos = pos.relative(direction);
             var neighborState = level.getBlockState(neighborPos);
             // Only update pipes
             if (neighborState.getBlock() instanceof AbstractPipeBlock pipeBlock) {
                 var updatedState = pipeBlock.addConnectionStates(neighborState, level, neighborPos, false);
-                level.setBlockAndUpdate(neighborPos, updatedState);
+                // Set every side before notifying: callbacks can otherwise copy a stale
+                // disconnected side back onto the pipe being placed between neighbors.
+                if (!neighborState.equals(updatedState)) {
+                    previousStates.put(neighborPos, neighborState);
+                    level.setBlock(neighborPos, updatedState, Block.UPDATE_KNOWN_SHAPE);
+                }
 
                 // Update network data if the state was changed
                 if (!neighborState.equals(updatedState) || pipeBlock instanceof GenericPipeDuctBlock) {
@@ -225,6 +232,8 @@ public abstract class GenericPipeBlock extends AbstractPipeBlock implements Wren
                 }
             }
         }
+        previousStates.forEach((neighborPos, previousState) -> level.markAndNotifyBlock(neighborPos, level.getChunkAt(neighborPos),
+                previousState, level.getBlockState(neighborPos), Block.UPDATE_ALL, Block.UPDATE_LIMIT));
     }
 
     @Override

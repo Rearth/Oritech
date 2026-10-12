@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "#c:ores/ruby"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:ruby_gem"
+    }
+  ],
+  "time": 100
+}

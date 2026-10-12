@@ -3,9 +3,9 @@ package rearth.oritech.client.init;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -16,12 +16,12 @@ import rearth.oritech.api.networking.NetworkManager;
 
 public class ParticleContent {
 
+    // public stuff
+
     public enum EffectType {
         HIGHLIGHT_BLOCK, WEED_KILLER, DEBUG_BLOCK, WANDERING_SOUL,
-        LASER_BOOM, CATALYST_CONNECTION, BLACK_HOLE_EMISSION, ACCELERATING
+        LASER_BOOM, CATALYST_CONNECTION, BLACK_HOLE_EMISSION, ACCELERATING, RESONATOR_DIRECTION, RESONATOR_SCAN
     }
-
-    // public stuff
 
     public static void HighlightBlock(Level level, Vec3 pos) {
         sendParticle(level, new Payload(EffectType.HIGHLIGHT_BLOCK, pos, Vec3.ZERO, Vec3.ZERO, 0));

@@ -38,6 +38,7 @@ import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
 import rearth.oritech.block.entity.augmenter.CyberneticAugmentationCenterEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.EndericLaserBlockEntity;
+import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.block.entity.pipes.ItemPipeInterfaceEntity;
@@ -95,6 +96,7 @@ public class NetworkManager {
     }
 
     public static void initServerBound(PayloadRegistrar registrar) {
+        registrar.playToServer(DestroyerBlockEntity.FluidRemovalPacket.PACKET_ID, getAutoCodec(DestroyerBlockEntity.FluidRemovalPacket.class), DestroyerBlockEntity::receiveFluidRemovalPacket);
         registrar.playToServer(ItemFilterBlockEntity.ItemFilterPayload.FILTER_PACKET_ID, ItemFilterBlockEntity.ItemFilterPayload.PACKET_CODEC, ItemFilterBlockEntity::handleClientUpdate);
         registrar.playToServer(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.PACKET_ID, getAutoCodec(StabilizedEnchanterBlockEntity.SelectEnchantingPacket.class), StabilizedEnchanterBlockEntity::receiveEnchantmentSelection);
         registrar.playToServer(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.PACKET_ID, getAutoCodec(RedstoneAddonBlockEntity.RedstoneAddonServerUpdate.class), RedstoneAddonBlockEntity::receiveOnServer);

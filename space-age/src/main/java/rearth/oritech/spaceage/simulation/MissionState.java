@@ -79,8 +79,7 @@ public final class MissionState {
     public List<SpaceSimulation.SpaceObjectData> legObjects = List.of();
     public String route = "communication.oritech_space_age.no_route";
     public boolean connected;
-    public boolean canTransmit;
-    public SpaceCommunications.Connection communication = new SpaceCommunications.Connection(false, false, 0, 0,
+    public SpaceCommunications.Connection communication = new SpaceCommunications.Connection(false, 0, 0,
             "communication.oritech_space_age.no_ground");
     RocketFlightPathCalculator.FlightPath path;
     boolean ended;

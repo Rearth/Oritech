@@ -26,6 +26,7 @@ import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.fluid.ItemAccessFluidHandler;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
@@ -213,7 +214,9 @@ public class ToolsContent {
                     return new ItemAccessEnergyHandler(itemAccess, ComponentContent.ENERGY.get(), tool.getEnergyCapacity(), tool.getMaxRFInputRate(), tool.getMaxRFOutputRate());
                 },
                 HAND_DRILL, CHAINSAW, ELECTRIC_MACE, ENDERIC_RAILGUN, EXO_CHESTPLATE,
-                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_ENERGY_STORAGE_ITEM
+                JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_ENERGY_STORAGE_ITEM,
+                ItemContent.GEODE_RESONATOR, ItemContent.PLATINUM_RESONATOR, ItemContent.NETHERITE_RESONATOR,
+                ItemContent.OIL_RESONATOR, ItemContent.RESOURCE_NODE_RESONATOR
         );
 
         event.registerItem(
@@ -223,7 +226,14 @@ public class ToolsContent {
                     if (stack.getItem() instanceof SmallFluidTankBlockItem) {
                         return new PortableTankFluidHandler(itemAccess, tool.getFluidCapacity());
                     }
-                    return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getFluidCapacity());
+
+                    // for jetpacks, accepts only turbofuel
+                    return new ItemAccessFluidHandler(itemAccess, ComponentContent.STORED_FLUID.get(), tool.getFluidCapacity()) {
+                        @Override
+                        public boolean isValid(int index, FluidResource resource) {
+                            return super.isValid(index, resource) && resource.is(TagContent.TURBOFUEL);
+                        }
+                    };
                 },
                 JETPACK, EXO_JETPACK, JETPACK_ELYTRA, JETPACK_EXO_ELYTRA, ItemContent.PORTABLE_TANK_ITEM, ItemContent.CREATIVE_TANK_ITEM
         );

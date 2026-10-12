@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "minecraft:water"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "id": "enderio:fluid_xp_juice_still"
+    }
+  ],
+  "itemInputs": [
+    "minecraft:sculk"
+  ],
+  "itemResults": [],
+  "time": 100
+}

@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "#c:obsidians"
+  ],
+  "itemResults": [
+    {
+      "count": 4,
+      "id": "enderio:powdered_obsidian"
+    }
+  ],
+  "time": 140
+}

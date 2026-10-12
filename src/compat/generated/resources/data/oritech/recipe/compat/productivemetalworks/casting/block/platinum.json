@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "productivemetalworks"
+    },
+    {
+      "type": "neoforge:not",
+      "value": {
+        "type": "neoforge:or",
+        "values": [
+          {
+            "type": "neoforge:mod_loaded",
+            "modid": "alltheores"
+          },
+          {
+            "type": "neoforge:mod_loaded",
+            "modid": "ftbmaterials"
+          }
+        ]
+      }
+    }
+  ],
+  "type": "productivemetalworks:block_casting",
+  "consume_cast": false,
+  "fluid": {
+    "amount": 810,
+    "ingredient": "productivemetalworks:molten_platinum"
+  },
+  "result": {
+    "id": "oritech:platinum"
+  }
+}

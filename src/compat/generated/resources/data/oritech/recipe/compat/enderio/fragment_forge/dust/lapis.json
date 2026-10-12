@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "enderio"
+    }
+  ],
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:gems/lapis"
+  ],
+  "itemResults": [
+    {
+      "id": "enderio:powdered_lapis_lazuli"
+    }
+  ],
+  "time": 140
+}

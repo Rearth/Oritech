@@ -1,5 +1,6 @@
 package rearth.oritech.block.entity.pipes;
 
+import dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -18,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -206,16 +208,16 @@ public class ItemFilterBlockEntity extends NetworkedBlockEntity implements ItemP
 
             for (var filterItem : filterSettings.items.values()) {
 
-                // todo
-//                if (ModList.get().isLoaded("ftbfiltersystem")) {
-//                    var filterApi = dev.ftb.mods.ftbfiltersystem.api.FTBFilterSystemAPI.api();
-//                    if (filterApi.isFilterItem(filterItem)) {
-//                        if (filterApi.doesFilterMatch(filterItem, stack, getLevel().registryAccess())) {
-//                            matchesFilterItems = true;
-//                            break;
-//                        }
-//                    }
-//                }
+                if (ModList.get().isLoaded("ftbfiltersystem")) {
+                    var filterApi = FTBFilterSystemAPI.api();
+                    if (filterApi.isFilterItem(filterItem)) {
+                        if (filterApi.doesFilterMatch(filterItem, stack, getLevel().registryAccess())) {
+                            matchesFilterItems = true;
+                            break;
+                        }
+                        continue;
+                    }
+                }
 
                 var matchesType = stack.getItem().equals(filterItem.getItem());
                 if (!matchesType) continue;

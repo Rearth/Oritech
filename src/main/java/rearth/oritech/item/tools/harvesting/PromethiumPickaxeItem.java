@@ -13,6 +13,9 @@ import com.geckolib.util.GeckoLibUtil;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -63,6 +66,11 @@ public class PromethiumPickaxeItem extends Item implements GeoItem {
     public PromethiumPickaxeItem(Properties properties) {
         super(properties);
         SingletonGeoAnimatable.registerSyncedAnimatable(this);
+    }
+
+    @Override
+    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
+        return !enchantment.is(Enchantments.UNBREAKING) && super.supportsEnchantment(stack, enchantment);
     }
 
     @Override

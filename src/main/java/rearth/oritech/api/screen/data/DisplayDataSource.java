@@ -11,6 +11,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.base.entity.UpgradableGeneratorBlockEntity;
 import rearth.oritech.block.entity.arcane.StabilizedEnchanterBlockEntity;
 import rearth.oritech.block.entity.generators.BasicGeneratorEntity;
+import rearth.oritech.block.entity.processing.AtomicForgeBlockEntity;
 import rearth.oritech.util.ScreenProvider;
 import rearth.oritech.util.TooltipHelper;
 
@@ -163,6 +164,11 @@ public abstract class DisplayDataSource {
     }
 
     public static Component getProgressTooltip(BlockEntity blockEntity) {
+        if (blockEntity instanceof AtomicForgeBlockEntity forge) {
+            var storage = forge.energyStorage;
+            return getEnergyTooltip(storage.getAmountAsLong(), storage.getCapacityAsLong(), 0, 0, false, false);
+        }
+
         if (blockEntity instanceof MachineBlockEntity machineEntity
                 && (machineEntity.getRecipeDuration() > 0 || machineEntity.getProgress() > 0)) {
 

@@ -10,6 +10,15 @@
     "oritech:diamond_resource_node",
     "oritech:coal_resource_node",
     "oritech:uranium_resource_node",
-    "oritech:platinum_resource_node"
+    "oritech:platinum_resource_node",
+    "oritech:aluminum_resource_node",
+    "oritech:lead_resource_node",
+    "oritech:osmium_resource_node",
+    "oritech:silver_resource_node",
+    "oritech:tin_resource_node",
+    "oritech:zinc_resource_node",
+    "oritech:iridium_resource_node",
+    "oritech:tungsten_resource_node",
+    "oritech:titanium_resource_node"
   ]
 }

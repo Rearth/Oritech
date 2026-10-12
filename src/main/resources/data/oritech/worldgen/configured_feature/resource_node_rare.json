@@ -5,45 +5,82 @@
     "nodeOreChance": 0.2,
     "boulderRadius": 3,
     "nodeOres": [
-      "oritech:diamond_resource_node",
-      "oritech:diamond_resource_node",
-      "oritech:gold_resource_node",
-      "oritech:emerald_resource_node",
-      "oritech:uranium_resource_node",
-      "oritech:platinum_resource_node"
+      {
+        "block": "oritech:diamond_resource_node",
+        "weight": 2
+      },
+      {
+        "block": "oritech:gold_resource_node"
+      },
+      {
+        "block": "oritech:emerald_resource_node"
+      },
+      {
+        "block": "oritech:uranium_resource_node"
+      },
+      {
+        "block": "oritech:platinum_resource_node"
+      },
+      {
+        "block": "oritech:iridium_resource_node",
+        "required": false,
+        "requiresAny": [
+          "alltheores:deepslate_iridium_ore",
+          "ftbmaterials:iridium_deepslate_ore"
+        ]
+      },
+      {
+        "block": "oritech:tungsten_resource_node",
+        "required": false,
+        "requiresAny": [
+          "ftbmaterials:tungsten_deepslate_ore"
+        ]
+      },
+      {
+        "block": "oritech:titanium_resource_node",
+        "required": false,
+        "requiresAny": [
+          "ftbmaterials:titanium_deepslate_ore"
+        ]
+      }
     ],
     "boulderOres": [
-      "minecraft:deepslate_diamond_ore",
-      "minecraft:deepslate_gold_ore",
-      "minecraft:deepslate_gold_ore",
-      "minecraft:deepslate_emerald_ore",
-      "oritech:deepslate_platinum_ore",
-      "oritech:deepslate_uranium_ore",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate"
+      {
+        "block": "minecraft:deepslate_diamond_ore"
+      },
+      {
+        "block": "minecraft:deepslate_gold_ore",
+        "weight": 2
+      },
+      {
+        "block": "minecraft:deepslate_emerald_ore"
+      },
+      {
+        "block": "oritech:deepslate_platinum_ore"
+      },
+      {
+        "block": "oritech:deepslate_uranium_ore"
+      },
+      {
+        "block": "alltheores:deepslate_iridium_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:iridium_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:tungsten_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:titanium_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "minecraft:deepslate",
+        "weight": 32
+      }
     ],
     "overlayBlock": "oritech:still_fuel_block",
     "overlayHeight": 5

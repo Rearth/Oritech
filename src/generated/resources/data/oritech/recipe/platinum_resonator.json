@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:ingots/nickel",
+    "r": "oritech:enderic_compound",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    " c ",
+    "rsr",
+    " c "
+  ],
+  "result": {
+    "id": "oritech:platinum_resonator"
+  }
+}

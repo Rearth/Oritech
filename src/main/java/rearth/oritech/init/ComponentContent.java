@@ -1,7 +1,7 @@
 package rearth.oritech.init;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -26,8 +26,8 @@ public class ComponentContent {
             "energy", builder -> builder.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT)
     );
 
-    public static final Supplier<DataComponentType<BlockPos>> TARGET_POSITION = COMPONENTS.registerComponentType(
-            "target_position", builder -> builder.persistent(BlockPos.CODEC).networkSynchronized(BlockPos.STREAM_CODEC)
+    public static final Supplier<DataComponentType<GlobalPos>> TARGET_GLOBAL_POSITION = COMPONENTS.registerComponentType(
+            "target_global_position", builder -> builder.persistent(GlobalPos.CODEC).networkSynchronized(GlobalPos.STREAM_CODEC)
     );
 
     public static final Supplier<DataComponentType<SimpleFluidContent>> STORED_FLUID = COMPONENTS.registerComponentType(

@@ -25,6 +25,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
     
     @Override
     protected void addTags(HolderLookup.Provider arg) {
+        tag(TagContent.GEODE_TARGETS).add(Blocks.BUDDING_AMETHYST);
         
         var pickaxeBuilder = this.tag(BlockTags.MINEABLE_WITH_PICKAXE);
         
@@ -125,7 +126,16 @@ public class BlockTagGenerator extends BlockTagsProvider {
           .add(BlockContent.DIAMOND_RESOURCE_NODE.get())
           .add(BlockContent.COAL_RESOURCE_NODE.get())
           .add(BlockContent.URANIUM_RESOURCE_NODE.get())
-          .add(BlockContent.PLATINUM_RESOURCE_NODE.get());
+          .add(BlockContent.PLATINUM_RESOURCE_NODE.get())
+          .add(BlockContent.ALUMINUM_RESOURCE_NODE.get())
+          .add(BlockContent.LEAD_RESOURCE_NODE.get())
+          .add(BlockContent.OSMIUM_RESOURCE_NODE.get())
+          .add(BlockContent.SILVER_RESOURCE_NODE.get())
+          .add(BlockContent.TIN_RESOURCE_NODE.get())
+          .add(BlockContent.ZINC_RESOURCE_NODE.get())
+          .add(BlockContent.IRIDIUM_RESOURCE_NODE.get())
+          .add(BlockContent.TUNGSTEN_RESOURCE_NODE.get())
+          .add(BlockContent.TITANIUM_RESOURCE_NODE.get());
         
         this.tag(TagContent.LASER_PASSTHROUGH)
                 .addTag(Tags.Blocks.GLASS_BLOCKS)

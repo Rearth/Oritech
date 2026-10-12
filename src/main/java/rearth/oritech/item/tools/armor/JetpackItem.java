@@ -92,7 +92,7 @@ public class JetpackItem extends Item implements GeoItem, BaseJetpackItem {
             @Override
             public @NonNull GeoArmorRenderer<?, ?> getGeoArmorRenderer(ItemStack itemStack, EquipmentSlot equipmentSlot) {
                 if (this.renderer == null)
-                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/exo_armor"));
+                    this.renderer = new ExosuitArmorRenderer(Oritech.id("armor/basic_jetpack"), Oritech.id("armor/basic_jetpack"));
 
                 return this.renderer;
             }

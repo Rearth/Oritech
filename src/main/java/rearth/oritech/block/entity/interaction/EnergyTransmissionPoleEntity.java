@@ -48,6 +48,7 @@ import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -55,7 +56,6 @@ import rearth.oritech.init.SoundContent;
 import rearth.oritech.util.InventoryInputMode;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.ScreenProvider;
-import rearth.oritech.client.init.ParticleContent;
 
 import java.util.*;
 

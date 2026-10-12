@@ -108,7 +108,7 @@ public interface ScreenProvider {
 
     default Optional<String> getWikiLink() {
         return Optional.empty();
-    } // optional override. Expected format is "interaction/enderic_laser". Defaults to the item link defined in the pages markdown.
+    } // optional content page reference, e.g. "enderic_laser". Defaults to the item ID defined in the page's frontmatter.
 
     default ArrowConfiguration getIndicatorConfiguration() {
         return new ArrowConfiguration(

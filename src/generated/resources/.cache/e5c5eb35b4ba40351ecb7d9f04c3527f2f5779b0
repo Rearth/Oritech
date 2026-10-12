@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-07T12:53:18.281871	Advancements
+// 26.1.2	2026-10-12T21:56:20.4048423	Advancements
 b7e74f406f93be9e4d12380a7b89777a4256c151 data/minecraft/advancement/oritech/ai.json
 cb7678be902015d4395ab3a4580c0136e30329e4 data/minecraft/advancement/oritech/assembler.json
 dadc19aea4506321a8516adac6a9a3fa2b931861 data/minecraft/advancement/oritech/atomicforge.json
@@ -21,6 +21,7 @@ e59d0f79785dfe361683a3d2614a62b4183d76ed data/minecraft/advancement/oritech/plas
 4a0630fe552b851cdece103985b2f8e73b535184 data/minecraft/advancement/oritech/promethium.json
 c0c5a8a43d0bd89136c83514f9bb5898fb5ca7b1 data/minecraft/advancement/oritech/pulverizer.json
 d716486f6e982f575bdbf9d37831b9db73588e6a data/minecraft/advancement/oritech/reactor.json
+1e15d602fc2221b75245bc89a601e3635e30e1cf data/minecraft/advancement/oritech/resonator.json
 a5be85a8089858223ed2174a5bf1655b2ece111d data/minecraft/advancement/oritech/resource_node.json
 203f7ff7abba09037b3795c188121b9f1c4ad9fa data/minecraft/advancement/oritech/root.json
 f4ce6bdfaaeed3050e23bb8eb71fded7b8888c56 data/minecraft/advancement/oritech/steam_engine.json

@@ -24,7 +24,7 @@ public class MissionControlMenu extends RocketAssemblerMenu {
     public int telemetryRevision;
     public boolean connected;
     public SpaceCommunications.NetworkStatus network =
-            new SpaceCommunications.NetworkStatus(0, 0, 0, 0, 0, 1);
+            new SpaceCommunications.NetworkStatus(0, 0, 0, 0);
     public List<SpaceCommunications.Node> networkNodes = List.of();
     public MissionState.Telemetry selectedTelemetry;
     public long simulationTick;

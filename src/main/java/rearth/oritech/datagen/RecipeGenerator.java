@@ -81,6 +81,14 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addVanillaAdditions(RecipeOutput exporter) {
 
+        // Efficient alternatives to vanilla crafting.
+        new AssemblerRecipeBuilder(this.registries).input(ItemTags.PLANKS).input(ItemTags.PLANKS).input(Items.BOOK).input(Items.BOOK).result(Items.BOOKSHELF, 2).timeMultiplier(0.4f).export(exporter, "bookshelf");
+        new AssemblerRecipeBuilder(this.registries).input(Items.FLINT).input(Items.STICK).input(Items.STICK).input(Items.FEATHER).result(Items.ARROW, 16).timeMultiplier(0.4f).export(exporter, "arrows");
+
+        // Golden dandelions and dried ghasts use fewer ingredients than vanilla crafting.
+        new AssemblerRecipeBuilder(this.registries).input(Items.DANDELION).input(cItemTag("nuggets/gold")).input(cItemTag("nuggets/gold")).input(cItemTag("nuggets/gold")).result(Items.GOLDEN_DANDELION).timeMultiplier(0.8f).export(exporter, "golden_dandelion");
+        new AssemblerRecipeBuilder(this.registries).input(Items.SOUL_SAND).input(Items.GHAST_TEAR).input(Items.GHAST_TEAR).input(Items.GHAST_TEAR).result(Items.DRIED_GHAST).timeMultiplier(0.8f).export(exporter, "dried_ghast");
+
         // slimeball from honey and biomass
         new AssemblerRecipeBuilder(this.registries).input(Items.HONEYCOMB).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
         // fireball in assembler (gunpowder, blaze powder + coal) = 5 charges
@@ -354,6 +362,13 @@ public class RecipeGenerator extends RecipeProvider {
 
         // electric mace
         offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE.get(), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
+
+        // resonators: no target material needed to craft the corresponding locator
+        offerResonatorRecipe(exporter, ItemContent.GEODE_RESONATOR.get(), of(cItemTag("ingots/copper")), Items.COPPER_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.PLATINUM_RESONATOR.get(), of(TagContent.NICKEL_INGOTS), ItemContent.NICKEL_INGOT.get());
+        offerResonatorRecipe(exporter, ItemContent.NETHERITE_RESONATOR.get(), of(cItemTag("ingots/gold")), Items.GOLD_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.OIL_RESONATOR.get(), of(cItemTag("ingots/iron")), Items.IRON_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.RESOURCE_NODE_RESONATOR.get(), of(cItemTag("gems/diamond")), Items.DIAMOND);
 
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR.get(), of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");
@@ -1257,6 +1272,15 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("cf ")
                 .pattern("   ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter);
+    }
+
+    private void offerResonatorRecipe(RecipeOutput exporter, Item output, Ingredient tuningMetal, Item unlockItem) {
+        this.shaped(RecipeCategory.MISC, output, 1)
+                .define('c', tuningMetal)
+                .define('s', of(TagContent.STEEL_INGOTS))
+                .define('r', of(ItemContent.ENDERIC_COMPOUND))
+                .pattern(" c ").pattern("rsr").pattern(" c ")
+                .unlockedBy(getHasName(unlockItem), has(unlockItem)).save(exporter);
     }
 
     public void offerDrillRecipe(RecipeOutput exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {

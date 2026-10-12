@@ -7,6 +7,10 @@ public class OritechConfig {
     // Server config
     private static final ModConfigSpec.Builder COMMON = new ModConfigSpec.Builder();
 
+    public static final ModConfigSpec.IntValue resonatorRange = COMMON
+            .comment("Horizontal resonator search radius in blocks. Only loaded chunks are searched; higher ranges take longer.")
+            .defineInRange("resonatorRange", 128, 16, 1024);
+
     // Machine settings
     static {
         COMMON.push("machineSettings");

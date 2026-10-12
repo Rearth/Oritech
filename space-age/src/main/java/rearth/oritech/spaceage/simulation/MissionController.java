@@ -105,7 +105,7 @@ public final class MissionController {
             if (leftNode.ground()) continue;
             for (var rightNode : nodes) {
                 if (leftNode.id().compareTo(rightNode.id()) >= 0 || rightNode.ground()
-                        || !SpaceCommunications.linked(leftNode, rightNode, nodes)) continue;
+                        || !SpaceCommunications.linked(leftNode, rightNode)) continue;
                 var left = data.craft.get(leftNode.id());
                 var right = data.craft.get(rightNode.id());
                 left.knowledge.merge(right.knowledge);
@@ -130,7 +130,7 @@ public final class MissionController {
         }
         if (linked && (action.type() == ActionType.NAVIGATE_TO || action.type() == ActionType.DOCK
                 || action.type() == ActionType.DECOUPLE && !RocketDocking.preservesPorts(data, state,
-                        action) || action.type() == ActionType.DETONATE || action.type() == ActionType.DISCARD_CRAFT)) {
+                        action) || action.type() == ActionType.DISCARD_CRAFT)) {
             state.status = "status.oritech_space_age.undock_required";
             return;
         }
@@ -155,16 +155,6 @@ public final class MissionController {
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
             case DECOUPLE -> decouple(data, state, system, action, tick);
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
-            case DETONATE -> {
-                var target = RocketExplosives.detonationTarget(system.truth(), state.position.x(), state.position.y());
-                if (target != null) system.applyAsteroidImpact(target.id(), AsteroidImpactRules.predictArrival(
-                        RocketPerformanceCalculator.calculate(state.rocket).wetMassKilograms(), target,
-                        Math.hypot(state.position.vx() - target.velocityX(), state.position.vy() - target.velocityY()),
-                        null, action, RocketExplosives.remaining(state.rocket), true));
-                state.ended = true;
-                state.status = MissionState.STATUS_DESTROYED;
-                state.complete();
-            }
             case DISCARD_CRAFT -> {
                 state.ended = true;
                 state.status = MissionState.STATUS_DISCARDED;
@@ -214,7 +204,7 @@ public final class MissionController {
                                  FlightPlanAction action) {
 
         state.actionTicks++;
-        if (state.canTransmit) {
+        if (state.connected) {
             deliverSurveyKnowledge(server, state, system);
             state.complete();
             state.status = MissionState.STATUS_INFORMATION_DELIVERED;

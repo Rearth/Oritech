@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "#c:ores/salt"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:salt_gem"
+    }
+  ],
+  "time": 100
+}

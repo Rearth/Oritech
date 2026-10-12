@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:centrifuge_fluid",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:water"
+  },
+  "itemInputs": [
+    "ftbmaterials:tungsten_clump"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:tungsten_dust"
+    }
+  ],
+  "time": 150
+}

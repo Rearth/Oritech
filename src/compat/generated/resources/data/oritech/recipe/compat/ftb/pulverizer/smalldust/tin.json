@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "ftbmaterials:tin_nugget"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:tin_tiny_dust"
+    }
+  ],
+  "time": 100
+}

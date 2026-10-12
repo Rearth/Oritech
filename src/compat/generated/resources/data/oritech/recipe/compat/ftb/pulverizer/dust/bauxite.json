@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:pulverizer",
+  "itemInputs": [
+    "#c:ores/bauxite"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:bauxite_dust"
+    }
+  ],
+  "time": 100
+}

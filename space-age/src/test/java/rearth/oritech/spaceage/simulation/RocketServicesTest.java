@@ -188,6 +188,39 @@ class RocketServicesTest {
     }
 
     @Test
+    void asteroidSurfaceAllowsProcessingInForecastAndLiveMission() {
+
+        var system = new SpaceSimulation();
+        var objects = system.truth();
+        var asteroid = objects.stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
+                .findFirst().orElseThrow();
+        var state = mission(1, 0);
+        var p = state.position;
+        state.position = new MissionState.Position(asteroid.x() + asteroid.radius(), asteroid.y(),
+                0, 0, asteroid.id(), OrbitBand.SURFACE, -1, p.stage(), p.asteroid(), p.anchor());
+        assertTrue(VacuumProcessing.zeroG(state.position.x(), state.position.y(), objects));
+        assertTrue(VacuumProcessing.zeroGForDuration(state.position.x(), state.position.y(), 0, 0, 1200, objects));
+        assertTrue(VacuumProcessing.zeroGForDuration(asteroid.x() - asteroid.radius() - 500, asteroid.y(),
+                100, 0, (asteroid.radius() * 2 + 1000) / 100 * 20, objects));
+
+        var module = RocketProcessingService.modules(state.rocket).getFirst();
+        var pair = RocketLayout.pair(state.rocket, module);
+        load(state.rocket, pair);
+        var action = craft(state, state);
+        var forecast = RocketFlightPathCalculator.calculateFrom(state.rocket, objects, state.plan, state.position, List.of(recipe("a")));
+        assertEquals("", forecast.processingEstimates().getFirst().issue());
+        assertEquals(RocketFlightPathCalculator.TerminalState.READY, forecast.paths().getFirst().terminalState());
+
+        var data = fleet(state);
+        for (var tick = 0; tick < 12; tick++) {
+            RocketProcessingService.tickJobs(data, owner -> system.truth());
+            if (state.action() != null) RocketProcessingService.process(data, state, system, action, List.of(recipe("a")));
+        }
+        assertNull(state.action());
+        assertTrue(RocketLayout.state(state.rocket, pair.controller().segment(), pair.left()).is(Blocks.GOLD_BLOCK));
+    }
+
+    @Test
     void datapackRecipeNumbersHaveNoArbitraryUpperBounds() {
 
         var base = recipe("large").value();

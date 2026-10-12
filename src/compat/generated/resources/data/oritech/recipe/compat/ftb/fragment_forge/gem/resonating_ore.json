@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:fragment_forge",
+  "itemInputs": [
+    "#c:ores/resonating_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:resonating_ore_gem"
+    }
+  ],
+  "time": 120
+}

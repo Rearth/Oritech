@@ -3,15 +3,12 @@ package rearth.oritech.spaceage.simulation;
 import net.minecraft.server.MinecraftServer;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
- * Earth broadcasts follow constellation milestones; craft uploads follow directional antenna range.
+ * Commands and data share the same Earth coverage, extended by constellation milestones.
  */
 public final class SpaceCommunications {
 
@@ -31,11 +28,6 @@ public final class SpaceCommunications {
         return count;
     }
 
-    public static double uploadRange(int antennas) {
-
-        return antennas <= 0 ? 0 : Math.scalb(SpaceBalance.ANTENNA_RANGE, Math.min(30, antennas - 1));
-    }
-
     public static int coverage(UUID owner, SpaceSimulation.OrbitBand orbit, List<Node> nodes) {
 
         var slots = SpaceBalance.slots(orbit);
@@ -51,9 +43,7 @@ public final class SpaceCommunications {
         var lowComplete = low == SpaceBalance.slots(SpaceSimulation.OrbitBand.LOW);
         var highComplete = lowComplete && high == SpaceBalance.slots(SpaceSimulation.OrbitBand.HIGH);
         return new NetworkStatus(ground, low, high,
-                ground == 0 ? 0 : highComplete ? -1 : lowComplete ? SpaceBalance.LOW_COMMAND_ALTITUDE : SpaceBalance.GROUND_COMMAND_ALTITUDE,
-                highComplete ? 60_000 : lowComplete ? 10_000 : 0,
-                highComplete ? 4 : lowComplete ? 2 : 1);
+                ground == 0 ? 0 : highComplete ? -1 : lowComplete ? SpaceBalance.LOW_COMMAND_ALTITUDE : SpaceBalance.GROUND_COMMAND_ALTITUDE);
     }
 
     private static double altitude(Node node) {
@@ -61,64 +51,25 @@ public final class SpaceCommunications {
         return Math.max(0, Math.hypot(node.x + 3_000_000, node.y) - 60_000);
     }
 
-    private static boolean canSend(Node from, Node to, NetworkStatus network) {
-
-        if (from.antennas == 0 || to.antennas == 0 || !from.owner.equals(to.owner)) return false;
-        if (to.ground)
-            return Math.max(0, altitude(from) - network.receiverAltitude) <= uploadRange(from.antennas) * network.receiverGain;
-        return Math.hypot(from.x - to.x, from.y - to.y) <= uploadRange(from.antennas);
-    }
-
-    /**
-     * Upload paths run toward Earth. Station-keeping craft in Earth relay slots can forward uploads.
-     */
-    public static Map<UUID, List<UUID>> routes(List<Node> nodes) {
-
-        var result = new HashMap<UUID, List<UUID>>();
-        var queue = new ArrayDeque<Node>();
-        for (var node : nodes)
-            if (node.ground && node.antennas > 0) {
-                result.put(node.id, List.of(node.id));
-                queue.add(node);
-            }
-        while (!queue.isEmpty()) {
-            var receiver = queue.removeFirst();
-            var network = network(receiver.owner, nodes);
-            for (var sender : nodes) {
-                if (result.containsKey(sender.id) || !canSend(sender, receiver, network)) continue;
-                var route = new ArrayList<>(result.get(receiver.id));
-                route.add(sender.id);
-                result.put(sender.id, List.copyOf(route));
-                if (sender.relay) queue.add(sender);
-            }
-        }
-        return result;
-    }
-
-    public static Connection connection(Node craft, List<Node> nodes, Map<UUID, List<UUID>> uploads) {
+    public static Connection connection(Node craft, List<Node> nodes) {
 
         var network = network(craft.owner, nodes);
-        var receive = craft.antennas > 0 && network.groundAntennas > 0
-                && (network.commandAltitude < 0 || altitude(craft) <= network.commandAltitude + 0.01);
-        var upload = craft.antennas > 0 && uploads.containsKey(craft.id);
-        var distance = Math.max(0, altitude(craft) - network.receiverAltitude);
-        var range = uploadRange(craft.antennas) * network.receiverGain;
+        var connected = craft.antennas > 0 && network.groundAntennas > 0
+                && (network.coverageAltitude < 0 || altitude(craft) <= network.coverageAltitude + 0.01);
         var reason = network.groundAntennas == 0 ? "communication.oritech_space_age.no_ground"
                 : craft.antennas == 0 ? "communication.oritech_space_age.no_craft_antenna"
-                  : !receive && !upload ? "communication.oritech_space_age.outside_both"
-                    : !receive ? "communication.oritech_space_age.upload_only"
-                      : !upload ? "communication.oritech_space_age.commands_only"
-                        : "communication.oritech_space_age.connected";
-        return new Connection(receive, upload, range, distance, reason);
+                  : !connected ? "communication.oritech_space_age.outside_coverage"
+                    : "communication.oritech_space_age.connected";
+        return new Connection(connected, network.coverageAltitude, altitude(craft), reason);
     }
 
     /**
-     * Nearby craft may exchange observations in both directions without delivering them to Earth.
+     * Nearby powered craft may exchange observations without delivering them to Earth.
      */
-    public static boolean linked(Node a, Node b, List<Node> nodes) {
+    public static boolean linked(Node a, Node b) {
 
-        var network = network(a.owner, nodes);
-        return canSend(a, b, network) && canSend(b, a, network);
+        return a.antennas > 0 && b.antennas > 0 && a.owner.equals(b.owner)
+                && Math.hypot(a.x - b.x, a.y - b.y) <= SpaceBalance.ANTENNA_RANGE;
     }
 
     static boolean isRelay(MissionState craft) {
@@ -134,7 +85,6 @@ public final class SpaceCommunications {
         var nodes = new ArrayList<Node>();
         for (var craft : data.craft.values()) {
             craft.connected = false;
-            craft.canTransmit = false;
             if (craft.ended) continue;
             var antennas = poweredAntennas(craft, true);
             nodes.add(new Node(craft.rocket.getRocketId(), craft.owner, craft.position.x(), craft.position.y(), antennas,
@@ -146,13 +96,11 @@ public final class SpaceCommunications {
         });
         data.stations.forEach((pos, station) -> nodes.add(new Node(UUID.nameUUIDFromBytes(pos.toString().getBytes(StandardCharsets.UTF_8)),
                 station.owner, -3_060_000, 0, station.poweredAntennas, SpaceSimulation.OrbitBand.SURFACE, -1, true, true)));
-        var uploads = routes(nodes);
         for (var node : nodes) {
             if (node.ground) continue;
             var craft = data.craft.get(node.id);
-            craft.communication = connection(node, nodes, uploads);
-            craft.connected = craft.communication.receiveCommands;
-            craft.canTransmit = craft.communication.upload;
+            craft.communication = connection(node, nodes);
+            craft.connected = craft.communication.connected;
             craft.route = craft.communication.reason;
         }
         data.networkNodes = List.copyOf(nodes);
@@ -164,8 +112,7 @@ public final class SpaceCommunications {
 
     }
 
-    public record NetworkStatus(int groundAntennas, int lowSlots, int highSlots, double commandAltitude,
-                                double receiverAltitude, double receiverGain) {
+    public record NetworkStatus(int groundAntennas, int lowSlots, int highSlots, double coverageAltitude) {
 
         public boolean lowComplete() {
 
@@ -178,7 +125,7 @@ public final class SpaceCommunications {
         }
     }
 
-    public record Connection(boolean receiveCommands, boolean upload, double uploadRange, double receiverDistance,
+    public record Connection(boolean connected, double coverageAltitude, double altitude,
                              String reason) {
 
     }

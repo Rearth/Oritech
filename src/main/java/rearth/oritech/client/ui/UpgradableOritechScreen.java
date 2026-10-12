@@ -280,24 +280,25 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
 
         var level = menu.addonController.getCoreQuality();
         var upgradeCount = Math.min((int) level - 1, 6);
+        var qualityTooltip = getQualityTooltip();
 
         // The 6th upgrade ring renders behind the center
         if (upgradeCount == 6) {
             addComponent(new TextureWidget(x, y, size, size,
-                    getRingIdentifier(6), 0, 0, 64, 64, 64, 64));
+                    getRingIdentifier(6), 0, 0, 64, 64, 64, 64).withTooltip(qualityTooltip));
             upgradeCount = 5;
         }
 
         // Center core
         var center = new TextureWidget(x, y, size, size,
                 MACHINE_CORE_CENTER, 0, 0, 64, 64, 64, 64);
-        center.withTooltip(getQualityTooltip());
+        center.withTooltip(qualityTooltip);
         addComponent(center);
 
-        // Ring overlays
+        // Ring overlays share the tooltip because the topmost widget receives hover events.
         for (int i = 1; i <= upgradeCount; i++) {
             addComponent(new TextureWidget(x, y, size, size,
-                    getRingIdentifier(i), 0, 0, 64, 64, 64, 64));
+                    getRingIdentifier(i), 0, 0, 64, 64, 64, 64).withTooltip(qualityTooltip));
         }
     }
 

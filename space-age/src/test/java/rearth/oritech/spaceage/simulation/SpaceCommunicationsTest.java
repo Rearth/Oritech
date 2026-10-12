@@ -45,51 +45,74 @@ class SpaceCommunicationsTest {
 
         var nodes = new ArrayList<>(network);
         nodes.add(craft);
-        return SpaceCommunications.connection(craft, nodes, SpaceCommunications.routes(nodes));
+        return SpaceCommunications.connection(craft, nodes);
     }
 
     @Test
-    void constellationTiersExtendCommandCoverage() {
+    void constellationTiersExtendCommunicationCoverage() {
 
         var nodes = ground();
         assertEquals(SpaceBalance.GROUND_COMMAND_ALTITUDE,
-                SpaceCommunications.network(OWNER, nodes).commandAltitude());
+                SpaceCommunications.network(OWNER, nodes).coverageAltitude());
 
         addRing(nodes, OrbitBand.LOW);
         var low = SpaceCommunications.network(OWNER, nodes);
         assertTrue(low.lowComplete());
-        assertEquals(SpaceBalance.LOW_COMMAND_ALTITUDE, low.commandAltitude());
+        assertEquals(SpaceBalance.LOW_COMMAND_ALTITUDE, low.coverageAltitude());
 
         addRing(nodes, OrbitBand.HIGH);
         var high = SpaceCommunications.network(OWNER, nodes);
         assertTrue(high.highComplete());
-        assertEquals(-1, high.commandAltitude());
+        assertEquals(-1, high.coverageAltitude());
 
         nodes.removeIf(SpaceCommunications.Node::ground);
-        assertEquals(0, SpaceCommunications.network(OWNER, nodes).commandAltitude());
-        assertFalse(link(node(1_000, 4, OrbitBand.LOW, -1, false, false), nodes).receiveCommands());
+        assertEquals(0, SpaceCommunications.network(OWNER, nodes).coverageAltitude());
+        assertFalse(link(node(1_000, 4, OrbitBand.LOW, -1, false, false), nodes).connected());
     }
 
     @Test
-    void receptionUploadAndForwardingFollowDifferentAntennaRules() {
+    void bothDirectionsUseLowEarthOrbitAndTheSameConstellationCoverage() {
 
-        var systemWide = ground();
-        addRing(systemWide, OrbitBand.LOW);
-        addRing(systemWide, OrbitBand.HIGH);
+        var nodes = ground();
+        assertTrue(link(node(OrbitBand.LOW.altitude(), 1, OrbitBand.LOW, -1, false, false), nodes).connected());
+        assertFalse(link(node(OrbitBand.LOW.altitude() + 1, 8, OrbitBand.LOW, -1, false, false), nodes).connected());
+        addRing(nodes, OrbitBand.LOW);
+        var boundary = link(node(SpaceBalance.LOW_COMMAND_ALTITUDE, 1, OrbitBand.TIGHT, -1, false, false), nodes);
+        assertTrue(boundary.connected());
+        assertEquals(SpaceBalance.LOW_COMMAND_ALTITUDE, boundary.coverageAltitude());
+        assertEquals(SpaceBalance.LOW_COMMAND_ALTITUDE, boundary.altitude());
+        assertFalse(link(node(SpaceBalance.LOW_COMMAND_ALTITUDE + 1, 8, OrbitBand.LOW, -1, false, false), nodes).connected());
 
-        var smallProbe = link(node(8_000_000, 1, OrbitBand.TIGHT, -1, false, false), systemWide);
-        var largeProbe = link(node(8_000_000, 4, OrbitBand.TIGHT, -1, false, false), systemWide);
-        assertTrue(smallProbe.receiveCommands());
-        assertFalse(smallProbe.upload());
-        assertTrue(largeProbe.receiveCommands());
-        assertTrue(largeProbe.upload());
-        assertEquals(SpaceBalance.ANTENNA_RANGE * 8, SpaceCommunications.uploadRange(4));
+        addRing(nodes, OrbitBand.HIGH);
+        assertTrue(link(node(8_000_000, 1, OrbitBand.TIGHT, -1, false, false), nodes).connected());
+        assertEquals(-1, link(node(8_000_000, 1, OrbitBand.TIGHT, -1, false, false), nodes).coverageAltitude());
+    }
 
-        var local = ground();
-        var probe = node(500_000, 1, OrbitBand.TIGHT, -1, false, false);
-        assertFalse(link(probe, local).upload());
-        local.add(node(250_000, 1, OrbitBand.LOW, 0, true, false));
-        assertTrue(link(probe, local).upload());
+    @Test
+    void poweredAntennasAndOwnedGroundStationAreRequired() {
+
+        var nodes = ground();
+        var unpowered = link(node(10_000, 0, OrbitBand.LOW, -1, false, false), nodes);
+        assertFalse(unpowered.connected());
+        assertEquals("communication.oritech_space_age.no_craft_antenna", unpowered.reason());
+        var noGround = link(node(10_000, 1, OrbitBand.LOW, -1, false, false), List.of());
+        assertFalse(noGround.connected());
+        assertEquals("communication.oritech_space_age.no_ground", noGround.reason());
+        var otherOwner = new SpaceCommunications.Node(UUID.randomUUID(), UUID.randomUUID(), -3_070_000, 0,
+                1, OrbitBand.LOW, -1, false, false);
+        assertFalse(link(otherOwner, nodes).connected());
+    }
+
+    @Test
+    void extraAntennasAndIndividualRelaysDoNotExtendDisplayedCoverage() {
+
+        var nodes = ground();
+        var probe = node(500_000, 8, OrbitBand.TIGHT, -1, false, false);
+        nodes.add(node(250_000, 1, OrbitBand.LOW, 0, true, false));
+        var connection = link(probe, nodes);
+        assertFalse(connection.connected());
+        assertEquals(SpaceBalance.GROUND_COMMAND_ALTITUDE, connection.coverageAltitude());
+        assertEquals("communication.oritech_space_age.outside_coverage", connection.reason());
     }
 
     @Test

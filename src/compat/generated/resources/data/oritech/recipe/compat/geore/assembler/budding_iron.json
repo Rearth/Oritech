@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "geore:iron_shard",
+    "geore:iron_shard",
+    "oritech:enderic_compound",
+    "oritech:overcharged_crystal"
+  ],
+  "itemResults": [
+    {
+      "id": "geore:budding_iron"
+    }
+  ],
+  "time": 120
+}

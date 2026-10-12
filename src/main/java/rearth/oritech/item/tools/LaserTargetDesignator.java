@@ -1,5 +1,6 @@
 package rearth.oritech.item.tools;
 
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -48,38 +49,41 @@ public class LaserTargetDesignator extends Item {
                 laserEntity.cycleHunterTargetMode();
                 context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.hunter_target", Component.translatable(laserEntity.hunterTargetMode.message)));
                 return InteractionResult.SUCCESS;
-            } else if (context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
-                var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
+            } else if (context.getItemInHand().has(ComponentContent.TARGET_GLOBAL_POSITION.get())) {
+                var target = context.getItemInHand().get(ComponentContent.TARGET_GLOBAL_POSITION.get());
 
-                var success = laserEntity.setTargetFromDesignator(target);
-                if (success)
+                if (!target.dimension().equals(context.getLevel().dimension()))
+                    return InteractionResult.FAIL;
+                var success = laserEntity.setTargetFromDesignator(target.pos());
+                if (success) {
                     context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
+                }
                 return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
             }
         } else if (targetBlockState.getBlock().equals(BlockContent.DRONE_PORT.get())
                 && context.getLevel().getBlockEntity(context.getClickedPos()) instanceof DronePortEntity dronePortEntity
-                && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
-            var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
-
-            var success = dronePortEntity.setTargetFromDesignator(target);
+                && context.getItemInHand().has(ComponentContent.TARGET_GLOBAL_POSITION.get())) {
+            var success = dronePortEntity.setTargetFromDesignator(context.getItemInHand().get(ComponentContent.TARGET_GLOBAL_POSITION.get()));
             if (success) {
                 context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_saved"));
             } else {
                 context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_invalid"));
             }
             return success ? InteractionResult.SUCCESS : InteractionResult.FAIL;
-        } else if (context.getLevel().getBlockEntity(targetPos) instanceof EnergyTransmissionPoleEntity energyTransmissionPole && context.getItemInHand().has(ComponentContent.TARGET_POSITION.get())) {
+        } else if (context.getLevel().getBlockEntity(targetPos) instanceof EnergyTransmissionPoleEntity energyTransmissionPole && context.getItemInHand().has(ComponentContent.TARGET_GLOBAL_POSITION.get())) {
 
-            var target = context.getItemInHand().get(ComponentContent.TARGET_POSITION.get());
-            energyTransmissionPole.assignNewTarget(target, context.getPlayer());
-            context.getItemInHand().remove(ComponentContent.TARGET_POSITION.get());
+            var target = context.getItemInHand().get(ComponentContent.TARGET_GLOBAL_POSITION.get());
+            if (!target.dimension().equals(context.getLevel().dimension()))
+                return InteractionResult.FAIL;
+            energyTransmissionPole.assignNewTarget(target.pos(), context.getPlayer());
+            context.getItemInHand().remove(ComponentContent.TARGET_GLOBAL_POSITION.get());
             return InteractionResult.SUCCESS;
         }
 
         if (!targetBlockState.getBlock().equals(Blocks.AIR)) {
             Oritech.LOGGER.debug(targetBlockState.toString());
 
-            context.getItemInHand().set(ComponentContent.TARGET_POSITION.get(), context.getClickedPos());
+            context.getItemInHand().set(ComponentContent.TARGET_GLOBAL_POSITION.get(), GlobalPos.of(context.getLevel().dimension(), context.getClickedPos()));
             context.getPlayer().sendSystemMessage(Component.translatable("message.oritech.target_designator.position_stored"));
 
             return InteractionResult.SUCCESS;
@@ -92,9 +96,10 @@ public class LaserTargetDesignator extends Item {
     public void appendHoverText(ItemStack itemStack, TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag tooltipFlag) {
         super.appendHoverText(itemStack, context, display, builder, tooltipFlag);
 
-        if (itemStack.has(ComponentContent.TARGET_POSITION.get())) {
-            var data = itemStack.get(ComponentContent.TARGET_POSITION.get());
-            builder.accept(Component.translatable("tooltip.oritech.target_designator.set_to", data.toShortString()));
+        if (itemStack.has(ComponentContent.TARGET_GLOBAL_POSITION.get())) {
+            var data = itemStack.get(ComponentContent.TARGET_GLOBAL_POSITION.get());
+            var target = data.pos().toShortString() + " (" + data.dimension().identifier() + ")";
+            builder.accept(Component.translatable("tooltip.oritech.target_designator.set_to", target));
         } else {
             builder.accept(Component.translatable("tooltip.oritech.target_designator.no_target"));
         }

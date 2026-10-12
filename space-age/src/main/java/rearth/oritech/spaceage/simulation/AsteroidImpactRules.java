@@ -39,18 +39,18 @@ public final class AsteroidImpactRules {
                                                   double relativeSpeed, SpaceSimulation.SpaceObjectData attached,
                                                   SpaceSimulation.FlightPlanAction action) {
 
-        return predictArrival(rocketMass, target, relativeSpeed, attached, action, 0, false);
+        return predictArrival(rocketMass, target, relativeSpeed, attached, action, 0);
     }
 
     public static ImpactPrediction predictArrival(double rocketMass, SpaceSimulation.SpaceObjectData target,
                                                   double relativeSpeed, SpaceSimulation.SpaceObjectData attached,
-                                                  SpaceSimulation.FlightPlanAction action, double explosiveEnergy, boolean detonation) {
+                                                  SpaceSimulation.FlightPlanAction action, double explosiveEnergy) {
 
         var asteroidMass = attached == null ? 0 : attached.mass() * KILOGRAMS_PER_ASTEROID_MASS;
         var combinedMass = Math.max(1, rocketMass + asteroidMass);
         var kinetic = combinedMass * relativeSpeed * relativeSpeed * 0.5;
         var safeSpeed = attached == null ? MAX_ASTEROID_CONNECTION_SPEED : SAFE_ASTEROID_SPEED;
-        var explosive = detonation || relativeSpeed > safeSpeed ? Math.max(0, explosiveEnergy) : 0;
+        var explosive = relativeSpeed > safeSpeed ? Math.max(0, explosiveEnergy) : 0;
         var energy = kinetic + explosive;
         var landingX = action.landingX() + action.landingOffsetX();
         var landingZ = action.landingZ() + action.landingOffsetZ();
@@ -68,13 +68,13 @@ public final class AsteroidImpactRules {
                 return new ImpactPrediction(ArrivalOutcome.ASTEROID_FRAGMENTATION, relativeSpeed, kinetic, 0,
                         mode, fragments, remainingMass, List.of(), landingX, landingZ, explosive);
             }
-            return new ImpactPrediction(canConnectAsteroid(relativeSpeed) && !detonation
+            return new ImpactPrediction(canConnectAsteroid(relativeSpeed)
                     ? ArrivalOutcome.SAFE_APPROACH : ArrivalOutcome.ROCKET_DESTRUCTION,
                     relativeSpeed, kinetic, 0, FragmentationMode.NONE, List.of(), target.mass(),
                     List.of(), landingX, landingZ, explosive);
         }
 
-        ArrivalOutcome outcome = relativeSpeed <= safeSpeed && !detonation ? ArrivalOutcome.SAFE_APPROACH
+        ArrivalOutcome outcome = relativeSpeed <= safeSpeed ? ArrivalOutcome.SAFE_APPROACH
                 : energy >= HEAVY_IMPACT_ENERGY || attached != null
                   ? ArrivalOutcome.HEAVY_IMPACT : ArrivalOutcome.ROCKET_DESTRUCTION;
         var craterRadius = outcome == ArrivalOutcome.HEAVY_IMPACT

@@ -1,0 +1,29 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "CC0-1.0"
+
+[[mods]]
+modId = "oritech_compat"
+version = "1.0.0"
+displayName = "Oritech Compat"
+authors = "jship"
+description = "Internal module for creating compat datagen files"
+
+[[dependencies.oritech_compat]]
+modId="neoforge"
+type="required"
+versionRange="[26.1,)"
+
+[[dependencies.oritech_compat]]
+modId="oritech"
+type="required"
+versionRange="[2.0,)"
+ordering="AFTER"
+side="BOTH"
+
+[[dependencies.oritech_compat]]
+modId="alltheores"
+type="required"
+versionRange="[4.0.4,)"
+ordering="NONE"
+side="BOTH"

@@ -208,7 +208,7 @@ class MissionSystemsTest {
 
         MissionController.step(null, data, mission, system, 20);
         assertEquals(transmit, mission.action());
-        mission.canTransmit = true;
+        mission.connected = true;
         MissionController.step(null, data, mission, system, 21);
         assertNull(mission.action());
         assertTrue(system.earthKnowledge.precise(asteroid.id()));

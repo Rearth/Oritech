@@ -1,0 +1,29 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:refinery",
+  "fluidInput": {
+    "amount": 250,
+    "ingredient": "oritech:still_sheol_fire"
+  },
+  "fluidOutputs": [
+    {
+      "amount": 100,
+      "id": "minecraft:lava"
+    }
+  ],
+  "itemInputs": [
+    "ftbmaterials:iridium_raw_ore"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:iridium_clump"
+    }
+  ],
+  "time": 80
+}

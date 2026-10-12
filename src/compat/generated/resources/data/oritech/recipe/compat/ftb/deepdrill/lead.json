@@ -1,0 +1,18 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:bedrock_extractor",
+  "itemInputs": [
+    "oritech:lead_resource_node"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:lead_raw_ore"
+    }
+  ],
+  "time": 1
+}

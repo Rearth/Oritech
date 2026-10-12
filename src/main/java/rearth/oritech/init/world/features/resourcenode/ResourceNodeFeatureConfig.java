@@ -7,16 +7,16 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 
 import java.util.List;
 
-public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<Identifier> nodeOres, float nodeOreChance,
-                                        List<Identifier> boulderOres, Identifier overlayBlock,
+public record ResourceNodeFeatureConfig(int nodeSize, int boulderRadius, List<WeightedBlock> nodeOres, float nodeOreChance,
+                                        List<WeightedBlock> boulderOres, Identifier overlayBlock,
                                         int overlayHeight) implements FeatureConfiguration {
 
     public static final Codec<ResourceNodeFeatureConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("nodeSize").forGetter(ResourceNodeFeatureConfig::nodeSize),
             Codec.INT.fieldOf("boulderRadius").forGetter(ResourceNodeFeatureConfig::boulderRadius),
-            Identifier.CODEC.listOf().fieldOf("nodeOres").forGetter(ResourceNodeFeatureConfig::nodeOres),
+            WeightedBlock.CODEC.listOf().fieldOf("nodeOres").forGetter(ResourceNodeFeatureConfig::nodeOres),
             Codec.FLOAT.fieldOf("nodeOreChance").forGetter(ResourceNodeFeatureConfig::nodeOreChance),
-            Identifier.CODEC.listOf().fieldOf("boulderOres").forGetter(ResourceNodeFeatureConfig::boulderOres),
+            WeightedBlock.CODEC.listOf().fieldOf("boulderOres").forGetter(ResourceNodeFeatureConfig::boulderOres),
             Identifier.CODEC.fieldOf("overlayBlock").forGetter(ResourceNodeFeatureConfig::overlayBlock),
             Codec.INT.fieldOf("overlayHeight").forGetter(ResourceNodeFeatureConfig::overlayHeight)
     ).apply(instance, ResourceNodeFeatureConfig::new));

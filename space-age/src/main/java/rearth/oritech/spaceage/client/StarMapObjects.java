@@ -7,6 +7,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.widgets.BlockWidget;
+import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
@@ -241,9 +242,25 @@ final class StarMapObjects {
         }
     }
 
+    List<Icon> groupIcons(StarMapCamera camera, Viewport viewport,
+                                           RocketStarMapWidget.NavigationSelection selectedTarget) {
+
+        var icons = new ArrayList<Icon>();
+        for (var object : objects) {
+            var type = object.data.type();
+            if (type != SpaceObjects.ObjectType.ASTEROID && type != SpaceObjects.ObjectType.CRAFT) continue;
+            if (fleetMarkers.contains(object.data.id())) continue;
+            var position = project(camera, viewport, x(object), y(object));
+            if (!intersects(viewport, position.x(), position.y(), 27, 27)) continue;
+            icons.add(new Icon(object.data.id(), type, position.x(), position.y(),
+                    selectedTarget != null && selectedTarget.objectId().equals(object.data.id())));
+        }
+        return icons;
+    }
+
     Entry renderIcons(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport,
                       RocketStarMapWidget.NavigationSelection selectedTarget, int mouseX, int mouseY, float delta,
-                      boolean pointerInViewport) {
+                      boolean pointerInViewport, Set<UUID> hiddenIcons) {
 
         Entry hovered = null;
         var drawnIcons = new HashSet<IconKey>();
@@ -252,7 +269,7 @@ final class StarMapObjects {
             if (object.data.type() == SpaceObjects.ObjectType.CRAFT) {
                 // Fleet markers already draw these craft; standalone docking targets use the same icon.
                 if (!intersects(viewport, position.x(), position.y(), 8, 8)) continue;
-                if (!fleetMarkers.contains(object.data.id())) {
+                if (!fleetMarkers.contains(object.data.id()) && !hiddenIcons.contains(object.data.id())) {
                     graphics.item(craftIcon, (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
                     if (camera.zoom() >= CRAFT_NAME_ZOOM) graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                             (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
@@ -279,7 +296,7 @@ final class StarMapObjects {
             // NeoForge pools them by equality, so duplicate states can overwrite a renderer in the pool.
             var icon = new IconKey((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius),
                     size, object.widget.getState());
-            if (drawnIcons.add(icon)) object.widget.render(graphics, mouseX, mouseY, delta);
+            if (!hiddenIcons.contains(object.data.id()) && drawnIcons.add(icon)) object.widget.render(graphics, mouseX, mouseY, delta);
             if (pointerInViewport && object.widget.isMouseOver(mouseX, mouseY)) hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),

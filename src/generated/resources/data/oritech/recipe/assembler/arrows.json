@@ -1,0 +1,16 @@
+{
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "minecraft:flint",
+    "minecraft:stick",
+    "minecraft:stick",
+    "minecraft:feather"
+  ],
+  "itemResults": [
+    {
+      "count": 16,
+      "id": "minecraft:arrow"
+    }
+  ],
+  "time": 48
+}

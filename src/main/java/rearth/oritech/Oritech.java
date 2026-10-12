@@ -14,6 +14,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
@@ -46,6 +47,7 @@ import rearth.oritech.item.tools.harvesting.PromethiumPickaxeItem;
 import rearth.oritech.item.tools.util.ArmorEventHandler;
 import rearth.oritech.util.LaserMachinePlayer;
 import rearth.oritech.util.ServerZiplineHandler;
+import rearth.oritech.util.ResonatorSearch;
 
 @Mod(Oritech.MOD_ID)
 public final class Oritech {
@@ -65,6 +67,7 @@ public final class Oritech {
         var neoEventBus = NeoForge.EVENT_BUS;
         neoEventBus.addListener(this::onServerStarted);
         neoEventBus.addListener(this::onServerTickPost);
+        neoEventBus.addListener(this::onServerStopped);
         neoEventBus.addListener(this::onLevelTickPos);
         neoEventBus.addListener(this::onPlayerTickPost);
         neoEventBus.addListener(this::onPlayerMinedEvent);
@@ -136,6 +139,7 @@ public final class Oritech {
 
     private void onServerTickPost(ServerTickEvent.Post event) {
         AcceleratorParticleLogic.onTickEnd();
+        ResonatorSearch.tick();
     }
 
     private void onLevelTickPos(LevelTickEvent.Post event) {
@@ -164,6 +168,10 @@ public final class Oritech {
 
     private void onEquipmentChanged(LivingEquipmentChangeEvent event) {
         ArmorEventHandler.processEvent(event.getEntity(), event.getSlot(), event.getFrom(), event.getTo());
+    }
+
+    private void onServerStopped(ServerStoppedEvent event) {
+        ResonatorSearch.clear();
     }
 
     private void onServerStarted(ServerStartedEvent event) {
