@@ -2,7 +2,7 @@
   "oracle_index.title.oritech": "Oritech",
   "message.oritech.oracle_index_missing": "Oracle Index is not installed. It is not required to play Oritech, and the same information is available online at moddedmc.wiki, but Oracle Index is highly recommended for in-game help.",
   "advancements.oritech.begin": "Oritech",
-  "key.oritech.hotkey_category": "Oritech",
+  "key.category.oritech.keys": "Oritech",
   "advancements.oritech.begin.description": "Nickel & Dime - Finde rohes Nickel, um dein technologisches Abenteuer zu beginnen. Shine on, you crazy miner!",
   "advancements.oritech.generator": "Power Up!",
   "advancements.oritech.generator.description": "Produziere einge Menge Energie mit einem einfachen Generator. Elektrifizierend, oder nicht?",
@@ -1194,7 +1194,6 @@
   "oritech.configuration.superConductorTransferRate": "Superconductor Transfer Rate",
   "oritech.configuration.steamToRfRatio": "Steam to RF Ratio",
   "oritech.configuration.smallEnergyStorage": "Small Energy Storage",
-  "oritech.configuration.generateOresFabricOnly": "[Fabric Only] Generate Ores",
   "oritech.configuration.ultimateAddonSpeed": "Ultimate Addon Speed",
   "oritech.configuration.additiveAddons": "Additive Addons",
   "oritech.configuration.exoJetpack": "Exo Jetpack",
@@ -1350,5 +1349,10 @@
   "tag.item.oritech.recyclable.small_iron_dust": "Recyclable Small Iron Dust",
   "tag.item.oritech.recyclable.string": "Recyclable String",
   "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
-  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility",
+  "oritech.configuration.baseEnergyUsage": "Base Energy Usage per Trip",
+  "oritech.configuration.distanceEnergyUsage": "Travel Distance Energy Multiplier",
+  "oritech.configuration.dronePortConfig": "Dronenhafen",
+  "oritech.configuration.interaction": "Interaction Machines",
+  "oritech.configuration.showOracleIndexWarning": "Show Oracle Index Warning"
 }
