@@ -1,1 +1,0 @@
-- Improve resonance scanners visuals
