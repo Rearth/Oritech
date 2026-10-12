@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/tungsten"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:tungsten_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

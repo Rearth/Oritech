@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "oritech:osmium_resource_node"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:osmium_raw_ore"
+    }
+  ],
+  "recipeType": "oritech:bedrock_extractor",
+  "time": 1
+}

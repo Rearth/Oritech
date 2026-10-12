@@ -1,0 +1,24 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "fluidInput": {
+    "amount": 1000,
+    "ingredient": "minecraft:water"
+  },
+  "itemInputs": [
+    "ftbmaterials:osmium_clump"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:osmium_dust"
+    }
+  ],
+  "recipeType": "oritech:centrifuge_fluid",
+  "time": 150
+}

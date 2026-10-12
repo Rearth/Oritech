@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ores/osmium"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "alltheores:raw_osmium"
+    },
+    {
+      "id": "oritech:raw_nickel"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

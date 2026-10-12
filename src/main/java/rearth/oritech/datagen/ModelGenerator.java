@@ -294,6 +294,17 @@ public class ModelGenerator extends ModelProvider {
         generator.createTrivialCube(BlockContent.PLATINUM_RESOURCE_NODE.get());
         generator.createTrivialCube(BlockContent.URANIUM_RESOURCE_NODE.get());
 
+        // COMPAT NODES
+        generator.createTrivialCube(BlockContent.ALUMINUM_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.LEAD_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.OSMIUM_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.SILVER_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.TIN_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.ZINC_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.IRIDIUM_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.TUNGSTEN_RESOURCE_NODE.get());
+        generator.createTrivialCube(BlockContent.TITANIUM_RESOURCE_NODE.get());
+
         //decorative
         generator.createTrivialCube(BlockContent.INDUSTRIAL_GLASS.get());
         generator.createTrivialCube(BlockContent.POWER_BANK_ADDON_EXTENDER.get());

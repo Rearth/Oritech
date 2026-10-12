@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:raw_materials/lead"
+  ],
+  "itemResults": [
+    {
+      "id": "alltheores:lead_dust"
+    },
+    {
+      "count": 3,
+      "id": "alltheores:lead_nugget"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

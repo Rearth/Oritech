@@ -5,29 +5,83 @@
     "nodeOreChance": 0.3,
     "boulderRadius": 3,
     "nodeOres": [
-      "oritech:gold_resource_node",
-      "oritech:nickel_resource_node",
-      "oritech:resource_node_lapis",
-      "oritech:resource_node_lapis",
-      "oritech:redstone_resource_node",
-      "oritech:redstone_resource_node",
-      "oritech:redstone_resource_node"
+      {
+        "block": "oritech:gold_resource_node"
+      },
+      {
+        "block": "oritech:nickel_resource_node"
+      },
+      {
+        "block": "oritech:resource_node_lapis",
+        "weight": 2
+      },
+      {
+        "block": "oritech:redstone_resource_node",
+        "weight": 3
+      },
+      {
+        "block": "oritech:lead_resource_node",
+        "required": false,
+        "requiresAny": [
+          "allthemods:deepslate_lead_ore",
+          "ftbmaterials:lead_deepslate_ore"
+        ]
+      },
+      {
+        "block": "oritech:silver_resource_node",
+        "required": false,
+        "requiresAny": [
+          "allthemods:deepslate_silver_ore",
+          "ftbmaterials:silver_deepslate_ore"
+        ]
+      },
+      {
+        "block": "oritech:osmium_resource_node",
+        "required": false,
+        "requiresAny": [
+          "allthemods:deepslate_osmium_ore",
+          "ftbmaterials:osmium_deepslate_ore"
+        ]
+      }
     ],
     "boulderOres": [
-      "minecraft:deepslate_gold_ore",
-      "minecraft:deepslate_lapis_ore",
-      "minecraft:deepslate_redstone_ore",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate",
-      "minecraft:deepslate"
+      {
+        "block": "minecraft:deepslate_gold_ore"
+      },
+      {
+        "block": "minecraft:deepslate_lapis_ore"
+      },
+      {
+        "block": "minecraft:deepslate_redstone_ore"
+      },
+      {
+        "block": "alltheores:deepslate_lead_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:lead_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "alltheores:deepslate_silver_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:silver_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "alltheores:deepslate_osmium_ore",
+        "required": false
+      },
+      {
+        "block": "ftbmaterials:osmium_deepslate_ore",
+        "required": false
+      },
+      {
+        "block": "minecraft:deepslate",
+        "weight": 10
+      }      
     ],
     "overlayBlock": "oritech:still_oil_block",
     "overlayHeight": 5

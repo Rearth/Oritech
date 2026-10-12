@@ -1,0 +1,20 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ores/titanium"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:titanium_raw_ore"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

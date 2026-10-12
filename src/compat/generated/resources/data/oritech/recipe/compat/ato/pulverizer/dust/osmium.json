@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/osmium"
+  ],
+  "itemResults": [
+    {
+      "id": "alltheores:osmium_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

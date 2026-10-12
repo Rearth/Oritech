@@ -1,0 +1,6 @@
+// 26.1.2	2026-08-07T12:15:22.1221795	Ender IO Oritech Compat
+68043abfc8cd9136e4bb53a3baa1ffcd16ac8158 data/oritech/advancement/recipes/misc/compat/enderio/crafting/fluid_pipe.json
+8b2b1d15ef19a6c47b787b5ebf08ed005a99cbae data/oritech/recipe/compat/enderio/centrifuge/fluid/sculk_xp.json
+1ea097d6fb71e927146d4b1298925f65f2980083 data/oritech/recipe/compat/enderio/crafting/fluid_pipe.json
+435b6fb8149639a560b2942af7390d6546bdcd8e data/oritech/recipe/compat/enderio/pulverizer/dust/lapis.json
+24b07113e1da5191cb733838842ba7bfc5e2997b data/oritech/recipe/compat/enderio/pulverizer/dust/obsidian.json

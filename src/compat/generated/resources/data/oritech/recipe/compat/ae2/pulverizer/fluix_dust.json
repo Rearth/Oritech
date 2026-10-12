@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ae2"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:gems/fluix"
+  ],
+  "itemResults": [
+    {
+      "id": "ae2:fluix_dust"
+    }
+  ],
+  "recipeType": "oritech:pulverizer",
+  "time": 100
+}

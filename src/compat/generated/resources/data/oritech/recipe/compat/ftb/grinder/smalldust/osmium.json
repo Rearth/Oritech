@@ -1,0 +1,19 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "ftbmaterials:osmium_nugget"
+  ],
+  "itemResults": [
+    {
+      "id": "ftbmaterials:osmium_tiny_dust"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}

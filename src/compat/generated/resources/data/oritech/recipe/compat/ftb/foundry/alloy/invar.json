@@ -1,0 +1,21 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "ftbmaterials"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ingots/iron",
+    "#c:ingots/iron"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "ftbmaterials:invar_ingot"
+    }
+  ],
+  "recipeType": "oritech:foundry",
+  "time": 80
+}

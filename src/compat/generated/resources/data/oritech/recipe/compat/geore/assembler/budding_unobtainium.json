@@ -1,0 +1,22 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "geore"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "geore:unobtainium_shard",
+    "geore:unobtainium_shard",
+    "oritech:enderic_compound",
+    "oritech:overcharged_crystal"
+  ],
+  "itemResults": [
+    {
+      "id": "geore:budding_unobtainium"
+    }
+  ],
+  "recipeType": "oritech:assembler",
+  "time": 120
+}

@@ -1,0 +1,23 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "alltheores"
+    }
+  ],
+  "type": "oritech:machine_recipe",
+  "itemInputs": [
+    "#c:ores/silver"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "alltheores:raw_silver"
+    },
+    {
+      "id": "minecraft:raw_copper"
+    }
+  ],
+  "recipeType": "oritech:grinder",
+  "time": 40
+}
