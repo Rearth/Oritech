@@ -7,6 +7,9 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.renderer.GeoItemRenderer;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -41,6 +44,11 @@ public class PromethiumAxeItem extends AxeItem implements GeoItem {
 
     public PromethiumAxeItem(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline, Item.Properties properties) {
         super(material, attackDamageBaseline, attackSpeedBaseline, properties);
+    }
+
+    @Override
+    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
+        return !enchantment.is(Enchantments.UNBREAKING) && super.supportsEnchantment(stack, enchantment);
     }
 
     @Override
