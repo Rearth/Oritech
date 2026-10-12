@@ -2,7 +2,7 @@
   "oracle_index.title.oritech": "Oritech",
   "message.oritech.oracle_index_missing": "Oracle Index is not installed. It is not required to play Oritech, and the same information is available online at moddedmc.wiki, but Oracle Index is highly recommended for in-game help.",
   "advancements.oritech.begin": "Oritech",
-  "key.oritech.hotkey_category": "Oritech",
+  "key.category.oritech.keys": "Oritech",
   "advancements.oritech.begin.description": "Níquel e Trocados - Comece sua aventura tecnológica adquirindo um pouco de níquel bruto. Continue brilhando, seu mineiro maluco!",
   "advancements.oritech.generator": "Energizar!",
   "advancements.oritech.generator.description": "Gere uma energia considerável com um gerador básico. Eletrizante, não é?",
@@ -1194,7 +1194,6 @@
   "oritech.configuration.superConductorTransferRate": "Taxa de Transferência do Supercondutor",
   "oritech.configuration.steamToRfRatio": "Proporção de Vapor para RF",
   "oritech.configuration.smallEnergyStorage": "Armazenamento de Energia Pequeno",
-  "oritech.configuration.generateOresFabricOnly": "[Apenas Fabric] Gerar Minérios",
   "oritech.configuration.ultimateAddonSpeed": "Velocidade do Complemento Ultimate",
   "oritech.configuration.additiveAddons": "Complementos Aditivos",
   "oritech.configuration.exoJetpack": "Exo-Jetpack",
@@ -1350,5 +1349,10 @@
   "tag.item.oritech.recyclable.small_iron_dust": "Pequeno Pó de Ferro Reciclável",
   "tag.item.oritech.recyclable.string": "Linha Reciclável",
   "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
-  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility",
+  "oritech.configuration.baseEnergyUsage": "Base Energy Usage per Trip",
+  "oritech.configuration.distanceEnergyUsage": "Travel Distance Energy Multiplier",
+  "oritech.configuration.dronePortConfig": "Porto de Drones",
+  "oritech.configuration.interaction": "Interaction Machines",
+  "oritech.configuration.showOracleIndexWarning": "Show Oracle Index Warning"
 }
