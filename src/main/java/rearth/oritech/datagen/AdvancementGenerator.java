@@ -61,7 +61,23 @@ public class AdvancementGenerator implements AdvancementSubProvider {
                                 // The first string used in criterion is the name referenced by other advancements when they want to have 'requirements'
                                 .addCriterion("got_generator", InventoryChangeTrigger.TriggerInstance.hasItems(BlockContent.BASIC_GENERATOR))
                                 .save(consumer, Oritech.MOD_ID + "/generator");
-        
+
+        var resonatorAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
+                .display(
+                        ItemContent.GEODE_RESONATOR,
+                        Component.translatable("advancements.oritech.resonator"),
+                        Component.translatable("advancements.oritech.resonator.description"),
+                        background,
+                        AdvancementType.TASK,
+                        true,
+                        true,
+                        false
+                )
+                .addCriterion("got_resonator", InventoryChangeTrigger.TriggerInstance.hasItems(
+                        ItemPredicate.Builder.item().of(registryLookup.lookupOrThrow(Registries.ITEM), ItemContent.GEODE_RESONATOR.get(), ItemContent.PLATINUM_RESONATOR.get(),
+                                ItemContent.NETHERITE_RESONATOR.get(), ItemContent.OIL_RESONATOR.get(), ItemContent.RESOURCE_NODE_RESONATOR.get())))
+                .save(consumer, Oritech.MOD_ID + "/resonator");
+
         var furnaceAdvancement = Advancement.Builder.advancement().parent(generatorAdvancement)
                                 .display(
                                   BlockContent.POWERED_FURNACE, // The display icon

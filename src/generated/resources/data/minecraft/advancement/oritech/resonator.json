@@ -1,0 +1,39 @@
+{
+  "parent": "minecraft:oritech/generator",
+  "criteria": {
+    "got_resonator": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "oritech:geode_resonator",
+              "oritech:platinum_resonator",
+              "oritech:netherite_resonator",
+              "oritech:oil_resonator",
+              "oritech:resource_node_resonator"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "background": "minecraft:gui/advancements/backgrounds/adventure",
+    "description": {
+      "translate": "advancements.oritech.resonator.description"
+    },
+    "icon": {
+      "id": "oritech:geode_resonator"
+    },
+    "title": {
+      "translate": "advancements.oritech.resonator"
+    }
+  },
+  "requirements": [
+    [
+      "got_resonator"
+    ]
+  ],
+  "sends_telemetry_event": true
+}
