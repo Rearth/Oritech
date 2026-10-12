@@ -234,6 +234,11 @@ dependencies {
     compileOnly "curse.maven:jade-324717:8326300"
     localRuntime "curse.maven:jade-324717:8326300"
 
+    // Oracle Index integration (optional at runtime)
+    compileOnly "curse.maven:oracle-index-1206582:8881971"
+    localRuntime "curse.maven:oracle-index-1206582:8881971"
+    localRuntime "dev.architectury:architectury-neoforge:20.0.9"
+
     // FTB Filter System integration (optional at runtime)
     compileOnly "curse.maven:ftb-filter-system-943925:8300191"
     localRuntime "curse.maven:ftb-filter-system-943925:8300191"
