@@ -9,6 +9,7 @@ import com.geckolib.animation.object.PlayState;
 import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -121,7 +122,7 @@ public class DronePortEntity extends NetworkedBlockEntity
     public boolean disabledViaRedstone;
 
     // work data
-    private BlockPos targetPosition;
+    private GlobalPos targetPosition;
     private long lastSentAt;
     private DroneTransferData incomingPacket;
     private boolean receivingPackage;
@@ -158,8 +159,8 @@ public class DronePortEntity extends NetworkedBlockEntity
     private void checkPositionCard() {
 
         var source = cardInventory.getItems().get(0);
-        if (source.getItem() instanceof LaserTargetDesignator && source.has(ComponentContent.TARGET_POSITION.get())) {
-            var target = source.get(ComponentContent.TARGET_POSITION.get());
+        if (source.getItem() instanceof LaserTargetDesignator && source.has(ComponentContent.TARGET_GLOBAL_POSITION.get())) {
+            var target = source.get(ComponentContent.TARGET_GLOBAL_POSITION.get());
             setTargetFromDesignator(target);
         } else {
             return;
@@ -184,7 +185,8 @@ public class DronePortEntity extends NetworkedBlockEntity
         output.putLong("energy_stored", energyStorage.energy);
 
         if (targetPosition != null) {
-            output.store("target_position", BlockPos.CODEC, targetPosition);
+            output.store("target_pos", GlobalPos.CODEC, targetPosition);
+
         }
     }
 
@@ -200,7 +202,7 @@ public class DronePortEntity extends NetworkedBlockEntity
         hasFluidAddon = input.getBooleanOr("has_fluid_addon", false);
         disabledViaRedstone = input.getBooleanOr("disabled_via_redstone", false);
         energyStorage.energy = input.getLongOr("energy_stored", 0);
-        targetPosition = input.read("target_position", BlockPos.CODEC).orElse(null);
+        targetPosition = input.read("target_pos", GlobalPos.CODEC).orElse(null);
         incomingPacket = null;
     }
 
@@ -267,8 +269,9 @@ public class DronePortEntity extends NetworkedBlockEntity
     }
 
     private void sendDrone() {
-        var targetPort = (DronePortEntity) level.getBlockEntity(targetPosition);
-        var arriveTime = level.getGameTime() + TOTAL_FLIGHT_TIME;
+        var targetPort = getTargetPort();
+        if (targetPort == null) return;
+        var arriveTime = targetPort.level.getGameTime() + TOTAL_FLIGHT_TIME;
         var data = new DroneTransferData(inventory.getStacks().stream().filter(stack -> !stack.isEmpty()).toList(), fluidStorage.getContent(), arriveTime);
         targetPort.setIncomingPacket(data);
 
@@ -315,18 +318,31 @@ public class DronePortEntity extends NetworkedBlockEntity
 
         if (disabledViaRedstone || targetPosition == null || (inventory.isEmpty() && fluidStorage.getAmount() == 0) || energyStorage.energy < calculateEnergyUsage() || incomingPacket != null)
             return false;
-        var targetEntity = level.getBlockEntity(targetPosition);
-        if (!(targetEntity instanceof DronePortEntity targetPort) || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getStacks(), fluidStorage.getContent()))
+        var targetPort = getTargetPort();
+        if (targetPort == null || targetPort.disabledViaRedstone || targetPort.getIncomingPacket() != null || !targetPort.canAcceptPayload(inventory.getStacks(), fluidStorage.getContent()))
             return false;
 
 
         return !isSendingDrone();
     }
 
+    @Nullable
+    private ServerLevel getTargetLevel(GlobalPos target) {
+        return level instanceof ServerLevel serverLevel ? serverLevel.getServer().getLevel(target.dimension()) : null;
+    }
+
+    @Nullable
+    private DronePortEntity getTargetPort() {
+        if (targetPosition == null) return null;
+        var targetLevel = getTargetLevel(targetPosition);
+        if (targetLevel == null || !targetLevel.hasChunkAt(targetPosition.pos())) return null;
+        return targetLevel.getBlockEntity(targetPosition.pos()) instanceof DronePortEntity port ? port : null;
+    }
+
     private long calculateEnergyUsage() {
         var baseEnergyUsage = OritechConfig.dronePortConfig.baseEnergyUsage.get();
         if (targetPosition == null) return baseEnergyUsage;
-        var distance = worldPosition.distManhattan(targetPosition);
+        var distance = worldPosition.distManhattan(targetPosition.pos());
         return (long) Math.sqrt(distance) * OritechConfig.dronePortConfig.distanceEnergyUsage.get() + baseEnergyUsage;
     }
 
@@ -353,25 +369,33 @@ public class DronePortEntity extends NetworkedBlockEntity
         triggerAnim("machine", "landing");
     }
 
-    public boolean setTargetFromDesignator(BlockPos targetPos) {
+    public boolean setTargetFromDesignator(GlobalPos target) {
+        if (target == null) return false;
+        var targetLevel = getTargetLevel(target);
+        if (targetLevel == null || !targetLevel.hasChunkAt(target.pos())) {
+            statusMessage = "message.oritech.drone.target_invalid";
+            return false;
+        }
+        var targetPos = target.pos();
 
         // if target is coreblock, adjust it to point to controller if connected
-        var targetState = Objects.requireNonNull(level).getBlockState(targetPos);
+        var targetState = targetLevel.getBlockState(targetPos);
         if (targetState.getBlock() instanceof MachineCoreBlock && targetState.getValue(MachineCoreBlock.USED)) {
-            var coreEntity = (MachineCoreEntity) level.getBlockEntity(targetPos);
+            var coreEntity = (MachineCoreEntity) targetLevel.getBlockEntity(targetPos);
             var controllerPos = Objects.requireNonNull(coreEntity).getControllerPos();
             if (controllerPos != null) targetPos = controllerPos;
         }
 
         var distance = targetPos.distManhattan(worldPosition);
-        if (distance < 50) {
+        if (target.dimension().equals(level.dimension()) && distance < 50) {
             statusMessage = "message.oritech.drone.invalid_distance";
             return false;
         }
 
-        if (level.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
+        if (targetLevel.getBlockState(targetPos).getBlock() instanceof DronePortBlock) {
             // store position
-            this.targetPosition = targetPos;
+            this.targetPosition = GlobalPos.of(target.dimension(), targetPos);
+            setChanged();
             statusMessage = "message.oritech.drone.target_set";
             return true;
         }
