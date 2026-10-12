@@ -10,6 +10,7 @@ import rearth.oritech.Oritech;
 import rearth.oritech.item.SchrodingersSafeItem;
 import rearth.oritech.item.other.*;
 import rearth.oritech.item.tools.LaserTargetDesignator;
+import rearth.oritech.item.tools.ResonatorItem;
 import rearth.oritech.item.tools.WeedKiller;
 import rearth.oritech.item.tools.Wrench;
 import rearth.oritech.util.ColorableMachine;
@@ -31,6 +32,12 @@ public class ItemContent {
     public static final DeferredItem<Item> TARGET_DESIGNATOR = ITEMS.registerItem("target_designator", LaserTargetDesignator::new, props -> props.stacksTo(1));
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WEED_KILLER = ITEMS.registerItem("weed_killer", WeedKiller::new, props -> props.stacksTo(1));
+    @ItemGroupTarget(Groups.EQUIPMENT)
+    public static final DeferredItem<Item> GEODE_RESONATOR = ITEMS.registerItem("geode_resonator", props -> new ResonatorItem(props, TagContent.GEODE_TARGETS, "geode_resonator", 0xB785F5), props -> props.stacksTo(1));
+    @ItemGroupTarget(Groups.EQUIPMENT)
+    public static final DeferredItem<Item> PLATINUM_RESONATOR = ITEMS.registerItem("platinum_resonator", props -> new ResonatorItem(props, TagContent.PLATINUM_ORE_BLOCKS, "platinum_resonator", 0x83D6F5), props -> props.stacksTo(1));
+    @ItemGroupTarget(Groups.EQUIPMENT)
+    public static final DeferredItem<Item> NETHERITE_RESONATOR = ITEMS.registerItem("netherite_resonator", props -> new ResonatorItem(props, TagContent.NETHERITE_ORE_BLOCKS, "netherite_resonator", 0xED9F60), props -> props.stacksTo(1));
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
 

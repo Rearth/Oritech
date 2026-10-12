@@ -25,6 +25,7 @@ public class BlockTagGenerator extends BlockTagsProvider {
     
     @Override
     protected void addTags(HolderLookup.Provider arg) {
+        tag(TagContent.GEODE_TARGETS).add(Blocks.BUDDING_AMETHYST);
         
         var pickaxeBuilder = this.tag(BlockTags.MINEABLE_WITH_PICKAXE);
         

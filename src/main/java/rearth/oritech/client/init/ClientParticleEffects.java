@@ -4,6 +4,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -50,6 +51,7 @@ public final class ClientParticleEffects {
         if (OritechClientConfig.visualEffects.get() == OritechClientConfig.VisualEffects.NONE) return;
         var type = EffectType.values()[payload.effectId()];
         switch (type) {
+            case RESONATOR_DIRECTION -> spawnLineWithAge(new DustParticleOptions(payload.extraInt(), 1.2f), payload.pos(), payload.data1(), 32, 160);
             case HIGHLIGHT_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos(), 1, 120, 6);
             case DEBUG_BLOCK -> spawnCubeOutline(ParticleTypes.ELECTRIC_SPARK, payload.pos(), 1, 120, 2);
             case ACCELERATING -> spawnCubeOutline(ParticleTypes.SCULK_CHARGE_POP, payload.pos(), 1, 5, 3);

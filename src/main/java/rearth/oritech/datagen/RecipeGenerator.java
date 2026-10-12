@@ -363,6 +363,11 @@ public class RecipeGenerator extends RecipeProvider {
         // electric mace
         offerDrillRecipe(exporter, ToolsContent.ELECTRIC_MACE.get(), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.CARBON_FIBRE_STRANDS), of(ItemContent.ADAMANT_INGOT), of(Items.HEAVY_CORE), "_emace");
 
+        // resonators: no target material needed to craft the corresponding locator
+        offerResonatorRecipe(exporter, ItemContent.GEODE_RESONATOR.get(), of(cItemTag("ingots/copper")), Items.COPPER_INGOT);
+        offerResonatorRecipe(exporter, ItemContent.PLATINUM_RESONATOR.get(), of(TagContent.NICKEL_INGOTS), ItemContent.NICKEL_INGOT.get());
+        offerResonatorRecipe(exporter, ItemContent.NETHERITE_RESONATOR.get(), of(cItemTag("ingots/gold")), Items.GOLD_INGOT);
+
         // designator
         offerDrillRecipe(exporter, ItemContent.TARGET_DESIGNATOR.get(), of(TagContent.STEEL_INGOTS), of(TagContent.ELECTRUM_INGOTS), of(ItemContent.PROCESSING_UNIT), of(TagContent.PLASTIC_PLATES), "designator");
         // weed killer
@@ -1265,6 +1270,15 @@ public class RecipeGenerator extends RecipeProvider {
                 .pattern("cf ")
                 .pattern("   ");
         builder.unlockedBy(getHasName(output), has(output)).save(exporter);
+    }
+
+    private void offerResonatorRecipe(RecipeOutput exporter, Item output, Ingredient tuningMetal, Item unlockItem) {
+        this.shaped(RecipeCategory.MISC, output, 1)
+                .define('c', tuningMetal)
+                .define('s', of(TagContent.STEEL_INGOTS))
+                .define('r', of(cItemTag("dusts/redstone")))
+                .pattern(" c ").pattern("rsr").pattern(" c ")
+                .unlockedBy(getHasName(unlockItem), has(unlockItem)).save(exporter);
     }
 
     public void offerDrillRecipe(RecipeOutput exporter, Item output, Ingredient doubleBase, Ingredient motor, Ingredient outer, Ingredient head, String suffix) {

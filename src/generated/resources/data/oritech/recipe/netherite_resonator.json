@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "c": "#c:ingots/gold",
+    "r": "#c:dusts/redstone",
+    "s": "#c:ingots/steel"
+  },
+  "pattern": [
+    " c ",
+    "rsr",
+    " c "
+  ],
+  "result": {
+    "id": "oritech:netherite_resonator"
+  }
+}

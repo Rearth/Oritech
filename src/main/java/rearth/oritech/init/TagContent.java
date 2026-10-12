@@ -99,6 +99,8 @@ public class TagContent {
     public static final TagKey<Item> MACHINE_PAINTS = oritechItemTag("paint");
 
     // blocks
+    public static final TagKey<Block> NETHERITE_ORE_BLOCKS = cBlockTag("ores/netherite_scrap");
+    public static final TagKey<Block> GEODE_TARGETS = oritechBlockTag("geode_targets");
     public static final TagKey<Block> DRILL_MINEABLE = oritechBlockTag("mineable/drill");
     public static final TagKey<Block> RESOURCE_NODES = oritechBlockTag("resource_nodes");
     public static final TagKey<Block> LASER_PASSTHROUGH = oritechBlockTag("laser_passthrough");
