@@ -1,4 +1,4 @@
-// 26.1.2	2026-08-27T21:55:44.3468284	Model Definitions - oritech
+// 26.1.2	2026-10-12T21:48:27.3459387	Model Definitions - oritech
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
 a0801733923625bd92b1a26db46a868174771600 assets/oritech/blockstates/accelerator_sensor.json
@@ -287,6 +287,7 @@ d078ae679ef8f22cb01c02460328853e67e7ab4d assets/oritech/items/fluxite_paint.json
 65ff973f425c7d66b12ee8e02bcda57edd203368 assets/oritech/items/framed_item_pipe.json
 b0f1ff002a2369f1a23016a1238b68ef74dec1dd assets/oritech/items/framed_superconductor.json
 9d2694ba9d2907c1f013a7033bcb433c05aacf97 assets/oritech/items/fuel_generator.json
+7a2d5fcfebc454a2555482312d289e2934412616 assets/oritech/items/geode_resonator.json
 f5c6f8164eae03252467f3883f2bb75c71e1dbdb assets/oritech/items/gold_clump.json
 9ae10c0a927cb972ded1daf03491e0aeaf768db3 assets/oritech/items/gold_dust.json
 0e91a56f6a99bda0b799c101dc096331409bcf9c assets/oritech/items/gold_gem.json
@@ -348,6 +349,7 @@ ab729a9357ec657890f1672a23f76c01520ac668 assets/oritech/items/machine_speed_addo
 d25e5e70f6e81c26d9f331ba2e94c786deac4bf0 assets/oritech/items/manhattan_module.json
 748e0485d863498b5fa0e562ab5b35201c5c8a31 assets/oritech/items/motor.json
 60212391a8ac5cfec71cf53298e2c40d7fa0bb90 assets/oritech/items/netherite_paint.json
+27def21d58230be50fac8012a8db19d81a22460e assets/oritech/items/netherite_resonator.json
 ff2a61379a34e2e0ab186bc7da231e969897c04e assets/oritech/items/nickel.json
 8f0ab083a3cbcee141c91a81341ce75f5c6c5405 assets/oritech/items/nickel_clump.json
 e5439b0a7a315d2bf08f94c1f7f5cefe07a0c6a8 assets/oritech/items/nickel_dust.json
@@ -361,6 +363,7 @@ cacc39ff5c35afce2cb0954ff60dcaf17eb1f67c assets/oritech/items/nickel_plating.jso
 4d8adee069bdd333397edc71fe6bdeeca2eade15 assets/oritech/items/nickel_plating_stairs.json
 4c2721b08c83260085f88845a3f4c08eaaeae60c assets/oritech/items/nickel_resource_node.json
 0a6f637da916045c627e3c2ff7aadeb72ec85e7c assets/oritech/items/nuclear_reactor_controller.json
+faf7e83d1b6f88f024e3c667c724aef3105bbd50 assets/oritech/items/oil_resonator.json
 bb3b55035c4e91131f61b0347f1554af5b6d5516 assets/oritech/items/orange_paint.json
 af45fe68f1a9120ba88962e31be1f1fa52bb5cf1 assets/oritech/items/osmium_resource_node.json
 d7943c15d1038927f092dac4e006f0367547304f assets/oritech/items/overcharged_crystal.json
@@ -376,6 +379,7 @@ c7f9056ff4d5d3a2e534e7f35c78b034b36f62e7 assets/oritech/items/platinum_dust.json
 74f5283d4f7f0211d9c8d13ea06ff41d47e81e49 assets/oritech/items/platinum_gem.json
 af7e1915cbd1178478c4ffb3bdd75e559329c2e4 assets/oritech/items/platinum_ingot.json
 b55046afc3df9b0882ed37e99918aed7e44867e4 assets/oritech/items/platinum_nugget.json
+897ea3798f4ec99690599ba405ee36702f808843 assets/oritech/items/platinum_resonator.json
 cd6fd408e22b32790e34cf4201a731530f45bc01 assets/oritech/items/platinum_resource_node.json
 b61dd71af86fccedc74db89dcae81e7fbaef9521 assets/oritech/items/plutonium_dust.json
 ad1ac96b754c986960648bdec66f63734dcc0e47 assets/oritech/items/plutonium_pellet.json
@@ -416,6 +420,7 @@ f2e2712772fcc1eec0d733f6b75b3e194892f1c3 assets/oritech/items/redstone_resource_
 19054dfce1fc714a16f6c40c508df8c642e9f26b assets/oritech/items/refinery_chamber_module.json
 9504d76d5b90a2f2373593a86611dae46d1a8da3 assets/oritech/items/reinforced_carbon_sheet.json
 5e83099af07734be728421c0354140e51b762b7e assets/oritech/items/resource_node_lapis.json
+d51e87fb22df5450ee47f049e253821a143b158e assets/oritech/items/resource_node_resonator.json
 bfe1547031dbe1fbdd5d8a10179e0c1896482285 assets/oritech/items/sculk_paint.json
 dd2e98f0fde7c2ae3faba4f7b8da8031a8f3e8eb assets/oritech/items/silicon.json
 7c7670edbf6ae9f110fae4acd488cd3391535113 assets/oritech/items/silicon_block.json
@@ -628,6 +633,7 @@ fb03aa413ddd02d32aca58d75003db4dbc224080 assets/oritech/models/item/exo_leggings
 a5bcc52397f53e02db0b9f96fcf5faa8c43e7d65 assets/oritech/models/item/fluxite.json
 c2360ffec5e5fa70adce6c78e39a9cc7bc0356e8 assets/oritech/models/item/fluxite_paint.json
 f38bcaafb1724024d072a57329230fe00a9d6f19 assets/oritech/models/item/flux_gate.json
+c220a209083bd4bd41b215db06694e014514b15c assets/oritech/models/item/geode_resonator.json
 4af7874799cc7544ddf9f32365204ce6f7e123df assets/oritech/models/item/gold_clump.json
 6b397fe0defa806d5dad91ae5b058d891f000270 assets/oritech/models/item/gold_dust.json
 f590ac4a8b7ba13bfcadb9b1e5aa6ef8d5b269c1 assets/oritech/models/item/gold_gem.json
@@ -645,11 +651,13 @@ fcb9b3c60f6a546e4ca12733d365343fa3f93046 assets/oritech/models/item/jetpack_exo_
 39ff24a652b7a17e3e9a5a25514e86d385bdbf66 assets/oritech/models/item/magnetic_coil.json
 82ed47b5b554b564a30eb4fe402f313c1e461657 assets/oritech/models/item/motor.json
 848268226620880318ad4e39852b8db96b615af0 assets/oritech/models/item/netherite_paint.json
+bd4c657c4f8f0048dc2d4ab6f4561bb6f8d7c232 assets/oritech/models/item/netherite_resonator.json
 f1cc0a5efbb99d896db1845b29e678f2e3c5a926 assets/oritech/models/item/nickel_clump.json
 8734efad9e993873bdcbe5d2f2f1842d2eac4035 assets/oritech/models/item/nickel_dust.json
 3a8039e2e6d09f627e913ee713637dcc8536a228 assets/oritech/models/item/nickel_gem.json
 56212ce16132243ea0a4aa805f685f0a39abee49 assets/oritech/models/item/nickel_ingot.json
 0dd1c2af854fd39d24d44e23735085a17e4fc982 assets/oritech/models/item/nickel_nugget.json
+f8fdbb1bb7256e549902ce1076a831d93850eb74 assets/oritech/models/item/oil_resonator.json
 446d5949c429bed7f1d397ef0b683c520aaf556f assets/oritech/models/item/orange_paint.json
 e8ea32d466df5531df3b6678639b3ffae59d9989 assets/oritech/models/item/overcharged_crystal.json
 05055246d8778d9605a919bccfa66ccd7dc3761f assets/oritech/models/item/packed_wheat.json
@@ -659,6 +667,7 @@ b0b2055caa3f84ee6c6d3bf82165b2e70413f5e0 assets/oritech/models/item/platinum_clu
 2899c3dcc635791ea94eb30eab06297df58143f4 assets/oritech/models/item/platinum_gem.json
 6adb9f1610801085ae00d014a07bb37013e01353 assets/oritech/models/item/platinum_ingot.json
 cec240e34fa9649256c19fccb4bbe8a4e708cc1d assets/oritech/models/item/platinum_nugget.json
+38b3e2ed3931374403e9f74be9e28418adc3ac11 assets/oritech/models/item/platinum_resonator.json
 3bf963a577a4e1e31ad87d9ac0826120373cbc00 assets/oritech/models/item/plutonium_dust.json
 492103cbf2eb6a437e22dc37f7bba715181a6bd0 assets/oritech/models/item/plutonium_pellet.json
 6bef52fac87d1aa123f63bd88ce709707fda84b1 assets/oritech/models/item/polymer_resin.json
@@ -672,6 +681,7 @@ f388ae2d88402443c2d3002fccc75ffef585998d assets/oritech/models/item/raw_nickel.j
 e0c98b1c4740926496045a1f6543a8016af8ef04 assets/oritech/models/item/raw_uranium.json
 e609552ea1eaaf885bbaeee51b19d5799f63ff9d assets/oritech/models/item/redstone_paint.json
 a56ba1bfe7d622dbdb068454fdf05e7ff2346e63 assets/oritech/models/item/reinforced_carbon_sheet.json
+10acb2dfa605e81588b7674a38f15d60209eb0a3 assets/oritech/models/item/resource_node_resonator.json
 f8eef517d77d0490ba266387570b4308dd787b3a assets/oritech/models/item/sculk_paint.json
 9d2d833346becdc9dfed862c2eb0af8e9b29be50 assets/oritech/models/item/silicon.json
 e15a0c1ece30675b81d092d98bff5564e2d0ff3a assets/oritech/models/item/silicon_wafer.json

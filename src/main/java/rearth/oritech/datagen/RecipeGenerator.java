@@ -1278,7 +1278,7 @@ public class RecipeGenerator extends RecipeProvider {
         this.shaped(RecipeCategory.MISC, output, 1)
                 .define('c', tuningMetal)
                 .define('s', of(TagContent.STEEL_INGOTS))
-                .define('r', of(cItemTag("dusts/redstone")))
+                .define('r', of(ItemContent.ENDERIC_COMPOUND))
                 .pattern(" c ").pattern("rsr").pattern(" c ")
                 .unlockedBy(getHasName(unlockItem), has(unlockItem)).save(exporter);
     }

@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "c": "#c:gems/diamond",
-    "r": "#c:dusts/redstone",
+    "r": "oritech:enderic_compound",
     "s": "#c:ingots/steel"
   },
   "pattern": [
