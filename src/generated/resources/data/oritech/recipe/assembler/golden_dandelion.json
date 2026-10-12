@@ -1,0 +1,15 @@
+{
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "minecraft:dandelion",
+    "#c:nuggets/gold",
+    "#c:nuggets/gold",
+    "#c:nuggets/gold"
+  ],
+  "itemResults": [
+    {
+      "id": "minecraft:golden_dandelion"
+    }
+  ],
+  "time": 96
+}

@@ -1,0 +1,16 @@
+{
+  "type": "oritech:assembler",
+  "itemInputs": [
+    "#minecraft:planks",
+    "#minecraft:planks",
+    "minecraft:book",
+    "minecraft:book"
+  ],
+  "itemResults": [
+    {
+      "count": 2,
+      "id": "minecraft:bookshelf"
+    }
+  ],
+  "time": 48
+}

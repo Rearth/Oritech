@@ -81,6 +81,14 @@ public class RecipeGenerator extends RecipeProvider {
 
     private void addVanillaAdditions(RecipeOutput exporter) {
 
+        // Efficient alternatives to vanilla crafting.
+        new AssemblerRecipeBuilder(this.registries).input(ItemTags.PLANKS).input(ItemTags.PLANKS).input(Items.BOOK).input(Items.BOOK).result(Items.BOOKSHELF, 2).timeMultiplier(0.4f).export(exporter, "bookshelf");
+        new AssemblerRecipeBuilder(this.registries).input(Items.FLINT).input(Items.STICK).input(Items.STICK).input(Items.FEATHER).result(Items.ARROW, 16).timeMultiplier(0.4f).export(exporter, "arrows");
+
+        // Golden dandelions and dried ghasts use fewer ingredients than vanilla crafting.
+        new AssemblerRecipeBuilder(this.registries).input(Items.DANDELION).input(cItemTag("nuggets/gold")).input(cItemTag("nuggets/gold")).input(cItemTag("nuggets/gold")).result(Items.GOLDEN_DANDELION).timeMultiplier(0.8f).export(exporter, "golden_dandelion");
+        new AssemblerRecipeBuilder(this.registries).input(Items.SOUL_SAND).input(Items.GHAST_TEAR).input(Items.GHAST_TEAR).input(Items.GHAST_TEAR).result(Items.DRIED_GHAST).timeMultiplier(0.8f).export(exporter, "dried_ghast");
+
         // slimeball from honey and biomass
         new AssemblerRecipeBuilder(this.registries).input(Items.HONEYCOMB).input(TagContent.BIOMASS).input(TagContent.BIOMASS).input(TagContent.BIOMASS).result(Items.SLIME_BALL).timeMultiplier(0.8f).export(exporter, "slime");
         // fireball in assembler (gunpowder, blaze powder + coal) = 5 charges
