@@ -2,7 +2,7 @@
   "oracle_index.title.oritech": "Oritech",
   "message.oritech.oracle_index_missing": "Oracle Index не установлен. Он не является обязательным для игры, и вся информация доступна на moddedmc.wiki, но Oracle Index рекомендуется для внутриигровой помощи.",
   "advancements.oritech.begin": "Oritech",
-  "key.oritech.hotkey_category": "Oritech",
+  "key.category.oritech.keys": "Oritech",
   "advancements.oritech.begin.description": "Никель & Диме - начните свое технологическое приключение с добычи необработанного никеля. Сияй, сумасшедший шахтер!",
   "advancements.oritech.generator": "Заряжайся!",
   "advancements.oritech.generator.description": "Получите серьезную энергию с помощью генератора. Захватывающе, не правда ли?",
@@ -1194,7 +1194,6 @@
   "oritech.configuration.superConductorTransferRate": "Скорость передачи сверхпроводника",
   "oritech.configuration.steamToRfRatio": "Соотношение пара к RF",
   "oritech.configuration.smallEnergyStorage": "Малое энергохранилище",
-  "oritech.configuration.generateOresFabricOnly": "[Только Fabric] Генерировать руды",
   "oritech.configuration.ultimateAddonSpeed": "Скорость ультимативного аддона",
   "oritech.configuration.additiveAddons": "Аддоны суммируются",
   "oritech.configuration.exoJetpack": "Экзо джетпак",
@@ -1350,5 +1349,10 @@
   "tag.item.oritech.recyclable.small_iron_dust": "Перерабатываемая мелкая железная пыль",
   "tag.item.oritech.recyclable.string": "Перерабатываемая нить",
   "pack.oritech.ato_resource_nodes": "Oritech - ATO Resource Node Compatibility",
-  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility"
+  "pack.oritech.ftb_resource_nodes": "Oritech - FTB Materials Resource Node Compatibility",
+  "oritech.configuration.baseEnergyUsage": "Base Energy Usage per Trip",
+  "oritech.configuration.distanceEnergyUsage": "Travel Distance Energy Multiplier",
+  "oritech.configuration.dronePortConfig": "Порт дронов",
+  "oritech.configuration.interaction": "Interaction Machines",
+  "oritech.configuration.showOracleIndexWarning": "Show Oracle Index Warning"
 }
