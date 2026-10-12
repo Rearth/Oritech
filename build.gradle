@@ -234,6 +234,12 @@ dependencies {
     compileOnly "curse.maven:jade-324717:8326300"
     localRuntime "curse.maven:jade-324717:8326300"
 
+    // FTB Filter System integration (optional at runtime)
+    compileOnly "curse.maven:ftb-filter-system-943925:8300191"
+    localRuntime "curse.maven:ftb-filter-system-943925:8300191"
+    // FTB Library 26.1.2.7, required by FTB Filter System and FTB Materials
+    localRuntime "curse.maven:ftb-library-forge-404465:8574542"
+
     // compat datagen dependencies
     // Oritech, from source
     compatImplementation sourceSets.main.output
@@ -261,8 +267,6 @@ dependencies {
 
     // FTB Materials 26.1.2.5 (6/24/2026)
     compatImplementation "curse.maven:ftb-materials-1124942:8500413"
-    // FTB Library 26.1.2.7 (8/4/2026)
-    compatRuntimeOnly "curse.maven:ftb-library-forge-404465:8574542"
 
     // GeOre 8.0.6 (6/20/2026)
     compatImplementation "curse.maven:geore-530544:8288343"

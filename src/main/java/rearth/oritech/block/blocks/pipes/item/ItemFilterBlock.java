@@ -28,6 +28,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.util.Geometry;
@@ -94,10 +95,9 @@ public class ItemFilterBlock extends Block implements EntityBlock, TooltipProvid
     public void addToTooltip(Item.TooltipContext tooltipContext, Consumer<Component> consumer, TooltipFlag tooltipFlag, DataComponentGetter dataComponentGetter) {
         consumer.accept(Component.translatable("tooltip.oritech.item_filter").withStyle(ChatFormatting.GRAY));
 
-//  todo
-//        if (Platform.isModLoaded("ftbfiltersystem")) {
-//            consumer.accept(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
-//        }
+        if (ModList.get().isLoaded("ftbfiltersystem")) {
+            consumer.accept(Component.translatable("tooltip.oritech.item_filter_ftb").withStyle(ChatFormatting.GRAY));
+        }
 
     }
 
