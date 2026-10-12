@@ -56,17 +56,25 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
 
     public abstract int getOperationEnergyUsage();
 
+    public float getMoveEnergyUsagePerTick() {
+        return getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+    }
+
+    public float getOperationEnergyUsagePerTick() {
+        return getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+    }
+
     @Override
     protected boolean canProgress() {
         return !disabledViaRedstone &&
-                energyStorage.energy >= getMoveEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()) &&
-                energyStorage.energy >= getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+                energyStorage.energy >= getMoveEnergyUsagePerTick() &&
+                energyStorage.energy >= getOperationEnergyUsagePerTick();
     }
 
     @Override
     protected void doProgress(boolean moving) {
-        var usedCost = moving ? getMoveEnergyUsage() : getOperationEnergyUsage();
-        energyStorage.energy -= (long) (usedCost * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed()));
+        var usedCost = moving ? getMoveEnergyUsagePerTick() : getOperationEnergyUsagePerTick();
+        energyStorage.energy -= (long) usedCost;
     }
 
     @Override
@@ -157,17 +165,17 @@ public abstract class ItemEnergyFrameInteractionBlockEntity extends FrameInterac
 
     @Override
     public float getDisplayedEnergyUsage() {
-        return getOperationEnergyUsage() * getBaseAddonData().efficiency() * (1 / getBaseAddonData().speed());
+        return getOperationEnergyUsagePerTick();
     }
 
     @Override
     public long getDefaultCapacity() {
-        return 100_000;
+        return 500_000;
     }
 
     @Override
     public long getDefaultInsertRate() {
-        return 5000;
+        return 50_000;
     }
 
     @Override

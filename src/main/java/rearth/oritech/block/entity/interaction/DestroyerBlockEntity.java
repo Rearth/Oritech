@@ -7,6 +7,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -27,14 +28,17 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockFrameInteractionEntity;
 import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
@@ -55,7 +59,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     @SyncField({SyncType.GUI_OPEN, SyncType.SPARSE_TICK})
     public int range = 1;
 
-    private boolean removeFluids = true;
+    @SyncField(SyncType.GUI_OPEN)
+    public boolean removeFluids = true;
 
     // non-persistent
     @SyncField
@@ -123,6 +128,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         output.putBoolean("silkTouchAddon", hasSilkTouchAddon);
         output.putInt("range", range);
         output.putInt("yield", yieldAddons);
+        output.putBoolean("removeFluids", removeFluids);
     }
 
     @Override
@@ -132,6 +138,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         hasSilkTouchAddon = input.getBooleanOr("silkTouchAddon", false);
         range = input.getIntOr("range", 1);
         yieldAddons = input.getIntOr("yield", 0);
+        removeFluids = input.getBooleanOr("removeFluids", true);
     }
 
     @Override
@@ -143,6 +150,8 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
         var targetPosition = toolPosition.below();
         var targetState = Objects.requireNonNull(level).getBlockState(targetPosition);
+
+        if (!removeFluids && targetState.getBlock() instanceof LiquidBlock) return false;
 
         // skip not grown crops
         if (hasCropFilterAddon && isImmatureCrop(targetState, level, targetPosition)) {
@@ -165,7 +174,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
 
     public static boolean isImmatureCrop(BlockState targetState, LevelReader reader, BlockPos targetPos) {
-        Block targetBlock = targetState.getBlock();
+        var targetBlock = targetState.getBlock();
         return (targetBlock instanceof BonemealableBlock cropBlock && cropBlock.isValidBonemealTarget(reader, targetPos, targetState))
                 // some crops arent bonemealable but still growing
                 || (targetBlock instanceof NetherWartBlock && targetState.getValue(NetherWartBlock.AGE) < NetherWartBlock.MAX_AGE)
@@ -173,10 +182,19 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
 
     private Tuple<BlockPos, BlockState> getQuarryDownwardState(BlockPos toolPosition) {
-        for (int i = 1; i <= range; i++) {
+        for (var i = 1; i <= range; i++) {
             var checkPos = toolPosition.below(i);
             var targetState = level.getBlockState(checkPos);
-            if (!targetState.isAir() && targetState.getFluidState().isEmpty()) {  // pass through both air and liquid
+
+            if (targetState.getBlock() instanceof LiquidBlock) {
+                if (removeFluids) {
+                    level.setBlock(checkPos, Blocks.AIR.defaultBlockState(),
+                            Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+                }
+                continue;
+            }
+
+            if (!targetState.isAir()) {  // pass through both air and liquid
                 quarryTarget = checkPos;
                 targetHardness = Math.clamp(targetState.getDestroySpeed(level, checkPos), 0, 100);
                 return new Tuple<>(checkPos, targetState);
@@ -206,8 +224,12 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
         }
 
         // remove fluids
-        if (!targetState.getFluidState().isEmpty()) {
-            level.setBlockAndUpdate(targetPosition, Blocks.AIR.defaultBlockState());
+        if (targetState.getBlock() instanceof LiquidBlock) {
+            if (removeFluids) {
+                level.setBlock(targetPosition, Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            }
+            return;
         }
 
         var targetHardness = targetState.getBlock().defaultDestroyTime();
@@ -248,7 +270,32 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
             targetState.getBlock().playerWillDestroy(level, targetPosition, targetState, getDestroyerPlayerEntity());
             level.playSound(null, targetPosition, targetState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 1f, 1f);
             level.destroyBlock(targetPosition, false);
+            if (removeFluids && !level.getFluidState(targetPosition).isEmpty()) {
+                level.setBlock(targetPosition, Blocks.AIR.defaultBlockState(),
+                        Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE);
+            }
             super.finishBlockWork(processed);
+        }
+    }
+
+    public static void receiveFluidRemovalPacket(FluidRemovalPacket packet, IPayloadContext context) {
+        var player = context.player();
+        if (!(player.containerMenu instanceof OritechScreenHandler menu)
+                || !menu.blockPos.equals(packet.position()) || !menu.stillValid(player)
+                || !(menu.blockEntity instanceof DestroyerBlockEntity destroyer)) return;
+
+        destroyer.removeFluids = packet.removeFluids();
+        destroyer.setChanged();
+        destroyer.sendUpdate(SyncType.GUI_OPEN);
+    }
+
+    public record FluidRemovalPacket(BlockPos position, boolean removeFluids) implements CustomPacketPayload {
+
+        public static final Type<FluidRemovalPacket> PACKET_ID = new Type<>(Oritech.id("destroyer_remove_fluids"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return PACKET_ID;
         }
     }
 
@@ -353,13 +400,20 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
     }
 
     @Override
+    public float getSpeedMultiplier() {
+        var quarrySpeedFactor = range > 1 ? 0.125f : 1f; // quarry has 8 times the speed (and even more increased block break speed) but at 4 times the RF cost
+        return super.getSpeedMultiplier() * quarrySpeedFactor;
+    }
+
+    @Override
     public int getMoveEnergyUsage() {
-        return OritechConfig.destroyerConfig.moveEnergyUsage.get();
+        var quarryCostBonus = range > 1 ? 4 : 1;
+        return OritechConfig.destroyerConfig.moveEnergyUsage.get() * quarryCostBonus;
     }
 
     @Override
     public int getOperationEnergyUsage() {
-        var quarryCostBonus = range > 1 ? 4 : 1;
+        var quarryCostBonus = range > 1 ? 32 : 1;
         return OritechConfig.destroyerConfig.workEnergyUsage.get() * quarryCostBonus;
     }
 

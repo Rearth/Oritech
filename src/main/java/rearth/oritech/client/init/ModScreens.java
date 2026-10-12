@@ -85,7 +85,7 @@ public class ModScreens {
         event.register(STORAGE_SCREEN.get(), LimitedEnergyStorageScreen::new);
         event.register(ENERGY_TRANSMISSION_POLE_SCREEN.get(), EnergyTransmissionPoleScreen::new);
         event.register(SCHRODINGERS_SAFE_SCREEN.get(), SchrodingersSafeScreen::new);
-        event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(DESTROYER_SCREEN.get(), UpgradableOritechScreen::new);
+        event.register(DESTROYER_SCREEN.get(), DestroyerScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(PLACER_SCREEN.get(), UpgradableOritechScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(FERTILIZER_SCREEN.get(), UpgradableOritechScreen::new);
         event.<UpgradableOritechScreenHandler, UpgradableOritechScreen<UpgradableOritechScreenHandler>>register(LASER_SCREEN.get(), UpgradableOritechScreen::new);
