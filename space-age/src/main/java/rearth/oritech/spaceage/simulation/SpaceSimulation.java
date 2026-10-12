@@ -151,6 +151,12 @@ public class SpaceSimulation {
     private void generateRandomObjects() {
 
         addCluster(-3_160_000, 0, 55_000, 12);
+        // Nearby survey destinations in several directions, from short hops to relay-range trips.
+        addCluster(-2_820_000, 100_000, 45_000, 8);
+        addCluster(-3_080_000, -290_000, 65_000, 10);
+        addCluster(-3_420_000, 240_000, 85_000, 12);
+        addCluster(-2_400_000, -320_000, 100_000, 10);
+        addCluster(-3_350_000, -880_000, 130_000, 14);
         for (int index = 0; index < 72; index++) {
             var angle = index * Math.PI * 2 / 72;
             addCluster(Math.cos(angle) * 6_500_000, Math.sin(angle) * 6_500_000, 310_000, 4);
@@ -387,7 +393,6 @@ public class SpaceSimulation {
         DISCONNECT_BOOSTER,
         MAINTAIN_POSITION,
         DISCARD_CRAFT,
-        DETONATE,
         PROCESS,
         DOCK,
         UNDOCK;

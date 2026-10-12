@@ -190,7 +190,7 @@ public final class RocketFlightPathCalculator {
             state.segments.values().forEach(segment -> segment.wetMass = Math.max(1, segment.dryMass + segment.fuelMass));
             var requiresUndocking = (!state.occupiedPortSegments.isEmpty() || !state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET))
                     && (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.DOCK
-                    || action.type() == SpaceSimulation.ActionType.DETONATE || action.type() == SpaceSimulation.ActionType.DISCARD_CRAFT);
+                    || action.type() == SpaceSimulation.ActionType.DISCARD_CRAFT);
             completed = !requiresUndocking && switch (action.type()) {
                 case SCAN, TRANSMIT_INFORMATION -> service(action, state, context);
                 case NAVIGATE_TO ->
@@ -205,17 +205,6 @@ public final class RocketFlightPathCalculator {
                 case PROCESS -> RocketServiceForecast.process(action, state, context);
                 case DOCK -> RocketServiceForecast.dock(action, state, context);
                 case UNDOCK -> RocketServiceForecast.undock(action, state, context);
-                case DETONATE -> {
-                    var target = RocketExplosives.detonationTarget(context.objects.values(), state.x, state.y);
-                    if (target != null) {
-                        var prediction = AsteroidImpactRules.predictArrival(state.rocketMass(), target,
-                                Math.hypot(state.velocityX - target.velocityX(), state.velocityY - target.velocityY()),
-                                state.attachedAsteroid, action, state.explosiveEnergy(), true);
-                        context.arrivalPredictions.add(new ArrivalPrediction(action.id(), state.branchId, target.id(), prediction));
-                    }
-                    state.destroyed = true;
-                    yield true;
-                }
                 case DISCARD_CRAFT -> {
                     state.discarded = true;
                     yield true;

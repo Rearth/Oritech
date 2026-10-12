@@ -80,17 +80,18 @@ class RocketExtensionRulesTest {
     }
 
     @Test
-    void safePayloadArrivalDoesNotIgniteButDetonationFragmentsAsteroids() {
+    void safePayloadArrivalDoesNotIgniteButHighSpeedImpactFragmentsAsteroids() {
 
         var target = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
                 0, 0, 0, 0, 100, .01f, 1, SpaceObjects.DetectionState.PRECISE, "Test", List.of());
         var action = FlightPlanAction.create(ActionType.NAVIGATE_TO);
-        var safe = AsteroidImpactRules.predictArrival(1000, target, 0, null, action, 1_000_000_000, false);
+        var safe = AsteroidImpactRules.predictArrival(1000, target, 0, null, action, 1_000_000_000);
         assertEquals(AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH, safe.outcome());
         assertEquals(0, safe.explosiveEnergyJoules());
-        var blast = AsteroidImpactRules.predictArrival(1000, target, 0, null, action, 1_000_000_000, true);
+        var blast = AsteroidImpactRules.predictArrival(1000, target, 20, null, action, 1_000_000_000);
         assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, blast.fragmentationMode());
-        assertEquals(1_000_000_000, blast.totalEnergyJoules());
+        assertEquals(1_000_000_000, blast.explosiveEnergyJoules());
+        assertEquals(1_000_200_000, blast.totalEnergyJoules());
         assertTrue(RocketExplosives.worldStrength(Double.MAX_VALUE) <= 32);
     }
 

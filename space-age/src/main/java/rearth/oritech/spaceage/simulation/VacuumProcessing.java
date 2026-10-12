@@ -29,7 +29,7 @@ public final class VacuumProcessing {
 
     public static boolean zeroG(double x, double y, Collection<SpaceSimulation.SpaceObjectData> objects) {
 
-        return objects.stream().filter(o -> RocketTransferRoute.hasSurface(o) || o.type() == SpaceObjects.ObjectType.ASTEROID)
+        return objects.stream().filter(RocketTransferRoute::hasSurface)
                 .noneMatch(o -> Math.hypot(x - o.x(), y - o.y()) < exclusionRadius(o));
     }
 
@@ -39,7 +39,7 @@ public final class VacuumProcessing {
         var dy = vy * ticks / 20;
         var lengthSquared = dx * dx + dy * dy;
         for (var object : objects) {
-            if (!RocketTransferRoute.hasSurface(object) && object.type() != SpaceObjects.ObjectType.ASTEROID) continue;
+            if (!RocketTransferRoute.hasSurface(object)) continue;
 
             // Check the closest point of the whole coast, so passing through gravity also pauses crafting.
             var t = lengthSquared == 0 ? 0 : Math.clamp(((object.x() - x) * dx + (object.y() - y) * dy) / lengthSquared, 0, 1);

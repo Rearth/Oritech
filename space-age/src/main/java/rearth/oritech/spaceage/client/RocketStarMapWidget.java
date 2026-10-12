@@ -13,6 +13,7 @@ import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
+import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.MissionController;
 import rearth.oritech.spaceage.simulation.MissionState;
@@ -41,6 +42,7 @@ final class RocketStarMapWidget extends UIComponent {
 
     // Celestial object state, orbit geometry, and object hover detection.
     private final StarMapObjects mapObjects = new StarMapObjects();
+    private final StarMapIconGroups iconGroups = new StarMapIconGroups();
     // One rocket icon at the end of each surviving branch.
     private final List<BranchMarker> rocketMarkers = new ArrayList<>();
     // Group boosters released together into one map marker.
@@ -296,8 +298,17 @@ final class RocketStarMapWidget extends UIComponent {
         hoveredSeparation = null;
         hoveredPathPoint = null;
         findHoveredPath(mouseX, mouseY);
+        var icons = mapObjects.groupIcons(camera, viewport, selectedTarget);
+        for (var marker : rocketMarkers) {
+            var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
+            if (!StarMapLineSimplifier.intersects(position.x, position.y, position.x, position.y,
+                    viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) continue;
+            icons.add(new Icon(marker.branchId, SpaceObjects.ObjectType.CRAFT, position.x, position.y,
+                    marker.branchId.equals(selectedBranch) || selectedTarget != null && selectedTarget.objectId().equals(marker.branchId)));
+        }
+        var hiddenIcons = iconGroups.hidden(icons);
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
-                isInsideViewport(mouseX, mouseY));
+                isInsideViewport(mouseX, mouseY), hiddenIcons);
         if (isInsideViewport(mouseX, mouseY))
             hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
         if (hoveredPathPoint != null && hoveredObject != null
@@ -305,7 +316,8 @@ final class RocketStarMapWidget extends UIComponent {
             hoveredObject = null;
             hoveredSelection = null;
         }
-        for (var marker : rocketMarkers) renderRocket(graphics, marker, mouseX, mouseY, delta);
+        for (var marker : rocketMarkers)
+            if (!hiddenIcons.contains(marker.branchId)) renderRocket(graphics, marker, mouseX, mouseY, delta);
         renderSeparations(graphics, mouseX, mouseY);
         graphics.disableScissor();
 
@@ -589,7 +601,7 @@ final class RocketStarMapWidget extends UIComponent {
             return branch.isRoot() ? Component.translatable("screen.oritech_space_age.branch.root")
                     : Component.translatable("screen.oritech_space_age.branch.number", index + 1);
         }
-        return Component.literal("–");
+        return Component.literal("â€“");
     }
 
     @Override

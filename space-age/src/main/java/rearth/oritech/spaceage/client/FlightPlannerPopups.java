@@ -81,7 +81,7 @@ final class FlightPlannerPopups {
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE -> 2;
-            case MAINTAIN_POSITION, DISCARD_CRAFT, DETONATE -> 1;
+            case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
             case PROCESS -> 7;
             case DOCK -> 9;
             case UNDOCK -> 6;

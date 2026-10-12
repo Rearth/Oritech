@@ -306,15 +306,15 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             var link = entry.communication();
             var radio = new LabelWidget(8, y + 61, listWidth - 24,
                     Component.translatable("screen.oritech_space_age.mission.radio_status",
-                            availability(entry.connected()), availability(link.upload())))
-                    .withColor(entry.connected() && link.upload() ? 0xFF9FE58A : 0xFFFFC46B);
+                            availability(entry.connected())))
+                    .withColor(entry.connected() ? 0xFF9FE58A : 0xFFFFC46B);
             radio.withTooltip(Component.translatable(link.reason()),
                     Component.translatable("screen.oritech_space_age.mission.radio_tooltip"));
             list.addChild(radio);
             radio.setVisible(!collapsed);
             var upload = new LabelWidget(8, y + 75, listWidth - 24, 18,
-                    Component.translatable("screen.oritech_space_age.mission.upload_distance",
-                            distance(link.uploadRange()), distance(link.receiverDistance())))
+                    Component.translatable("screen.oritech_space_age.mission.coverage_distance",
+                            coverageDistance(link.coverageAltitude()), distance(link.altitude())))
                     .withBrightColor().withWrap(true);
             upload.withTooltip(Component.translatable(link.reason()));
             list.addChild(upload);
@@ -355,7 +355,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                     .filter(FleetViewPreferences::collapsed).collect(Collectors.toSet()));
             map.setCoverage(nodes);
             map.setShowSummary(false);
-            map.setCommandCoverage(network.groundAntennas() == 0 ? -2 : network.commandAltitude());
+            map.setCommandCoverage(network.groundAntennas() == 0 ? -2 : network.coverageAltitude());
             map.setFleetTimes(presentation.times());
             map.setCraftLabels(presentation.labels());
             addComponent(map);
@@ -432,12 +432,12 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                     ? Component.translatable("screen.oritech_space_age.mission.science_delivered")
                     : location(telemetry, menu.fleetSnapshot.objects()));
             row.radio().setText(Component.translatable("screen.oritech_space_age.mission.radio_status",
-                    availability(entry.connected()), availability(link.upload())));
-            row.radio().withColor(entry.connected() && link.upload() ? 0xFF9FE58A : 0xFFFFC46B);
+                    availability(entry.connected())));
+            row.radio().withColor(entry.connected() ? 0xFF9FE58A : 0xFFFFC46B);
             row.radio().setTooltip(List.of(Component.translatable(link.reason()),
                     Component.translatable("screen.oritech_space_age.mission.radio_tooltip")));
-            row.upload().setText(Component.translatable("screen.oritech_space_age.mission.upload_distance",
-                    distance(link.uploadRange()), distance(link.receiverDistance())));
+            row.upload().setText(Component.translatable("screen.oritech_space_age.mission.coverage_distance",
+                    coverageDistance(link.coverageAltitude()), distance(link.altitude())));
             row.upload().setTooltip(List.of(Component.translatable(link.reason())));
             row.edit().setLabel(Component.translatable(entry.connected()
                     ? "screen.oritech_space_age.mission.view_edit"
@@ -453,7 +453,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
 
         map.updateFlightPath(presentation.snapshot(), presentation.flight(), null);
         map.setCoverage(menu.networkNodes);
-        map.setCommandCoverage(menu.network.groundAntennas() == 0 ? -2 : menu.network.commandAltitude());
+        map.setCommandCoverage(menu.network.groundAntennas() == 0 ? -2 : menu.network.coverageAltitude());
         map.setFleetTimes(presentation.times());
         map.setCraftLabels(presentation.labels());
     }
@@ -473,6 +473,12 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             if (row != null) row.status().setText(status(entry.telemetry(), path, elapsedTicks));
         }
         map.setFleetTimes(times);
+    }
+
+    private static Component coverageDistance(double altitude) {
+
+        return altitude < 0 ? Component.translatable("screen.oritech_space_age.mission.system_range")
+                : Component.literal(distance(altitude));
     }
 
     private void addNetworkIndicators(int width, SpaceCommunications.NetworkStatus network) {
@@ -499,12 +505,11 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                                   : "screen.oritech_space_age.mission.high_incomplete")));
         start += chipWidth + 3;
         var coverage = network.groundAntennas() == 0 ? Component.translatable("screen.oritech_space_age.mission.no_range")
-                : network.commandAltitude() < 0 ? Component.translatable("screen.oritech_space_age.mission.system_range")
-                  : Component.literal(distance(network.commandAltitude()));
+                : network.coverageAltitude() < 0 ? Component.translatable("screen.oritech_space_age.mission.system_range")
+                  : Component.literal(distance(network.coverageAltitude()));
         addNetworkIndicator(start, chipWidth, SpaceAgeBlocks.ANTENNA.get().asItem(), coverage,
                 network.groundAntennas() > 0,
                 List.of(Component.translatable("screen.oritech_space_age.mission.command_coverage", coverage),
-                        Component.translatable("screen.oritech_space_age.mission.receiver_gain", (int) network.receiverGain()),
                         Component.translatable("screen.oritech_space_age.mission.command_boundary_tooltip")));
     }
 
