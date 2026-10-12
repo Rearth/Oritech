@@ -6,6 +6,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -15,6 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
@@ -23,6 +26,7 @@ import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.PlayerInventoryWrapper;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -57,6 +61,7 @@ public class EquipmentChargerBlockEntity extends NetworkedBlockEntity implements
     // 0 = bucket/item to be charged/filled, 1 = empty bucket/charged/fill item
     public final InOutInventoryStorage inventory = new InOutInventoryStorage(2, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
 
+    private boolean padOccupied;
 
     public EquipmentChargerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.EQUIPMENT_CHARGER.get(), pos, state);
@@ -66,35 +71,65 @@ public class EquipmentChargerBlockEntity extends NetworkedBlockEntity implements
     public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         if (serverLevel.isClientSide()) return;
 
-        // stop if no input is given, or it's a stackable item
-        if (inventory.getItem(0).isEmpty() || inventory.getItem(0).getCount() > 1) return;
-
-        var isFull = true;
         var startEnergy = energyStorage.energy;
         var startFluid = fluidStorage.getAmount();
 
-        // try charge item
-        if (!chargeItems()) isFull = false;
+        if (!inventory.getItem(0).isEmpty() && inventory.getItem(0).getCount() == 1) {
+            var isFull = chargeItems();
+            if (!fillItems()) isFull = false;
 
-        // try filling item
-        if (!fillItems()) isFull = false;
-
-        // move charged and/or filled item to right
-        if (isFull) {
-            var outSlot = inventory.getItem(1);
-            if (outSlot.isEmpty()) {
+            // move charged and/or filled item to right
+            if (isFull && inventory.getItem(1).isEmpty()) {
                 inventory.getStacks().set(1, inventory.getItem(0));
                 inventory.getStacks().set(0, ItemStack.EMPTY);
+                setChanged();
             }
         }
 
         if (fluidStorage.getAmount() != startFluid || energyStorage.energy != startEnergy) {
-            if (serverLevel instanceof ServerLevel sl) {
-                var c = pos.getCenter().add(0.1, 0.1, 0);
-                ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
-            }
+            var c = pos.getCenter().add(0.1, 0.1, 0);
+            ParticleContent.sendParticles(serverLevel, ParticleTypes.ENCHANTED_HIT, c.x, c.y, c.z, 1, 0.6, 0.6, 0.6, 0);
         }
 
+        // The input slot and all players share the charger's per-tick transfer limit.
+        chargePlayers(serverLevel, pos, Math.max(0, energyStorage.maxExtract - (startEnergy - energyStorage.energy)));
+    }
+
+    private void chargePlayers(ServerLevel level, BlockPos pos, long remainingEnergy) {
+        // The charger is half a block tall. Only grounded players with feet on its surface count.
+        var surfaceY = pos.getY() + 0.5;
+        var players = level.getEntitiesOfClass(Player.class,
+                new AABB(pos.getX(), surfaceY, pos.getZ(), pos.getX() + 1, surfaceY + 0.1, pos.getZ() + 1),
+                player -> player.isAlive() && !player.isSpectator() && player.onGround()
+                        && Math.abs(player.getY() - surfaceY) < 0.05);
+
+        var occupied = !players.isEmpty();
+        if (occupied != padOccupied) {
+            level.playSound(null, pos, occupied ? SoundEvents.STONE_PRESSURE_PLATE_CLICK_ON : SoundEvents.STONE_PRESSURE_PLATE_CLICK_OFF,
+                    SoundSource.BLOCKS, 0.3F, occupied ? 0.8F : 0.7F);
+            padOccupied = occupied;
+        }
+
+        for (var player : players) {
+            var transferred = 0L;
+            var playerInventory = PlayerInventoryWrapper.of(player);
+            for (var slot = 0; slot < playerInventory.size(); slot++) {
+                if (remainingEnergy <= 0 || energyStorage.energy <= 0) break;
+                if (player.getInventory().getItem(slot).isEmpty()) continue;
+
+                var itemEnergy = ItemAccess.forPlayerSlot(player, slot).getCapability(Capabilities.Energy.ITEM);
+                if (itemEnergy == null) continue;
+
+                var moved = transferEnergy(itemEnergy, remainingEnergy);
+                remainingEnergy -= moved;
+                transferred += moved;
+            }
+
+            if (transferred > 0 && level.getGameTime() % 4 == 0) {
+                ParticleContent.sendParticles(level, ParticleTypes.ELECTRIC_SPARK,
+                        player.getX(), surfaceY + 0.3, player.getZ(), 4, 0.35, 0.2, 0.35, 0.02);
+            }
+        }
     }
 
     @Override
@@ -118,16 +153,24 @@ public class EquipmentChargerBlockEntity extends NetworkedBlockEntity implements
         var heldStack = inventory.getStacks().get(0);
         var slotEnergyContainer = heldStack.getCapability(Capabilities.Energy.ITEM, ItemAccess.forHandlerIndexStrict(inventory, 0));
         if (slotEnergyContainer != null) {
-            try (var transaction = Transaction.openRoot()) {
-                var moved = slotEnergyContainer.insert((int) Math.min(energyStorage.maxExtract, energyStorage.energy), transaction);
-                if (moved > 0) {
-                    energyStorage.internalExtract(moved, transaction);
-                    transaction.commit();
-                }
-            }
+            transferEnergy(slotEnergyContainer, energyStorage.maxExtract);
             return slotEnergyContainer.getAmountAsLong() >= slotEnergyContainer.getCapacityAsLong();
         } else {
             return true;
+        }
+    }
+
+    private int transferEnergy(EnergyHandler target, long limit) {
+        var available = (int) Math.min(Integer.MAX_VALUE, Math.min(limit, energyStorage.energy));
+        if (available <= 0) return 0;
+
+        try (var transaction = Transaction.openRoot()) {
+            var moved = target.insert(available, transaction);
+            if (moved > 0) {
+                energyStorage.internalExtract(moved, transaction);
+                transaction.commit();
+            }
+            return moved;
         }
     }
 
