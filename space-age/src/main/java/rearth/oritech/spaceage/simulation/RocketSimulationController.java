@@ -48,17 +48,11 @@ public final class RocketSimulationController {
 
     public static void beginReentry(ServerLevel level, ActiveRocketData rocket, BlockPos landing, long ticks, double speed) {
 
-        beginReentry(level, rocket, landing, ticks, speed, List.of());
-    }
-
-    public static void beginReentry(ServerLevel level, ActiveRocketData rocket, BlockPos landing, long ticks, double speed,
-                                    List<ParachuteLanding.Point> descent) {
-
         var now = level.getGameTime();
-        if (speed <= 12 && descent.isEmpty()) ticks = Math.max(200, ticks);
+        if (speed <= 12) ticks = Math.max(200, ticks);
         rocket.setFlight(new RocketFlight(true, null, level.dimension(), RocketPerformanceCalculator.calculate(rocket),
                 landing, landing.above(ORBIT_HEIGHT_BLOCKS), landing, new Vector2i(0, 0), 0, speed,
-                now - 1, now, now + ticks, null, -1, descent));
+                now - 1, now, now + ticks, null, -1));
         var data = getSavedData(level);
         data.rockets.put(rocket.getRocketId(), rocket);
         data.setDirty();
@@ -187,17 +181,6 @@ public final class RocketSimulationController {
         }
 
         var progress = Mth.clamp((gameTime - flight.reentryTick()) / Math.max(1, flight.impactTick() - flight.reentryTick()), 0, 1);
-        if (!flight.parachuteDescent().isEmpty()) {
-            var points = flight.parachuteDescent();
-            var seconds = progress * points.getLast().seconds();
-            var end = 1;
-            while (end < points.size() - 1 && points.get(end).seconds() < seconds) end++;
-            var a = points.get(end - 1);
-            var b = points.get(end);
-            var fraction = Math.clamp((seconds - a.seconds()) / Math.max(1e-9, b.seconds() - a.seconds()), 0, 1);
-            var altitude = a.altitude() + (b.altitude() - a.altitude()) * fraction;
-            return impactPosition.add(0, Math.max(0, altitude), 0);
-        }
         var duration = Math.max(1, flight.impactTick() - flight.reentryTick()) / 20.0;
         var height = Math.max(1, orbitPosition.y - impactPosition.y);
         return orbitPosition.lerp(impactPosition, descentProgress(progress, height, duration, flight.impactSpeedMetersPerSecond()));

@@ -7,6 +7,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Matrix3x2f;
+import org.joml.Matrix4f;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -32,6 +33,12 @@ public record BlockPreviewRenderState(
         @Nullable ScreenRectangle scissorArea,
         @Nullable ScreenRectangle bounds
 ) implements PictureInPictureRenderState {
+
+    /** Shared by the renderer and GUI geometry projected onto the block model. */
+    public static Matrix4f modelRotation(float rotationX, float rotationY) {
+        return new Matrix4f().scaling(1, -1, -1)
+                .rotateX((float) Math.toRadians(rotationX)).rotateY((float) Math.toRadians(rotationY));
+    }
 
     public BlockPreviewRenderState(List<Entry> blocks, float rotationX, float rotationY,
                                    float centerX, float centerY, float centerZ,

@@ -37,6 +37,7 @@ final class StarMapObjects {
     private static final int MAX_CIRCLE_SEGMENTS = 512;
     // Texture resolution is independent of the body's displayed world-space size.
     private static final int ICON_TEXTURE_SIZE = 128;
+    private static final int PLANET_TEXTURE_PADDING = 16;
     // Each object keeps its 3D block widget so its familiar planet icon can be reused each frame.
     private final List<Entry> objects = new ArrayList<>();
     private final List<FogPatch> fogBridges = new ArrayList<>();
@@ -117,6 +118,23 @@ final class StarMapObjects {
                 && y + radiusY >= viewport.y() && y - radiusY < viewport.bottom();
     }
 
+    private static boolean isPlanet(SpaceObjects.ObjectType type) {
+
+        return type == SpaceObjects.ObjectType.SUN || type == SpaceObjects.ObjectType.EARTH
+                || type == SpaceObjects.ObjectType.MARS;
+    }
+
+    RocketMapPaths.Point surfacePosition(RocketMapPaths.Point point) {
+
+        for (var object : objects) {
+            if (!isPlanet(object.data.type())) continue;
+            var body = object.data;
+            if (Math.abs(Math.hypot(point.x() - body.x(), point.y() - body.y()) - body.radius()) < .1)
+                return PlanetSurfaceProjection.closestEdge(point, body.x(), body.y(), body.radius(), object.outline);
+        }
+        return point;
+    }
+
     private static boolean circleIntersects(Viewport viewport, StarMapCamera camera, double x, double y, double radius) {
 
         var center = project(camera, viewport, x, y);
@@ -131,10 +149,10 @@ final class StarMapObjects {
             var widget = new BlockWidget(0, 0, ICON_TEXTURE_SIZE, iconBlock(object));
             // Normalize the two-block celestial models to the same unit as asteroid models.
             if (object.type() == SpaceObjects.ObjectType.EARTH || object.type() == SpaceObjects.ObjectType.SUN
-                    || object.type() == SpaceObjects.ObjectType.MARS) widget.withScale(.5f);
+                    || object.type() == SpaceObjects.ObjectType.MARS) widget.withScale(.5f).withRenderPadding(PLANET_TEXTURE_PADDING);
             if (object.type() != SpaceObjects.ObjectType.EARTH && object.type() != SpaceObjects.ObjectType.SUN)
                 widget.withCachedRendering();
-            objects.add(new Entry(object, widget));
+            objects.add(new Entry(object, widget, isPlanet(object.type()) ? PlanetSurfaceProjection.outline(widget) : List.of()));
         }
         connectFog();
     }
@@ -192,6 +210,7 @@ final class StarMapObjects {
             }
         }
         for (var object : objects) {
+            if (isPlanet(object.data.type())) continue;
             if (object.data.radius() * camera.zoom() < 2) continue;
             var center = project(camera, viewport, x(object), y(object));
             var color = switch (object.data.type()) {
@@ -237,6 +256,7 @@ final class StarMapObjects {
         }
         for (var object : objects) {
             if (!visibleIcons.contains(object.data.id()) && object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION) continue;
+            if (isPlanet(object.data.type())) continue;
             var objectX = x(object);
             var objectY = y(object);
             if (object.data.radius() * camera.zoom() >= 2) {
@@ -308,7 +328,8 @@ final class StarMapObjects {
             }
             var size = iconSize(object, camera);
             var radius = size / 2d;
-            if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
+            var renderRadius = radius + (isPlanet(object.data.type()) ? size * PLANET_TEXTURE_PADDING / ICON_TEXTURE_SIZE : 0);
+            if (!intersects(viewport, position.x(), position.y(), renderRadius + 2, renderRadius + 2)) continue;
             // Match the PIP deduplication used when submitting block previews.
             var icon = new IconKey((float) (position.x() - radius), (float) (position.y() - radius),
                     size, object.widget.getState());
@@ -356,7 +377,8 @@ final class StarMapObjects {
             var size = iconSize(object, camera);
             var radius = size / 2d;
             // PIP block previews are expensive, so never submit one when it is fully clipped away.
-            if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
+            var renderRadius = radius + (isPlanet(object.data.type()) ? size * PLANET_TEXTURE_PADDING / ICON_TEXTURE_SIZE : 0);
+            if (!intersects(viewport, position.x(), position.y(), renderRadius + 2, renderRadius + 2)) continue;
             if (visibleIcons.contains(object.data.id())) {
                 graphics.pose().pushMatrix();
                 graphics.pose().translate((float) (position.x() - radius), (float) (position.y() - radius));
@@ -365,14 +387,27 @@ final class StarMapObjects {
                 object.widget.render(graphics, mouseX, mouseY, delta);
                 graphics.pose().popMatrix();
             }
-            if (pointerInViewport && Math.abs(mouseX - position.x()) <= radius
-                    && Math.abs(mouseY - position.y()) <= radius) hovered = object;
+            if (pointerInViewport && (isPlanet(object.data.type())
+                    ? PlanetSurfaceProjection.contains(object.outline,
+                            new RocketMapPaths.Point((mouseX - position.x()) / size, (mouseY - position.y()) / size))
+                    : Math.abs(mouseX - position.x()) <= radius && Math.abs(mouseY - position.y()) <= radius)) hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                         (int) Math.round(position.x() + size / 2d + 3), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
             }
             if (selectedTarget != null && selectedTarget.objectId().equals(object.data.id())
                     && selectedTarget.orbit() == SpaceSimulation.OrbitBand.SURFACE) {
+                if (isPlanet(object.data.type())) {
+                    var outlineLines = new ArrayList<StarMapLineRenderer.Line>();
+                    for (var index = 0; index < object.outline.size(); index++) {
+                        var a = object.outline.get(index);
+                        var b = object.outline.get((index + 1) % object.outline.size());
+                        outlineLines.add(new StarMapLineRenderer.Line(position.x() + a.x() * size, position.y() + a.y() * size,
+                                position.x() + b.x() * size, position.y() + b.y() * size, 0xFFF6C65B, 1, true));
+                    }
+                    StarMapLineRenderer.submit(graphics, outlineLines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                    continue;
+                }
                 graphics.fill((int) Math.round(position.x() - size / 2f - 2), (int) Math.round(position.y() - size / 2f - 2),
                         (int) Math.round(position.x() + size / 2f + 2), (int) Math.round(position.y() - size / 2f), 0xFFF6C65B);
             }
@@ -476,7 +511,7 @@ final class StarMapObjects {
     /**
      * Simulation data, reusable 3D icon, target selection, and tooltips for one map object.
      */
-    record Entry(SpaceSimulation.SpaceObjectData data, BlockWidget widget) {
+    record Entry(SpaceSimulation.SpaceObjectData data, BlockWidget widget, List<RocketMapPaths.Point> outline) {
 
     }
 }

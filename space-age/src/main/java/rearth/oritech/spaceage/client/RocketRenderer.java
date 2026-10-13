@@ -53,7 +53,7 @@ public final class RocketRenderer {
 
             var position = RocketSimulationController.getRocketPosition(flight, gameTime);
             var blocks = collectBlocks(rocket, position, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
-            if (!flight.parachuteDescent().isEmpty() && gameTime >= flight.reentryTick()) {
+            if (flight.impactSpeedMetersPerSecond() <= 12 && flight.reentryTick() >= 0 && gameTime >= flight.reentryTick()) {
                 // Placeholder folded hardware opens into a broad white canopy with four ropes.
                 var seen = new HashSet<BlockPos>();
                 for (var segment : rocket.getStaticSegments().values())

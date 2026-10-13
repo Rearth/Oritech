@@ -48,7 +48,6 @@ final class RocketFlightPathState {
         final int stageCount;
         final Map<UUID, DockingTarget> stations = new HashMap<>();
         final Map<UUID, Craft> stationCraft = new HashMap<>();
-        final Set<UUID> parachuteApproaches = new HashSet<>();
         final Map<UUID, Set<RocketServiceSettings.HardwareRef>> claimedPorts = new HashMap<>();
         // Results collected while branches split and finish.
         final Map<UUID, CraftPath> paths = new LinkedHashMap<>();

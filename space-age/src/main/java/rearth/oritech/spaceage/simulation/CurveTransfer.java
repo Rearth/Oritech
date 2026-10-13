@@ -12,6 +12,13 @@ final class CurveTransfer {
                       double speedLimit, RocketBurnProfile profile, double engineEfficiency,
                       double departureGravity, double arrivalGravity) {
 
+        return solve(distance, initial, arrival, freeArrival, speedLimit, profile, engineEfficiency, departureGravity, arrivalGravity, 0);
+    }
+
+    static Plan solve(double distance, double initial, double arrival, boolean freeArrival,
+                      double speedLimit, RocketBurnProfile profile, double engineEfficiency,
+                      double departureGravity, double arrivalGravity, double brakingCredit) {
+
         if (distance <= 0 || profile.intervals().isEmpty() || !(speedLimit > 0)) return null;
         var minimum = Math.max(initial, freeArrival ? 0 : arrival);
         if (minimum > speedLimit) return null;
@@ -19,12 +26,12 @@ final class CurveTransfer {
         var maximum = Math.min(speedLimit, minimum + profile.deltaV() * engineEfficiency
                 + Math.max(0, departureGravity) * totalBurnTime);
         Candidate best = candidate(minimum, initial, arrival, freeArrival, profile,
-                engineEfficiency, departureGravity, arrivalGravity);
+                engineEfficiency, departureGravity, arrivalGravity, brakingCredit);
         if (best == null || best.distance > distance + 1e-6) return null;
         for (int iteration = 0; iteration < 80; iteration++) {
             var middle = (minimum + maximum) * .5;
             var candidate = candidate(middle, initial, arrival, freeArrival, profile,
-                    engineEfficiency, departureGravity, arrivalGravity);
+                    engineEfficiency, departureGravity, arrivalGravity, brakingCredit);
             if (candidate != null && candidate.distance <= distance) {
                 minimum = middle;
                 best = candidate;
@@ -32,28 +39,29 @@ final class CurveTransfer {
         }
         if (best.peak <= 1e-9) return null;
         var coast = Math.max(0, (distance - best.distance) / best.peak);
-        return new Plan(best.first.seconds, coast, best.last.seconds);
+        return new Plan(best.first.seconds, coast, best.last.seconds, best.brakingFuelFactor);
     }
 
     private static Candidate candidate(double peak, double initial, double arrival, boolean freeArrival,
                                        RocketBurnProfile profile, double efficiency,
-                                       double departureGravity, double arrivalGravity) {
+                                       double departureGravity, double arrivalGravity, double brakingCredit) {
 
-        var first = burn(profile, 0, Math.max(0, peak - initial), efficiency, departureGravity);
+        var first = burn(profile, 0, Math.max(0, peak - initial), efficiency, departureGravity, 1);
         if (first == null) return null;
+        var brakingFuelFactor = ParachuteLanding.fuelFactor(brakingCredit, peak - arrival);
         var last = freeArrival ? new Burn(0, 0, 0)
-                : burn(profile, first.seconds, Math.max(0, peak - arrival), efficiency, -arrivalGravity);
+                : burn(profile, first.seconds, Math.max(0, peak - arrival), efficiency, -arrivalGravity, brakingFuelFactor);
         if (last == null) return null;
         var distance = initial * first.seconds + first.distance
                 + peak * last.seconds - last.distance;
-        return new Candidate(peak, first, last, distance);
+        return new Candidate(peak, first, last, distance, brakingFuelFactor);
     }
 
     /**
      * Integrates full-power engine time after an earlier burn, including stage-rate changes.
      */
     private static Burn burn(RocketBurnProfile profile, double elapsed, double wanted,
-                             double efficiency, double gravity) {
+                             double efficiency, double gravity, double fuelFactor) {
 
         if (wanted <= 1e-9) return new Burn(0, 0, 0);
         var remainingOffset = elapsed;
@@ -66,6 +74,7 @@ final class CurveTransfer {
             remainingOffset -= skipped;
             availableSeconds -= skipped;
             if (availableSeconds <= 1e-9) continue;
+            availableSeconds /= Math.max(1e-9, fuelFactor);
             var acceleration = interval.acceleration() * efficiency + gravity;
             // A stage that cannot overcome gravity cannot advance this prescribed curve.
             if (acceleration <= 1e-9) return null;
@@ -78,7 +87,7 @@ final class CurveTransfer {
         return null;
     }
 
-    record Plan(double firstSeconds, double coastSeconds, double lastSeconds) {
+    record Plan(double firstSeconds, double coastSeconds, double lastSeconds, double brakingFuelFactor) {
 
     }
 
@@ -86,7 +95,7 @@ final class CurveTransfer {
 
     }
 
-    private record Candidate(double peak, Burn first, Burn last, double distance) {
+    private record Candidate(double peak, Burn first, Burn last, double distance, double brakingFuelFactor) {
 
     }
 }

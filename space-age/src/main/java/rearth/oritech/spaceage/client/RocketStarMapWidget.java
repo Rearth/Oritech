@@ -66,6 +66,7 @@ final class RocketStarMapWidget extends UIComponent {
     private final ButtonWidget fitRouteButton;
     // Simplified draw geometry is reused while the player is looking at a stationary map.
     private List<StarMapLineRenderer.Line> cachedLines = List.of();
+    private List<StarMapLineRenderer.Line> cachedFlightLines = List.of();
     private View cachedView;
     // A stationary pointer does not need another search through all trajectory samples every frame.
     private PathHover cachedPathHover;
@@ -173,7 +174,7 @@ final class RocketStarMapWidget extends UIComponent {
         this.snapshot = snapshot;
         mapObjects.setSnapshot(snapshot);
         this.flightPath = flightPath;
-        mapPaths = new RocketMapPaths(snapshot.plan(), flightPath);
+        mapPaths = new RocketMapPaths(snapshot.plan(), flightPath, mapObjects::surfacePosition);
         this.selectedBranch = selectedBranch;
         fitRouteButton.setActive(flightPath.paths().stream().anyMatch(path -> path.samples().size() > 1));
         pathsByBranch.clear();
@@ -310,6 +311,8 @@ final class RocketStarMapWidget extends UIComponent {
         findHoveredPath(mouseX, mouseY);
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
                 isInsideViewport(mouseX, mouseY), visibleIcons);
+        graphics.nextStratum();
+        StarMapLineRenderer.submit(graphics, cachedFlightLines, viewportX, viewportY, viewportWidth, viewportHeight);
         if (isInsideViewport(mouseX, mouseY))
             hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject, visibleIcons);
         if (hoveredPathPoint != null && hoveredObject != null
@@ -337,8 +340,10 @@ final class RocketStarMapWidget extends UIComponent {
         var lines = new ArrayList<StarMapLineRenderer.Line>();
         mapObjects.addReferenceLines(lines, camera, viewport, selectedTarget, visibleIcons);
         addCoverage(lines, viewport);
-        addFlightPaths(lines);
         cachedLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+        lines.clear();
+        addFlightPaths(lines);
+        cachedFlightLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         cachedView = view;
         cachedPathHover = null;
     }
@@ -473,7 +478,7 @@ final class RocketStarMapWidget extends UIComponent {
                 var action = actionsById.get(moment.actionId());
                 if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO)
                     continue;
-                var point = project(moment.x(), moment.y());
+                var point = renderedPosition(path.branchId(), moment.timeSeconds(), moment.x(), moment.y());
                 if (!StarMapLineSimplifier.intersects(point.x, point.y, point.x, point.y,
                         viewportX(), viewportY(), viewportWidth(), viewportHeight(), 4)) continue;
                 lines.add(new StarMapLineRenderer.Line(point.x, point.y - 3, point.x + 3, point.y, color, 1, true));

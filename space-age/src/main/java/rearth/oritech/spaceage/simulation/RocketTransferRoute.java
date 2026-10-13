@@ -69,6 +69,9 @@ final class RocketTransferRoute {
         var efficiency = 1 / (1 + curve.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
         var cap = action.maxSpeed() == 0 ? Double.POSITIVE_INFINITY : action.maxSpeed();
         var freeArrival = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM;
+        var parachuteCount = ParachuteLanding.eligible(action)
+                ? craft.segments.values().stream().mapToInt(segment -> segment.parachutes).sum() : 0;
+        var brakingCredit = ParachuteLanding.deltaVReduction(craft.mass(), parachuteCount);
         var departureGravity = gravityAlong(context, curve, 0, craft.time);
         var arrivalGravity = gravityAlong(context, curve, curve.length(), craft.time);
         // With no meaningful gravity, retain the mature solver's ballistic and over-cap handling.
@@ -85,10 +88,10 @@ final class RocketTransferRoute {
                     new Burn(transfer.firstSeconds(), transfer.firstDirectionX(), 0, craft.atmosphere),
                     new Burn(transfer.coastSeconds(), 0, 0, craft.atmosphere),
                     new Burn(transfer.lastSeconds(), transfer.lastDirectionX(), 0, craft.atmosphere)),
-                    transfer.duration(), curve, efficiency, 0, 0);
+                    transfer.duration(), curve, efficiency, 0, 0, ParachuteLanding.Result.NONE);
         }
         var gravityTransfer = CurveTransfer.solve(curve.length(), speed, arrival, freeArrival, cap,
-                craft.burnProfile(context), efficiency, departureGravity, arrivalGravity);
+                craft.burnProfile(context), efficiency, departureGravity, arrivalGravity, brakingCredit);
         if (gravityTransfer == null) return null;
         return new Route(List.of(
                 new Burn(gravityTransfer.firstSeconds(), 1, 0, craft.atmosphere),
@@ -96,7 +99,7 @@ final class RocketTransferRoute {
                 new Burn(gravityTransfer.lastSeconds(), -1, 0, craft.atmosphere)),
                 gravityTransfer.firstSeconds() + gravityTransfer.coastSeconds()
                         + gravityTransfer.lastSeconds(), curve, efficiency,
-                departureGravity, arrivalGravity);
+                departureGravity, arrivalGravity, new ParachuteLanding.Result(parachuteCount, craft.mass(), brakingCredit, gravityTransfer.brakingFuelFactor()));
     }
 
     /**
@@ -131,7 +134,11 @@ final class RocketTransferRoute {
     }
 
     record Route(List<Burn> burns, double duration, FlightCurve curve, double efficiency,
-                 double departureGravity, double arrivalGravity) {
+                 double departureGravity, double arrivalGravity, ParachuteLanding.Result parachutes) {
 
+        double brakingFuelFactor() {
+
+            return parachutes.brakingFuelFactor();
+        }
     }
 }

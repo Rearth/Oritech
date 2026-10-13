@@ -140,7 +140,7 @@ public final class SpaceAgeGameTests {
         malformed.setFlight(flight);
         valid.setFlight(flight);
         var json = ActiveRocketData.CODEC.listOf().encodeStart(JsonOps.INSTANCE, List.of(malformed, valid)).getOrThrow();
-        json.getAsJsonArray().get(0).getAsJsonObject().getAsJsonObject("flight").remove("parachute_descent");
+        json.getAsJsonArray().get(0).getAsJsonObject().getAsJsonObject("flight").remove("performance");
         // Match SavedDataStorage: keep the partial result produced by an incompatible visual record.
         var loaded = RocketSimulationController.ActiveRocketSavedData.CODEC.parse(JsonOps.INSTANCE, json)
                 .resultOrPartial(ignored -> {

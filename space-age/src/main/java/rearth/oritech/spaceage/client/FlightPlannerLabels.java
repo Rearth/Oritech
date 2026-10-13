@@ -194,14 +194,8 @@ final class FlightPlannerLabels {
         if (result.parachutes() == 0) return List.of();
         var lines = new ArrayList<Component>();
         lines.add(Component.translatable("screen.oritech_space_age.parachute.stats", result.parachutes(),
-                String.format(Locale.ROOT, "%.0f", result.mass()), String.format(Locale.ROOT, "%.1f", result.deploymentSpeed()),
-                String.format(Locale.ROOT, "%.1f", result.terminalSpeed())));
-        lines.add(Component.translatable(result.sufficient() ? "screen.oritech_space_age.parachute.sufficient"
-                : "screen.oritech_space_age.parachute.insufficient"));
-        lines.add(Component.translatable("screen.oritech_space_age.parachute.braking", String.format(Locale.ROOT, "%.1f", result.brakingDeltaV()),
-                String.format(Locale.ROOT, "%.1f", result.descentSeconds())));
-        lines.add(result.fuelSavedTicks() < 0 ? Component.translatable("screen.oritech_space_age.parachute.powered_infeasible")
-                : Component.translatable("screen.oritech_space_age.parachute.fuel_saved", String.format(Locale.ROOT, "%.1f", result.fuelSavedTicks())));
+                String.format(Locale.ROOT, "%.0f", result.mass())));
+        lines.add(Component.translatable("screen.oritech_space_age.parachute.braking", String.format(Locale.ROOT, "%.1f", result.deltaVReduction())));
         return lines;
     }
 

@@ -2,7 +2,6 @@ package rearth.oritech.client.ui.render;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -49,9 +48,7 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
         minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.ITEMS_3D);
 
         // GUI coordinates point down and the PIP base transform flips depth.
-        poseStack.scale(1f, -1f, -1f);
-        poseStack.mulPose(Axis.XP.rotationDegrees(state.rotationX()));
-        poseStack.mulPose(Axis.YP.rotationDegrees(state.rotationY()));
+        poseStack.mulPose(BlockPreviewRenderState.modelRotation(state.rotationX(), state.rotationY()));
         poseStack.translate(-state.centerX(), -state.centerY(), -state.centerZ());
 
         for (var entry : state.blocks()) {

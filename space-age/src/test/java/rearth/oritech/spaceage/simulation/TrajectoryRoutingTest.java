@@ -110,6 +110,57 @@ class TrajectoryRoutingTest {
     }
 
     @Test
+    void stoppedAsteroidRoundTripsReachEarthSurface() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        for (int index = 0; index < 12; index++) {
+            var angle = index * Math.PI / 6;
+            var asteroid = new SpaceObjectData(new UUID(8, index), SpaceObjects.ObjectType.ASTEROID,
+                    earth.x() + (float) (Math.cos(angle) * 300_000), (float) (Math.sin(angle) * 300_000), 100, 0, SpaceObjects.DetectionState.PRECISE);
+            var craft = craft(earth.x() + 60_000, 0);
+            var context = context(earth, asteroid);
+            assertTrue(RocketFlightNavigation.navigate(action(asteroid.id(), 80 + index), craft, context), "outbound " + index);
+            assertTrue(RocketFlightNavigation.navigate(action(earth.id(), 100 + index), craft, context),
+                    "return " + index + ": " + craft.blockedState + " at " + craft.x + ", " + craft.y
+                            + " speed " + Math.hypot(craft.velocityX, craft.velocityY));
+        }
+    }
+
+    @Test
+    void heavyParachuteCraftUsesTheNormalLandingCurve() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var asteroid = new SpaceObjectData(new UUID(9, 9), SpaceObjects.ObjectType.ASTEROID,
+                earth.x() - 300_000, -30_000, 100, 0, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(earth.x() + 60_000, 0);
+        var segment = new RocketFlightPathState.Segment(248_140, 3_000_000, 0, 2_840, 0, new RocketHardware(12, 0, 0, 0));
+        segment.parachutes = 3;
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
+        var context = context(earth, asteroid);
+        assertTrue(RocketFlightNavigation.navigate(action(asteroid.id(), 119), craft, context));
+        var powered = craft.copyFor(Set.copyOf(craft.segments.keySet()));
+        powered.segments.values().forEach(s -> s.parachutes = 0);
+        var landing = action(earth.id(), 120);
+        var route = RocketTransferRoute.solve(craft, context, landing, earth, earth.x() + earth.radius(), 0);
+        var poweredRoute = RocketTransferRoute.solve(powered, context, landing, earth, earth.x() + earth.radius(), 0);
+        assertNotNull(route);
+        assertNotNull(poweredRoute);
+        for (int index = 0; index <= 10; index++)
+            assertEquals(poweredRoute.curve().atDistance(poweredRoute.curve().length() * index / 10, 1),
+                    route.curve().atDistance(route.curve().length() * index / 10, 1));
+        assertTrue(RocketFlightNavigation.navigate(landing, craft, context));
+        assertTrue(RocketFlightNavigation.navigate(landing, powered, context(earth, asteroid)));
+        assertEquals(earth.x() + earth.radius(), craft.x, .01);
+        assertEquals(0, craft.velocityX, 1e-5);
+        assertTrue(craft.samples.stream().noneMatch(sample -> sample.phase() == PathPhase.PARACHUTE));
+        assertTrue(context.arrivalPredictions.getLast().parachutes().deltaVReduction() > 0);
+        assertTrue(segment.chemicalSeconds > powered.segments.values().iterator().next().chemicalSeconds,
+                "parachutes must reduce landing fuel consumption");
+    }
+
+    @Test
     void gravityMakesSurfaceAscentHarderThanFinalBraking() {
 
         var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,

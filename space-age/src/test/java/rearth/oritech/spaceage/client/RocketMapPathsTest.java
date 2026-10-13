@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.client;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.simulation.FlightMotion;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPath;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.BoosterEvent;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.CraftPath;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.FlightPath;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.MotionSample;
@@ -90,6 +91,85 @@ class RocketMapPathsTest {
         var stationary = path(sample(0, 5, 6, 0, 0), sample(0, 5, 6, 0, 0));
         assertTrue(geometry(stationary).renderedPathSegments(stationary).isEmpty());
         assertEquals(6, geometry(stationary).renderedWorldPosition(ID, 0, -1, -1).y());
+    }
+
+    @Test
+    void surfaceOffsetsKeepMarkersOnTheRenderedCurveAndLeaveSimulationUntouched() {
+
+        var start = sample(0, 100, 0, 10, 0);
+        var end = sample(10, 200, 100, 10, 20);
+        var path = path(start, end);
+        var geometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(path), List.of(), path.durationSeconds()),
+                point -> point.x() == 100 && point.y() == 0 ? new RocketMapPaths.Point(40, 0) : point);
+        assertEquals(40, geometry.renderedWorldPosition(ID, 0, -1, -1).x());
+        assertEquals(200, geometry.renderedWorldPosition(ID, 10, -1, -1).x());
+        for (var piece : geometry.renderedPathSegments(path)) {
+            var time = piece.sampleProgressTo() * 10;
+            var marker = geometry.renderedWorldPosition(ID, time, -1, -1);
+            assertEquals(piece.to().x(), marker.x(), 1e-9);
+            assertEquals(piece.to().y(), marker.y(), 1e-9);
+            assertSame(end, piece.secondSample());
+        }
+        assertEquals(100, start.x());
+        assertEquals(150, FlightMotion.sample(path.samples(), 5).x());
+        assertEquals(112.5, geometry.renderedWorldPosition(ID, 5, -1, -1).x());
+    }
+
+    @Test
+    void movingASurfaceEndpointCannotIntroduceAReversalAtTheNextSample() {
+
+        var path = path(sample(0, 100, 0, -10, 0), sample(1, 90, 0, -10, 0),
+                sample(2, 80, 0, -10, 0), sample(10, 0, 0, -10, 0));
+        var geometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(path), List.of(), path.durationSeconds()),
+                point -> point.x() == 100 ? new RocketMapPaths.Point(40, 0) : point);
+        var previous = 40d;
+        for (int tick = 0; tick <= 200; tick++) {
+            var point = geometry.renderedWorldPosition(ID, tick / 20d, -1, -1);
+            assertTrue(point.x() <= previous + 1e-9, "The whole departure must move toward the target");
+            assertEquals(0, point.y(), 1e-9);
+            previous = point.x();
+        }
+        assertEquals(0, previous, 1e-9);
+    }
+
+    @Test
+    void surfaceCurveDoesNotDependOnTelemetrySampleDensity() {
+
+        var start = sample(0, 100, 0, 10, 0);
+        var end = sample(10, 200, 100, 10, 20);
+        var sparse = path(start, end);
+        var dense = path(start, sample(5, 150, 25, 10, 10), end);
+        var sparseGeometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(sparse), List.of(), 10),
+                point -> point.x() == 100 ? new RocketMapPaths.Point(40, 0) : point);
+        var denseGeometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(dense), List.of(), 10),
+                point -> point.x() == 100 ? new RocketMapPaths.Point(40, 0) : point);
+        for (int tick = 0; tick <= 200; tick++) {
+            var a = sparseGeometry.renderedWorldPosition(ID, tick / 20d, -1, -1);
+            var b = denseGeometry.renderedWorldPosition(ID, tick / 20d, -1, -1);
+            assertEquals(a.x(), b.x(), 1e-9);
+            assertEquals(a.y(), b.y(), 1e-9);
+        }
+    }
+
+    @Test
+    void boosterSeparationStartsAtTheParentsDisplayedCurve() {
+
+        var parent = path(sample(0, 100, 0, -10, 0), sample(10, 0, 0, -10, 0));
+        var childId = new UUID(0, 2);
+        var child = new CraftPath(childId, Set.of(), List.of(sample(5, 50, 0, -10, 0), sample(10, 0, 0, -10, 0)),
+                List.of(), 10, 0, TerminalState.READY);
+        var event = new BoosterEvent(new UUID(0, 3), ID, childId, ID, null, 1, 5, 50, 0);
+        var geometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(child, parent), List.of(event), 10),
+                point -> point.x() == 100 ? new RocketMapPaths.Point(40, 0) : point);
+        assertEquals(20, geometry.renderedWorldPosition(ID, 5, -1, -1).x());
+        assertEquals(geometry.renderedWorldPosition(ID, 5, -1, -1),
+                geometry.renderedWorldPosition(childId, 5, -1, -1));
+        assertEquals(20, geometry.renderedPathSegments(child).getFirst().from().x());
     }
 
     @Test

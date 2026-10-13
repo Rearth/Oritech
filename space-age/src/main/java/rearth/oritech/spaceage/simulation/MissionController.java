@@ -384,10 +384,14 @@ public final class MissionController {
             var next = samples.get(index);
             var duration = Math.max(0, Math.min(after, next.timeSeconds()) - Math.max(before, previous.timeSeconds()));
             if (duration <= 0) continue;
+            var brakingFuelFactor = next.phase() == RocketFlightPathCalculator.PathPhase.BRAKE
+                    ? state.path.arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id()))
+                            .mapToDouble(a -> a.parachutes().brakingFuelFactor()).findFirst().orElse(1) : 1;
+            var burnSeconds = duration * brakingFuelFactor;
             var depleted = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
                 var h = RocketHardware.of(entry.getValue());
                 var r = state.rocket.getDynamicSegments().get(entry.getKey());
-                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0 && r.availableRF < duration * 20 * h.ion() * SpaceBalance.ION_RF
+                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0 && r.availableRF < burnSeconds * 20 * h.ion() * SpaceBalance.ION_RF
                         && state.leg.rocket().getDynamicSegments().get(entry.getKey()).availableRF > 0;
             });
             if (depleted) {
@@ -399,7 +403,7 @@ public final class MissionController {
             }
             state.rocket.getStaticSegments().forEach((id, segment) -> {
                 if (next.firingSegments().contains(SegmentRef.of(segment)))
-                    RocketHardware.of(segment).burn(state.rocket.getDynamicSegments().get(id), duration);
+                    RocketHardware.of(segment).burn(state.rocket.getDynamicSegments().get(id), burnSeconds);
             });
         }
         state.position = sample(samples, before + 0.05, state.position);
@@ -412,27 +416,14 @@ public final class MissionController {
         }
         var earthLanding = action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == OrbitBand.SURFACE
                 && state.path.navigationAborts().stream().noneMatch(abort -> abort.actionId().equals(action.id()));
-        var deployment = path.samples().stream().filter(s -> s.phase() == RocketFlightPathCalculator.PathPhase.PARACHUTE).findFirst().orElse(null);
-        if (earthLanding && server != null && state.landing == null
-                && (path.durationSeconds() - after <= 10 || deployment != null && after >= deployment.timeSeconds())) {
+        if (earthLanding && server != null && state.landing == null && path.durationSeconds() - after <= 10) {
             var level = server.overworld();
             if (level.hasChunkAt(new BlockPos(action.landingX(), 0, action.landingZ()))) {
                 state.landing = RocketRecovery.landingPosition(level, state.rocket,
                         action.landingX() + action.landingOffsetX(), action.landingZ() + action.landingOffsetZ());
                 var last = path.samples().getLast();
-                var earth = system.truth().stream().filter(o -> o.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
-                var descent = deployment == null ? List.<ParachuteLanding.Point>of() : path.samples().stream()
-                        .filter(s -> s.timeSeconds() >= after).map(s -> new ParachuteLanding.Point(s.timeSeconds() - after,
-                                Math.max(0, Math.hypot(s.x() - earth.x(), s.y() - earth.y()) - earth.radius()), s.speedMetersPerSecond())).toList();
-                if (!descent.isEmpty()) {
-                    var points = new ArrayList<ParachuteLanding.Point>();
-                    points.add(new ParachuteLanding.Point(0, Math.max(0, Math.hypot(state.position.x() - earth.x(), state.position.y() - earth.y()) - earth.radius()),
-                            Math.hypot(state.position.vx(), state.position.vy())));
-                    points.addAll(descent);
-                    descent = points;
-                }
                 RocketSimulationController.beginReentry(level, state.rocket, state.landing,
-                        Math.max(1, (long) ((path.durationSeconds() - after) * 20)), last.speedMetersPerSecond(), descent);
+                        Math.max(1, (long) ((path.durationSeconds() - after) * 20)), last.speedMetersPerSecond());
             }
         }
         if (after + 1e-7 < path.durationSeconds()) return;

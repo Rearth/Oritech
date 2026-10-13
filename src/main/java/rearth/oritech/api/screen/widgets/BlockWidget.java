@@ -4,6 +4,8 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 
@@ -18,6 +20,7 @@ public class BlockWidget extends UIComponent {
     private BlockState state;
     private boolean cacheTexture;
     private float modelScale = 1f;
+    private int renderPadding;
     private float rotationY = 225f; // isometric-ish default
     private float rotationX = 30f;
     private float mouseRotationSpeed = 0f;
@@ -53,9 +56,22 @@ public class BlockWidget extends UIComponent {
         return this;
     }
 
+    /** Expands the preview texture without changing the model's scale or center. */
+    public BlockWidget withRenderPadding(int pixels) {
+        this.renderPadding = pixels;
+        return this;
+    }
+
     public BlockWidget withMouseRotation(float speed) {
         this.mouseRotationSpeed = speed;
         return this;
+    }
+
+    /** Projects a model-space point into widget-width units relative to the icon center. */
+    public Vector2f projectModelPoint(float x, float y, float z) {
+        var point = BlockPreviewRenderState.modelRotation(rotationX, rotationY + currentMouseRotation)
+                .transformPosition(x - .5f, y - .5f, z - .5f, new Vector3f());
+        return new Vector2f(point.x, point.y).mul(.625f * modelScale);
     }
 
     @Override
@@ -79,7 +95,7 @@ public class BlockWidget extends UIComponent {
                 rotationY + currentMouseRotation,
                 0f, 0f, 0f,
                 cacheTexture ? 0 : delta, cacheTexture,
-                cx, cy, cx + cw, cy + ch,
+                cx - renderPadding, cy - renderPadding, cx + cw + renderPadding, cy + ch + renderPadding,
                 scale,
                 graphics.pose(),
                 graphics.peekScissorStack()
