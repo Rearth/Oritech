@@ -1,0 +1,3 @@
+Note: These collision files are placed in the resources folder for organization, but their
+loading bypasses normal minecraft resource pack loading. This also allows this to work on servers.
+See CollisionShapes.java for their loading.
