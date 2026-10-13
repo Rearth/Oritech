@@ -1,4 +1,0 @@
-- Add proper (simplified) collision shapes for most multiblock machines. More will follow later.
-- Improve resonator tooltips
-- Fix crash from resonator shader on older gpu drivers
-- Update translations from crowdIn
