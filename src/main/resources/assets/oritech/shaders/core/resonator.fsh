@@ -50,8 +50,8 @@ void main() {
         float radius = age / 4.0 * range;
         // Fixed two-block patches lead or lag by up to 0.75 blocks in five steps.
         // Share the offset across the front, bands and wake so they stay together.
-        vec3 patch = floor(offset / 2.0);
-        float variation = fract(sin(dot(patch, vec3(127.1, 311.7, 74.7))) * 43758.5453);
+        vec3 patchCell = floor(offset / 2.0);
+        float variation = fract(sin(dot(patchCell, vec3(127.1, 311.7, 74.7))) * 43758.5453);
         float terrace = (floor(variation * 5.0) - 2.0) * 0.375;
         float edge = distance - radius - terrace;
         intensity = scanBands(edge, 0.75);
