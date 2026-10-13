@@ -290,14 +290,11 @@ final class RocketStarMapWidget extends UIComponent {
 
         var viewport = new StarMapObjects.Viewport(viewportX, viewportY, viewportWidth, viewportHeight);
         mapObjects.renderSurfaceDiscs(graphics, camera, viewport);
-        prepareLines(viewport);
-        StarMapLineRenderer.submit(graphics, cachedLines, viewportX, viewportY, viewportWidth, viewportHeight);
 
         hoveredObject = null;
         hoveredSelection = null;
         hoveredSeparation = null;
         hoveredPathPoint = null;
-        findHoveredPath(mouseX, mouseY);
         var icons = mapObjects.groupIcons(camera, viewport, selectedTarget);
         for (var marker : rocketMarkers) {
             var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
@@ -307,10 +304,14 @@ final class RocketStarMapWidget extends UIComponent {
                     marker.branchId.equals(selectedBranch) || selectedTarget != null && selectedTarget.objectId().equals(marker.branchId)));
         }
         var hiddenIcons = iconGroups.hidden(icons);
+        var visibleIcons = mapObjects.visibleIcons(camera, viewport, hiddenIcons);
+        prepareLines(viewport, visibleIcons);
+        StarMapLineRenderer.submit(graphics, cachedLines, viewportX, viewportY, viewportWidth, viewportHeight);
+        findHoveredPath(mouseX, mouseY);
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
-                isInsideViewport(mouseX, mouseY), hiddenIcons);
+                isInsideViewport(mouseX, mouseY), visibleIcons);
         if (isInsideViewport(mouseX, mouseY))
-            hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
+            hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject, visibleIcons);
         if (hoveredPathPoint != null && hoveredObject != null
                 && hoveredObject.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             hoveredObject = null;
@@ -329,12 +330,12 @@ final class RocketStarMapWidget extends UIComponent {
                 : fitRouteButton.isMouseOver(mouseX, mouseY) ? fitRouteButton : null;
     }
 
-    private void prepareLines(StarMapObjects.Viewport viewport) {
+    private void prepareLines(StarMapObjects.Viewport viewport, Set<UUID> visibleIcons) {
 
-        var view = new View(camera.revision(), x, y, width, height, selectedTarget);
+        var view = new View(camera.revision(), x, y, width, height, selectedTarget, visibleIcons);
         if (view.equals(cachedView)) return;
         var lines = new ArrayList<StarMapLineRenderer.Line>();
-        mapObjects.addReferenceLines(lines, camera, viewport, selectedTarget);
+        mapObjects.addReferenceLines(lines, camera, viewport, selectedTarget, visibleIcons);
         addCoverage(lines, viewport);
         addFlightPaths(lines);
         cachedLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
@@ -757,9 +758,9 @@ final class RocketStarMapWidget extends UIComponent {
     }
 
     /**
-     * Camera revision, panel bounds and selected ring determine all projected line geometry.
+     * Camera revision, panel bounds, selected ring and visible icons determine projected line geometry.
      */
-    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target) {
+    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target, Set<UUID> visibleIcons) {
 
     }
 

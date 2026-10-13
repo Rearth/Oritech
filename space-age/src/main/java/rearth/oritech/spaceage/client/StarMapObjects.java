@@ -7,6 +7,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.widgets.BlockWidget;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
@@ -33,6 +35,8 @@ final class StarMapObjects {
     // Reference rings adapt to their screen size so true orbit points remain on the visible ring.
     private static final int MIN_CIRCLE_SEGMENTS = 48;
     private static final int MAX_CIRCLE_SEGMENTS = 512;
+    // Texture resolution is independent of the body's displayed world-space size.
+    private static final int ICON_TEXTURE_SIZE = 128;
     // Each object keeps its 3D block widget so its familiar planet icon can be reused each frame.
     private final List<Entry> objects = new ArrayList<>();
     private final List<FogPatch> fogBridges = new ArrayList<>();
@@ -71,16 +75,40 @@ final class StarMapObjects {
         return camera.project(x, y, viewport.x(), viewport.y(), viewport.width(), viewport.height());
     }
 
-    private static BlockState placeholderBlock(SpaceObjects.ObjectType type) {
+    private static BlockState iconBlock(SpaceSimulation.SpaceObjectData object) {
 
-        return switch (type) {
-            case EARTH -> Blocks.GRASS_BLOCK.defaultBlockState();
-            case SUN -> Blocks.GOLD_BLOCK.defaultBlockState();
-            case MARS -> Blocks.RED_SAND.defaultBlockState();
+        return switch (object.type()) {
+            case EARTH -> SpaceAgeBlocks.EARTH.get().defaultBlockState();
+            case SUN -> SpaceAgeBlocks.SUN.get().defaultBlockState();
+            case MARS -> SpaceAgeBlocks.MARS.get().defaultBlockState();
             case SURVEY_REGION -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
-            case ASTEROID -> Blocks.IRON_ORE.defaultBlockState();
+            case ASTEROID -> asteroidBlock(object);
             case CRAFT -> SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState();
         };
+    }
+
+    private static BlockState asteroidBlock(SpaceSimulation.SpaceObjectData object) {
+
+        // Seed the shape by identity so telemetry refreshes and screen switches keep it stable.
+        var random = new Random(object.id().getMostSignificantBits() ^ object.id().getLeastSignificantBits());
+        var block = switch (random.nextInt(3)) {
+            case 0 -> SpaceAgeBlocks.ASTEROID_1.get();
+            case 1 -> SpaceAgeBlocks.ASTEROID_2.get();
+            default -> SpaceAgeBlocks.ASTEROID_3.get();
+        };
+        var ore = Ore.IRON;
+        var largestAmount = 0;
+        for (var material : object.materials()) {
+            var path = material.block().getPath();
+            for (var candidate : Ore.values()) {
+                var orePath = candidate.getSerializedName() + "_ore";
+                if ((path.equals(orePath) || path.endsWith("_" + orePath)) && material.amount() > largestAmount) {
+                    ore = candidate;
+                    largestAmount = material.amount();
+                }
+            }
+        }
+        return block.defaultBlockState().setValue(AsteroidBlock.ORE, ore);
     }
 
     private static boolean intersects(Viewport viewport, double x, double y, double radiusX, double radiusY) {
@@ -100,8 +128,13 @@ final class StarMapObjects {
 
         objects.clear();
         for (var object : snapshot.mapObjects()) {
-            var size = object.type() == SpaceObjects.ObjectType.ASTEROID ? 12 : 18;
-            objects.add(new Entry(object, new BlockWidget(0, 0, size, placeholderBlock(object.type())).withCachedRendering()));
+            var widget = new BlockWidget(0, 0, ICON_TEXTURE_SIZE, iconBlock(object));
+            // Normalize the two-block celestial models to the same unit as asteroid models.
+            if (object.type() == SpaceObjects.ObjectType.EARTH || object.type() == SpaceObjects.ObjectType.SUN
+                    || object.type() == SpaceObjects.ObjectType.MARS) widget.withScale(.5f);
+            if (object.type() != SpaceObjects.ObjectType.EARTH && object.type() != SpaceObjects.ObjectType.SUN)
+                widget.withCachedRendering();
+            objects.add(new Entry(object, widget));
         }
         connectFog();
     }
@@ -192,16 +225,18 @@ final class StarMapObjects {
     }
 
     void addReferenceLines(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
-                           RocketStarMapWidget.NavigationSelection selectedTarget) {
+                           RocketStarMapWidget.NavigationSelection selectedTarget, Set<UUID> visibleIcons) {
 
         var sun = byId(SpaceSimulation.SUN_ID);
         if (sun != null) for (var object : objects) {
+            if (!visibleIcons.contains(object.data.id())) continue;
             if (object.data.type() == SpaceObjects.ObjectType.EARTH || object.data.type() == SpaceObjects.ObjectType.MARS) {
                 addCircle(lines, camera, viewport, sun.data.x(), sun.data.y(),
                         Math.hypot(object.data.x() - sun.data.x(), object.data.y() - sun.data.y()), 0x553C5368, 0.55f);
             }
         }
         for (var object : objects) {
+            if (!visibleIcons.contains(object.data.id()) && object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION) continue;
             var objectX = x(object);
             var objectY = y(object);
             if (object.data.radius() * camera.zoom() >= 2) {
@@ -215,6 +250,7 @@ final class StarMapObjects {
         // Match the original draw order: solar orbits, surfaces, motion guides, then local orbits.
         addMotionLines(lines, camera, viewport);
         for (var object : objects) {
+            if (!visibleIcons.contains(object.data.id())) continue;
             var objectX = x(object);
             var objectY = y(object);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
@@ -258,18 +294,50 @@ final class StarMapObjects {
         return icons;
     }
 
+    Set<UUID> visibleIcons(StarMapCamera camera, Viewport viewport, Set<UUID> hiddenIcons) {
+
+        var visible = new HashSet<UUID>();
+        var drawnIcons = new HashSet<IconKey>();
+        for (var object : objects) {
+            if (hiddenIcons.contains(object.data.id()) || object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) continue;
+            var position = project(camera, viewport, x(object), y(object));
+            if (object.data.type() == SpaceObjects.ObjectType.CRAFT) {
+                if (!fleetMarkers.contains(object.data.id()) && intersects(viewport, position.x(), position.y(), 8, 8))
+                    visible.add(object.data.id());
+                continue;
+            }
+            var size = iconSize(object, camera);
+            var radius = size / 2d;
+            if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
+            // Match the PIP deduplication used when submitting block previews.
+            var icon = new IconKey((float) (position.x() - radius), (float) (position.y() - radius),
+                    size, object.widget.getState());
+            if (drawnIcons.add(icon)) visible.add(object.data.id());
+        }
+        return Set.copyOf(visible);
+    }
+
+    private static float iconSize(Entry object, StarMapCamera camera) {
+
+        var diameterScale = switch (object.data.type()) {
+            case SUN, EARTH, MARS -> 1;
+            case ASTEROID -> 1.3;
+            default -> 2;
+        };
+        return (float) (object.data.radius() * camera.zoom() * diameterScale);
+    }
+
     Entry renderIcons(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport,
                       RocketStarMapWidget.NavigationSelection selectedTarget, int mouseX, int mouseY, float delta,
-                      boolean pointerInViewport, Set<UUID> hiddenIcons) {
+                      boolean pointerInViewport, Set<UUID> visibleIcons) {
 
         Entry hovered = null;
-        var drawnIcons = new HashSet<IconKey>();
         for (var object : objects) {
             var position = project(camera, viewport, x(object), y(object));
             if (object.data.type() == SpaceObjects.ObjectType.CRAFT) {
                 // Fleet markers already draw these craft; standalone docking targets use the same icon.
                 if (!intersects(viewport, position.x(), position.y(), 8, 8)) continue;
-                if (!fleetMarkers.contains(object.data.id()) && !hiddenIcons.contains(object.data.id())) {
+                if (visibleIcons.contains(object.data.id())) {
                     graphics.item(craftIcon, (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
                     if (camera.zoom() >= CRAFT_NAME_ZOOM) graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                             (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
@@ -285,19 +353,20 @@ final class StarMapObjects {
                 if (pointerInViewport && dx * dx + dy * dy <= 1 && hovered == null) hovered = object;
                 continue;
             }
-            var minimum = object.data.type() == SpaceObjects.ObjectType.ASTEROID ? 10 : 16;
-            var size = (int) Math.clamp(object.data.radius() * camera.zoom() * 2, minimum, 54);
+            var size = iconSize(object, camera);
             var radius = size / 2d;
             // PIP block previews are expensive, so never submit one when it is fully clipped away.
             if (!intersects(viewport, position.x(), position.y(), radius + 2, radius + 2)) continue;
-            object.widget.setPosition((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius));
-            object.widget.setSize(size, size);
-            // Zoomed-out contacts can land on exactly the same pixel. Submit identical PIP states only once:
-            // NeoForge pools them by equality, so duplicate states can overwrite a renderer in the pool.
-            var icon = new IconKey((int) Math.round(position.x() - radius), (int) Math.round(position.y() - radius),
-                    size, object.widget.getState());
-            if (!hiddenIcons.contains(object.data.id()) && drawnIcons.add(icon)) object.widget.render(graphics, mouseX, mouseY, delta);
-            if (pointerInViewport && object.widget.isMouseOver(mouseX, mouseY)) hovered = object;
+            if (visibleIcons.contains(object.data.id())) {
+                graphics.pose().pushMatrix();
+                graphics.pose().translate((float) (position.x() - radius), (float) (position.y() - radius));
+                var scale = size / ICON_TEXTURE_SIZE;
+                graphics.pose().scale(scale, scale);
+                object.widget.render(graphics, mouseX, mouseY, delta);
+                graphics.pose().popMatrix();
+            }
+            if (pointerInViewport && Math.abs(mouseX - position.x()) <= radius
+                    && Math.abs(mouseY - position.y()) <= radius) hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                         (int) Math.round(position.x() + size / 2d + 3), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
@@ -312,12 +381,13 @@ final class StarMapObjects {
     }
 
     RocketStarMapWidget.NavigationSelection findHoveredOrbit(double mouseX, double mouseY, StarMapCamera camera,
-                                                             Viewport viewport, Entry hoveredObject) {
+                                                             Viewport viewport, Entry hoveredObject, Set<UUID> visibleIcons) {
 
         var world = camera.unproject(mouseX, mouseY, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         var closestDistance = 5d;
         RocketStarMapWidget.NavigationSelection closest = null;
         for (var object : objects) {
+            if (!visibleIcons.contains(object.data.id())) continue;
             var offsetX = world.x() - x(object);
             var offsetY = world.y() - y(object);
             var angle = Math.atan2(offsetY, offsetX);
@@ -383,7 +453,7 @@ final class StarMapObjects {
 
     }
 
-    private record IconKey(int x, int y, int size, BlockState state) {
+    private record IconKey(float x, float y, float size, BlockState state) {
 
     }
 

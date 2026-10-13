@@ -14,6 +14,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 
@@ -45,9 +47,29 @@ public class SpaceAgeModelProvider extends ModelProvider {
         blockModels.registerSimpleItemModel(block, model);
     }
 
+    private static void createAsteroidBlock(Block block, BlockModelGenerators blockModels) {
+
+        var model = ModelLocationUtils.getModelLocation(block);
+        var variants = PropertyDispatch.initial(AsteroidBlock.ORE);
+        for (var ore : Ore.values()) {
+            variants.select(ore, BlockModelGenerators.variant(new Variant(model.withSuffix("_" + ore.getSerializedName()))));
+        }
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block).with(variants));
+        blockModels.registerSimpleItemModel(block, model.withSuffix("_iron"));
+    }
+
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
 
+        createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
+        createAsteroidBlock(SpaceAgeBlocks.ASTEROID_1.get(), blockModels);
+        createAsteroidBlock(SpaceAgeBlocks.ASTEROID_2.get(), blockModels);
+        createAsteroidBlock(SpaceAgeBlocks.ASTEROID_3.get(), blockModels);
         blockModels.createHorizontallyRotatedBlock(SpaceAgeBlocks.ROCKET_ASSEMBLER.get(), TexturedModel.CUBE);
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_PAD.get());
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_COUPLING.get());

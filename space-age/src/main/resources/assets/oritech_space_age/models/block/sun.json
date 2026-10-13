@@ -1,0 +1,364 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "surface": "oritech_space_age:block/sun_surface",
+    "glow": "oritech_space_age:block/sun_glow",
+    "flares": "oritech_space_age:block/sun_flares",
+    "particle": "#surface"
+  },
+  "elements": [
+    {
+      "name": "sun_surface",
+      "from": [
+        -8,
+        -8,
+        -8
+      ],
+      "to": [
+        24,
+        24,
+        24
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "east": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#surface",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    },
+    {
+      "name": "solar_glow",
+      "from": [
+        -9,
+        -9,
+        -9
+      ],
+      "to": [
+        25,
+        25,
+        25
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        },
+        "east": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        },
+        "south": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        },
+        "west": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        },
+        "up": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        },
+        "down": {
+          "texture": "#glow",
+          "uv": [
+            0,
+            0,
+            11.333333333333334,
+            11.333333333333334
+          ]
+        }
+      }
+    },
+    {
+      "name": "top_flare",
+      "from": [
+        -4,
+        24,
+        4
+      ],
+      "to": [
+        12,
+        32,
+        4
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "rotation": 0
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            8,
+            0,
+            0,
+            8
+          ],
+          "rotation": 0
+        }
+      }
+    },
+    {
+      "name": "right_flare",
+      "from": [
+        24,
+        6,
+        12
+      ],
+      "to": [
+        32,
+        22,
+        12
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            8,
+            0,
+            16,
+            8
+          ],
+          "rotation": 270
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            16,
+            0,
+            8,
+            8
+          ],
+          "rotation": 90
+        }
+      }
+    },
+    {
+      "name": "left_flare",
+      "from": [
+        -16,
+        -2,
+        6
+      ],
+      "to": [
+        -8,
+        14,
+        6
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "rotation": 90
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            8,
+            0,
+            0,
+            8
+          ],
+          "rotation": 270
+        }
+      }
+    },
+    {
+      "name": "front_flare",
+      "from": [
+        4,
+        16,
+        -16
+      ],
+      "to": [
+        20,
+        16,
+        -8
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "up": {
+          "texture": "#flares",
+          "uv": [
+            8,
+            0,
+            16,
+            8
+          ],
+          "rotation": 0
+        },
+        "down": {
+          "texture": "#flares",
+          "uv": [
+            8,
+            8,
+            16,
+            0
+          ],
+          "rotation": 0
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.125,
+        0.125,
+        0.125
+      ]
+    },
+    "fixed": {
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        0.2,
+        0.2,
+        0.2
+      ]
+    }
+  }
+}

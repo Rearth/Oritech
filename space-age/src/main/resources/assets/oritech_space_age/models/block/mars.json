@@ -1,0 +1,141 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "surface": "oritech_space_age:block/mars_surface",
+    "particle": "#surface"
+  },
+  "elements": [
+    {
+      "name": "mars_surface",
+      "from": [
+        -8,
+        -8,
+        -8
+      ],
+      "to": [
+        24,
+        24,
+        24
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0.0,
+            0.0,
+            5.333333333333333,
+            8.0
+          ],
+          "texture": "#surface"
+        },
+        "east": {
+          "uv": [
+            5.333333333333333,
+            0.0,
+            10.666666666666666,
+            8.0
+          ],
+          "texture": "#surface"
+        },
+        "south": {
+          "uv": [
+            10.666666666666666,
+            0.0,
+            16.0,
+            8.0
+          ],
+          "texture": "#surface"
+        },
+        "west": {
+          "uv": [
+            0.0,
+            8.0,
+            5.333333333333333,
+            16.0
+          ],
+          "texture": "#surface"
+        },
+        "up": {
+          "uv": [
+            5.333333333333333,
+            8.0,
+            10.666666666666666,
+            16.0
+          ],
+          "texture": "#surface"
+        },
+        "down": {
+          "uv": [
+            10.666666666666666,
+            8.0,
+            16.0,
+            16.0
+          ],
+          "texture": "#surface"
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "scale": [
+        0.3,
+        0.3,
+        0.3
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.125,
+        0.125,
+        0.125
+      ]
+    },
+    "fixed": {
+      "scale": [
+        0.25,
+        0.25,
+        0.25
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.2,
+        0.2,
+        0.2
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        0.2,
+        0.2,
+        0.2
+      ]
+    }
+  }
+}

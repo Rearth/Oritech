@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "ore=copper": {
+      "model": "oritech_space_age:block/asteroid_2_copper"
+    },
+    "ore=diamond": {
+      "model": "oritech_space_age:block/asteroid_2_diamond"
+    },
+    "ore=emerald": {
+      "model": "oritech_space_age:block/asteroid_2_emerald"
+    },
+    "ore=gold": {
+      "model": "oritech_space_age:block/asteroid_2_gold"
+    },
+    "ore=iron": {
+      "model": "oritech_space_age:block/asteroid_2_iron"
+    },
+    "ore=lapis": {
+      "model": "oritech_space_age:block/asteroid_2_lapis"
+    },
+    "ore=nickel": {
+      "model": "oritech_space_age:block/asteroid_2_nickel"
+    },
+    "ore=platinum": {
+      "model": "oritech_space_age:block/asteroid_2_platinum"
+    },
+    "ore=redstone": {
+      "model": "oritech_space_age:block/asteroid_2_redstone"
+    },
+    "ore=uranium": {
+      "model": "oritech_space_age:block/asteroid_2_uranium"
+    }
+  }
+}

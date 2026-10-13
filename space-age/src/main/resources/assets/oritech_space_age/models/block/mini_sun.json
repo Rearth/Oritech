@@ -1,0 +1,364 @@
+{
+  "parent": "minecraft:block/block",
+  "ambientocclusion": false,
+  "textures": {
+    "surface": "oritech_space_age:block/mini_sun_surface",
+    "glow": "oritech_space_age:block/mini_sun_glow",
+    "flares": "oritech_space_age:block/mini_sun_flares",
+    "particle": "#surface"
+  },
+  "elements": [
+    {
+      "name": "sun_surface",
+      "from": [
+        4.0,
+        4.0,
+        4.0
+      ],
+      "to": [
+        12.0,
+        12.0,
+        12.0
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "east": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "south": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "west": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "up": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "down": {
+          "texture": "#surface",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        }
+      }
+    },
+    {
+      "name": "solar_glow",
+      "from": [
+        3.75,
+        3.75,
+        3.75
+      ],
+      "to": [
+        12.25,
+        12.25,
+        12.25
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        },
+        "east": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        },
+        "south": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        },
+        "west": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        },
+        "up": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        },
+        "down": {
+          "texture": "#glow",
+          "uv": [
+            0.0,
+            0.0,
+            8.5,
+            8.5
+          ]
+        }
+      }
+    },
+    {
+      "name": "top_flare",
+      "from": [
+        5.0,
+        12.0,
+        7.0
+      ],
+      "to": [
+        9.0,
+        14.0,
+        7.0
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            0.0,
+            0.0,
+            4.0,
+            2.0
+          ],
+          "rotation": 0
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            4.0,
+            0.0,
+            0.0,
+            2.0
+          ],
+          "rotation": 0
+        }
+      }
+    },
+    {
+      "name": "right_flare",
+      "from": [
+        12.0,
+        7.5,
+        9.0
+      ],
+      "to": [
+        14.0,
+        11.5,
+        9.0
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            4.0,
+            0.0,
+            8.0,
+            2.0
+          ],
+          "rotation": 270
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            8.0,
+            0.0,
+            4.0,
+            2.0
+          ],
+          "rotation": 90
+        }
+      }
+    },
+    {
+      "name": "left_flare",
+      "from": [
+        2.0,
+        5.5,
+        7.5
+      ],
+      "to": [
+        4.0,
+        9.5,
+        7.5
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "north": {
+          "texture": "#flares",
+          "uv": [
+            0.0,
+            0.0,
+            4.0,
+            2.0
+          ],
+          "rotation": 90
+        },
+        "south": {
+          "texture": "#flares",
+          "uv": [
+            4.0,
+            0.0,
+            0.0,
+            2.0
+          ],
+          "rotation": 270
+        }
+      }
+    },
+    {
+      "name": "front_flare",
+      "from": [
+        7.0,
+        10.0,
+        2.0
+      ],
+      "to": [
+        11.0,
+        10.0,
+        4.0
+      ],
+      "shade": false,
+      "light_emission": 15,
+      "faces": {
+        "up": {
+          "texture": "#flares",
+          "uv": [
+            4.0,
+            0.0,
+            8.0,
+            2.0
+          ],
+          "rotation": 0
+        },
+        "down": {
+          "texture": "#flares",
+          "uv": [
+            4.0,
+            2.0,
+            8.0,
+            0.0
+          ],
+          "rotation": 0
+        }
+      }
+    }
+  ],
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        225,
+        0
+      ],
+      "scale": [
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    "ground": {
+      "translation": [
+        0,
+        3,
+        0
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "fixed": {
+      "scale": [
+        1.0,
+        1.0,
+        1.0
+      ]
+    },
+    "thirdperson_righthand": {
+      "rotation": [
+        75,
+        45,
+        0
+      ],
+      "translation": [
+        0,
+        2.5,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    },
+    "firstperson_righthand": {
+      "rotation": [
+        0,
+        45,
+        0
+      ],
+      "scale": [
+        0.8,
+        0.8,
+        0.8
+      ]
+    }
+  }
+}

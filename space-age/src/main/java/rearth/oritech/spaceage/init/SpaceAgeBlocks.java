@@ -11,14 +11,42 @@ import rearth.oritech.spaceage.block.MissionControlBlock;
 import rearth.oritech.spaceage.block.SurveyModuleBlock;
 import rearth.oritech.spaceage.block.VacuumCrafterBlock;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.PlanetBlock;
 import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.block.basic.RocketPadBlock;
 
-// all models are placeholders for now
 public final class SpaceAgeBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(OritechSpaceAge.MOD_ID);
+
+    public static final DeferredBlock<PlanetBlock> EARTH = BLOCKS.registerBlock("earth", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<PlanetBlock> SUN = BLOCKS.registerBlock("sun", PlanetBlock::new,
+            () -> machineProperties().noOcclusion().lightLevel(state -> 15));
+
+    public static final DeferredBlock<PlanetBlock> MARS = BLOCKS.registerBlock("mars", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<PlanetBlock> MINI_EARTH = BLOCKS.registerBlock("mini_earth",
+            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<PlanetBlock> MINI_MARS = BLOCKS.registerBlock("mini_mars",
+            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<PlanetBlock> MINI_SUN = BLOCKS.registerBlock("mini_sun",
+            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion().lightLevel(state -> 15));
+
+    public static final DeferredBlock<AsteroidBlock> ASTEROID_1 = BLOCKS.registerBlock("asteroid_1",
+            properties -> new AsteroidBlock(properties, 1), () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<AsteroidBlock> ASTEROID_2 = BLOCKS.registerBlock("asteroid_2",
+            properties -> new AsteroidBlock(properties, 2), () -> machineProperties().noOcclusion());
+
+    public static final DeferredBlock<AsteroidBlock> ASTEROID_3 = BLOCKS.registerBlock("asteroid_3",
+            properties -> new AsteroidBlock(properties, 3), () -> machineProperties().noOcclusion());
 
     public static final DeferredBlock<RocketAssemblerBlock> ROCKET_ASSEMBLER = BLOCKS.registerBlock("rocket_assembler", RocketAssemblerBlock::new,
             () -> machineProperties().noOcclusion());

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech_space_age:block/asteroid_1",
+  "textures": {
+    "rock": "oritech_space_age:block/asteroid_1_diamond"
+  }
+}

@@ -1,5 +1,14 @@
 {
   "values": [
+    "oritech_space_age:earth",
+    "oritech_space_age:sun",
+    "oritech_space_age:mars",
+    "oritech_space_age:mini_earth",
+    "oritech_space_age:mini_mars",
+    "oritech_space_age:mini_sun",
+    "oritech_space_age:asteroid_1",
+    "oritech_space_age:asteroid_2",
+    "oritech_space_age:asteroid_3",
     "oritech_space_age:rocket_assembler",
     "oritech_space_age:rocket_pad",
     "oritech_space_age:rocket_coupling",

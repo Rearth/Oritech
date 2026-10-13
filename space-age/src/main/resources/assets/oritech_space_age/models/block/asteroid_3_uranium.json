@@ -1,0 +1,6 @@
+{
+  "parent": "oritech_space_age:block/asteroid_3",
+  "textures": {
+    "rock": "oritech_space_age:block/asteroid_3_uranium"
+  }
+}

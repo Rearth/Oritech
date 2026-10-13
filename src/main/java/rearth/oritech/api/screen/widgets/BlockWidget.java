@@ -17,6 +17,7 @@ public class BlockWidget extends UIComponent {
 
     private BlockState state;
     private boolean cacheTexture;
+    private float modelScale = 1f;
     private float rotationY = 225f; // isometric-ish default
     private float rotationX = 30f;
     private float mouseRotationSpeed = 0f;
@@ -47,6 +48,11 @@ public class BlockWidget extends UIComponent {
         return this;
     }
 
+    public BlockWidget withScale(float scale) {
+        this.modelScale = scale;
+        return this;
+    }
+
     public BlockWidget withMouseRotation(float speed) {
         this.mouseRotationSpeed = speed;
         return this;
@@ -64,7 +70,7 @@ public class BlockWidget extends UIComponent {
         int cy = contentY();
         int cw = contentWidth();
         int ch = contentHeight();
-        float scale = cw * 0.625f;
+        float scale = cw * 0.625f * modelScale;
 
         var entries = List.of(new BlockPreviewRenderState.Entry(state, null, Vec3i.ZERO));
         var renderState = new BlockPreviewRenderState(
