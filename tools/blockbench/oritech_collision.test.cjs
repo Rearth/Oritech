@@ -133,7 +133,7 @@ test('bakes cube and ancestor quarter turns around their pivots', () => {
     assert.throws(() => collisionCopy(cube({inflate: -8})), /positive/);
 });
 
-test('context action copies a selection in one undo edit and rejects invalid batches before editing', () => {
+for (const selectionMethod of ['markAsSelected', 'selectLow']) test(`context action copies the full selection with ${selectionMethod} and rejects invalid batches`, () => {
     let plugin, undo, edits = 0, message;
     const roots = [];
     const actions = {};
@@ -144,19 +144,21 @@ test('context action copies a selection in one undo edit and rejects invalid bat
         constructor(data) { Object.assign(this, cube(data)); }
         addTo(parent) { this.parent = parent; parent.children.push(this); return this; }
         init() { return this; }
-        selectLow() { MockCube.selected.push(this); }
+        [selectionMethod]() { MockCube.selected.push(this); }
     }
     MockCube.prototype.menu = {addAction(action) { menu.push(action); }};
     const context = {
         Plugin: {register(id, data) { plugin = data; }},
-        Format: {id: 'geckolib_model'}, Modes: {edit: {selected: true}}, Outliner: {root: roots},
+        Format: {id: 'geckolib_model'}, Modes: {edit: true}, Outliner: {root: roots},
         Cube: MockCube,
         Group: class {
             constructor(data) { Object.assign(this, group([], data)); }
             addTo(parent) { assert.equal(parent, 'root'); roots.push(this); return this; }
             init() { return this; }
         },
-        Undo: {initEdit(data) { undo = data; edits++; }, finishEdit() { assert.equal(undo.elements.length, 2); }},
+        Undo: {initEdit(data) { undo = data; edits++; }, finishEdit(label) {
+            assert.equal(undo.elements.length, label === 'Add enclosing collision box' ? 1 : 2);
+        }},
         unselectAllElements() { MockCube.selected = []; }, updateSelection() {},
         Blockbench: {...emitter(), showMessageBox(data) { message = data.message; }},
         Codecs: {bedrock: emitter()}, MenuBar: {addAction() {}},
@@ -180,6 +182,8 @@ test('context action copies a selection in one undo edit and rejects invalid bat
     assert.ok(MockCube.selected.every(copy => !sources.includes(copy)));
     assert.equal(undo.selection, true);
     assert.equal(compileCollision(roots).boxes.length, 2);
+    assert.deepEqual(JSON.parse(JSON.stringify(roots[0].children.map(copy => ({from: copy.from, to: copy.to})))),
+        sources.map(source => ({from: source.from, to: source.to})));
 
     // Reuse the existing root, and leave it untouched if any selected cube is invalid.
     MockCube.selected = [sources[0], cube({rotation: [0, 45, 0]})];
@@ -191,7 +195,32 @@ test('context action copies a selection in one undo edit and rejects invalid bat
     action.click();
     assert.equal(roots.length, 1);
     assert.equal(roots[0].children.length, 4);
-    context.Modes.edit.selected = false;
+
+    const enclosing = actions.add_as_oritech_enclosing_collision_box;
+    assert.equal(menu[1], enclosing);
+    MockCube.selected = [sources[0]];
+    assert.equal(enclosing.condition(), false);
+    MockCube.selected = [sources[0], cube({from: [16, 24, -32], to: [24, 32, -16], inflate: 1})];
+    assert.equal(enclosing.condition(), true);
+    const beforeEnclosing = edits;
+    enclosing.click();
+    assert.equal(edits, beforeEnclosing + 1);
+    assert.equal(roots.length, 1);
+    assert.equal(roots[0].children.length, 5);
+    assert.equal(MockCube.selected.length, 1);
+    assert.deepEqual(JSON.parse(JSON.stringify({from: MockCube.selected[0].from, to: MockCube.selected[0].to})),
+        {from: [-8, 0, -33], to: [25, 33, 8]});
+
+    MockCube.selected = [sources[0], cube({parent: group([], {rotation: [0, 45, 0]})})];
+    enclosing.click();
+    assert.equal(edits, beforeEnclosing + 1);
+    assert.equal(roots[0].children.length, 5);
+    assert.match(message, /axis-aligned/);
+    context.Modes.edit = false;
+    assert.equal(action.condition(), false);
+    context.Modes.edit = true;
+    assert.equal(action.condition(), true);
+    context.Format.id = 'java_block';
     assert.equal(action.condition(), false);
     plugin.onunload();
 });

@@ -129,6 +129,7 @@
     let exportAction;
     let addAction;
     let copyAction;
+    let enclosingAction;
     const overridden = new Map();
     const isGecko = () => typeof Format !== 'undefined' && Format.id === 'geckolib_model';
 
@@ -168,12 +169,54 @@
         }
     }
 
+    function copySelection(singleBox) {
+        let copies;
+        const roots = collisionRoots(Outliner.root);
+        try {
+            if (roots.length > 1) throw new Error('Keep exactly one root-level collision bone.');
+            if (roots[0] && vector(roots[0].rotation || [0, 0, 0], 'collision: rotation').some(n => n !== 0)) {
+                throw new Error('The root collision bone must be unrotated.');
+            }
+            // Validate the entire selection before starting an undo edit or creating anything.
+            copies = Cube.selected.map(collisionCopy);
+        } catch (error) {
+            Blockbench.showMessageBox({title: 'Cannot add collision boxes', message: error.message});
+            return;
+        }
+        if (!copies.length) return;
+
+    if (singleBox) {
+        // Bounds are already baked into model coordinates, including pivots, inflation and stretch.
+        copies = [{
+            name: 'collision_bounds',
+            from: [0, 1, 2].map(axis => Math.min(...copies.map(box => box.from[axis]))),
+            to: [0, 1, 2].map(axis => Math.max(...copies.map(box => box.to[axis]))),
+        }];
+    }
+
+        const elements = [];
+        Undo.initEdit({elements, outliner: true, selection: true});
+        const root = roots[0] || new Group({name: 'collision', origin: [0, 0, 0]}).addTo('root').init();
+        unselectAllElements();
+        for (const data of copies) {
+            // Fresh cubes keep all faces enabled and do not inherit textures or export/visibility flags.
+            const copy = new Cube(data).addTo(root).init();
+            elements.push(copy);
+            // Blockbench 5 renamed selectLow to markAsSelected. Neither clears earlier copies.
+            if (copy.markAsSelected) copy.markAsSelected();
+            else copy.selectLow();
+        }
+        updateSelection();
+        Undo.finishEdit(singleBox ? 'Add enclosing collision box' : 'Add selection as collision boxes');
+        refreshPreview();
+    }
+
     Plugin.register('oritech_collision', {
         title: 'Oritech Collision Shapes',
         author: 'Oritech',
         description: 'Author collision boxes with a through-model preview and export Oritech collision assets.',
         icon: 'select_all',
-        version: '1.1.0',
+        version: '1.2.0',
         min_version: '4.12.0',
         variant: 'both',
         onload() {
@@ -229,39 +272,22 @@
             copyAction = new Action('add_as_oritech_collision_box', {
                 name: 'Add as collision box',
                 icon: 'content_copy',
-                condition: () => isGecko() && Modes.edit.selected && Cube.selected.length > 0,
+                // Modes.edit is a boolean flag, not the Mode object in Modes.options.edit.
+                condition: () => isGecko() && Modes.edit && Cube.selected.length > 0,
                 click() {
-                    let copies;
-                    const roots = collisionRoots(Outliner.root);
-                    try {
-                        if (roots.length > 1) throw new Error('Keep exactly one root-level collision bone.');
-                        if (roots[0] && vector(roots[0].rotation || [0, 0, 0], 'collision: rotation').some(n => n !== 0)) {
-                            throw new Error('The root collision bone must be unrotated.');
-                        }
-                        // Validate the entire selection before starting an undo edit or creating anything.
-                        copies = Cube.selected.map(collisionCopy);
-                    } catch (error) {
-                        Blockbench.showMessageBox({title: 'Cannot add collision boxes', message: error.message});
-                        return;
-                    }
-                    if (!copies.length) return;
-
-                    const elements = [];
-                    Undo.initEdit({elements, outliner: true, selection: true});
-                    const root = roots[0] || new Group({name: 'collision', origin: [0, 0, 0]}).addTo('root').init();
-                    unselectAllElements();
-                    for (const data of copies) {
-                        // Fresh cubes keep all faces enabled and do not inherit textures or export/visibility flags.
-                        const copy = new Cube(data).addTo(root).init();
-                        elements.push(copy);
-                        copy.selectLow();
-                    }
-                    updateSelection();
-                    Undo.finishEdit('Add selection as collision boxes');
-                    refreshPreview();
+                    copySelection(false);
+                },
+            });
+            enclosingAction = new Action('add_as_oritech_enclosing_collision_box', {
+                name: 'Add as single collision box',
+                icon: 'select_all',
+                condition: () => isGecko() && Modes.edit && Cube.selected.length > 1,
+                click() {
+                    copySelection(true);
                 },
             });
             Cube.prototype.menu.addAction(copyAction);
+            Cube.prototype.menu.addAction(enclosingAction);
             MenuBar.addAction(exportAction, 'file.export');
             MenuBar.addAction(addAction, 'edit');
             Codecs.bedrock.on('compile', onCompile);
@@ -279,6 +305,7 @@
             exportAction.delete();
             addAction.delete();
             copyAction.delete();
+            enclosingAction.delete();
         },
     });
 })();

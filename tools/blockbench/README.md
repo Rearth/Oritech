@@ -15,6 +15,8 @@ Keep exactly one root `collision` bone. A nested bone named `collision` elsewher
 
 To reuse visual geometry, select one or more cubes in Edit mode, right-click a selected cube, and choose **Add as collision box**. This copies their bounds into the root `collision` bone (creating it if needed), selects the new boxes, and leaves the originals untouched. The entire operation is one undo step. Inflation, stretch, and 90° rotations on cubes or ancestor bones are baked into the new unrotated boxes; other rotation angles are rejected before anything is added. The copy uses the authored model, not an animation pose, and does not copy textures or disabled faces.
 
+With multiple cubes selected, **Add as single collision box** creates one enclosing box using the minimum and maximum X, Y and Z coordinates of all selected cubes. It uses the same transform handling and includes the gaps between cubes, making it useful for a coarser collision shape. The originals remain untouched and the operation is one undo step.
+
 Use **unrotated, axis-aligned boxes and bones**. Nonzero rotations, non-unit stretch, flat/inverted boxes, and non-cube elements inside the collision subtree produce an actionable export error. Inflation is included. Bone pivots do not translate unrotated boxes. Do not animate collision bones: the export uses authored dimensions, not the current animation frame. These boxes represent a stable assembled machine shape.
 
 The overlay changes only runtime mesh materials/render order, not UVs, textures or saved project properties. Unloading the plugin restores them. Reload the plugin when updating its JavaScript file.
