@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -24,7 +25,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.CollisionShapes;
 import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.base.block.MachineBlock;
 import rearth.oritech.block.entity.MachineCoreEntity;
@@ -47,7 +51,9 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
     }
 
     public MachineCoreBlock(Properties settings, IntSupplier coreLevel) {
-        super(settings);
+        // A used core's shape depends on its controller, not just its own block state.
+        // Disable vanilla's state-only shape cache so different machines can share the same core block.
+        super(settings.dynamicShape());
         this.registerDefaultState(defaultBlockState().setValue(USED, false));
         this.coreLevel = coreLevel;
     }
@@ -120,6 +126,13 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
     public static BlockPos getControllerPos(LevelAccessor level, BlockPos pos) {
         var coreEntity = (MachineCoreEntity) level.getBlockEntity(pos);
         return Objects.requireNonNull(coreEntity).getControllerPos();
+    }
+
+    // Vanilla also uses this shape for collision, keeping targeting and movement consistent.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Nullable

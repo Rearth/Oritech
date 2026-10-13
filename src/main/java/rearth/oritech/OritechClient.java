@@ -37,6 +37,7 @@ import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
 import rearth.oritech.client.init.*;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
+import rearth.oritech.client.renderers.MachineOutlineRenderer;
 import rearth.oritech.client.renderers.PortableTankItemRenderer;
 import rearth.oritech.client.renderers.ResonatorRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
@@ -85,6 +86,7 @@ public final class OritechClient {
 
         // ore-scanner highlight uses the same split-phase world-render flow
         neoEventBus.addListener(ResonatorRenderer::onAfterLevel);
+        neoEventBus.addListener(MachineOutlineRenderer::onExtractBlockOutline);
         neoEventBus.addListener(ResonatorRenderer::onExtractRenderState);
         neoEventBus.addListener(ResonatorRenderer::onLogout);
         neoEventBus.addListener(OreFinderRenderer::onFrameGraphSetup);

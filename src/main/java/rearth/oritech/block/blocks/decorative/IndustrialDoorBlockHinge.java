@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.decorative;
 
+import rearth.oritech.util.CollisionShapes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -25,7 +26,8 @@ import static rearth.oritech.block.blocks.decorative.IndustrialDoorBlock.OPENED;
 public class IndustrialDoorBlockHinge extends HorizontalDirectionalBlock {
 
     public IndustrialDoorBlockHinge(Properties settings) {
-        super(settings);
+        // The authored section comes from the anchor block, so it cannot use the state-only cache.
+        super(settings.dynamicShape());
         registerDefaultState(defaultBlockState().setValue(OPENED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
@@ -64,6 +66,9 @@ public class IndustrialDoorBlockHinge extends HorizontalDirectionalBlock {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        if (shape != null) return shape;
+
         return IndustrialDoorBlock.getClosedShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
 

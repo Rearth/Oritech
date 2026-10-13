@@ -1,5 +1,9 @@
 package rearth.oritech.block.blocks.interaction;
 
+import rearth.oritech.util.CollisionShapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentGetter;
@@ -39,6 +43,13 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
 public class DronePortBlock extends Block implements EntityBlock, TooltipProvider {
+
+    // Use the authored shape for both targeting and vanilla collision; keep the existing fallback.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
 
     public DronePortBlock(Properties settings) {
         super(settings);

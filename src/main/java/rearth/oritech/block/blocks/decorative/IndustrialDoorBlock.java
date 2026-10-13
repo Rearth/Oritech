@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.decorative;
 
+import rearth.oritech.util.CollisionShapes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -88,6 +89,9 @@ public class IndustrialDoorBlock extends HorizontalDirectionalBlock implements E
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        if (shape != null) return shape;
+
         return getClosedShape(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
     }
 

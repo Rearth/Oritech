@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.augmenter;
 
+import rearth.oritech.util.CollisionShapes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -67,6 +68,9 @@ public class CyberneticAugmentationCenterBlock extends HorizontalDirectionalBloc
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        if (shape != null) return shape;
+
 
         if (!state.getValue(ASSEMBLED)) {
             return super.getShape(state, level, pos, context);

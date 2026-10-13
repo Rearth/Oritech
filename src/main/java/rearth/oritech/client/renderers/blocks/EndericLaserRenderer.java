@@ -5,7 +5,7 @@ import com.geckolib.renderer.base.BoneSnapshots;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import rearth.oritech.util.AnimatedBlockRotation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -251,22 +251,7 @@ public class EndericLaserRenderer<R extends BlockEntityRenderState & GeoRenderSt
     protected void tryRotateByBlockstate(RenderPassInfo<R> renderPassInfo, PoseStack poseStack) {
         // Since tryRotateByBlockstate handles facing in the same way as standard rotateBlock, we override it
         final Direction facing = renderPassInfo.getOrDefaultGeckolibData(DIRECTION_FACING, Direction.NORTH);
-        if (Objects.requireNonNull(facing) == Direction.DOWN) {
-            poseStack.translate(0, 1, 0);
-            poseStack.mulPose(Axis.XP.rotationDegrees(180));
-        } else if (facing == Direction.WEST) {
-            poseStack.translate(0.5, 0.5, 0);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-        } else if (facing == Direction.EAST) {
-            poseStack.translate(-0.5, 0.5, 0);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(270));
-        } else if (facing == Direction.SOUTH) {
-            poseStack.translate(0, 0.5, -0.5);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (facing == Direction.NORTH) {
-            poseStack.translate(0, 0.5, 0.5);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-        }
+        poseStack.mulPose(AnimatedBlockRotation.getModelRotation(facing, false, false));
     }
 
     public static Vec3 lerp(Vec3 a, Vec3 b, float f) {

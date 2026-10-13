@@ -1,5 +1,9 @@
 package rearth.oritech.block.blocks.arcane;
 
+import rearth.oritech.util.CollisionShapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.BlockGetter;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -33,6 +37,13 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 public class StabilizedEnchanterBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
+
+    // Use the authored shape for both targeting and vanilla collision; keep the existing fallback.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
 
     public StabilizedEnchanterBlock(Properties settings) {
         super(settings);

@@ -55,6 +55,48 @@
         return {format_version: 1, coordinate_system: 'oritech:block_local_north', boxes};
     }
 
+    // Bake authored dimensions and quarter-turn rotations into an unrotated copy.
+    // Bone pivots are model-space coordinates; apply the cube transform first, then its ancestors.
+    function collisionCopy(source) {
+        const from = vector(source.from, `${source.name}: from`);
+        const to = vector(source.to, `${source.name}: to`);
+        const stretch = vector(source.stretch || [1, 1, 1], `${source.name}: stretch`);
+        const inflate = source.inflate ?? 0;
+        if (!Number.isFinite(inflate)) throw new Error(`${source.name}: inflate must be finite.`);
+
+        const center = from.map((n, i) => (n + to[i]) / 2);
+        const half = from.map((n, i) => ((to[i] - n) / 2 + inflate) * stretch[i]);
+        if (!half.every(n => Number.isFinite(n) && n > 0)) {
+            throw new Error(`${source.name}: each box dimension must be positive.`);
+        }
+        const corners = Array.from({length: 8}, (_, corner) => center.map((n, i) => n + ((corner >> i) & 1 ? half[i] : -half[i])));
+
+        for (let node = source; node && typeof node === 'object'; node = node.parent) {
+            const rotation = vector(node.rotation || [0, 0, 0], `${node.name}: rotation`);
+            if (rotation.some(angle => angle % 90 !== 0)) {
+                throw new Error(`${node.name}: only axis-aligned cubes and bones (multiples of 90°) can be copied.`);
+            }
+            const pivot = vector(node.origin || [0, 0, 0], `${node.name}: pivot`);
+            for (const point of corners) {
+                for (let axis = 0; axis < 3; axis++) {
+                    const a = (axis + 1) % 3;
+                    const b = (axis + 2) % 3;
+                    const turns = ((rotation[axis] / 90) % 4 + 4) % 4;
+                    for (let turn = 0; turn < turns; turn++) {
+                        const previousA = point[a] - pivot[a];
+                        point[a] = pivot[a] - (point[b] - pivot[b]);
+                        point[b] = pivot[b] + previousA;
+                    }
+                }
+            }
+        }
+        return {
+            name: `${source.name || 'box'}_collision`,
+            from: [0, 1, 2].map(i => Math.min(...corners.map(point => point[i]))),
+            to: [0, 1, 2].map(i => Math.max(...corners.map(point => point[i]))),
+        };
+    }
+
     // Remove only the exported root collision subtree, never modify the authoring project.
     function stripCollisionGeometry(model, sourceBoneNames = []) {
         for (const geometry of model['minecraft:geometry'] || []) {
@@ -79,13 +121,14 @@
 
     // Same source is exercised by Node tests, without requiring a Blockbench installation.
     if (typeof Plugin === 'undefined') {
-        if (typeof module !== 'undefined') module.exports = {compileCollision, collisionNodes, stripCollisionGeometry};
+        if (typeof module !== 'undefined') module.exports = {compileCollision, collisionCopy, collisionNodes, stripCollisionGeometry};
         return;
     }
 
     let material;
     let exportAction;
     let addAction;
+    let copyAction;
     const overridden = new Map();
     const isGecko = () => typeof Format !== 'undefined' && Format.id === 'geckolib_model';
 
@@ -130,7 +173,7 @@
         author: 'Oritech',
         description: 'Author collision boxes with a through-model preview and export Oritech collision assets.',
         icon: 'select_all',
-        version: '1.0.0',
+        version: '1.1.0',
         min_version: '4.12.0',
         variant: 'both',
         onload() {
@@ -183,6 +226,42 @@
                     refreshPreview();
                 },
             });
+            copyAction = new Action('add_as_oritech_collision_box', {
+                name: 'Add as collision box',
+                icon: 'content_copy',
+                condition: () => isGecko() && Modes.edit.selected && Cube.selected.length > 0,
+                click() {
+                    let copies;
+                    const roots = collisionRoots(Outliner.root);
+                    try {
+                        if (roots.length > 1) throw new Error('Keep exactly one root-level collision bone.');
+                        if (roots[0] && vector(roots[0].rotation || [0, 0, 0], 'collision: rotation').some(n => n !== 0)) {
+                            throw new Error('The root collision bone must be unrotated.');
+                        }
+                        // Validate the entire selection before starting an undo edit or creating anything.
+                        copies = Cube.selected.map(collisionCopy);
+                    } catch (error) {
+                        Blockbench.showMessageBox({title: 'Cannot add collision boxes', message: error.message});
+                        return;
+                    }
+                    if (!copies.length) return;
+
+                    const elements = [];
+                    Undo.initEdit({elements, outliner: true, selection: true});
+                    const root = roots[0] || new Group({name: 'collision', origin: [0, 0, 0]}).addTo('root').init();
+                    unselectAllElements();
+                    for (const data of copies) {
+                        // Fresh cubes keep all faces enabled and do not inherit textures or export/visibility flags.
+                        const copy = new Cube(data).addTo(root).init();
+                        elements.push(copy);
+                        copy.selectLow();
+                    }
+                    updateSelection();
+                    Undo.finishEdit('Add selection as collision boxes');
+                    refreshPreview();
+                },
+            });
+            Cube.prototype.menu.addAction(copyAction);
             MenuBar.addAction(exportAction, 'file.export');
             MenuBar.addAction(addAction, 'edit');
             Codecs.bedrock.on('compile', onCompile);
@@ -199,6 +278,7 @@
             material.dispose();
             exportAction.delete();
             addAction.delete();
+            copyAction.delete();
         },
     });
 })();

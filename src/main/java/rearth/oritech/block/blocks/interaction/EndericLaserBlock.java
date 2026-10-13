@@ -1,5 +1,9 @@
 package rearth.oritech.block.blocks.interaction;
 
+import rearth.oritech.util.CollisionShapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.BlockGetter;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -47,6 +51,13 @@ public class EndericLaserBlock extends Block implements EntityBlock, TooltipProv
     public static final Map<Block, EndericLaserBlockBehavior> BLOCK_BEHAVIORS = new Object2ObjectOpenHashMap<>();
     private static final EndericLaserEntityBehavior DEFAULT_ENTITY_BEHAVIOR = new EndericLaserEntityBehavior();
     public static final Map<EntityType<?>, EndericLaserEntityBehavior> ENTITY_BEHAVIORS = new Object2ObjectOpenHashMap<>();
+
+    // Use the authored shape for both targeting and vanilla collision; keep the existing fallback.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
 
     public EndericLaserBlock(Properties settings) {
         super(settings);

@@ -2,6 +2,10 @@ package rearth.oritech.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -56,6 +60,20 @@ public class MachineCoreEntity extends BlockEntity implements ItemProvider, Flui
         return worldPosition.offset(controllerOffset);
     }
 
+    // Cores do not tick. NetworkedBlockEntity sends its initial/periodic updates from a ticker,
+    // so using it here would require ticking every core just to sync this rarely changed link.
+    // Vanilla's chunk update tag supplies the link when a client starts tracking the chunk.
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registryLookup) {
+        return saveWithoutMetadata(registryLookup);
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        // Reuse the same saved controller offset for changes after the chunk has loaded.
+        return ClientboundBlockEntityDataPacket.create(this);
+    }
+
     public void setControllerPos(BlockPos controllerPos) {
         var newOffset = RelativePosition.toOffset(controllerPos, worldPosition);
         if (controllerOffset.equals(newOffset)) return;
@@ -63,6 +81,10 @@ public class MachineCoreEntity extends BlockEntity implements ItemProvider, Flui
         this.controllerOffset = newOffset;
         this.controllerEntity = null;    // forces cache reload
         this.setChanged();
+
+        // Clients need the link for targeting/collision as well as the server's capability forwarding.
+        if (level != null && !level.isClientSide())
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     @Nullable

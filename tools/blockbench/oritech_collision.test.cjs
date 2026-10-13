@@ -2,7 +2,7 @@ const {test} = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
-const {compileCollision, stripCollisionGeometry} = require('./oritech_collision.js');
+const {compileCollision, collisionCopy, stripCollisionGeometry} = require('./oritech_collision.js');
 
 const cube = (extra = {}) => ({type: 'cube', name: 'box', from: [-8, 0, -8], to: [8, 16, 8], ...extra});
 const group = (children, extra = {}) => ({type: 'group', name: 'collision', children, ...extra});
@@ -76,7 +76,7 @@ test('plugin exports, restores preview state, and cleans up listeners/materials'
     const context = {
         Plugin: {register(id, data) { plugin = data; }},
         Format: {id: 'geckolib_model'}, Outliner: {root: roots}, Project: {name: 'assembler'},
-        Blockbench: blockbench, Cube: {preview_controller: preview}, Codecs: {bedrock: codec},
+        Blockbench: blockbench, Cube: {preview_controller: preview, prototype: {menu: {addAction() {}}}}, Codecs: {bedrock: codec},
         MenuBar: {addAction() {}},
         Action: class { constructor(id, data) { Object.assign(this, data); actions[id] = this; } delete() { this.deleted = true; } },
         THREE: {DoubleSide: 2, MeshBasicMaterial: class {
@@ -115,4 +115,83 @@ test('plugin exports, restores preview state, and cleans up listeners/materials'
     assert.equal(overlay.disposed, true);
     assert.equal(blockbench.events.size + preview.events.size + codec.events.size, 0);
     assert.ok(Object.values(actions).every(action => action.deleted));
+});
+
+test('copies dimensions, baking inflation and stretch without modifying visual cubes', () => {
+    const source = cube({inflate: 1, stretch: [2, 1, 1], visibility: false, export: false});
+    const before = JSON.stringify(source);
+    assert.deepEqual(collisionCopy(source), {name: 'box_collision', from: [-18, -1, -9], to: [18, 17, 9]});
+    assert.equal(JSON.stringify(source), before);
+});
+
+test('bakes cube and ancestor quarter turns around their pivots', () => {
+    const source = cube({from: [0, 0, 0], to: [2, 4, 6], origin: [1, 2, 0], rotation: [0, 0, 90],
+        parent: group([], {name: 'visual', rotation: [0, 90, 0], origin: [0, 0, 0], parent: 'root'})});
+    assert.deepEqual(collisionCopy(source), {name: 'box_collision', from: [0, 1, -3], to: [6, 3, 1]});
+    assert.throws(() => collisionCopy(cube({parent: group([], {rotation: [0, 45, 0]})})), /axis-aligned/);
+    assert.throws(() => collisionCopy(cube({rotation: [30, 0, 0]})), /axis-aligned/);
+    assert.throws(() => collisionCopy(cube({inflate: -8})), /positive/);
+});
+
+test('context action copies a selection in one undo edit and rejects invalid batches before editing', () => {
+    let plugin, undo, edits = 0, message;
+    const roots = [];
+    const actions = {};
+    const menu = [];
+    class MockCube {
+        static selected = [];
+        static preview_controller = emitter();
+        constructor(data) { Object.assign(this, cube(data)); }
+        addTo(parent) { this.parent = parent; parent.children.push(this); return this; }
+        init() { return this; }
+        selectLow() { MockCube.selected.push(this); }
+    }
+    MockCube.prototype.menu = {addAction(action) { menu.push(action); }};
+    const context = {
+        Plugin: {register(id, data) { plugin = data; }},
+        Format: {id: 'geckolib_model'}, Modes: {edit: {selected: true}}, Outliner: {root: roots},
+        Cube: MockCube,
+        Group: class {
+            constructor(data) { Object.assign(this, group([], data)); }
+            addTo(parent) { assert.equal(parent, 'root'); roots.push(this); return this; }
+            init() { return this; }
+        },
+        Undo: {initEdit(data) { undo = data; edits++; }, finishEdit() { assert.equal(undo.elements.length, 2); }},
+        unselectAllElements() { MockCube.selected = []; }, updateSelection() {},
+        Blockbench: {...emitter(), showMessageBox(data) { message = data.message; }},
+        Codecs: {bedrock: emitter()}, MenuBar: {addAction() {}},
+        Action: class {constructor(id, data) { Object.assign(this, data); actions[id] = this; } delete() {}},
+        THREE: {MeshBasicMaterial: class {dispose() {}}},
+    };
+    vm.runInNewContext(fs.readFileSync(require.resolve('./oritech_collision.js'), 'utf8'), context);
+    plugin.onload();
+    const action = actions.add_as_oritech_collision_box;
+    assert.equal(menu[0], action);
+    assert.equal(action.condition(), false);
+    const sources = [cube(), cube({name: 'upper', from: [0, 16, 0], to: [8, 24, 8]})];
+    MockCube.selected = sources.slice();
+    assert.equal(action.condition(), true);
+    action.click();
+    assert.equal(edits, 1);
+    assert.equal(roots.length, 1);
+    assert.equal(roots[0].name, 'collision');
+    assert.equal(roots[0].children.length, 2);
+    assert.equal(MockCube.selected.length, 2);
+    assert.ok(MockCube.selected.every(copy => !sources.includes(copy)));
+    assert.equal(undo.selection, true);
+    assert.equal(compileCollision(roots).boxes.length, 2);
+
+    // Reuse the existing root, and leave it untouched if any selected cube is invalid.
+    MockCube.selected = [sources[0], cube({rotation: [0, 45, 0]})];
+    action.click();
+    assert.match(message, /axis-aligned/);
+    assert.equal(edits, 1);
+    assert.equal(roots[0].children.length, 2);
+    MockCube.selected = sources.slice();
+    action.click();
+    assert.equal(roots.length, 1);
+    assert.equal(roots[0].children.length, 4);
+    context.Modes.edit.selected = false;
+    assert.equal(action.condition(), false);
+    plugin.onunload();
 });

@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.decorative;
 
+import rearth.oritech.util.CollisionShapes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,7 +25,8 @@ public class HangarDoorHelperBlock extends Block {
     public static final IntegerProperty PART = IntegerProperty.create("part", 1, 2);
 
     public HangarDoorHelperBlock(Properties settings) {
-        super(settings);
+        // The authored section comes from the anchor block, so it cannot use the state-only cache.
+        super(settings.dynamicShape());
         registerDefaultState(defaultBlockState().setValue(PART, 1).setValue(SURFACE, Direction.NORTH).setValue(OPENED, false).setValue(ROTATED, false));
     }
 
@@ -35,12 +37,15 @@ public class HangarDoorHelperBlock extends Block {
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        if (shape != null) return shape;
+
         return HangarDoorBlock.getClosedShape(state.getValue(SURFACE), state.getValue(ROTATED));
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return state.getValue(OPENED) ? Shapes.empty() : HangarDoorBlock.getClosedShape(state.getValue(SURFACE), state.getValue(ROTATED));
+        return state.getValue(OPENED) ? Shapes.empty() : getShape(state, level, pos, context);
     }
 
     @Override

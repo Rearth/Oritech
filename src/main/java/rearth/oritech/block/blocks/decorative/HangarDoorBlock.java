@@ -1,5 +1,6 @@
 package rearth.oritech.block.blocks.decorative;
 
+import rearth.oritech.util.CollisionShapes;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -97,12 +98,15 @@ public class HangarDoorBlock extends Block implements EntityBlock, TooltipProvid
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        if (shape != null) return shape;
+
         return FULL_BLOCK_SHAPE;
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        return FULL_BLOCK_SHAPE;
+        return getShape(state, level, pos, context);
     }
 
     @Override

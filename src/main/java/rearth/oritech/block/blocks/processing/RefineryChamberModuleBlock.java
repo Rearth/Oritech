@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -26,7 +27,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.util.CollisionShapes;
 import rearth.oritech.api.transfer.fluid.FluidContainerInteraction;
 import rearth.oritech.block.entity.processing.RefineryChamberModuleBlockEntity;
 import rearth.oritech.util.MultiblockMachineController;
@@ -54,6 +58,13 @@ public class RefineryChamberModuleBlock extends HorizontalDirectionalBlock imple
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
         builder.add(BlockStateProperties.HORIZONTAL_FACING, ASSEMBLED);
+    }
+
+    // Vanilla also uses this shape for collision, keeping targeting and movement consistent.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Nullable

@@ -4,7 +4,7 @@ import com.geckolib.constant.dataticket.DataTicket;
 import com.geckolib.renderer.base.GeoRenderState;
 import com.geckolib.renderer.base.RenderPassInfo;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import rearth.oritech.util.AnimatedBlockRotation;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.core.Direction;
@@ -38,34 +38,7 @@ public class HangarDoorRenderer<R extends BlockEntityRenderState & GeoRenderStat
         var surface = renderPassInfo.getOrDefaultGeckolibData(SURFACE_TICKET, Direction.NORTH);
         var rotated = renderPassInfo.getOrDefaultGeckolibData(ROTATED_TICKET, false);
 
-        if (rotated && surface.getAxis().isVertical()) {
-            poseStack.translate(0, 0, -1);
-            poseStack.translate(0.5, 0, 0.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
-            poseStack.translate(-0.5, 0, -0.5);
-        }
-
-        if (surface == Direction.DOWN) {
-            poseStack.translate(0, 1, 0);
-            poseStack.mulPose(Axis.XP.rotationDegrees(180));
-        } else if (surface == Direction.WEST) {
-            poseStack.translate(0.5, 0.5, 0);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-        } else if (surface == Direction.EAST) {
-            poseStack.translate(-0.5, 0.5, 0);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(270));
-        } else if (surface == Direction.SOUTH) {
-            poseStack.translate(0, 0.5, -0.5);
-            poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (surface == Direction.NORTH) {
-            poseStack.translate(0, 0.5, 0.5);
-            poseStack.mulPose(Axis.XN.rotationDegrees(90));
-        }
-
-        if (rotated && surface.getAxis().isHorizontal())
-            poseStack.mulPose(Axis.YP.rotationDegrees(90));
+        poseStack.mulPose(AnimatedBlockRotation.getModelRotation(surface, true, rotated));
     }
 
 }

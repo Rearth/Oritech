@@ -1,5 +1,9 @@
 package rearth.oritech.block.blocks.storage;
 
+import rearth.oritech.util.CollisionShapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -27,6 +31,13 @@ import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 public class SchrodingersSafeBlock extends Block implements EntityBlock {
 
     public static final BooleanProperty SETUP_DONE = BooleanProperty.create("setup");
+
+    // Use the authored shape for both targeting and vanilla collision; keep the existing fallback.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        var shape = CollisionShapes.getShape(state, level, pos);
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
 
     public SchrodingersSafeBlock(Properties settings) {
         super(settings);
