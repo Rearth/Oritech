@@ -5,7 +5,7 @@
 	"textures": {
 		"2": "oritech_space_age:block/globe",
 		"surface": "oritech_space_age:block/mini_sun_surface",
-		"particle": "#surface"
+		"particle": "oritech:block/machine_particle_texture"
 	},
 	"elements": [
 		{
