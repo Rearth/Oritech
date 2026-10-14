@@ -1,2 +1,0 @@
-- Fix addons not being able to be built on machines with custom shapes
-- Make fluid toggle on destroyer block screens only visible when quarry addons are installed
