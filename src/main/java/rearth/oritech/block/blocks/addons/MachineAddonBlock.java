@@ -184,9 +184,15 @@ public class MachineAddonBlock extends FaceAttachedHorizontalDirectionalBlock im
 
     @Override
     public boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
-        if (addonSettings.needsSupport)
-            return super.canSurvive(state, level, pos);
-        return true;
+        if (!addonSettings.needsSupport()) return true;
+
+        var supportDirection = getConnectedDirection(state).getOpposite();
+        var supportPos = pos.relative(supportDirection);
+        var supportState = level.getBlockState(supportPos);
+
+        // Custom machine shapes and other partial blocks can support addons without a full face.
+        return supportState.isFaceSturdy(level, supportPos, supportDirection.getOpposite())
+                || !supportState.getCollisionShape(level, supportPos).isEmpty();
     }
 
     @Override
