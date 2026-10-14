@@ -1,6 +1,12 @@
 package rearth.oritech.spaceage.simulation;
 
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.neoforged.neoforge.network.connection.ConnectionType;
+import rearth.oritech.api.networking.ReflectiveCodecBuilder;
+import rearth.oritech.spaceage.init.SpaceAgeComponents.MissionCard;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
@@ -362,4 +368,79 @@ class MissionSystemsTest {
             assertTrue(originY + relative.getY() >= surface);
         }
     }
+
+    @Test
+    void closestAsteroidUsesInclusiveRadiusLimitsAndCurrentPosition() {
+
+        var small = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, 10, 0, 100, 0, SpaceObjects.DetectionState.PRECISE);
+        var medium = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, 20, 0, 200, 0, SpaceObjects.DetectionState.PRECISE);
+        var large = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, 40, 0, 300, 0, SpaceObjects.DetectionState.PRECISE);
+        var action = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(FlightPlanAction.CLOSEST_ASTEROID)
+                .withAsteroidTarget(new AsteroidTarget(true, 200, 300)).withOrbit(OrbitBand.TIGHT);
+        var objects = List.of(small, medium, large);
+        assertEquals(medium.id(), AsteroidTarget.resolve(action, objects, 0, 0, 0, FlightPlanAction.NO_TARGET).targetId());
+        assertEquals(large.id(), AsteroidTarget.resolve(action, objects, 50, 0, 0, FlightPlanAction.NO_TARGET).targetId());
+        assertEquals(FlightPlanAction.NO_TARGET, AsteroidTarget.resolve(action, List.of(small), 0, 0, 0, FlightPlanAction.NO_TARGET).targetId());
+        assertFalse(new AsteroidTarget(true, 300, 200).valid());
+        assertTrue(new AsteroidTarget(true, 300, 0).valid());
+        var capture = FlightPlanAction.create(ActionType.CONNECT_ASTEROID).withTarget(FlightPlanAction.CLOSEST_ASTEROID);
+        assertEquals(large.id(), AsteroidTarget.resolve(capture, objects, 0, 0, 0, large.id()).targetId());
+    }
+
+    @Test
+    void missionCardAndPacketsKeepDynamicSelectionAndPreviewResolvesAgain() {
+
+        var first = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, -3_100_000, 0, 1_000, 0, SpaceObjects.DetectionState.PRECISE);
+        var second = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, -3_140_000, 0, 2_000, 0, SpaceObjects.DetectionState.PRECISE);
+        var navigate = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(first.id())
+                .withOrbit(OrbitBand.TIGHT).withAsteroidTarget(new AsteroidTarget(true, 1_000, 2_000));
+        var card = new MissionCard(UUID.randomUUID(), "Asteroid run", plan(navigate));
+        var loaded = MissionCard.CODEC.parse(NbtOps.INSTANCE, MissionCard.CODEC.encodeStart(NbtOps.INSTANCE, card).getOrThrow()).getOrThrow();
+        assertEquals(card, loaded);
+        var codec = ReflectiveCodecBuilder.create(FlightPlan.class);
+        var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY, ConnectionType.NEOFORGE);
+        codec.encode(buffer, loaded.plan());
+        assertEquals(loaded.plan(), codec.decode(buffer));
+        buffer.release();
+
+        var craft = rocket(true, 0, 20_000_000);
+        var start = new MissionState.Position(-3_080_000, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW,
+                -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var earth = new SpaceSimulation().truth().stream().filter(o -> o.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
+        var preview = RocketFlightPathCalculator.calculateFrom(craft, List.of(earth, first, second), loaded.plan(), start);
+        assertTrue(preview.paths().getFirst().samples().stream().anyMatch(sample -> sample.targetId().equals(first.id())));
+        var repeated = RocketFlightPathCalculator.calculateFrom(craft, List.of(earth, second), loaded.plan(), start);
+        assertTrue(repeated.paths().getFirst().samples().stream().anyMatch(sample -> sample.targetId().equals(second.id())));
+        assertEquals(first.id(), loaded.plan().root().actions().getFirst().targetId());
+    }
+
+    @Test
+    void dynamicNavigationWaitsForKnowledgeAndKeepsDestinationAcrossReload() {
+
+        var system = new SpaceSimulation();
+        var data = new MissionSavedData();
+        var craft = rocket(true, 0, 20_000_000);
+        var navigate = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(FlightPlanAction.CLOSEST_ASTEROID)
+                .withOrbit(OrbitBand.TIGHT).withAsteroidTarget(new AsteroidTarget(true, 0, 0));
+        var start = new MissionState.Position(-3_080_000, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW,
+                -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var original = new MissionState(OWNER, craft, plan(navigate), start, new SurveyKnowledge(), BlockPos.ZERO, 0);
+        MissionController.step(null, data, original, system, 0);
+        assertEquals("status.oritech_space_age.no_matching_asteroid", original.status);
+        assertNull(original.leg);
+        original.knowledge.scan(system.truth(), 0, 0, 0, Double.MAX_VALUE);
+        var expected = AsteroidTarget.resolve(navigate, system.knownObjects(original.knowledge), start.x(), start.y(), 0, start.target());
+        for (int tick = 1; tick < 30; tick++) MissionController.step(null, data, original, system, tick);
+        assertEquals(expected.targetId(), original.action().targetId());
+        var loaded = MissionState.CODEC.parse(NbtOps.INSTANCE, MissionState.CODEC.encodeStart(NbtOps.INSTANCE, original).getOrThrow()).getOrThrow();
+        for (int tick = 30; tick < 60; tick++) {
+            MissionController.step(null, data, original, system, tick);
+            MissionController.step(null, data, loaded, system, tick);
+        }
+        assertEquals(original.position, loaded.position);
+        assertEquals(original.plan, loaded.plan);
+        assertEquals(expected.targetId(), loaded.action().targetId());
+        assertTrue(loaded.action().asteroidTarget().closest());
+    }
+
 }

@@ -167,6 +167,14 @@ class AsteroidImpactRulesTest {
                         last.y() - earth.yAt(last.timeSeconds())), 0.01,
                 "the projected path should end on Earth's surface");
 
+        var dynamicPlan = base.withBranches(List.of(base.root().withActions(List.of(
+                arrive.withTarget(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID).withAsteroidTarget(new AsteroidTarget(true, 2_000, 2_000)),
+                connect.withTarget(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID), returnToEarth,
+                release.withTarget(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID)))));
+        var dynamicResult = RocketFlightPathCalculator.calculate(rocket, List.of(earth, asteroid), dynamicPlan);
+        assertTrue(dynamicResult.paths().getFirst().actionMoments().stream().allMatch(RocketFlightPathCalculator.ActionMoment::completed));
+        assertEquals(asteroidId, dynamicResult.asteroidPaths().getFirst().asteroidId());
+
         var flyby = arrive.withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
         var invalidPlan = base.withBranches(List.of(base.root().withActions(List.of(flyby, connect))));
         var invalidPath = RocketFlightPathCalculator.calculate(rocket, List.of(earth, asteroid), invalidPlan)

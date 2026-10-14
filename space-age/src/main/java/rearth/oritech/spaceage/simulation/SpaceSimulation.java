@@ -682,9 +682,10 @@ public class SpaceSimulation {
                                    UUID targetId, OrbitBand orbit,
                                    ArrivalVelocityMode velocityMode, int targetVelocity, int maxSpeed,
                                    int landingX, int landingZ, int landingOffsetX, int landingOffsetZ,
-                                   List<ActionAddon> addons, ServiceSettings service, RocketServiceSettings settings) {
+                                   List<ActionAddon> addons, ServiceSettings service, RocketServiceSettings settings, AsteroidTarget asteroidTarget) {
 
         public static final UUID NO_TARGET = new UUID(0, 0);
+        public static final UUID CLOSEST_ASTEROID = UUID.fromString("d1a720f4-a3b4-4b51-8bde-5f01421bf631");
         public static final Codec<FlightPlanAction> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(FlightPlanAction::id),
                 ActionType.CODEC.fieldOf("type").forGetter(FlightPlanAction::type),
@@ -700,8 +701,16 @@ public class SpaceSimulation {
                 Codec.INT.optionalFieldOf("landing_offset_z", 0).forGetter(FlightPlanAction::landingOffsetZ),
                 ActionAddon.CODEC.listOf().optionalFieldOf("addons", List.of()).forGetter(FlightPlanAction::addons),
                 ServiceSettings.CODEC.optionalFieldOf("service", ServiceSettings.DEFAULT).forGetter(FlightPlanAction::service),
-                RocketServiceSettings.CODEC.fieldOf("settings").forGetter(FlightPlanAction::settings)
+                RocketServiceSettings.CODEC.fieldOf("settings").forGetter(FlightPlanAction::settings),
+                AsteroidTarget.CODEC.optionalFieldOf("asteroid_target", AsteroidTarget.DEFAULT).forGetter(FlightPlanAction::asteroidTarget)
         ).apply(instance, FlightPlanAction::new));
+
+        public FlightPlanAction(UUID id, ActionType type, List<SegmentRef> segments, UUID targetId, OrbitBand orbit,
+                                ArrivalVelocityMode mode, int velocity, int speed, int x, int z, int ox, int oz,
+                                List<ActionAddon> addons, ServiceSettings service, RocketServiceSettings settings) {
+
+            this(id, type, segments, targetId, orbit, mode, velocity, speed, x, z, ox, oz, addons, service, settings, AsteroidTarget.DEFAULT);
+        }
 
         public FlightPlanAction(UUID id, ActionType type, List<SegmentRef> segments, UUID targetId, OrbitBand orbit,
                                 ArrivalVelocityMode mode, int velocity, int speed, int x, int z, int ox, int oz, List<ActionAddon> addons, ServiceSettings service) {
@@ -742,25 +751,25 @@ public class SpaceSimulation {
         public FlightPlanAction withTarget(UUID target) {
 
             return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withOrbit(OrbitBand newOrbit) {
 
             return new FlightPlanAction(id, type, segments, targetId, newOrbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withVelocity(ArrivalVelocityMode newMode, int newVelocity) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, newMode, newVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withSegments(List<SegmentRef> newSegments) {
 
             return new FlightPlanAction(id, type, newSegments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
         }
 
         /**
@@ -769,31 +778,37 @@ public class SpaceSimulation {
         public FlightPlanAction withMaxSpeed(int speed) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, speed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withLanding(int x, int z, int offsetX, int offsetZ) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    x, z, offsetX, offsetZ, addons, service, settings);
+                    x, z, offsetX, offsetZ, addons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withAddons(List<ActionAddon> newAddons) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, newAddons, service, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, newAddons, service, settings, asteroidTarget);
         }
 
         public FlightPlanAction withService(ServiceSettings serviceSettings) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, serviceSettings, settings);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, serviceSettings, settings, asteroidTarget);
         }
 
         public FlightPlanAction withSettings(RocketServiceSettings value) {
 
             return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, value);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, value, asteroidTarget);
+        }
+
+        public FlightPlanAction withAsteroidTarget(AsteroidTarget value) {
+
+            return new FlightPlanAction(id, type, segments, targetId, orbit, velocityMode, targetVelocity, maxSpeed,
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, value);
         }
 
         public boolean isGenerated() {

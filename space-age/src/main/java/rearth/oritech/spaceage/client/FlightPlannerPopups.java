@@ -77,7 +77,7 @@ final class FlightPlannerPopups {
         var deployment = action.targetId().equals(SpaceObjects.EARTH_ID)
                 && SpaceBalance.hasSlots(action.orbit());
         var settingCount = switch (action.type()) {
-            case NAVIGATE_TO -> 4 + (survey || craft ? 0 : 1) + (deployment ? 1 : 0);
+            case NAVIGATE_TO -> 4 + (survey || craft ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE -> 2;
@@ -153,6 +153,17 @@ final class FlightPlannerPopups {
                         .withZIndex(9_001));
                 rowY += rowSpacing;
 
+            }
+
+            if (action.asteroidTarget().closest()) {
+                for (var minimum : new boolean[]{true, false}) {
+                    var radius = minimum ? action.asteroidTarget().minRadius() : action.asteroidTarget().maxRadius();
+                    addSettingLabel(px, rowY, minimum ? "screen.oritech_space_age.action.min_radius" : "screen.oritech_space_age.action.max_radius");
+                    editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                            Component.translatable("screen.oritech_space_age.action.radius_limit", radius),
+                            ignored -> editors.editAsteroidRadius(action, minimum)).withZIndex(9_001));
+                    rowY += rowSpacing;
+                }
             }
 
             addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.arrival");
@@ -298,7 +309,11 @@ final class FlightPlannerPopups {
         String helpKey;
         String presetKey;
         var presetValue = 0;
-        if (editors.editingResourceAmount) {
+        if (editors.asteroidRadiusField >= 0) {
+            labelKey = "screen.oritech_space_age.action.radius_metres";
+            helpKey = "screen.oritech_space_age.action.radius_help";
+            presetKey = "screen.oritech_space_age.action.radius_unrestricted";
+        } else if (editors.editingResourceAmount) {
             labelKey = "screen.oritech_space_age.service.resource_amount_title";
             helpKey = "screen.oritech_space_age.service.resource_amount_help";
             presetKey = "screen.oritech_space_age.service.resource_amount_zero";
@@ -429,6 +444,14 @@ final class FlightPlannerPopups {
                 .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
         editors.targetList.setZIndex(9_001);
         editors.targetOptions.clear();
+        var editedAction = editors.findAction(editors.targetAction);
+        if (editedAction != null && editedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            var label = Component.translatable("screen.oritech_space_age.action.closest_asteroid");
+            var button = SpaceAgeButtons.panel(4, 0, popupWidth - 36, 18, label, ignored -> editors.selectClosestAsteroid());
+            selectListButton(button, editedAction.asteroidTarget().closest());
+            editors.targetList.addChild(button);
+            editors.targetOptions.add(new FlightPlannerEditors.TargetOption(button, label.getString().toLowerCase(Locale.ROOT)));
+        }
         var objects = editors.currentDraftSnapshot().mapObjects().stream()
                 .filter(object -> {
                     var action = editors.findAction(editors.targetAction);
@@ -443,7 +466,7 @@ final class FlightPlannerPopups {
             var button = SpaceAgeButtons.panel(4, 0, popupWidth - 36, 18,
                     RocketStarMapWidget.objectName(object), ignored -> editors.selectNavigationTarget(object));
             var action = editors.findAction(editors.targetAction);
-            selectListButton(button, action != null && object.id().equals(action.targetId()));
+            selectListButton(button, action != null && !action.asteroidTarget().closest() && object.id().equals(action.targetId()));
             editors.targetList.addChild(button);
             editors.targetOptions.add(new FlightPlannerEditors.TargetOption(button,
                     RocketStarMapWidget.objectName(object).getString().toLowerCase(Locale.ROOT)));
@@ -518,8 +541,8 @@ final class FlightPlannerPopups {
         var action = editors.findAction(editors.destinationAction);
         var target = action == null ? null : editors.currentDraftSnapshot().objects().stream()
                 .filter(object -> object.id().equals(action.targetId())).findFirst().orElse(null);
-        if (action == null || target == null) return;
-        var orbits = RocketFlightPlanRules.availableOrbits(target.type());
+        if (action == null || target == null && !action.asteroidTarget().closest()) return;
+        var orbits = RocketFlightPlanRules.availableOrbits(action.asteroidTarget().closest() ? SpaceObjects.ObjectType.ASTEROID : target.type());
         var surfaceCoordinates = action.targetId().equals(SpaceObjects.EARTH_ID)
                 && editors.destinationOrbit == SpaceSimulation.OrbitBand.SURFACE;
         var popupWidth = Math.min(300, editors.panelWidth() - 12);

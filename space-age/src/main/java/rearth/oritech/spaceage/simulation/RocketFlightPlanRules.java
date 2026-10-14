@@ -76,6 +76,8 @@ public final class RocketFlightPlanRules {
                             && modules.stream().anyMatch(ref -> RocketProcessingService.controller(rocket, ref) == null))
                         issues.add(new Issue(branch.id(), action.id(), "invalid_action", 0, 0));
                 }
+                if (action.asteroidTarget().closest() && !action.asteroidTarget().valid())
+                    issues.add(new Issue(branch.id(), action.id(), "asteroid_size_invalid", 0, 0));
                 var serviceIssue = serviceIssue(action, rocket, stations);
                 if (!serviceIssue.isEmpty()) issues.add(new Issue(branch.id(), action.id(), serviceIssue, 0, 0));
                 if (!seen.add(action.id()) || accepted == null || !accepted.addons().equals(action.addons()))
@@ -228,12 +230,17 @@ public final class RocketFlightPlanRules {
                 var validatedAction = action;
                 if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
                     var target = objectsById.get(action.targetId());
-                    if (target == null) continue;
-                    validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
+                    if (action.asteroidTarget().closest()) {
+                        validatedAction = action.withOrbit(compatibleOrbit(SpaceObjects.ObjectType.ASTEROID, action.orbit()));
+                    } else {
+                        if (target == null) continue;
+                        validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
+                    }
                 } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
                     var target = objectsById.get(action.targetId());
-                    if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID) continue;
-                    validatedAction = action.withOrbit(compatibleOrbit(target.type(), action.orbit()));
+                    if (!action.targetId().equals(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID)
+                            && (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID)) continue;
+                    validatedAction = action.withOrbit(compatibleOrbit(SpaceObjects.ObjectType.ASTEROID, action.orbit()));
                 } else if (action.type() == SpaceSimulation.ActionType.SCAN) {
                     validatedAction = action.withService(SpaceSimulation.ServiceSettings.DEFAULT);
                 }

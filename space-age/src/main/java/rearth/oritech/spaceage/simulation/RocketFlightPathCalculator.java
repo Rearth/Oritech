@@ -185,7 +185,9 @@ public final class RocketFlightPathCalculator {
         var completed = true;
 
         for (int index = 0; index < branch.actions().size(); index++) {
-            var action = branch.actions().get(index);
+            var action = AsteroidTarget.resolve(branch.actions().get(index), context.objects.values(),
+                    state.x, state.y, state.time, branch.actions().get(index).type() == SpaceSimulation.ActionType.DECOUPLE
+                            && state.attachedAsteroid != null ? state.attachedAsteroid.id() : state.currentTarget);
             if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) continue;
             state.segments.values().forEach(segment -> segment.wetMass = Math.max(1, segment.dryMass + segment.fuelMass));
             var requiresUndocking = (!state.occupiedPortSegments.isEmpty() || !state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET))

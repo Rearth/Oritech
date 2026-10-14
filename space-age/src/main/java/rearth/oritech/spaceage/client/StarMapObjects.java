@@ -185,7 +185,9 @@ final class StarMapObjects {
             var action = actionsById.get(moment.actionId());
             if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO)
                 continue;
-            var target = snapshot.mapObjects().stream().filter(object -> object.id().equals(action.targetId())).findFirst().orElse(null);
+            var targetId = selectedPath.samples().stream().filter(sample -> sample.actionId().equals(action.id()))
+                    .map(sample -> sample.targetId()).findFirst().orElse(action.targetId());
+            var target = snapshot.mapObjects().stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
             if (target != null && target.type() == SpaceObjects.ObjectType.ASTEROID) {
                 displayedPositions.put(target.id(), new StarMapTooltip.ArrivalPosition(
                         target.xAt(moment.timeSeconds()), target.yAt(moment.timeSeconds()), moment.timeSeconds()));

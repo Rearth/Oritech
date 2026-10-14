@@ -542,5 +542,16 @@
   "status.oritech_space_age.cargo_overlap": "Cargo controllers cannot share payload cells. Move or rotate one controller.",
   "status.oritech_space_age.cargo_segment": "Work cells must belong to their controller segment; move them away from a coupling boundary.",
   "screen.oritech_space_age.mission.expand": "Expand spacecraft details and show its path",
-  "screen.oritech_space_age.mission.collapse": "Collapse spacecraft details and hide its path"
+  "screen.oritech_space_age.mission.collapse": "Collapse spacecraft details and hide its path",
+  "screen.oritech_space_age.action.closest_asteroid": "Closest asteroid",
+  "screen.oritech_space_age.action.closest_asteroid_resolved": "Closest asteroid: %s",
+  "screen.oritech_space_age.action.arrival_asteroid": "Arrival asteroid",
+  "screen.oritech_space_age.action.min_radius": "Min radius",
+  "screen.oritech_space_age.action.max_radius": "Max radius",
+  "screen.oritech_space_age.action.radius_limit": "%s m (0: any)",
+  "screen.oritech_space_age.action.radius_metres": "Radius (m)",
+  "screen.oritech_space_age.action.radius_help": "Limit asteroid radius in metres. Zero removes this limit. Surface arrivals require a precise contact.",
+  "screen.oritech_space_age.action.radius_unrestricted": "No limit",
+  "screen.oritech_space_age.validation.asteroid_size_invalid": "Minimum radius must not exceed maximum radius.",
+  "status.oritech_space_age.no_matching_asteroid": "No matching known asteroid"
 }

@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.client;
 
 import net.minecraft.client.gui.components.EditBox;
+import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
@@ -48,6 +49,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected boolean editingServiceTime;
     protected boolean editingResourceAmount;
     protected int resourceField;
+    protected int asteroidRadiusField = -1;
     protected EditBox speedField;
     protected String speedText;
     // Card currently choosing a new action type.
@@ -222,7 +224,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     Integer parseEditorNumber(String text) {
 
-        if (!editingResourceAmount) return parseSpeedLimit(text);
+        if (!editingResourceAmount && asteroidRadiusField < 0) return parseSpeedLimit(text);
         try {
             var value = Integer.parseInt(text.strip());
             return value >= 0 ? value : null;
@@ -305,7 +307,11 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         if (branch == null) return;
         speedAction = null;
         var edited = action;
-        if (editingResourceAmount) {
+        if (asteroidRadiusField >= 0) {
+            var selection = action.asteroidTarget();
+            edited = action.withAsteroidTarget(new AsteroidTarget(true,
+                    asteroidRadiusField == 0 ? value : selection.minRadius(), asteroidRadiusField == 1 ? value : selection.maxRadius()));
+        } else if (editingResourceAmount) {
             var e = action.settings().exchange();
             var fuel = resourceField < 2;
             var reserve = resourceField % 2 == 1;
@@ -411,6 +417,10 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                 asteroid = currentDraftSnapshot().objects().stream()
                         .filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID).findFirst().orElse(null);
             }
+            if (arrival != null && arrival.asteroidTarget().closest()) {
+                return changed.withTarget(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID).withOrbit(arrival.orbit())
+                        .withSegments(List.of(anchors.getFirst()));
+            }
             if (asteroid == null) return null;
             var orbit = arrival == null ? RocketFlightPlanRules.compatibleOrbit(asteroid.type(), selectedTarget().orbit())
                     : arrival.orbit();
@@ -485,13 +495,39 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         dropdownY = flightPlanActionScroll().getY() + 4 + contentY - Math.round(flightPlanActionScroll().getScrollY());
     }
 
+    void editAsteroidRadius(SpaceSimulation.FlightPlanAction action, boolean minimum) {
+
+        closeNestedEditorState();
+        editingServiceTime = false;
+        editingResourceAmount = false;
+        asteroidRadiusField = minimum ? 0 : 1;
+        speedAction = action.id();
+        speedText = Integer.toString(minimum ? action.asteroidTarget().minRadius() : action.asteroidTarget().maxRadius());
+        rebuildComponents();
+    }
+
+    void selectClosestAsteroid() {
+
+        var action = findAction(targetAction);
+        if (action == null) return;
+        var branch = findBranchContaining(action);
+        if (branch == null) return;
+        var changed = action.withTarget(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID)
+                .withAsteroidTarget(new AsteroidTarget(true, action.asteroidTarget().minRadius(), action.asteroidTarget().maxRadius()))
+                .withOrbit(RocketFlightPlanRules.compatibleOrbit(SpaceObjects.ObjectType.ASTEROID, action.orbit()));
+        changed = freezeNavigationTarget(changed);
+        closeNestedEditorState();
+        replaceAction(branch.id(), action.id(), changed, flightPlanRocket());
+        rebuildComponents();
+    }
+
     protected void selectNavigationTarget(SpaceSimulation.SpaceObjectData target) {
 
         var action = findAction(targetAction);
         if (action == null) return;
         var branch = findBranchContaining(action);
         if (branch == null) return;
-        var changed = action.withTarget(target.id()).withOrbit(
+        var changed = action.withAsteroidTarget(AsteroidTarget.DEFAULT).withTarget(target.id()).withOrbit(
                 RocketFlightPlanRules.compatibleOrbit(target.type(), action.orbit()));
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) changed = freezeNavigationTarget(changed);
         if (FlightPlannerLabels.isEarthSurface(changed)) {
@@ -760,6 +796,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     private void closeNestedEditorState() {
 
         speedAction = null;
+        asteroidRadiusField = -1;
         actionTypeAction = null;
         newActionBranch = null;
         targetAction = null;

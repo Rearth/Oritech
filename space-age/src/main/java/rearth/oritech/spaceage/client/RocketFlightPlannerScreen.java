@@ -18,6 +18,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.MissionForecast;
 import rearth.oritech.spaceage.simulation.MissionState;
@@ -33,6 +34,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -604,7 +606,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             if (objects.isEmpty()) return;
             var current = objects.stream().map(SpaceSimulation.SpaceObjectData::id).toList().indexOf(action.targetId());
             var target = objects.get((current + 1) % objects.size());
-            var changed = action.withTarget(target.id()).withOrbit(
+            var changed = action.withAsteroidTarget(AsteroidTarget.DEFAULT).withTarget(target.id()).withOrbit(
                     RocketFlightPlanRules.compatibleOrbit(target.type(), action.orbit()));
             selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
             replaceAction(branchId, action.id(), changed, rocket);
@@ -738,6 +740,13 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
             return Component.translatable("screen.oritech_space_age.action.upload_survey_data");
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+            if (action.asteroidTarget().closest()) {
+                var resolved = calculatedFlight.paths().stream().flatMap(path -> path.samples().stream())
+                        .filter(sample -> sample.actionId().equals(action.id())).map(sample -> findObject(sample.targetId()))
+                        .filter(Objects::nonNull).findFirst().orElse(null);
+                return resolved == null ? Component.translatable("screen.oritech_space_age.action.closest_asteroid")
+                        : Component.translatable("screen.oritech_space_age.action.closest_asteroid_resolved", RocketStarMapWidget.objectName(resolved));
+            }
             var target = findObject(action.targetId());
             return target == null ? Component.translatable("screen.oritech_space_age.action.no_target")
                     : RocketStarMapWidget.objectName(target);
@@ -883,6 +892,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     private String objectName(UUID id) {
 
+        if (id.equals(SpaceSimulation.FlightPlanAction.CLOSEST_ASTEROID))
+            return Component.translatable("screen.oritech_space_age.action.arrival_asteroid").getString();
         var object = findObject(id);
         return object == null ? "?" : RocketStarMapWidget.objectName(object).getString();
     }
@@ -948,7 +959,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             if (action.id().equals(beforeAction)) break;
             if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) continue;
             var target = findObject(action.targetId());
-            arrival = target != null && target.type() == SpaceObjects.ObjectType.ASTEROID
+            arrival = (action.asteroidTarget().closest() || target != null && target.type() == SpaceObjects.ObjectType.ASTEROID)
                     && (action.orbit() == SpaceSimulation.OrbitBand.TIGHT
                     || action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
                     && canConnectAfter(action) ? action : null;

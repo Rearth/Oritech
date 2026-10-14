@@ -117,6 +117,19 @@ public final class MissionController {
     static void step(MinecraftServer server, MissionSavedData data, MissionState state, SpaceSimulation system, long tick) {
 
         var action = state.action();
+        if (action != null && (state.leg == null && action.type() == ActionType.NAVIGATE_TO && action.asteroidTarget().closest()
+                || action.targetId().equals(FlightPlanAction.CLOSEST_ASTEROID))) {
+            var resolved = AsteroidTarget.resolve(action, system.knownObjects(state.knowledge), state.position.x(), state.position.y(), 0, action.type() == ActionType.DECOUPLE ? state.position.asteroid() : state.position.target());
+            if (resolved.targetId().equals(FlightPlanAction.NO_TARGET)) {
+                state.status = "status.oritech_space_age.no_matching_asteroid";
+                return;
+            }
+            var root = state.plan.root();
+            var original = action;
+            state.plan = state.plan.withBranches(state.plan.branches().stream().map(b -> b.isRoot()
+                    ? root.withActions(root.actions().stream().map(a -> a.id().equals(original.id()) ? resolved : a).toList()) : b).toList());
+            action = resolved;
+        }
         var linked = RocketDocking.linked(data, state.rocket.getRocketId());
         if (!linked && (action == null || action.type() != ActionType.NAVIGATE_TO && action.type() != ActionType.MAINTAIN_POSITION)) {
             var p = state.position;

@@ -47,7 +47,7 @@ final class StarMapTooltip {
             for (int i = 0; i < branch.actions().size(); i++) {
                 var action = branch.actions().get(i);
                 if (!action.id().equals(sample.actionId())) continue;
-                var target = objectById.apply(action.targetId());
+                var target = objectById.apply(sample.targetId());
                 if (target != null) lines.add(Component.translatable("screen.oritech_space_age.path_action", i + 1,
                         RocketStarMapWidget.objectName(target)));
             }
