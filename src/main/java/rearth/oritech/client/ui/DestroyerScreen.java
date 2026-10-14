@@ -33,6 +33,7 @@ public class DestroyerScreen extends UpgradableOritechScreen<UpgradableOritechSc
                     ClientPacketDistributor.sendToServer(new DestroyerBlockEntity.FluidRemovalPacket(menu.blockPos, value));
                 });
         removeFluidsToggle.withTooltip(Component.translatable("tooltip.oritech.destroyer.remove_fluids"));
+        removeFluidsToggle.setVisible(destroyer.range > 1);
         addComponent(removeFluidsToggle);
         updateEnergyTooltips();
     }
@@ -40,7 +41,8 @@ public class DestroyerScreen extends UpgradableOritechScreen<UpgradableOritechSc
     @Override
     protected void tickExtra() {
         super.tickExtra();
-        removeFluidsToggle.setValue(((DestroyerBlockEntity) menu.blockEntity).removeFluids);
+        var destroyer = (DestroyerBlockEntity) menu.blockEntity;
+        removeFluidsToggle.setValue(destroyer.removeFluids);
         updateEnergyTooltips();
     }
 
