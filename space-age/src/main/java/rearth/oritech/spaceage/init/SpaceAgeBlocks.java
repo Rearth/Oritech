@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import rearth.oritech.init.BlockContent.NoBlockItem;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.block.MissionControlBlock;
@@ -12,6 +13,7 @@ import rearth.oritech.spaceage.block.SurveyModuleBlock;
 import rearth.oritech.spaceage.block.VacuumCrafterBlock;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.GlobeBlock;
 import rearth.oritech.spaceage.block.basic.PlanetBlock;
 import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
@@ -21,23 +23,26 @@ public final class SpaceAgeBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(OritechSpaceAge.MOD_ID);
 
+    @NoBlockItem
     public static final DeferredBlock<PlanetBlock> EARTH = BLOCKS.registerBlock("earth", PlanetBlock::new,
             () -> machineProperties().noOcclusion());
 
+    @NoBlockItem
     public static final DeferredBlock<PlanetBlock> SUN = BLOCKS.registerBlock("sun", PlanetBlock::new,
             () -> machineProperties().noOcclusion().lightLevel(state -> 15));
 
+    @NoBlockItem
     public static final DeferredBlock<PlanetBlock> MARS = BLOCKS.registerBlock("mars", PlanetBlock::new,
             () -> machineProperties().noOcclusion());
 
-    public static final DeferredBlock<PlanetBlock> MINI_EARTH = BLOCKS.registerBlock("mini_earth",
-            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion());
+    public static final DeferredBlock<GlobeBlock> MINI_EARTH = BLOCKS.registerBlock("mini_earth",
+            GlobeBlock::new, () -> machineProperties().noOcclusion());
 
-    public static final DeferredBlock<PlanetBlock> MINI_MARS = BLOCKS.registerBlock("mini_mars",
-            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion());
+    public static final DeferredBlock<GlobeBlock> MINI_MARS = BLOCKS.registerBlock("mini_mars",
+            GlobeBlock::new, () -> machineProperties().noOcclusion());
 
-    public static final DeferredBlock<PlanetBlock> MINI_SUN = BLOCKS.registerBlock("mini_sun",
-            properties -> new PlanetBlock(properties, 8), () -> machineProperties().noOcclusion().lightLevel(state -> 15));
+    public static final DeferredBlock<GlobeBlock> MINI_SUN = BLOCKS.registerBlock("mini_sun",
+            GlobeBlock::new, () -> machineProperties().noOcclusion().lightLevel(state -> 15));
 
     public static final DeferredBlock<AsteroidBlock> ASTEROID_1 = BLOCKS.registerBlock("asteroid_1",
             properties -> new AsteroidBlock(properties, 1), () -> machineProperties().noOcclusion());

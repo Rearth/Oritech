@@ -11,6 +11,7 @@ import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
@@ -44,6 +45,15 @@ public class SpaceAgeModelProvider extends ModelProvider {
 
         var model = ModelLocationUtils.getModelLocation(block);
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.variant(new Variant(model))));
+        if (block.asItem() != Items.AIR)
+            blockModels.registerSimpleItemModel(block, model);
+    }
+
+    private static void createGlobeBlock(Block block, BlockModelGenerators blockModels) {
+
+        var model = ModelLocationUtils.getModelLocation(block);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.variant(new Variant(model)))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
         blockModels.registerSimpleItemModel(block, model);
     }
 
@@ -64,9 +74,9 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
+        createGlobeBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
+        createGlobeBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
+        createGlobeBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_1.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_2.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_3.get(), blockModels);

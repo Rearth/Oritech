@@ -414,7 +414,7 @@
   "screen.oritech_space_age.stat.parachutes": "Parachutes: %s",
   "screen.oritech_space_age.arrival_energy": "Energy: %s MJ kinetic + %s MJ explosive = %s MJ total",
   "screen.oritech_space_age.path_phase.parachute": "Parachute descent",
-  "screen.oritech_space_age.parachute.stats": "%s parachutes · %s kg",
+  "screen.oritech_space_age.parachute.stats": "%s parachutes \u00b7 %s kg",
   "screen.oritech_space_age.parachute.braking": "Landing delta-v reduction: up to %s m/s",
   "block.oritech_space_age.vacuum_crafter": "Vacuum Crafter",
   "screen.oritech_space_age.vacuum.ground": "Load here \u00b7 process in space",
