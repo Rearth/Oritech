@@ -51,16 +51,13 @@ public final class MissionState {
             SpaceSimulation.FlightPlan.CODEC.fieldOf("plan").forGetter(m -> m.plan),
             Position.CODEC.fieldOf("position").forGetter(m -> m.position),
             SurveyKnowledge.CODEC.fieldOf("knowledge").forGetter(m -> m.knowledge),
-            Codec.LONG.fieldOf("action_ticks").forGetter(m -> m.actionTicks),
+            Codec.LONG.fieldOf("action_ticks").forGetter(m -> m.serviceTicks),
             Codec.STRING.fieldOf("status").forGetter(m -> m.status),
-            Telemetry.CODEC.optionalFieldOf("leg").forGetter(m -> Optional.ofNullable(m.leg)),
+            ActiveTransfer.CODEC.optionalFieldOf("transfer").forGetter(m -> Optional.ofNullable(m.transfer)),
             BlockPos.CODEC.fieldOf("launch").forGetter(m -> m.launch),
             SpaceSimulation.FlightPlanAction.CODEC.listOf().fieldOf("completed").forGetter(m -> m.completed),
-            BlockPos.CODEC.optionalFieldOf("landing").forGetter(m -> Optional.ofNullable(m.landing)),
-            SpaceSimulation.SpaceObjectData.CODEC.listOf().fieldOf("leg_objects").forGetter(m -> m.legObjects),
             Codec.LONG.fieldOf("position_revision").forGetter(m -> m.positionRevision),
-            Codec.INT.fieldOf("service_progress").forGetter(m -> m.serviceProgress),
-            DockingTarget.CODEC.listOf().fieldOf("leg_stations").forGetter(m -> m.legStations)
+            Codec.INT.fieldOf("service_progress").forGetter(m -> m.serviceProgress)
     ).apply(i, MissionState::new));
     public final UUID owner;
     public final SurveyKnowledge knowledge;
@@ -69,44 +66,32 @@ public final class MissionState {
     public ActiveRocketData rocket;
     public SpaceSimulation.FlightPlan plan;
     public Position position;
-    public long actionTicks;
-    public List<DockingTarget> legStations = List.of();
+    private long serviceTicks;
+    ActiveTransfer transfer;
     public long positionRevision;
     public int serviceProgress;
     public String status;
-    public Telemetry leg;
-    public BlockPos landing;
-    public List<SpaceSimulation.SpaceObjectData> legObjects = List.of();
     public String route = "communication.oritech_space_age.no_route";
     public boolean connected;
     public SpaceCommunications.Connection communication = new SpaceCommunications.Connection(false, 0, 0,
             "communication.oritech_space_age.no_ground");
-    RocketFlightPathCalculator.FlightPath path;
     boolean ended;
-    private Telemetry forecastLeg;
-    private SpaceSimulation.FlightPlan forecastPlan;
-    private Collection<RecipeHolder<VacuumRecipe>> forecastRecipes;
-    private MissionForecast.Navigation navigationForecast = MissionForecast.Navigation.EMPTY;
     private MissionState(UUID owner, ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position,
                          SurveyKnowledge knowledge, long ticks, String status,
-                         Optional<Telemetry> leg, BlockPos launch, List<SpaceSimulation.FlightPlanAction> completed,
-                         Optional<BlockPos> landing, List<SpaceSimulation.SpaceObjectData> legObjects,
-                         long positionRevision, int serviceProgress, List<DockingTarget> legStations) {
+                         Optional<ActiveTransfer> transfer, BlockPos launch, List<SpaceSimulation.FlightPlanAction> completed,
+                         long positionRevision, int serviceProgress) {
 
-        this.legStations = List.copyOf(legStations);
         this.positionRevision = positionRevision;
         this.serviceProgress = serviceProgress;
-        this.landing = landing.orElse(null);
-        this.legObjects = List.copyOf(legObjects);
         this.owner = owner;
         this.rocket = rocket;
         this.plan = plan;
         this.position = position;
         this.knowledge = knowledge;
-        this.actionTicks = ticks;
+        this.serviceTicks = ticks;
         this.status = status;
         this.completed.addAll(completed);
-        this.leg = leg.orElse(null);
+        this.transfer = transfer.orElse(null);
         this.launch = launch;
         this.ended = isRecovered(status) || status.equals(STATUS_DESTROYED) || status.equals(STATUS_DISCARDED);
     }
@@ -115,7 +100,7 @@ public final class MissionState {
                         Position position, SurveyKnowledge knowledge, BlockPos launch, long tick) {
 
         this(owner, rocket, plan, position, knowledge, 0, STATUS_READY,
-                Optional.empty(), launch, List.of(), Optional.empty(), List.of(), 0, 0, List.of());
+                Optional.empty(), launch, List.of(), 0, 0);
     }
 
     public static boolean isRecovered(String status) {
@@ -139,22 +124,29 @@ public final class MissionState {
 
     public MissionForecast.Navigation navigationForecast() {
 
-        return navigationForecast(List.of(), List.of());
+        return navigationForecast(List.of());
     }
 
-    public MissionForecast.Navigation navigationForecast(Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
+    public MissionForecast.Navigation navigationForecast(Collection<RecipeHolder<VacuumRecipe>> recipes) {
 
-        if (!legStations.isEmpty()) stations = legStations;
-        if (leg == null || action() == null || action().type() != SpaceSimulation.ActionType.NAVIGATE_TO || ended)
-            return MissionForecast.Navigation.EMPTY;
-        if (forecastLeg != leg || !plan.equals(forecastPlan) || forecastRecipes != recipes) {
-            var flight = RocketFlightPathCalculator.calculateFrom(leg.rocket(), legObjects, plan, leg.position(), recipes, stations);
-            navigationForecast = MissionForecast.Navigation.forClient(flight);
-            forecastLeg = leg;
-            forecastPlan = plan;
-            forecastRecipes = recipes;
-        }
-        return navigationForecast;
+        return transfer == null || ended ? MissionForecast.Navigation.EMPTY : transfer.forecast(plan, recipes);
+    }
+
+    public long actionTicks() {
+
+        return transfer == null ? serviceTicks : transfer.ticks;
+    }
+
+    long advanceAction() {
+
+        return transfer == null ? ++serviceTicks : ++transfer.ticks;
+    }
+
+    void resetAction() {
+
+        serviceTicks = 0;
+        serviceProgress = 0;
+        transfer = null;
     }
 
     public SpaceSimulation.FlightPlanAction action() {
@@ -179,17 +171,12 @@ public final class MissionState {
         if (!actions.isEmpty()) completed.add(actions.removeFirst());
         while (!actions.isEmpty() && actions.getFirst().isGenerated()) actions.removeFirst();
         plan = plan.withBranches(plan.branches().stream().map(b -> b.isRoot() ? b.withActions(actions) : b).toList());
-        actionTicks = 0;
-        serviceProgress = 0;
-        leg = null;
-        path = null;
-        landing = null;
-        legStations = List.of();
+        resetAction();
     }
 
     public Telemetry telemetry(long tick) {
 
-        return new Telemetry(copyRocket(rocket), plan, position, tick, status, List.copyOf(completed), actionTicks,
+        return new Telemetry(copyRocket(rocket), plan, position, tick, status, List.copyOf(completed), actionTicks(),
                 actionDurationTicks(), serviceProgress);
     }
 
@@ -198,8 +185,8 @@ public final class MissionState {
         var action = action();
         if (action == null) return 0;
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION) return action.service().timeoutTicks();
-        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || path == null) return 0;
-        return path.paths().stream().filter(item -> item.branchId().equals(plan.root().id())).findFirst()
+        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || transfer == null || transfer.path == null) return 0;
+        return transfer.path.paths().stream().filter(item -> item.branchId().equals(plan.root().id())).findFirst()
                 .map(item -> Math.max(1L, Math.round(item.durationSeconds() * 20))).orElse(0L);
     }
 

@@ -619,7 +619,7 @@ class RocketServicesTest {
         MissionController.step(null, data, visitor, system, 1);
         assertEquals(position, visitor.position);
         assertEquals("status.oritech_space_age.dock_target_moved", visitor.status);
-        assertNull(visitor.leg);
+        assertNull(visitor.transfer);
     }
 
     @Test

@@ -29,6 +29,7 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -229,14 +230,14 @@ class MissionSystemsTest {
         var mission = new MissionState(OWNER, rocket(true, 0, 1_000_000), plan(current),
                 MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO, 0);
         mission.completed.add(completed);
-        mission.actionTicks = 400;
+        for (int i = 0; i < 400; i++) mission.advanceAction();
         var replacement = plan(completed, current, FlightPlanAction.create(ActionType.DISCARD_CRAFT));
 
         assertFalse(MissionController.replace(mission, replacement, system));
         mission.connected = true;
         assertTrue(MissionController.replace(mission, replacement, system));
         assertEquals(current, mission.action());
-        assertEquals(400, mission.actionTicks);
+        assertEquals(400, mission.actionTicks());
         assertEquals(List.of(completed), mission.completed);
 
         mission.ended = true;
@@ -333,8 +334,15 @@ class MissionSystemsTest {
                 new SurveyKnowledge(), BlockPos.ZERO, 0);
         for (int tick = 0; tick < 100; tick++) MissionController.step(null, data, original, system, tick);
 
+        assertNotNull(original.transfer);
+        assertEquals(100, original.actionTicks());
+        original.transfer.landing = new BlockPos(1, 70, 2);
         var encoded = MissionState.CODEC.encodeStart(NbtOps.INSTANCE, original).getOrThrow();
         var loaded = MissionState.CODEC.parse(NbtOps.INSTANCE, encoded).getOrThrow();
+        assertNotNull(loaded.transfer);
+        assertNull(loaded.transfer.path, "compiled guidance is rebuilt from the frozen snapshot");
+        assertEquals(original.transfer.landing, loaded.transfer.landing);
+        assertEquals(original.actionTicks(), loaded.actionTicks());
         for (int tick = 100; tick < 200; tick++) {
             MissionController.step(null, data, original, system, tick);
             MissionController.step(null, data, loaded, system, tick);
@@ -344,6 +352,13 @@ class MissionSystemsTest {
         assertEquals(original.plan, loaded.plan);
         assertEquals(original.rocket.getDynamicSegments().values().iterator().next().availableRF,
                 loaded.rocket.getDynamicSegments().values().iterator().next().availableRF);
+        assertEquals(original.rocket.getDynamicSegments().values().iterator().next().rf(),
+                loaded.rocket.getDynamicSegments().values().iterator().next().rf());
+        loaded.connected = true;
+        assertTrue(MissionController.replace(loaded, plan(navigate.withOrbit(OrbitBand.MEDIUM)), system));
+        assertNull(loaded.transfer, "changing navigation clears guidance, clock, landing and frozen inputs together");
+        assertEquals(0, loaded.actionTicks());
+        assertEquals(MissionForecast.Navigation.EMPTY, loaded.navigationForecast());
     }
 
     @Test
@@ -427,7 +442,7 @@ class MissionSystemsTest {
         var original = new MissionState(OWNER, craft, plan(navigate), start, new SurveyKnowledge(), BlockPos.ZERO, 0);
         MissionController.step(null, data, original, system, 0);
         assertEquals("status.oritech_space_age.no_matching_asteroid", original.status);
-        assertNull(original.leg);
+        assertNull(original.transfer);
         original.knowledge.scan(system.truth(), 0, 0, 0, Double.MAX_VALUE);
         var expected = AsteroidTarget.resolve(navigate, system.knownObjects(original.knowledge), start.x(), start.y(), 0, start.target());
         for (int tick = 1; tick < 30; tick++) MissionController.step(null, data, original, system, tick);

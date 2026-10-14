@@ -138,14 +138,14 @@ final class RocketFlightPathState {
         void consume(double seconds) {
 
             consumeFuel(seconds);
-            rf = Math.max(0, rf - Math.min(ionSeconds, seconds) * hardware.ion() * SpaceBalance.ION_RF * 20);
+            rf = Math.max(0, rf - hardware.rfCost(Math.min(ionSeconds, seconds)));
             ionSeconds = Math.max(0, ionSeconds - seconds);
         }
 
         void spendRF(double amount) {
 
             rf = Math.max(0, rf - amount);
-            if (hardware.ion() > 0) ionSeconds = Math.min(ionSeconds, rf / (20 * SpaceBalance.ION_RF * hardware.ion()));
+            if (hardware.ion() > 0) ionSeconds = Math.min(ionSeconds, rf / hardware.rfCost(1));
         }
 
         Segment copy() {

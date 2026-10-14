@@ -17,40 +17,6 @@ public record RocketBurnProfile(List<Interval> intervals) {
         return intervals.stream().mapToDouble(interval -> interval.acceleration() * interval.seconds()).sum();
     }
 
-    // Integrate velocity gained during a burn, starting after the preceding burn's delta-v has been spent.
-    Burn burn(double startDeltaV, double deltaV) {
-
-        var offset = startDeltaV;
-        var remaining = deltaV;
-        var gained = 0d;
-        var seconds = 0d;
-        var distance = 0d;
-        var endAcceleration = intervals.getLast().acceleration();
-        for (var interval : intervals) {
-            var available = interval.acceleration() * interval.seconds();
-            var skipped = Math.min(offset, available);
-            offset -= skipped;
-            var used = Math.min(remaining, available - skipped);
-            if (used <= 0) continue;
-            var duration = used / interval.acceleration();
-            distance += (gained + used * 0.5) * duration;
-            seconds += duration;
-            gained += used;
-            remaining -= used;
-            endAcceleration = interval.acceleration();
-            if (remaining <= 0) break;
-        }
-        // Search iterates may exceed the fuel budget. Extend the last rate for the equations only;
-        // the transfer solver rejects any resulting plan which exceeds the actual budget.
-        if (remaining > 0) {
-            endAcceleration = intervals.getLast().acceleration();
-            var duration = remaining / endAcceleration;
-            distance += (gained + remaining * 0.5) * duration;
-            seconds += duration;
-        }
-        return new Burn(seconds, distance, endAcceleration);
-    }
-
     public record Interval(double acceleration, double seconds) {
 
         public Interval {
@@ -62,7 +28,4 @@ public record RocketBurnProfile(List<Interval> intervals) {
         }
     }
 
-    record Burn(double seconds, double distance, double endAcceleration) {
-
-    }
 }

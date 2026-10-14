@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.Level;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
@@ -117,7 +116,7 @@ public final class MissionController {
     static void step(MinecraftServer server, MissionSavedData data, MissionState state, SpaceSimulation system, long tick) {
 
         var action = state.action();
-        if (action != null && (state.leg == null && action.type() == ActionType.NAVIGATE_TO && action.asteroidTarget().closest()
+        if (action != null && (state.transfer == null && action.type() == ActionType.NAVIGATE_TO && action.asteroidTarget().closest()
                 || action.targetId().equals(FlightPlanAction.CLOSEST_ASTEROID))) {
             var resolved = AsteroidTarget.resolve(action, system.knownObjects(state.knowledge), state.position.x(), state.position.y(), 0, action.type() == ActionType.DECOUPLE ? state.position.asteroid() : state.position.target());
             if (resolved.targetId().equals(FlightPlanAction.NO_TARGET)) {
@@ -164,7 +163,7 @@ public final class MissionController {
             case UNDOCK -> RocketDocking.undock(data, state);
             case SCAN -> scan(state, system, action, tick);
             case TRANSMIT_INFORMATION -> transmit(server, state, system, action);
-            case NAVIGATE_TO -> navigate(server, data, state, system, action, tick);
+            case NAVIGATE_TO -> MissionNavigation.tick(server, data, state, system, action, tick);
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
             case DECOUPLE -> decouple(data, state, system, action, tick);
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
@@ -216,13 +215,13 @@ public final class MissionController {
     private static void transmit(MinecraftServer server, MissionState state, SpaceSimulation system,
                                  FlightPlanAction action) {
 
-        state.actionTicks++;
+        state.advanceAction();
         if (state.connected) {
             deliverSurveyKnowledge(server, state, system);
             state.complete();
             state.status = MissionState.STATUS_INFORMATION_DELIVERED;
         } else if (action.service().timeoutTicks() > 0
-                && state.actionTicks >= action.service().timeoutTicks()) {
+                && state.actionTicks() >= action.service().timeoutTicks()) {
             state.complete();
             state.status = MissionState.STATUS_TRANSMISSION_TIMED_OUT;
         } else state.status = MissionState.STATUS_WAITING_FOR_LINK;
@@ -312,7 +311,7 @@ public final class MissionController {
             state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
             return;
         }
-        if (++state.actionTicks % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0) {
+        if (state.advanceAction() % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0) {
             var mass = RocketDocking.mass(data, state);
             if (!state.position.asteroid().equals(FlightPlanAction.NO_TARGET)) {
                 mass += system.truth().stream()
@@ -332,223 +331,10 @@ public final class MissionController {
 
         var addon = action.addons().stream().filter(item -> item.type().isMaintainPositionCondition())
                 .findFirst().orElse(null);
-        if (addon == null) return false;
-        long current;
-        long initial;
-        if (addon.type() == SpaceSimulation.ActionAddonType.LOW_RF) {
-            current = state.rocket.getStaticSegments().entrySet().stream()
-                    .filter(entry -> RocketHardware.of(entry.getValue()).usesStationKeepingRF())
-                    .mapToLong(entry -> state.rocket.getDynamicSegments().get(entry.getKey()).availableRF).sum();
-            initial = state.rocket.getStaticSegments().values().stream()
-                    .filter(segment -> RocketHardware.of(segment).usesStationKeepingRF())
-                    .mapToLong(StaticRocketSegment::initialRF).sum();
-        } else {
-            current = state.rocket.getStaticSegments().entrySet().stream()
-                    .filter(entry -> RocketHardware.of(entry.getValue()).usesStationKeepingFuel())
-                    .mapToLong(entry -> state.rocket.getDynamicSegments().get(entry.getKey()).availableFuelBurnTimeTicks).sum();
-            initial = state.rocket.getStaticSegments().values().stream()
-                    .filter(segment -> RocketHardware.of(segment).usesStationKeepingFuel())
-                    .mapToLong(StaticRocketSegment::initialFuel).sum();
-        }
-        return initial > 0 && current * 100.0 <= initial * (double) addon.value();
+        return StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), addon, 0, 0);
     }
 
-    private static void navigate(MinecraftServer server, MissionSavedData data, MissionState state, SpaceSimulation system, FlightPlanAction action, long tick) {
-
-        var rendezvous = action.settings().docking();
-        if (action.targetId().equals(rendezvous.host())) {
-            var issue = RocketDocking.rendezvousIssue(data, state, rendezvous);
-            if (!issue.isEmpty()) {
-                state.status = "status.oritech_space_age." + issue;
-                return;
-            }
-        }
-        if (state.leg == null) {
-            state.positionRevision++;
-            // Older/incomplete saves may have elapsed transfer ticks without the matching start snapshot.
-            // Restart guidance from the persisted current position instead of sampling past a newly built path.
-            state.actionTicks = 0;
-            state.leg = new MissionState.Telemetry(MissionState.copyRocket(state.rocket), state.plan, state.position, tick, MissionState.STATUS_TRANSFER);
-            state.legObjects = system.knownObjects(state.knowledge);
-            state.legStations = RocketDocking.targets(data, state.owner);
-            var p = state.position;
-            state.position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), -1, p.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
-        }
-        if (state.path == null) {
-            if (state.legObjects.isEmpty()) state.legObjects = system.knownObjects(state.knowledge);
-            var root = state.plan.root().withActions(List.of(action));
-            var branches = new ArrayList<>(state.plan.branches());
-            branches.removeIf(FlightPlanBranch::isRoot);
-            branches.addFirst(root);
-            state.path = RocketFlightPathCalculator.calculateFrom(state.leg.rocket(), state.legObjects,
-                    state.plan.withBranches(branches), state.leg.position(), server == null ? List.of()
-                            : server.overworld().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get()), state.legStations);
-        }
-        var path = state.path.paths().stream().filter(p -> p.branchId().equals(state.plan.root().id())).findFirst().orElse(null);
-        if (path == null || path.samples().isEmpty()) {
-            state.status = MissionState.STATUS_NO_FEASIBLE_TRANSFER;
-            return;
-        }
-        var before = state.actionTicks / 20.0;
-        var after = Math.min(path.durationSeconds(), before + 0.05);
-        var samples = path.samples();
-        for (int index = 1; index < samples.size(); index++) {
-            var previous = samples.get(index - 1);
-            var next = samples.get(index);
-            var duration = Math.max(0, Math.min(after, next.timeSeconds()) - Math.max(before, previous.timeSeconds()));
-            if (duration <= 0) continue;
-            var brakingFuelFactor = next.phase() == RocketFlightPathCalculator.PathPhase.BRAKE
-                    ? state.path.arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id()))
-                            .mapToDouble(a -> a.parachutes().brakingFuelFactor()).findFirst().orElse(1) : 1;
-            var burnSeconds = duration * brakingFuelFactor;
-            var depleted = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
-                var h = RocketHardware.of(entry.getValue());
-                var r = state.rocket.getDynamicSegments().get(entry.getKey());
-                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0 && r.availableRF < burnSeconds * 20 * h.ion() * SpaceBalance.ION_RF
-                        && state.leg.rocket().getDynamicSegments().get(entry.getKey()).availableRF > 0;
-            });
-            if (depleted) {
-                state.leg = null;
-                state.path = null;
-                state.actionTicks = 0;
-                state.status = MissionState.STATUS_REPLANNING;
-                return;
-            }
-            state.rocket.getStaticSegments().forEach((id, segment) -> {
-                if (next.firingSegments().contains(SegmentRef.of(segment)))
-                    RocketHardware.of(segment).burn(state.rocket.getDynamicSegments().get(id), burnSeconds);
-            });
-        }
-        state.position = sample(samples, before + 0.05, state.position);
-        state.actionTicks++;
-        state.status = MissionState.STATUS_IN_FLIGHT;
-        for (var event : state.path.boosterEvents()) {
-            if (!event.branchId().equals(state.plan.root().id()) || event.timeSeconds() > after) continue;
-            var id = state.rocket.getStaticSegments().entrySet().stream().filter(e -> SegmentRef.of(e.getValue()).equals(event.segment())).map(Map.Entry::getKey).findFirst().orElse(null);
-            if (id != null) split(data, state, Set.of(id), event.id(), tick);
-        }
-        var earthLanding = action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == OrbitBand.SURFACE
-                && state.path.navigationAborts().stream().noneMatch(abort -> abort.actionId().equals(action.id()));
-        if (earthLanding && server != null && state.landing == null && path.durationSeconds() - after <= 10) {
-            var level = server.overworld();
-            if (level.hasChunkAt(new BlockPos(action.landingX(), 0, action.landingZ()))) {
-                state.landing = RocketRecovery.landingPosition(level, state.rocket,
-                        action.landingX() + action.landingOffsetX(), action.landingZ() + action.landingOffsetZ());
-                var last = path.samples().getLast();
-                RocketSimulationController.beginReentry(level, state.rocket, state.landing,
-                        Math.max(1, (long) ((path.durationSeconds() - after) * 20)), last.speedMetersPerSecond());
-            }
-        }
-        if (after + 1e-7 < path.durationSeconds()) return;
-        var completed = !path.actionMoments().isEmpty() && path.actionMoments().getLast().completed();
-        if (!completed) {
-            state.status = MissionState.STATUS_TRANSFER_BLOCKED;
-            return;
-        }
-        var p = state.position;
-        var slot = -1;
-        if (action.targetId().equals(SpaceObjects.EARTH_ID) && SpaceBalance.hasSlots(action.orbit())
-                && Math.hypot(p.vx(), p.vy()) <= 12) {
-            slot = action.service().slot();
-            if (slot < 0) {
-                var occupied = new HashSet<Integer>();
-                data.craft.values().stream().filter(c -> c.owner.equals(state.owner) && c.position.orbit() == action.orbit()).forEach(c -> occupied.add(c.position.slot()));
-                slot = 0;
-                while (occupied.contains(slot) && slot < SpaceBalance.slots(action.orbit()) - 1) slot++;
-            }
-            slot %= SpaceBalance.slots(action.orbit());
-        }
-        var px = p.x();
-        var py = p.y();
-        if (slot >= 0) {
-            var angle = Math.PI + slot * Math.PI * 2 / SpaceBalance.slots(action.orbit());
-            px = -3_000_000 + Math.cos(angle) * (60_000 + action.orbit().altitude());
-            py = Math.sin(angle) * (60_000 + action.orbit().altitude());
-        }
-        state.position = new MissionState.Position(px, py, p.vx(), p.vy(), action.targetId(), action.orbit(), slot, p.stage(), p.asteroid(), p.anchor(),
-                p.headingX(), p.headingY());
-        if (earthLanding) {
-            var visual = state.rocket.getFlight();
-            if (server != null && state.landing != null && visual != null
-                    && server.overworld().getGameTime() < visual.impactTick()) {
-                state.status = MissionState.STATUS_DESCENDING;
-                return;
-            }
-            if (state.landing == null) {
-                state.status = MissionState.STATUS_LANDING_UNLOADED;
-                return;
-            }
-            state.landing = RocketRecovery.landingPosition(server.overworld(), state.rocket,
-                    action.landingX() + action.landingOffsetX(), action.landingZ() + action.landingOffsetZ());
-            if (path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED || Math.hypot(p.vx(), p.vy()) > 12) {
-                var level = server.overworld();
-                var pos = state.landing;
-                var energy = state.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID))
-                        .mapToDouble(a -> a.impact().totalEnergyJoules()).findFirst().orElse(
-                                .5 * RocketPerformanceCalculator.calculate(state.rocket).wetMassKilograms() * (p.vx() * p.vx() + p.vy() * p.vy())
-                                        + RocketExplosives.remaining(state.rocket));
-                level.explode(null, pos.getX(), pos.getY(), pos.getZ(), RocketExplosives.worldStrength(energy), Level.ExplosionInteraction.BLOCK);
-                state.ended = true;
-                state.status = MissionState.STATUS_DESTROYED;
-            } else if (RocketRecovery.restore(server.overworld(), state.rocket, state.landing)) {
-                deliverSurveyKnowledge(server, state, system);
-                state.ended = true;
-                state.status = MissionState.STATUS_RECOVERED;
-            } else {
-                state.status = MissionState.STATUS_LANDING_UNAVAILABLE;
-                return;
-            }
-        }
-        if (path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED && !earthLanding) {
-            state.ended = true;
-            state.status = MissionState.STATUS_DESTROYED;
-            UUID debrisRegion = null;
-            for (var arrival : state.path.arrivalPredictions()) {
-                var created = system.applyAsteroidImpact(arrival.targetId(), arrival.impact());
-                if (created != null) debrisRegion = created;
-            }
-            if (debrisRegion != null) {
-                var position = state.position;
-                state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(),
-                        debrisRegion, OrbitBand.SURFACE, -1, position.stage(), position.asteroid(), position.anchor(),
-                        position.headingX(), position.headingY());
-            }
-        }
-        if (earthLanding && state.ended && !p.asteroid().equals(FlightPlanAction.NO_TARGET)) {
-            state.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID)).findFirst()
-                    .ifPresent(arrival -> system.recoverAsteroid(server.overworld(), p.asteroid(), arrival.impact(), false));
-        }
-        state.complete();
-    }
-
-    public static MissionState.Position sample(List<RocketFlightPathCalculator.PathSample> samples, double time, MissionState.Position previous) {
-
-        var index = FlightMotion.endIndex(samples, time);
-        var sample = samples.get(index);
-        var motion = FlightMotion.sample(samples, time);
-        var hx = motion.vx();
-        var hy = motion.vy();
-        if (Math.hypot(hx, hy) < .001) {
-            hx = previous.headingX();
-            hy = previous.headingY();
-            // Recover an arrival direction even when a tick jumps directly to a stopped endpoint.
-            for (int i = index; i > 0; i--) {
-                var interval = new FlightMotion(samples.get(i - 1), samples.get(i));
-                if (interval.duration() <= 0) continue;
-                var incoming = interval.at(.999);
-                if (Math.hypot(incoming.vx(), incoming.vy()) < .000001) continue;
-                hx = incoming.vx();
-                hy = incoming.vy();
-                break;
-            }
-        }
-        var length = Math.max(1e-12, Math.hypot(hx, hy));
-        return new MissionState.Position(motion.x(), motion.y(), motion.vx(), motion.vy(),
-                previous.target(), previous.orbit(), previous.slot(), sample.stage(), sample.attachedAsteroidId(), previous.anchor(),
-                hx / length, hy / length);
-    }
-
-    private static void split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
+    static void split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
 
         var childStatic = new HashMap<UUID, StaticRocketSegment>();
         var childDynamic = new HashMap<UUID, DynamicRocketSegment>();
@@ -565,7 +351,7 @@ public final class MissionController {
         childBranches.add(new FlightPlanBranch(child.id(), FlightPlanBranch.NO_PARENT, child.actions()));
         state.plan.branches().stream().filter(b -> !b.isRoot() && !b.id().equals(child.id())).forEach(childBranches::add);
         var position = state.position;
-        var attachment = state.leg == null ? position : state.leg.position();
+        var attachment = state.transfer == null ? position : state.transfer.start.position();
         var takesAsteroid = childStatic.values().stream().anyMatch(s -> SegmentRef.of(s).equals(attachment.anchor()));
         var childPosition = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(), position.target(), position.orbit(),
                 position.slot(), position.stage(), takesAsteroid ? attachment.asteroid() : FlightPlanAction.NO_TARGET, attachment.anchor(),
@@ -644,18 +430,12 @@ public final class MissionController {
         var unchangedCurrent = current != null && !validated.root().actions().isEmpty()
                 && current.equals(validated.root().actions().getFirst());
         state.plan = validated;
-        if (!unchangedCurrent) {
-            state.actionTicks = 0;
-            state.serviceProgress = 0;
-            state.legStations = List.of();
-            state.leg = null;
-            state.path = null;
-        }
+        if (!unchangedCurrent) state.resetAction();
         state.status = MissionState.STATUS_UPDATE_ACCEPTED;
         return true;
     }
 
-    private static void deliverSurveyKnowledge(MinecraftServer server, MissionState state, SpaceSimulation system) {
+    static void deliverSurveyKnowledge(MinecraftServer server, MissionState state, SpaceSimulation system) {
 
         var before = new HashMap<UUID, SpaceObjectData>();
         system.earthKnowledge.contacts().forEach(contact -> before.put(contact.id(), contact));

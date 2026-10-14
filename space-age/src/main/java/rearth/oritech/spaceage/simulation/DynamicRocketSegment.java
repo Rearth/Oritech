@@ -38,7 +38,9 @@ public class DynamicRocketSegment {
             LAYOUT_CODEC.fieldOf("layout").forGetter(segment -> segment.layout),
             LAYOUT_CODEC.fieldOf("reserved").forGetter(segment -> segment.reserved),
             CraftPass.CODEC.optionalFieldOf("craft_pass").forGetter(segment -> Optional.ofNullable(segment.pass)),
-            RocketCargoTransfer.Result.CODEC.optionalFieldOf("exchange_report").forGetter(segment -> Optional.ofNullable(segment.lastExchange))
+            RocketCargoTransfer.Result.CODEC.optionalFieldOf("exchange_report").forGetter(segment -> Optional.ofNullable(segment.lastExchange)),
+            Codec.DOUBLE.optionalFieldOf("fuel_fraction", 0.0).forGetter(segment -> segment.fuelFraction),
+            Codec.DOUBLE.optionalFieldOf("rf_fraction", 0.0).forGetter(segment -> segment.rfFraction)
     ).apply(instance, DynamicRocketSegment::new));
     // Only changed cells are stored here; unchanged cells come from the launch structure.
     public final Map<BlockPos, BlockState> layout = new HashMap<>();
@@ -55,16 +57,21 @@ public class DynamicRocketSegment {
     public long availableFuelBurnTimeTicks;
     public long availableRF;
     public double currentFuelWeight;
+    private double fuelFraction;
+    private double rfFraction;
 
     public DynamicRocketSegment(long fuel, long rf, double mass, Set<UUID> connections, Map<BlockPos, RocketControllerState> crafters,
                                 long fuelCapacity, long rfCapacity, Map<BlockPos, BlockState> layout,
-                                Map<BlockPos, BlockState> reserved, Optional<CraftPass> pass, Optional<RocketCargoTransfer.Result> lastExchange) {
+                                Map<BlockPos, BlockState> reserved, Optional<CraftPass> pass, Optional<RocketCargoTransfer.Result> lastExchange,
+                                double fuelFraction, double rfFraction) {
 
         this(fuel, rf, mass, connections, crafters, fuelCapacity, rfCapacity);
         this.layout.putAll(layout);
         this.reserved.putAll(reserved);
         this.pass = pass.map(CraftPass::copy).orElse(null);
         this.lastExchange = lastExchange.orElse(null);
+        this.fuelFraction = fuelFraction;
+        this.rfFraction = rfFraction;
     }
 
     public DynamicRocketSegment(long fuel, long rf, double mass, Set<UUID> connections, Map<BlockPos, RocketControllerState> crafters, long fuelCapacity, long rfCapacity) {
@@ -95,17 +102,44 @@ public class DynamicRocketSegment {
 
         // Forecasts and detached craft must not share mutable passes, controllers or cell maps.
         return new DynamicRocketSegment(availableFuelBurnTimeTicks, availableRF, currentFuelWeight, connectedSegments, crafters,
-                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange));
+                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange), fuelFraction, rfFraction);
     }
 
     /**
      * Mixed fuels use the same remaining fraction for mass and chemical blast energy.
      */
-    public void consumeFuel(long ticks) {
+    public void consumeFuel(double ticks) {
 
-        var previous = availableFuelBurnTimeTicks;
-        availableFuelBurnTimeTicks = Math.max(0, previous - ticks);
-        if (previous > 0) currentFuelWeight *= availableFuelBurnTimeTicks / (double) previous;
+        var previous = fuel();
+        var remaining = Math.max(0, previous - ticks);
+        availableFuelBurnTimeTicks = (long) remaining;
+        fuelFraction = remaining - availableFuelBurnTimeTicks;
+        if (previous > 0) currentFuelWeight *= remaining / previous;
+    }
+
+    public void spendRF(double amount) {
+
+        var remaining = Math.max(0, rf() - amount);
+        availableRF = (long) remaining;
+        rfFraction = remaining - availableRF;
+    }
+
+    public double fuel() {
+
+        return availableFuelBurnTimeTicks + fuelFraction;
+    }
+
+    public double rf() {
+
+        return availableRF + rfFraction;
+    }
+
+    void setResources(double fuel, double rf) {
+
+        availableFuelBurnTimeTicks = (long) fuel;
+        fuelFraction = fuel - availableFuelBurnTimeTicks;
+        availableRF = (long) rf;
+        rfFraction = rf - availableRF;
     }
 
     public Set<UUID> getConnectedSegments() {

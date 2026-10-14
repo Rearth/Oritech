@@ -15,7 +15,7 @@ public final class RocketResourceTransfer {
         var sources = source.getDynamicSegments().entrySet().stream().sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList();
         var destinations = destination.getDynamicSegments().entrySet().stream().sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList();
         var stored = sources.stream().mapToLong(s -> fuel ? s.availableFuelBurnTimeTicks : s.availableRF).sum();
-        var room = destinations.stream().mapToLong(s -> Math.max(0, fuel ? s.fuelCapacity - s.availableFuelBurnTimeTicks : s.rfCapacity - s.availableRF)).sum();
+        var room = destinations.stream().mapToLong(s -> Math.max(0, fuel ? (long) (s.fuelCapacity - s.fuel()) : (long) (s.rfCapacity - s.rf()))).sum();
         var remaining = Math.min(Math.min(Math.max(0, limit), Math.max(0, stored - reserve)), room);
         var moved = remaining;
         var movedFuelWeight = 0d;
@@ -34,7 +34,7 @@ public final class RocketResourceTransfer {
         remaining = moved;
         for (var segment : destinations) {
             if (remaining == 0) break;
-            var amount = Math.min(remaining, Math.max(0, fuel ? segment.fuelCapacity - segment.availableFuelBurnTimeTicks : segment.rfCapacity - segment.availableRF));
+            var amount = Math.min(remaining, Math.max(0, fuel ? (long) (segment.fuelCapacity - segment.fuel()) : (long) (segment.rfCapacity - segment.rf())));
             if (fuel) {
                 segment.availableFuelBurnTimeTicks += amount;
                 // Transfer the moved mixture's mass with its burn budget, without retaining fluid types.

@@ -18,7 +18,27 @@ final class FlightCurve {
     private final double bowY;
     private final double[] lengths = new double[STEPS + 1];
 
-    FlightCurve(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double bowX, double bowY) {
+    static FlightCurve between(double startX, double startY, double endX, double endY,
+                               double sx, double sy, double ex, double ey, double startHandle) {
+
+        var dx = endX - startX;
+        var dy = endY - startY;
+        var distance = Math.max(1e-6, Math.hypot(dx, dy));
+        var endHandle = Math.max(distance / 3, startHandle / 4);
+        var collinear = Math.abs(sx * dy - sy * dx) < distance * .01
+                && Math.abs(ex * dy - ey * dx) < distance * .01;
+        var turnsBack = sx * dx + sy * dy < 0 || ex * dx + ey * dy < 0;
+        // Long braking approaches need width and an arrival handle proportional to their extent.
+        var bow = Math.max(0, startHandle - distance) * SpaceBalance.REVERSAL_STEERING_RATIO;
+        if (collinear && turnsBack) bow = Math.max(bow, distance * SpaceBalance.REVERSAL_STEERING_RATIO);
+        // Stay on the control polygon's side so the bow reinforces its curvature.
+        var side = (sx * dy - sy * dx) * startHandle - (ex * dy - ey * dx) * endHandle;
+        if (side > 0) bow = -bow;
+        return new FlightCurve(startX, startY, startX + sx * startHandle, startY + sy * startHandle,
+                endX - ex * endHandle, endY - ey * endHandle, endX, endY, -dy / distance * bow, dx / distance * bow);
+    }
+
+    private FlightCurve(double ax, double ay, double bx, double by, double cx, double cy, double dx, double dy, double bowX, double bowY) {
 
         this.ax = ax;
         this.ay = ay;

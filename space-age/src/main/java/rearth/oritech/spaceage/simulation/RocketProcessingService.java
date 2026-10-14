@@ -47,8 +47,8 @@ public final class RocketProcessingService {
 
     static void process(MissionSavedData data, MissionState state, SpaceSimulation system, FlightPlanAction action, Collection<RecipeHolder<VacuumRecipe>> recipes) {
 
-        state.actionTicks++;
-        if (action.service().timeoutTicks() > 0 && state.actionTicks > action.service().timeoutTicks()) {
+        state.advanceAction();
+        if (action.service().timeoutTicks() > 0 && state.actionTicks() > action.service().timeoutTicks()) {
             state.complete();
             state.status = "status.oritech_space_age.processing_timed_out";
             return;
@@ -65,7 +65,7 @@ public final class RocketProcessingService {
         }
         var link = RocketDocking.visitorLink(data, state.rocket.getRocketId());
         if (Math.hypot(state.position.vx(), state.position.vy()) <= .001 && link == null
-                && (state.actionTicks - 1) % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0
+                && (state.actionTicks() - 1) % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0
                 && !StationServiceRules.upkeep(state, RocketDocking.mass(data, state), SpaceBalance.STATION_KEEPING_INTERVAL_TICKS)) {
             state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
             return;
@@ -114,7 +114,7 @@ public final class RocketProcessingService {
         if (pass.pending().isEmpty() && !running) {
             storage.pass = null;
             state.complete();
-        } else if (action.service().timeoutTicks() > 0 && state.actionTicks >= action.service().timeoutTicks()) {
+        } else if (action.service().timeoutTicks() > 0 && state.actionTicks() >= action.service().timeoutTicks()) {
             state.complete();
             state.status = "status.oritech_space_age.processing_timed_out";
         }

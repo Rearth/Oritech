@@ -193,6 +193,63 @@ class TrajectoryRoutingTest {
     }
 
     @Test
+    void maximumOrbitArrivalDoesNotApplySurfaceGravityAcrossTheEntireBrakingLoop() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(-300_000, 30_000);
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                100, 1_200, 0, 10_000, 0, new RocketHardware(1, 0, 0, 0)));
+        var context = context(earth);
+        var orbit = action(earth.id(), 152).withOrbit(OrbitBand.LOW).withVelocity(ArrivalVelocityMode.MAXIMUM, 0);
+        assertTrue(RocketFlightNavigation.navigate(orbit, craft, context));
+        var arrivalSpeed = Math.hypot(craft.velocityX, craft.velocityY);
+        var landing = RocketTransferRoute.solve(craft, context, action(earth.id(), 153), earth, earth.radius(), 0);
+        assertNotNull(landing);
+        var vacuumStoppingDistance = arrivalSpeed * arrivalSpeed / (2 * 12 * landing.efficiency());
+        assertTrue(landing.curve().length() < vacuumStoppingDistance * 1.5,
+                "a long loop must not pay surface gravity over its entire braking distance");
+        assertTrue(landing.gravity() < 1,
+                "gravity work is bounded by the difference in endpoint potential");
+        assertTrue(RocketFlightNavigation.navigate(action(earth.id(), 153), craft, context));
+        assertEquals(0, Math.hypot(craft.velocityX, craft.velocityY), 1e-5);
+    }
+
+    @Test
+    void longLandingTurnsStayRoundedAndApproachAlongTheSurfaceNormal() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        for (var heading : new double[]{0, .005, Math.PI - .005, Math.PI}) {
+            var craft = craft(70_000, 0);
+            craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                    100, 2_000, 0, 10_000, 0, new RocketHardware(1, 0, 0, 0)));
+            craft.velocityX = Math.cos(heading) * 6_000;
+            craft.velocityY = Math.sin(heading) * 6_000;
+            var route = RocketTransferRoute.solve(craft, context(earth), action(earth.id(), 151), earth, earth.radius(), 0);
+            assertNotNull(route);
+            var curve = route.curve();
+            var width = 0d;
+            for (int i = 0; i <= 1_000; i++) {
+                var point = curve.atDistance(curve.length() * i / 1_000, 1);
+                width = Math.max(width, Math.abs(point.y()));
+            }
+            assertTrue(width > curve.length() * .05,
+                    "braking turns need width proportional to their length, not the short endpoint distance");
+            var start = curve.atDistance(0, 1);
+            assertEquals(Math.cos(heading), start.vx(), 1e-7);
+            assertEquals(Math.sin(heading), start.vy(), 1e-7);
+            var approach = curve.atDistance(curve.length() * .9999, 1);
+            assertTrue(approach.vx() < -.99, "the last part of the approach should already point inward");
+            var end = curve.atDistance(curve.length(), 1);
+            assertEquals(earth.radius(), end.x(), 1e-7);
+            assertEquals(0, end.y(), 1e-7);
+            assertEquals(-1, end.vx(), 1e-7);
+            assertEquals(0, end.vy(), 1e-7);
+        }
+    }
+
+    @Test
     void anExtendedLandingApproachDoesNotAccelerateBeforeBraking() {
 
         var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
@@ -244,13 +301,13 @@ class TrajectoryRoutingTest {
         var action = action(earth.id(), 30).withOrbit(OrbitBand.LOW);
         var route = RocketTransferRoute.solve(craft, context, action, earth, 160_000, 0);
         assertNotNull(route);
-        assertTrue(route.departureGravity() < -9.8);
-        assertTrue(route.burns().getFirst().seconds() > route.burns().getLast().seconds() * 2,
+        assertEquals(-3.67875, route.gravity(), .001);
+        assertTrue(route.burns().getFirst().seconds() > route.burns().getLast().seconds() * 1.5,
                 "gravity must lengthen outward acceleration and assist final braking");
 
         var weakProfile = new RocketBurnProfile(List.of(new RocketBurnProfile.Interval(9, 10_000)));
         assertNull(CurveTransfer.solve(100_000, 0, 0, false, Double.POSITIVE_INFINITY,
-                weakProfile, 1, -9.81, -1), "9 m/s^2 cannot depart against 9.81 m/s^2 gravity");
+                weakProfile, 1, -9.81), "9 m/s^2 cannot depart against 9.81 m/s^2 gravity");
     }
 
     @Test
@@ -270,7 +327,7 @@ class TrajectoryRoutingTest {
         assertEquals(departure, repeated.curve().atDistance(0, 1));
         assertTrue(Math.abs(departure.vy()) > .05, "stopped return should separate from the arrival line");
         assertTrue(departure.vx() < -.93, "jitter remains slight");
-        var stopped = MissionController.sample(craft.samples, craft.time + 1, MissionState.Position.surface());
+        var stopped = FlightMotion.position(craft.samples, craft.time + 1, MissionState.Position.surface());
         assertTrue(stopped.headingX() > .99, "arrival heading survives a tick past the stop");
         var position = new MissionState.Position(craft.x, craft.y, 0, 0, target.id(), OrbitBand.SURFACE,
                 -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO), craft.headingX, craft.headingY);

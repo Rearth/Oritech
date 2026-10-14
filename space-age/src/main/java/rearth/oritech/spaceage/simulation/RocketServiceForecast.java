@@ -144,8 +144,7 @@ final class RocketServiceForecast {
         var resources = new HashMap<UUID, DynamicRocketSegment>();
         craft.segments.values().forEach(segment -> {
             var r = segment.physical.copy();
-            r.availableRF = (long) segment.rf;
-            r.availableFuelBurnTimeTicks = (long) segment.fuelTicks;
+            r.setResources(segment.fuelTicks, segment.rf);
             r.currentFuelWeight = segment.fuelMass / RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT;
             r.crafters.clear();
             segment.crafters.forEach((pos, c) -> r.crafters.put(pos, c.copy()));
@@ -164,8 +163,8 @@ final class RocketServiceForecast {
             segment.physical = r.copy();
             segment.crafters.clear();
             r.crafters.forEach((pos, c) -> segment.crafters.put(pos, c.copy()));
-            segment.rf = r.availableRF;
-            segment.fuelTicks = r.availableFuelBurnTimeTicks;
+            segment.rf = r.rf();
+            segment.fuelTicks = r.fuel();
             segment.fuelMass = r.currentFuelWeight * RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT;
             segment.chemicalSeconds = segment.hardware.chemicalSeconds(r);
             segment.ionSeconds = segment.hardware.ionSeconds(r);

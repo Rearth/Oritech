@@ -161,7 +161,7 @@ final class RocketFlightNavigation {
                 // Stop exactly at fuel boundaries so stage markers do not drift.
                 var nextEngineStop = active.stream().map(craft.segments::get)
                         .mapToDouble(segment -> segment.seconds()).min().orElse(0);
-                stepSeconds = Math.min(stepSeconds, nextEngineStop / (command.directionX < 0 ? Math.max(1e-9, transferPlan.transfer.brakingFuelFactor()) : 1));
+                stepSeconds = Math.min(stepSeconds, nextEngineStop / (command.directionX < 0 ? Math.max(1e-9, command.fuelFactor) : 1));
             } else if (Math.hypot(craft.velocityX, craft.velocityY) <= 0.0001
                     && !Double.isFinite(command.stepLimitSeconds)) {
                 craft.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
@@ -173,13 +173,12 @@ final class RocketFlightNavigation {
 
             var phase = !command.burning ? PathPhase.COAST
                     : command.directionX > 0 ? PathPhase.ACCELERATE : PathPhase.BRAKE;
-            var gravity = command.directionX > 0 ? transferPlan.transfer.departureGravity()
-                    : command.directionX < 0 ? transferPlan.transfer.arrivalGravity() : 0;
+            var gravity = command.burning ? transferPlan.transfer.gravity() : 0;
             var signedAcceleration = command.burning ? command.directionX * acceleration + gravity : 0;
             travelled += speed * stepSeconds + .5 * signedAcceleration * stepSeconds * stepSeconds;
             speed = Math.max(0, speed + signedAcceleration * stepSeconds);
             craft.time += stepSeconds;
-            if (command.burning) craft.consumeBurnTime(active, stepSeconds * (command.directionX < 0 ? transferPlan.transfer.brakingFuelFactor() : 1));
+            if (command.burning) craft.consumeBurnTime(active, stepSeconds * (command.directionX < 0 ? command.fuelFactor : 1));
             var elapsedTicks = stepSeconds * 20;
             craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, elapsedTicks)));
             var curve = transferPlan.transfer.curve();
@@ -337,19 +336,19 @@ final class RocketFlightNavigation {
             for (var burn : transfer.burns()) {
                 if (elapsed < burn.seconds() - 1e-7) {
                     var remaining = burn.seconds() - elapsed;
-                    if (!burn.firing()) return new GuidanceCommand(false, 0, remaining);
-                    return new GuidanceCommand(true, burn.x(), remaining);
+                    if (!burn.firing()) return new GuidanceCommand(false, 0, 1, remaining);
+                    return new GuidanceCommand(true, burn.direction(), burn.fuelFactor(), remaining);
                 }
                 elapsed -= burn.seconds();
             }
-            return new GuidanceCommand(false, 0, 0);
+            return new GuidanceCommand(false, 0, 1, 0);
         }
     }
 
     /**
      * Longitudinal thrust sign and time remaining in the current engine phase.
      */
-    private record GuidanceCommand(boolean burning, double directionX, double stepLimitSeconds) {
+    private record GuidanceCommand(boolean burning, double directionX, double fuelFactor, double stepLimitSeconds) {
 
     }
 

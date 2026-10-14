@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.DoubleUnaryOperator;
 
 /**
  * Compiles high-level navigation actions into a bounded two-dimensional flight preview.
@@ -149,11 +148,11 @@ public final class RocketFlightPathCalculator {
                     hardware.chemicalSeconds(dynamic), hardware.ionSeconds(dynamic), hardware);
             previewSegment.structure = rocket.getOriginalSegments().get(entry.getKey());
             previewSegment.physical = dynamic.copy();
-            previewSegment.rf = dynamic.availableRF;
+            previewSegment.rf = dynamic.rf();
             previewSegment.fuelMass = performance.fuelMassKilograms();
             previewSegment.dryMass = performance.dryMassKilograms();
             previewSegment.payloadEnergy = entry.getValue().payloadEnergyJoules();
-            previewSegment.fuelTicks = dynamic.availableFuelBurnTimeTicks;
+            previewSegment.fuelTicks = dynamic.fuel();
             previewSegment.parachutes = ParachuteLanding.count(entry.getValue());
             dynamic.crafters.forEach((pos, cargo) -> previewSegment.crafters.put(pos, cargo.copy()));
             previewSegment.initialRF = entry.getValue().initialRF();
@@ -308,36 +307,10 @@ public final class RocketFlightPathCalculator {
         var correctionBurnSecondsPerSecond = SpaceBalance.stationKeepingBurnSecondsPerSecond(thrust, state.mass());
         var addon = action.addons().stream().filter(item -> item.type().isMaintainPositionCondition())
                 .findFirst().orElse(null);
-        double chemicalSeconds = 0;
-        double ionSeconds = 0;
-        var antennaSeconds = Double.POSITIVE_INFINITY;
-        var hasAntenna = false;
-        for (var segment : state.segments.values()) {
-            if (segment.hardware.chemical() > 0 && segment.chemicalSeconds > 0)
-                chemicalSeconds = Math.max(chemicalSeconds, segment.chemicalSeconds / correctionBurnSecondsPerSecond);
-            if (segment.hardware.ion() > 0 && segment.rf > 0) {
-                var rate = stationKeepingRfPerSecond(segment, correctionBurnSecondsPerSecond);
-                if (rate > 0) ionSeconds = Math.max(ionSeconds, segment.rf / rate);
-            }
-            if (segment.hardware.antennas() > 0) {
-                if (!hasAntenna) antennaSeconds = 0;
-                hasAntenna = true;
-                var rate = stationKeepingRfPerSecond(segment, correctionBurnSecondsPerSecond);
-                if (rate > 0) antennaSeconds = Math.max(antennaSeconds, segment.rf / rate);
-            }
-        }
-        var propulsionSeconds = Math.max(chemicalSeconds, ionSeconds);
-        var automaticSeconds = Math.min(propulsionSeconds, antennaSeconds);
-        var automaticEnd = antennaSeconds <= propulsionSeconds || ionSeconds > chemicalSeconds
-                ? StationKeepingEnd.RF : StationKeepingEnd.FUEL;
-        var conditionSeconds = addon == null ? Double.POSITIVE_INFINITY
-                : maintainPositionConditionSeconds(state, addon, correctionBurnSecondsPerSecond);
-        var conditionReached = conditionSeconds + 1e-7 < automaticSeconds;
-        var duration = conditionReached ? conditionSeconds : automaticSeconds;
-        var end = conditionReached
-                ? addon.type() == SpaceSimulation.ActionAddonType.LOW_RF
-                  ? StationKeepingEnd.LOW_RF : StationKeepingEnd.LOW_FUEL
-                : automaticEnd;
+        var estimate = StationServiceRules.estimate(StationServiceRules.budgets(state), correctionBurnSecondsPerSecond, addon);
+        var duration = estimate.seconds();
+        var end = estimate.end();
+        var conditionReached = estimate.conditionReached();
         context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, end));
         state.velocityX = 0;
         state.velocityY = 0;
@@ -349,47 +322,12 @@ public final class RocketFlightPathCalculator {
         state.segments.values().forEach(segment -> {
             if (segment.hardware.chemical() > 0)
                 segment.consumeFuel(duration * correctionBurnSecondsPerSecond);
-            segment.spendRF(duration * stationKeepingRfPerSecond(segment, correctionBurnSecondsPerSecond));
+            segment.spendRF(duration * StationServiceRules.rfPerSecond(segment.hardware, correctionBurnSecondsPerSecond));
         });
         if (addon != null && conditionReached) {
             context.navigationAborts.add(new NavigationAbortMoment(action.id(), state.branchId, addon.id(), addon.value(),
                     state.time, state.x, state.y, state.x, state.y));
         }
-    }
-
-    private static double stationKeepingRfPerSecond(Segment segment, double correctionRate) {
-
-        return segment.hardware.antennas() * SpaceBalance.ANTENNA_RF * 20.0
-                + segment.hardware.ion() * SpaceBalance.ION_RF * 20.0 * correctionRate;
-    }
-
-    private static double maintainPositionConditionSeconds(Craft state, SpaceSimulation.ActionAddon addon,
-                                                           double correctionRate) {
-
-        var rf = addon.type() == SpaceSimulation.ActionAddonType.LOW_RF;
-        var relevant = state.segments.values().stream().filter(segment -> rf
-                ? segment.hardware.usesStationKeepingRF()
-                : segment.hardware.usesStationKeepingFuel()).toList();
-        var initial = relevant.stream().mapToDouble(segment ->
-                rf ? segment.initialRF : segment.initialFuelTicks).sum();
-        var target = initial * addon.value() / 100;
-        DoubleUnaryOperator remaining = seconds -> relevant.stream().mapToDouble(segment -> {
-            var current = rf ? segment.rf : segment.chemicalSeconds * segment.hardware.chemical() * 20;
-            var rate = rf ? stationKeepingRfPerSecond(segment, correctionRate)
-                    : segment.hardware.chemical() * 20.0 * correctionRate;
-            return Math.max(0, current - rate * seconds);
-        }).sum();
-        if (remaining.applyAsDouble(0) <= target) return 0;
-        double high = 1;
-        while (high < 1e12 && remaining.applyAsDouble(high) > target) high *= 2;
-        if (remaining.applyAsDouble(high) > target) return Double.POSITIVE_INFINITY;
-        double low = 0;
-        for (int i = 0; i < 64; i++) {
-            var middle = (low + high) * .5;
-            if (remaining.applyAsDouble(middle) <= target) high = middle;
-            else low = middle;
-        }
-        return high;
     }
 
     static boolean finishStage(SpaceSimulation.FlightPlanAction navigation, Craft state,

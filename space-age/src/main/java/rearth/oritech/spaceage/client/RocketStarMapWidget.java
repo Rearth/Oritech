@@ -15,7 +15,7 @@ import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.MissionController;
+import rearth.oritech.spaceage.simulation.FlightMotion;
 import rearth.oritech.spaceage.simulation.MissionState;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -370,7 +370,7 @@ final class RocketStarMapWidget extends UIComponent {
         times.forEach((id, time) -> {
             var path = pathsByBranch.get(id);
             if (path == null || path.samples().isEmpty()) return;
-            var sample = MissionController.sample(path.samples(), time,
+            var sample = FlightMotion.position(path.samples(), time,
                     MissionState.Position.surface());
             var marker = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
             marker.withShowOverlay(false).withTooltipFromStack(false);

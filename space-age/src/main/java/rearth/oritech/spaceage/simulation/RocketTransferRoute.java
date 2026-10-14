@@ -66,31 +66,28 @@ final class RocketTransferRoute {
         var burnProfile = craft.burnProfile(context);
         FlightCurve curve = null;
         var efficiency = 1d;
-        var departureGravity = 0d;
-        var arrivalGravity = 0d;
-        for (int attempt = 0; attempt < 4; attempt++) {
-            curve = curve(craft, endX, endY, sx, sy, ex, ey, startHandle);
+        var gravity = 0d;
+        for (int attempt = 0; attempt < 16; attempt++) {
+            curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle);
             efficiency = 1 / (1 + curve.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
-            departureGravity = gravityAlong(context, curve, 0, craft.time);
-            arrivalGravity = gravityAlong(context, curve, curve.length(), craft.time);
+            gravity = gravityForLeg(context, curve, craft.time);
             var brakingArrival = freeArrival ? cap : arrival;
             if (speed <= brakingArrival || burnProfile.intervals().isEmpty()) break;
-            var usesGravity = speed <= cap && Math.max(Math.abs(departureGravity), Math.abs(arrivalGravity)) >= .01;
             var brakingDistance = CurveTransfer.brakingDistance(speed, brakingArrival, burnProfile,
-                    efficiency, usesGravity ? arrivalGravity : 0, usesGravity ? brakingCredit : 0);
+                    efficiency, gravity, brakingCredit);
             if (!Double.isFinite(brakingDistance)) break;
             if (brakingDistance <= curve.length()) {
-                if (extended && speed <= cap) {
+                if (extended) {
                     // Fit the extra approach to the stopping distance instead of leaving space
                     // that the peak-speed solver would fill with another acceleration burn.
                     var low = minimumHandle;
                     var high = startHandle;
                     for (int refinement = 0; refinement < 32; refinement++) {
                         var middle = (low + high) * .5;
-                        var candidate = curve(craft, endX, endY, sx, sy, ex, ey, middle);
+                        var candidate = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, middle);
                         var candidateEfficiency = 1 / (1 + candidate.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
                         var needed = CurveTransfer.brakingDistance(speed, brakingArrival, burnProfile,
-                                candidateEfficiency, usesGravity ? arrivalGravity : 0, usesGravity ? brakingCredit : 0);
+                                candidateEfficiency, gravityForLeg(context, candidate, craft.time), brakingCredit);
                         if (candidate.length() >= needed * 1.000001) {
                             high = middle;
                             curve = candidate;
@@ -104,50 +101,43 @@ final class RocketTransferRoute {
             startHandle = Math.max(startHandle * 2, brakingDistance * 2);
         }
         if (extended) cap = Math.min(cap, speed);
-        // With no meaningful gravity, retain the mature solver's ballistic and over-cap handling.
-        if (burnProfile.intervals().isEmpty()
-                || Math.max(Math.abs(departureGravity), Math.abs(arrivalGravity)) < .01
-                || speed > cap) {
-            var curveEfficiency = efficiency;
-            var profile = new RocketBurnProfile(burnProfile.intervals().stream()
-                    .map(interval -> new RocketBurnProfile.Interval(
-                            interval.acceleration() * curveEfficiency, interval.seconds())).toList());
-            var transfer = FullPowerTransfer.solve(curve.length(), 0, speed, 0, arrival, 0,
-                    freeArrival, profile, cap, 1_200_000);
-            if (transfer == null) return null;
-            return new Route(List.of(
-                    new Burn(transfer.firstSeconds(), transfer.firstDirectionX(), 0, craft.atmosphere),
-                    new Burn(transfer.coastSeconds(), 0, 0, craft.atmosphere),
-                    new Burn(transfer.lastSeconds(), transfer.lastDirectionX(), 0, craft.atmosphere)),
-                    transfer.duration(), curve, efficiency, 0, 0, ParachuteLanding.Result.NONE);
-        }
+        gravity = gravityForLeg(context, curve, craft.time);
+        // Averaged gravity must not let underpowered engines lift off or touch down safely.
+        var localDeparture = gravityAlong(context, curve, 0, craft.time);
+        var localArrival = gravityAlong(context, curve, curve.length(), craft.time);
+        var curveEfficiency = efficiency;
+        if (departure != null && speed < .001 && acceleration * efficiency + localDeparture <= 0) return null;
         var gravityTransfer = CurveTransfer.solve(curve.length(), speed, arrival, freeArrival, cap,
-                burnProfile, efficiency, departureGravity, arrivalGravity, brakingCredit);
-        if (gravityTransfer == null) return null;
+                burnProfile, efficiency, gravity, brakingCredit);
+        if (gravityTransfer == null || gravityTransfer.duration() > 1_200_000) return null;
+        if (gravityTransfer.lastSeconds() > 0 && action.orbit() == SpaceSimulation.OrbitBand.SURFACE
+                && hasSurface(target) && burnProfile.intervals().stream()
+                .noneMatch(interval -> interval.acceleration() * curveEfficiency > localArrival)) return null;
         return new Route(List.of(
-                new Burn(gravityTransfer.firstSeconds(), 1, 0, craft.atmosphere),
-                new Burn(gravityTransfer.coastSeconds(), 0, 0, craft.atmosphere),
-                new Burn(gravityTransfer.lastSeconds(), -1, 0, craft.atmosphere)),
-                gravityTransfer.firstSeconds() + gravityTransfer.coastSeconds()
-                        + gravityTransfer.lastSeconds(), curve, efficiency,
-                departureGravity, arrivalGravity, new ParachuteLanding.Result(parachuteCount, craft.mass(), brakingCredit, gravityTransfer.brakingFuelFactor()));
+                new Burn(gravityTransfer.firstSeconds(), gravityTransfer.firstDirection(),
+                        gravityTransfer.firstDirection() < 0 ? gravityTransfer.brakingFuelFactor() : 1, craft.atmosphere),
+                new Burn(gravityTransfer.coastSeconds(), 0, 1, craft.atmosphere),
+                new Burn(gravityTransfer.lastSeconds(), -1, gravityTransfer.brakingFuelFactor(), craft.atmosphere)),
+                gravityTransfer.duration(), curve, efficiency,
+                gravity, new ParachuteLanding.Result(parachuteCount, craft.mass(), brakingCredit, gravityTransfer.brakingFuelFactor()));
     }
 
-    private static FlightCurve curve(Craft craft, double endX, double endY, double sx, double sy,
-                                     double ex, double ey, double startHandle) {
+    /**
+     * Average gravitational work per metre. A long loop cannot accumulate surface gravity forever.
+     * Gravity during coasts remains omitted; this is guidance, not an orbital integrator.
+     */
+    static double gravityForLeg(Context context, FlightCurve curve, double time) {
 
-        var dx = endX - craft.x;
-        var dy = endY - craft.y;
-        var distance = Math.max(1e-6, Math.hypot(dx, dy));
-        var handle = distance / 3;
-        var collinear = Math.abs(sx * dy - sy * dx) < distance * .01
-                && Math.abs(ex * dy - ey * dx) < distance * .01;
-        var turnsBack = sx * dx + sy * dy < 0 || ex * dx + ey * dy < 0;
-        // Overshooting collinear handles need an interior bow to avoid a zero-velocity cusp.
-        var bow = collinear && (turnsBack || startHandle > distance)
-                ? distance * SpaceBalance.REVERSAL_STEERING_RATIO : 0;
-        return new FlightCurve(craft.x, craft.y, craft.x + sx * startHandle, craft.y + sy * startHandle,
-                endX - ex * handle, endY - ey * handle, endX, endY, -dy / distance * bow, dx / distance * bow);
+        var start = curve.atDistance(0, 0);
+        var end = curve.atDistance(curve.length(), 0);
+        var work = 0d;
+        for (var body : context.objects.values()) {
+            if (body.radius() <= 0 || body.surfaceGravity() <= 0) continue;
+            var from = Math.max(body.radius(), Math.hypot(start.x() - body.xAt(time), start.y() - body.yAt(time)));
+            var to = Math.max(body.radius(), Math.hypot(end.x() - body.xAt(time), end.y() - body.yAt(time)));
+            work += body.surfaceGravity() * body.radius() * body.radius() * (1 / to - 1 / from);
+        }
+        return work / curve.length();
     }
 
     /**
@@ -173,20 +163,15 @@ final class RocketTransferRoute {
         return gravity;
     }
 
-    record Burn(double seconds, double x, double y, boolean atmosphere) {
+    record Burn(double seconds, double direction, double fuelFactor, boolean atmosphere) {
 
         boolean firing() {
 
-            return x != 0;
+            return direction != 0;
         }
     }
 
     record Route(List<Burn> burns, double duration, FlightCurve curve, double efficiency,
-                 double departureGravity, double arrivalGravity, ParachuteLanding.Result parachutes) {
-
-        double brakingFuelFactor() {
-
-            return parachutes.brakingFuelFactor();
-        }
+                 double gravity, ParachuteLanding.Result parachutes) {
     }
 }

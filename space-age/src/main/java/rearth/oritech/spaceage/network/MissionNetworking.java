@@ -107,7 +107,7 @@ public final class MissionNetworking {
         var entries = data.craft.values().stream().filter(m -> m.owner.equals(player.getUUID())).map(mission ->
                 new FleetEntry(mission.rocket.getRocketId(), mission.telemetry(tick), mission.canUpdateMission(),
                         mission.canDismiss() && !RocketDocking.linked(data, mission.rocket.getRocketId()),
-                        mission.route, mission.communication, mission.navigationForecast(recipes, stations))).toList();
+                        mission.route, mission.communication, mission.navigationForecast(recipes))).toList();
         var nodes = data.networkNodes.stream().filter(n -> n.owner().equals(player.getUUID())).toList();
         PacketDistributor.sendToPlayer(player, new FleetPayload(entries, system.id(), system.createObjectData(), tick, data.debugSpeed,
                 SpaceCommunications.network(player.getUUID(), nodes), nodes, stations));

@@ -37,6 +37,33 @@ public record FlightMotion(PathSample start, PathSample end) {
         return motion.at(motion.duration() <= 0 ? 1 : (time - motion.start.timeSeconds()) / motion.duration());
     }
 
+    public static MissionState.Position position(List<PathSample> samples, double time, MissionState.Position previous) {
+
+        var index = FlightMotion.endIndex(samples, time);
+        var sample = samples.get(index);
+        var motion = FlightMotion.sample(samples, time);
+        var hx = motion.vx();
+        var hy = motion.vy();
+        if (Math.hypot(hx, hy) < .001) {
+            hx = previous.headingX();
+            hy = previous.headingY();
+            // Recover an arrival direction even when a tick jumps directly to a stopped endpoint.
+            for (int i = index; i > 0; i--) {
+                var interval = new FlightMotion(samples.get(i - 1), samples.get(i));
+                if (interval.duration() <= 0) continue;
+                var incoming = interval.at(.999);
+                if (Math.hypot(incoming.vx(), incoming.vy()) < .000001) continue;
+                hx = incoming.vx();
+                hy = incoming.vy();
+                break;
+            }
+        }
+        var length = Math.max(1e-12, Math.hypot(hx, hy));
+        return new MissionState.Position(motion.x(), motion.y(), motion.vx(), motion.vy(),
+                previous.target(), previous.orbit(), previous.slot(), sample.stage(), sample.attachedAsteroidId(), previous.anchor(),
+                hx / length, hy / length);
+    }
+
     public double duration() {
 
         return end.timeSeconds() - start.timeSeconds();

@@ -30,12 +30,12 @@ public record RocketHardware(int chemical, int ion, int scanners, int antennas) 
 
     public double chemicalSeconds(DynamicRocketSegment resources) {
 
-        return chemical == 0 ? 0 : resources.availableFuelBurnTimeTicks / (20.0 * chemical);
+        return chemical == 0 ? 0 : resources.fuel() / fuelCost(1);
     }
 
     public double ionSeconds(DynamicRocketSegment resources) {
 
-        return ion == 0 ? 0 : resources.availableRF / (20.0 * SpaceBalance.ION_RF * ion);
+        return ion == 0 ? 0 : resources.rf() / rfCost(1);
     }
 
     public boolean usesStationKeepingRF() {
@@ -48,9 +48,19 @@ public record RocketHardware(int chemical, int ion, int scanners, int antennas) 
         return chemical > 0;
     }
 
+    public double fuelCost(double seconds) {
+
+        return seconds * 20 * chemical;
+    }
+
+    public double rfCost(double seconds) {
+
+        return seconds * 20 * SpaceBalance.ION_RF * ion;
+    }
+
     public void burn(DynamicRocketSegment resources, double seconds) {
 
-        resources.consumeFuel(Math.round(seconds * 20 * chemical));
-        resources.availableRF = Math.max(0, resources.availableRF - Math.round(seconds * 20 * SpaceBalance.ION_RF * ion));
+        resources.consumeFuel(fuelCost(seconds));
+        resources.spendRF(rfCost(seconds));
     }
 }

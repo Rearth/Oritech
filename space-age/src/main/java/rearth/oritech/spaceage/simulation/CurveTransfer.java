@@ -1,7 +1,7 @@
 package rearth.oritech.spaceage.simulation;
 
 /**
- * Scalar burn/coast/burn timing along a curve, with constant endpoint gravity projections.
+ * Full-power burn/coast/burn timing along a curve. Coasting does not spend engine time.
  */
 final class CurveTransfer {
 
@@ -10,28 +10,30 @@ final class CurveTransfer {
 
     static Plan solve(double distance, double initial, double arrival, boolean freeArrival,
                       double speedLimit, RocketBurnProfile profile, double engineEfficiency,
-                      double departureGravity, double arrivalGravity) {
+                      double gravity) {
 
-        return solve(distance, initial, arrival, freeArrival, speedLimit, profile, engineEfficiency, departureGravity, arrivalGravity, 0);
+        return solve(distance, initial, arrival, freeArrival, speedLimit, profile, engineEfficiency, gravity, 0);
     }
 
     static Plan solve(double distance, double initial, double arrival, boolean freeArrival,
                       double speedLimit, RocketBurnProfile profile, double engineEfficiency,
-                      double departureGravity, double arrivalGravity, double brakingCredit) {
+                      double gravity, double brakingCredit) {
 
-        if (distance <= 0 || profile.intervals().isEmpty() || !(speedLimit > 0)) return null;
-        var minimum = Math.max(initial, freeArrival ? 0 : arrival);
-        if (minimum > speedLimit) return null;
+        if (distance <= 0 || !(speedLimit > 0) || !freeArrival && arrival > speedLimit) return null;
+        if (profile.intervals().isEmpty())
+            return initial > 0 && initial <= speedLimit && (freeArrival || Math.abs(initial - arrival) < 1e-7)
+                    ? new Plan(0, distance / initial, 0, 1, 1) : null;
+        var minimum = Math.max(Math.min(initial, speedLimit), freeArrival ? 0 : arrival);
         var totalBurnTime = profile.intervals().stream().mapToDouble(RocketBurnProfile.Interval::seconds).sum();
         var maximum = Math.min(speedLimit, minimum + profile.deltaV() * engineEfficiency
-                + Math.max(0, departureGravity) * totalBurnTime);
+                + Math.max(0, gravity) * totalBurnTime);
         Candidate best = candidate(minimum, initial, arrival, freeArrival, profile,
-                engineEfficiency, departureGravity, arrivalGravity, brakingCredit);
+                engineEfficiency, gravity, brakingCredit);
         if (best == null || best.distance > distance + 1e-6) return null;
         for (int iteration = 0; iteration < 80; iteration++) {
             var middle = (minimum + maximum) * .5;
             var candidate = candidate(middle, initial, arrival, freeArrival, profile,
-                    engineEfficiency, departureGravity, arrivalGravity, brakingCredit);
+                    engineEfficiency, gravity, brakingCredit);
             if (candidate != null && candidate.distance <= distance) {
                 minimum = middle;
                 best = candidate;
@@ -39,29 +41,32 @@ final class CurveTransfer {
         }
         if (best.peak <= 1e-9) return null;
         var coast = Math.max(0, (distance - best.distance) / best.peak);
-        return new Plan(best.first.seconds, coast, best.last.seconds, best.brakingFuelFactor);
+        return new Plan(best.first.seconds, coast, best.last.seconds, best.brakingFuelFactor,
+                best.peak < initial ? -1 : 1);
     }
 
     private static Candidate candidate(double peak, double initial, double arrival, boolean freeArrival,
                                        RocketBurnProfile profile, double efficiency,
-                                       double departureGravity, double arrivalGravity, double brakingCredit) {
+                                       double gravity, double brakingCredit) {
 
-        var first = burn(profile, 0, Math.max(0, peak - initial), efficiency, departureGravity, 1);
+        var brakingFuelFactor = freeArrival ? 1 : ParachuteLanding.fuelFactor(brakingCredit, Math.max(initial, peak) - arrival);
+        var firstFactor = peak < initial ? brakingFuelFactor : 1;
+        var first = burn(profile, 0, Math.abs(peak - initial), efficiency,
+                peak < initial ? -gravity : gravity, firstFactor);
         if (first == null) return null;
-        var brakingFuelFactor = ParachuteLanding.fuelFactor(brakingCredit, peak - arrival);
         var last = freeArrival ? new Burn(0, 0, 0)
-                : burn(profile, first.seconds, Math.max(0, peak - arrival), efficiency, -arrivalGravity, brakingFuelFactor);
+                : burn(profile, first.seconds * firstFactor, Math.max(0, peak - arrival), efficiency, -gravity, brakingFuelFactor);
         if (last == null) return null;
-        var distance = initial * first.seconds + first.distance
+        var distance = initial * first.seconds + (peak < initial ? -first.distance : first.distance)
                 + peak * last.seconds - last.distance;
         return new Candidate(peak, first, last, distance, brakingFuelFactor);
     }
 
     static double brakingDistance(double initial, double arrival, RocketBurnProfile profile,
-                                  double efficiency, double arrivalGravity, double brakingCredit) {
+                                  double efficiency, double gravity, double brakingCredit) {
 
         var factor = ParachuteLanding.fuelFactor(brakingCredit, initial - arrival);
-        var braking = burn(profile, 0, Math.max(0, initial - arrival), efficiency, -arrivalGravity, factor);
+        var braking = burn(profile, 0, Math.max(0, initial - arrival), efficiency, -gravity, factor);
         return braking == null ? Double.POSITIVE_INFINITY : initial * braking.seconds - braking.distance;
     }
 
@@ -95,7 +100,13 @@ final class CurveTransfer {
         return null;
     }
 
-    record Plan(double firstSeconds, double coastSeconds, double lastSeconds, double brakingFuelFactor) {
+    record Plan(double firstSeconds, double coastSeconds, double lastSeconds, double brakingFuelFactor,
+                double firstDirection) {
+
+        double duration() {
+
+            return firstSeconds + coastSeconds + lastSeconds;
+        }
 
     }
 

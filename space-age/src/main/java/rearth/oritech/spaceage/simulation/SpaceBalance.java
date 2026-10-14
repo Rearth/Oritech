@@ -13,8 +13,8 @@ public final class SpaceBalance {
     // Stable stopped-departure jitter; surface normals and moving departures take precedence.
     public static final double STOPPED_DEPARTURE_ANGLE_MIN = Math.toRadians(12);
     public static final double STOPPED_DEPARTURE_ANGLE_MAX = Math.toRadians(20);
-    // Fraction of trip distance used to separate an otherwise collinear turnaround.
-    public static final double REVERSAL_STEERING_RATIO = 0.025;
+    // Width of a turnaround relative to its approach extent, including braking overshoots.
+    public static final double REVERSAL_STEERING_RATIO = 0.2;
     // Steering is a small fuel surcharge; it must not turn an otherwise launch-capable rocket into one below local gravity.
     public static final double CURVE_STEERING_COST = 0.002;
     public static final int DAY = 24_000;
