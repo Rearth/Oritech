@@ -13,6 +13,7 @@ import rearth.oritech.spaceage.block.SurveyModuleBlock;
 import rearth.oritech.spaceage.block.VacuumCrafterBlock;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.GalleryLightBlock;
 import rearth.oritech.spaceage.block.basic.GlobeBlock;
 import rearth.oritech.spaceage.block.basic.PlanetBlock;
 import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
@@ -43,6 +44,9 @@ public final class SpaceAgeBlocks {
 
     public static final DeferredBlock<GlobeBlock> MINI_SUN = BLOCKS.registerBlock("mini_sun",
             GlobeBlock::new, () -> machineProperties().noOcclusion().lightLevel(state -> 15));
+
+    public static final DeferredBlock<GalleryLightBlock> GALLERY_LIGHT = BLOCKS.registerBlock("gallery_light",
+            GalleryLightBlock::new, () -> machineProperties().noOcclusion().lightLevel(state -> 15));
 
     public static final DeferredBlock<AsteroidBlock> ASTEROID_1 = BLOCKS.registerBlock("asteroid_1",
             properties -> new AsteroidBlock(properties, 1), () -> machineProperties().noOcclusion());

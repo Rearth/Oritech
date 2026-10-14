@@ -57,6 +57,14 @@ final class CurveTransfer {
         return new Candidate(peak, first, last, distance, brakingFuelFactor);
     }
 
+    static double brakingDistance(double initial, double arrival, RocketBurnProfile profile,
+                                  double efficiency, double arrivalGravity, double brakingCredit) {
+
+        var factor = ParachuteLanding.fuelFactor(brakingCredit, initial - arrival);
+        var braking = burn(profile, 0, Math.max(0, initial - arrival), efficiency, -arrivalGravity, factor);
+        return braking == null ? Double.POSITIVE_INFINITY : initial * braking.seconds - braking.distance;
+    }
+
     /**
      * Integrates full-power engine time after an earlier burn, including stage-rate changes.
      */

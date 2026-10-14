@@ -1,4 +1,4 @@
-// 26.1.2	2026-10-14T17:04:42.6550892	Model Definitions - oritech_space_age
+// 26.1.2	2026-10-14T17:54:56.5154521	Model Definitions - oritech_space_age
 30027ccd40761e66318b62065bc443676335fe92 assets/oritech_space_age/blockstates/antenna.json
 84513150db63c4eeed32a416e1b18828a8cb84de assets/oritech_space_age/blockstates/asteroid_1.json
 0f11287d0cd41a8d8fad37660581672bab69775e assets/oritech_space_age/blockstates/asteroid_2.json
@@ -7,6 +7,7 @@ c392e7247b68d9ba472e0e04cea44e8ae44d9221 assets/oritech_space_age/blockstates/as
 29db540ea059e1426e36dbaf8d754e43497d368f assets/oritech_space_age/blockstates/basic_booster_rocket.json
 ef77b491672e723af200f4b16e94ba358880155b assets/oritech_space_age/blockstates/cargo.json
 b81f0336c34a91114261ac398bfcd27833467ecf assets/oritech_space_age/blockstates/earth.json
+5d6a919aaa30985805749d5bcec909a48e94b2a7 assets/oritech_space_age/blockstates/gallery_light.json
 1dbe12d964d9e078a94ed6721bfb848f9be363b2 assets/oritech_space_age/blockstates/ion_booster_rocket.json
 333b09c88ed6e83492fd8c8bc88c9f88d7426773 assets/oritech_space_age/blockstates/mars.json
 58960601b2ed356a423aea40e1c59d66475f502a assets/oritech_space_age/blockstates/mini_earth.json
@@ -28,6 +29,7 @@ fd76386ed1fb27bf3aa8365c65344fad7334c1ec assets/oritech_space_age/items/asteroid
 f37b0b86d350832bf5e15f38c69dcfc8904fa1cd assets/oritech_space_age/items/asteroid_anchor.json
 3b423af62aa7e912cb042eaa6b9e9690ae768a57 assets/oritech_space_age/items/basic_booster_rocket.json
 c86aec14e7ace427c34fcf70df78c117f0f89c17 assets/oritech_space_age/items/cargo.json
+a29c18fd5dfd2e38f67754963851d6eabc767ab8 assets/oritech_space_age/items/gallery_light.json
 9a80121097c518cf842ab95cfb087a569231c053 assets/oritech_space_age/items/ion_booster_rocket.json
 f896c2d56ffb0c09e532db03dadfdba176f35f1d assets/oritech_space_age/items/mini_earth.json
 0f0352dd6e6bfe51a16c39e1d81dc5c0f85fa5a1 assets/oritech_space_age/items/mini_mars.json

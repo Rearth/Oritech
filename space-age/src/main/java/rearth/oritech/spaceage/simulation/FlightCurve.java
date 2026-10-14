@@ -59,6 +59,9 @@ final class FlightCurve {
     FlightMotion.State atDistance(double distance, double speed) {
 
         distance = Math.clamp(distance, 0, length());
+        // Long overshoots can leave tiny arc-length errors near a short endpoint handle.
+        // Use the exact endpoint tangent once the remaining distance is below numerical precision.
+        if (length() - distance <= Math.max(1e-7, Math.ulp(length()) * 32)) distance = length();
         var low = 1;
         var high = STEPS;
         while (low < high) {

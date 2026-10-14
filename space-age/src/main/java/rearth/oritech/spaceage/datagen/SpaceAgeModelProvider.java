@@ -49,7 +49,7 @@ public class SpaceAgeModelProvider extends ModelProvider {
             blockModels.registerSimpleItemModel(block, model);
     }
 
-    private static void createGlobeBlock(Block block, BlockModelGenerators blockModels) {
+    private static void createHorizontalModelBlock(Block block, BlockModelGenerators blockModels) {
 
         var model = ModelLocationUtils.getModelLocation(block);
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.variant(new Variant(model)))
@@ -74,9 +74,10 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);
-        createGlobeBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
-        createGlobeBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
-        createGlobeBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
+        createHorizontalModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
+        createHorizontalModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
+        createHorizontalModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
+        createHorizontalModelBlock(SpaceAgeBlocks.GALLERY_LIGHT.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_1.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_2.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_3.get(), blockModels);

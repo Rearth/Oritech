@@ -58,16 +58,19 @@ final class RocketMapPaths {
         var result = new ArrayList<LegTransform>();
         var samples = path.samples();
         var initial = new Point(samples.getFirst().x(), samples.getFirst().y());
-        result.add(LegTransform.between(initial, initial, mappedInitial, mappedInitial));
+        var initialTime = samples.getFirst().timeSeconds();
+        result.add(LegTransform.between(initial, initial, mappedInitial, mappedInitial, initialTime, initialTime));
         for (var first = 1; first < samples.size();) {
             var last = first;
             // Phase, staging and time samples belong to one curve, not independent surface departures.
             while (last + 1 < samples.size() && samples.get(last + 1).actionId().equals(samples.get(first).actionId())) last++;
             var start = new Point(samples.get(first - 1).x(), samples.get(first - 1).y());
             var end = new Point(samples.get(last).x(), samples.get(last).y());
-            var mappedStart = result.getLast().apply(start);
+            var startTime = samples.get(first - 1).timeSeconds();
+            var endTime = samples.get(last).timeSeconds();
+            var mappedStart = result.getLast().apply(start, startTime);
             var mappedEnd = start.equals(end) ? mappedStart : surfacePosition.apply(end);
-            var transform = LegTransform.between(start, end, mappedStart, mappedEnd);
+            var transform = LegTransform.between(start, end, mappedStart, mappedEnd, startTime, endTime);
             for (var index = first; index <= last; index++) result.add(transform);
             first = last + 1;
         }
@@ -114,13 +117,19 @@ final class RocketMapPaths {
             var motion = new FlightMotion(samples.get(i - 1), samples.get(i));
             if (motion.duration() <= 0) continue;
             var transform = transforms.get(path.branchId()).get(i);
-            var a = projection.apply(transform.apply(new Point(motion.start().x(), motion.start().y())));
-            var b = projection.apply(transform.apply(new Point(motion.start().x() + motion.start().velocityX() * motion.duration() / 3,
-                    motion.start().y() + motion.start().velocityY() * motion.duration() / 3)));
+            var startTime = motion.start().timeSeconds();
+            var endTime = motion.end().timeSeconds();
+            var start = transform.apply(new Point(motion.start().x(), motion.start().y()), startTime);
+            var startVelocity = transform.velocity(new Point(motion.start().velocityX(), motion.start().velocityY()), startTime);
+            var a = projection.apply(start);
+            var b = projection.apply(new Point(start.x() + startVelocity.x() * motion.duration() / 3,
+                    start.y() + startVelocity.y() * motion.duration() / 3));
             var end = motion.at(1);
-            var c = projection.apply(transform.apply(new Point(end.x() - end.vx() * motion.duration() / 3,
-                    end.y() - end.vy() * motion.duration() / 3)));
-            var d = projection.apply(transform.apply(new Point(end.x(), end.y())));
+            var finish = transform.apply(new Point(end.x(), end.y()), endTime);
+            var endVelocity = transform.velocity(new Point(end.vx(), end.vy()), endTime);
+            var c = projection.apply(new Point(finish.x() - endVelocity.x() * motion.duration() / 3,
+                    finish.y() - endVelocity.y() * motion.duration() / 3));
+            var d = projection.apply(finish);
             subdivide(result, motion, a, b, c, d, 0, 1, x, y, width, height, 0);
         }
         return result;
@@ -132,12 +141,13 @@ final class RocketMapPaths {
         if (path.samples().isEmpty()) return result;
         var start = new Point(path.samples().getFirst().x(), path.samples().getFirst().y());
         var end = new Point(path.samples().getLast().x(), path.samples().getLast().y());
-        var transform = LegTransform.between(start, end, surfacePosition.apply(start), surfacePosition.apply(end));
+        var transform = LegTransform.between(start, end, surfacePosition.apply(start), surfacePosition.apply(end),
+                path.samples().getFirst().timeSeconds(), path.samples().getLast().timeSeconds());
         for (int i = 1; i < path.samples().size(); i++) {
             var a = path.samples().get(i - 1);
             var b = path.samples().get(i);
-            result.add(new RenderedAsteroidSegment(transform.apply(new Point(a.x(), a.y())),
-                    transform.apply(new Point(b.x(), b.y()))));
+            result.add(new RenderedAsteroidSegment(transform.apply(new Point(a.x(), a.y()), a.timeSeconds()),
+                    transform.apply(new Point(b.x(), b.y()), b.timeSeconds())));
         }
         return result;
     }
@@ -148,31 +158,32 @@ final class RocketMapPaths {
         if (path == null || path.samples().isEmpty()) return surfacePosition.apply(new Point(fallbackX, fallbackY));
         var state = FlightMotion.sample(path.samples(), time);
         var index = FlightMotion.endIndex(path.samples(), time);
-        return transforms.get(branch).get(index).apply(new Point(state.x(), state.y()));
+        return transforms.get(branch).get(index).apply(new Point(state.x(), state.y()), time);
     }
 
-    /** One similarity transform fits the entire leg to its visual endpoints without introducing bends. */
-    private record LegTransform(Point origin, Point destination, double real, double imaginary) {
+    /** A cubic endpoint offset preserves waypoint velocities without rotating or scaling overshoots. */
+    private record LegTransform(Point startOffset, Point endOffset, double startTime, double endTime) {
 
-        static LegTransform between(Point start, Point end, Point mappedStart, Point mappedEnd) {
+        static LegTransform between(Point start, Point end, Point mappedStart, Point mappedEnd, double startTime, double endTime) {
 
-            var dx = end.x() - start.x();
-            var dy = end.y() - start.y();
-            var lengthSquared = dx * dx + dy * dy;
-            if (lengthSquared < 1e-12 || start.equals(mappedStart) && end.equals(mappedEnd))
-                return new LegTransform(start, mappedStart, 1, 0);
-            var mappedX = mappedEnd.x() - mappedStart.x();
-            var mappedY = mappedEnd.y() - mappedStart.y();
-            return new LegTransform(start, mappedStart, (mappedX * dx + mappedY * dy) / lengthSquared,
-                    (mappedY * dx - mappedX * dy) / lengthSquared);
+            return new LegTransform(new Point(mappedStart.x() - start.x(), mappedStart.y() - start.y()),
+                    new Point(mappedEnd.x() - end.x(), mappedEnd.y() - end.y()), startTime, endTime);
         }
 
-        Point apply(Point point) {
+        Point apply(Point point, double time) {
 
-            var x = point.x() - origin.x();
-            var y = point.y() - origin.y();
-            return new Point(destination.x() + real * x - imaginary * y,
-                    destination.y() + imaginary * x + real * y);
+            var progress = endTime > startTime ? Math.clamp((time - startTime) / (endTime - startTime), 0, 1) : 0;
+            var offset = startOffset.lerp(endOffset, progress * progress * (3 - 2 * progress));
+            return new Point(point.x() + offset.x(), point.y() + offset.y());
+        }
+
+        Point velocity(Point velocity, double time) {
+
+            if (endTime <= startTime) return velocity;
+            var progress = Math.clamp((time - startTime) / (endTime - startTime), 0, 1);
+            var rate = 6 * progress * (1 - progress) / (endTime - startTime);
+            return new Point(velocity.x() + (endOffset.x() - startOffset.x()) * rate,
+                    velocity.y() + (endOffset.y() - startOffset.y()) * rate);
         }
     }
 

@@ -161,6 +161,80 @@ class TrajectoryRoutingTest {
     }
 
     @Test
+    void fastLowOrbitArrivalsHaveRoomToBrakeBeforeLanding() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        for (int i = 0; i < 8; i++) {
+            var craft = craft(earth.radius() + OrbitBand.LOW.altitude(), 0);
+            craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                    100, 2_000, 0, 10_000, 0, new RocketHardware(1, 0, 0, 0)));
+            craft.velocityX = Math.cos(i * Math.PI / 4) * 1500;
+            craft.velocityY = Math.sin(i * Math.PI / 4) * 1500;
+            craft.samples.clear();
+            craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
+            var context = context(earth);
+            var landing = action(earth.id(), 140 + i);
+            assertTrue(craft.availableDeltaV(context) > 100_000);
+            var fuelBefore = craft.availableDeltaV(context);
+            var route = RocketTransferRoute.solve(craft, context, landing, earth, earth.radius(), 0);
+            assertNotNull(route);
+            var start = route.curve().atDistance(0, 1500);
+            assertEquals(craft.velocityX, start.vx(), 1e-6);
+            assertEquals(craft.velocityY, start.vy(), 1e-6);
+            assertEquals(fuelBefore, craft.availableDeltaV(context), 1e-6, "solving must not consume fuel");
+            assertTrue(RocketFlightNavigation.navigate(landing, craft, context),
+                    "heading " + i + ": " + craft.blockedState);
+            assertEquals(earth.radius(), craft.x, .01);
+            assertEquals(0, craft.y, .01);
+            assertEquals(0, Math.hypot(craft.velocityX, craft.velocityY), 1e-5);
+            assertTrue(craft.availableDeltaV(context) > 0);
+        }
+    }
+
+    @Test
+    void anExtendedLandingApproachDoesNotAccelerateBeforeBraking() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(70_000, 0);
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                100, 2_000, 0, 10_000, 0, new RocketHardware(1, 0, 0, 0)));
+        craft.velocityX = -1500;
+        craft.samples.clear();
+        craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
+        var context = context(earth);
+        var landing = action(earth.id(), 150);
+        var route = RocketTransferRoute.solve(craft, context, landing, earth, earth.radius(), 0);
+        assertNotNull(route);
+        var stoppingDistance = 1500 * 1500 / (2 * (20 * route.efficiency() - earth.surfaceGravity()));
+        assertTrue(route.curve().length() <= stoppingDistance * 1.001,
+                "the added approach should closely fit the full-power stopping distance");
+        assertTrue(RocketFlightNavigation.navigate(landing, craft, context));
+        assertTrue(craft.samples.stream().noneMatch(s -> s.phase() == PathPhase.ACCELERATE),
+                "an approach extended to accommodate braking must not accelerate into the extra distance");
+        assertTrue(craft.samples.stream().allMatch(s -> s.speedMetersPerSecond() <= 1500 + 1e-5));
+    }
+
+    @Test
+    void longerLandingApproachesStillRequireEnoughFuelAndThrust() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        for (var segment : List.of(
+                new RocketFlightPathState.Segment(100, 900, 0, 100_000, 0, new RocketHardware(1, 0, 0, 0)),
+                new RocketFlightPathState.Segment(100, 2_000, 0, 10, 0, new RocketHardware(1, 0, 0, 0)))) {
+            var craft = craft(earth.radius() + OrbitBand.LOW.altitude(), 0);
+            craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
+            craft.velocityX = -1500;
+            var context = context(earth);
+            var fuelBefore = craft.availableDeltaV(context);
+            assertNull(RocketTransferRoute.solve(craft, context, action(earth.id(), 149), earth, earth.radius(), 0));
+            assertEquals(fuelBefore, craft.availableDeltaV(context), 1e-6);
+        }
+    }
+
+    @Test
     void gravityMakesSurfaceAscentHarderThanFinalBraking() {
 
         var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,

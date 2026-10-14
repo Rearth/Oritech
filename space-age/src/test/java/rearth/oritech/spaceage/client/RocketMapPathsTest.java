@@ -113,7 +113,7 @@ class RocketMapPathsTest {
         }
         assertEquals(100, start.x());
         assertEquals(150, FlightMotion.sample(path.samples(), 5).x());
-        assertEquals(112.5, geometry.renderedWorldPosition(ID, 5, -1, -1).x());
+        assertEquals(120, geometry.renderedWorldPosition(ID, 5, -1, -1).x());
     }
 
     @Test
@@ -153,6 +153,31 @@ class RocketMapPathsTest {
             assertEquals(a.x(), b.x(), 1e-9);
             assertEquals(a.y(), b.y(), 1e-9);
         }
+    }
+
+    @Test
+    void aShortSurfaceLegPreservesWaypointDirectionAndDoesNotMagnifyItsOvershoot() {
+
+        var waypoint = sample(10, 100, 0, 10, 0);
+        var nextAction = new UUID(0, 9);
+        var overshoot = new PathSample(15, 1_000, 20, 10, 10, 0, PathPhase.BRAKE,
+                ID, nextAction, 1, Set.of(), Set.of(), SpaceSimulation.FlightPlanAction.NO_TARGET);
+        var end = new PathSample(20, 101, 0, 0, 0, 0, PathPhase.BRAKE,
+                ID, nextAction, 1, Set.of(), Set.of(), SpaceSimulation.FlightPlanAction.NO_TARGET);
+        var path = path(sample(0, 0, 0, 10, 0), waypoint, overshoot, end);
+        var geometry = new RocketMapPaths(SpaceSimulation.FlightPlan.empty(),
+                new FlightPath(List.of(path), List.of(), 20),
+                point -> point.x() == 101 ? new RocketMapPaths.Point(101, 30) : point);
+        var before = geometry.renderedWorldPosition(ID, 10 - 1e-4, 0, 0);
+        var at = geometry.renderedWorldPosition(ID, 10, 0, 0);
+        var after = geometry.renderedWorldPosition(ID, 10 + 1e-4, 0, 0);
+        assertTrue(after.x() > at.x());
+        assertEquals(at.x() - before.x(), after.x() - at.x(), 1e-5);
+        assertEquals(at.y() - before.y(), after.y() - at.y(), 1e-5);
+        var mappedOvershoot = geometry.renderedWorldPosition(ID, 15, 0, 0);
+        assertEquals(1_000, mappedOvershoot.x(), 1e-9);
+        assertTrue(Math.abs(mappedOvershoot.y() - 20) <= 30);
+        assertEquals(new RocketMapPaths.Point(101, 30), geometry.renderedWorldPosition(ID, 20, 0, 0));
     }
 
     @Test

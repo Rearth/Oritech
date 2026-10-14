@@ -1,4 +1,4 @@
-// 26.1.2	2026-10-14T17:04:42.6576135	Loot Tables
+// 26.1.2	2026-10-14T17:54:56.5204532	Loot Tables
 9cf3d538ff6d3f953de005ec955951ce7025392f data/oritech_space_age/loot_table/blocks/antenna.json
 7d5f0ef336c7df8eeea3125c846445c679dc39f3 data/oritech_space_age/loot_table/blocks/asteroid_1.json
 9857858861d3a43003daed63297fc864fcee5d70 data/oritech_space_age/loot_table/blocks/asteroid_2.json
@@ -6,6 +6,7 @@
 67faff8348ca879b8086987f3cfb3ad3a9319252 data/oritech_space_age/loot_table/blocks/asteroid_anchor.json
 0592858497e3fae0476770ee73b569642eb26b11 data/oritech_space_age/loot_table/blocks/basic_booster_rocket.json
 02280fe48e135f2476991996c2f2dd8b69e1f095 data/oritech_space_age/loot_table/blocks/cargo.json
+64a589a00c9a9930f441030cd2222caf15962f1c data/oritech_space_age/loot_table/blocks/gallery_light.json
 66b879b15718bdc57faf4a41c72d14d8f34e5513 data/oritech_space_age/loot_table/blocks/ion_booster_rocket.json
 cc7ac34e86e3819c89a1c4396bce91d5bad9064e data/oritech_space_age/loot_table/blocks/mini_earth.json
 32bb662f173f89d05eb06d8862c3156761c884f7 data/oritech_space_age/loot_table/blocks/mini_mars.json

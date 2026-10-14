@@ -9,6 +9,8 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -51,6 +53,7 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
         FUNCTIONS.register("visual_reload", () -> SpaceAgeGameTests::visualReload);
+        FUNCTIONS.register("gallery_light", () -> SpaceAgeGameTests::galleryLight);
     }
 
     public static void register(RegisterGameTestsEvent event) {
@@ -62,6 +65,8 @@ public final class SpaceAgeGameTests {
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));
         event.registerTest(OritechSpaceAge.id("visual_reload"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
                 OritechSpaceAge.id("visual_reload")), info));
+        event.registerTest(OritechSpaceAge.id("gallery_light"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
+                OritechSpaceAge.id("gallery_light")), info));
     }
 
     private static void recovery(GameTestHelper test) {
@@ -167,6 +172,32 @@ public final class SpaceAgeGameTests {
             missions.craft.remove(malformed.getRocketId());
             storage.set(RocketSimulationController.ActiveRocketSavedData.TYPE, original);
         }
+    }
+
+    private static void galleryLight(GameTestHelper test) {
+
+        var level = test.getLevel();
+        var pos = test.absolutePos(new BlockPos(2, 2, 2));
+        var light = SpaceAgeBlocks.GALLERY_LIGHT.get();
+        var item = new ItemStack(light);
+        test.assertTrue(!item.isEmpty(), "Gallery light has a block item");
+        for (var facing : Direction.Plane.HORIZONTAL) {
+            var support = pos.relative(facing.getOpposite());
+            level.setBlock(support, Blocks.STONE.defaultBlockState(), 3);
+            var context = new DirectionalPlaceContext(level, pos, facing.getOpposite(), item, facing);
+            var state = light.getStateForPlacement(context);
+            test.assertTrue(state != null && state.getValue(BlockStateProperties.HORIZONTAL_FACING) == facing, "Light faces away from its wall");
+            test.assertTrue(state.getLightEmission(level, pos) == 15, "Gallery light emits level 15");
+            level.setBlock(pos, state, 3);
+            level.setBlock(support, Blocks.AIR.defaultBlockState(), 3);
+            test.assertTrue(level.getBlockState(pos).isAir(), "Light drops when its wall is removed");
+            test.assertTrue(light.getStateForPlacement(context) == null, "Light needs wall support");
+        }
+        for (var facing : List.of(Direction.UP, Direction.DOWN)) {
+            var context = new DirectionalPlaceContext(level, pos, Direction.NORTH, item, facing);
+            test.assertTrue(light.getStateForPlacement(context) == null, "Light cannot mount on floors or ceilings");
+        }
+        test.succeed();
     }
 
     private static void content(GameTestHelper test) {

@@ -55,32 +55,63 @@ final class RocketTransferRoute {
         var handle = distance / 3;
         var startHandle = sx * dx + sy * dy < distance * .5
                 ? Math.max(handle, speed * speed / (2 * Math.max(.001, acceleration))) : handle;
-        // A collinear turnaround needs an interior bow: moving an endpoint handle would violate
-        // its radial/inherited direction. The extra term vanishes at both ends, including its derivative.
-        var collinear = Math.abs(sx * dy - sy * dx) < distance * .01
-                && Math.abs(ex * dy - ey * dx) < distance * .01;
-        var turnsBack = sx * dx + sy * dy < 0 || ex * dx + ey * dy < 0;
-        var bow = collinear && turnsBack ? distance * SpaceBalance.REVERSAL_STEERING_RATIO : 0;
-        var curve = new FlightCurve(craft.x, craft.y, craft.x + sx * startHandle, craft.y + sy * startHandle,
-                endX - ex * handle, endY - ey * handle, endX, endY, -dy / distance * bow, dx / distance * bow);
+        var minimumHandle = startHandle;
+        var extended = false;
         var arrival = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM ? action.targetVelocity() : 0;
-        // Approximate steering as a small reduction in longitudinal acceleration while engines fire.
-        // Coasting along the curve remains an intentional gameplay approximation.
-        var efficiency = 1 / (1 + curve.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
         var cap = action.maxSpeed() == 0 ? Double.POSITIVE_INFINITY : action.maxSpeed();
         var freeArrival = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.MAXIMUM;
         var parachuteCount = ParachuteLanding.eligible(action)
                 ? craft.segments.values().stream().mapToInt(segment -> segment.parachutes).sum() : 0;
         var brakingCredit = ParachuteLanding.deltaVReduction(craft.mass(), parachuteCount);
-        var departureGravity = gravityAlong(context, curve, 0, craft.time);
-        var arrivalGravity = gravityAlong(context, curve, curve.length(), craft.time);
+        var burnProfile = craft.burnProfile(context);
+        FlightCurve curve = null;
+        var efficiency = 1d;
+        var departureGravity = 0d;
+        var arrivalGravity = 0d;
+        for (int attempt = 0; attempt < 4; attempt++) {
+            curve = curve(craft, endX, endY, sx, sy, ex, ey, startHandle);
+            efficiency = 1 / (1 + curve.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
+            departureGravity = gravityAlong(context, curve, 0, craft.time);
+            arrivalGravity = gravityAlong(context, curve, curve.length(), craft.time);
+            var brakingArrival = freeArrival ? cap : arrival;
+            if (speed <= brakingArrival || burnProfile.intervals().isEmpty()) break;
+            var usesGravity = speed <= cap && Math.max(Math.abs(departureGravity), Math.abs(arrivalGravity)) >= .01;
+            var brakingDistance = CurveTransfer.brakingDistance(speed, brakingArrival, burnProfile,
+                    efficiency, usesGravity ? arrivalGravity : 0, usesGravity ? brakingCredit : 0);
+            if (!Double.isFinite(brakingDistance)) break;
+            if (brakingDistance <= curve.length()) {
+                if (extended && speed <= cap) {
+                    // Fit the extra approach to the stopping distance instead of leaving space
+                    // that the peak-speed solver would fill with another acceleration burn.
+                    var low = minimumHandle;
+                    var high = startHandle;
+                    for (int refinement = 0; refinement < 32; refinement++) {
+                        var middle = (low + high) * .5;
+                        var candidate = curve(craft, endX, endY, sx, sy, ex, ey, middle);
+                        var candidateEfficiency = 1 / (1 + candidate.turnAngle() * SpaceBalance.CURVE_STEERING_COST);
+                        var needed = CurveTransfer.brakingDistance(speed, brakingArrival, burnProfile,
+                                candidateEfficiency, usesGravity ? arrivalGravity : 0, usesGravity ? brakingCredit : 0);
+                        if (candidate.length() >= needed * 1.000001) {
+                            high = middle;
+                            curve = candidate;
+                            efficiency = candidateEfficiency;
+                        } else low = middle;
+                    }
+                }
+                break;
+            }
+            extended = true;
+            startHandle = Math.max(startHandle * 2, brakingDistance * 2);
+        }
+        if (extended) cap = Math.min(cap, speed);
         // With no meaningful gravity, retain the mature solver's ballistic and over-cap handling.
-        if (craft.burnProfile(context).intervals().isEmpty()
+        if (burnProfile.intervals().isEmpty()
                 || Math.max(Math.abs(departureGravity), Math.abs(arrivalGravity)) < .01
                 || speed > cap) {
-            var profile = new RocketBurnProfile(craft.burnProfile(context).intervals().stream()
+            var curveEfficiency = efficiency;
+            var profile = new RocketBurnProfile(burnProfile.intervals().stream()
                     .map(interval -> new RocketBurnProfile.Interval(
-                            interval.acceleration() * efficiency, interval.seconds())).toList());
+                            interval.acceleration() * curveEfficiency, interval.seconds())).toList());
             var transfer = FullPowerTransfer.solve(curve.length(), 0, speed, 0, arrival, 0,
                     freeArrival, profile, cap, 1_200_000);
             if (transfer == null) return null;
@@ -91,7 +122,7 @@ final class RocketTransferRoute {
                     transfer.duration(), curve, efficiency, 0, 0, ParachuteLanding.Result.NONE);
         }
         var gravityTransfer = CurveTransfer.solve(curve.length(), speed, arrival, freeArrival, cap,
-                craft.burnProfile(context), efficiency, departureGravity, arrivalGravity, brakingCredit);
+                burnProfile, efficiency, departureGravity, arrivalGravity, brakingCredit);
         if (gravityTransfer == null) return null;
         return new Route(List.of(
                 new Burn(gravityTransfer.firstSeconds(), 1, 0, craft.atmosphere),
@@ -100,6 +131,23 @@ final class RocketTransferRoute {
                 gravityTransfer.firstSeconds() + gravityTransfer.coastSeconds()
                         + gravityTransfer.lastSeconds(), curve, efficiency,
                 departureGravity, arrivalGravity, new ParachuteLanding.Result(parachuteCount, craft.mass(), brakingCredit, gravityTransfer.brakingFuelFactor()));
+    }
+
+    private static FlightCurve curve(Craft craft, double endX, double endY, double sx, double sy,
+                                     double ex, double ey, double startHandle) {
+
+        var dx = endX - craft.x;
+        var dy = endY - craft.y;
+        var distance = Math.max(1e-6, Math.hypot(dx, dy));
+        var handle = distance / 3;
+        var collinear = Math.abs(sx * dy - sy * dx) < distance * .01
+                && Math.abs(ex * dy - ey * dx) < distance * .01;
+        var turnsBack = sx * dx + sy * dy < 0 || ex * dx + ey * dy < 0;
+        // Overshooting collinear handles need an interior bow to avoid a zero-velocity cusp.
+        var bow = collinear && (turnsBack || startHandle > distance)
+                ? distance * SpaceBalance.REVERSAL_STEERING_RATIO : 0;
+        return new FlightCurve(craft.x, craft.y, craft.x + sx * startHandle, craft.y + sy * startHandle,
+                endX - ex * handle, endY - ey * handle, endX, endY, -dy / distance * bow, dx / distance * bow);
     }
 
     /**
