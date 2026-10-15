@@ -245,18 +245,18 @@ public final class RocketFlightPlanRules {
                     validatedAction = action.withService(SpaceSimulation.ServiceSettings.DEFAULT);
                 }
                 if (validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                        && (!validatedAction.targetId().equals(SpaceObjects.EARTH_ID) || !SpaceBalance.hasSlots(validatedAction.orbit()))) {
+                        && !SpaceBalance.hasSlots(validatedAction.targetId(), validatedAction.orbit())) {
                     var settings = validatedAction.service();
                     validatedAction = validatedAction.withService(new SpaceSimulation.ServiceSettings(settings.durationTicks(),
                             settings.timeoutTicks(), -1));
                 }
                 var validatedType = validatedAction.type();
                 var addons = validatedType == SpaceSimulation.ActionType.NAVIGATE_TO
-                        || validatedType == SpaceSimulation.ActionType.MAINTAIN_POSITION
+                        || (validatedType == SpaceSimulation.ActionType.MAINTAIN_POSITION || validatedType == SpaceSimulation.ActionType.BEAM_POWER)
                         ? validatedAction.addons().stream()
                         .filter(addon -> validatedType == SpaceSimulation.ActionType.NAVIGATE_TO
                                          ? addon.type().isNavigationCondition()
-                                         : addon.type().isMaintainPositionCondition())
+                                         : addon.type().isStationaryCondition())
                         .limit(1)
                         .map(addon -> addon.withValue(clampAddonValue(addon.type(), addon.value()))).toList()
                         : List.<SpaceSimulation.ActionAddon>of();
@@ -348,6 +348,7 @@ public final class RocketFlightPlanRules {
 
     public static List<SpaceSimulation.OrbitBand> availableOrbits(SpaceObjects.ObjectType type) {
 
+        if (type == SpaceObjects.ObjectType.SUN) return List.of(SpaceSimulation.OrbitBand.SOLAR);
         if (type == SpaceObjects.ObjectType.SURVEY_REGION || type == SpaceObjects.ObjectType.CRAFT)
             return List.of(SpaceSimulation.OrbitBand.SURFACE);
         return type == SpaceObjects.ObjectType.ASTEROID ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
@@ -389,7 +390,7 @@ public final class RocketFlightPlanRules {
 
         return switch (type) {
             case DISTANCE_FROM_TARGET -> Math.clamp(value, 1, 10_000_000);
-            case TIME_BEFORE_ARRIVAL -> Math.clamp(value, 1, 1_000_000);
+            case TIME_BEFORE_ARRIVAL, DURATION -> Math.clamp(value, 1, 1_000_000);
             case DESIRED_UNCERTAINTY -> Math.clamp(value, 1, 100_000);
             case LOW_RF, LOW_FUEL -> Math.clamp(value, 1, 100);
         };

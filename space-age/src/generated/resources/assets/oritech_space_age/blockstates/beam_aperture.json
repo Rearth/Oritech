@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=down": {
+      "model": "oritech_space_age:block/beam_aperture",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "oritech_space_age:block/beam_aperture",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/beam_aperture"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/beam_aperture",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "oritech_space_age:block/beam_aperture",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/beam_aperture",
+      "y": 270
+    }
+  }
+}

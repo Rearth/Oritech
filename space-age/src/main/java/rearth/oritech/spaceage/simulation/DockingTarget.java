@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 public record DockingTarget(UUID id, String name, ActiveRocketData rocket, MissionState.Position position,
                             long revision, List<HardwareRef> ports, List<UUID> visitors, List<DockingLink> links,
-                            double visitorMass) {
+                            double visitorMass, SpacePowerHardware power) {
 
     public static final Codec<DockingTarget> CODEC = RecordCodecBuilder.create(i -> i.group(
             UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(DockingTarget::id),
@@ -23,8 +23,15 @@ public record DockingTarget(UUID id, String name, ActiveRocketData rocket, Missi
             Codec.LONG.fieldOf("revision").forGetter(DockingTarget::revision), HardwareRef.CODEC.listOf().fieldOf("ports").forGetter(DockingTarget::ports),
             UUIDUtil.STRING_CODEC.listOf().fieldOf("visitors").forGetter(DockingTarget::visitors),
             DockingLink.CODEC.listOf().fieldOf("links").forGetter(DockingTarget::links),
-            Codec.DOUBLE.fieldOf("visitor_mass").forGetter(DockingTarget::visitorMass)
+            Codec.DOUBLE.fieldOf("visitor_mass").forGetter(DockingTarget::visitorMass),
+            SpacePowerHardware.CODEC.optionalFieldOf("power", new SpacePowerHardware(0, 0, 0, 0)).forGetter(DockingTarget::power)
     ).apply(i, DockingTarget::new));
+
+    public DockingTarget(UUID id, String name, ActiveRocketData rocket, MissionState.Position position,
+                         long revision, List<HardwareRef> ports, List<UUID> visitors, List<DockingLink> links, double visitorMass) {
+
+        this(id, name, rocket, position, revision, ports, visitors, links, visitorMass, rocket.powerHardware());
+    }
 
     public DockingTarget(UUID id, String name, ActiveRocketData rocket, MissionState.Position position,
                          long revision, List<HardwareRef> ports, List<UUID> visitors) {

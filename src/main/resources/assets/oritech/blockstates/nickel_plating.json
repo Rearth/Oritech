@@ -4,7 +4,6 @@
       "model": "oritech:block/nickel_plating"
     }
   },
-
   "athena:loader": "athena:ctm",
   "ctm_textures": {
     "center": "oritech:block/nickel_plating/center",
@@ -12,5 +11,17 @@
     "horizontal": "oritech:block/nickel_plating/horizontal",
     "vertical": "oritech:block/nickel_plating/vertical",
     "particle": "oritech:block/nickel_plating/particle"
+  },
+  "connect_to": {
+    "type": "or",
+    "conditions": [
+      {
+        "type": "sameState"
+      },
+      {
+        "type": "tag",
+        "tag": "oritech:plating_connections"
+      }
+    ]
   }
 }

@@ -58,7 +58,7 @@ public final class MissionController {
         var data = MissionSavedData.get(server);
         for (int step = 0; step < data.debugSpeed; step++) {
             if (step > 0) data.extraTicks++;
-            tickOnce(server, data, missionTime(server));
+            tickOnce(server, data, missionTime(server), step == data.debugSpeed - 1);
         }
     }
 
@@ -67,11 +67,13 @@ public final class MissionController {
         return server.overworld().getGameTime() + MissionSavedData.get(server).extraTicks;
     }
 
-    private static void tickOnce(MinecraftServer server, MissionSavedData data, long tick) {
+    private static void tickOnce(MinecraftServer server, MissionSavedData data, long tick, boolean physicalTick) {
 
         data.craft.values().stream().map(m -> m.owner).distinct().forEach(owner ->
                 SpaceSimulationSavedData.get(server).getOrCreate(owner).tickAsteroids(server.overworld()));
         RocketDocking.synchronize(data);
+        if (physicalTick) SurfaceBeamData.get(server.overworld()).tick(server.overworld());
+        SpacePowerService.generate(data);
         RocketProcessingService.tickJobs(data, owner -> SpaceSimulationSavedData.get(server).getOrCreate(owner).truth());
         var nodes = SpaceCommunications.update(server, data);
         for (var state : List.copyOf(data.craft.values())) {
@@ -81,15 +83,17 @@ public final class MissionController {
             if (!state.ended && !state.position.asteroid().equals(FlightPlanAction.NO_TARGET))
                 system.moveAttached(state.position.asteroid(), state.position.x(), state.position.y());
         }
+        SpacePowerService.beams(server, data, physicalTick);
         // An idle host still pays for its visitors. Maintain Position and local Process pay in their runners.
         data.dockingLinks.stream().map(DockingLink::host).distinct().map(data.craft::get).filter(Objects::nonNull)
-                .filter(host -> host.action() == null || host.action().type() != ActionType.MAINTAIN_POSITION && host.action().type() != ActionType.PROCESS)
+                .filter(host -> host.action() == null || host.action().type() != ActionType.MAINTAIN_POSITION && host.action().type() != ActionType.PROCESS && host.action().type() != ActionType.BEAM_POWER)
                 .forEach(host -> {
                     if (tick % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0 && !StationServiceRules.upkeep(host, RocketDocking.mass(data, host),
                             SpaceBalance.STATION_KEEPING_INTERVAL_TICKS))
                         host.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
                 });
         RocketDocking.synchronize(data);
+        SpacePowerService.finishAccounting(data);
         shareFleetKnowledge(data, nodes);
         SpaceSimulationSavedData.get(server).setDirty();
         if (!data.craft.isEmpty()) data.setDirty();
@@ -100,16 +104,25 @@ public final class MissionController {
      */
     private static void shareFleetKnowledge(MissionSavedData data, List<SpaceCommunications.Node> nodes) {
 
-        for (var leftNode : nodes) {
-            if (leftNode.ground()) continue;
-            for (var rightNode : nodes) {
-                if (leftNode.id().compareTo(rightNode.id()) >= 0 || rightNode.ground()
-                        || !SpaceCommunications.linked(leftNode, rightNode)) continue;
-                var left = data.craft.get(leftNode.id());
-                var right = data.craft.get(rightNode.id());
-                left.knowledge.merge(right.knowledge);
-                right.knowledge.merge(left.knowledge);
+        record Cell(UUID owner, int x, int y) { }
+
+        var cells = new HashMap<Cell, List<SpaceCommunications.Node>>();
+        for (var node : nodes) {
+            if (node.ground() || node.antennas() <= 0) continue;
+            var x = (int) Math.floor(node.x() / SpaceBalance.ANTENNA_RANGE);
+            var y = (int) Math.floor(node.y() / SpaceBalance.ANTENNA_RANGE);
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (var other : cells.getOrDefault(new Cell(node.owner(), x + dx, y + dy), List.of())) {
+                        if (!SpaceCommunications.linked(node, other)) continue;
+                        var left = data.craft.get(node.id());
+                        var right = data.craft.get(other.id());
+                        left.knowledge.merge(right.knowledge);
+                        right.knowledge.merge(left.knowledge);
+                    }
+                }
             }
+            cells.computeIfAbsent(new Cell(node.owner(), x, y), ignored -> new ArrayList<>()).add(node);
         }
     }
 
@@ -137,7 +150,9 @@ public final class MissionController {
                     p.target(), p.orbit(), p.slot(), p.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
         }
         if (action == null) {
-            state.status = MissionState.STATUS_COMPLETE;
+            if (!state.status.equals("status.oritech_space_age.solar_lost") && !state.status.equals("status.oritech_space_age.orbit_full")
+                    && !state.status.equals(MissionState.STATUS_STATION_KEEPING_EXHAUSTED))
+                state.status = MissionState.STATUS_COMPLETE;
             return;
         }
         if (linked && (action.type() == ActionType.NAVIGATE_TO || action.type() == ActionType.DOCK
@@ -166,6 +181,7 @@ public final class MissionController {
             case NAVIGATE_TO -> MissionNavigation.tick(server, data, state, system, action, tick);
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
             case DECOUPLE -> decouple(data, state, system, action, tick);
+            case BEAM_POWER -> { }
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
             case DISCARD_CRAFT -> {
                 state.ended = true;
@@ -302,6 +318,17 @@ public final class MissionController {
             state.status = MissionState.STATUS_READY;
             return;
         }
+        if (SolarPower.stationary(state) && SolarPower.output(state) > 0) {
+            if (!StationServiceRules.available(state)) {
+                state.complete();
+                state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
+            } else {
+                state.advanceAction();
+                var services = state.rocket.hardware().values().stream().mapToDouble(hardware -> StationServiceRules.antennaRF(hardware, 1)).sum();
+                state.status = SolarPower.output(state) >= services ? "status.oritech_space_age.sustainable" : "status.oritech_space_age.battery_draining";
+            }
+            return;
+        }
         var performance = RocketPerformanceCalculator.calculate(state.rocket);
         var hasAntenna = state.rocket.getStaticSegments().values().stream()
                 .anyMatch(segment -> RocketHardware.of(segment).antennas() > 0);
@@ -329,9 +356,9 @@ public final class MissionController {
 
     private static boolean maintainPositionConditionReached(MissionState state, FlightPlanAction action) {
 
-        var addon = action.addons().stream().filter(item -> item.type().isMaintainPositionCondition())
+        var addon = action.addons().stream().filter(item -> item.type().isStationaryCondition())
                 .findFirst().orElse(null);
-        return StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), addon, 0, 0);
+        return addon != null && StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), addon, 0, state.actionTicks() / 20d);
     }
 
     static void split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
@@ -389,21 +416,27 @@ public final class MissionController {
 
     public static FlightPlan resolveOrbitSlots(FlightPlan plan, MissionSavedData data, UUID owner, UUID self) {
 
-        var occupied = new HashMap<OrbitBand, Set<Integer>>();
+        record Ring(UUID body, OrbitBand orbit) { }
+
+        var occupied = new HashMap<Ring, Set<Integer>>();
         for (var craft : data.craft.values()) {
             if (!craft.owner.equals(owner) || craft.ended || craft.rocket.getRocketId().equals(self)) continue;
-            occupied.computeIfAbsent(craft.position.orbit(), ignored -> new HashSet<>()).add(craft.position.slot());
+            occupied.computeIfAbsent(new Ring(craft.position.target(), craft.position.orbit()), ignored -> new HashSet<>()).add(craft.position.slot());
             craft.plan.branches().stream().flatMap(b -> b.actions().stream()).filter(a -> a.type() == ActionType.NAVIGATE_TO
-                    && a.targetId().equals(SpaceObjects.EARTH_ID) && a.service().slot() >= 0).forEach(a ->
-                    occupied.computeIfAbsent(a.orbit(), ignored -> new HashSet<>()).add(a.service().slot()));
+                    && SpaceBalance.hasSlots(a.targetId(), a.orbit()) && a.service().slot() >= 0).forEach(a ->
+                    occupied.computeIfAbsent(new Ring(a.targetId(), a.orbit()), ignored -> new HashSet<>()).add(a.service().slot()));
         }
         return plan.withBranches(plan.branches().stream().map(branch -> branch.withActions(branch.actions().stream().map(action -> {
-            if (action.type() != ActionType.NAVIGATE_TO || !action.targetId().equals(SpaceObjects.EARTH_ID)
-                    || !SpaceBalance.hasSlots(action.orbit()) || action.service().slot() >= 0) return action;
-            var used = occupied.computeIfAbsent(action.orbit(), ignored -> new HashSet<>());
-            var slot = 0;
-            while (used.contains(slot) && slot < SpaceBalance.slots(action.orbit()) - 1) slot++;
-            used.add(slot);
+            if (action.type() != ActionType.NAVIGATE_TO || !SpaceBalance.hasSlots(action.targetId(), action.orbit())) return action;
+            var used = occupied.computeIfAbsent(new Ring(action.targetId(), action.orbit()), ignored -> new HashSet<>());
+            var slot = action.service().slot();
+            if (slot < 0 || used.contains(slot)) {
+                slot = 0;
+                while (used.contains(slot)) slot++;
+            }
+            // A full ring retains an unassigned destination; arrival waits with an explicit full-ring status.
+            if (slot >= SpaceBalance.slots(action.targetId(), action.orbit())) slot = -1;
+            else used.add(slot);
             var settings = action.service();
             return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
         }).toList())).toList());

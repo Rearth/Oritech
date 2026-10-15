@@ -198,9 +198,9 @@ public final class RocketFlightPathCalculator {
                         state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET) && RocketFlightNavigation.navigate(action, state, context);
                 case CONNECT_ASTEROID -> connectAsteroid(action, state, context);
                 case DECOUPLE -> separate(action, state, context);
-                case MAINTAIN_POSITION -> {
+                case MAINTAIN_POSITION, BEAM_POWER -> {
+                    if (action.type() == SpaceSimulation.ActionType.BEAM_POWER && !beamAvailable(action, state, context)) yield false;
                     maintainPosition(action, state, context);
-                    state.maintainingPosition = false;
                     yield true;
                 }
                 case PROCESS -> RocketServiceForecast.process(action, state, context);
@@ -221,7 +221,7 @@ public final class RocketFlightPathCalculator {
 
         var terminal = state.destroyed ? TerminalState.DESTROYED
                 : state.discarded ? TerminalState.DISCARDED
-                  : state.maintainingPosition ? TerminalState.STATION_KEEPING_EXHAUSTED
+                  : state.maintainingPosition ? TerminalState.SUSTAINABLE
                     : completed ? TerminalState.READY : state.blockedState;
         context.paths.put(branch.id(), state.toPath(terminal, context));
     }
@@ -301,13 +301,65 @@ public final class RocketFlightPathCalculator {
         return true;
     }
 
+    private static boolean beamAvailable(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
+
+        if (Math.hypot(state.velocityX, state.velocityY) > .001 || !VacuumProcessing.zeroG(state.x, state.y, context.objects.values())) {
+            state.blockedState = TerminalState.BEAM_STATIONARY_REQUIRED;
+            return false;
+        }
+        var hardware = SpacePowerHardware.scan(SolarPower.structures(state));
+        if (hardware.throughput() <= 0) {
+            state.blockedState = TerminalState.BEAM_APERTURE_REQUIRED;
+            return false;
+        }
+        if (!action.targetId().equals(SpaceObjects.EARTH_ID) && (!context.stations.containsKey(action.targetId()) || action.targetId().equals(state.craftId))) {
+            state.blockedState = TerminalState.TARGET_UNAVAILABLE;
+            return false;
+        }
+        return true;
+    }
+
     private static void maintainPosition(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
 
+        var solar = SolarPower.output(state);
+        if (solar > 0) {
+            var services = state.segments.values().stream().mapToDouble(s -> StationServiceRules.antennaRF(s.hardware, 1)).sum();
+            var beamOutput = action.type() == SpaceSimulation.ActionType.BEAM_POWER
+                    ? SpacePowerHardware.scan(SolarPower.structures(state)).throughput() : 0;
+            var addon = action.addons().stream().filter(a -> a.type().isStationaryCondition()).findFirst().orElse(null);
+            var reserve = StationServiceRules.beamReserve(state, action.settings().beam().reservePercent());
+            var estimate = beamOutput > 0 ? StationServiceRules.beamEstimate(StationServiceRules.budgets(state), solar, services, beamOutput, reserve, addon)
+                    : StationServiceRules.solarEstimate(StationServiceRules.budgets(state), solar, services, addon);
+            var duration = estimate.seconds();
+            var sustainable = estimate.end() == StationKeepingEnd.SUSTAINABLE;
+            context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, estimate.end()));
+            state.velocityX = 0;
+            state.velocityY = 0;
+            state.addSample(PathPhase.COAST, state.currentTarget, action.id());
+            if (!sustainable) {
+                var rf = state.segments.values().stream().mapToDouble(segment -> segment.rf).sum();
+                var remaining = StationServiceRules.beamRemainingRF(rf, reserve, solar - services, beamOutput, duration * 20);
+                StationServiceRules.forecast(state, duration * 20, state.mass(), true);
+                if (beamOutput > 0) StationServiceRules.limitRF(state, remaining);
+                state.time += duration;
+                state.addSample(PathPhase.COAST, state.currentTarget, action.id());
+            }
+            state.maintainingPosition = sustainable;
+            return;
+        }
         var thrust = state.segments.values().stream().mapToDouble(segment -> segment.thrust(false)).sum();
         var correctionBurnSecondsPerSecond = SpaceBalance.stationKeepingBurnSecondsPerSecond(thrust, state.mass());
-        var addon = action.addons().stream().filter(item -> item.type().isMaintainPositionCondition())
+        var addon = action.addons().stream().filter(item -> item.type().isStationaryCondition())
                 .findFirst().orElse(null);
         var estimate = StationServiceRules.estimate(StationServiceRules.budgets(state), correctionBurnSecondsPerSecond, addon);
+        var beamOutput = action.type() == SpaceSimulation.ActionType.BEAM_POWER
+                ? SpacePowerHardware.scan(SolarPower.structures(state)).throughput() : 0;
+        if (beamOutput > 0) {
+            var services = state.segments.values().stream().mapToDouble(segment -> StationServiceRules.rfPerSecond(segment.hardware, correctionBurnSecondsPerSecond) / 20).sum();
+            var beamEstimate = StationServiceRules.beamEstimate(StationServiceRules.budgets(state), 0, services, beamOutput,
+                    StationServiceRules.beamReserve(state, action.settings().beam().reservePercent()), addon);
+            if (beamEstimate.end() != StationKeepingEnd.SUSTAINABLE && beamEstimate.seconds() <= estimate.seconds()) estimate = beamEstimate;
+        }
         var duration = estimate.seconds();
         var end = estimate.end();
         var conditionReached = estimate.conditionReached();
@@ -319,11 +371,16 @@ public final class RocketFlightPathCalculator {
             state.time += duration;
             state.addSample(PathPhase.COAST, state.currentTarget, action.id());
         }
+        var storedRF = state.segments.values().stream().mapToDouble(segment -> segment.rf).sum();
+        var serviceRF = state.segments.values().stream().mapToDouble(segment -> StationServiceRules.rfPerSecond(segment.hardware, correctionBurnSecondsPerSecond) / 20).sum();
+        var beamRemaining = StationServiceRules.beamRemainingRF(storedRF,
+                StationServiceRules.beamReserve(state, action.settings().beam().reservePercent()), -serviceRF, beamOutput, duration * 20);
         state.segments.values().forEach(segment -> {
             if (segment.hardware.chemical() > 0)
                 segment.consumeFuel(duration * correctionBurnSecondsPerSecond);
             segment.spendRF(duration * StationServiceRules.rfPerSecond(segment.hardware, correctionBurnSecondsPerSecond));
         });
+        if (beamOutput > 0) StationServiceRules.limitRF(state, beamRemaining);
         if (addon != null && conditionReached) {
             context.navigationAborts.add(new NavigationAbortMoment(action.id(), state.branchId, addon.id(), addon.value(),
                     state.time, state.x, state.y, state.x, state.y));
@@ -457,6 +514,8 @@ public final class RocketFlightPathCalculator {
 
     public enum StationKeepingEnd {
 
+        SUSTAINABLE,
+        DURATION,
         RF,
         FUEL,
         LOW_RF,
@@ -474,7 +533,11 @@ public final class RocketFlightPathCalculator {
 
     public enum TerminalState {
 
+        SOLAR_REQUIRED,
+        BEAM_APERTURE_REQUIRED,
+        BEAM_STATIONARY_REQUIRED,
         READY,
+        SUSTAINABLE,
         STATION_KEEPING_EXHAUSTED,
         DISCARDED,
         DESTROYED,
@@ -499,7 +562,7 @@ public final class RocketFlightPathCalculator {
 
         public boolean isFailure() {
 
-            return this != READY && this != STATION_KEEPING_EXHAUSTED && this != DISCARDED;
+            return this != READY && this != SUSTAINABLE && this != STATION_KEEPING_EXHAUSTED && this != DISCARDED;
         }
 
         /**

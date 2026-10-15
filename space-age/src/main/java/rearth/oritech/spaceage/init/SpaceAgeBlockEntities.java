@@ -4,6 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.BeamApertureBlockEntity;
 import rearth.oritech.spaceage.block.GroundStationBlockEntity;
 import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
@@ -29,6 +30,10 @@ public final class SpaceAgeBlockEntities {
     public static final Supplier<BlockEntityType<VacuumCrafterBlockEntity>> VACUUM_CRAFTER =
             BLOCK_ENTITY_TYPES.register("vacuum_crafter", () -> new BlockEntityType<>(
                     VacuumCrafterBlockEntity::new, SpaceAgeBlocks.VACUUM_CRAFTER.get(), SpaceAgeBlocks.CARGO.get()));
+
+    public static final Supplier<BlockEntityType<BeamApertureBlockEntity>> BEAM_APERTURE =
+            BLOCK_ENTITY_TYPES.register("beam_aperture", () -> new BlockEntityType<>(
+                    BeamApertureBlockEntity::new, SpaceAgeBlocks.BEAM_APERTURE.get()));
 
     private SpaceAgeBlockEntities() {
     }

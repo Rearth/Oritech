@@ -47,6 +47,15 @@ final class RocketFlightNavigation {
                 return false;
             }
         }
+        var solarTarget = target.id().equals(SpaceSimulation.SUN_ID);
+        if (target.type() == SpaceObjects.ObjectType.CRAFT) {
+            var station = context.stations.get(target.id());
+            solarTarget = station != null && SolarPower.sunRegion(station.position());
+        }
+        if (solarTarget && SolarPower.rating(SolarPower.structures(craft)) <= 0) {
+            craft.blockedState = TerminalState.SOLAR_REQUIRED;
+            return false;
+        }
         var angle = targetPointAngle(action, craft, target);
         return navigateLeg(action, craft, context, angle);
     }
@@ -220,7 +229,7 @@ final class RocketFlightNavigation {
             case TIME_BEFORE_ARRIVAL ->
                     Math.max(0, transferPlan.transfer.duration() - (craft.time - transferPlan.startTime));
             case DESIRED_UNCERTAINTY -> AsteroidImpactRules.landingUncertaintyBlocks(distance);
-            case LOW_RF, LOW_FUEL -> Double.POSITIVE_INFINITY;
+            case LOW_RF, LOW_FUEL, DURATION -> Double.POSITIVE_INFINITY;
         };
         return actual <= addon.value() ? new Abort(addon, actual) : null;
     }
@@ -231,6 +240,12 @@ final class RocketFlightNavigation {
                                            List<PathSample> samples,
                                            Context context, RocketTransferRoute.Route route) {
 
+        var solarTarget = target.id().equals(SpaceSimulation.SUN_ID) || target.type() == SpaceObjects.ObjectType.CRAFT
+                && context.stations.containsKey(target.id()) && SolarPower.sunRegion(context.stations.get(target.id()).position());
+        if (solarTarget && SolarPower.rating(SolarPower.structures(craft)) <= 0) {
+            craft.blockedState = TerminalState.SOLAR_REQUIRED;
+            return false;
+        }
         var distance = Math.hypot(destination.x - craft.x, destination.y - craft.y);
         if (distance > POSITION_TOLERANCE || (action.velocityMode() != SpaceSimulation.ArrivalVelocityMode.MAXIMUM
                 && !(Math.hypot(craft.velocityX - targetVelocityX, craft.velocityY - targetVelocityY)
@@ -293,9 +308,9 @@ final class RocketFlightNavigation {
         if (target.id().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
             return SpaceBalance.surfaceAngle((double) action.landingX() + action.landingOffsetX(),
                     (double) action.landingZ() + action.landingOffsetZ());
-        if (target.id().equals(SpaceObjects.EARTH_ID) && SpaceBalance.hasSlots(action.orbit())
+        if (SpaceBalance.hasSlots(target.id(), action.orbit())
                 && action.service().slot() >= 0)
-            return Math.PI + Math.PI * 2 * action.service().slot() / SpaceBalance.slots(action.orbit());
+            return Math.PI + Math.PI * 2 * action.service().slot() / SpaceBalance.slots(target.id(), action.orbit());
         var nearestAngle = Math.atan2(craft.y - target.yAt(craft.time), craft.x - target.xAt(craft.time));
         return nearestAngle + targetPointOffset(action);
     }

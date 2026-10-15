@@ -2,11 +2,13 @@ package rearth.oritech.spaceage.init;
 
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent.NoBlockItem;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.BeamApertureBlock;
 import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.block.MissionControlBlock;
 import rearth.oritech.spaceage.block.SurveyModuleBlock;
@@ -83,6 +85,12 @@ public final class SpaceAgeBlocks {
 
     public static final DeferredBlock<VacuumCrafterBlock> VACUUM_CRAFTER = BLOCKS.registerBlock(
             "vacuum_crafter", VacuumCrafterBlock::new, SpaceAgeBlocks::machineProperties);
+
+    public static final DeferredBlock<TransparentBlock> CRYSTAL_GLASS = BLOCKS.registerBlock(
+            "crystal_glass", TransparentBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).strength(1.5F, 6.0F).noOcclusion());
+
+    public static final DeferredBlock<BeamApertureBlock> BEAM_APERTURE = BLOCKS.registerBlock(
+            "beam_aperture", BeamApertureBlock::new, SpaceAgeBlocks::machineProperties);
 
     public static final DeferredBlock<BlockPairController> CARGO = BLOCKS.registerBlock(
             "cargo", BlockPairController::new, SpaceAgeBlocks::machineProperties);

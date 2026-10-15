@@ -34,7 +34,9 @@ import rearth.oritech.spaceage.simulation.SpaceCommunications;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -101,11 +103,23 @@ public final class MissionNetworking {
         var tick = MissionController.missionTime(player.level().getServer());
         var system = SpaceSimulationSavedData.getForPlayer(player);
         var recipes = player.level().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
-        var stations = RocketDocking.targets(data, player.getUUID());
+        var details = new HashSet<UUID>();
+        if (player.containerMenu instanceof MissionControlMenu menu) {
+            if (menu.selected != null) details.add(menu.selected);
+            if (menu.detailTarget != null) details.add(menu.detailTarget);
+            var selected = data.craft.get(menu.selected);
+            if (selected != null) selected.plan.branches().stream().flatMap(branch -> branch.actions().stream()).forEach(action -> {
+                details.add(action.targetId());
+                details.add(action.settings().docking().host());
+                details.add(action.settings().processing().host());
+            });
+        }
+        var stations = RocketDocking.targets(data, player.getUUID(), details);
 
         // Build station snapshots once for the packet, rather than copying every station per fleet entry.
         var entries = data.craft.values().stream().filter(m -> m.owner.equals(player.getUUID())).map(mission ->
-                new FleetEntry(mission.rocket.getRocketId(), mission.telemetry(tick), mission.canUpdateMission(),
+                new FleetEntry(mission.rocket.getRocketId(), player.containerMenu instanceof MissionControlMenu menu
+                        && mission.rocket.getRocketId().equals(menu.selected) ? mission.telemetry(tick) : mission.summary(tick), mission.canUpdateMission(),
                         mission.canDismiss() && !RocketDocking.linked(data, mission.rocket.getRocketId()),
                         mission.route, mission.communication, mission.navigationForecast(recipes))).toList();
         var nodes = data.networkNodes.stream().filter(n -> n.owner().equals(player.getUUID())).toList();
@@ -124,6 +138,11 @@ public final class MissionNetworking {
 
         if (!(context.player() instanceof ServerPlayer player) || !(player.containerMenu instanceof MissionControlMenu menu) || !menu.stillValid(player))
             return;
+        if (payload.edit) menu.selected = payload.selected;
+        else {
+            var target = MissionSavedData.get(player.level().getServer()).craft.get(payload.selected);
+            if (target != null && target.owner.equals(player.getUUID())) menu.detailTarget = payload.selected;
+        }
         sendFleet(player);
         if (!payload.edit) return;
         var data = MissionSavedData.get(player.level().getServer());
@@ -136,7 +155,7 @@ public final class MissionNetworking {
         var system = SpaceSimulationSavedData.getForPlayer(player);
         PacketDistributor.sendToPlayer(player, new SelectedPayload(known.position(),
                 new SpaceSimulation.FlightPlannerSnapshot(system.id(), known.rocket().getRocketId(), system.createObjectData(), known.plan(),
-                        RocketDocking.targets(data, player.getUUID())),
+                        RocketDocking.targets(data, player.getUUID(), Set.of(payload.selected))),
                 known.rocket(), known.completed(), known.status(), connected));
     }
 

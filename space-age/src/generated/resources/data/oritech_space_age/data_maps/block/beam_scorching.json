@@ -1,0 +1,16 @@
+{
+  "values": {
+    "minecraft:dirt": {
+      "Name": "minecraft:coarse_dirt"
+    },
+    "minecraft:grass_block": {
+      "Name": "minecraft:dirt"
+    },
+    "minecraft:sand": {
+      "Name": "minecraft:glass"
+    },
+    "minecraft:stone": {
+      "Name": "minecraft:blackstone"
+    }
+  }
+}

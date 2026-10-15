@@ -124,6 +124,13 @@ public class DynamicRocketSegment {
         rfFraction = remaining - availableRF;
     }
 
+    public double receiveRF(double amount) {
+
+        var accepted = Math.min(Math.max(0, amount), Math.max(0, rfCapacity - rf()));
+        setResources(fuel(), rf() + accepted);
+        return accepted;
+    }
+
     public double fuel() {
 
         return availableFuelBurnTimeTicks + fuelFraction;

@@ -1,3 +1,4 @@
-// 26.1.2	2026-10-14T17:54:56.5214522	Tags for minecraft:block mod id oritech_space_age
-b06e59deb8b4a8300bc9ff2cb2444e48d87d8d7e data/minecraft/tags/block/mineable/pickaxe.json
-b06e59deb8b4a8300bc9ff2cb2444e48d87d8d7e data/minecraft/tags/block/needs_iron_tool.json
+// 26.1.2	2026-10-14T22:38:34.884566	Tags for minecraft:block mod id oritech_space_age
+4fade31d31ad109d55ba8cd3e14b11a9c2747144 data/c/tags/block/glass_blocks.json
+fbad0065bd3d4e1d90243b8848d04e47918b723e data/minecraft/tags/block/mineable/pickaxe.json
+86277027f1e056b4db211f7a8f017237c47ab7b6 data/minecraft/tags/block/needs_iron_tool.json

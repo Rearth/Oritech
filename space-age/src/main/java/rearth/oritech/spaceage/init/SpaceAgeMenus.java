@@ -6,9 +6,11 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.BeamApertureMenu;
 import rearth.oritech.spaceage.block.MissionControlMenu;
 import rearth.oritech.spaceage.block.VacuumCrafterMenu;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
+import rearth.oritech.spaceage.client.BeamApertureScreen;
 import rearth.oritech.spaceage.client.MissionControlScreen;
 import rearth.oritech.spaceage.client.RocketAssemblerScreen;
 import rearth.oritech.spaceage.client.VacuumCrafterScreen;
@@ -29,11 +31,15 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<VacuumCrafterMenu>> VACUUM_CRAFTER =
             MENUS.register("vacuum_crafter", () -> IMenuTypeExtension.create(VacuumCrafterMenu::new));
 
+    public static final Supplier<MenuType<BeamApertureMenu>> BEAM_APERTURE =
+            MENUS.register("beam_aperture", () -> IMenuTypeExtension.create(BeamApertureMenu::new));
+
     private SpaceAgeMenus() {
     }
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
+        event.register(BEAM_APERTURE.get(), BeamApertureScreen::new);
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
         event.register(VACUUM_CRAFTER.get(), VacuumCrafterScreen::new);
         event.register(MISSION_CONTROL.get(), MissionControlScreen::new);

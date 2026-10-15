@@ -18,6 +18,33 @@ final class FleetViewPreferences {
     private static final Path FILE = FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-collapsed-craft.txt");
     private static final Set<UUID> COLLAPSED = load();
 
+    private static final Path SUN_FILE = FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-show-sun.txt");
+    private static boolean showSun = loadSun();
+
+    static boolean showSun() {
+
+        return showSun;
+    }
+
+    static void toggleSun() {
+
+        showSun = !showSun;
+        try {
+            Files.writeString(SUN_FILE, Boolean.toString(showSun));
+        } catch (IOException exception) {
+            OritechSpaceAge.LOGGER.warn("Could not save Sun fleet preference", exception);
+        }
+    }
+
+    private static boolean loadSun() {
+
+        try {
+            return Files.exists(SUN_FILE) && Boolean.parseBoolean(Files.readString(SUN_FILE));
+        } catch (IOException exception) {
+            return false;
+        }
+    }
+
     private FleetViewPreferences() {
     }
 

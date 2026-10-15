@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "minecraft:comparator",
+    "G": "minecraft:glass",
+    "I": "minecraft:iron_ingot"
+  },
+  "pattern": [
+    "IGI",
+    "GCG",
+    "IGI"
+  ],
+  "result": {
+    "id": "oritech_space_age:beam_aperture"
+  }
+}

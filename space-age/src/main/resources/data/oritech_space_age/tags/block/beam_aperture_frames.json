@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "oritech:iron_plating",
+    "oritech:carbon_plating",
+    "oritech:nickel_plating",
+    "oritech:copper_reinforced_plating"
+  ]
+}

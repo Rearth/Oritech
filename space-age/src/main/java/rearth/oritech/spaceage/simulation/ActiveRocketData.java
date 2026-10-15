@@ -4,9 +4,15 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.spaceage.SpaceAgeConfig;
+import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,6 +42,57 @@ public class ActiveRocketData {
     private final Map<UUID, StaticRocketSegment> staticSegments = new HashMap<>();
     private final Map<UUID, DynamicRocketSegment> dynamicSegments = new HashMap<>();
     private RocketFlight flight;
+    private SpacePowerHardware powerHardware;
+    private Map<UUID, Map<BlockPos, BlockState>> powerLayouts = Map.of();
+    private int apertureArmLimit;
+    private Object solarData;
+    private Object apertureData;
+    private Map<UUID, RocketHardware> hardware = Map.of();
+    private List<HardwareRef> processingModules = List.of();
+    private List<HardwareRef> couplingPorts = List.of();
+
+    public SpacePowerHardware powerHardware() {
+
+        var registry = BuiltInRegistries.BLOCK;
+        var solar = registry.getDataMap(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS);
+        var apertures = registry.getDataMap(SpaceAgeDataMaps.BEAM_APERTURE_MATERIALS);
+        if (powerHardware == null || apertureArmLimit != SpaceAgeConfig.apertureArmLimit() || solarData != solar || apertureData != apertures
+                || dynamicSegments.entrySet().stream().anyMatch(e -> !e.getValue().layout.equals(powerLayouts.get(e.getKey())))) {
+            var structures = getStaticSegments();
+            powerHardware = SpacePowerHardware.scan(structures.values().stream().toList());
+            var hardware = new HashMap<UUID, RocketHardware>();
+            structures.forEach((id, segment) -> hardware.put(id, RocketHardware.of(segment)));
+            this.hardware = Map.copyOf(hardware);
+            processingModules = RocketLayout.controllers(this, true);
+            couplingPorts = RocketDocking.scanPorts(this);
+            var layouts = new HashMap<UUID, Map<BlockPos, BlockState>>();
+            dynamicSegments.forEach((id, segment) -> layouts.put(id, Map.copyOf(segment.layout)));
+            powerLayouts = layouts;
+            solarData = solar;
+            apertureData = apertures;
+            apertureArmLimit = SpaceAgeConfig.apertureArmLimit();
+        }
+        return powerHardware;
+    }
+
+    public Map<UUID, RocketHardware> hardware() {
+
+        powerHardware();
+        return hardware;
+    }
+
+    public List<HardwareRef> processingModules() {
+
+        powerHardware();
+        return processingModules;
+    }
+
+    public List<HardwareRef> couplingPorts() {
+
+        powerHardware();
+        return couplingPorts;
+    }
+
     private BlockPos launchPosition = BlockPos.ZERO;
 
     public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {

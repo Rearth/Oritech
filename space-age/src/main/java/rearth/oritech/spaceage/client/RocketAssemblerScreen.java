@@ -21,6 +21,7 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
+import rearth.oritech.client.ui.render.BlockPreviewEntities;
 import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -587,7 +588,10 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             var immutablePosition = position.immutable();
             segmentPositions.add(immutablePosition);
             segmentsByPosition.putIfAbsent(immutablePosition, segmentId);
-            if (addedPositions.add(immutablePosition)) addBlock(state, null, immutablePosition);
+            if (!addedPositions.add(immutablePosition)) return;
+            var worldPos = rocket.getLaunchPosition().offset(position);
+            var entity = BlockPreviewEntities.create(worldPos, state, minecraft.level);
+            addBlock(state, entity, immutablePosition);
         }
 
         @Override

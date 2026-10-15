@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "A": "minecraft:amethyst_shard",
+    "D": "minecraft:diamond",
+    "G": "oritech:industrial_glass"
+  },
+  "pattern": [
+    "GAG",
+    "ADA",
+    "GAG"
+  ],
+  "result": {
+    "count": 4,
+    "id": "oritech_space_age:crystal_glass"
+  }
+}

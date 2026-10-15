@@ -15,8 +15,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 
@@ -88,6 +88,8 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.PARACHUTE.get(), blockModels);
         createPairBlock(SpaceAgeBlocks.VACUUM_CRAFTER.get(), blockModels);
         createPairBlock(SpaceAgeBlocks.CARGO.get(), blockModels);
+        createPairBlock(SpaceAgeBlocks.BEAM_APERTURE.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.CRYSTAL_GLASS.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.ANTENNA.get(), blockModels);

@@ -7,8 +7,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.widgets.BlockWidget;
-import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
@@ -146,6 +146,10 @@ final class StarMapObjects {
 
         objects.clear();
         for (var object : snapshot.mapObjects()) {
+            if (!FleetViewPreferences.showSun() && object.type() == SpaceObjects.ObjectType.CRAFT
+                    && snapshot.stations().stream().anyMatch(station -> station.id().equals(object.id())
+                    && station.position().target().equals(SpaceSimulation.SUN_ID))
+                    && snapshot.plan().branches().stream().flatMap(branch -> branch.actions().stream()).noneMatch(action -> action.targetId().equals(object.id()))) continue;
             var widget = new BlockWidget(0, 0, ICON_TEXTURE_SIZE, iconBlock(object));
             // Normalize the two-block celestial models to the same unit as asteroid models.
             if (object.type() == SpaceObjects.ObjectType.EARTH || object.type() == SpaceObjects.ObjectType.SUN

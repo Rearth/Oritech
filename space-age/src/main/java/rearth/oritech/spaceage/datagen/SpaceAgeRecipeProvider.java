@@ -36,6 +36,18 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.ADVANCED_COMPUTING_ENGINE)
                 .define('a', ItemContent.ENERGITE_INGOT).define('c', BlockContent.ASSEMBLER).define('b', ItemContent.ADVANCED_BATTERY)
                 .unlockedBy("has_energite", has(ItemContent.ENERGITE_INGOT)).save(output);
+        shaped(RecipeCategory.MISC, SpaceAgeBlocks.BEAM_APERTURE)
+                .pattern("IGI").pattern("GCG").pattern("IGI")
+                .define('I', Items.IRON_INGOT)
+                .define('G', Items.GLASS)
+                .define('C', Items.COMPARATOR)
+                .unlockedBy("has_glass", has(Items.GLASS)).save(output);
+        shaped(RecipeCategory.BUILDING_BLOCKS, SpaceAgeBlocks.CRYSTAL_GLASS, 4)
+                .pattern("GAG").pattern("ADA").pattern("GAG")
+                .define('G', BlockContent.INDUSTRIAL_GLASS)
+                .define('A', Items.AMETHYST_SHARD)
+                .define('D', Items.DIAMOND)
+                .unlockedBy("has_industrial_glass", has(BlockContent.INDUSTRIAL_GLASS)).save(output);
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.CARGO)
                 .pattern("sis").pattern("s s").pattern("sis").define('s', ItemContent.STEEL_INGOT).define('i', Items.IRON_INGOT)
                 .unlockedBy("has_steel", has(ItemContent.STEEL_INGOT)).save(output);

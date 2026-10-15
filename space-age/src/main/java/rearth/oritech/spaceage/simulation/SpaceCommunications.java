@@ -4,6 +4,7 @@ import net.minecraft.server.MinecraftServer;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,15 +18,11 @@ public final class SpaceCommunications {
 
     public static int poweredAntennas(MissionState craft, boolean consume) {
 
-        var count = 0;
-        for (var entry : craft.rocket.getStaticSegments().entrySet()) {
-            var hardware = RocketHardware.of(entry.getValue());
-            var resources = craft.rocket.getDynamicSegments().get(entry.getKey());
-            var available = (int) Math.min(hardware.antennas(), resources.availableRF / SpaceBalance.ANTENNA_RF);
-            if (consume) resources.availableRF -= available * SpaceBalance.ANTENNA_RF;
-            count += available;
-        }
-        return count;
+        var installed = craft.rocket.hardware().values().stream().mapToInt(RocketHardware::antennas).sum();
+        var stored = craft.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
+        var available = (int) Math.min(installed, stored / SpaceBalance.ANTENNA_RF);
+        if (consume) SolarPower.spend(craft.rocket, available * SpaceBalance.ANTENNA_RF);
+        return available;
     }
 
     public static int coverage(UUID owner, SpaceSimulation.OrbitBand orbit, List<Node> nodes) {
@@ -53,7 +50,11 @@ public final class SpaceCommunications {
 
     public static Connection connection(Node craft, List<Node> nodes) {
 
-        var network = network(craft.owner, nodes);
+        return connection(craft, network(craft.owner, nodes));
+    }
+
+    private static Connection connection(Node craft, NetworkStatus network) {
+
         var connected = craft.antennas > 0 && network.groundAntennas > 0
                 && (network.coverageAltitude < 0 || altitude(craft) <= network.coverageAltitude + 0.01);
         var reason = network.groundAntennas == 0 ? "communication.oritech_space_age.no_ground"
@@ -96,10 +97,11 @@ public final class SpaceCommunications {
         });
         data.stations.forEach((pos, station) -> nodes.add(new Node(UUID.nameUUIDFromBytes(pos.toString().getBytes(StandardCharsets.UTF_8)),
                 station.owner, -3_060_000, 0, station.poweredAntennas, SpaceSimulation.OrbitBand.SURFACE, -1, true, true)));
+        var networks = new HashMap<UUID, NetworkStatus>();
         for (var node : nodes) {
             if (node.ground) continue;
             var craft = data.craft.get(node.id);
-            craft.communication = connection(node, nodes);
+            craft.communication = connection(node, networks.computeIfAbsent(node.owner, owner -> network(owner, nodes)));
             craft.connected = craft.communication.connected;
             craft.route = craft.communication.reason;
         }

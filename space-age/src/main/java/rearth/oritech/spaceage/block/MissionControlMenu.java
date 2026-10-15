@@ -18,6 +18,7 @@ import java.util.UUID;
 public class MissionControlMenu extends RocketAssemblerMenu {
 
     public UUID selected;
+    public UUID detailTarget;
     public MissionState.Position knownPosition;
     public List<MissionNetworking.FleetEntry> fleet = List.of();
     public int fleetRevision;

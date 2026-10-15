@@ -1,5 +1,7 @@
 package rearth.oritech.spaceage.simulation;
 
+import java.util.UUID;
+
 /**
  * Prototype balance in simulation ticks and map metres.
  */
@@ -46,6 +48,17 @@ public final class SpaceBalance {
         var acceleration = thrustNewtons / massKilograms;
         var correctionDeltaVPerSecond = STATION_KEEPING_DELTA_V_PER_DAY * 20 / DAY;
         return correctionDeltaVPerSecond / acceleration;
+    }
+
+    public static int slots(UUID body, SpaceSimulation.OrbitBand orbit) {
+
+        if (body.equals(SpaceSimulation.SUN_ID)) return orbit == SpaceSimulation.OrbitBand.SOLAR ? 200 : 0;
+        return body.equals(SpaceObjects.EARTH_ID) ? slots(orbit) : 0;
+    }
+
+    public static boolean hasSlots(UUID body, SpaceSimulation.OrbitBand orbit) {
+
+        return slots(body, orbit) > 0;
     }
 
     public static boolean hasSlots(SpaceSimulation.OrbitBand orbit) {

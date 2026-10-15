@@ -10,6 +10,7 @@ import org.joml.Matrix3f;
 import org.joml.Vector3f;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
@@ -77,7 +78,7 @@ public class BlockPreviewWidget extends UIComponent {
     }
 
     public BlockPreviewWidget withRotation(float xRotation, float yRotation) {
-        this.rotationX = Mth.clamp(xRotation, MIN_PITCH, MAX_PITCH);
+        this.rotationX = Mth.clamp(xRotation, -90f, 90f);
         this.rotationY = yRotation;
         this.lastRenderedRotationX = this.rotationX;
         this.lastRenderedRotation = yRotation + rotation;
@@ -327,6 +328,11 @@ public class BlockPreviewWidget extends UIComponent {
         var positions = new ArrayList<Vec3i>();
         positions.add(entry.offset());
 
+        // The deployed solar sheet extends beyond its core blocks.
+        if (entry.entity() instanceof BigSolarPanelEntity) {
+            positions.add(entry.offset().offset(-2, 0, -2));
+            positions.add(entry.offset().offset(2, 2, 2));
+        }
         if (entry.entity() instanceof MultiblockMachineController multiblock) {
             var facing = multiblock.getFacingForMultiblock();
             for (var relativeOffset : multiblock.getCorePositions()) {

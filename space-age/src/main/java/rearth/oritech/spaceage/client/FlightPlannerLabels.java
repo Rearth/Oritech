@@ -2,13 +2,17 @@ package rearth.oritech.spaceage.client;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import rearth.oritech.spaceage.simulation.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.BeamAperture;
 import rearth.oritech.spaceage.simulation.ParachuteLanding;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpacePowerHardware;
+import rearth.oritech.spaceage.simulation.SolarPower;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
@@ -22,6 +26,33 @@ import java.util.UUID;
 final class FlightPlannerLabels {
 
     private FlightPlannerLabels() {
+    }
+
+    static List<Component> beamPreview(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
+                                       SpaceSimulation.FlightPlannerSnapshot snapshot, RocketFlightPathCalculator.FlightPath flight) {
+
+        var sample = flight.paths().stream().flatMap(path -> path.samples().stream())
+                .filter(point -> point.actionId().equals(action.id())).findFirst().orElse(null);
+        if (sample == null) return List.of(Component.translatable("screen.oritech_space_age.beam.preview_unavailable"));
+        var hardware = SpacePowerHardware.scan(rocket.getStaticSegments().values().stream()
+                .filter(segment -> sample.connectedSegments().contains(SpaceSimulation.SegmentRef.of(segment))).toList());
+        var result = new ArrayList<Component>();
+        var generation = hardware.solar() * SolarPower.multiplier(sample.x(), sample.y());
+        result.add(Component.translatable("screen.oritech_space_age.beam.solar_generation", TooltipHelper.getEnergyText((long) generation)));
+        var ground = action.targetId().equals(SpaceObjects.EARTH_ID);
+        var target = snapshot.stations().stream().filter(station -> station.id().equals(action.targetId())).findFirst().orElse(null);
+        if (!ground && target == null) {
+            result.add(Component.translatable("screen.oritech_space_age.beam.preview_unavailable"));
+            return result;
+        }
+        var distance = ground ? Math.max(0, Math.hypot(sample.x() + 3_000_000, sample.y()) - 60_000)
+                : Math.hypot(sample.x() - target.position().x(), sample.y() - target.position().y());
+        var efficiency = BeamAperture.idealEfficiency(distance, hardware.focus(), ground);
+        result.add(Component.translatable("screen.oritech_space_age.beam.ideal_efficiency", String.format(Locale.ROOT, "%.1f", efficiency * 100)));
+        result.add(Component.translatable("screen.oritech_space_age.beam.ideal_arrival", TooltipHelper.getEnergyText((long) (hardware.throughput() * efficiency))));
+        if (ground) result.add(Component.translatable("screen.oritech_space_age.beam.radius",
+                String.format(Locale.ROOT, "%.1f", BeamAperture.footprint(distance, hardware.focus(), ground))));
+        return result;
     }
 
     static Component actionName(SpaceSimulation.ActionType type) {
@@ -64,6 +95,8 @@ final class FlightPlannerLabels {
 
     static Component stationKeepingDuration(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
 
+        if (estimate != null && estimate.end() == RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE)
+            return Component.translatable("screen.oritech_space_age.power.sustainable");
         if (estimate == null || !Double.isFinite(estimate.durationSeconds()))
             return Component.translatable("screen.oritech_space_age.action.station_keeping_unavailable");
         return Component.translatable("screen.oritech_space_age.action.station_keeping_estimate",
@@ -147,7 +180,7 @@ final class FlightPlannerLabels {
 
         return switch (type) {
             case DISTANCE_FROM_TARGET -> String.format(Locale.ROOT, "%.0f m", value);
-            case TIME_BEFORE_ARRIVAL -> String.format(Locale.ROOT, "%.0f s", value);
+            case TIME_BEFORE_ARRIVAL, DURATION -> String.format(Locale.ROOT, "%.0f s", value);
             case DESIRED_UNCERTAINTY -> String.format(Locale.ROOT, "±%.0f blocks", value);
             case LOW_RF, LOW_FUEL -> String.format(Locale.ROOT, "%.0f%%", value);
         };

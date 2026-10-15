@@ -30,6 +30,9 @@ public final class MissionForecast {
             adjusted = adjusted.withService(new SpaceSimulation.ServiceSettings(settings.durationTicks(),
                     (int) Math.max(1, settings.timeoutTicks() - actionTicks), settings.slot()));
         }
+        if (current.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || current.type() == SpaceSimulation.ActionType.BEAM_POWER)
+            adjusted = adjusted.withAddons(adjusted.addons().stream().map(addon -> addon.type() == SpaceSimulation.ActionAddonType.DURATION
+                    ? addon.withValue((int) Math.max(1, addon.value() - actionTicks / 20)) : addon).toList());
         var remaining = adjusted;
         return plan.withBranches(plan.branches().stream().map(branch -> branch.isRoot() ? branch.withActions(
                 branch.actions().stream().map(action -> action.id().equals(current.id()) ? remaining : action).toList()) : branch).toList());

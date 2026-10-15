@@ -39,23 +39,35 @@ final class MissionArrival {
         }
         var p = state.position;
         var slot = -1;
-        if (action.targetId().equals(SpaceObjects.EARTH_ID) && SpaceBalance.hasSlots(action.orbit())
+        if (SpaceBalance.hasSlots(action.targetId(), action.orbit())
                 && Math.hypot(p.vx(), p.vy()) <= 12) {
+            var occupied = new HashSet<Integer>();
+            data.craft.values().stream().filter(c -> c != state && !c.ended && c.owner.equals(state.owner)
+                    && c.position.target().equals(action.targetId()) && c.position.orbit() == action.orbit())
+                    .forEach(c -> occupied.add(c.position.slot()));
             slot = action.service().slot();
-            if (slot < 0) {
-                var occupied = new HashSet<Integer>();
-                data.craft.values().stream().filter(c -> c.owner.equals(state.owner) && c.position.orbit() == action.orbit()).forEach(c -> occupied.add(c.position.slot()));
+            if (slot < 0 || occupied.contains(slot)) {
                 slot = 0;
-                while (occupied.contains(slot) && slot < SpaceBalance.slots(action.orbit()) - 1) slot++;
+                while (occupied.contains(slot)) slot++;
             }
-            slot %= SpaceBalance.slots(action.orbit());
+            if (slot >= SpaceBalance.slots(action.targetId(), action.orbit())) {
+                state.status = "status.oritech_space_age.orbit_full";
+                return;
+            }
+        }
+        var targetCraft = data.craft.get(action.targetId());
+        if ((action.targetId().equals(SpaceSimulation.SUN_ID) || targetCraft != null
+                && SolarPower.sunRegion(targetCraft.position)) && SolarPower.output(state) <= 0) {
+            state.status = "status.oritech_space_age.solar_required";
+            return;
         }
         var px = p.x();
         var py = p.y();
         if (slot >= 0) {
-            var angle = Math.PI + slot * Math.PI * 2 / SpaceBalance.slots(action.orbit());
-            px = -3_000_000 + Math.cos(angle) * (60_000 + action.orbit().altitude());
-            py = Math.sin(angle) * (60_000 + action.orbit().altitude());
+            var angle = Math.PI + slot * Math.PI * 2 / SpaceBalance.slots(action.targetId(), action.orbit());
+            var body = system.truth().stream().filter(o -> o.id().equals(action.targetId())).findFirst().orElseThrow();
+            px = body.x() + Math.cos(angle) * (body.radius() + action.orbit().altitude());
+            py = body.y() + Math.sin(angle) * (body.radius() + action.orbit().altitude());
         }
         state.position = new MissionState.Position(px, py, p.vx(), p.vy(), action.targetId(), action.orbit(), slot, p.stage(), p.asteroid(), p.anchor(),
                 p.headingX(), p.headingY());

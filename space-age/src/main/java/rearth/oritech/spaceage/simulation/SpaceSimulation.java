@@ -350,6 +350,7 @@ public class SpaceSimulation {
         DISTANCE_FROM_TARGET(50_000),
         TIME_BEFORE_ARRIVAL(120),
         DESIRED_UNCERTAINTY(256),
+        DURATION(1200),
         LOW_RF(10),
         LOW_FUEL(10);
 
@@ -373,7 +374,12 @@ public class SpaceSimulation {
 
         public boolean isMaintainPositionCondition() {
 
-            return !isNavigationCondition();
+            return this == LOW_RF || this == LOW_FUEL;
+        }
+
+        public boolean isStationaryCondition() {
+
+            return isMaintainPositionCondition() || this == DURATION;
         }
 
         @Override
@@ -392,6 +398,7 @@ public class SpaceSimulation {
         DECOUPLE,
         DISCONNECT_BOOSTER,
         MAINTAIN_POSITION,
+        BEAM_POWER,
         DISCARD_CRAFT,
         PROCESS,
         DOCK,
@@ -412,7 +419,8 @@ public class SpaceSimulation {
         TIGHT(1_000),
         LOW(10_000),
         MEDIUM(30_000),
-        HIGH(60_000);
+        HIGH(60_000),
+        SOLAR(250_000);
 
         public static final Codec<OrbitBand> CODEC = StringRepresentable.fromEnum(OrbitBand::values);
         private final double altitude;

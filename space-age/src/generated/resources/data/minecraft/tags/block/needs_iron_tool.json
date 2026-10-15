@@ -22,6 +22,7 @@
     "oritech_space_age:space_scanner",
     "oritech_space_age:antenna",
     "oritech_space_age:vacuum_crafter",
+    "oritech_space_age:beam_aperture",
     "oritech_space_age:cargo"
   ]
 }

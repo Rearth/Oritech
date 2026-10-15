@@ -6,6 +6,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -37,6 +40,7 @@ public final class OritechSpaceAge {
 
     public OritechSpaceAge(IEventBus modEventBus, ModContainer modContainer) {
 
+        modContainer.registerConfig(ModConfig.Type.SERVER, SpaceAgeConfig.SPEC);
         LOGGER.info("Initializing Oritech: Space Age with {}", Oritech.MOD_ID);
         SpaceAgeGameTests.FUNCTIONS.register(modEventBus);
         modEventBus.addListener(SpaceAgeGameTests::register);
@@ -46,6 +50,9 @@ public final class OritechSpaceAge {
         NeoForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
         modEventBus.addListener(this::addNetworkHandlers);
         modEventBus.addListener(SpaceAgeDataMaps::register);
+        modEventBus.addListener((RegisterCapabilitiesEvent event) ->
+                event.registerBlockEntity(Capabilities.Energy.BLOCK,
+                        SpaceAgeBlockEntities.BEAM_APERTURE.get(), (entity, side) -> entity.energy));
 
         SpaceAgeComponents.COMPONENTS.register(modEventBus);
         SpaceAgeRecipes.TYPES.register(modEventBus);

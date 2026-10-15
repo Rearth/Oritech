@@ -12,13 +12,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
  * A craft owns its mission and data independently of the assembler or any loaded station.
  */
 public final class MissionState {
+
+    double powerStartRF;
+    double solarAccepted;
+    public SpacePowerService.Report powerReport = SpacePowerService.Report.EMPTY;
 
     public static final String STATUS_READY = "status.oritech_space_age.ready";
     public static final String STATUS_LAUNCHED = "status.oritech_space_age.launched";
@@ -177,13 +183,32 @@ public final class MissionState {
     public Telemetry telemetry(long tick) {
 
         return new Telemetry(copyRocket(rocket), plan, position, tick, status, List.copyOf(completed), actionTicks(),
-                actionDurationTicks(), serviceProgress);
+                actionDurationTicks(), serviceProgress, powerReport, true);
+    }
+
+    public Telemetry summary(long tick) {
+
+        var structures = new HashMap<UUID, StaticRocketSegment>();
+        var resources = new HashMap<UUID, DynamicRocketSegment>();
+        rocket.getOriginalSegments().forEach((id, segment) -> {
+            structures.put(id, new StaticRocketSegment(id, Set.of(), Map.of(), segment.staticWeight(), segment.engineCount(),
+                    segment.initialRF(), segment.initialFuel(), segment.payloadEnergyJoules()));
+            var original = rocket.getDynamicSegments().get(id);
+            var summary = new DynamicRocketSegment(0, 0, original.currentFuelWeight, Set.of(), Map.of(), original.fuelCapacity, original.rfCapacity);
+            summary.setResources(original.fuel(), original.rf());
+            resources.put(id, summary);
+        });
+        return new Telemetry(new ActiveRocketData(rocket.getRocketId(), structures, resources, null), plan, position, tick, status,
+                List.copyOf(completed), actionTicks(), actionDurationTicks(), serviceProgress, powerReport, false);
     }
 
     private long actionDurationTicks() {
 
         var action = action();
         if (action == null) return 0;
+        if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || action.type() == SpaceSimulation.ActionType.BEAM_POWER)
+            return action.addons().stream().filter(addon -> addon.type() == SpaceSimulation.ActionAddonType.DURATION)
+                    .mapToLong(addon -> addon.value() * 20L).findFirst().orElse(0);
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION) return action.service().timeoutTicks();
         if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || transfer == null || transfer.path == null) return 0;
         return transfer.path.paths().stream().filter(item -> item.branchId().equals(plan.root().id())).findFirst()
@@ -222,7 +247,7 @@ public final class MissionState {
     public record Telemetry(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position,
                             long tick, String status, List<SpaceSimulation.FlightPlanAction> completed,
                             long actionTicks,
-                            long actionDurationTicks, int serviceProgress) {
+                            long actionDurationTicks, int serviceProgress, SpacePowerService.Report power, boolean fullLayout) {
 
         public static final Codec<Telemetry> CODEC = RecordCodecBuilder.create(i -> i.group(
                 ActiveRocketData.CODEC.fieldOf("rocket").forGetter(Telemetry::rocket),
@@ -232,8 +257,16 @@ public final class MissionState {
                 SpaceSimulation.FlightPlanAction.CODEC.listOf().fieldOf("completed").forGetter(Telemetry::completed),
                 Codec.LONG.optionalFieldOf("action_ticks", 0L).forGetter(Telemetry::actionTicks),
                 Codec.LONG.optionalFieldOf("action_duration_ticks", 0L).forGetter(Telemetry::actionDurationTicks),
-                Codec.INT.fieldOf("service_progress").forGetter(Telemetry::serviceProgress)
+                Codec.INT.fieldOf("service_progress").forGetter(Telemetry::serviceProgress),
+                SpacePowerService.Report.CODEC.optionalFieldOf("power", SpacePowerService.Report.EMPTY).forGetter(Telemetry::power),
+                Codec.BOOL.optionalFieldOf("full_layout", true).forGetter(Telemetry::fullLayout)
         ).apply(i, Telemetry::new));
+
+        public Telemetry(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position, long tick, String status,
+                         List<SpaceSimulation.FlightPlanAction> completed, long actionTicks, long actionDurationTicks, int serviceProgress) {
+
+            this(rocket, plan, position, tick, status, completed, actionTicks, actionDurationTicks, serviceProgress, SpacePowerService.Report.EMPTY, true);
+        }
 
         public Telemetry(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position, long tick, String status,
                          List<SpaceSimulation.FlightPlanAction> completed, long actionTicks, long actionDurationTicks) {

@@ -11,6 +11,8 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.BeamApertureMenu;
+import rearth.oritech.spaceage.block.BeamApertureMenu.Snapshot;
 import rearth.oritech.spaceage.block.MissionControlMenu;
 import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.VacuumCrafterMenu;
@@ -36,6 +38,11 @@ public final class RocketNetworking {
     public static void register(PayloadRegistrar registrar) {
 
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
+        NetworkManager.registerCodec(Snapshot.STREAM_CODEC, Snapshot.class);
+        registrar.playToClient(AperturePayload.TYPE, NetworkManager.getAutoCodec(AperturePayload.class), (payload, context) -> context.enqueueWork(() -> {
+            if (context.player().containerMenu instanceof BeamApertureMenu menu
+                    && menu.containerId == payload.menuId() && menu.pos.equals(payload.position())) menu.snapshot = payload.snapshot();
+        }));
         NetworkManager.getAutoCodec(SpaceObjects.AsteroidMaterial.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SegmentRef.class);
@@ -281,6 +288,17 @@ public final class RocketNetworking {
     public record InvalidAssemblerPreviewPayload(BlockPos position) implements CustomPacketPayload {
 
         private static final Type<InvalidAssemblerPreviewPayload> TYPE = new Type<>(OritechSpaceAge.id("invalid_assembler_preview"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+    }
+
+    public record AperturePayload(int menuId, BlockPos position, Snapshot snapshot) implements CustomPacketPayload {
+
+        public static final Type<AperturePayload> TYPE = new Type<>(OritechSpaceAge.id("aperture"));
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

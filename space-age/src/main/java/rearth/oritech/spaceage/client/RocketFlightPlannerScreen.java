@@ -18,8 +18,8 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.MissionForecast;
 import rearth.oritech.spaceage.simulation.MissionState;
 import rearth.oritech.spaceage.simulation.NavigationComputerRules;
@@ -27,6 +27,7 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -89,6 +90,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private int editorHeight;
     private ButtonWidget sendMissionButton;
     private LabelWidget missionStateLabel;
+    private final Map<UIComponent, List<Component>> powerTooltipCards = new HashMap<>();
     private LabelWidget capacityLabel;
     private int fleetTicks;
     private int recipeRevision = -1;
@@ -248,10 +250,44 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 || !(menu instanceof MissionControlMenu control)
                 || control.selectedTelemetry == null) return;
         missionStateLabel.setText(missionStateText(control));
+        updatePowerTooltips();
         missionStateLabel.withColor(isReadOnly() ? 0xFF65532C : 0xFF285522);
         missionStateLabel.setTooltip(List.of(Component.translatable(isReadOnly()
                 ? "screen.oritech_space_age.mission.read_only_state_tooltip"
                 : "screen.oritech_space_age.mission.connected_state_tooltip")));
+        MissionControlScreen.serviceDetails(control.selectedTelemetry).forEach(missionStateLabel::addTooltipLine);
+    }
+
+    void registerPowerTooltip(UIComponent card) {
+
+        powerTooltipCards.put(card, card.getTooltip() == null ? List.of() : List.copyOf(card.getTooltip()));
+        updatePowerTooltips();
+    }
+
+    private void updatePowerTooltips() {
+
+        var power = craftPowerTooltip();
+        powerTooltipCards.forEach((card, original) -> {
+            var details = new ArrayList<>(original);
+            details.addAll(power);
+            card.setTooltip(details);
+        });
+    }
+
+    private List<Component> craftPowerTooltip() {
+
+        var result = new ArrayList<Component>();
+        result.add(Component.translatable("screen.oritech_space_age.power.craft_tooltip"));
+        if (menu instanceof MissionControlMenu control && control.selectedTelemetry != null) {
+            result.add(MissionControlScreen.compactPower(control.selectedTelemetry));
+            result.addAll(MissionControlScreen.serviceDetails(control.selectedTelemetry));
+        } else if (flightPlanRocket != null) {
+            var stored = flightPlanRocket.getDynamicSegments().values().stream().mapToDouble(segment -> segment.rf()).sum();
+            var capacity = flightPlanRocket.getDynamicSegments().values().stream().mapToDouble(segment -> segment.rfCapacity).sum();
+            result.add(Component.translatable("screen.oritech_space_age.aperture.stored", TooltipHelper.getEnergyText((long) stored), TooltipHelper.getEnergyText((long) capacity)));
+            result.add(Component.translatable("screen.oritech_space_age.power.solar_rating", TooltipHelper.getEnergyText((long) flightPlanRocket.powerHardware().solar())));
+        }
+        return result;
     }
 
     void registerCurrentActionLabel(LabelWidget label) {
@@ -391,6 +427,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     protected void buildComponents() {
 
         missionStateLabel = null;
+        powerTooltipCards.clear();
         capacityLabel = null;
         panelWidth = width - WINDOW_PADDING * 2;
         panelHeight = height - WINDOW_PADDING * 2;
@@ -536,6 +573,17 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         validationIssues = RocketFlightPlanRules.inspect(draftPlan, flightPlanRocket, currentDraftSnapshot().objects(),
                 !(menu instanceof MissionControlMenu), menu instanceof MissionControlMenu c ? c.knownPosition : null,
                 SpaceAgeClientRecipes.vacuum(), currentDraftSnapshot().stations(), calculatedFlight).issues();
+    }
+
+    @Override
+    protected void showBeamTarget(UUID target) {
+
+        var solar = currentDraftSnapshot().stations().stream().anyMatch(station -> station.id().equals(target)
+                && station.position().target().equals(SpaceSimulation.SUN_ID));
+        if (solar && !FleetViewPreferences.showSun()) FleetViewPreferences.toggleSun();
+        selectedTarget = new RocketStarMapWidget.NavigationSelection(target, SpaceSimulation.OrbitBand.SURFACE);
+        closeActionEditor();
+        flightPlanMap.focusTarget(selectedTarget);
     }
 
     private void selectMapTarget(RocketStarMapWidget.NavigationSelection selection) {
@@ -739,7 +787,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             return Component.translatable("screen.oritech_space_age.action.scan_instant");
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
             return Component.translatable("screen.oritech_space_age.action.upload_survey_data");
-        if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
+        if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.BEAM_POWER) {
             if (action.asteroidTarget().closest()) {
                 var resolved = calculatedFlight.paths().stream().flatMap(path -> path.samples().stream())
                         .filter(sample -> sample.actionId().equals(action.id())).map(sample -> findObject(sample.targetId()))

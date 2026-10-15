@@ -41,6 +41,7 @@ import rearth.oritech.client.renderers.MachineOutlineRenderer;
 import rearth.oritech.client.renderers.PortableTankItemRenderer;
 import rearth.oritech.client.renderers.ResonatorRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
+import rearth.oritech.client.ui.render.PreviewBlockRenderTypes;
 import rearth.oritech.datagen.*;
 import rearth.oritech.datagen.builders.OritechAugmentDataGenerator;
 import rearth.oritech.datagen.tags.BlockTagGenerator;
@@ -103,6 +104,7 @@ public final class OritechClient {
         modEventBus.addListener(FluidModelContent::registerFluidModels);
         modEventBus.addListener(OreFinderRenderer::registerPipelines);
         modEventBus.addListener(ResonatorRenderer::registerPipelines);
+        modEventBus.addListener(PreviewBlockRenderTypes::registerPipelines);
     }
 
     // client datagen

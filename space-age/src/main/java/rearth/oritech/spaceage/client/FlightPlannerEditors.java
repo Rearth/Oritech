@@ -1,25 +1,27 @@
 package rearth.oritech.spaceage.client;
 
 import net.minecraft.client.gui.components.EditBox;
-import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
-import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.MissionControlMenu;
+import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
+import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.DockingTarget;
 import rearth.oritech.spaceage.simulation.RocketDocking;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.RocketProcessingService;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.RocketServiceSettings.Docking;
 import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
@@ -36,7 +38,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     // Generated booster cards cannot be selected as a manual action type.
     protected static final SpaceSimulation.ActionType[] EDITABLE_ACTION_TYPES = {
             SpaceSimulation.ActionType.NAVIGATE_TO, SpaceSimulation.ActionType.CONNECT_ASTEROID,
-            SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.MAINTAIN_POSITION,
+            SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.MAINTAIN_POSITION, SpaceSimulation.ActionType.BEAM_POWER,
             SpaceSimulation.ActionType.DISCARD_CRAFT, SpaceSimulation.ActionType.SCAN,
             SpaceSimulation.ActionType.PROCESS, SpaceSimulation.ActionType.DOCK,
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
@@ -88,7 +90,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     // Dropdown origin in panel coordinates after accounting for card scrolling.
     protected int dropdownX;
     protected int dropdownY;
-    private int popupLayerOffset;
 
     protected FlightPlannerEditors(RocketAssemblerMenu menu, Inventory inventory, Component title) {
 
@@ -139,6 +140,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected abstract RocketStarMapWidget.NavigationSelection selectedTarget();
 
     protected abstract void setSelectedTarget(RocketStarMapWidget.NavigationSelection target);
+
+    protected abstract void showBeamTarget(UUID target);
 
     protected abstract int panelWidth();
 
@@ -209,6 +212,23 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         rebuildComponents();
     }
 
+    void toggleSunStations() {
+
+        FleetViewPreferences.toggleSun();
+        rebuildComponents();
+    }
+
+    void editBeamReserve(SpaceSimulation.FlightPlanAction action) {
+
+        closeNestedEditorState();
+        editingResourceAmount = true;
+        editingServiceTime = false;
+        resourceField = 5;
+        speedAction = action.id();
+        speedText = Integer.toString(action.settings().beam().reservePercent());
+        rebuildComponents();
+    }
+
     void editResourceAmount(SpaceSimulation.FlightPlanAction action, boolean fuel, boolean reserve) {
 
         closeNestedEditorState();
@@ -227,7 +247,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         if (!editingResourceAmount && asteroidRadiusField < 0) return parseSpeedLimit(text);
         try {
             var value = Integer.parseInt(text.strip());
-            return value >= 0 ? value : null;
+            return value >= 0 && (!editingResourceAmount || resourceField != 5 || value <= 100) ? value : null;
         } catch (NumberFormatException ignored) {
             return null;
         }
@@ -273,14 +293,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     void addPopupComponent(UIComponent component) {
 
-        if (popupLayerOffset != 0) component.setZIndex(component.getZIndex() + popupLayerOffset);
         if (component instanceof ScrollWidget scroll) popupScrolls.add(scroll);
         addComponent(component);
-    }
-
-    void setPopupLayerOffset(int offset) {
-
-        popupLayerOffset = offset;
     }
 
     EditBox addPopupField(EditBox field) {
@@ -311,6 +325,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             var selection = action.asteroidTarget();
             edited = action.withAsteroidTarget(new AsteroidTarget(true,
                     asteroidRadiusField == 0 ? value : selection.minRadius(), asteroidRadiusField == 1 ? value : selection.maxRadius()));
+        } else if (editingResourceAmount && resourceField >= 4) {
+            edited = action.withSettings(action.settings().withBeam(new RocketServiceSettings.Beam(value)));
         } else if (editingResourceAmount) {
             var e = action.settings().exchange();
             var fuel = resourceField < 2;
@@ -391,7 +407,9 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                                                                SpaceSimulation.FlightPlanBranch branch,
                                                                UUID beforeAction) {
 
-        if (type == SpaceSimulation.ActionType.DOCK) {
+        if (type == SpaceSimulation.ActionType.BEAM_POWER) {
+            changed = changed.withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
+        } else if (type == SpaceSimulation.ActionType.DOCK) {
             var ports = RocketDocking.ports(flightPlanRocket());
             var host = dockingTargetBefore(branch, beforeAction);
             if (host != null && !host.ports().isEmpty() && !ports.isEmpty())
@@ -523,6 +541,9 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected void selectNavigationTarget(SpaceSimulation.SpaceObjectData target) {
 
+        if (menu instanceof MissionControlMenu && target.type() == SpaceObjects.ObjectType.CRAFT)
+            ClientPacketDistributor.sendToServer(new MissionNetworking.FleetRequest(target.id(), false));
+
         var action = findAction(targetAction);
         if (action == null) return;
         var branch = findBranchContaining(action);
@@ -587,7 +608,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
         var action = findAction(actionId);
         if (action == null || !action.addons().isEmpty()) return;
-        var addon = SpaceSimulation.ActionAddon.create(action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION
+        var addon = SpaceSimulation.ActionAddon.create((action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || action.type() == SpaceSimulation.ActionType.BEAM_POWER)
                 ? SpaceSimulation.ActionAddonType.LOW_RF
                 : SpaceSimulation.ActionAddonType.DISTANCE_FROM_TARGET);
         replaceAction(branchId, actionId, action.withAddons(List.of(addon)), rocket);
@@ -900,6 +921,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         }
         if (actionEditorAction != null) {
             if (event.isEscape()) closeActionEditor();
+            else if (getFocused() == landingXField && landingXField != null) landingXField.keyPressed(event);
+            else if (getFocused() == landingZField && landingZField != null) landingZField.keyPressed(event);
             return true;
         }
         return super.keyPressed(event);

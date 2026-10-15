@@ -142,6 +142,7 @@ final class FlightPlannerCards {
                 branchButton.withTooltip(reason);
                 scroll.addChild(blockedBorder(branchX, rowY + 5, BRANCH_CARD_WIDTH, 58, List.of(reason)));
             }
+            screen.registerPowerTooltip(branchButton);
             var branchColor = selectedBranch ? LabelWidget.BRIGHT_TEXT : LabelWidget.DARK_TEXT;
             scroll.addChild(new LabelWidget(branchX + 7, rowY + 13, BRANCH_CARD_WIDTH - 14, branchName)
                     .withColor(branchColor).withShadow(selectedBranch));
@@ -165,7 +166,7 @@ final class FlightPlannerCards {
                 } else {
                     addEditableCard(scroll, branch, action, index, rocket, cursorX, rowY);
                     if ((action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                            || action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION)
+                            || (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || action.type() == SpaceSimulation.ActionType.BEAM_POWER))
                             && (!action.addons().isEmpty() || !screen.isReadOnly())) {
                         addNavigationAddonCard(scroll, branch, action, rocket, cursorX, rowY);
                     }
@@ -241,7 +242,7 @@ final class FlightPlannerCards {
         card.withTooltip(FlightPlannerLabels.actionTooltip(action.type()));
         screen.calculatedFlight().arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id())).findFirst()
                 .ifPresent(a -> FlightPlannerLabels.parachuteTooltip(a.parachutes()).forEach(card::addTooltipLine));
-        if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+        if ((action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || action.type() == SpaceSimulation.ActionType.BEAM_POWER)) {
             card.addTooltipLine(stationKeepingEstimate(action));
         }
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE
@@ -303,7 +304,7 @@ final class FlightPlannerCards {
             scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18,
                     FlightPlannerLabels.scanEnergyLabel(scanEstimate)).withBrightColor().withWrap(true)
                     .withTooltip(FlightPlannerLabels.scanEnergyTooltip(scanEstimate)));
-        } else if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+        } else if ((action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION || action.type() == SpaceSimulation.ActionType.BEAM_POWER)) {
             scroll.addChild(new LabelWidget(cursorX + 6, rowY + 45, NORMAL_CARD_WIDTH - 20, 18,
                     stationKeepingEstimate(action)).withBrightColor().withWrap(true));
         } else if (action.type() == SpaceSimulation.ActionType.DECOUPLE && action.segments().size() == 2

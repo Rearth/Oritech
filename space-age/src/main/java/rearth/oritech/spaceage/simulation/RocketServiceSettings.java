@@ -14,27 +14,50 @@ import java.util.UUID;
 /**
  * Typed parameters for explicit rocket services. A reference always belongs to its containing segment.
  */
-public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange) {
+public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam) {
 
     public static final RocketServiceSettings DEFAULT = new RocketServiceSettings(Processing.DEFAULT, Docking.DEFAULT, Exchange.DEFAULT);
     public static final Codec<RocketServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
             Processing.CODEC.fieldOf("processing").forGetter(RocketServiceSettings::processing), Docking.CODEC.fieldOf("docking").forGetter(RocketServiceSettings::docking),
-            Exchange.CODEC.fieldOf("exchange").forGetter(RocketServiceSettings::exchange)
+            Exchange.CODEC.fieldOf("exchange").forGetter(RocketServiceSettings::exchange), Beam.CODEC.optionalFieldOf("beam", Beam.DEFAULT).forGetter(RocketServiceSettings::beam)
     ).apply(i, RocketServiceSettings::new));
+
+    public RocketServiceSettings(Processing processing, Docking docking, Exchange exchange) {
+
+        this(processing, docking, exchange, Beam.DEFAULT);
+    }
+
+    public record Beam(int reservePercent) {
+
+        public static final Beam DEFAULT = new Beam(20);
+        public static final Codec<Beam> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.INT.fieldOf("reserve_percent").forGetter(Beam::reservePercent)
+        ).apply(i, Beam::new));
+
+        public Beam {
+
+            reservePercent = Math.clamp(reservePercent, 0, 100);
+        }
+    }
+
+    public RocketServiceSettings withBeam(Beam value) {
+
+        return new RocketServiceSettings(processing, docking, exchange, value);
+    }
 
     public RocketServiceSettings withProcessing(Processing value) {
 
-        return new RocketServiceSettings(value, docking, exchange);
+        return new RocketServiceSettings(value, docking, exchange, beam);
     }
 
     public RocketServiceSettings withDocking(Docking value) {
 
-        return new RocketServiceSettings(processing, value, exchange);
+        return new RocketServiceSettings(processing, value, exchange, beam);
     }
 
     public RocketServiceSettings withExchange(Exchange value) {
 
-        return new RocketServiceSettings(processing, docking, value);
+        return new RocketServiceSettings(processing, docking, value, beam);
     }
 
     public enum SourceScope {

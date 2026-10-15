@@ -5,6 +5,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -23,13 +24,14 @@ public class SpaceAgeBlockTagProvider extends BlockTagsProvider {
     @SuppressWarnings("unchecked")
     protected void addTags(HolderLookup.Provider provider) {
 
+        tag(Tags.Blocks.GLASS_BLOCKS).add(SpaceAgeBlocks.CRYSTAL_GLASS.get());
         var pickaxeTag = tag(BlockTags.MINEABLE_WITH_PICKAXE);
         var ironToolTag = tag(BlockTags.NEEDS_IRON_TOOL);
 
         RegistryReflectionUtil.IterateFields(SpaceAgeBlocks.class, DeferredBlock.class, (field, identifier, value) -> {
             var block = ((DeferredBlock<? extends Block>) value).get();
             pickaxeTag.add(block);
-            ironToolTag.add(block);
+            if (block != SpaceAgeBlocks.CRYSTAL_GLASS.get()) ironToolTag.add(block);
         });
     }
 }

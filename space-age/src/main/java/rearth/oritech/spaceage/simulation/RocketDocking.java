@@ -29,6 +29,11 @@ public final class RocketDocking {
 
     public static List<HardwareRef> ports(ActiveRocketData rocket) {
 
+        return rocket.couplingPorts();
+    }
+
+    static List<HardwareRef> scanPorts(ActiveRocketData rocket) {
+
         var result = new ArrayList<HardwareRef>();
         rocket.getStaticSegments().values().forEach(s -> s.blocks().stream()
                 .filter(b -> b.state().is(SpaceAgeBlocks.ROCKET_COUPLING.get()))
@@ -61,14 +66,19 @@ public final class RocketDocking {
 
     public static List<DockingTarget> targets(MissionSavedData data, UUID owner) {
 
+        return targets(data, owner, null);
+    }
+
+    public static List<DockingTarget> targets(MissionSavedData data, UUID owner, Set<UUID> fullLayouts) {
+
         return data.craft.values().stream().filter(m -> m.owner.equals(owner) && stationary(m)
                         && visitorLink(data, m.rocket.getRocketId()) == null)
                 .map(m -> new DockingTarget(m.rocket.getRocketId(), m.plan.name().isBlank() ? "Station " + m.rocket.getRocketId().toString().substring(0, 8) : m.plan.name(),
-                        MissionState.copyRocket(m.rocket), m.position, m.positionRevision,
+                        fullLayouts == null || fullLayouts.contains(m.rocket.getRocketId()) ? MissionState.copyRocket(m.rocket) : m.summary(0).rocket(), m.position, m.positionRevision,
                         ports(m.rocket).stream().filter(p -> !occupied(data, m.rocket.getRocketId(), p)).toList(),
                         data.dockingLinks.stream().filter(l -> l.host().equals(m.rocket.getRocketId())).map(DockingLink::visitor).toList(),
                         data.dockingLinks.stream().filter(l -> l.host().equals(m.rocket.getRocketId())).toList(),
-                        mass(data, m) - RocketPerformanceCalculator.calculate(m.rocket).wetMassKilograms()))
+                        mass(data, m) - RocketPerformanceCalculator.calculate(m.rocket).wetMassKilograms(), m.rocket.powerHardware()))
                 .toList();
     }
 

@@ -40,6 +40,26 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
     public static final RawAnimation FOLD = RawAnimation.begin().thenPlayAndHold("fold");
     public static final RawAnimation UNFOLD = RawAnimation.begin().thenPlayAndHold("unfold");
 
+    public static final List<Vec3i> CORE_POSITIONS = List.of(
+            // top
+            new Vec3i(1, 1, 1),
+            new Vec3i(0, 1, 1),
+            new Vec3i(-1, 1, 1),
+            new Vec3i(1, 1, 0),
+            new Vec3i(0, 1, 0),
+            new Vec3i(-1, 1, 0),
+            new Vec3i(1, 1, -1),
+            new Vec3i(0, 1, -1),
+            new Vec3i(-1, 1, -1),
+            // bottom
+            new Vec3i(1, 0, 1),
+            new Vec3i(0, 0, 1),
+            new Vec3i(-1, 0, 1),
+            new Vec3i(1, 0, -1),
+            new Vec3i(0, 0, -1),
+            new Vec3i(-1, 0, -1)
+    );
+
     // animation
     protected final AnimatableInstanceCache animatableInstanceCache = GeckoLibUtil.createInstanceCache(this);
     private final AnimationController<BigSolarPanelEntity> animationController = getAnimationController();
@@ -135,25 +155,7 @@ public class BigSolarPanelEntity extends PassiveGeneratorBlockEntity implements 
 
     @Override
     public List<Vec3i> getCorePositions() {
-        return List.of(
-                // top
-                new Vec3i(1, 1, 1),
-                new Vec3i(0, 1, 1),
-                new Vec3i(-1, 1, 1),
-                new Vec3i(1, 1, 0),
-                new Vec3i(0, 1, 0),
-                new Vec3i(-1, 1, 0),
-                new Vec3i(1, 1, -1),
-                new Vec3i(0, 1, -1),
-                new Vec3i(-1, 1, -1),
-                // bottom
-                new Vec3i(1, 0, 1),
-                new Vec3i(0, 0, 1),
-                new Vec3i(-1, 0, 1),
-                new Vec3i(1, 0, -1),
-                new Vec3i(0, 0, -1),
-                new Vec3i(-1, 0, -1)
-        );
+        return CORE_POSITIONS;
     }
     //endregion
 

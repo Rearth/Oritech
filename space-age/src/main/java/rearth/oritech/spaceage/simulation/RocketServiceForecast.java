@@ -79,7 +79,8 @@ final class RocketServiceForecast {
             if (action.service().timeoutTicks() > 0) ticks = Math.min(ticks, action.service().timeoutTicks() - elapsed);
             var rate = jobs.stream().mapToLong(m -> m.job.rfPerTick()).sum();
             var available = machines.getDynamicSegments().values().stream().mapToLong(r -> r.availableRF).sum();
-            if (rate > 0) ticks = (int) Math.min(ticks, Math.max(1, available / rate));
+            var solar = Math.hypot(target.velocityX, target.velocityY) <= .001 ? SolarPower.output(target) : 0;
+            if (rate > solar) ticks = (int) Math.min(ticks, Math.max(1, available / (rate - solar)));
             if (ticks <= 0) {
                 if (action.service().timeoutTicks() > 0) {
                     elapsed = action.service().timeoutTicks();
@@ -90,6 +91,11 @@ final class RocketServiceForecast {
                 if (target != craft) apply(target, machines);
                 craft.blockedState = RocketFlightPathCalculator.TerminalState.NOT_ENOUGH_SERVICE_RF;
                 return processIssue(action, context, "processing_no_power");
+            }
+            if (solar > 0) {
+                // Forecast a continuous supply over this work interval; clamp surplus after the jobs spend it.
+                var battery = machines.getDynamicSegments().values().iterator().next();
+                battery.setResources(battery.fuel(), battery.rf() + solar * ticks);
             }
             var progressed = false;
             for (var ref : settings.modules()) {
@@ -117,6 +123,8 @@ final class RocketServiceForecast {
                 craft.blockedState = RocketFlightPathCalculator.TerminalState.NOT_ENOUGH_SERVICE_RF;
                 return processIssue(action, context, "processing_no_power");
             }
+            for (var battery : machines.getDynamicSegments().values())
+                battery.setResources(battery.fuel(), Math.min(battery.rf(), battery.rfCapacity));
             elapsed += ticks;
             if (action.service().timeoutTicks() > 0 && elapsed >= action.service().timeoutTicks()) {
                 timedOut = true;
@@ -239,12 +247,12 @@ final class RocketServiceForecast {
         if (ticks <= 0) return true;
         if (!craft.dockedHost.equals(FlightPlanAction.NO_TARGET)) {
             var host = context.stationCraft.get(craft.dockedHost);
-            if (host == null || !StationServiceRules.forecast(host, ticks, host.mass() + craft.mass())) return false;
+            if (host == null || !StationServiceRules.forecast(host, ticks, host.mass() + craft.mass(), false)) return false;
             craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, ticks)));
             host.time += ticks / 20;
             return true;
         }
-        if (Math.hypot(craft.velocityX, craft.velocityY) <= .001) return StationServiceRules.forecast(craft, ticks);
+        if (Math.hypot(craft.velocityX, craft.velocityY) <= .001) return StationServiceRules.forecast(craft, ticks, craft.mass(), false);
         craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, ticks)));
         return true;
     }

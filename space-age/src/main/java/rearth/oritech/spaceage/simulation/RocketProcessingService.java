@@ -24,7 +24,7 @@ public final class RocketProcessingService {
 
     public static List<HardwareRef> modules(ActiveRocketData rocket) {
 
-        return RocketLayout.controllers(rocket, true);
+        return rocket.processingModules();
     }
 
     public static DynamicRocketSegment resources(ActiveRocketData rocket, HardwareRef ref) {
@@ -108,8 +108,17 @@ public final class RocketProcessingService {
         state.serviceProgress = pass.total() - pass.pending().size();
         var needsPower = target.rocket.getDynamicSegments().values().stream().flatMap(resources -> resources.crafters.values().stream())
                 .anyMatch(machine -> machine.job != null && machine.job.rfPerTick() > 0);
-        if (target.rocket.getDynamicSegments().values().stream().mapToLong(r -> r.availableRF).sum() == 0 && needsPower)
-            issue = "processing_no_power";
+        if (needsPower) {
+            var required = target.rocket.getDynamicSegments().values().stream().flatMap(resources -> resources.crafters.values().stream())
+                    .filter(machine -> machine.job != null && machine.job.rfPerTick() > 0).mapToLong(machine -> machine.job.rfPerTick()).min().orElse(0);
+            var rf = target.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
+            var nextSolar = SolarPower.stationary(target) ? SolarPower.output(target) : 0;
+            if (rf + nextSolar < required) {
+                state.complete();
+                state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
+                return;
+            }
+        }
         state.status = "status.oritech_space_age." + (issue.isEmpty() ? "processing" : issue);
         if (pass.pending().isEmpty() && !running) {
             storage.pass = null;

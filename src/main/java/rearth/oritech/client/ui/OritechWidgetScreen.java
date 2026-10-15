@@ -302,6 +302,10 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     }
 
     protected void addTitle() {
+        addTitle(imageWidth);
+    }
+
+    protected void addTitle(int panelWidth) {
         var blockTitle = getTitleState().getBlock().getName();
         var icon = getTitleIcon();
 
@@ -320,9 +324,9 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         labelWidget.withDarkColor();
 
         int combinedWidth = iconWidget.getWidth() + labelWidget.getWidth() + 2;
-        int titleX = (imageWidth - combinedWidth) * 65 / 100;
+        int titleX = (panelWidth - combinedWidth) * 65 / 100;
         if (blockTitle.getString().length() > 15)
-            titleX = imageWidth - combinedWidth;
+            titleX = panelWidth - combinedWidth;
         int titleY = getTitleY();
 
         iconWidget.setPosition(titleX, titleY);

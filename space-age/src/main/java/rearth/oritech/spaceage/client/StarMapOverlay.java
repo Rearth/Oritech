@@ -5,6 +5,7 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
+import rearth.oritech.api.screen.widgets.ToggleWidget;
 
 import java.util.Locale;
 
@@ -15,8 +16,8 @@ final class StarMapOverlay {
 
     private static final int COLLAPSED_LEGEND_WIDTH = 112;
     private static final int COLLAPSED_LEGEND_HEIGHT = 18;
-    private static final int EXPANDED_LEGEND_WIDTH = 330;
-    private static final int EXPANDED_LEGEND_HEIGHT = 44;
+    private static final String[] LEGEND_KEYS = {"accelerate", "redirect", "coast", "brake", "separation", "command_coverage"};
+    private static final int[] LEGEND_COLORS = {0xFFFF8A20, 0xFF8FDB68, 0xFF66B9D5, 0xFFB68CFF, 0xFFFFD45C, 0xFF5AD6EB};
 
     private StarMapOverlay() {
     }
@@ -46,8 +47,9 @@ final class StarMapOverlay {
                     selectedPath != null && selectedPath.terminalState().isFailure() ? 0xFFFF9999 : 0xFFCAD8E5, false);
         }
 
-        var legendWidth = legendExpanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
-        var legendHeight = legendExpanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
+        var layout = legendLayout(width, legendExpanded);
+        var legendWidth = layout.width();
+        var legendHeight = layout.height();
         var legendX = x + width - legendWidth - 9;
         var legendY = y + height - legendHeight - 8;
         OritechSurface.PANEL_DARK.render(graphics, legendX, legendY, legendWidth, legendHeight);
@@ -56,24 +58,51 @@ final class StarMapOverlay {
         graphics.text(font, Component.literal(legendExpanded ? "−" : "+"),
                 legendX + legendWidth - 14, legendY + 5, 0xFFF2F6FA, true);
         if (!legendExpanded) return;
-        entry(graphics, legendX + 8, legendY + 18, 0xFFFF8A20, "accelerate");
-        entry(graphics, legendX + 8, legendY + 29, 0xFF8FDB68, "redirect");
-        entry(graphics, legendX + 118, legendY + 18, 0xFF66B9D5, "coast");
-        entry(graphics, legendX + 118, legendY + 29, 0xFFB68CFF, "brake");
-        entry(graphics, legendX + 218, legendY + 18, 0xFFFFD45C, "separation");
-        if (showCommandCoverage) dashedEntry(graphics, legendX + 218, legendY + 29,
-                0xFF5AD6EB, "screen.oritech_space_age.path.command_coverage");
+        for (int index = 0; index < LEGEND_KEYS.length; index++) {
+            if (index == 5 && !showCommandCoverage) continue;
+            var entryX = legendX + 8 + index % layout.columns() * layout.cellWidth();
+            var entryY = legendY + 18 + index / layout.columns() * 12;
+            if (index == 5) dashedEntry(graphics, entryX, entryY, LEGEND_COLORS[index],
+                    "screen.oritech_space_age.path." + LEGEND_KEYS[index]);
+            else entry(graphics, entryX, entryY, LEGEND_COLORS[index], LEGEND_KEYS[index]);
+        }
     }
 
     static boolean isOverLegend(double mouseX, double mouseY, int x, int y, int width, int height,
                                 boolean expanded) {
 
-        var legendWidth = expanded ? EXPANDED_LEGEND_WIDTH : COLLAPSED_LEGEND_WIDTH;
-        var legendHeight = expanded ? EXPANDED_LEGEND_HEIGHT : COLLAPSED_LEGEND_HEIGHT;
+        var layout = legendLayout(width, expanded);
+        var legendWidth = layout.width();
+        var legendHeight = layout.height();
         var legendX = x + width - legendWidth - 9;
         var legendY = y + height - legendHeight - 8;
         return mouseX >= legendX && mouseX < legendX + legendWidth
                 && mouseY >= legendY && mouseY < legendY + legendHeight;
+    }
+
+    static void positionOptions(ToggleWidget beams, ToggleWidget sun, int x, int y, int width, int height) {
+
+        var layout = legendLayout(width, true);
+        var left = x + width - layout.width() - 1;
+        var bottom = y + height - 8;
+        beams.setPosition(left, bottom - 40);
+        sun.setPosition(left, bottom - 20);
+        beams.setWidth(layout.width() - 16);
+        sun.setWidth(layout.width() - 16);
+    }
+
+    private static LegendLayout legendLayout(int mapWidth, boolean expanded) {
+
+        if (!expanded) return new LegendLayout(COLLAPSED_LEGEND_WIDTH, COLLAPSED_LEGEND_HEIGHT, 1, 0);
+        var cellWidth = 0;
+        var font = Minecraft.getInstance().font;
+        for (var key : LEGEND_KEYS)
+            cellWidth = Math.max(cellWidth, 26 + font.width(Component.translatable("screen.oritech_space_age.path." + key)));
+        var columns = mapWidth - 18 >= 16 + 2 * cellWidth ? 2 : 1;
+        return new LegendLayout(16 + columns * cellWidth, 64 + (LEGEND_KEYS.length / columns) * 12, columns, cellWidth);
+    }
+
+    private record LegendLayout(int width, int height, int columns, int cellWidth) {
     }
 
     private static void entry(GuiGraphicsExtractor graphics, int x, int y, int color, String key) {

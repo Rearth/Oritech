@@ -46,8 +46,101 @@ public final class StationServiceRules {
                 segment.initialFuelTicks, segment.initialRF)).toList();
     }
 
+    static Estimate solarEstimate(List<Budget> budgets, double solar, double services, ActionAddon condition) {
+
+        var rf = budgets.stream().mapToDouble(Budget::rf).sum();
+        var drain = services - solar;
+        var duration = drain > 0 ? rf / drain / 20 : Double.POSITIVE_INFINITY;
+        var end = drain > 0 ? StationKeepingEnd.RF : StationKeepingEnd.SUSTAINABLE;
+        if (condition != null) {
+            var limit = Double.POSITIVE_INFINITY;
+            if (condition.type() == ActionAddonType.DURATION) limit = condition.value();
+            else if (condition.type() == ActionAddonType.LOW_RF) {
+                var initial = budgets.stream().mapToDouble(Budget::initialRF).sum();
+                var threshold = initial * condition.value() / 100;
+                if (rf <= threshold) limit = 0;
+                else if (drain > 0) limit = (rf - threshold) / drain / 20;
+            } else if (conditionReached(budgets, condition, 0, 0)) limit = 0;
+            if (Double.isFinite(limit) && limit <= duration) {
+                duration = limit;
+                end = condition.type() == ActionAddonType.DURATION ? StationKeepingEnd.DURATION
+                        : condition.type() == ActionAddonType.LOW_RF ? StationKeepingEnd.LOW_RF : StationKeepingEnd.LOW_FUEL;
+            }
+        }
+        return new Estimate(Double.isFinite(duration) ? duration : 0, end);
+    }
+
+    /** Beam output throttles itself at the reserve; only ordinary services can drain below it. */
+    static Estimate beamEstimate(List<Budget> budgets, double solar, double services, double limit, double reserve, ActionAddon condition) {
+
+        var rf = budgets.stream().mapToDouble(Budget::rf).sum();
+        var net = solar - services;
+        var ticks = net < 0 ? beamThresholdTicks(rf, reserve, net, limit, 0) : Double.POSITIVE_INFINITY;
+        var end = Double.isFinite(ticks) ? StationKeepingEnd.RF : StationKeepingEnd.SUSTAINABLE;
+        if (condition != null) {
+            var stop = Double.POSITIVE_INFINITY;
+            if (condition.type() == ActionAddonType.DURATION) stop = condition.value() * 20d;
+            else if (condition.type() == ActionAddonType.LOW_RF)
+                stop = beamThresholdTicks(rf, reserve, net, limit, budgets.stream().mapToDouble(Budget::initialRF).sum() * condition.value() / 100);
+            else if (conditionReached(budgets, condition, 0, 0)) stop = 0;
+            if (Double.isFinite(stop) && stop <= ticks) {
+                ticks = stop;
+                end = condition.type() == ActionAddonType.DURATION ? StationKeepingEnd.DURATION
+                        : condition.type() == ActionAddonType.LOW_RF ? StationKeepingEnd.LOW_RF : StationKeepingEnd.LOW_FUEL;
+            }
+        }
+        return new Estimate(Double.isFinite(ticks) ? ticks / 20 : 0, end);
+    }
+
+    private static double beamThresholdTicks(double rf, double reserve, double net, double limit, double threshold) {
+
+        if (rf <= threshold) return 0;
+        var ticks = 0d;
+        if (rf > reserve) {
+            var drain = limit - net;
+            if (drain <= 0) return Double.POSITIVE_INFINITY;
+            if (threshold >= reserve) return (rf - threshold) / drain;
+            ticks = (rf - reserve) / drain;
+            rf = reserve;
+        }
+        return net < 0 ? ticks + (rf - threshold) / -net : Double.POSITIVE_INFINITY;
+    }
+
+    static double beamRemainingRF(double rf, double reserve, double net, double limit, double ticks) {
+
+        if (rf > reserve) {
+            var drain = limit - net;
+            if (drain <= 0) return rf - drain * ticks;
+            var first = Math.min(ticks, (rf - reserve) / drain);
+            rf -= first * drain;
+            ticks -= first;
+        }
+        if (net <= 0) return Math.max(0, rf + net * ticks);
+        var filling = Math.min(ticks, Math.max(0, reserve - rf) / net);
+        return rf + net * filling + Math.max(0, net - limit) * (ticks - filling);
+    }
+
+    static double beamReserve(RocketFlightPathState.Craft craft, int percent) {
+
+        return craft.segments.values().stream().mapToDouble(segment -> segment.physical == null ? segment.initialRF : segment.physical.rfCapacity).sum() * percent / 100;
+    }
+
+    static void limitRF(RocketFlightPathState.Craft craft, double remaining) {
+
+        var spent = Math.max(0, craft.segments.values().stream().mapToDouble(segment -> segment.rf).sum() - remaining);
+        for (var segment : craft.segments.values()) {
+            var debit = Math.min(segment.rf, spent);
+            segment.spendRF(debit);
+            spent -= debit;
+        }
+    }
+
     static Estimate estimate(List<Budget> budgets, double correctionRate, ActionAddon condition) {
 
+        if (condition != null && condition.type() == ActionAddonType.DURATION) {
+            var resources = estimate(budgets, correctionRate, null);
+            return resources.seconds >= condition.value() ? new Estimate(condition.value(), StationKeepingEnd.DURATION) : resources;
+        }
         var propulsionSeconds = 0d;
         var antennaSeconds = Double.POSITIVE_INFINITY;
         var hasAntenna = false;
@@ -91,11 +184,12 @@ public final class StationServiceRules {
     static boolean conditionReached(List<Budget> budgets, ActionAddon condition, double correctionRate, double seconds) {
 
         if (condition == null) return false;
+        if (condition.type() == ActionAddonType.DURATION) return seconds >= condition.value();
         var rf = condition.type() == ActionAddonType.LOW_RF;
         var initial = 0d;
         var remaining = 0d;
         for (var budget : budgets) {
-            if (rf ? !budget.hardware.usesStationKeepingRF() : !budget.hardware.usesStationKeepingFuel()) continue;
+            if (!rf && !budget.hardware.usesStationKeepingFuel()) continue;
             initial += rf ? budget.initialRF : budget.initialFuel;
             var rate = rf ? rfPerSecond(budget.hardware, correctionRate) : budget.hardware.fuelCost(correctionRate);
             remaining += Math.max(0, (rf ? budget.rf : budget.fuel) - rate * seconds);
@@ -111,7 +205,7 @@ public final class StationServiceRules {
 
         boolean conditionReached() {
 
-            return end == StationKeepingEnd.LOW_RF || end == StationKeepingEnd.LOW_FUEL;
+            return end == StationKeepingEnd.LOW_RF || end == StationKeepingEnd.LOW_FUEL || end == StationKeepingEnd.DURATION;
         }
     }
 
@@ -122,8 +216,33 @@ public final class StationServiceRules {
 
     static boolean forecast(RocketFlightPathState.Craft craft, double ticks, double mass) {
 
+        return forecast(craft, ticks, mass, true);
+    }
+
+    static boolean forecast(RocketFlightPathState.Craft craft, double ticks, double mass, boolean generate) {
+
         var thrust = craft.segments.values().stream().mapToDouble(s -> s.thrust(false)).sum();
         if (ticks <= 0) return true;
+        var solar = SolarPower.output(craft);
+        if (solar > 0) {
+            var rf = craft.segments.values().stream().mapToDouble(s -> s.rf).sum();
+            var required = craft.segments.values().stream().mapToDouble(s -> antennaRF(s.hardware, ticks)).sum();
+            if (rf + (generate ? solar * ticks : 0) < required) return false;
+            var remaining = (generate ? solar * ticks : 0) - required;
+            for (var segment : craft.segments.values()) {
+                var capacity = segment.physical == null ? segment.initialRF : segment.physical.rfCapacity;
+                if (remaining >= 0) {
+                    var accepted = Math.min(remaining, Math.max(0, capacity - segment.rf));
+                    segment.rf += accepted;
+                    remaining -= accepted;
+                } else {
+                    var spent = Math.min(segment.rf, -remaining);
+                    segment.spendRF(spent);
+                    remaining += spent;
+                }
+            }
+            return true;
+        }
         if (thrust <= 0) return false;
         var seconds = burnSeconds(thrust, mass, ticks);
         var available = craft.segments.values().stream().mapToDouble(s -> Math.max(s.chemicalSeconds, s.ionSeconds)).max().orElse(0);
@@ -138,15 +257,21 @@ public final class StationServiceRules {
 
     public static boolean available(MissionState state) {
 
+        var antennaReady = state.rocket.hardware().values().stream().noneMatch(s -> s.antennas() > 0)
+                || SpaceCommunications.poweredAntennas(state, false) > 0;
+        if (SolarPower.stationary(state) && SolarPower.output(state) > 0) {
+            var rf = state.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
+            var capacity = state.rocket.getDynamicSegments().values().stream().mapToDouble(segment -> segment.rfCapacity).sum();
+            return antennaReady || Math.min(capacity, rf + SolarPower.output(state)) >= SpaceBalance.ANTENNA_RF;
+        }
         var performance = RocketPerformanceCalculator.calculate(state.rocket);
-        return (state.rocket.getStaticSegments().values().stream().noneMatch(s -> RocketHardware.of(s).antennas() > 0)
-                || SpaceCommunications.poweredAntennas(state, false) > 0)
-                && performance.thrustNewtons() > 0 && performance.availableBurnSeconds() >= burnSeconds(performance.thrustNewtons(),
-                        performance.wetMassKilograms(), SpaceBalance.STATION_KEEPING_INTERVAL_TICKS);
+        return antennaReady && performance.thrustNewtons() > 0 && performance.availableBurnSeconds() >= burnSeconds(performance.thrustNewtons(),
+                performance.wetMassKilograms(), SpaceBalance.STATION_KEEPING_INTERVAL_TICKS);
     }
 
     public static boolean upkeep(MissionState state, double mass, long ticks) {
 
+        if (SolarPower.stationary(state) && SolarPower.output(state) > 0) return available(state);
         var performance = RocketPerformanceCalculator.calculate(state.rocket);
         if (performance.availableBurnSeconds() <= 0) return false;
         var seconds = burnSeconds(performance.thrustNewtons(), mass, ticks);
