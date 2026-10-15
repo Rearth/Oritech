@@ -142,6 +142,42 @@ public final class RocketFlightPathTest {
     }
 
     @Test
+    void fastEarthAscentThenManualSeparationAndMixedEngineMarsBrakingComplete() {
+
+        var coreId = new UUID(30, 1);
+        var boosterId = new UUID(30, 2);
+        var core = new StaticRocketSegment(coreId, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), SpaceAgeBlocks.ANTENNA.get().defaultBlockState())),
+                Map.of(boosterId, Set.of()), 100, 2, 20_000_000, 200_000);
+        var booster = new StaticRocketSegment(boosterId,
+                IntStream.range(2, 6).mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                        SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())).collect(Collectors.toSet()),
+                Map.of(coreId, Set.of()), 10, 4, 0, 200_000);
+        var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
+                coreId, new DynamicRocketSegment(200_000, 20_000_000, 0, Set.of(boosterId)),
+                boosterId, new DynamicRocketSegment(200_000, 0, 0, Set.of(coreId))));
+        var ascent = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.HIGH)
+                .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
+        var separate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
+                .withSegments(List.of(SpaceSimulation.SegmentRef.of(core), SpaceSimulation.SegmentRef.of(booster)));
+        var mars = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(SpaceSimulation.MARS_ID).withOrbit(SpaceSimulation.OrbitBand.HIGH);
+        var base = SpaceSimulation.FlightPlan.empty();
+        var plan = base.withBranches(List.of(base.root().withActions(List.of(ascent, separate, mars))));
+        var result = RocketFlightPathCalculator.calculate(rocket, new SpaceSimulation().truth(), plan);
+        var path = result.paths().stream().filter(p -> p.branchId().equals(plan.root().id())).findFirst().orElseThrow();
+        ready(path);
+        require(path.actionMoments().size() == 3 && path.actionMoments().stream().allMatch(RocketFlightPathCalculator.ActionMoment::completed),
+                "ascent, manual separation and stopped Mars arrival must all complete");
+        require(path.samples().getLast().speedMetersPerSecond() < .00001, "Mars arrival must actually stop");
+        require(path.remainingDeltaV() > 0, "unused chemical propulsion remains available");
+        require(rocket.getDynamicSegments().get(coreId).rf() == 20_000_000, "forecast must not consume launch resources");
+    }
+
+    @Test
     void navigationCompletionConditionsStopEarlyWithoutEndingThePlan() {
 
         SharedConstants.tryDetectVersion();
@@ -391,7 +427,7 @@ public final class RocketFlightPathTest {
                 Map.of(coreId, Set.of()), 25, 4);
         var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
                 coreId, new DynamicRocketSegment(0, 40_000_000, 0, Set.of(boosterId)),
-                boosterId, new DynamicRocketSegment(0, boosterRF, 0, Set.of(coreId))));
+                boosterId, new DynamicRocketSegment(0, boosterRF * SpaceBalance.ION_RF / 1_000, 0, Set.of(coreId))));
         var objects = List.of(
                 new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
                         -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE),

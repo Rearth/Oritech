@@ -7,7 +7,9 @@ import net.minecraft.core.UUIDUtil;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,7 +19,7 @@ import java.util.UUID;
 // this data does not change during the flight of a rocket segment
 public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> originalCouplings,
                                   long staticWeight, int engineCount, long initialRF, long initialFuel,
-                                  double payloadEnergyJoules) {
+                                  double payloadEnergyJoules, BlockPos planAnchor) {
 
     private static final Codec<Set<BlockData>> BLOCKS_CODEC = BlockData.CODEC.listOf()
             .xmap(Set::copyOf, List::copyOf);
@@ -33,8 +35,32 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
             Codec.INT.fieldOf("engine_count").forGetter(StaticRocketSegment::engineCount),
             Codec.LONG.optionalFieldOf("initial_rf", 0L).forGetter(StaticRocketSegment::initialRF),
             Codec.LONG.optionalFieldOf("initial_fuel", 0L).forGetter(StaticRocketSegment::initialFuel),
-            Codec.DOUBLE.fieldOf("payload_energy").forGetter(StaticRocketSegment::payloadEnergyJoules)
-    ).apply(instance, StaticRocketSegment::new));
+            Codec.DOUBLE.fieldOf("payload_energy").forGetter(StaticRocketSegment::payloadEnergyJoules),
+            BlockPos.CODEC.optionalFieldOf("plan_anchor").forGetter(segment -> Optional.of(segment.planAnchor()))
+    ).apply(instance, (id, blocks, couplings, weight, engines, rf, fuel, energy, anchor) ->
+            new StaticRocketSegment(id, blocks, couplings, weight, engines, rf, fuel, energy, anchor.orElseGet(() -> blockAnchor(blocks)))));
+
+    public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines,
+                               long rf, long fuel, double energy) {
+
+        this(id, blocks, couplings, weight, engines, rf, fuel, energy, blockAnchor(blocks));
+    }
+
+    private static BlockPos blockAnchor(Set<BlockData> blocks) {
+
+        return blocks.stream().map(BlockData::relativePos).min(Comparator.comparingInt((BlockPos pos) -> pos.getY())
+                .thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ)).orElse(BlockPos.ZERO);
+    }
+
+    /** The segment's side of its first connection stays fixed when ordinary blocks are edited. */
+    public static BlockPos couplingAnchor(Map<UUID, Set<CouplingData>> couplings) {
+
+        return couplings.values().stream().flatMap(Set::stream)
+                .map(coupling -> coupling.relativePos().offset(coupling.relativePos().subtract(coupling.oppositeSide())))
+                .min(Comparator.comparingInt((BlockPos pos) -> pos.getY()).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ))
+                .orElse(BlockPos.ZERO);
+    }
+
     public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines, long rf, long fuel) {
 
         this(id, blocks, couplings, weight, engines, rf, fuel, 0);

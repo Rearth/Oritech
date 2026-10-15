@@ -2,6 +2,9 @@ package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.JsonOps;
 import org.junit.jupiter.api.Test;
+import net.minecraft.core.BlockPos;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import java.util.Map;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Segment;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
@@ -15,6 +18,27 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RocketResourceAccountingTest {
+
+    @Test
+    void portableBatteriesGiveIonCraftUsefulVacuumEndurance() {
+
+        // One 250 kN engine, three default 1 MRF batteries, 20 tonnes including their mass.
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())), Map.of(), 20, 1, 3_000_000, 0);
+        var resources = new DynamicRocketSegment(0, 3_000_000, 0, Set.of());
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, resources));
+        var performance = RocketPerformanceCalculator.calculate(rocket);
+        assertEquals(250_000, performance.thrustNewtons());
+        assertEquals(1_500, performance.availableBurnSeconds());
+        assertEquals(18_750, performance.availableDeltaVMetersPerSecond());
+        var hardware = RocketHardware.of(segment);
+        hardware.burn(resources, 1_500);
+        assertEquals(0, resources.rf(), 1e-6);
+        assertEquals(0, hardware.ionSeconds(resources));
+        // Additional engines improve acceleration but share the same total stored RF impulse.
+        assertEquals(750, new RocketHardware(0, 2, 0, 0).ionSeconds(new DynamicRocketSegment(0, 3_000_000, 0, Set.of())));
+    }
 
     @Test
     void tinyBurnsMatchOneContinuousBurnAndPreviewIncludingReload() {

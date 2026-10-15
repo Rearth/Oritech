@@ -25,6 +25,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.simulation.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.RocketRecovery;
 import rearth.oritech.spaceage.simulation.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.MissionController;
 import rearth.oritech.spaceage.simulation.MissionSavedData;
@@ -121,7 +122,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
             return false;
         }
 
-        MissionController.launch((ServerLevel) level, player.getUUID(), result, validated, start);
+        MissionController.launch((ServerLevel) level, player.getUUID(), result, validated, result.getLaunchPosition());
         return true;
     }
 
@@ -232,7 +233,9 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
                 scannedSegments.put(segment.id, scanSegmentContent(segment, transaction, storageScan));
         }
 
-        var rocketData = createRocket(start, segments, scannedSegments, consumeResources);
+        // The assembler-facing pad fixes local coordinates even when a new block changes the flood-fill start.
+        var origin = worldPosition.relative(getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)).above();
+        var rocketData = createRocket(origin, segments, scannedSegments, consumeResources);
         OritechSpaceAge.LOGGER.debug("Assembled rocket with {} segments at {}", segments.size(), worldPosition);
         return rocketData;
 
@@ -352,7 +355,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
                     scannedData.engineCount, scannedData.availableRF, scannedData.availableFuelBurnTimeTicks);
             staticSegments.put(segment.id, new StaticRocketSegment(segment.id, blocks, couplings, scannedData.staticWeight,
                     scannedData.engineCount, scannedData.availableRF, scannedData.availableFuelBurnTimeTicks,
-                    RocketExplosives.installed(structure)));
+                    RocketExplosives.installed(structure), StaticRocketSegment.couplingAnchor(couplings)));
             dynamicSegments.put(segment.id, new DynamicRocketSegment(
                     scannedData.availableFuelBurnTimeTicks,
                     scannedData.availableRF,
@@ -366,6 +369,8 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
 
         var rocketData = new ActiveRocketData(staticSegments, dynamicSegments);
         rocketData.setLaunchPosition(origin);
+        var facing = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+        rocketData.setLaunchPadCenter(RocketRecovery.center(padFloodFill(worldPosition.relative(facing))).above());
         if (removeBlocks) {
             var blocksToRemove = new HashSet<BlockPos>();
             for (var segment : segments.values()) {

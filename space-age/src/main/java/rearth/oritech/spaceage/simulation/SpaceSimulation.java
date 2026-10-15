@@ -541,12 +541,7 @@ public class SpaceSimulation {
 
         public static SegmentRef of(StaticRocketSegment segment) {
 
-            var anchor = segment.blocks().stream().map(StaticRocketSegment.BlockData::relativePos)
-                    .min(Comparator.comparingInt((BlockPos pos) -> pos.getY())
-                            .thenComparingInt(pos -> pos.getX())
-                            .thenComparingInt(pos -> pos.getZ()))
-                    .orElse(BlockPos.ZERO);
-            return new SegmentRef(anchor);
+            return new SegmentRef(segment.planAnchor());
         }
     }
 

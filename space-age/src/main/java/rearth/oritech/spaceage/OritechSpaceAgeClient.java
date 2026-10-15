@@ -9,6 +9,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.RocketRenderer;
+import rearth.oritech.spaceage.client.GroundBeamRenderer;
 import rearth.oritech.spaceage.datagen.SpaceAgeDataGenerators;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
@@ -38,6 +39,9 @@ public final class OritechSpaceAgeClient {
         });
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onExtractRenderState);
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
+        NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::extract);
+        NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::submit);
+        NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::clear);
         modEventBus.addListener(SpaceAgeDataGenerators::gatherData);
         modEventBus.addListener(SpaceAgeMenus::registerScreens);
     }

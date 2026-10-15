@@ -66,7 +66,9 @@ final class MissionNavigation {
             var depleted = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
                 var h = RocketHardware.of(entry.getValue());
                 var r = state.rocket.getDynamicSegments().get(entry.getKey());
-                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0 && r.rf() + 1e-7 < h.rfCost(burnSeconds)
+                // Mixed segments keep firing their chemical engines after the planned ion burnout.
+                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0
+                        && h.chemicalSeconds(r) <= RocketFlightPathState.BURN_TOLERANCE && r.rf() + 1e-7 < h.rfCost(burnSeconds)
                         && state.transfer.start.rocket().getDynamicSegments().get(entry.getKey()).rf() > 0;
             });
             if (depleted) {

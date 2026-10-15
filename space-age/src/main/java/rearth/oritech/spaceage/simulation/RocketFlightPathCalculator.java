@@ -3,6 +3,8 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
@@ -17,7 +19,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -669,7 +673,13 @@ public final class RocketFlightPathCalculator {
      */
     public record CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments,
                             List<PathSample> samples, List<ActionMoment> actionMoments,
-                            double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
+                            double durationSeconds, double remainingDeltaV, TerminalState terminalState, Optional<NavigationFailure> failure) {
+
+        public CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments, List<PathSample> samples,
+                         List<ActionMoment> actionMoments, double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
+
+            this(branchId, segments, samples, actionMoments, durationSeconds, remainingDeltaV, terminalState, Optional.empty());
+        }
 
         public static final Codec<CraftPath> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("branchId").forGetter(CraftPath::branchId),
@@ -678,9 +688,33 @@ public final class RocketFlightPathCalculator {
                 ActionMoment.CODEC.listOf().fieldOf("actionMoments").forGetter(CraftPath::actionMoments),
                 Codec.DOUBLE.fieldOf("durationSeconds").forGetter(CraftPath::durationSeconds),
                 Codec.DOUBLE.fieldOf("remainingDeltaV").forGetter(CraftPath::remainingDeltaV),
-                Codec.STRING.xmap(TerminalState::valueOf, TerminalState::name).fieldOf("terminalState").forGetter(CraftPath::terminalState)
+                Codec.STRING.xmap(TerminalState::valueOf, TerminalState::name).fieldOf("terminalState").forGetter(CraftPath::terminalState),
+                NavigationFailure.CODEC.optionalFieldOf("failure").forGetter(CraftPath::failure)
         ).apply(i, CraftPath::new));
 
+    }
+
+    /** Numeric cause of an infeasible transfer, shared by cards, validation and network forecasts. */
+    public record NavigationFailure(String reason, double actual, double limit) {
+
+        public static final Codec<NavigationFailure> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.STRING.fieldOf("reason").forGetter(NavigationFailure::reason),
+                Codec.DOUBLE.fieldOf("actual").forGetter(NavigationFailure::actual),
+                Codec.DOUBLE.fieldOf("limit").forGetter(NavigationFailure::limit)
+        ).apply(i, NavigationFailure::new));
+
+        public MutableComponent description() {
+
+            var days = SpaceBalance.DAY / 20d;
+            return reason.equals("time_limit") ? Component.translatable("screen.oritech_space_age.transfer.time_limit",
+                    number(actual / days), number(limit / days), number((actual - limit) / days))
+                    : Component.translatable("screen.oritech_space_age.transfer." + reason, number(actual), number(limit));
+        }
+
+        private static String number(double value) {
+
+            return String.format(Locale.ROOT, "%.2f", value);
+        }
     }
 
     /**

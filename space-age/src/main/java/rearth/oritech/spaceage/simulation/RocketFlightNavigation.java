@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.simulation;
 
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.ArrivalPrediction;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationAbortMoment;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathSample;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState;
@@ -22,8 +23,6 @@ final class RocketFlightNavigation {
 
     // Limits keep one invalid card from locking up the planner.
     private static final int MAX_STEPS = 10_000;
-    // The preview does not need to simulate routes lasting more than a thousand Minecraft days.
-    private static final double MAX_SECONDS = 1_200_000;
     // Arrival tolerances absorb normal floating-point integration leftovers.
     private static final double POSITION_TOLERANCE = 0.01;
     private static final double VELOCITY_TOLERANCE = 0.00001;
@@ -58,6 +57,14 @@ final class RocketFlightNavigation {
         }
         var angle = targetPointAngle(action, craft, target);
         return navigateLeg(action, craft, context, angle);
+    }
+
+    private static boolean exceedsTimeLimit(RocketTransferRoute.Route route, Craft craft) {
+
+        if (route == null || route.duration() <= SpaceBalance.MAX_TRANSFER_SECONDS) return false;
+        craft.navigationFailure = new NavigationFailure("time_limit", route.duration(), SpaceBalance.MAX_TRANSFER_SECONDS);
+        craft.blockedState = TerminalState.INTEGRATION_TIME_LIMIT;
+        return true;
     }
 
     private static boolean navigateLeg(SpaceSimulation.FlightPlanAction action, Craft craft,
@@ -103,7 +110,7 @@ final class RocketFlightNavigation {
         var speed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
 
         var step = 0;
-        for (; step < MAX_STEPS && craft.time - startTime < MAX_SECONDS; step++) {
+        for (; step < MAX_STEPS && craft.time - startTime < SpaceBalance.MAX_TRANSFER_SECONDS; step++) {
             destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target),
                     action.orbit(), destinationAngle);
             if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, transferPlan == null ? null : transferPlan.transfer)) {
@@ -115,15 +122,7 @@ final class RocketFlightNavigation {
             var acceleration = craft.deltaVPerSecond(active);
             if (transferPlan == null) {
                 var transfer = RocketTransferRoute.solve(craft, context, action, target, destination.x, destination.y);
-                // Reserve estimated radio overhead while solving, then spend only elapsed time below.
-                if (craft.segments.values().stream().anyMatch(s -> s.hardware.antennas() > 0 && s.hardware.ion() > 0)) {
-                    for (int estimate = 0; estimate < 3 && transfer != null; estimate++) {
-                        var budget = craft.copyFor(Set.copyOf(craft.segments.keySet()));
-                        var ticks = transfer.duration() * 20;
-                        budget.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, ticks)));
-                        transfer = RocketTransferRoute.solve(budget, context, action, target, destination.x, destination.y);
-                    }
-                }
+                if (exceedsTimeLimit(transfer, craft)) return false;
                 if (transfer == null) {
                     craft.blockedState = acceleration <= 0.0001
                             ? TerminalState.NO_ACTIVE_ENGINES
@@ -168,16 +167,17 @@ final class RocketFlightNavigation {
                     return false;
                 }
                 // Stop exactly at fuel boundaries so stage markers do not drift.
+                var factor = command.directionX < 0 ? Math.max(1e-9, command.fuelFactor) : 1;
                 var nextEngineStop = active.stream().map(craft.segments::get)
-                        .mapToDouble(segment -> segment.seconds()).min().orElse(0);
-                stepSeconds = Math.min(stepSeconds, nextEngineStop / (command.directionX < 0 ? Math.max(1e-9, command.fuelFactor) : 1));
+                        .mapToDouble(segment -> segment.burnSeconds(factor)).min().orElse(0);
+                stepSeconds = Math.min(stepSeconds, nextEngineStop);
             } else if (Math.hypot(craft.velocityX, craft.velocityY) <= 0.0001
                     && !Double.isFinite(command.stepLimitSeconds)) {
                 craft.blockedState = TerminalState.NO_FEASIBLE_TRANSFER;
                 appendSamples(craft, samples);
                 return false;
             }
-            stepSeconds = Math.min(stepSeconds, MAX_SECONDS - (craft.time - startTime));
+            stepSeconds = Math.min(stepSeconds, SpaceBalance.MAX_TRANSFER_SECONDS - (craft.time - startTime));
             if (stepSeconds <= BURN_TOLERANCE) break;
 
             var phase = !command.burning ? PathPhase.COAST
@@ -188,8 +188,7 @@ final class RocketFlightNavigation {
             speed = Math.max(0, speed + signedAcceleration * stepSeconds);
             craft.time += stepSeconds;
             if (command.burning) craft.consumeBurnTime(active, stepSeconds * (command.directionX < 0 ? command.fuelFactor : 1));
-            var elapsedTicks = stepSeconds * 20;
-            craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, elapsedTicks)));
+            craft.spendRadio(stepSeconds);
             var curve = transferPlan.transfer.curve();
             var position = curve.atDistance(travelled, speed);
             craft.x = position.x() + target.velocityX() * (craft.time - startTime);

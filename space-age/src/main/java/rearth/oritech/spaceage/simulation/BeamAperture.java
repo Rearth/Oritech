@@ -25,7 +25,6 @@ public final class BeamAperture {
 
     public static final TagKey<Block> FRAMES = TagKey.create(Registries.BLOCK, OritechSpaceAge.id("beam_aperture_frames"));
     public static final double RF_PER_GLASS = 10_000;
-    public static final double TRANSMISSION_EFFICIENCY = .9;
     private static final double METRES_PER_FOCUS = 100_000;
     private static final double ATMOSPHERIC_SPREAD = 10;
 
@@ -63,7 +62,6 @@ public final class BeamAperture {
         for (int x = -width; x <= width; x++) {
             for (int y = -height; y <= height; y++) {
                 var pos = centre.relative(horizontal, x).relative(vertical, y);
-                if (x == 0 && y == 0) continue;
                 cells.add(pos);
                 if (x == 0 || y == 0) continue;
                 var value = opticalQuality.applyAsDouble(blocks.apply(pos));
@@ -71,7 +69,7 @@ public final class BeamAperture {
                 quality += value;
             }
         }
-        return new Array(width * 2 + 1, height * 2 + 1, quality, width * height * 4, Set.copyOf(cells), null);
+        return new Array(width * 2 + 1, height * 2 + 1, quality, (width * 2 + 1) * (height * 2 + 1), Set.copyOf(cells), null);
     }
 
     private static int arm(BlockPos centre, Direction direction, Function<BlockPos, BlockState> blocks, Predicate<BlockState> frame) {
@@ -109,13 +107,39 @@ public final class BeamAperture {
     public static double idealEfficiency(double distance, double senderWidth, boolean surface) {
 
         var arm = SpaceAgeConfig.apertureArmLimit();
-        return TRANSMISSION_EFFICIENCY * collectionFraction(4d * arm * arm, footprint(distance, senderWidth, surface));
+        return collectionFraction(Math.pow(arm * 2 + 1, 2), footprint(distance, senderWidth, surface));
     }
 
     /** Both craft and surface receivers collect their share of a uniform circular beam. */
-    public static double collectionFraction(double glassArea, double radius) {
+    public static double collectionFraction(double collectingArea, double radius) {
 
-        return Math.min(1, Math.max(0, glassArea) / (Math.PI * radius * radius));
+        var fraction = Math.max(0, collectingArea) / (Math.PI * radius * radius);
+        // Exact coverage must not lose a whole RF to floating-point error at surface insertion.
+        return fraction >= 1 - 1e-9 ? 1 : fraction;
+    }
+
+    /** Area of one block's square face inside the circular beam, including partial edge cells. */
+    public static double cellArea(double x, double z, double radius) {
+
+        if (Math.hypot(Math.abs(x) + .5, Math.abs(z) + .5) <= radius) return 1;
+        if (Math.hypot(Math.max(0, Math.abs(x) - .5), Math.max(0, Math.abs(z) - .5)) >= radius) return 0;
+        return Math.clamp(quadrantArea(x + .5, z + .5, radius) - quadrantArea(x - .5, z + .5, radius)
+                - quadrantArea(x + .5, z - .5, radius) + quadrantArea(x - .5, z - .5, radius), 0, 1);
+    }
+
+    /** Signed area from the circle centre to (x,z), used for rectangle inclusion/exclusion. */
+    private static double quadrantArea(double x, double z, double radius) {
+
+        var width = Math.min(radius, Math.abs(x));
+        var height = Math.min(radius, Math.abs(z));
+        var straight = Math.min(width, Math.sqrt(Math.max(0, radius * radius - height * height)));
+        var area = straight * height + circleIntegral(width, radius) - circleIntegral(straight, radius);
+        return Math.signum(x) * Math.signum(z) * area;
+    }
+
+    private static double circleIntegral(double x, double radius) {
+
+        return .5 * (x * Math.sqrt(Math.max(0, radius * radius - x * x)) + radius * radius * Math.asin(x / radius));
     }
 
     public static double footprint(double distance, double width, boolean surface) {

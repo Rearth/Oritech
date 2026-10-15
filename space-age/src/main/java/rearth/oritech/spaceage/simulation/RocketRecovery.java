@@ -7,6 +7,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.function.IntBinaryOperator;
 
@@ -46,9 +47,31 @@ public final class RocketRecovery {
 
     public static BlockPos landingPosition(ServerLevel level, ActiveRocketData rocket, int x, int z) {
 
-        return new BlockPos(x, landingOriginY(rocket, x, z,
-                (worldX, worldZ) -> level.getHeight(Heightmap.Types.MOTION_BLOCKING,
-                        worldX, worldZ)), z);
+        return landingPosition(rocket, x, z, (worldX, worldZ) -> level.getHeight(Heightmap.Types.MOTION_BLOCKING, worldX, worldZ));
+    }
+
+    static BlockPos landingPosition(ActiveRocketData rocket, int x, int z, IntBinaryOperator surfaceHeight) {
+
+        var centre = footprintCenter(rocket);
+        var originX = x - centre.getX();
+        var originZ = z - centre.getZ();
+        return new BlockPos(originX, landingOriginY(rocket, originX, originZ, surfaceHeight), originZ);
+    }
+
+    public static BlockPos footprintCenter(ActiveRocketData rocket) {
+
+        return center(restorationBlocks(rocket).stream().map(StaticRocketSegment.BlockData::relativePos).toList());
+    }
+
+    /** Nearest block-grid centre; differing even/odd footprints can only align to half a block. */
+    public static BlockPos center(Collection<BlockPos> positions) {
+
+        if (positions.isEmpty()) return BlockPos.ZERO;
+        var x = positions.stream().mapToInt(BlockPos::getX).summaryStatistics();
+        var y = positions.stream().mapToInt(BlockPos::getY).summaryStatistics();
+        var z = positions.stream().mapToInt(BlockPos::getZ).summaryStatistics();
+        return new BlockPos(Math.floorDiv(x.getMin() + x.getMax(), 2), Math.floorDiv(y.getMin() + y.getMax(), 2),
+                Math.floorDiv(z.getMin() + z.getMax(), 2));
     }
 
     static int landingOriginY(ActiveRocketData rocket, int x, int z, IntBinaryOperator surfaceHeight) {

@@ -26,6 +26,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,6 +71,165 @@ class TrajectoryRoutingTest {
 
         return new FlightPlanAction(new UUID(0, id), ActionType.NAVIGATE_TO, List.of(), target, OrbitBand.SURFACE,
                 ArrivalVelocityMode.ZERO, 0, 0, 0, 0, 0, 0, List.of());
+    }
+
+    @Test
+    void timeLimitRetainsTheActualEstimatedDurationInsteadOfGenericInfeasibility() {
+
+        var target = new SpaceObjectData(new UUID(80, 1), SpaceObjects.ObjectType.ASTEROID,
+                3_000_000, 0, 100, 0, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(0, 0);
+        var context = context(earth(0), target);
+        var action = action(target.id(), 800).withMaxSpeed(1);
+        assertFalse(RocketFlightNavigation.navigate(action, craft, context));
+        assertEquals(TerminalState.INTEGRATION_TIME_LIMIT, craft.blockedState);
+        assertNotNull(craft.navigationFailure);
+        assertEquals("time_limit", craft.navigationFailure.reason());
+        assertEquals(SpaceBalance.MAX_TRANSFER_SECONDS, craft.navigationFailure.limit());
+        assertTrue(craft.navigationFailure.actual() > 2_900_000, "The slow leg has a concrete estimated duration");
+        var path = craft.toPath(craft.blockedState, context);
+        var saved = RocketFlightPathCalculator.CraftPath.CODEC.encodeStart(JsonOps.INSTANCE, path).getOrThrow();
+        var restored = RocketFlightPathCalculator.CraftPath.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow();
+        assertEquals(path.failure(), restored.failure());
+        var flight = new FlightPath(List.of(restored), List.of(), 0);
+        assertEquals(path.failure(), MissionForecast.Navigation.forClient(flight).paths().getFirst().failure());
+    }
+
+    @Test
+    void collectorRingAcceptsThe11590DeltaVLowThrustCraft() {
+
+        var sun = new SpaceObjectData(SpaceSimulation.SUN_ID, SpaceObjects.ObjectType.SUN,
+                0, 0, 250_000, 274, SpaceObjects.DetectionState.PRECISE);
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(-3_120_000, 0);
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                1000, 1000, 0, 11590, 0, new RocketHardware(1, 0, 0, 0)));
+        var context = context(earth, sun);
+        assertEquals(11590, craft.availableDeltaV(context), 1e-6);
+        var action = action(sun.id(), 801).withOrbit(OrbitBand.SOLAR);
+        var route = RocketTransferRoute.solve(craft, context, action, sun, -500_000, 0);
+        assertNotNull(route);
+        assertNull(craft.navigationFailure);
+        assertTrue(route.duration() < SpaceBalance.MAX_TRANSFER_SECONDS);
+        assertTrue(route.gravity() < 0, "Earth departure gravity still applies, without a Sun braking penalty");
+    }
+
+    @Test
+    void sunGravityIsZeroAtAndOutsideTheCollectorRingButStillAppliesInside() {
+
+        var sun = new SpaceObjectData(SpaceSimulation.SUN_ID, SpaceObjects.ObjectType.SUN,
+                0, 0, 250_000, 274, SpaceObjects.DetectionState.PRECISE);
+        var context = context(sun);
+        var outside = FlightCurve.between(-1_000_000, 0, -500_000, 0, 1, 0, 1, 0, 100_000);
+        assertEquals(0, RocketTransferRoute.gravityForLeg(context, outside, 0), 1e-12);
+        assertEquals(0, RocketTransferRoute.gravityAlong(context, outside, 0, 0), 1e-12);
+        assertEquals(0, RocketTransferRoute.gravityAlong(context, outside, outside.length(), 0), 1e-12);
+        var inside = FlightCurve.between(-500_000, 0, -300_000, 0, 1, 0, 1, 0, 60_000);
+        assertTrue(RocketTransferRoute.gravityForLeg(context, inside, 0) > 0);
+        assertTrue(RocketTransferRoute.gravityAlong(context, inside, inside.length(), 0) > 0);
+        var bodyEarth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        assertTrue(RocketTransferRoute.gravityForLeg(context(bodyEarth), outside, 0) > 0,
+                "The Sun-only cutoff must not remove other bodies' gravity");
+        var craft = craft(-1_000_000, 0);
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
+                1_000_000, 1000, 0, 100_000, 0, new RocketHardware(1, 0, 0, 0)));
+        var arrival = action(sun.id(), 802).withOrbit(OrbitBand.SOLAR);
+        var route = RocketTransferRoute.solve(craft, context, arrival, sun, -500_000, 0);
+        assertNotNull(route, "Even a 0.001 m/s² craft can stop at the collector ring with enough propulsion/time");
+        assertEquals(0, route.gravity(), 1e-12);
+        assertNull(craft.navigationFailure);
+        craft.x = -500_000;
+        var departure = RocketTransferRoute.solve(craft, context, arrival, sun, -1_000_000, 0);
+        assertNotNull(departure, "Departures and rendezvous routes also use the same zero-Sun-gravity region");
+        assertEquals(0, departure.gravity(), 1e-12);
+        assertNull(RocketTransferRoute.solve(craft, context, arrival.withOrbit(OrbitBand.SURFACE), sun, -250_000, 0),
+                "The collector ring exemption does not make a low-thrust Sun-surface landing safe");
+        assertEquals("braking_thrust", craft.navigationFailure.reason());
+    }
+
+    @Test
+    void marsHighOrbitRoutesCompleteAfterFastEarthDepartures() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var mars = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
+                5_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
+        var failures = new ArrayList<String>();
+        for (var acceleration : new double[]{.1, 1, 10, 100}) {
+            for (var initialSpeed : new double[]{0, 100, 500, 1000, 2500}) {
+                for (var startTime : new double[]{0, 100, 100_000}) {
+                    for (var poweredRadio : new boolean[]{false, true}) {
+                        var craft = craft(-3_120_000, 0);
+                        craft.time = startTime;
+                        craft.velocityX = initialSpeed;
+                        var hardware = poweredRadio ? new RocketHardware(0, 1, 0, 1) : new RocketHardware(1, 0, 0, 0);
+                        var segment = new RocketFlightPathState.Segment(1000,
+                                poweredRadio ? 0 : 1000 * acceleration, poweredRadio ? 1000 * acceleration : 0,
+                                poweredRadio ? 0 : 11590 / acceleration, poweredRadio ? 11590 / acceleration : 0, hardware);
+                        if (poweredRadio) {
+                            // Keep propulsion and a long coast's radio bill funded independently of ion balance.
+                            segment.rf = hardware.rfCost(segment.ionSeconds) + 2_000_000;
+                            segment.ionSeconds = segment.rf / hardware.rfCost(1);
+                        }
+                        craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
+                        var action = action(mars.id(), 803).withOrbit(OrbitBand.HIGH);
+                        var success = RocketFlightNavigation.navigate(action, craft, context(earth, mars));
+                        if (!success) failures.add("a=" + acceleration + " initial=" + initialSpeed + " start=" + startTime
+                                + " radio=" + poweredRadio + " status=" + craft.blockedState + " velocity=" + Math.hypot(craft.velocityX, craft.velocityY)
+                                + " time=" + craft.time + " deltaV=" + craft.availableDeltaV(context(earth, mars)));
+                    }
+                }
+            }
+        }
+        assertTrue(failures.isEmpty(), String.join("\n", failures));
+    }
+
+    @Test
+    void mixedPropulsionWithRadioArrivesWithItsRemainingChemicalBudget() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
+        var mars = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
+                5_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
+        for (var ionSeconds : new double[]{25, 1000, 10_000}) {
+            for (var speedCap : new int[]{0, 500, 2000}) {
+                for (var antennas : new int[]{1, 4}) {
+                    var craft = craft(-3_120_000, 0);
+                    craft.velocityX = 500;
+                    var hardware = new RocketHardware(1, 1, 0, antennas);
+                    var segment = new RocketFlightPathState.Segment(1000, 1000, 1000, 10_000, ionSeconds, hardware);
+                    segment.rf = hardware.rfCost(segment.ionSeconds);
+                    craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
+                    var success = RocketFlightNavigation.navigate(action(mars.id(), 804).withOrbit(OrbitBand.HIGH)
+                            .withMaxSpeed(speedCap), craft, context(earth, mars));
+                    assertTrue(success, "ion=" + ionSeconds + " cap=" + speedCap + " antennas=" + antennas
+                            + " status=" + craft.blockedState + " speed=" + Math.hypot(craft.velocityX, craft.velocityY));
+                    assertEquals(0, Math.hypot(craft.velocityX, craft.velocityY), 1e-6);
+                    assertTrue(segment.chemicalSeconds > 0, "The spare chemical budget remains available after arrival");
+                    assertEquals(mars.id(), craft.currentTarget);
+                }
+            }
+        }
+    }
+
+    @Test
+    void insufficientRfForPropulsionAndRadioRejectsBeforeDrawingAFlight() {
+
+        var target = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
+                8_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
+        var craft = craft(0, 0);
+        var hardware = new RocketHardware(0, 1, 0, 1);
+        var segment = new RocketFlightPathState.Segment(1000, 0, 1_000_000, 0, 11.59, hardware);
+        segment.rf = hardware.rfCost(segment.ionSeconds);
+        craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
+        assertFalse(RocketFlightNavigation.navigate(action(target.id(), 805).withOrbit(OrbitBand.HIGH), craft, context(target)));
+        assertEquals(0, craft.time);
+        assertEquals(hardware.rfCost(11.59), segment.rf, 1e-6);
+        assertNotNull(craft.navigationFailure);
+        assertEquals("radio_budget", craft.navigationFailure.reason());
+        assertEquals(1, craft.samples.size(), "An impossible power schedule must not draw a completed transfer");
     }
 
     @Test

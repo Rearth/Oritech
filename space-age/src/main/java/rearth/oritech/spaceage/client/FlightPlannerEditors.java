@@ -583,6 +583,13 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         rebuildComponents();
     }
 
+    protected void useLaunchPadCoordinates() {
+
+        var centre = flightPlanRocket().getLaunchPadCenter();
+        landingXField.setValue(Integer.toString(centre.getX()));
+        landingZField.setValue(Integer.toString(centre.getZ()));
+    }
+
     protected void applyDestination() {
 
         var action = findAction(destinationAction);

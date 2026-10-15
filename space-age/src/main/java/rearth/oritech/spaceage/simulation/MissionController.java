@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
@@ -73,7 +74,7 @@ public final class MissionController {
                 SpaceSimulationSavedData.get(server).getOrCreate(owner).tickAsteroids(server.overworld()));
         RocketDocking.synchronize(data);
         if (physicalTick) SurfaceBeamData.get(server.overworld()).tick(server.overworld());
-        SpacePowerService.generate(data);
+        data.power.update(server, data, tick);
         RocketProcessingService.tickJobs(data, owner -> SpaceSimulationSavedData.get(server).getOrCreate(owner).truth());
         var nodes = SpaceCommunications.update(server, data);
         for (var state : List.copyOf(data.craft.values())) {
@@ -83,7 +84,7 @@ public final class MissionController {
             if (!state.ended && !state.position.asteroid().equals(FlightPlanAction.NO_TARGET))
                 system.moveAttached(state.position.asteroid(), state.position.x(), state.position.y());
         }
-        SpacePowerService.beams(server, data, physicalTick);
+
         // An idle host still pays for its visitors. Maintain Position and local Process pay in their runners.
         data.dockingLinks.stream().map(DockingLink::host).distinct().map(data.craft::get).filter(Objects::nonNull)
                 .filter(host -> host.action() == null || host.action().type() != ActionType.MAINTAIN_POSITION && host.action().type() != ActionType.PROCESS && host.action().type() != ActionType.BEAM_POWER)
@@ -93,7 +94,11 @@ public final class MissionController {
                         host.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
                 });
         RocketDocking.synchronize(data);
-        SpacePowerService.finishAccounting(data);
+        data.power.update(server, data, tick);
+        if (physicalTick) {
+            data.power.surface(server);
+            GroundBeamNetworking.sync(server, data.power);
+        }
         shareFleetKnowledge(data, nodes);
         SpaceSimulationSavedData.get(server).setDirty();
         if (!data.craft.isEmpty()) data.setDirty();
@@ -181,7 +186,7 @@ public final class MissionController {
             case NAVIGATE_TO -> MissionNavigation.tick(server, data, state, system, action, tick);
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
             case DECOUPLE -> decouple(data, state, system, action, tick);
-            case BEAM_POWER -> { }
+            case BEAM_POWER -> SpacePowerService.step(data, state);
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
             case DISCARD_CRAFT -> {
                 state.ended = true;
@@ -208,7 +213,7 @@ public final class MissionController {
             var hardware = RocketHardware.of(entry.getValue());
             if (hardware.scanners() == 0) continue;
             scannerInstalled = true;
-            available += state.rocket.getDynamicSegments().get(entry.getKey()).availableRF;
+            available += (long) state.rocket.getDynamicSegments().get(entry.getKey()).rf();
         }
         if (!scannerInstalled || available < SpaceBalance.SCAN_RF) {
             state.status = MissionState.STATUS_SCAN_WAITING;
@@ -218,8 +223,8 @@ public final class MissionController {
         for (var entry : state.rocket.getStaticSegments().entrySet()) {
             if (RocketHardware.of(entry.getValue()).scanners() == 0) continue;
             var resources = state.rocket.getDynamicSegments().get(entry.getKey());
-            var spent = Math.min(remaining, resources.availableRF);
-            resources.availableRF -= spent;
+            var spent = Math.min(remaining, (long) resources.rf());
+            resources.spendRF(spent);
             remaining -= spent;
             if (remaining == 0) break;
         }
@@ -387,6 +392,7 @@ public final class MissionController {
             state.position = new MissionState.Position(position.x(), position.y(), position.vx(), position.vy(), position.target(), position.orbit(),
                     position.slot(), position.stage(), FlightPlanAction.NO_TARGET, attachment.anchor(), position.headingX(), position.headingY());
         var rocket = new ActiveRocketData(child.id(), childStatic, childDynamic, null);
+        rocket.copyLaunchFrom(state.rocket);
         childDynamic.values().forEach(r -> r.crafters.values().forEach(c -> c.reassignOperator(state.rocket.getRocketId(), rocket.getRocketId())));
         var childRefs = childStatic.values().stream().map(SegmentRef::of).toList();
         var childSettings = state.plan.segmentConfigurations().stream().filter(c -> childRefs.contains(c.segment())).toList();
@@ -409,7 +415,9 @@ public final class MissionController {
                 }
         } while (found);
         state.plan = state.plan.withBranches(state.plan.branches().stream().filter(b -> !childBranchIds.contains(b.id())).toList());
-        state.rocket = new ActiveRocketData(state.rocket.getRocketId(), parentStatic, parentDynamic, state.rocket.getFlight());
+        var parent = new ActiveRocketData(state.rocket.getRocketId(), parentStatic, parentDynamic, state.rocket.getFlight());
+        parent.copyLaunchFrom(state.rocket);
+        state.rocket = parent;
         var parentRefs = parentStatic.values().stream().map(SegmentRef::of).toList();
         state.plan = state.plan.withSegmentConfigurations(state.plan.segmentConfigurations().stream().filter(c -> parentRefs.contains(c.segment())).toList());
     }
@@ -463,7 +471,7 @@ public final class MissionController {
         var unchangedCurrent = current != null && !validated.root().actions().isEmpty()
                 && current.equals(validated.root().actions().getFirst());
         state.plan = validated;
-        if (!unchangedCurrent) state.resetAction();
+        if (!unchangedCurrent || state.navigationBlocked()) state.resetAction();
         state.status = MissionState.STATUS_UPDATE_ACCEPTED;
         return true;
     }

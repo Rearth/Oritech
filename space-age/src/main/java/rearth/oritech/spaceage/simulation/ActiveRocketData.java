@@ -31,10 +31,12 @@ public class ActiveRocketData {
             STATIC_SEGMENTS_CODEC.fieldOf("static_segments").forGetter(ActiveRocketData::getOriginalSegments),
             DYNAMIC_SEGMENTS_CODEC.fieldOf("dynamic_segments").forGetter(ActiveRocketData::getDynamicSegments),
             BlockPos.CODEC.optionalFieldOf("launch_position", BlockPos.ZERO).forGetter(ActiveRocketData::getLaunchPosition),
-            RocketFlight.CODEC.optionalFieldOf("flight").forGetter(rocket -> Optional.ofNullable(rocket.flight))
-    ).apply(instance, (rocketId, staticSegments, dynamicSegments, launch, flight) -> {
+            RocketFlight.CODEC.optionalFieldOf("flight").forGetter(rocket -> Optional.ofNullable(rocket.flight)),
+            BlockPos.CODEC.optionalFieldOf("launch_pad_center").forGetter(rocket -> Optional.ofNullable(rocket.launchPadCenter))
+    ).apply(instance, (rocketId, staticSegments, dynamicSegments, launch, flight, pad) -> {
         var rocket = new ActiveRocketData(rocketId, staticSegments, dynamicSegments, flight.orElse(null));
         rocket.setLaunchPosition(launch);
+        pad.ifPresent(rocket::setLaunchPadCenter);
         return rocket;
     }));
 
@@ -94,6 +96,7 @@ public class ActiveRocketData {
     }
 
     private BlockPos launchPosition = BlockPos.ZERO;
+    private BlockPos launchPadCenter;
 
     public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {
 
@@ -121,6 +124,22 @@ public class ActiveRocketData {
     public void setLaunchPosition(BlockPos position) {
 
         launchPosition = position.immutable();
+    }
+
+    public BlockPos getLaunchPadCenter() {
+
+        return launchPadCenter == null ? launchPosition.offset(RocketRecovery.footprintCenter(this)) : launchPadCenter;
+    }
+
+    public void setLaunchPadCenter(BlockPos position) {
+
+        launchPadCenter = position.immutable();
+    }
+
+    public void copyLaunchFrom(ActiveRocketData original) {
+
+        setLaunchPosition(original.getLaunchPosition());
+        setLaunchPadCenter(original.getLaunchPadCenter());
     }
 
     public UUID getRocketId() {

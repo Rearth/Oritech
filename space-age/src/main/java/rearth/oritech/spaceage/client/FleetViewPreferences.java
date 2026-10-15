@@ -15,6 +15,7 @@ import java.util.UUID;
  */
 final class FleetViewPreferences {
 
+    static final FleetCategories CATEGORIES = new FleetCategories(FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-fleet-categories.json"));
     private static final Path FILE = FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-collapsed-craft.txt");
     private static final Set<UUID> COLLAPSED = load();
 

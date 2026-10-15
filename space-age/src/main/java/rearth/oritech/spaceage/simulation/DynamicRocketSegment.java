@@ -29,7 +29,7 @@ public class DynamicRocketSegment {
                     map -> map.entrySet().stream().map(e -> new StaticRocketSegment.BlockData(e.getKey(), e.getValue())).toList());
     public static final Codec<DynamicRocketSegment> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.LONG.fieldOf("fuel_burn_ticks").forGetter(segment -> segment.availableFuelBurnTimeTicks),
-            Codec.LONG.fieldOf("available_rf").forGetter(segment -> segment.availableRF),
+            Codec.LONG.fieldOf("available_rf").forGetter(segment -> (long) segment.rf()),
             Codec.DOUBLE.fieldOf("fuel_weight").forGetter(segment -> segment.currentFuelWeight),
             CONNECTIONS_CODEC.fieldOf("connected_segments").forGetter(DynamicRocketSegment::getConnectedSegments),
             CRAFTING_CODEC.fieldOf("crafters").forGetter(segment -> segment.crafters),
@@ -40,7 +40,7 @@ public class DynamicRocketSegment {
             CraftPass.CODEC.optionalFieldOf("craft_pass").forGetter(segment -> Optional.ofNullable(segment.pass)),
             RocketCargoTransfer.Result.CODEC.optionalFieldOf("exchange_report").forGetter(segment -> Optional.ofNullable(segment.lastExchange)),
             Codec.DOUBLE.optionalFieldOf("fuel_fraction", 0.0).forGetter(segment -> segment.fuelFraction),
-            Codec.DOUBLE.optionalFieldOf("rf_fraction", 0.0).forGetter(segment -> segment.rfFraction)
+            Codec.DOUBLE.optionalFieldOf("rf_fraction", 0.0).forGetter(segment -> segment.rf() - (long) segment.rf())
     ).apply(instance, DynamicRocketSegment::new));
     // Only changed cells are stored here; unchanged cells come from the launch structure.
     public final Map<BlockPos, BlockState> layout = new HashMap<>();
@@ -59,6 +59,7 @@ public class DynamicRocketSegment {
     public double currentFuelWeight;
     private double fuelFraction;
     private double rfFraction;
+    SpacePowerService.Account powerAccount;
 
     public DynamicRocketSegment(long fuel, long rf, double mass, Set<UUID> connections, Map<BlockPos, RocketControllerState> crafters,
                                 long fuelCapacity, long rfCapacity, Map<BlockPos, BlockState> layout,
@@ -101,8 +102,8 @@ public class DynamicRocketSegment {
     public DynamicRocketSegment copy() {
 
         // Forecasts and detached craft must not share mutable passes, controllers or cell maps.
-        return new DynamicRocketSegment(availableFuelBurnTimeTicks, availableRF, currentFuelWeight, connectedSegments, crafters,
-                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange), fuelFraction, rfFraction);
+        return new DynamicRocketSegment(availableFuelBurnTimeTicks, (long) rf(), currentFuelWeight, connectedSegments, crafters,
+                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange), fuelFraction, rf() - (long) rf());
     }
 
     /**
@@ -119,13 +120,14 @@ public class DynamicRocketSegment {
 
     public void spendRF(double amount) {
 
-        var remaining = Math.max(0, rf() - amount);
-        availableRF = (long) remaining;
-        rfFraction = remaining - availableRF;
+        if (amount <= 0) return;
+        if (powerAccount != null) powerAccount.changed();
+        materializeRF(Math.max(0, rf() - amount));
     }
 
     public double receiveRF(double amount) {
 
+        if (amount <= 0) return 0;
         var accepted = Math.min(Math.max(0, amount), Math.max(0, rfCapacity - rf()));
         setResources(fuel(), rf() + accepted);
         return accepted;
@@ -138,13 +140,24 @@ public class DynamicRocketSegment {
 
     public double rf() {
 
-        return availableRF + rfFraction;
+        return powerAccount == null ? availableRF + rfFraction : powerAccount.rf(this);
     }
 
     void setResources(double fuel, double rf) {
 
+        if (powerAccount != null) powerAccount.changed();
         availableFuelBurnTimeTicks = (long) fuel;
         fuelFraction = fuel - availableFuelBurnTimeTicks;
+        materializeRF(rf);
+    }
+
+    double rfFraction() {
+
+        return rfFraction;
+    }
+
+    void materializeRF(double rf) {
+
         availableRF = (long) rf;
         rfFraction = rf - availableRF;
     }

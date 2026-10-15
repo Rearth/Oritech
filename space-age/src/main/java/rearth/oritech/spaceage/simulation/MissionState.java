@@ -22,8 +22,8 @@ import java.util.UUID;
  */
 public final class MissionState {
 
-    double powerStartRF;
-    double solarAccepted;
+    UUID powerAction;
+    double powerReadyAt;
     public SpacePowerService.Report powerReport = SpacePowerService.Report.EMPTY;
 
     public static final String STATUS_READY = "status.oritech_space_age.ready";
@@ -99,6 +99,7 @@ public final class MissionState {
         this.completed.addAll(completed);
         this.transfer = transfer.orElse(null);
         this.launch = launch;
+        rocket.setLaunchPosition(launch);
         this.ended = isRecovered(status) || status.equals(STATUS_DESTROYED) || status.equals(STATUS_DISCARDED);
     }
 
@@ -124,7 +125,7 @@ public final class MissionState {
         var dynamic = new HashMap<UUID, DynamicRocketSegment>();
         rocket.getDynamicSegments().forEach((id, r) -> dynamic.put(id, r.copy()));
         var copy = new ActiveRocketData(rocket.getRocketId(), rocket.getOriginalSegments(), dynamic, rocket.getFlight());
-        copy.setLaunchPosition(rocket.getLaunchPosition());
+        copy.copyLaunchFrom(rocket);
         return copy;
     }
 
@@ -167,7 +168,12 @@ public final class MissionState {
 
     public boolean canDismiss() {
 
-        return ended || action() == null;
+        return ended || action() == null || navigationBlocked();
+    }
+
+    public boolean navigationBlocked() {
+
+        return status.equals(STATUS_NO_FEASIBLE_TRANSFER) || status.equals(STATUS_TRANSFER_BLOCKED);
     }
 
     public void complete() {
@@ -192,13 +198,15 @@ public final class MissionState {
         var resources = new HashMap<UUID, DynamicRocketSegment>();
         rocket.getOriginalSegments().forEach((id, segment) -> {
             structures.put(id, new StaticRocketSegment(id, Set.of(), Map.of(), segment.staticWeight(), segment.engineCount(),
-                    segment.initialRF(), segment.initialFuel(), segment.payloadEnergyJoules()));
+                    segment.initialRF(), segment.initialFuel(), segment.payloadEnergyJoules(), segment.planAnchor()));
             var original = rocket.getDynamicSegments().get(id);
             var summary = new DynamicRocketSegment(0, 0, original.currentFuelWeight, Set.of(), Map.of(), original.fuelCapacity, original.rfCapacity);
             summary.setResources(original.fuel(), original.rf());
             resources.put(id, summary);
         });
-        return new Telemetry(new ActiveRocketData(rocket.getRocketId(), structures, resources, null), plan, position, tick, status,
+        var summaryRocket = new ActiveRocketData(rocket.getRocketId(), structures, resources, null);
+        summaryRocket.copyLaunchFrom(rocket);
+        return new Telemetry(summaryRocket, plan, position, tick, status,
                 List.copyOf(completed), actionTicks(), actionDurationTicks(), serviceProgress, powerReport, false);
     }
 

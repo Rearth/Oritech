@@ -28,6 +28,7 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
     private BlockPreviewWidget preview;
     private LabelWidget status;
     private LabelWidget output;
+    private LabelWidget coverage;
     private LabelWidget geometry;
     private LabelWidget heat;
     private ProgressBarWidget received;
@@ -70,13 +71,15 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
                 () -> menu.snapshot.quality() > 0 ? (float) (menu.snapshot.received() / (menu.snapshot.quality() * BeamAperture.RF_PER_GLASS)) : 0f,
                 () -> ProgressBarWidget.PRESET_GREEN).withTextColor(LabelWidget.DARK_TEXT);
         addComponent(received);
-        buffer = new ProgressBarWidget(rightX, 77, rightWidth, 22, Component.empty(),
+        coverage = new LabelWidget(rightX, 72, rightWidth, Component.empty()).withDarkColor();
+        addComponent(coverage);
+        buffer = new ProgressBarWidget(rightX, 94, rightWidth, 22, Component.empty(),
                 () -> (float) menu.snapshot.energy() / BeamApertureBlockEntity.CAPACITY,
                 () -> ProgressBarWidget.PRESET_BLUE).withTextColor(LabelWidget.DARK_TEXT);
         addComponent(buffer);
-        output = new LabelWidget(rightX, 115, rightWidth, Component.empty()).withDarkColor();
-        geometry = new LabelWidget(rightX, 135, rightWidth, Component.empty()).withDarkColor();
-        heat = new LabelWidget(rightX, 155, rightWidth, Component.empty()).withDarkColor();
+        output = new LabelWidget(rightX, 126, rightWidth, Component.empty()).withDarkColor();
+        geometry = new LabelWidget(rightX, 146, rightWidth, Component.empty()).withDarkColor();
+        heat = new LabelWidget(rightX, 166, rightWidth, Component.empty()).withDarkColor();
         addComponent(output);
         addComponent(geometry);
         addComponent(heat);
@@ -107,7 +110,11 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
         status.withColor(issue.equals("receiving") || issue.equals("ready") ? 0xFF398332 : 0xFFAA5724);
         status.setTooltip(data.defect().map(pos -> List.of(text("missing", pos.toShortString()))).orElse(List.of()));
         received.setTitle(text("received", energy(data.received())));
-        received.withTooltip(text("capacity", energy(data.quality() * BeamAperture.RF_PER_GLASS)));
+        received.withTooltip(text("capacity", energy(data.quality() * BeamAperture.RF_PER_GLASS)),
+                text("rejected_capacity", energy(data.reception().capacityLoss())), text("rejected_storage", energy(data.reception().storageLoss())));
+        coverage.setText(data.reception().incident() > 0 ? text("coverage", decimal(data.reception().coverage() * 100)) : text("coverage_idle"));
+        coverage.withTooltip(text("incident", energy(data.reception().incident())), text("collected", energy(data.reception().collected())),
+                text("missed", energy(data.reception().missed())), text("beam_radius", decimal(data.reception().radius())), text("collection_note"));
         buffer.setTitle(text("buffer", energy(data.energy())));
         buffer.withTooltip(text("stored", energy(data.energy()), energy(BeamApertureBlockEntity.CAPACITY)));
         output.setText(text("output", energy(data.exported())));

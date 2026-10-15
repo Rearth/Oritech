@@ -102,6 +102,7 @@ public final class PhysicalCrafting {
         resources.reserved.put(pair.right(), second);
         RocketLayout.setPair(source, pair, Blocks.AIR.defaultBlockState(), Blocks.AIR.defaultBlockState());
         var recipe = match.recipe();
+        controller.workFraction = 0;
         controller.job = new RocketControllerState.Job(match.id(), pair, first, second, recipe.resultState(), recipe.ticks(), recipe.rfPerTick(), 0, operator);
         return "";
     }
@@ -124,20 +125,21 @@ public final class PhysicalCrafting {
             reserved.remove(job.source().right());
         }
         machine.job = null;
+        machine.workFraction = 0;
     }
 
     public static boolean spendRF(ActiveRocketData machines, HardwareRef machine, long amount) {
 
-        if (machines.getDynamicSegments().values().stream().mapToLong(r -> r.availableRF).sum() < amount) return false;
+        if (machines.getDynamicSegments().values().stream().mapToLong(r -> (long) r.rf()).sum() < amount) return false;
 
         // Drain the machine's segment first, then the rest in stable order for matching forecasts.
         var local = RocketProcessingService.resources(machines, machine);
-        var taken = Math.min(local.availableRF, amount);
-        local.availableRF -= taken;
+        var taken = Math.min((long) local.rf(), amount);
+        local.spendRF(taken);
         amount -= taken;
         for (var entry : machines.getDynamicSegments().entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
-            taken = Math.min(entry.getValue().availableRF, amount);
-            entry.getValue().availableRF -= taken;
+            taken = Math.min((long) entry.getValue().rf(), amount);
+            entry.getValue().spendRF(taken);
             amount -= taken;
         }
         return true;
@@ -147,7 +149,7 @@ public final class PhysicalCrafting {
 
         var machine = RocketProcessingService.controller(machines, ref);
         var job = machine.job;
-        var available = machines.getDynamicSegments().values().stream().mapToLong(r -> r.availableRF).sum();
+        var available = machines.getDynamicSegments().values().stream().mapToLong(r -> (long) r.rf()).sum();
         var remaining = job.duration() - job.elapsed();
         var affordable = job.rfPerTick() == 0 ? remaining : available / job.rfPerTick();
         var performed = (int) Math.min(Math.min(ticks, remaining), affordable);

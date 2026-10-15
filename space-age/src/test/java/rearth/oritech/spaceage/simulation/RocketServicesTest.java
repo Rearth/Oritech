@@ -259,6 +259,27 @@ class RocketServicesTest {
     }
 
     @Test
+    void eventDrivenJobsFinishAtTheirDeadlineWithoutTickingOrChargingAfterCompletion() {
+
+        var state = mission(1, 0);
+        var machine = RocketProcessingService.modules(state.rocket).getFirst();
+        var pair = RocketLayout.pair(state.rocket, machine);
+        load(state.rocket, pair);
+        assertEquals("", PhysicalCrafting.start(state.rocket, machine, state.rocket, pair, List.of(recipe("event_job")), state.rocket.getRocketId()));
+        var data = fleet(state);
+        data.power.update(null, data, 0);
+        data.power.advance(4.5);
+        var saved = ActiveRocketData.CODEC.encodeStart(JsonOps.INSTANCE, state.rocket).getOrThrow();
+        var restored = ActiveRocketData.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow();
+        assertEquals(4, RocketProcessingService.controller(restored, machine).job.elapsed());
+        data.power.advance(1_000_000);
+        assertNull(RocketProcessingService.controller(state.rocket, machine).job);
+        assertTrue(RocketLayout.state(state.rocket, pair.controller().segment(), pair.left()).is(Blocks.GOLD_BLOCK));
+        assertEquals(999_000, state.rocket.getDynamicSegments().values().iterator().next().rf(), 1e-6);
+        assertTrue(data.power.revisions() <= 3);
+    }
+
+    @Test
     void localPairPrecedesCargoAndPairReservationPreventsDoubleConsumption() {
 
         var state = mission(2, 1);

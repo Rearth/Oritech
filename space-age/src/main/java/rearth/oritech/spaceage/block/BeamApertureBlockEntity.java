@@ -20,6 +20,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.BeamAperture;
+import rearth.oritech.spaceage.simulation.BeamReception;
 import rearth.oritech.spaceage.simulation.SurfaceBeamData;
 
 import java.util.Optional;
@@ -36,6 +37,8 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
     private double receiveRate;
     private double exportRate;
     private int rateTicks;
+    private BeamReception intervalReception = BeamReception.EMPTY;
+    private BeamReception receptionRate = BeamReception.EMPTY;
 
     public BeamApertureBlockEntity(BlockPos pos, BlockState state) {
 
@@ -61,6 +64,8 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
         SurfaceBeamData.get(server).receivers.put(worldPosition, this);
         if (++rateTicks == 20) {
             receiveRate = received / 20d;
+            receptionRate = intervalReception.scaled(1 / 20d);
+            intervalReception = BeamReception.EMPTY;
             exportRate = exported / 20d;
             received = 0;
             exported = 0;
@@ -82,9 +87,15 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
         }
     }
 
+    public void recordBeam(BeamReception reception) {
+
+        intervalReception = intervalReception.plus(reception);
+    }
+
     public double receive(double amount) {
 
-        var accepted = (long) Math.min(amount, energy.capacity - energy.energy);
+        // Analytic event times can put an integral RF pulse just below its integer boundary.
+        var accepted = (long) Math.min(Math.floor(amount + 1e-6), energy.capacity - energy.energy);
         energy.energy += accepted;
         received += accepted;
         if (accepted > 0) setChanged();
@@ -101,7 +112,7 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
                 ? SurfaceBeamData.get(server).temperature(worldPosition) : 0;
         return new BeamApertureMenu.Snapshot(blocks, array.width(), array.height(), array.area(), array.quality(),
                 Optional.ofNullable(array.defect()), energy.energy, receiveRate, exportRate, heat,
-                level.dimension() == Level.OVERWORLD, facing == Direction.UP);
+                level.dimension() == Level.OVERWORLD, facing == Direction.UP, receptionRate);
     }
 
     @Override

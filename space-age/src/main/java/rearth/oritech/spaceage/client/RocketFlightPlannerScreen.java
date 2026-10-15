@@ -255,7 +255,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         missionStateLabel.setTooltip(List.of(Component.translatable(isReadOnly()
                 ? "screen.oritech_space_age.mission.read_only_state_tooltip"
                 : "screen.oritech_space_age.mission.connected_state_tooltip")));
-        MissionControlScreen.serviceDetails(control.selectedTelemetry).forEach(missionStateLabel::addTooltipLine);
+        MissionControlScreen.serviceDetails(control.selectedTelemetry, control.debugSpeed).forEach(missionStateLabel::addTooltipLine);
     }
 
     void registerPowerTooltip(UIComponent card) {
@@ -279,8 +279,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var result = new ArrayList<Component>();
         result.add(Component.translatable("screen.oritech_space_age.power.craft_tooltip"));
         if (menu instanceof MissionControlMenu control && control.selectedTelemetry != null) {
-            result.add(MissionControlScreen.compactPower(control.selectedTelemetry));
-            result.addAll(MissionControlScreen.serviceDetails(control.selectedTelemetry));
+            result.add(MissionControlScreen.compactPower(control.selectedTelemetry, control.debugSpeed));
+            result.addAll(MissionControlScreen.serviceDetails(control.selectedTelemetry, control.debugSpeed));
         } else if (flightPlanRocket != null) {
             var stored = flightPlanRocket.getDynamicSegments().values().stream().mapToDouble(segment -> segment.rf()).sum();
             var capacity = flightPlanRocket.getDynamicSegments().values().stream().mapToDouble(segment -> segment.rfCapacity).sum();

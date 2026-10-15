@@ -138,7 +138,7 @@ final class FlightPlannerCards {
             var branchPath = screen.calculatedFlight().paths().stream()
                     .filter(path -> path.branchId().equals(branch.id())).findFirst().orElse(null);
             if (branchPath != null && branchPath.terminalState().isFailure()) {
-                var reason = FlightPlannerLabels.blockedTooltip(branchPath.terminalState());
+                var reason = branchPath.failure().<Component>map(failure -> failure.description()).orElseGet(() -> FlightPlannerLabels.blockedTooltip(branchPath.terminalState()));
                 branchButton.withTooltip(reason);
                 scroll.addChild(blockedBorder(branchX, rowY + 5, BRANCH_CARD_WIDTH, 58, List.of(reason)));
             }

@@ -113,7 +113,7 @@ public final class RocketProcessingService {
                     .filter(machine -> machine.job != null && machine.job.rfPerTick() > 0).mapToLong(machine -> machine.job.rfPerTick()).min().orElse(0);
             var rf = target.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
             var nextSolar = SolarPower.stationary(target) ? SolarPower.output(target) : 0;
-            if (rf + nextSolar < required) {
+            if (rf + nextSolar + target.powerReport.incoming() < required) {
                 state.complete();
                 state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
                 return;
@@ -152,6 +152,7 @@ public final class RocketProcessingService {
                     continue;
                 }
                 if (!VacuumProcessing.zeroG(host.position.x(), host.position.y(), objects.apply(host.owner))) continue;
+                if (SpacePowerService.account(host.rocket) != null) continue;
                 if (PhysicalCrafting.work(host.rocket, ref, source.rocket, 1) == 0)
                     host.status = "status.oritech_space_age.processing_no_power";
             }

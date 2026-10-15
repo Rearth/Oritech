@@ -1,6 +1,11 @@
 package rearth.oritech.spaceage.simulation;
 
 import org.junit.jupiter.api.Test;
+import com.mojang.serialization.JsonOps;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Blocks;
+import java.util.Map;
+import java.util.Set;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +20,21 @@ class RocketFlightPlanRulesTest {
         return new SpaceSimulation.FlightPlanAction(new UUID(1, 2), SpaceSimulation.ActionType.NAVIGATE_TO,
                 List.of(), SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.SURFACE,
                 SpaceSimulation.ArrivalVelocityMode.ZERO, 0, 0, 100, 200, 32, -24, addons);
+    }
+
+    @Test
+    void savedSegmentsWithoutPlanAnchorKeepTheirExistingReferences() {
+
+        var position = new BlockPos(-2, 3, -4);
+        var segment = new StaticRocketSegment(UUID.randomUUID(), Set.of(new StaticRocketSegment.BlockData(position,
+                Blocks.IRON_BLOCK.defaultBlockState())), Map.of(), 5, 0);
+        var json = StaticRocketSegment.CODEC.encodeStart(JsonOps.INSTANCE, segment).getOrThrow().getAsJsonObject();
+        json.remove("plan_anchor");
+        var restored = StaticRocketSegment.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow();
+        assertEquals(new SpaceSimulation.SegmentRef(position), SpaceSimulation.SegmentRef.of(restored));
+        var resources = new DynamicRocketSegment(0, 0, 0, Set.of());
+        resources.layout.put(position.below(), Blocks.GOLD_BLOCK.defaultBlockState());
+        assertEquals(position, RocketLayout.current(restored, resources).planAnchor());
     }
 
     @Test

@@ -78,7 +78,9 @@ final class FlightPlannerLabels {
         var processing = flight.processingEstimates().stream().filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
         if (processing != null && !processing.issue().isEmpty())
             return Component.translatable("status.oritech_space_age." + processing.issue()).withStyle(ChatFormatting.RED);
-        return blockedTooltip(state);
+        return flight.paths().stream().filter(path -> path.actionMoments().stream().anyMatch(moment -> moment.actionId().equals(actionId)))
+                .flatMap(path -> path.failure().stream()).findFirst().<Component>map(failure -> failure.description().withStyle(ChatFormatting.RED))
+                .orElseGet(() -> blockedTooltip(state));
     }
 
     static RocketFlightPathCalculator.ScanEstimate scanEstimate(RocketFlightPathCalculator.FlightPath flight, UUID actionId) {

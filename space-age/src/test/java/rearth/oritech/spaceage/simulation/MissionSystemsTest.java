@@ -11,6 +11,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
@@ -245,6 +246,108 @@ class MissionSystemsTest {
     }
 
     @Test
+    void missionUpdatesRejectUnflyableNavigationWithoutReplacingTheRunningTask() {
+
+        var system = new SpaceSimulation();
+        var current = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
+        var navigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.HIGH);
+        var position = new MissionState.Position(-3_070_000, 0, 0, 0, SpaceObjects.EARTH_ID,
+                OrbitBand.LOW, 0, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        for (var craft : List.of(rocket(true, 0, 0), rocket(false, 0, 1_000_000))) {
+            var state = new MissionState(OWNER, craft, plan(current), position, new SurveyKnowledge(), BlockPos.ZERO, 0);
+            state.connected = true;
+            state.advanceAction();
+            var oldPlan = state.plan;
+            var charge = craft.getDynamicSegments().values().iterator().next().rf();
+            var replacement = plan(navigation);
+            var issues = RocketFlightPlanRules.inspect(replacement, craft, system.createObjectData(), false, position).issues();
+            assertTrue(issues.stream().anyMatch(issue -> issue.actionId().equals(navigation.id()) && issue.code().startsWith("navigation_")),
+                    () -> "Unflyable route with " + charge + " RF: " + issues);
+            assertFalse(MissionController.replace(state, replacement, system));
+            assertEquals(oldPlan, state.plan);
+            assertEquals(current, state.action());
+            assertEquals(1, state.actionTicks());
+            assertEquals(charge, craft.getDynamicSegments().values().iterator().next().rf());
+            assertNull(state.transfer);
+        }
+    }
+
+    @Test
+    void missionValidationReportsHowFarTheEstimatedFlightExceedsTheTimeLimit() {
+
+        var system = new SpaceSimulation();
+        var craft = rocket(false, 1_000_000, 0);
+        var position = new MissionState.Position(-3_070_000, 0, 0, 0, SpaceObjects.EARTH_ID,
+                OrbitBand.LOW, 0, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var navigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.MARS_ID)
+                .withOrbit(OrbitBand.LOW).withMaxSpeed(1);
+        var validation = RocketFlightPlanRules.inspect(plan(navigation), craft, system.createObjectData(), false, position);
+        assertFalse(validation.valid());
+        var issue = validation.issues().stream().filter(item -> item.actionId().equals(navigation.id())).findFirst().orElseThrow();
+        assertNotNull(issue.failure());
+        assertEquals("time_limit", issue.failure().reason());
+        assertTrue(issue.failure().actual() > issue.failure().limit());
+        assertTrue(issue.failure().actual() / 1200 > 1000);
+        var state = new MissionState(OWNER, craft, plan(FlightPlanAction.create(ActionType.MAINTAIN_POSITION)), position,
+                new SurveyKnowledge(), BlockPos.ZERO, 0);
+        state.connected = true;
+        assertFalse(MissionController.replace(state, plan(navigation), system));
+        assertEquals(ActionType.MAINTAIN_POSITION, state.action().type());
+    }
+
+    @Test
+    void failedTransferCanBeRemovedOfflineButNotThroughAnotherOwnerOrDockingLink() {
+
+        for (var status : List.of(MissionState.STATUS_NO_FEASIBLE_TRANSFER, MissionState.STATUS_TRANSFER_BLOCKED)) {
+            var navigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.HIGH);
+            var mission = new MissionState(OWNER, rocket(true, 0, 0), plan(navigation), MissionState.Position.surface(),
+                    new SurveyKnowledge(), BlockPos.ZERO, 0);
+            mission.status = status;
+            var saved = MissionState.CODEC.encodeStart(NbtOps.INSTANCE, mission).getOrThrow();
+            var restored = MissionState.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+            var data = new MissionSavedData();
+            var id = restored.rocket.getRocketId();
+            data.craft.put(id, restored);
+            assertFalse(restored.canUpdateMission());
+            assertTrue(restored.canDismiss(), "Blocked craft need an X even without communication, including after reload");
+            assertFalse(data.dismiss(new UUID(2, 2), id));
+            var port = new HardwareRef(SegmentRef.of(restored.rocket.getOriginalSegments().values().iterator().next()), BlockPos.ZERO);
+            data.dockingLinks.add(new DockingLink(id, new UUID(3, 3), port, port));
+            assertFalse(data.dismiss(OWNER, id), "A docking link still protects the other participant");
+            data.dockingLinks.clear();
+            assertTrue(data.dismiss(OWNER, id));
+            assertTrue(data.craft.isEmpty());
+        }
+        var busy = new MissionState(OWNER, rocket(true, 0, 0), plan(FlightPlanAction.create(ActionType.MAINTAIN_POSITION)),
+                MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO, 0);
+        assertFalse(busy.canDismiss(), "Loss of radio alone must not enable deleting a running mission");
+    }
+
+    @Test
+    void correctingABlockedNavigationDiscardsItsFrozenGuidanceEvenForTheSameCard() {
+
+        var system = new SpaceSimulation();
+        var navigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.HIGH);
+        var position = new MissionState.Position(-3_070_000, 0, 0, 0, SpaceObjects.EARTH_ID,
+                OrbitBand.LOW, 0, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var state = new MissionState(OWNER, rocket(true, 0, 0), plan(navigation), position,
+                new SurveyKnowledge(), BlockPos.ZERO, 0);
+        var data = new MissionSavedData();
+        MissionController.step(null, data, state, system, 0);
+        assertTrue(state.navigationBlocked());
+        assertNotNull(state.transfer);
+        state.rocket.getDynamicSegments().values().iterator().next().rfCapacity = 20_000_000;
+        state.rocket.getDynamicSegments().values().iterator().next().receiveRF(20_000_000);
+        state.connected = true;
+        assertTrue(MissionController.replace(state, state.plan, system));
+        assertNull(state.transfer, "Re-uploading after recharging must not retain the old empty-battery forecast");
+        assertEquals(0, state.actionTicks());
+        MissionController.step(null, data, state, system, 1);
+        assertFalse(state.navigationBlocked());
+        assertEquals(MissionState.STATUS_IN_FLIGHT, state.status);
+    }
+
+    @Test
     void maintainPositionResourceConditionsAdvanceTheLiveMission() {
 
         var system = new SpaceSimulation();
@@ -359,6 +462,106 @@ class MissionSystemsTest {
         assertNull(loaded.transfer, "changing navigation clears guidance, clock, landing and frozen inputs together");
         assertEquals(0, loaded.actionTicks());
         assertEquals(MissionForecast.Navigation.EMPTY, loaded.navigationForecast());
+    }
+
+    @Test
+    void mixedEngineMarsFlightWithAntennaFinishesInTheLiveRunner() {
+
+        var id = new UUID(31, 1);
+        var segment = new StaticRocketSegment(id, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), SpaceAgeBlocks.ANTENNA.get().defaultBlockState())),
+                Map.of(), 250, 2, 20_000_000, 200_000);
+        var craft = new ActiveRocketData(Map.of(id, segment), Map.of(id, new DynamicRocketSegment(200_000, 20_000_000, 0, Set.of())));
+        var navigate = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.MARS_ID).withOrbit(OrbitBand.HIGH);
+        var start = new MissionState.Position(-3_120_000, 0, 500, 0, SpaceObjects.EARTH_ID,
+                OrbitBand.HIGH, -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var system = new SpaceSimulation();
+        var program = plan(navigate);
+        var forecast = RocketFlightPathCalculator.calculateFrom(craft, system.truth(), program, start).paths().getFirst();
+        assertEquals(RocketFlightPathCalculator.TerminalState.READY, forecast.terminalState());
+        var state = new MissionState(OWNER, craft, program, start, new SurveyKnowledge(), BlockPos.ZERO, 0);
+        var data = new MissionSavedData();
+        data.craft.put(craft.getRocketId(), state);
+        var deadline = Math.ceil(forecast.durationSeconds() * 20) + 1000;
+        var replans = 0;
+        for (int tick = 0; tick < deadline && state.action() != null; tick++) {
+            SpaceCommunications.poweredAntennas(state, true);
+            MissionController.step(null, data, state, system, tick);
+            if (state.status.equals(MissionState.STATUS_REPLANNING)) replans++;
+            if (replans >= 5 || state.navigationBlocked()) throw new AssertionError("status=" + state.status + " tick=" + tick
+                    + " rf=" + craft.getDynamicSegments().get(id).rf() + " actionTicks=" + state.actionTicks()
+                    + " position=" + state.position);
+        }
+        assertNull(state.action(), "Live guidance must finish; status=" + state.status + " position=" + state.position);
+        assertEquals(0, replans, "Planned ion burnout must not invalidate the chemical continuation");
+        assertEquals(SpaceSimulation.MARS_ID, state.position.target());
+        assertEquals(0, Math.hypot(state.position.vx(), state.position.vy()), 1e-5);
+        assertTrue(craft.getDynamicSegments().get(id).fuel() > 0);
+    }
+
+    @Test
+    void missionLaunchOriginRestoresMissingDetachedCraftLaunchMetadata() {
+
+        var craft = rocket(true, 0, 0);
+        var launch = new BlockPos(500, 70, -800);
+        var state = new MissionState(OWNER, craft, FlightPlan.empty(), MissionState.Position.surface(), new SurveyKnowledge(), launch, 0);
+        assertEquals(launch, state.rocket.getLaunchPosition());
+        assertEquals(launch, state.rocket.getLaunchPadCenter(), "Older craft fall back to their known launch footprint centre");
+        var saved = MissionState.CODEC.encodeStart(NbtOps.INSTANCE, state).getOrThrow();
+        var restored = MissionState.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+        assertEquals(launch, restored.rocket.getLaunchPadCenter());
+    }
+
+    @Test
+    void landingCoordinatesCenterTheActualFootprintRatherThanItsOffsetOrigin() {
+
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(
+                new StaticRocketSegment.BlockData(new BlockPos(-5, -2, -7), Blocks.IRON_BLOCK.defaultBlockState()),
+                new StaticRocketSegment.BlockData(new BlockPos(-1, 2, -3), Blocks.IRON_BLOCK.defaultBlockState())), Map.of(), 2, 0);
+        var craft = new ActiveRocketData(Map.of(id, segment), Map.of(id, new DynamicRocketSegment(0, 0, 0, Set.of())));
+        var centre = RocketRecovery.footprintCenter(craft);
+        assertEquals(-3, centre.getX());
+        assertEquals(-5, centre.getZ());
+        var origin = RocketRecovery.landingPosition(craft, 100, -200, (x, z) -> 70);
+        assertEquals(100, origin.getX() + centre.getX());
+        assertEquals(-200, origin.getZ() + centre.getZ());
+        assertEquals(72, origin.getY());
+        assertEquals(new BlockPos(-4, 0, -6), RocketRecovery.center(List.of(new BlockPos(-5, 0, -7), new BlockPos(-2, 0, -4))),
+                "Even footprints use a stable nearest block-grid alignment, including negative coordinates");
+    }
+
+    @Test
+    void launchPadMetadataSurvivesCopiesPersistenceAndBothSidesOfASeparation() {
+
+        var first = UUID.randomUUID();
+        var second = UUID.randomUUID();
+        var left = new StaticRocketSegment(first, Set.of(new StaticRocketSegment.BlockData(new BlockPos(-5, 0, -7),
+                Blocks.IRON_BLOCK.defaultBlockState())), Map.of(), 1, 0);
+        var right = new StaticRocketSegment(second, Set.of(new StaticRocketSegment.BlockData(new BlockPos(1, 0, 2),
+                Blocks.GLASS.defaultBlockState())), Map.of(), 1, 0);
+        var rocket = new ActiveRocketData(Map.of(first, left, second, right),
+                Map.of(first, new DynamicRocketSegment(0, 0, 0, Set.of(second)), second, new DynamicRocketSegment(0, 0, 0, Set.of(first))));
+        var pad = new BlockPos(400, 71, -900);
+        var launch = pad.offset(2, 0, 1);
+        rocket.setLaunchPosition(launch);
+        rocket.setLaunchPadCenter(pad);
+        assertEquals(pad, MissionState.copyRocket(rocket).getLaunchPadCenter());
+        var saved = ActiveRocketData.CODEC.encodeStart(NbtOps.INSTANCE, rocket).getOrThrow();
+        var restored = ActiveRocketData.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+        assertEquals(pad, restored.getLaunchPadCenter());
+        var state = new MissionState(OWNER, restored, FlightPlan.empty(), MissionState.Position.surface(), new SurveyKnowledge(), launch, 0);
+        var data = new MissionSavedData();
+        data.craft.put(restored.getRocketId(), state);
+        MissionController.split(data, state, Set.of(second), UUID.randomUUID(), 0);
+        assertEquals(2, data.craft.size());
+        for (var craft : data.craft.values()) {
+            assertEquals(pad, craft.rocket.getLaunchPadCenter());
+            assertEquals(launch, craft.rocket.getLaunchPosition());
+            assertEquals(pad, craft.summary(0).rocket().getLaunchPadCenter());
+        }
     }
 
     @Test

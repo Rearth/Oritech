@@ -30,6 +30,7 @@ public final class MissionSavedData extends SavedData {
     public List<SpaceCommunications.Node> networkNodes = List.of();
     public long extraTicks;
     public int debugSpeed = 1;
+    public final SpacePowerService power = new SpacePowerService();
 
     MissionSavedData() {
     }
@@ -51,6 +52,7 @@ public final class MissionSavedData extends SavedData {
         var mission = craft.get(craftId);
         if (mission == null || !mission.owner.equals(owner) || !mission.canDismiss() || RocketDocking.linked(this, craftId))
             return false;
+        power.changed();
         craft.remove(craftId);
         return true;
     }

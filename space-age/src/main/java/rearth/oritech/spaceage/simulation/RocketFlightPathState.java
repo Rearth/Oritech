@@ -9,9 +9,11 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPat
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.BoosterEvent;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.CraftPath;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationAbortMoment;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathSample;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState;
+import rearth.oritech.spaceage.simulation.RocketTransferRoute.Burn;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,6 +23,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -118,6 +121,14 @@ final class RocketFlightPathState {
                     ionSeconds > BURN_TOLERANCE ? ionSeconds : Double.POSITIVE_INFINITY);
         }
 
+        double burnSeconds(double fuelFactor) {
+
+            var seconds = seconds() / fuelFactor;
+            if (ionSeconds <= BURN_TOLERANCE) return seconds;
+            var drain = hardware.rfCost(fuelFactor) + StationServiceRules.antennaRF(hardware, 20);
+            return Math.min(seconds, rf / drain);
+        }
+
         double thrust(boolean atmosphere) {
 
             return (chemicalSeconds > BURN_TOLERANCE ? chemicalThrust : 0)
@@ -209,6 +220,7 @@ final class RocketFlightPathState {
         SpaceSimulation.FlightPlanAction lastEarthSurfaceAction;
         // Failure reason shown when a card cannot complete.
         TerminalState blockedState = TerminalState.PLAN_BLOCKED;
+        NavigationFailure navigationFailure;
 
         Craft(Map<SpaceSimulation.SegmentRef, Segment> segments,
               Map<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>> connections,
@@ -317,10 +329,34 @@ final class RocketFlightPathState {
 
         RocketBurnProfile burnProfile(Context context) {
 
+            return burnProfile(context, List.of(), false);
+        }
+
+        RocketBurnProfile navigationBurnProfile(Context context, List<Burn> schedule) {
+
+            return burnProfile(context, schedule, true);
+        }
+
+        private RocketBurnProfile burnProfile(Context context, List<Burn> schedule, boolean radio) {
+
             // Plan braking against a copy so looking ahead never consumes the real craft.
             var copy = copyFor(Set.copyOf(segments.keySet()));
             var intervals = new ArrayList<RocketBurnProfile.Interval>();
+            var phase = 0;
+            var remaining = schedule.isEmpty() ? Double.POSITIVE_INFINITY : schedule.getFirst().seconds();
             while (true) {
+                if (remaining <= BURN_TOLERANCE) {
+                    phase++;
+                    remaining = phase < schedule.size() ? schedule.get(phase).seconds() : Double.POSITIVE_INFINITY;
+                    continue;
+                }
+                var burn = phase < schedule.size() ? schedule.get(phase)
+                        : new Burn(Double.POSITIVE_INFINITY, 1, schedule.isEmpty() ? 1 : schedule.getLast().fuelFactor(), atmosphere);
+                if (!burn.firing()) {
+                    if (radio) copy.spendRadio(remaining);
+                    remaining = 0;
+                    continue;
+                }
                 var active = copy.activeSegments(context);
                 if (copy.currentStage < context.stageCount && (copy.stageFinished(context) || active.isEmpty())) {
                     for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
@@ -330,17 +366,25 @@ final class RocketFlightPathState {
                 if (active.isEmpty()) break;
                 var rate = copy.deltaVPerSecond(active);
                 if (rate <= 0) break;
-                var seconds = active.stream().map(copy.segments::get)
-                        .mapToDouble(segment -> segment.seconds()).min().orElse(0);
+                var factor = Math.max(1e-9, burn.fuelFactor());
+                var seconds = Math.min(remaining, active.stream().map(copy.segments::get)
+                        .mapToDouble(segment -> radio ? segment.burnSeconds(factor) : segment.seconds() / factor).min().orElse(0));
                 if (seconds <= 0) break;
-                copy.consumeBurnTime(active, seconds);
-                intervals.add(new RocketBurnProfile.Interval(rate, seconds));
+                copy.consumeBurnTime(active, seconds * factor);
+                if (radio) copy.spendRadio(seconds);
+                intervals.add(new RocketBurnProfile.Interval(rate, seconds * factor));
+                remaining -= seconds;
                 if (copy.stageFinished(context)) {
                     for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
                     copy.currentStage = Math.min(context.stageCount, copy.currentStage + 1);
                 }
             }
             return new RocketBurnProfile(intervals);
+        }
+
+        void spendRadio(double seconds) {
+
+            segments.values().forEach(segment -> segment.spendRF(StationServiceRules.antennaRF(segment.hardware, seconds * 20)));
         }
 
         void removeSegment(SpaceSimulation.SegmentRef ref) {
@@ -431,7 +475,7 @@ final class RocketFlightPathState {
                          Context context) {
 
             return new CraftPath(branchId, Set.copyOf(segments.keySet()), List.copyOf(samples),
-                    List.copyOf(actionMoments), time, availableDeltaV(context), terminal);
+                    List.copyOf(actionMoments), time, availableDeltaV(context), terminal, Optional.ofNullable(navigationFailure));
         }
     }
 }

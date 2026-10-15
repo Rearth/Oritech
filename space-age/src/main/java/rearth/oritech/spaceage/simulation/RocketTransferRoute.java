@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.simulation;
 
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,40 @@ final class RocketTransferRoute {
     static Route solve(Craft craft, Context context, SpaceSimulation.FlightPlanAction action,
                        SpaceSimulation.SpaceObjectData target, double endX, double endY) {
 
+        var profile = craft.navigationBurnProfile(context, List.of());
+        var route = solve(craft, context, action, target, endX, endY, profile);
+        if (route == null || craft.segments.values().stream().noneMatch(segment -> segment.hardware.antennas() > 0 && segment.hardware.ion() > 0))
+            return route;
+        // Radio draw changes burnout times. Replay burn/coast boundaries on a copy until
+        // the timing solver and the resource schedule describe the same flight.
+        for (int iteration = 0; iteration < 64; iteration++) {
+            profile = craft.navigationBurnProfile(context, route.burns());
+            var next = solve(craft, context, action, target, endX, endY, profile);
+            if (next == null) {
+                var duration = route.duration();
+                var radioRF = craft.segments.values().stream()
+                        .mapToDouble(segment -> StationServiceRules.antennaRF(segment.hardware, duration * 20)).sum();
+                craft.navigationFailure = new NavigationFailure("radio_budget", radioRF,
+                        craft.segments.values().stream().mapToDouble(segment -> segment.rf).sum());
+                return null;
+            }
+            var settled = true;
+            for (int phase = 0; phase < route.burns().size(); phase++)
+                settled &= Math.abs(route.burns().get(phase).seconds() - next.burns().get(phase).seconds()) < 1e-9;
+            route = next;
+            if (settled) return route;
+        }
+        var duration = route.duration();
+        craft.navigationFailure = new NavigationFailure("radio_budget", craft.segments.values().stream()
+                .mapToDouble(segment -> StationServiceRules.antennaRF(segment.hardware, duration * 20)).sum(),
+                craft.segments.values().stream().mapToDouble(segment -> segment.rf).sum());
+        return null;
+    }
+
+    private static Route solve(Craft craft, Context context, SpaceSimulation.FlightPlanAction action,
+                               SpaceSimulation.SpaceObjectData target, double endX, double endY, RocketBurnProfile burnProfile) {
+
+        craft.navigationFailure = null;
         var dx = endX - craft.x;
         var dy = endY - craft.y;
         var distance = Math.max(1e-6, Math.hypot(dx, dy));
@@ -63,7 +98,6 @@ final class RocketTransferRoute {
         var parachuteCount = ParachuteLanding.eligible(action)
                 ? craft.segments.values().stream().mapToInt(segment -> segment.parachutes).sum() : 0;
         var brakingCredit = ParachuteLanding.deltaVReduction(craft.mass(), parachuteCount);
-        var burnProfile = craft.burnProfile(context);
         FlightCurve curve = null;
         var efficiency = 1d;
         var gravity = 0d;
@@ -106,13 +140,31 @@ final class RocketTransferRoute {
         var localDeparture = gravityAlong(context, curve, 0, craft.time);
         var localArrival = gravityAlong(context, curve, curve.length(), craft.time);
         var curveEfficiency = efficiency;
-        if (departure != null && speed < .001 && acceleration * efficiency + localDeparture <= 0) return null;
+        if (departure != null && speed < .001 && acceleration * efficiency + localDeparture <= 0) {
+            craft.navigationFailure = new NavigationFailure("departure_thrust", acceleration * efficiency, -localDeparture);
+            return null;
+        }
         var gravityTransfer = CurveTransfer.solve(curve.length(), speed, arrival, freeArrival, cap,
                 burnProfile, efficiency, gravity, brakingCredit);
-        if (gravityTransfer == null || gravityTransfer.duration() > 1_200_000) return null;
+        if (gravityTransfer == null) {
+            var strongest = burnProfile.intervals().stream().mapToDouble(interval -> interval.acceleration() * curveEfficiency).max().orElse(0);
+            if (!freeArrival && gravity > 0 && strongest <= gravity)
+                craft.navigationFailure = new NavigationFailure("braking_thrust", strongest, gravity);
+            else if (gravity < 0 && strongest <= -gravity)
+                craft.navigationFailure = new NavigationFailure("departure_thrust", strongest, -gravity);
+            else if (!freeArrival && arrival > cap)
+                craft.navigationFailure = new NavigationFailure("arrival_cap", arrival, cap);
+            else if (speed > arrival && !freeArrival && burnProfile.deltaV() * efficiency < speed - arrival)
+                craft.navigationFailure = new NavigationFailure("braking_budget", burnProfile.deltaV() * efficiency, speed - arrival);
+            return null;
+        }
         if (gravityTransfer.lastSeconds() > 0 && action.orbit() == SpaceSimulation.OrbitBand.SURFACE
                 && hasSurface(target) && burnProfile.intervals().stream()
-                .noneMatch(interval -> interval.acceleration() * curveEfficiency > localArrival)) return null;
+                .noneMatch(interval -> interval.acceleration() * curveEfficiency > localArrival)) {
+            craft.navigationFailure = new NavigationFailure("braking_thrust", burnProfile.intervals().stream()
+                    .mapToDouble(interval -> interval.acceleration() * curveEfficiency).max().orElse(0), localArrival);
+            return null;
+        }
         return new Route(List.of(
                 new Burn(gravityTransfer.firstSeconds(), gravityTransfer.firstDirection(),
                         gravityTransfer.firstDirection() < 0 ? gravityTransfer.brakingFuelFactor() : 1, craft.atmosphere),
@@ -135,9 +187,18 @@ final class RocketTransferRoute {
             if (body.radius() <= 0 || body.surfaceGravity() <= 0) continue;
             var from = Math.max(body.radius(), Math.hypot(start.x() - body.xAt(time), start.y() - body.yAt(time)));
             var to = Math.max(body.radius(), Math.hypot(end.x() - body.xAt(time), end.y() - body.yAt(time)));
-            work += body.surfaceGravity() * body.radius() * body.radius() * (1 / to - 1 / from);
+            work += gravityPotential(body, to) - gravityPotential(body, from);
         }
         return work / curve.length();
+    }
+
+    private static double gravityPotential(SpaceSimulation.SpaceObjectData body, double distance) {
+
+        var inverseDistance = 1 / distance;
+        // The collector ring is a zero-Sun-gravity destination. Preserve gravity only inside it.
+        if (body.type() == SpaceObjects.ObjectType.SUN)
+            inverseDistance = Math.max(0, inverseDistance - 1 / (body.radius() + SpaceSimulation.OrbitBand.SOLAR.altitude()));
+        return body.surfaceGravity() * body.radius() * body.radius() * inverseDistance;
     }
 
     /**
@@ -155,6 +216,8 @@ final class RocketTransferRoute {
             var dy = bodyY - position.y();
             var actualDistance = Math.hypot(dx, dy);
             if (actualDistance < 1e-6) continue;
+            if (body.type() == SpaceObjects.ObjectType.SUN
+                    && actualDistance >= body.radius() + SpaceSimulation.OrbitBand.SOLAR.altitude() - 1e-6) continue;
             var boundedDistance = Math.max(body.radius(), actualDistance);
             var acceleration = body.surfaceGravity() * body.radius() * body.radius()
                     / (boundedDistance * boundedDistance);

@@ -4,6 +4,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +12,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -88,6 +90,13 @@ public final class RocketFlightPlanRules {
         if (forecast == null)
             forecast = RocketFlightPathCalculator.calculateFrom(rocket, objects, normalized, position, recipes, stations);
         issues.addAll(NavigationComputerRules.issues(normalized, rocket, forecast));
+        for (var path : forecast.paths()) {
+            if (!path.terminalState().preventsLaunch() || path.actionMoments().isEmpty()) continue;
+            var moment = path.actionMoments().getLast();
+            var action = actions.get(moment.actionId());
+            if (action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO)
+                issues.add(new Issue(path.branchId(), action.id(), "navigation_" + path.terminalState().name().toLowerCase(Locale.ROOT), 0, 0, path.failure().orElse(null)));
+        }
         // Preserve invalid instructions in editable drafts; callers decide whether to accept them.
         return new Validation(issues.isEmpty() ? normalized : plan, issues);
     }
@@ -294,7 +303,8 @@ public final class RocketFlightPlanRules {
     }
 
     /**
-     * A booster creates the stage after its final enabled stage; ordinary engine selections do not.
+     * Keep configured stage numbers after separation, even when only one segment remains.
+     * Boosters also create the stage after their final enabled stage.
      */
     public static int stageCount(SpaceSimulation.FlightPlan plan, int segmentCount) {
 
@@ -302,9 +312,9 @@ public final class RocketFlightPlanRules {
         var result = plan.segmentConfigurations().stream().anyMatch(SpaceSimulation.SegmentConfiguration::booster)
                 ? 2 : 1;
         for (var configuration : plan.segmentConfigurations()) {
-            if (configuration.booster()) result = Math.max(result, configuration.lastEngineStage() + 1);
+            result = Math.max(result, configuration.lastEngineStage() + (configuration.booster() ? 1 : 0));
         }
-        return Math.clamp(result, 1, segmentCount);
+        return Math.clamp(result, 1, MAX_ACTIONS);
     }
 
     /**
@@ -429,11 +439,18 @@ public final class RocketFlightPlanRules {
         }
     }
 
-    public record Issue(UUID branchId, UUID actionId, String code, int required, int available) {
+    public record Issue(UUID branchId, UUID actionId, String code, int required, int available, NavigationFailure failure) {
+
+        public Issue(UUID branchId, UUID actionId, String code, int required, int available) {
+
+            this(branchId, actionId, code, required, available, null);
+        }
 
         public Component description() {
 
-            return Component.translatable("screen.oritech_space_age.validation." + code, required, available);
+            if (failure != null) return failure.description();
+            return code.startsWith("navigation_") ? Component.translatable("screen.oritech_space_age.blocked." + code.substring("navigation_".length()))
+                    : Component.translatable("screen.oritech_space_age.validation." + code, required, available);
         }
     }
 

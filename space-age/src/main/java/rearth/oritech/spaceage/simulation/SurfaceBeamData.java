@@ -61,9 +61,9 @@ public final class SurfaceBeamData extends SavedData {
         return true;
     }
 
-    public double deliver(ServerLevel level, int x, int z, double radius, double incident) {
+    public BeamReception deliver(ServerLevel level, int x, int z, double radius, double incident) {
 
-        if (!loaded(level, x, z, radius)) return 0;
+        if (!loaded(level, x, z, radius)) return BeamReception.EMPTY;
         var footprint = Math.PI * radius * radius;
         if (incident > 0 && level.getGameTime() % 20 == 0) {
             for (int part = 0; part < 16; part++) {
@@ -76,7 +76,7 @@ public final class SurfaceBeamData extends SavedData {
         }
         var claimed = new HashSet<BlockPos>();
         var columns = new HashSet<Long>();
-        var accepted = 0d;
+        var reception = BeamReception.EMPTY;
         for (var pos : receivers.keySet().stream().sorted().toList()) {
             var receiver = receivers.get(pos);
             if (receiver.isRemoved() || !level.hasChunkAt(pos)
@@ -84,23 +84,25 @@ public final class SurfaceBeamData extends SavedData {
             var array = receiver.array();
             if (!array.valid() || array.cells().stream().anyMatch(claimed::contains)) continue;
             claimed.addAll(array.cells());
-            var cells = array.cells().stream().filter(cell -> cell.getX() != pos.getX() && cell.getZ() != pos.getZ())
-                    .filter(cell -> Math.hypot(cell.getX() - x, cell.getZ() - z) <= radius)
-                    .filter(cell -> columns.add(BlockPos.asLong(cell.getX(), 0, cell.getZ()))).count();
-            var intercepted = Math.min(Math.max(0, incident - accepted), incident * BeamAperture.collectionFraction(cells, radius));
+            var area = array.cells().stream().filter(cell -> columns.add(BlockPos.asLong(cell.getX(), 0, cell.getZ())))
+                    .mapToDouble(cell -> BeamAperture.cellArea(cell.getX() - x, cell.getZ() - z, radius)).sum();
+            var intercepted = Math.min(Math.max(0, incident - reception.collected()), incident * BeamAperture.collectionFraction(area, radius));
             var available = Math.max(0, array.throughput() - receivedThisTick.getOrDefault(pos, 0d));
             var stored = receiver.receive(Math.min(intercepted, available));
             receivedThisTick.merge(pos, stored, Double::sum);
-            accepted += stored;
+            var detail = BeamReception.limited(incident, intercepted, available, stored, radius);
+            if (area > 0) receiver.recordBeam(detail);
+            // Incident is shared by all arrays: count the footprint once, not once per receiver.
+            reception = reception.plus(new BeamReception(0, detail.collected(), detail.capacityLoss(), detail.storageLoss(), stored, radius));
         }
-        var overflow = Math.max(0, incident - accepted);
+        var overflow = Math.max(0, incident - reception.accepted());
         var chunks = new HashSet<Long>();
         for (int cx = (int) Math.floor((x - radius) / 16); cx <= (int) Math.floor((x + radius) / 16); cx++)
             for (int cz = (int) Math.floor((z - radius) / 16); cz <= (int) Math.floor((z + radius) / 16); cz++)
                 chunks.add(ChunkPos.pack(cx, cz));
         for (var chunk : chunks) heat.merge(chunk, overflow / Math.max(1, footprint) / 100_000, Double::sum);
         setDirty();
-        return Math.min(incident, accepted);
+        return new BeamReception(incident, reception.collected(), reception.capacityLoss(), reception.storageLoss(), reception.accepted(), radius);
     }
 
     public void tick(ServerLevel level) {

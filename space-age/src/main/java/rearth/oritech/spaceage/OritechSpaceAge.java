@@ -25,6 +25,7 @@ import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.MissionController;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
@@ -76,6 +77,7 @@ public final class OritechSpaceAge {
 
         RocketNetworking.register(event.registrar("1"));
         MissionNetworking.register(event.registrar("1"));
+        GroundBeamNetworking.register(event.registrar("1"));
     }
 
     private void onServerTickPost(ServerTickEvent.Post event) {

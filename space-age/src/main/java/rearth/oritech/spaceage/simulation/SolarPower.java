@@ -65,13 +65,14 @@ public final class SolarPower {
         return !state.ended && !(state.position.orbit() == OrbitBand.SURFACE
                 && (state.position.target().equals(SpaceObjects.EARTH_ID) || state.position.target().equals(SpaceSimulation.MARS_ID)
                 || state.position.target().equals(SpaceSimulation.SUN_ID)))
-                && (state.action() == null || state.action().type() != ActionType.NAVIGATE_TO)
+                && (state.action() == null || state.action().type() != ActionType.NAVIGATE_TO || state.navigationBlocked())
                 && Math.hypot(state.position.vx(), state.position.vy()) < .001;
     }
 
     public static double output(MissionState state) {
 
-        return state.rocket.powerHardware().solar() * multiplier(state.position.x(), state.position.y());
+        var account = SpacePowerService.account(state.rocket);
+        return account == null ? state.rocket.powerHardware().solar() * multiplier(state.position.x(), state.position.y()) : account.solarGeneration();
     }
 
     public static double receive(ActiveRocketData rocket, double amount) {

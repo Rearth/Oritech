@@ -626,9 +626,12 @@ final class FlightPlannerPopups {
             rowY += 22;
         }
         if (surfaceCoordinates) {
-            editors.addPopupComponent(new LabelWidget(px + 10, rowY + 5, popupWidth - 20,
+            editors.addPopupComponent(new LabelWidget(px + 10, rowY + 5, popupWidth - 150,
                     Component.translatable("screen.oritech_space_age.action.setting.coordinates"))
                     .withBrightColor().withZIndex(9_001));
+            editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 130, rowY, 120, 18,
+                    Component.translatable("screen.oritech_space_age.action.launch_pad"), ignored -> editors.useLaunchPadCoordinates())
+                    .withTooltip(Component.translatable("screen.oritech_space_age.action.launch_pad_tooltip")).withZIndex(9_001));
             rowY += 20;
             editors.addPopupComponent(new LabelWidget(px + 10, rowY + 5, 18, Component.literal("X"))
                     .withBrightColor().withZIndex(9_001));

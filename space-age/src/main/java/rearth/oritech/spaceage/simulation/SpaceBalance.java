@@ -20,13 +20,15 @@ public final class SpaceBalance {
     // Steering is a small fuel surcharge; it must not turn an otherwise launch-capable rocket into one below local gravity.
     public static final double CURVE_STEERING_COST = 0.002;
     public static final int DAY = 24_000;
+    public static final double MAX_TRANSFER_SECONDS = 1_200_000;
     public static final double SCAN_RANGE = 250_000;
     /**
      * One instant survey sweep, below a default portable battery (1 MRF).
      */
     public static final long SCAN_RF = 600_000;
     public static final long ANTENNA_RF = 10;
-    public static final long ION_RF = 1_000;
+    // A default portable battery supplies 500 seconds of full-power vacuum thrust.
+    public static final long ION_RF = 100;
     public static final double ION_ATMOSPHERE = 0.1;
     public static final double ANTENNA_RANGE = 300_000;
     public static final double GROUND_COMMAND_ALTITUDE = 10_000;

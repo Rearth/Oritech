@@ -18,6 +18,8 @@ public final class SpaceCommunications {
 
     public static int poweredAntennas(MissionState craft, boolean consume) {
 
+        var account = SpacePowerService.account(craft.rocket);
+        if (account != null) return account.poweredAntennas();
         var installed = craft.rocket.hardware().values().stream().mapToInt(RocketHardware::antennas).sum();
         var stored = craft.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
         var available = (int) Math.min(installed, stored / SpaceBalance.ANTENNA_RF);

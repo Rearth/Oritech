@@ -17,10 +17,18 @@ import java.util.UUID;
 public final class RocketControllerState {
 
     public static final Codec<RocketControllerState> CODEC = RecordCodecBuilder.create(i -> i.group(
-            Codec.STRING.fieldOf("name").forGetter(c -> c.name), Job.CODEC.optionalFieldOf("job").forGetter(c -> Optional.ofNullable(c.job))
-    ).apply(i, RocketControllerState::new));
+            Codec.STRING.fieldOf("name").forGetter(c -> c.name), Job.CODEC.optionalFieldOf("job").forGetter(c -> Optional.ofNullable(c.currentJob())),
+            Codec.DOUBLE.optionalFieldOf("work_fraction", 0d).forGetter(RocketControllerState::currentWorkFraction)
+    ).apply(i, (name, job, fraction) -> {
+        var state = new RocketControllerState(name, job);
+        state.workFraction = fraction;
+        return state;
+    }));
     public String name;
     public Job job;
+    double workFraction;
+    SpacePowerService.Account powerClock;
+    HardwareRef powerRef;
 
     public RocketControllerState() {
 
@@ -41,7 +49,19 @@ public final class RocketControllerState {
 
     public RocketControllerState copy() {
 
-        return new RocketControllerState(name, Optional.ofNullable(job));
+        var copy = new RocketControllerState(name, Optional.ofNullable(currentJob()));
+        copy.workFraction = currentWorkFraction();
+        return copy;
+    }
+
+    private Job currentJob() {
+
+        return powerClock == null ? job : powerClock.jobSnapshot(powerRef, job);
+    }
+
+    private double currentWorkFraction() {
+
+        return powerClock == null ? workFraction : powerClock.jobFraction(powerRef, job);
     }
 
     public record Pair(UUID rocket, HardwareRef controller, BlockPos left,

@@ -83,7 +83,7 @@ public final class RocketLayout {
         var blocks = new HashSet<StaticRocketSegment.BlockData>();
         cells.forEach((pos, state) -> blocks.add(new StaticRocketSegment.BlockData(pos, state)));
         return new StaticRocketSegment(original.segmentId(), blocks, original.originalCouplings(), Math.max(0, Math.round(weight)),
-                original.engineCount(), original.initialRF(), original.initialFuel(), Math.max(0, energy));
+                original.engineCount(), original.initialRF(), original.initialFuel(), Math.max(0, energy), original.planAnchor());
     }
 
     public static double mass(BlockState state) {

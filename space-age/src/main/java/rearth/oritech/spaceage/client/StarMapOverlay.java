@@ -41,6 +41,8 @@ final class StarMapOverlay {
                     "screen.oritech_space_age.terminal." + selectedPath.terminalState().name().toLowerCase(Locale.ROOT));
             var duration = selectedPath == null ? "–"
                     : String.format(Locale.ROOT, "%.2f", selectedPath.durationSeconds() / 1_200d);
+            if (selectedPath != null && selectedPath.failure().filter(failure -> failure.reason().equals("time_limit")).isPresent())
+                duration = "~" + String.format(Locale.ROOT, "%.2f", (selectedPath.durationSeconds() + selectedPath.failure().orElseThrow().actual()) / 1_200d);
             var summary = Component.translatable("screen.oritech_space_age.flight_stats_compact",
                     selectedBranch, duration, deltaV, status);
             graphics.text(font, summary, statsX + 8, y - 24,
