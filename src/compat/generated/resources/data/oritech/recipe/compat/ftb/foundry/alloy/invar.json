@@ -8,7 +8,7 @@
   "type": "oritech:foundry",
   "itemInputs": [
     "#c:ingots/iron",
-    "#c:ingots/iron"
+    "#c:ingots/nickel"
   ],
   "itemResults": [
     {

@@ -1,4 +1,4 @@
-// 26.1.2	2026-10-12T11:58:47.2417653	FTB Materials Oritech Compat
+// 26.1.2	2026-10-18T16:12:39.2713713	FTB Materials Oritech Compat
 6199f2b1a8e7d0b0e3b8f5af62d9d4911ba7017a data/oritech/recipe/compat/ftb/centrifuge/clump/aluminum.json
 f0ca8515b6c7629f557b335e7048b91590a0cdfc data/oritech/recipe/compat/ftb/centrifuge/clump/antimony.json
 1499f34d872d0dea63b9050213b0bf5b36fed597 data/oritech/recipe/compat/ftb/centrifuge/clump/iridium.json
@@ -41,10 +41,10 @@ e5be7f3430f4821f36ff3498f31a4c36ba759d61 data/oritech/recipe/compat/ftb/centrifu
 292b2adf4098a7557860c07361a3a20ff461c338 data/oritech/recipe/compat/ftb/deepdrill/titanium.json
 a107f9cde9ad1e578ab10e4e89f55571695e5c76 data/oritech/recipe/compat/ftb/deepdrill/tungsten.json
 769612f64d2ea7dec962a8955715b88e6cf43305 data/oritech/recipe/compat/ftb/deepdrill/zinc.json
-148cdc44433ee172676ac494613f164353ddcac7 data/oritech/recipe/compat/ftb/foundry/alloy/brass.json
-53f9d1dab7c2f375b034180ca6969d87a9241619 data/oritech/recipe/compat/ftb/foundry/alloy/bronze.json
-2891dec84ce48f6d15fee5911f6424e61b0d6994 data/oritech/recipe/compat/ftb/foundry/alloy/constantan.json
-4403558d296f6db8fd09856aee409338e81c506e data/oritech/recipe/compat/ftb/foundry/alloy/invar.json
+d75279a4abb8ac05c75b72fe7d7a756b4ae5a8b3 data/oritech/recipe/compat/ftb/foundry/alloy/brass.json
+bbfb159950d0e2b5a7594d210da013d515f2e04d data/oritech/recipe/compat/ftb/foundry/alloy/bronze.json
+c05d58fbd8211980b01ae0fb2a9797a716999548 data/oritech/recipe/compat/ftb/foundry/alloy/constantan.json
+802c2e83c6cada041957ec332072952ecb01f845 data/oritech/recipe/compat/ftb/foundry/alloy/invar.json
 cf55e211c43cce374140ddcd7b650c612be7cdb1 data/oritech/recipe/compat/ftb/fragment_forge/dust/aluminum.json
 10a692f6574712ec6e8ec9c92e6d58579597dd97 data/oritech/recipe/compat/ftb/fragment_forge/dust/antimony.json
 7780f1c81116be6e9d78ee34d8efb47378088b77 data/oritech/recipe/compat/ftb/fragment_forge/dust/bauxite.json

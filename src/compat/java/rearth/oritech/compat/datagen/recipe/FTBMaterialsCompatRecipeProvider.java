@@ -1,7 +1,5 @@
 package rearth.oritech.compat.datagen.recipe;
 
-import java.util.concurrent.CompletableFuture;
-
 import dev.ftb.mods.ftbmaterials.FTBMaterials;
 import dev.ftb.mods.ftbmaterials.resources.Resource;
 import dev.ftb.mods.ftbmaterials.resources.ResourceType;
@@ -19,6 +17,8 @@ import rearth.oritech.datagen.builders.FoundryRecipeBuilder;
 import rearth.oritech.datagen.builders.PulverizerRecipeBuilder;
 import rearth.oritech.datagen.builders.util.MetalProcessingChainBuilder;
 import rearth.oritech.init.BlockContent;
+
+import java.util.concurrent.CompletableFuture;
 
 public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
     private static final String PATH = "compat/ftb";
@@ -121,7 +121,7 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
     private void addFoundryAlloying(Resource resourceA, Resource resourceB, Resource result, int resultCount) {
         new FoundryRecipeBuilder(this.registries)
             .input(resolver.ingredient(resourceA, ResourceType.INGOT))
-            .input(resolver.ingredient(resourceA, ResourceType.INGOT))
+            .input(resolver.ingredient(resourceB, ResourceType.INGOT))
             .result(new ItemStackTemplate(resolver.item(result, ResourceType.INGOT), resultCount))
             .export(this.modLoadedOutput, PATH, result.name().toLowerCase(), Oritech.MOD_ID);
     }
