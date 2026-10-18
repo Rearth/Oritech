@@ -2,19 +2,19 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
-import rearth.oritech.util.Geometry;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.block.blocks.processing.MachineCoreBlock;
+import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.util.Geometry;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 public final class SolarPower {
 

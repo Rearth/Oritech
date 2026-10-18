@@ -3,23 +3,16 @@ package rearth.oritech.spaceage.simulation;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.connection.ConnectionType;
-import rearth.oritech.api.networking.ReflectiveCodecBuilder;
-import rearth.oritech.spaceage.init.SpaceAgeComponents.MissionCard;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.junit.jupiter.api.Test;
+import rearth.oritech.api.networking.ReflectiveCodecBuilder;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.init.SpaceAgeComponents.MissionCard;
 import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -28,11 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MissionSystemsTest {
 

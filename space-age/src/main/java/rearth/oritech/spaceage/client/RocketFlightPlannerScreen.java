@@ -17,27 +17,10 @@ import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
-import rearth.oritech.spaceage.simulation.AsteroidTarget;
-import rearth.oritech.spaceage.simulation.MissionForecast;
-import rearth.oritech.spaceage.simulation.MissionState;
-import rearth.oritech.spaceage.simulation.NavigationComputerRules;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.*;
 import rearth.oritech.util.TooltipHelper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -436,22 +419,32 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         flightPlannerRevision = menu.getFlightPlannerRevision();
         addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
 
-        var rocketTab = SpaceAgeButtons.panel(9, 9, 92, 20,
-                menu instanceof MissionControlMenu ? Component.translatable("screen.oritech_space_age.mission.fleet") : Component.translatable("screen.oritech_space_age.rocket"), ignored -> switchToRocketScreen());
-        rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT);
-        addComponent(rocketTab);
-        var flightPlanTab = SpaceAgeButtons.panel(101, 9, 92, 20,
-                Component.translatable("screen.oritech_space_age.flight_plan"), ignored -> {
-                });
-        flightPlanTab.setActive(false);
-        flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
-        addComponent(flightPlanTab);
-        addComponent(SpaceAgeButtons.panel(200, 9, 70, 20, Component.translatable("screen.oritech_space_age.mission.save_card"), ignored -> card(true)));
-        var loadCard = SpaceAgeButtons.panel(273, 9, 70, 20, Component.translatable("screen.oritech_space_age.mission.load_card"), ignored -> card(false));
+        if (menu instanceof MissionControlMenu control) {
+            SpaceAgeButtons.missionTabs(2,
+                    () -> Minecraft.getInstance().setScreen(new MissionControlScreen(control, screenInventory, screenTitle)),
+                    this::switchToRocketScreen, () -> {
+                    }).forEach(this::addComponent);
+        } else {
+            var rocketTab = SpaceAgeButtons.panel(9, 9, 92, 20,
+                    Component.translatable("screen.oritech_space_age.rocket"), ignored -> switchToRocketScreen());
+            rocketTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT);
+            addComponent(rocketTab);
+            var flightPlanTab = SpaceAgeButtons.panel(101, 9, 92, 20,
+                    Component.translatable("screen.oritech_space_age.flight_plan"), ignored -> {
+                    });
+            flightPlanTab.setActive(false);
+            flightPlanTab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
+            addComponent(flightPlanTab);
+        }
+        var compactHeader = menu instanceof MissionControlMenu && panelWidth < 505;
+        var actionsX = menu instanceof MissionControlMenu ? compactHeader ? 9 : 252 : 200;
+        var actionsY = compactHeader ? 34 : 9;
+        addComponent(SpaceAgeButtons.panel(actionsX, actionsY, 70, 20, Component.translatable("screen.oritech_space_age.mission.save_card"), ignored -> card(true)));
+        var loadCard = SpaceAgeButtons.panel(actionsX + 73, actionsY, 70, 20, Component.translatable("screen.oritech_space_age.mission.load_card"), ignored -> card(false));
         loadCard.setActive(!isReadOnly());
         addComponent(loadCard);
         if (menu instanceof MissionControlMenu control) {
-            sendMissionButton = SpaceAgeButtons.orangePanel(346, 9, 95, 20, Component.translatable("screen.oritech_space_age.mission.send_changes"), ignored -> {
+            sendMissionButton = SpaceAgeButtons.orangePanel(actionsX + 146, actionsY, 95, 20, Component.translatable("screen.oritech_space_age.mission.send_changes"), ignored -> {
                 ClientPacketDistributor.sendToServer(
                         new RocketNetworking.SubmitFlightPlanPayload(menu.blockPos, flightPlanRocket.getRocketId(), draftPlan));
             });
@@ -461,7 +454,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         buildFlightPlanTab();
         updateSendButton();
         if (menu instanceof MissionControlMenu control && control.selectedTelemetry != null) {
-            missionStateLabel = new LabelWidget(12, 36, panelWidth - 24, 22,
+            missionStateLabel = new LabelWidget(12, compactHeader ? 61 : 36, panelWidth - 24, 22,
                     missionStateText(control)).withWrap(true)
                     .withColor(isReadOnly() ? 0xFF65532C : 0xFF285522);
             missionStateLabel.withTooltip(Component.translatable(isReadOnly()
@@ -496,7 +489,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (activeBranchId == null || draftPlan.branches().stream()
                 .noneMatch(branch -> branch.id().equals(activeBranchId))) activeBranchId = draftPlan.root().id();
 
-        var mapY = menu instanceof MissionControlMenu ? 65 : 39;
+        var mapY = menu instanceof MissionControlMenu ? panelWidth < 505 ? 90 : 65 : 39;
         capacityLabel = new LabelWidget(panelWidth - 70, panelHeight - 17, 58, capacityText())
                 .withDarkColor().withAlignment(LabelWidget.Alignment.RIGHT);
         updateCapacityLabel();
@@ -878,7 +871,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
         submitFlightPlanIfDirty();
         Minecraft.getInstance().setScreen(menu instanceof MissionControlMenu control
-                ? new MissionControlScreen(control, screenInventory, screenTitle) : new RocketAssemblerScreen(menu, screenInventory, screenTitle));
+                ? new CraftStatusScreen(control, screenInventory, screenTitle) : new RocketAssemblerScreen(menu, screenInventory, screenTitle));
     }
 
     @Override

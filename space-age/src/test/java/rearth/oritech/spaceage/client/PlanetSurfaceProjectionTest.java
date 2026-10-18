@@ -7,9 +7,7 @@ import org.junit.jupiter.api.Test;
 import rearth.oritech.api.screen.widgets.BlockWidget;
 import rearth.oritech.spaceage.client.RocketMapPaths.Point;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PlanetSurfaceProjectionTest {
 

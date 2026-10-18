@@ -2,23 +2,16 @@ package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.levelgen.Heightmap;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
 import rearth.oritech.spaceage.simulation.RocketControllerState.Job;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /** Piecewise-linear power network. Only boundary/input events settle batteries and solve new flow rates. */
 public final class SpacePowerService {

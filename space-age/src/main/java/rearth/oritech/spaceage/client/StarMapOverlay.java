@@ -4,8 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.OritechSurface;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
 
 import java.util.Locale;
 
@@ -28,9 +28,9 @@ final class StarMapOverlay {
                        boolean showCommandCoverage) {
 
         var font = Minecraft.getInstance().font;
-        graphics.fill(x + 6, y + 6, x + width - 6, y + 21, 0xDD080D18);
-        graphics.text(font, Component.translatable("screen.oritech_space_age.star_system"), x + 10, y + 9, 0xFFCAD8E5, true);
-        if (selectedTarget != null) graphics.text(font, selectedTarget, x + 82, y + 9, 0xFFF6C65B, false);
+        graphics.fill(x, y, x + width, y + 20, 0xDD080D18);
+        graphics.text(font, Component.translatable("screen.oritech_space_age.star_system"), x + 10, y + 6, 0xFFCAD8E5, true);
+        if (selectedTarget != null) graphics.text(font, selectedTarget, x + 82, y + 6, 0xFFF6C65B, false);
 
         if (showSummary) {
             var statsRight = x + width - 9;

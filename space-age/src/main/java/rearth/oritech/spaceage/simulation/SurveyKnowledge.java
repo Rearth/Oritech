@@ -3,11 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Precise asteroid contacts collected by a craft and merged only when their results are transmitted or recovered.

@@ -3,14 +3,11 @@ package rearth.oritech.spaceage.client;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.Test;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.BeamReception;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.*;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathSample;
 import rearth.oritech.spaceage.simulation.SpacePowerService.Report;
-import rearth.oritech.spaceage.simulation.DynamicRocketSegment;
-import rearth.oritech.spaceage.simulation.MissionState;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.StaticRocketSegment;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MissionPowerUiTest {
 
@@ -57,4 +55,61 @@ class MissionPowerUiTest {
                 RocketFlightPathCalculator.TerminalState.READY);
         assertEquals(-1, MissionControlScreen.progressPercent(telemetry, path));
     }
+
+    @Test
+    void craftDiagramDistinguishesSmallFlowsWithoutLettingLargeBeamsFillTheScreen() {
+
+        assertTrue(CraftStatusWidget.flowWidth(1) > CraftStatusWidget.flowWidth(0));
+        assertTrue(CraftStatusWidget.flowWidth(1000) > CraftStatusWidget.flowWidth(10));
+        assertTrue(CraftStatusWidget.flowWidth(1_000_000) < CraftStatusWidget.flowWidth(1000) * 2);
+        assertTrue(CraftStatusWidget.flowWidth(Long.MAX_VALUE) <= 32);
+    }
+
+    @Test
+    void engineDemandUsesLiveFiringSegmentsAndIgnoresCoastingAndDepletedEngines() {
+
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())), Map.of(), 20, 1, 1000, 0);
+        var resources = new DynamicRocketSegment(0, 1000, 0, Set.of());
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, resources));
+        var plan = SpaceSimulation.FlightPlan.empty();
+        var telemetry = new MissionState.Telemetry(rocket, plan, MissionState.Position.surface(), 20,
+                MissionState.STATUS_IN_FLIGHT, List.of(), 20);
+        var ref = SpaceSimulation.SegmentRef.of(segment);
+        for (var phase : List.of(PathPhase.ACCELERATE, PathPhase.COAST, PathPhase.BRAKE)) {
+            for (var firing : List.of(Set.<SpaceSimulation.SegmentRef>of(), Set.of(ref))) {
+                var sample = new PathSample(10, 0, 0, 1, 1, 0, phase, SpaceSimulation.FlightPlanAction.NO_TARGET,
+                        SpaceSimulation.FlightPlanAction.NO_TARGET, 1, Set.of(ref), firing, SpaceSimulation.FlightPlanAction.NO_TARGET);
+                var path = new RocketFlightPathCalculator.CraftPath(plan.root().id(), Set.of(ref), List.of(sample), List.of(),
+                        10, 0, RocketFlightPathCalculator.TerminalState.READY);
+                resources.availableRF = 1000;
+                assertEquals(phase == PathPhase.COAST || firing.isEmpty() ? 0 : SpaceBalance.ION_RF,
+                        CraftStatusWidget.propulsionDemand(telemetry, List.of(path)));
+                resources.availableRF = 0;
+                assertEquals(0, CraftStatusWidget.propulsionDemand(telemetry, List.of(path)));
+            }
+        }
+    }
+
+    @Test
+    void statusCategoriesFollowInstalledHardwareRatherThanCurrentDemand() {
+
+        var id = UUID.randomUUID();
+        var radio = BlockPos.ZERO;
+        var engine = new BlockPos(1, 0, 0);
+        var processor = new BlockPos(2, 0, 0);
+        var segment = new StaticRocketSegment(id, Set.of(
+                new StaticRocketSegment.BlockData(radio, SpaceAgeBlocks.ANTENNA.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(engine, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(processor, SpaceAgeBlocks.VACUUM_CRAFTER.get().defaultBlockState())), Map.of(), 20, 1, 0, 0);
+        var resources = new DynamicRocketSegment(0, 0, 0, Set.of());
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, resources));
+        assertEquals(List.of("radio", "processing", "propulsion"), CraftStatusWidget.supportedCategories(rocket));
+        resources.layout.put(radio, Blocks.AIR.defaultBlockState());
+        resources.layout.put(engine, Blocks.AIR.defaultBlockState());
+        resources.layout.put(processor, Blocks.AIR.defaultBlockState());
+        assertEquals(List.of(), CraftStatusWidget.supportedCategories(rocket));
+    }
+
 }

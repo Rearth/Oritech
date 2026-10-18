@@ -3,29 +3,10 @@ package rearth.oritech.spaceage.simulation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.ActionMoment;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.ArrivalPrediction;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.BoosterEvent;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.CraftPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationAbortMoment;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathSample;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.*;
 import rearth.oritech.spaceage.simulation.RocketTransferRoute.Burn;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Mutable state used while one flight-plan preview is being compiled.

@@ -13,18 +13,7 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Segment;
 
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Compiles high-level navigation actions into a bounded two-dimensional flight preview.

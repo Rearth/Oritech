@@ -24,33 +24,9 @@ import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.RocketRecovery;
-import rearth.oritech.spaceage.simulation.DynamicRocketSegment;
-import rearth.oritech.spaceage.simulation.MissionController;
-import rearth.oritech.spaceage.simulation.MissionSavedData;
-import rearth.oritech.spaceage.simulation.PhysicalCrafting;
-import rearth.oritech.spaceage.simulation.RocketControllerState;
-import rearth.oritech.spaceage.simulation.RocketDocking;
-import rearth.oritech.spaceage.simulation.RocketExplosives;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.RocketPerformanceCalculator;
-import rearth.oritech.spaceage.simulation.RocketStorageScan;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
-import rearth.oritech.spaceage.simulation.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -139,7 +115,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         scanIssue = "";
 
         var startSegment = segmentFloodFill(start);
-        if (!startSegment.fullyScanned || startSegment.blocks.isEmpty() || !segmentCouplingsValid(startSegment)) {
+        if (!startSegment.fullyScanned || startSegment.blocks.isEmpty()) {
             OritechSpaceAge.LOGGER.warn("Unable to assemble invalid rocket at {}", worldPosition);
             return null;
         }
@@ -162,7 +138,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
             var segment = segmentFloodFill(candidate);
             if (segment.blocks.isEmpty()) continue;
 
-            var couplingsValid = segment.fullyScanned && segmentCouplingsValid(segment);
+            var couplingsValid = segment.fullyScanned;
             if (!couplingsValid) {
                 OritechSpaceAge.LOGGER.warn("Unable to assemble rocket with invalid couplings at {}", worldPosition);
                 return null;
@@ -396,16 +372,6 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
     public AbstractContainerMenu createMenu(int syncId, Inventory playerInventory, Player player) {
 
         return new RocketAssemblerMenu(syncId, playerInventory, this, createPreview());
-    }
-
-    // ensures no couples connect to the segment itself
-    private boolean segmentCouplingsValid(RocketFloodSegment segment) {
-
-        for (var coupling : segment.couplings) {
-            if (segment.blocks.stream().anyMatch(block -> block.pos.equals(coupling.oppositeSide))) return false;
-        }
-
-        return true;
     }
 
     private boolean rocketConnectionsValid(Map<UUID, RocketFloodSegment> segments) {

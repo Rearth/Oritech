@@ -17,15 +17,14 @@ public class EnergyDisplayWidget extends AbstractDataDisplayWidget {
 
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-        int cx = contentX();
-        int cy = contentY();
-        int cw = contentWidth();
-        int ch = contentHeight();
+        renderBar(graphics, contentX(), contentY(), contentWidth(), contentHeight(), getFillRatio());
+    }
+
+    public static void renderBar(GuiGraphicsExtractor graphics, int cx, int cy, int cw, int ch, float fillRatio) {
 
         // background
         graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, cy, 24, 0, cw, ch, REGION_WIDTH, REGION_HEIGHT, 98, 96);
 
-        float fillRatio = getFillRatio();
         int filledHeight = (int) (ch * fillRatio);
         if (filledHeight <= 0) {
             return;

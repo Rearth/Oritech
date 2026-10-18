@@ -28,30 +28,12 @@ import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.BlockIngredient;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.Docking;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.Exchange;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.Processing;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.ResourceExchange;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.SourceScope;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ServiceSettings;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings.*;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RocketServicesTest {
 

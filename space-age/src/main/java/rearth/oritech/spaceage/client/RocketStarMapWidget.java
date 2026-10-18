@@ -12,28 +12,12 @@ import net.minecraft.world.item.Items;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
-import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
+import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.FlightMotion;
-import rearth.oritech.spaceage.simulation.MissionState;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceCommunications;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -117,7 +101,7 @@ final class RocketStarMapWidget extends UIComponent {
                         Consumer<NavigationContextRequest> contextMenuListener) {
 
         super(x, y, width, height);
-        surface = OritechSurface.PANEL_INSET;
+        surface = OritechSurface.NONE;
         this.selectionListener = selectionListener;
         this.contextMenuListener = contextMenuListener;
         this.selectedTarget = selectedTarget;
@@ -136,12 +120,12 @@ final class RocketStarMapWidget extends UIComponent {
                     if (sunVisibilityListener != null) sunVisibilityListener.run();
                 }).withTextColor(0xFFCAD8E5);
         sunButton.withTooltip(Component.translatable("screen.oritech_space_age.sun_filter_tooltip"));
-        fitSystemButton = SpaceAgeButtons.darkPanel(x + width - 118, y + 6, 52, 14,
+        fitSystemButton = SpaceAgeButtons.darkPanel(x + width - 118, y + 3, 52, 14,
                 Component.translatable("screen.oritech_space_age.map.fit_system"), ignored -> fitSystem());
         fitSystemButton.withTooltip(
                 Component.translatable("screen.oritech_space_age.map.fit_system_tooltip"),
                 Component.translatable("screen.oritech_space_age.map_controls"));
-        fitRouteButton = SpaceAgeButtons.darkPanel(x + width - 62, y + 6, 52, 14,
+        fitRouteButton = SpaceAgeButtons.darkPanel(x + width - 62, y + 3, 52, 14,
                 Component.translatable("screen.oritech_space_age.map.fit_route"), ignored -> fitFlightPath());
         fitRouteButton.withTooltip(
                 Component.translatable("screen.oritech_space_age.map.fit_route_tooltip"),
@@ -302,10 +286,10 @@ final class RocketStarMapWidget extends UIComponent {
 
         camera.advanceZoom();
         camera.advancePan();
-        var viewportX = x + 5;
-        var viewportY = y + 22;
-        var viewportWidth = width - 10;
-        var viewportHeight = height - 27;
+        var viewportX = viewportX();
+        var viewportY = viewportY();
+        var viewportWidth = viewportWidth();
+        var viewportHeight = viewportHeight();
         graphics.enableScissor(viewportX, viewportY, viewportX + viewportWidth, viewportY + viewportHeight);
         // Keep the animated portal backdrop; a dark veil preserves path and label contrast above it.
         var textures = Minecraft.getInstance().getTextureManager();
@@ -787,22 +771,22 @@ final class RocketStarMapWidget extends UIComponent {
 
     private int viewportX() {
 
-        return x + 5;
+        return x;
     }
 
     private int viewportY() {
 
-        return y + 22;
+        return y + 20;
     }
 
     private int viewportWidth() {
 
-        return width - 10;
+        return width;
     }
 
     private int viewportHeight() {
 
-        return height - 27;
+        return height - 20;
     }
 
     void setTooltipsEnabled(boolean enabled) {

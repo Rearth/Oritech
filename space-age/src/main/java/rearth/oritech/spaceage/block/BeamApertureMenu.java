@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.network.RocketNetworking.AperturePayload;
-import rearth.oritech.spaceage.simulation.StaticRocketSegment.BlockData;
 import rearth.oritech.spaceage.simulation.BeamReception;
+import rearth.oritech.spaceage.simulation.StaticRocketSegment.BlockData;
 
 import java.util.List;
 import java.util.Optional;

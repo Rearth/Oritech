@@ -9,12 +9,7 @@ import net.minecraft.world.level.saveddata.SavedDataType;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.GroundStationBlockEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public final class MissionSavedData extends SavedData {
 
@@ -45,6 +40,17 @@ public final class MissionSavedData extends SavedData {
     public static MissionSavedData get(MinecraftServer server) {
 
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
+    }
+
+    public void deleteCrafts(UUID owner, List<UUID> ids) {
+
+        var owned = ids.stream().distinct().filter(id -> craft.containsKey(id) && craft.get(id).owner.equals(owner)).toList();
+        // Restore remote crafting inputs before either side and its docking links disappear.
+        owned.forEach(id -> RocketProcessingService.cancel(this, id));
+        dockingLinks.removeIf(link -> owned.contains(link.host()) || owned.contains(link.visitor()));
+        owned.forEach(craft::remove);
+        power.changed();
+        setDirty();
     }
 
     public boolean dismiss(UUID owner, UUID craftId) {

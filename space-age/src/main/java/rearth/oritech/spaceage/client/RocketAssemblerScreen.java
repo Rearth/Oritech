@@ -20,31 +20,15 @@ import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
-import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.client.ui.render.BlockPreviewEntities;
+import rearth.oritech.client.ui.render.BlockPreviewRenderState;
 import rearth.oritech.spaceage.block.BlockPairController;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.RocketNetworking;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.NavigationComputerRules;
-import rearth.oritech.spaceage.simulation.PhysicalCrafting;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.RocketLayout;
-import rearth.oritech.spaceage.simulation.RocketPerformanceCalculator;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

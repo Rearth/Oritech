@@ -50,7 +50,7 @@ final class FleetListWidgets {
                 ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"));
     }
 
-    static UIComponent row(int x, int y, int width, int height, Runnable context) {
+    static UIComponent row(int x, int y, int width, int height, Runnable toggle, Runnable context) {
 
         return new UIComponent(x, y, width, height) {
 
@@ -64,8 +64,9 @@ final class FleetListWidgets {
             @Override
             public boolean handleClick(double mouseX, double mouseY, int button) {
 
-                if (button != 1) return false;
-                context.run();
+                if (button == 0) toggle.run();
+                else if (button == 1) context.run();
+                else return false;
                 return true;
             }
         };
@@ -81,28 +82,6 @@ final class FleetListWidgets {
                 graphics.fill(x, y, x + 1, y + height, 0xFF56616C);
             }
         };
-    }
-
-    static UIComponent disclosure(int x, int y, boolean collapsed, Runnable toggle) {
-
-        return new UIComponent(x, y, 16, 16) {
-
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-
-                if (isMouseOver(mouseX, mouseY)) graphics.fill(x, y, x + width, y + height, 0xFF56616C);
-                chevron(graphics, x + 5, y + 5, collapsed, TEXT);
-            }
-
-            @Override
-            public boolean handleClick(double mouseX, double mouseY, int button) {
-
-                if (button != 0) return false;
-                toggle.run();
-                return true;
-            }
-        }.withTooltip(Component.translatable(collapsed
-                ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"));
     }
 
     private static void chevron(GuiGraphicsExtractor graphics, int x, int y, boolean collapsed, int color) {

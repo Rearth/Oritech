@@ -8,14 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * A craft owns its mission and data independently of the assembler or any loaded station.

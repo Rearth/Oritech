@@ -6,8 +6,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.DataMapProvider;
 import rearth.oritech.init.BlockContent;
-import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 
 import java.util.concurrent.CompletableFuture;

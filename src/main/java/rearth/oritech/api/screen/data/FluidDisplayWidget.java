@@ -86,16 +86,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         int cw = contentWidth();
         int ch = contentHeight();
 
-        graphics.fill(cx, cy, cx + cw, cy + ch, FLUID_BACKGROUND);
-
-        if (fluidSprite != null && getFillRatio() > 0) {
-            renderFluidSprite(graphics, cx, cy, cw, ch);
-        }
-
-        int overlayHeight = (int) (ch * (1f - getFillRatio()) * 0.98f);
-        if (overlayHeight > 0) {
-            graphics.fill(cx, cy, cx + cw, cy + overlayHeight, OVERLAY_COLOR);
-        }
+        renderContents(graphics, cx, cy, cw, ch, getFillRatio(), fluidSprite, fluidColor);
 
         var carried = Minecraft.getInstance().player.containerMenu.getCarried();
         if (isMouseOver(mouseX, mouseY) && !carried.isEmpty()) {
@@ -108,7 +99,29 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
 
         renderTransferBurst(graphics, cx, cy, cw, ch);
 
-        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, cx, cy, 48, 0, cw, ch, FRAME_REGION_WIDTH, FRAME_REGION_HEIGHT, 98, 96);
+        renderFrame(graphics, cx, cy, cw, ch);
+    }
+
+    /** Draws the standard tank gauge without container interactions. */
+    public static void renderGauge(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float fillRatio, FluidStack fluid) {
+        var sprite = fluid.isEmpty() ? null : RenderHelpers.getFluidSprite(fluid.getFluid());
+        var color = fluid.isEmpty() ? 0xFFFFFFFF : ColorHelper.makeOpaque(ColorHelper.getFluidTint(fluid));
+        renderContents(graphics, x, y, width, height, Mth.clamp(fillRatio, 0, 1), sprite, color);
+        renderFrame(graphics, x, y, width, height);
+    }
+
+    private static void renderContents(GuiGraphicsExtractor graphics, int x, int y, int width, int height,
+                                       float fillRatio, @Nullable TextureAtlasSprite sprite, int color) {
+        graphics.fill(x, y, x + width, y + height, FLUID_BACKGROUND);
+        if (sprite != null && fillRatio > 0) {
+            renderFluidSprite(graphics, x, y, width, height, sprite, color);
+        }
+        int overlayHeight = (int) (height * (1f - fillRatio) * 0.98f);
+        if (overlayHeight > 0) graphics.fill(x, y, x + width, y + overlayHeight, OVERLAY_COLOR);
+    }
+
+    private static void renderFrame(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
+        graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_COMPONENTS, x, y, 48, 0, width, height, FRAME_REGION_WIDTH, FRAME_REGION_HEIGHT, 98, 96);
     }
 
     private void updateFluidRenderData() {
@@ -236,7 +249,7 @@ public class FluidDisplayWidget extends AbstractDataDisplayWidget {
         }
     }
 
-    private void renderFluidSprite(GuiGraphicsExtractor graphics, int x, int y, int width, int height) {
+    private static void renderFluidSprite(GuiGraphicsExtractor graphics, int x, int y, int width, int height, TextureAtlasSprite fluidSprite, int fluidColor) {
         int spriteWidth = Math.max(fluidSprite.contents().width(), 16);
         int spriteHeight = Math.max(fluidSprite.contents().height(), 16);
 

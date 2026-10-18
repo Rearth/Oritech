@@ -24,6 +24,18 @@ final class StarMapLineRenderer {
     static void submit(GuiGraphicsExtractor graphics, List<Line> lines,
                        int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
 
+        submit(graphics, lines, viewportX, viewportY, viewportWidth, viewportHeight, false);
+    }
+
+    static void submitConnected(GuiGraphicsExtractor graphics, List<Line> lines,
+                                int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+
+        submit(graphics, lines, viewportX, viewportY, viewportWidth, viewportHeight, true);
+    }
+
+    private static void submit(GuiGraphicsExtractor graphics, List<Line> lines,
+                               int viewportX, int viewportY, int viewportWidth, int viewportHeight, boolean connected) {
+
         if (lines.isEmpty()) return;
         var pose = new Matrix3x2f(graphics.pose());
         var scissor = graphics.peekScissorStack();
@@ -32,7 +44,7 @@ final class StarMapLineRenderer {
         // Use physical pixels so the soft edge does not grow with the player's GUI scale.
         var guiScale = Minecraft.getInstance().gameRenderer.getGameRenderState().windowRenderState.guiScale;
         var edgeWidth = 1f / Math.max(1, guiScale);
-        graphics.submitGuiElementRenderState(new RenderState(List.copyOf(lines), pose, edgeWidth, scissor, clippedBounds));
+        graphics.submitGuiElementRenderState(new RenderState(List.copyOf(lines), pose, edgeWidth, connected, scissor, clippedBounds));
     }
 
     /**
@@ -47,53 +59,78 @@ final class StarMapLineRenderer {
         }
     }
 
+    private static boolean touches(Line first, Line second) {
+
+        return first.toX == second.fromX && first.toY == second.fromY;
+    }
+
+    // Both segments use exactly the same edge vertices, including while pulse widths change.
+    static Join join(Line first, Line second) {
+
+        var firstLength = Math.hypot(first.toX - first.fromX, first.toY - first.fromY);
+        var secondLength = Math.hypot(second.toX - second.fromX, second.toY - second.fromY);
+        var ax = -(first.toY - first.fromY) / firstLength;
+        var ay = (first.toX - first.fromX) / firstLength;
+        var bx = -(second.toY - second.fromY) / secondLength;
+        var by = (second.toX - second.fromX) / secondLength;
+        var divisor = Math.max(.25, 1 + ax * bx + ay * by);
+        return new Join((ax + bx) / divisor, (ay + by) / divisor, (first.width + second.width) * .5f);
+    }
+
+    record Join(double x, double y, float width) {
+    }
+
     /**
      * Captured geometry, transform, one-pixel edge width, clipping area and viewport bounds.
      */
-    private record RenderState(List<Line> lines, Matrix3x2f pose, float edgeWidth,
+    private record RenderState(List<Line> lines, Matrix3x2f pose, float edgeWidth, boolean connected,
                                @Nullable ScreenRectangle scissorArea,
                                @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
 
         @Override
         public void buildVertices(VertexConsumer consumer) {
 
-            for (var line : lines) {
+            for (var index = 0; index < lines.size(); index++) {
+                var line = lines.get(index);
                 var dx = line.toX - line.fromX;
                 var dy = line.toY - line.fromY;
                 var length = Math.hypot(dx, dy);
                 if (length < 0.001 || line.width <= 0) continue;
                 var normalX = -dy / length;
                 var normalY = dx / length;
+                var start = new Join(normalX, normalY, line.width);
+                var end = start;
+                if (connected && index > 0 && touches(lines.get(index - 1), line)) start = join(lines.get(index - 1), line);
+                if (connected && index + 1 < lines.size() && touches(line, lines.get(index + 1))) end = join(line, lines.get(index + 1));
                 if (!line.antialiased) {
-                    band(consumer, line, normalX, normalY, -line.width * 0.5f, line.width * 0.5f,
+                    band(consumer, line, start, end, -start.width * 0.5f, start.width * 0.5f, -end.width * 0.5f, end.width * 0.5f,
                             line.color, line.color);
                     continue;
                 }
 
                 // Center the fade on the old edge, keeping the apparent thickness close to the original.
-                var inner = Math.max(0, (line.width - edgeWidth) * 0.5f);
-                var outer = inner + edgeWidth;
+                var innerStart = Math.max(0, (start.width - edgeWidth) * 0.5f);
+                var innerEnd = Math.max(0, (end.width - edgeWidth) * 0.5f);
+                var outerStart = innerStart + edgeWidth;
+                var outerEnd = innerEnd + edgeWidth;
                 var alpha = Math.round((line.color >>> 24) * Math.min(1, line.width / edgeWidth));
                 var centerColor = (line.color & 0x00FFFFFF) | (alpha << 24);
                 var clearColor = line.color & 0x00FFFFFF;
-                if (inner > 0) band(consumer, line, normalX, normalY, -inner, inner, centerColor, centerColor);
-                band(consumer, line, normalX, normalY, -outer, -inner, clearColor, centerColor);
-                band(consumer, line, normalX, normalY, inner, outer, centerColor, clearColor);
+                if (innerStart > 0 || innerEnd > 0)
+                    band(consumer, line, start, end, -innerStart, innerStart, -innerEnd, innerEnd, centerColor, centerColor);
+                band(consumer, line, start, end, -outerStart, -innerStart, -outerEnd, -innerEnd, clearColor, centerColor);
+                band(consumer, line, start, end, innerStart, outerStart, innerEnd, outerEnd, centerColor, clearColor);
                 // Only soften the sides: fading every short segment's ends would leave dots along a curve.
             }
         }
 
-        private void band(VertexConsumer consumer, Line line, double normalX, double normalY,
-                          float firstOffset, float secondOffset, int firstColor, int secondColor) {
+        private void band(VertexConsumer consumer, Line line, Join start, Join end,
+                          float firstStart, float secondStart, float firstEnd, float secondEnd, int firstColor, int secondColor) {
 
-            var firstX = (float) (normalX * firstOffset);
-            var firstY = (float) (normalY * firstOffset);
-            var secondX = (float) (normalX * secondOffset);
-            var secondY = (float) (normalY * secondOffset);
-            consumer.addVertexWith2DPose(pose, (float) line.fromX + firstX, (float) line.fromY + firstY).setColor(firstColor);
-            consumer.addVertexWith2DPose(pose, (float) line.fromX + secondX, (float) line.fromY + secondY).setColor(secondColor);
-            consumer.addVertexWith2DPose(pose, (float) line.toX + secondX, (float) line.toY + secondY).setColor(secondColor);
-            consumer.addVertexWith2DPose(pose, (float) line.toX + firstX, (float) line.toY + firstY).setColor(firstColor);
+            consumer.addVertexWith2DPose(pose, (float) (line.fromX + start.x * firstStart), (float) (line.fromY + start.y * firstStart)).setColor(firstColor);
+            consumer.addVertexWith2DPose(pose, (float) (line.fromX + start.x * secondStart), (float) (line.fromY + start.y * secondStart)).setColor(secondColor);
+            consumer.addVertexWith2DPose(pose, (float) (line.toX + end.x * secondEnd), (float) (line.toY + end.y * secondEnd)).setColor(secondColor);
+            consumer.addVertexWith2DPose(pose, (float) (line.toX + end.x * firstEnd), (float) (line.toY + end.y * firstEnd)).setColor(firstColor);
         }
 
         @Override

@@ -1,7 +1,7 @@
 package rearth.oritech.spaceage.client;
 
-import rearth.oritech.spaceage.client.RocketMapPaths.Point;
 import rearth.oritech.api.screen.widgets.BlockWidget;
+import rearth.oritech.spaceage.client.RocketMapPaths.Point;
 
 import java.util.ArrayList;
 import java.util.Comparator;

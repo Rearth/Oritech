@@ -1,13 +1,13 @@
 package rearth.oritech.spaceage.simulation;
 
-import org.junit.jupiter.api.Test;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
-import java.util.Map;
-import java.util.Set;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -2,20 +2,14 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SpaceCommunicationsTest {
 

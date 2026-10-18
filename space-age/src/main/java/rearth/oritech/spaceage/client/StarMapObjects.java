@@ -7,24 +7,13 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.widgets.BlockWidget;
-import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.client.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.SurveyRules;
+import rearth.oritech.spaceage.simulation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Celestial object state and all object, surface, and orbit map rendering.

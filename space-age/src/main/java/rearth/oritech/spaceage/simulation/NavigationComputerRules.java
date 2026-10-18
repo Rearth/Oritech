@@ -1,20 +1,9 @@
 package rearth.oritech.spaceage.simulation;
 
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

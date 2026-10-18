@@ -5,28 +5,12 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
-import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
+import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ServiceSettings;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**

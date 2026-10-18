@@ -4,11 +4,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /** Slots describe stationary destinations, rather than propagated physical orbits. */
 final class SunOrbitRules {

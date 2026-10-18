@@ -7,24 +7,10 @@ import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
-import rearth.oritech.api.screen.widgets.ButtonWidget;
-import rearth.oritech.api.screen.widgets.LabelWidget;
-import rearth.oritech.api.screen.widgets.ScrollWidget;
-import rearth.oritech.api.screen.widgets.SurfaceWidget;
-import rearth.oritech.api.screen.widgets.ToggleWidget;
-import rearth.oritech.spaceage.simulation.NavigationComputerRules;
-import rearth.oritech.spaceage.simulation.RocketDocking;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.RocketHardware;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.api.screen.widgets.*;
+import rearth.oritech.spaceage.simulation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Locale;
-import java.util.List;
+import java.util.*;
 
 /**
  * Builds popup controls; their text, selected card and input handling stay in the editor.

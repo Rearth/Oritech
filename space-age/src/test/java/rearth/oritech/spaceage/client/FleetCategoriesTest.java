@@ -3,15 +3,12 @@ package rearth.oritech.spaceage.client;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class FleetCategoriesTest {
 
@@ -36,8 +33,9 @@ class FleetCategoriesTest {
         preferences.toggle(category);
         preferences.toggle(FleetCategories.SUN);
         var loaded = new FleetCategories(file);
-        assertEquals(category, loaded.category(relay, true), "A manual assignment survives orbit changes");
-        assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(solar, true), "Manual Uncategorized overrides automatic Sun grouping");
+        assertEquals(category, loaded.category(relay, false), "Manual assignments survive restart");
+        assertEquals(FleetCategories.SUN, loaded.category(relay, true), "Sun orbit always groups automatically");
+        assertEquals(FleetCategories.SUN, loaded.category(solar, true), "Manual Uncategorized cannot hide a Sun craft");
         assertTrue(loaded.collapsed(category));
         assertFalse(loaded.collapsed(FleetCategories.SUN));
         assertEquals("Relays", loaded.categories().getLast().name());
@@ -59,10 +57,23 @@ class FleetCategoriesTest {
         preferences.delete(FleetCategories.SUN, List.of(automatic));
         var loaded = new FleetCategories(file);
         for (var craft : List.of(active, absent, automatic, UUID.randomUUID()))
-            assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(craft, true));
-        assertEquals(List.of(FleetCategories.UNCATEGORIZED), loaded.categories().stream().map(FleetCategories.Category::id).toList());
+            assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(craft, false));
+        assertEquals(List.of(FleetCategories.UNCATEGORIZED, FleetCategories.SUN), loaded.categories().stream().map(FleetCategories.Category::id).toList());
         loaded.delete(FleetCategories.UNCATEGORIZED, List.of(active));
-        assertEquals(1, new FleetCategories(file).categories().size(), "The fallback section always exists");
+        assertEquals(2, new FleetCategories(file).categories().size(), "Both automatic sections always exist");
+        assertEquals(FleetCategories.SUN, loaded.category(automatic, true));
+    }
+
+    @Test
+    void missingSunSectionIsRestoredFromExistingPreferences() throws Exception {
+
+        var file = directory.resolve("categories.json");
+        Files.writeString(file, "{\"categories\":[],\"assignments\":{}}");
+        var preferences = new FleetCategories(file);
+        assertEquals(List.of(FleetCategories.UNCATEGORIZED, FleetCategories.SUN),
+                preferences.categories().stream().map(FleetCategories.Category::id).toList());
+        preferences.delete(FleetCategories.SUN, List.of());
+        assertEquals(FleetCategories.SUN, preferences.category(UUID.randomUUID(), true));
     }
 
     @Test

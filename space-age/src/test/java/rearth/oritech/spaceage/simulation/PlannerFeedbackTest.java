@@ -3,25 +3,13 @@ package rearth.oritech.spaceage.simulation;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NOT_ENOUGH_SERVICE_RF;
-import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NO_FEASIBLE_TRANSFER;
-import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.NO_SCANNER;
-import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.READY;
+import static rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState.*;
 
 class PlannerFeedbackTest {
 

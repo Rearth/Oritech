@@ -6,17 +6,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Keeps the client editor and server storage on the same small set of mission-plan rules.

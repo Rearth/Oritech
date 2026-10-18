@@ -2,9 +2,12 @@ package rearth.oritech.spaceage.client;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -13,6 +16,24 @@ import java.util.function.Consumer;
 final class SpaceAgeButtons {
 
     private SpaceAgeButtons() {
+    }
+
+    static List<ButtonWidget> missionTabs(int selected, Runnable fleet, Runnable craft, Runnable plan) {
+
+        var keys = List.of("screen.oritech_space_age.mission.fleet", "screen.oritech_space_age.craft.title",
+                "screen.oritech_space_age.flight_plan");
+        var actions = List.of(fleet, craft, plan);
+        var tabs = new ArrayList<ButtonWidget>();
+        for (var index = 0; index < keys.size(); index++) {
+            var action = actions.get(index);
+            var tab = panel(9 + index * 80, 9, 76, 20, Component.translatable(keys.get(index)), ignored -> action.run());
+            if (index == selected) {
+                tab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
+                tab.setActive(false);
+            }
+            tabs.add(tab);
+        }
+        return tabs;
     }
 
     static ButtonWidget panel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {

@@ -2,11 +2,7 @@ package rearth.oritech.spaceage.client;
 
 import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Reduce crowded map icons in screen space, independently for rockets and asteroids.

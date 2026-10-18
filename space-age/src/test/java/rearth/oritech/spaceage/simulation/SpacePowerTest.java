@@ -8,8 +8,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import rearth.oritech.spaceage.recipe.BlockIngredient;
-import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,28 +15,15 @@ import net.neoforged.neoforge.registries.BaseMappedRegistry;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-
-import java.util.HashMap;
-import java.util.HashSet;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
+import rearth.oritech.spaceage.recipe.BlockIngredient;
+import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 class SpacePowerTest {
 
@@ -74,6 +59,24 @@ class SpacePowerTest {
         var plan = new FlightPlan(List.of(new FlightPlanBranch(UUID.randomUUID(), FlightPlanBranch.NO_PARENT, List.of(action))), List.of());
         return new MissionState(owner, rocket, plan, new MissionState.Position(x, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW,
                 -1, 1, FlightPlanAction.NO_TARGET, SegmentRef.of(structure)), new SurveyKnowledge(), BlockPos.ZERO, 0);
+    }
+
+    @Test
+    void bulkDeletionOnlyRemovesOwnedCraftAndCleansDockingLinks() {
+
+        var owner = UUID.randomUUID();
+        var host = station(owner, 0);
+        var visitor = station(owner, 0);
+        var foreign = station(UUID.randomUUID(), 0);
+        var data = new MissionSavedData();
+        for (var state : List.of(host, visitor, foreign)) data.craft.put(state.rocket.getRocketId(), state);
+        data.dockingLinks.add(new DockingLink(host.rocket.getRocketId(), visitor.rocket.getRocketId(),
+                RocketServiceSettings.HardwareRef.NONE, RocketServiceSettings.HardwareRef.NONE));
+        data.deleteCrafts(owner, List.of(host.rocket.getRocketId(), foreign.rocket.getRocketId(), UUID.randomUUID()));
+        assertFalse(data.craft.containsKey(host.rocket.getRocketId()));
+        assertTrue(data.craft.containsKey(visitor.rocket.getRocketId()));
+        assertTrue(data.craft.containsKey(foreign.rocket.getRocketId()));
+        assertTrue(data.dockingLinks.isEmpty());
     }
 
     private static void powerTick(MissionSavedData data) {

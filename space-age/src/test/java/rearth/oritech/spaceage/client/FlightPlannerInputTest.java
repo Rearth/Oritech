@@ -4,12 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.DISTANCE_FROM_TARGET;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.LOW_FUEL;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.LOW_RF;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.TIME_BEFORE_ARRIVAL;
-import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.values;
+import static rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType.*;
 
 /**
  * Keep the editor's accepted input and limits unchanged when moving it out of the screen.

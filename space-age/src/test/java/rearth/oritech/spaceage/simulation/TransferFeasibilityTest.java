@@ -8,22 +8,11 @@ import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Segment;
 import rearth.oritech.spaceage.simulation.SpaceObjects.DetectionState;
 import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ArrivalVelocityMode;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TransferFeasibilityTest {
 

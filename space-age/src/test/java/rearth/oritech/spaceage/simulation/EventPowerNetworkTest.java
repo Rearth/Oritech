@@ -4,29 +4,16 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.Test;
-import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashSet;
+import org.junit.jupiter.api.TestFactory;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
+
+import java.util.*;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /** Controlled hardware isolates network integration from the separate real-block/datamap GameTests. */
 class EventPowerNetworkTest {

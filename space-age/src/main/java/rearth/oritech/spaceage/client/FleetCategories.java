@@ -11,11 +11,7 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /** Local fleet organization; assignments are independent of missions and their changing locations. */
 final class FleetCategories {
@@ -37,7 +33,9 @@ final class FleetCategories {
             } catch (IOException | RuntimeException exception) {
                 OritechSpaceAge.LOGGER.warn("Could not load fleet categories", exception);
             }
-        } else categories.add(new Category(SUN, "", true));
+        }
+        if (categories.stream().noneMatch(category -> category.id().equals(SUN)))
+            categories.add(new Category(SUN, "", true));
         if (categories.stream().noneMatch(category -> category.id().equals(UNCATEGORIZED)))
             categories.addFirst(new Category(UNCATEGORIZED, "", false));
     }
@@ -47,11 +45,9 @@ final class FleetCategories {
         return List.copyOf(categories);
     }
 
-    String category(UUID craft, boolean sunOrbit) {
+    static boolean permanent(String id) {
 
-        var assigned = assignments.get(craft);
-        if (assigned != null && contains(assigned)) return assigned;
-        return sunOrbit && contains(SUN) ? SUN : UNCATEGORIZED;
+        return id.equals(UNCATEGORIZED) || id.equals(SUN);
     }
 
     boolean collapsed(String id) {
@@ -83,12 +79,19 @@ final class FleetCategories {
         save();
     }
 
+    String category(UUID craft, boolean sunOrbit) {
+
+        if (sunOrbit) return SUN;
+        var assigned = assignments.get(craft);
+        if (assigned != null && !assigned.equals(SUN) && contains(assigned)) return assigned;
+        return UNCATEGORIZED;
+    }
+
     void delete(String id, List<UUID> members) {
 
-        if (id.equals(UNCATEGORIZED)) return;
+        if (permanent(id)) return;
         categories.removeIf(category -> category.id().equals(id));
         assignments.replaceAll((craft, category) -> category.equals(id) ? UNCATEGORIZED : category);
-        // Automatic Sun assignments must also stay uncategorized after deleting their section.
         members.forEach(craft -> assignments.put(craft, UNCATEGORIZED));
         save();
     }

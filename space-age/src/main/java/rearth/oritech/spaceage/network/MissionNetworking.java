@@ -19,20 +19,7 @@ import rearth.oritech.spaceage.client.MissionNotifications;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
-import rearth.oritech.spaceage.simulation.DockingTarget;
-import rearth.oritech.spaceage.simulation.MissionController;
-import rearth.oritech.spaceage.simulation.MissionForecast;
-import rearth.oritech.spaceage.simulation.MissionSavedData;
-import rearth.oritech.spaceage.simulation.MissionState;
-import rearth.oritech.spaceage.simulation.RocketDocking;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.RocketProcessingService;
-import rearth.oritech.spaceage.simulation.SpaceCommunications;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
+import rearth.oritech.spaceage.simulation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -84,6 +71,12 @@ public final class MissionNetworking {
             var data = MissionSavedData.get(player.level().getServer());
             if (!data.dismiss(player.getUUID(), payload.id())) return;
             data.setDirty();
+            sendFleet(player);
+        });
+        registrar.playToServer(DeleteCrafts.TYPE, NetworkManager.getAutoCodec(DeleteCrafts.class), (payload, context) -> {
+            if (!(context.player() instanceof ServerPlayer player)
+                    || !(player.containerMenu instanceof MissionControlMenu menu) || !menu.stillValid(player)) return;
+            MissionSavedData.get(player.level().getServer()).deleteCrafts(player.getUUID(), payload.ids());
             sendFleet(player);
         });
         registrar.playToServer(CardRequest.TYPE, NetworkManager.getAutoCodec(CardRequest.class), MissionNetworking::card);
@@ -319,6 +312,16 @@ public final class MissionNetworking {
     public record CancelCrafting(UUID id) implements CustomPacketPayload {
 
         public static final Type<CancelCrafting> TYPE = new Type<>(OritechSpaceAge.id("cancel_crafting"));
+
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+    }
+
+    public record DeleteCrafts(List<UUID> ids) implements CustomPacketPayload {
+
+        public static final Type<DeleteCrafts> TYPE = new Type<>(OritechSpaceAge.id("delete_crafts"));
 
         public Type<? extends CustomPacketPayload> type() {
 

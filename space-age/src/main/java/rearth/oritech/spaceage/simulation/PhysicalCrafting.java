@@ -10,11 +10,7 @@ import rearth.oritech.spaceage.simulation.RocketServiceSettings.HardwareRef;
 import rearth.oritech.spaceage.simulation.RocketServiceSettings.Processing;
 import rearth.oritech.spaceage.simulation.RocketServiceSettings.SourceScope;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Pair discovery and ownership are shared by live services and isolated forecasts.

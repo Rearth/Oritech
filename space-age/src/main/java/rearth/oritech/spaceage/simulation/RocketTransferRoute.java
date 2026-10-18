@@ -1,8 +1,8 @@
 package rearth.oritech.spaceage.simulation;
 
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Context;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Craft;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.NavigationFailure;
 
 import java.util.List;
 import java.util.Random;

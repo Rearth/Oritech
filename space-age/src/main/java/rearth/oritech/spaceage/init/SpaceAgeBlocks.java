@@ -8,19 +8,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent.NoBlockItem;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.BeamApertureBlock;
-import rearth.oritech.spaceage.block.BlockPairController;
-import rearth.oritech.spaceage.block.MissionControlBlock;
-import rearth.oritech.spaceage.block.SurveyModuleBlock;
-import rearth.oritech.spaceage.block.VacuumCrafterBlock;
+import rearth.oritech.spaceage.block.*;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
-import rearth.oritech.spaceage.block.basic.AsteroidBlock;
-import rearth.oritech.spaceage.block.basic.GalleryLightBlock;
-import rearth.oritech.spaceage.block.basic.GlobeBlock;
-import rearth.oritech.spaceage.block.basic.PlanetBlock;
-import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
-import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
-import rearth.oritech.spaceage.block.basic.RocketPadBlock;
+import rearth.oritech.spaceage.block.basic.*;
 
 public final class SpaceAgeBlocks {
 

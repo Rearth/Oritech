@@ -11,35 +11,12 @@ import org.junit.jupiter.api.Test;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.ReflectiveCodecBuilder;
 import rearth.oritech.spaceage.network.MissionNetworking;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.FlightPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.MotionSample;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.ProcessingEstimate;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ArrivalVelocityMode;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.*;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class TrajectoryRoutingTest {
 

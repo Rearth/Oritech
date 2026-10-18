@@ -1,21 +1,19 @@
 package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.JsonOps;
-import org.junit.jupiter.api.Test;
 import net.minecraft.core.BlockPos;
+import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import java.util.Map;
 import rearth.oritech.spaceage.simulation.RocketFlightPathState.Segment;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RocketResourceAccountingTest {
 

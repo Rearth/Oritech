@@ -2,24 +2,14 @@ package rearth.oritech.spaceage.client;
 
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.simulation.FlightMotion;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.AsteroidPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.BoosterEvent;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.CraftPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.FlightPath;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.MotionSample;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathPhase;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.PathSample;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.TerminalState;
+import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator.*;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class RocketMapPathsTest {
 

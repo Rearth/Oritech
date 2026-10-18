@@ -15,8 +15,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 

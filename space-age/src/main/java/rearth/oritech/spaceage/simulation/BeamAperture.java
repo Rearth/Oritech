@@ -9,12 +9,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.SpaceAgeConfig;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
-
 import rearth.oritech.spaceage.simulation.StaticRocketSegment.BlockData;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;

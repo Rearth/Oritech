@@ -1,24 +1,24 @@
 package rearth.oritech.spaceage.client;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import rearth.oritech.client.init.OritechClientConfig;
-import rearth.oritech.spaceage.simulation.SpacePowerService.SurfaceBeam;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.client.renderers.blocks.EndericLaserRenderer;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.network.GroundBeamNetworking.Beams;
+import rearth.oritech.spaceage.simulation.SpacePowerService.SurfaceBeam;
 
 import java.util.List;
 

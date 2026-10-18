@@ -2,17 +2,7 @@ package rearth.oritech.spaceage.client;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import rearth.oritech.spaceage.simulation.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
-import rearth.oritech.spaceage.simulation.BeamAperture;
-import rearth.oritech.spaceage.simulation.ParachuteLanding;
-import rearth.oritech.spaceage.simulation.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.SpacePowerHardware;
-import rearth.oritech.spaceage.simulation.SolarPower;
+import rearth.oritech.spaceage.simulation.*;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
