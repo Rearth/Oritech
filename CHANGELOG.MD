@@ -1,0 +1,3 @@
+- Fix fertilizer causing crash by trying to open a destroyer screen
+- Fix ftb materials compat recipes adding wrong foundry recipes
+- Update crowdin translations
