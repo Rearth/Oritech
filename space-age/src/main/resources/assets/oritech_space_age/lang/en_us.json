@@ -2,6 +2,7 @@
   "communication.oritech_space_age.outside_coverage": "Outside communication coverage",
   "screen.oritech_space_age.fleet.uncategorized": "Uncategorized",
   "screen.oritech_space_age.fleet.sun": "Sun orbit",
+  "screen.oritech_space_age.fleet.filtered": "%s hidden by Sun filter",
   "screen.oritech_space_age.fleet.create": "+ New category",
   "screen.oritech_space_age.fleet.current": "%s (current)",
   "screen.oritech_space_age.fleet.name": "Category name",

@@ -68,6 +68,7 @@ final class RocketStarMapWidget extends UIComponent {
     private final ToggleWidget beamsButton;
     private final ToggleWidget sunButton;
     private boolean showBeams = true;
+    private Runnable sunVisibilityListener;
     // Simplified draw geometry is reused while the player is looking at a stationary map.
     private List<StarMapLineRenderer.Line> cachedLines = List.of();
     private List<StarMapLineRenderer.Line> cachedFlightLines = List.of();
@@ -132,6 +133,7 @@ final class RocketStarMapWidget extends UIComponent {
                     var currentSnapshot = this.snapshot;
                     this.snapshot = null;
                     updateFlightPath(currentSnapshot, this.flightPath, this.selectedBranch);
+                    if (sunVisibilityListener != null) sunVisibilityListener.run();
                 }).withTextColor(0xFFCAD8E5);
         sunButton.withTooltip(Component.translatable("screen.oritech_space_age.sun_filter_tooltip"));
         fitSystemButton = SpaceAgeButtons.darkPanel(x + width - 118, y + 6, 52, 14,
@@ -386,7 +388,7 @@ final class RocketStarMapWidget extends UIComponent {
 
         for (var branch : snapshot.plan().branches()) {
             var action = branch.actions().stream().filter(a -> !a.isGenerated()).findFirst().orElse(null);
-            if (action == null || action.type() != SpaceSimulation.ActionType.BEAM_POWER || hiddenBranches.contains(branch.id())) continue;
+            if (action == null || action.type() != SpaceSimulation.ActionType.BEAM_POWER) continue;
             var path = pathsByBranch.get(branch.id());
             if (path == null || path.samples().isEmpty()) continue;
             var sample = path.samples().getFirst();
@@ -428,6 +430,11 @@ final class RocketStarMapWidget extends UIComponent {
             marker.withShowOverlay(false).withTooltipFromStack(false);
             rocketMarkers.add(new BranchMarker(id, time, sample.x(), sample.y(), marker));
         });
+    }
+
+    void setSunVisibilityListener(Runnable listener) {
+
+        sunVisibilityListener = listener;
     }
 
     void setHiddenBranches(Set<UUID> branches) {

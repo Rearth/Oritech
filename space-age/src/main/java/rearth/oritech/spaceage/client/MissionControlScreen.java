@@ -325,7 +325,16 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         addComponent(speedButton);
         addNetworkIndicators(w, menu.network);
         var listWidth = Math.min(235, w / 3);
-        var list = new ScrollWidget(8, 30, listWidth, h - 40).withVerticalScroll(true).withRenderCulling(4);
+        var list = new ScrollWidget(8, 30, listWidth, h - 40) {
+
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                graphics.fill(x, y, x + width, y + height, 0xFF2A3036);
+                super.renderContent(graphics, mouseX, mouseY, delta);
+            }
+        }.withVerticalScroll(true).withRenderCulling(4);
+        list.setSurface(OritechSurface.NONE);
         fleetList = list;
         categoryPopup = null;
         categoryNameField = null;
@@ -341,27 +350,31 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         for (int i = 0; i < menu.fleet.size(); i++) numbers.put(menu.fleet.get(i).id(), i + 1);
         for (var category : FleetViewPreferences.CATEGORIES.categories()) {
             var members = menu.fleet.stream().filter(entry -> category(entry).equals(category.id())).toList();
-            var heading = categoryName(category).copy().append(" (" + members.size() + ")");
-            list.addChild(SpaceAgeButtons.darkPanel(2, y, listWidth - 61, 22,
-                    fit(heading, listWidth - 73), ignored -> {
+            var sectionY = y;
+            list.addChild(FleetListWidgets.section(2, y, listWidth - 12, categoryName(category), members.size(),
+                    category.collapsed(), () -> {
                         FleetViewPreferences.CATEGORIES.toggle(category.id());
                         rebuildComponents();
-                    }).withTooltip(heading));
-            list.addChild(SpaceAgeButtons.collapse(listWidth - 35, y + 3, category.collapsed(), ignored -> {
-                FleetViewPreferences.CATEGORIES.toggle(category.id());
-                rebuildComponents();
-            }));
-            if (!category.id().equals(FleetCategories.UNCATEGORIZED))
-                list.addChild(SpaceAgeButtons.darkPanel(listWidth - 54, y + 3, 16, 16, Component.literal("×"), ignored -> {
-                    deletingCategory = category.id();
-                    rebuildComponents();
-                }).withTooltip(Component.translatable("screen.oritech_space_age.fleet.delete")));
+                    }, category.id().equals(FleetCategories.UNCATEGORIZED) ? null : () -> {
+                        deletingCategory = category.id();
+                        rebuildComponents();
+                    }));
             y += 27;
             if (!category.collapsed()) {
-                for (var entry : members) y = addFleetRow(list, listWidth, y, entry, numbers.get(entry.id()), presentation);
+                for (var entry : members) {
+                    if (shown(entry)) y = addFleetRow(list, listWidth, y, entry, numbers.get(entry.id()), presentation);
+                }
+                var filtered = members.stream().filter(entry -> !shown(entry)).count();
+                if (filtered > 0) {
+                    list.addChild(new LabelWidget(20, y + 5, listWidth - 36,
+                            Component.translatable("screen.oritech_space_age.fleet.filtered", filtered)).withColor(0xFF9EAAB5));
+                    y += 22;
+                }
             }
+            if (y > sectionY + 27) list.addChild(FleetListWidgets.guide(7, sectionY + 27, y - sectionY - 29));
+            y += 8;
         }
-        list.addChild(SpaceAgeButtons.panel(2, y + 4, listWidth - 12, 22,
+        list.addChild(SpaceAgeButtons.darkPanel(14, y + 4, listWidth - 24, 20,
                 Component.translatable("screen.oritech_space_age.fleet.create"), ignored -> {
                     creatingCategory = true;
                     categoryNameDraft = "";
@@ -379,6 +392,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             }, ignored -> {
             });
             map.copyViewFrom(previous);
+            map.setSunVisibilityListener(this::rebuildComponents);
             map.setHiddenBranches(menu.fleet.stream().filter(this::hidden).map(MissionNetworking.FleetEntry::id).collect(Collectors.toSet()));
             map.setCoverage(nodes);
             map.setShowSummary(false);
@@ -556,40 +570,33 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         var collapsed = FleetViewPreferences.collapsed(entry.id());
         var working = telemetry.rocket().getDynamicSegments().values().stream().anyMatch(r -> !r.reserved.isEmpty()
                 || r.crafters.values().stream().anyMatch(c -> c.job != null));
-        list.addChild(new SurfaceWidget(2, y, listWidth - 12, collapsed ? 28 : working ? 120 : 100, OritechSurface.PANEL_DARK) {
-
-            @Override
-            public boolean handleClick(double mouseX, double mouseY, int button) {
-
-                if (button != 1) return false;
-                categoryCraft = entry.id();
-                rebuildComponents();
-                return true;
-            }
-        }.withTooltip(Component.translatable("screen.oritech_space_age.fleet.assign_hint")));
-        var titleWidth = listWidth - (!collapsed && entry.dismissible() ? 65 : 45);
-        var titleLabel = new LabelWidget(8, y + 6, titleWidth, 18, craftName).withBrightColor().withWrap(true);
+        list.addChild(FleetListWidgets.row(14, y, listWidth - 24, collapsed ? 24 : working ? 120 : 100, () -> {
+            categoryCraft = entry.id();
+            rebuildComponents();
+        }).withTooltip(Component.translatable("screen.oritech_space_age.fleet.assign_hint")));
+        var titleWidth = listWidth - (!collapsed && entry.dismissible() ? 77 : 57);
+        var titleLabel = new LabelWidget(20, y + 6, titleWidth, 18, fit(craftName, titleWidth)).withBrightColor();
         titleLabel.withTooltip(craftName);
         list.addChild(titleLabel);
-        list.addChild(SpaceAgeButtons.collapse(listWidth - 35, y + 5, collapsed, ignored -> {
+        list.addChild(FleetListWidgets.disclosure(listWidth - 34, y + 4, collapsed, () -> {
             FleetViewPreferences.toggle(entry.id());
             rebuildComponents();
         }));
         if (!collapsed && entry.dismissible()) list.addChild(SpaceAgeButtons.darkPanel(listWidth - 54, y + 5, 16, 16,
                         Component.literal("×"), ignored -> ClientPacketDistributor.sendToServer(new MissionNetworking.DismissCraft(entry.id())))
                 .withTooltip(Component.translatable("screen.oritech_space_age.mission.dismiss_tooltip")));
-        var statusLabel = new LabelWidget(8, y + 25, listWidth - 24, 18, status).withBrightColor().withWrap(true);
+        var statusLabel = new LabelWidget(20, y + 25, listWidth - 36, 18, status).withBrightColor().withWrap(true);
         statusLabel.setVisible(!collapsed);
         statusLabel.withTooltip(serviceDetails(telemetry, menu.debugSpeed));
         list.addChild(statusLabel);
-        var locationLabel = new LabelWidget(8, y + 43, listWidth - 24, 18,
+        var locationLabel = new LabelWidget(20, y + 43, listWidth - 36, 18,
                 recovered ? Component.translatable("screen.oritech_space_age.mission.science_delivered")
                         : location(telemetry, menu.fleetSnapshot.objects()))
                 .withBrightColor().withWrap(true);
         list.addChild(locationLabel);
         locationLabel.setVisible(!collapsed);
         var link = entry.communication();
-        var radio = new LabelWidget(8, y + 61, listWidth - 24,
+        var radio = new LabelWidget(20, y + 61, listWidth - 36,
                 Component.translatable("screen.oritech_space_age.mission.radio_status",
                         availability(entry.connected())))
                 .withColor(entry.connected() ? 0xFF9FE58A : 0xFFFFC46B);
@@ -598,7 +605,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                 Component.translatable("screen.oritech_space_age.mission.coverage_distance", coverageDistance(link.coverageAltitude()), distance(link.altitude())));
         list.addChild(radio);
         radio.setVisible(!collapsed);
-        var edit = SpaceAgeButtons.panel(8, y + 78, listWidth - 24, 17,
+        var edit = SpaceAgeButtons.panel(20, y + 78, listWidth - 36, 17,
                 Component.translatable(entry.connected() ? "screen.oritech_space_age.mission.view_edit"
                         : "screen.oritech_space_age.mission.view_read_only"), ignored ->
                         ClientPacketDistributor.sendToServer(new MissionNetworking.FleetRequest(entry.id(), true)));
@@ -609,13 +616,13 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         edit.setVisible(!collapsed);
         fleetRows.put(entry.id(), new FleetRow(craftNumber, titleLabel, statusLabel, locationLabel, radio, edit));
         if (working && !collapsed) {
-            var cancel = SpaceAgeButtons.panel(8, y + 97, listWidth - 24, 17, Component.translatable("screen.oritech_space_age.service.cancel_crafting"),
+            var cancel = SpaceAgeButtons.panel(20, y + 97, listWidth - 36, 17, Component.translatable("screen.oritech_space_age.service.cancel_crafting"),
                     ignored -> ClientPacketDistributor.sendToServer(new MissionNetworking.CancelCrafting(entry.id())));
             cancel.setActive(entry.connected());
             cancel.withTooltip(Component.translatable("screen.oritech_space_age.service.cancel_crafting_help"));
             list.addChild(cancel);
         }
-        return y + (collapsed ? 33 : working ? 125 : 105);
+        return y + (collapsed ? 26 : working ? 122 : 102);
     }
 
     private String category(MissionNetworking.FleetEntry entry) {
@@ -625,6 +632,13 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                 && position.orbit() == SpaceSimulation.OrbitBand.SOLAR);
     }
 
+    private boolean shown(MissionNetworking.FleetEntry entry) {
+
+        var position = entry.telemetry().position();
+        return FleetViewPreferences.showSun() || !position.target().equals(SpaceSimulation.SUN_ID)
+                || position.orbit() != SpaceSimulation.OrbitBand.SOLAR;
+    }
+
     private boolean hidden(MissionNetworking.FleetEntry entry) {
 
         return FleetViewPreferences.collapsed(entry.id()) || !visible(entry);
@@ -632,7 +646,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
 
     private boolean visible(MissionNetworking.FleetEntry entry) {
 
-        return !FleetViewPreferences.CATEGORIES.collapsed(category(entry));
+        return shown(entry) && !FleetViewPreferences.CATEGORIES.collapsed(category(entry));
     }
 
     private FleetPresentation createFleetPresentation() {
@@ -648,6 +662,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         for (var entry : menu.fleet) {
             var telemetry = entry.telemetry();
             craftNumber++;
+            if (!shown(entry)) continue;
             if (!hidden(entry)) labels.put(entry.id(), craftTitle(telemetry, craftNumber));
             var forecast = MissionForecast.remainingServices(telemetry.plan(), telemetry.actionTicks(), telemetry.serviceProgress());
             if (!telemetry.fullLayout() && entry.navigation().paths().isEmpty()) {
@@ -682,7 +697,10 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                             abort.x(), abort.y(), abort.destinationX(), abort.destinationY())));
         }
         var snapshot = new SpaceSimulation.FlightPlannerSnapshot(menu.fleetSnapshot.simulationId(),
-                new UUID(0, 0), menu.fleetSnapshot.objects(), new SpaceSimulation.FlightPlan(branches, List.of()), menu.fleetSnapshot.stations());
+                new UUID(0, 0), menu.fleetSnapshot.objects(), new SpaceSimulation.FlightPlan(branches, List.of()),
+                menu.fleetSnapshot.stations().stream().filter(station -> FleetViewPreferences.showSun()
+                        || !station.position().target().equals(SpaceSimulation.SUN_ID)
+                        || station.position().orbit() != SpaceSimulation.OrbitBand.SOLAR).toList());
         var flight = new RocketFlightPathCalculator.FlightPath(paths, List.of(), 0,
                 List.of(), List.of(), aborts);
         return new FleetPresentation(snapshot, flight, pathsByCraft, times, labels);
@@ -716,7 +734,8 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             var recovered = MissionState.isRecovered(telemetry.status());
             var link = entry.communication();
 
-            row.title().setText(craftTitle(telemetry, row.number()));
+            row.title().setText(fit(craftTitle(telemetry, row.number()), row.title().getWidth()));
+            row.title().withTooltip(craftTitle(telemetry, row.number()));
             row.status().setText(status(telemetry, path));
             row.status().withTooltip(serviceDetails(telemetry, menu.debugSpeed));
             row.location().setText(recovered
@@ -754,6 +773,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         var elapsedSeconds = elapsedTicks / 20.0;
         var times = new HashMap<UUID, Double>();
         for (var entry : menu.fleet) {
+            if (!shown(entry)) continue;
             var path = fleetPaths.get(entry.id());
             if (path != null)
                 times.put(entry.id(), Math.min(elapsedSeconds + (entry.navigation().paths().isEmpty() ? 0 : entry.telemetry().actionTicks() / 20.0), path.durationSeconds()));
