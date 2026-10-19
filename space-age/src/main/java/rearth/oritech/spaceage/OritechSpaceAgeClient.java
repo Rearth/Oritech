@@ -6,14 +6,18 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.GroundBeamRenderer;
 import rearth.oritech.spaceage.client.RocketRenderer;
 import rearth.oritech.spaceage.datagen.SpaceAgeDataGenerators;
+import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
+import rearth.oritech.spaceage.robot.client.RobotArmRenderer;
+import rearth.oritech.spaceage.robot.client.RobotWorkArea;
 import rearth.oritech.spaceage.simulation.BeamAperture;
 import rearth.oritech.util.TooltipHelper;
 
@@ -42,6 +46,9 @@ public final class OritechSpaceAgeClient {
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::extract);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::submit);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::clear);
+        modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.ROBOT_ARM.get(), RobotArmRenderer::new));
+        NeoForge.EVENT_BUS.addListener(RobotWorkArea::extract);
+        NeoForge.EVENT_BUS.addListener(RobotWorkArea::submit);
         modEventBus.addListener(SpaceAgeDataGenerators::gatherData);
         modEventBus.addListener(SpaceAgeMenus::registerScreens);
     }

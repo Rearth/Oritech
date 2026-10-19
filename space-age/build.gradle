@@ -80,6 +80,7 @@ configurations {
 }
 
 dependencies {
+    implementation "com.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
     // Compile and run against the Oritech project currently checked out in this repository.
     implementation project(':')
     testImplementation 'org.junit.jupiter:junit-jupiter:6.0.3'

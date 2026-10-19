@@ -31,6 +31,14 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes() {
 
+        shaped(RecipeCategory.MISC, SpaceAgeBlocks.ROBOT_ARM)
+                .pattern("sps").pattern("mcm").pattern("sfs")
+                .define('s', ItemContent.STEEL_INGOT).define('p', Items.PISTON).define('m', ItemContent.MOTOR)
+                .define('c', ItemContent.PROCESSING_UNIT).define('f', BlockContent.MACHINE_FRAME)
+                .unlockedBy("has_motor", has(ItemContent.MOTOR)).save(output);
+        shaped(RecipeCategory.MISC, SpaceAgeItems.ACTION_CARD)
+                .pattern("pp").pattern("sc").define('p', Items.PAPER).define('s', ItemContent.STEEL_INGOT)
+                .define('c', ItemContent.PROCESSING_UNIT).unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.VACUUM_CRAFTER)
                 .pattern("sps").pattern("aca").pattern("sbs")
                 .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.ADVANCED_COMPUTING_ENGINE)

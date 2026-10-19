@@ -71,6 +71,8 @@ public class SpaceAgeModelProvider extends ModelProvider {
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
 
+        createHorizontalModelBlock(SpaceAgeBlocks.ROBOT_ARM.get(), blockModels);
+        itemModels.itemModelOutput.accept(SpaceAgeItems.ACTION_CARD.get(), ItemModelUtils.plainModel(OritechSpaceAge.id("item/action_card")));
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);

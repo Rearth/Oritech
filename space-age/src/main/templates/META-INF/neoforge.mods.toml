@@ -29,3 +29,10 @@ type = "required"
 versionRange = "[${oritech_version},)"
 ordering = "AFTER"
 side = "BOTH"
+
+[[dependencies.${ space_age_mod_id }]]
+modId = "geckolib"
+type = "required"
+versionRange = "[5,)"
+ordering = "AFTER"
+side = "BOTH"

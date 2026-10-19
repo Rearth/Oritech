@@ -20,6 +20,8 @@ import rearth.oritech.spaceage.init.*;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
+import rearth.oritech.spaceage.robot.RobotNetworking;
+import rearth.oritech.spaceage.robot.RobotRecording;
 import rearth.oritech.spaceage.simulation.MissionController;
 import rearth.oritech.spaceage.simulation.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceAgeGameTests;
@@ -48,6 +50,12 @@ public final class OritechSpaceAge {
                 event.registerBlockEntity(Capabilities.Energy.BLOCK,
                         SpaceAgeBlockEntities.BEAM_APERTURE.get(), (entity, side) -> entity.energy));
 
+        RobotRecording.register();
+        modEventBus.addListener((RegisterCapabilitiesEvent event) -> {
+            event.registerBlockEntity(Capabilities.Energy.BLOCK, SpaceAgeBlockEntities.ROBOT_ARM.get(), (entity, side) -> entity.getEnergyStorage());
+            event.registerBlockEntity(Capabilities.Item.BLOCK, SpaceAgeBlockEntities.ROBOT_ARM.get(), (entity, side) -> entity.inventory.getExternalAccess());
+        });
+
         SpaceAgeComponents.COMPONENTS.register(modEventBus);
         SpaceAgeRecipes.TYPES.register(modEventBus);
         SpaceAgeRecipes.SERIALIZERS.register(modEventBus);
@@ -71,6 +79,7 @@ public final class OritechSpaceAge {
         RocketNetworking.register(event.registrar("1"));
         MissionNetworking.register(event.registrar("1"));
         GroundBeamNetworking.register(event.registrar("1"));
+        RobotNetworking.register(event.registrar("1"));
     }
 
     private void onServerTickPost(ServerTickEvent.Post event) {

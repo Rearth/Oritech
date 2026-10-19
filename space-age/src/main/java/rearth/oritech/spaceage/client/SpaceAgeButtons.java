@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 /**
  * Match text contrast to Oritech's light, dark, and pressed surfaces.
  */
-final class SpaceAgeButtons {
+public final class SpaceAgeButtons {
 
     private SpaceAgeButtons() {
     }
@@ -36,7 +36,7 @@ final class SpaceAgeButtons {
         return tabs;
     }
 
-    static ButtonWidget panel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
+    public static ButtonWidget panel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
 
         return colors(ButtonWidget.panel(x, y, width, height, label, onPress));
     }

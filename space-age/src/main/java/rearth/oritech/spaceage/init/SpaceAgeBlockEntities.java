@@ -8,6 +8,7 @@ import rearth.oritech.spaceage.block.BeamApertureBlockEntity;
 import rearth.oritech.spaceage.block.GroundStationBlockEntity;
 import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
+import rearth.oritech.spaceage.robot.RobotArmBlockEntity;
 
 import java.util.function.Supplier;
 
@@ -34,6 +35,8 @@ public final class SpaceAgeBlockEntities {
     public static final Supplier<BlockEntityType<BeamApertureBlockEntity>> BEAM_APERTURE =
             BLOCK_ENTITY_TYPES.register("beam_aperture", () -> new BlockEntityType<>(
                     BeamApertureBlockEntity::new, SpaceAgeBlocks.BEAM_APERTURE.get()));
+
+    public static final Supplier<BlockEntityType<RobotArmBlockEntity>> ROBOT_ARM = BLOCK_ENTITY_TYPES.register("robot_arm", () -> new BlockEntityType<>(RobotArmBlockEntity::new, SpaceAgeBlocks.ROBOT_ARM.get()));
 
     private SpaceAgeBlockEntities() {
     }

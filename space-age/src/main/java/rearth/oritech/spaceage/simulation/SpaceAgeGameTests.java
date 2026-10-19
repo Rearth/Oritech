@@ -36,6 +36,7 @@ import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.GroundBeamNetworking.Beams;
 import rearth.oritech.spaceage.recipe.BlockIngredient;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.robot.RobotGameTests;
 import rearth.oritech.spaceage.simulation.SpacePowerService.SurfaceBeam;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
 
@@ -54,6 +55,7 @@ public final class SpaceAgeGameTests {
     private static final ResourceKey<Consumer<GameTestHelper>> CONTENT = ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("content"));
 
     static {
+        FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -67,6 +69,7 @@ public final class SpaceAgeGameTests {
 
         var environment = event.registerEnvironment(OritechSpaceAge.id("hardware"));
         var info = new TestData<>(environment, Identifier.parse("minecraft:empty"), 20, 1, true);
+        event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(RECOVERY.identifier(), new FunctionGameTestInstance(RECOVERY, info));
         event.registerTest(CONTENT.identifier(), new FunctionGameTestInstance(CONTENT, info));
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));

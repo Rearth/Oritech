@@ -1,4 +1,4 @@
-// 26.1.2	2026-10-14T22:38:34.8815479	Loot Tables
+// 26.1.2	2026-10-19T19:16:26.1163786	Loot Tables
 9cf3d538ff6d3f953de005ec955951ce7025392f data/oritech_space_age/loot_table/blocks/antenna.json
 7d5f0ef336c7df8eeea3125c846445c679dc39f3 data/oritech_space_age/loot_table/blocks/asteroid_1.json
 9857858861d3a43003daed63297fc864fcee5d70 data/oritech_space_age/loot_table/blocks/asteroid_2.json
@@ -16,6 +16,7 @@ f7c309a7923173011e1e93901c3ca892b6bd52c6 data/oritech_space_age/loot_table/block
 52e3f1d1bb7d1ff5ed582087de2cd2ec4e6a4388 data/oritech_space_age/loot_table/blocks/mission_control.json
 5114b9ee59c4e418533922c42c4d7876861aae05 data/oritech_space_age/loot_table/blocks/navigation_computer.json
 63d60e084dfb20414150b9195efcccf7f8ffeb83 data/oritech_space_age/loot_table/blocks/parachute.json
+7c4fff44b2f33aecf8a2ff30cdd4f8e952b45fcc data/oritech_space_age/loot_table/blocks/robot_arm.json
 6d08478d63f09ddd428e7c03bb4cb1f093468059 data/oritech_space_age/loot_table/blocks/rocket_assembler.json
 b5bbf3113257e5dee99df670c8a453c12d457eb9 data/oritech_space_age/loot_table/blocks/rocket_coupling.json
 5f294b129738004f0c6163e456c17331fa7f145e data/oritech_space_age/loot_table/blocks/rocket_pad.json

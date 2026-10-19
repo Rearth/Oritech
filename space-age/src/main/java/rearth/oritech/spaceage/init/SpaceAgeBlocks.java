@@ -11,10 +11,13 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.*;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
 import rearth.oritech.spaceage.block.basic.*;
+import rearth.oritech.spaceage.robot.RobotArmBlock;
 
 public final class SpaceAgeBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(OritechSpaceAge.MOD_ID);
+
+    public static final DeferredBlock<RobotArmBlock> ROBOT_ARM = BLOCKS.registerBlock("robot_arm", RobotArmBlock::new, () -> machineProperties().noOcclusion());
 
     @NoBlockItem
     public static final DeferredBlock<PlanetBlock> EARTH = BLOCKS.registerBlock("earth", PlanetBlock::new,

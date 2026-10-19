@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.item.MissionCardItem;
+import rearth.oritech.spaceage.robot.ActionCardItem;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 public final class SpaceAgeItems {
@@ -16,6 +17,8 @@ public final class SpaceAgeItems {
 
     public static final DeferredItem<Item> MISSION_CARD =
             ITEMS.registerItem("mission_card", MissionCardItem::new, () -> new Item.Properties().stacksTo(1));
+
+    public static final DeferredItem<Item> ACTION_CARD = ITEMS.registerItem("action_card", ActionCardItem::new, () -> new Item.Properties().stacksTo(1));
 
     private SpaceAgeItems() {
     }
