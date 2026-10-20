@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.common.NeoForge;
@@ -90,6 +91,8 @@ public final class RobotRecording {
         var card = card(player);
         if (card.isEmpty()) return;
         var click = CLICKS.get(player.getUUID());
+        // Tool transformations also fire placement events; retain the original item-use action.
+        if (click != null && !(click.action.item().getItem() instanceof BlockItem)) return;
         if (click != null) click.placed = true;
         var state = event.getPlacedBlock();
         var pos = event.getPos().immutable();

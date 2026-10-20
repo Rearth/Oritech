@@ -50,7 +50,8 @@ public final class RobotScreen extends OritechWidgetScreen<RobotMenu> {
                     .append(" " + action.pos().toShortString());
             list.addChild(new LabelWidget(5, i * 23 + 6, menu.arm == null ? 310 : 235, label)
                     .withColor(menu.arm != null && menu.cursor == i ? 0xFF906020 : 0xFF202020)
-                    .withTooltip(action.state().getBlock().getName()));
+                    .withTooltip(action.item().isEmpty() ? new Component[]{action.state().getBlock().getName()}
+                            : new Component[]{action.state().getBlock().getName(), action.item().getHoverName()}));
             if (menu.arm == null) {
                 list.addChild(SpaceAgeButtons.panel(326, i * 23 + 2, 24, 18, Component.literal("×"), ignored ->
                         minecraft.gameMode.handleInventoryButtonClick(menu.containerId, 1000 + index)));

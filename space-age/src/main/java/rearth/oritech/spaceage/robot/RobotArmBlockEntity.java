@@ -20,15 +20,14 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
-import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
@@ -99,6 +98,7 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     public void serverTick(ServerLevel world, BlockPos pos, BlockState state, NetworkedBlockEntity entity) {
 
         addBurstTicks();
+        if (robot != null) robot.getCooldowns().tick();
         var signal = world.hasNeighborSignal(pos);
         var rising = signal && !powered;
         if (powered != signal || pulseTicks > 0) setChanged();
@@ -130,7 +130,8 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
                 updateVisual(false);
                 return;
             }
-            if (action.kind() == Kind.PLACE && !reserve(action.item())) {
+            if ((action.kind() == Kind.PLACE || action.kind() == Kind.INTERACT && !action.item().isEmpty())
+                    && !reserve(action.item(), action.kind() == Kind.PLACE)) {
                 blocked("missing_item");
                 updateVisual(false);
                 return;
@@ -199,8 +200,8 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         var kind = action.kind();
         var ticks = switch (actionPhase) {
             case 2 -> kind == Kind.DESTROY ? 20 : 2;
-            case 3 -> returning ? 20 : 1;
-            default -> kind == Kind.DESTROY ? 25 : 20;
+            case 3 -> returning ? 28 : 1;
+            default -> kind == Kind.DESTROY ? 33 : 28;
         };
         var hardnessMultiplier = 1f;
         if (actionPhase == 2 && kind == Kind.DESTROY) {
@@ -302,11 +303,11 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         return "";
     }
 
-    private boolean reserve(ItemStack wanted) {
+    private boolean reserve(ItemStack wanted, boolean exactComponents) {
 
         for (int slot = 1; slot < getInventorySize(); slot++) {
             var stack = inventory.getItem(slot);
-            if (ItemStack.isSameItemSameComponents(stack, wanted)) {
+            if (exactComponents ? ItemStack.isSameItemSameComponents(stack, wanted) : ItemStack.isSameItem(stack, wanted)) {
                 var reserved = stack.copyWithCount(1);
                 try (var transaction = Transaction.openRoot()) {
                     if (inventory.extract(slot, ItemResource.of(stack), 1, transaction) == 1) {
@@ -337,11 +338,26 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
 
     private FakePlayer player(Action action) {
 
-        if (robot == null) robot = new FakePlayer((ServerLevel) level,
-                new GameProfile(UUID.nameUUIDFromBytes("oritech_robot_arm".getBytes(StandardCharsets.UTF_8)), "[Oritech Robot]"));
-        robot.setPos(action.pos().getX() + .5, action.pos().getY(), action.pos().getZ() + .5);
+        if (robot == null) {
+            robot = new FakePlayer((ServerLevel) level,
+                    new GameProfile(UUID.nameUUIDFromBytes("oritech_robot_arm".getBytes(StandardCharsets.UTF_8)), "[Oritech Robot]")) {
+                @Override
+                public boolean hasCorrectToolForDrops(BlockState state) {
+
+                    // The built-in gripper harvests without a separate mining tool.
+                    return true;
+                }
+            };
+            robot.gameMode.changeGameModeForPlayer(GameType.SURVIVAL);
+        }
         robot.setYRot(action.yaw());
+        robot.setYHeadRot(action.yaw());
+        robot.yHeadRotO = action.yaw();
         robot.setXRot(action.pitch());
+        // Some block tools raycast again. Keep their view ray on the recorded hit.
+        var eye = Vec3.atLowerCornerOf(action.pos()).add(action.hit()).subtract(robot.getLookAngle().scale(2));
+        robot.setPos(eye.x, eye.y - robot.getEyeHeight(), eye.z);
+        robot.setOldPosAndRot();
         robot.setShiftKeyDown(action.sneaking());
         robot.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         return robot;
@@ -354,16 +370,12 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         var world = (ServerLevel) level;
         var player = player(action);
         var pos = action.pos();
-        var state = world.getBlockState(pos);
         if (!world.mayInteract(player, pos)) return "protected";
         if (action.kind() == Kind.DESTROY) {
-            if (NeoForge.EVENT_BUS.post(new BreakBlockEvent(world, pos, state, player)).isCanceled()) return "protected";
-            var drops = Block.getDrops(state, world, pos, world.getBlockEntity(pos), player, ItemStack.EMPTY);
-            var bounds = new AABB(pos);
+            // Player breaking calls multipart cleanup, protection events, and normal loot hooks.
+            var bounds = new AABB(pos).inflate(1);
             var existing = world.getEntitiesOfClass(ItemEntity.class, bounds).stream().map(ItemEntity::getUUID).collect(Collectors.toSet());
-            if (!world.destroyBlock(pos, false, player)) return "failed";
-            cargo.addAll(drops);
-            // Container contents are spawned by removal hooks, separately from the block's loot table.
+            if (!player.gameMode.destroyBlock(pos)) return "protected";
             for (var drop : world.getEntitiesOfClass(ItemEntity.class, bounds)) {
                 if (existing.contains(drop.getUUID())) continue;
                 cargo.add(drop.getItem().copy());
@@ -384,17 +396,21 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
             cargo.removeIf(ItemStack::isEmpty);
             return "";
         }
-        var emptyResult = player.gameMode.useItemOn(player, world, ItemStack.EMPTY, InteractionHand.MAIN_HAND, hit);
-        if (emptyResult.consumesAction()) return "";
-        if (action.item().isEmpty()) return "failed";
-        if (!reserve(action.item())) return "missing_item";
-        var held = cargo.getFirst();
+        if (!action.item().isEmpty() && cargo.isEmpty()) return "missing_item";
+        var held = cargo.isEmpty() ? ItemStack.EMPTY : cargo.getFirst();
         player.setItemInHand(InteractionHand.MAIN_HAND, held);
         var result = player.gameMode.useItemOn(player, world, held, InteractionHand.MAIN_HAND, hit);
         var remaining = player.getMainHandItem().copy();
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         cargo.clear();
         if (!remaining.isEmpty()) cargo.add(remaining);
+        // Bucket replacements and other byproducts may be put directly into the player's inventory.
+        for (int slot = 0; slot < player.getInventory().getContainerSize(); slot++) {
+            var stack = player.getInventory().getItem(slot);
+            if (stack.isEmpty()) continue;
+            cargo.add(stack.copy());
+            player.getInventory().setItem(slot, ItemStack.EMPTY);
+        }
         return result.consumesAction() ? "" : "failed";
     }
 

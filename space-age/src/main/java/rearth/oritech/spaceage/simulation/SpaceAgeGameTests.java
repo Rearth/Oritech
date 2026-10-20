@@ -56,6 +56,7 @@ public final class SpaceAgeGameTests {
 
     static {
         FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
+        FUNCTIONS.register("robot_tools", () -> RobotGameTests::toolsAndDoors);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -70,6 +71,7 @@ public final class SpaceAgeGameTests {
         var environment = event.registerEnvironment(OritechSpaceAge.id("hardware"));
         var info = new TestData<>(environment, Identifier.parse("minecraft:empty"), 20, 1, true);
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
+        event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
         event.registerTest(RECOVERY.identifier(), new FunctionGameTestInstance(RECOVERY, info));
         event.registerTest(CONTENT.identifier(), new FunctionGameTestInstance(CONTENT, info));
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));

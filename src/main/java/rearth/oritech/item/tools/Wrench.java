@@ -14,10 +14,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.TooltipDisplay;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.BlockHitResult;
 import rearth.oritech.client.cablesurfer.ClientCableFinder;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.init.BlockContent;
@@ -88,15 +90,35 @@ public class Wrench extends Item {
      * @param player The player using the wrench
      */
     protected boolean useWrench(ItemStack item, Player player, InteractionHand hand) {
+
+        var result = getPlayerPOVHitResult(player.level(), player, ClipContext.Fluid.NONE);
+        return result.getType() == HitResult.Type.BLOCK && useWrench(item, player, hand, (BlockHitResult) result);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+
+        var player = context.getPlayer();
+        if (player == null) return InteractionResult.PASS;
+        var level = context.getLevel();
+        var pos = context.getClickedPos();
+        if (!(level.getBlockState(pos).getBlock() instanceof Wrenchable)
+                && !(level.getBlockState(pos.relative(context.getClickedFace())).getBlock() instanceof Wrenchable))
+            return InteractionResult.PASS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS;
+        var hit = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), pos, context.isInside());
+        return useWrench(context.getItemInHand(), player, context.getHand(), hit)
+                ? InteractionResult.SUCCESS : InteractionResult.FAIL;
+    }
+
+    protected boolean useWrench(ItemStack item, Player player, InteractionHand hand, BlockHitResult result) {
+
         if (player.getCooldowns().isOnCooldown(item)) return false;
         player.getCooldowns().addCooldown(item, ACTION_COOLDOWN);
 
         if (!(player instanceof ServerPlayer)) return false;
 
         var level = player.level();
-        var result = getPlayerPOVHitResult(level, player, ClipContext.Fluid.NONE);
-        if (result.getType() != HitResult.Type.BLOCK) return false;
-
         var blockPos = result.getBlockPos();
         var blockState = level.getBlockState(blockPos);
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {

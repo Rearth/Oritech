@@ -12,19 +12,22 @@ public final class RobotArmIk {
 
     public static final String[] BONES = {"rotY", "rotZ2", "rotZ3", "rotZ4", "rotY2", "rotZ5", "rotZ6", "rotZ8", "rotZ9", "rotX", "rotX2"};
     public static final char[] AXES = {'y', 'z', 'z', 'z', 'y', 'z', 'z', 'z', 'z', 'x', 'x'};
-    private static final float[] HEIGHTS = {29, 34.5f, 48.5f, 56.6f, 64.5f, 71.5f, 79.5f, 98.5f, 104.5f, 107.5f, 115.5f};
+    private static final float[] HEIGHTS = {19, 24.5f, 38.5f, 46.6f, 54.5f, 61.5f, 69.5f, 88.5f, 94.5f, 97.5f, 105.5f};
+    private static final float ROTATION_SPEED = 6;
     private final float[] angles = new float[BONES.length];
     private final Vector3f[] positions = new Vector3f[BONES.length];
+    private final Vector3f[] worldAxes = new Vector3f[BONES.length];
     private final Vector3f tip = new Vector3f();
     public static final float MAX_EXTENSION = RobotArmReach.MAX_EXTENSION;
     private float extension;
-    private float renderedYaw;
+    private float targetYaw;
     private boolean constrained;
 
     public RobotArmIk() {
 
         for (int i = 0; i < BONES.length; i++) {
             positions[i] = new Vector3f();
+            worldAxes[i] = new Vector3f();
         }
         forward();
     }
@@ -39,10 +42,11 @@ public final class RobotArmIk {
         constrained = rotation != null;
         if (constrained) target = new Vector3f(target).sub(rotation.transform(new Vector3f(0, 15.5f, 0)));
 
-        var distance = target.distance(0, 34.5f, 8);
-        // Bend the ordinary links first. The telescope only supplies the missing reach,
-        // with extra clearance for work beneath the shoulder.
-        var desiredExtension = Math.clamp(distance - (constrained ? 68.5f : 84) + Math.max(0, -target.y - 32) * .6f, 0, MAX_EXTENSION);
+        var distance = target.distance(8, HEIGHTS[1], 8);
+        // Use almost the entire ordinary chain before extending the telescope.
+        // Four pixels retain a gentle bend; low targets need extra housing clearance.
+        var ordinaryReach = (constrained ? HEIGHTS[HEIGHTS.length - 1] : 121) - HEIGHTS[1] - 4;
+        var desiredExtension = Math.clamp(distance - ordinaryReach + Math.max(0, -target.y - 32) * .6f, 0, MAX_EXTENSION);
         extension = desiredExtension;
         var fold = 1 - Math.clamp((distance - 55) / (RobotArmReach.LENGTH + MAX_EXTENSION - 55), 0, 1);
         Arrays.fill(angles, 0);
@@ -59,28 +63,27 @@ public final class RobotArmIk {
         var lower = new Vector3f(tip).sub(positions[6]).rotateZ(-upperTurn);
         var upperLength = upper.length();
         var lowerLength = lower.length();
-        var radial = (float) Math.hypot(target.x, target.z - 8);
-        var vertical = target.y - 34.5f;
+        var radial = (float) Math.hypot(target.x - 8, target.z - 8);
+        var vertical = target.y - HEIGHTS[1];
         var reach = Math.clamp(distance, Math.abs(upperLength - lowerLength) + .001f, upperLength + lowerLength - .001f);
         var shoulder = (float) Math.atan2(radial, vertical)
                 - (float) Math.acos(Math.clamp((upperLength * upperLength + reach * reach - lowerLength * lowerLength) / (2 * upperLength * reach), -1, 1));
         var elbow = (float) Math.acos(Math.clamp((reach * reach - upperLength * upperLength - lowerLength * lowerLength) / (2 * upperLength * lowerLength), -1, 1));
         angles[1] = -shoulder + (float) Math.atan2(upper.x, upper.y);
         angles[6] = -elbow - upperTurn - (float) Math.atan2(upper.x, upper.y) + (float) Math.atan2(lower.x, lower.y);
-        var yaw = (float) Math.atan2(8 - target.z, target.x);
+        var yaw = (float) Math.atan2(8 - target.z, target.x - 8);
         if (radial > .5f) {
-            var delta = (float) Math.atan2(Math.sin(yaw - renderedYaw), Math.cos(yaw - renderedYaw));
-            renderedYaw += delta * (1 - (float) Math.exp(-seconds * 18));
+            targetYaw += (float) Math.atan2(Math.sin(yaw - targetYaw), Math.cos(yaw - targetYaw));
         }
+        yaw = targetYaw;
         angles[0] = yaw;
         // A small spatial wrist curl uses the secondary axes without random motion.
         var twist = fold * Math.clamp(radial / 24, 0, 1);
         angles[4] = twist * (.12f + .45f * (float) Math.sin(yaw) * Math.min(1, radial * radial / (48 * 48)));
         angles[9] = .18f * twist;
         angles[10] = -.24f * twist;
-        var reachable = new Vector3f(target).sub(0, 34.5f, 8).mul(Math.min(1, (upperLength + lowerLength - .15f) / Math.max(distance, .001f))).add(0, 34.5f, 8);
+        var reachable = new Vector3f(target).sub(8, HEIGHTS[1], 8).mul(Math.min(1, (upperLength + lowerLength - .15f) / Math.max(distance, .001f))).add(8, HEIGHTS[1], 8);
         refine(reachable);
-        if (!constrained) angles[0] += renderedYaw - yaw;
         forward();
         var wrist = new Vector3f();
         if (constrained) {
@@ -99,9 +102,14 @@ public final class RobotArmIk {
         var rendered = next.angles().clone();
         for (int i = 0; i < rendered.length - 1; i++) {
             var delta = rendered[i] - previous.angles()[i];
-            rendered[i] = previous.angles()[i] + (float) Math.atan2(Math.sin(delta), Math.cos(delta)) * blend;
+            var step = (float) Math.atan2(Math.sin(delta), Math.cos(delta)) * blend;
+            rendered[i] = previous.angles()[i] + Math.clamp(step, -ROTATION_SPEED * seconds, ROTATION_SPEED * seconds);
         }
-        var wrist = wristRotation(previous).slerp(wristRotation(next), blend).normalize().getEulerAnglesZYX(new Vector3f());
+        var oldWrist = wristRotation(previous);
+        var newWrist = wristRotation(next);
+        var wristAngle = 2 * (float) Math.acos(Math.clamp(Math.abs(oldWrist.dot(newWrist)), 0, 1));
+        var wristBlend = Math.min(blend, ROTATION_SPEED * seconds / Math.max(wristAngle, .0001f));
+        var wrist = oldWrist.slerp(newWrist, wristBlend).normalize().getEulerAnglesZYX(new Vector3f());
         rendered[rendered.length - 1] = 0;
         return new Pose(rendered, previous.extension() + (next.extension() - previous.extension()) * blend,
                 new Vector3f(previous.tip()).lerp(next.tip(), blend), wrist);
@@ -122,13 +130,9 @@ public final class RobotArmIk {
             forward();
             var error = new Vector3f(target).sub(tip);
             if (error.lengthSquared() < .0001f) break;
-            var origin = new Vector3f(tip);
             var jacobian = new Matrix3f().zero();
             for (int column = 0; column < joints.length; column++) {
-                angles[joints[column]] += .001f;
-                forward();
-                jacobian.setColumn(column, new Vector3f(tip).sub(origin).mul(1000));
-                angles[joints[column]] -= .001f;
+                jacobian.setColumn(column, derivative(joints[column]));
             }
             var transpose = new Matrix3f(jacobian).transpose();
             var normal = new Matrix3f(transpose).mul(jacobian);
@@ -136,6 +140,11 @@ public final class RobotArmIk {
             var delta = normal.invert().transform(transpose.transform(error));
             for (int i = 0; i < joints.length; i++) angles[joints[i]] += Math.clamp(delta.get(i), -.15f, .15f);
         }
+    }
+
+    private Vector3f derivative(int joint) {
+
+        return new Vector3f(worldAxes[joint]).cross(new Vector3f(tip).sub(positions[joint]));
     }
 
     private float clearancePenalty() {
@@ -150,9 +159,9 @@ public final class RobotArmIk {
                 var x = a.x + (b.x - a.x) * t;
                 var y = a.y + (b.y - a.y) * t;
                 var z = a.z + (b.z - a.z) * t;
-                var depth = Math.min(29 - y, y + 3);
-                depth = Math.min(depth, Math.min(x + 11, 27 - x));
-                depth = Math.min(depth, Math.min(z + 11, 27 - z));
+                var depth = Math.min(17 - y, y - 2);
+                depth = Math.min(depth, Math.min(x + 6, 22 - x));
+                depth = Math.min(depth, Math.min(z + 5, 21 - z));
                 if (depth > 0) penalty += depth * depth;
             }
         }
@@ -167,17 +176,19 @@ public final class RobotArmIk {
     private void forward() {
 
         var orientation = new Quaternionf();
-        var position = new Vector3f(0, HEIGHTS[0], 8);
+        var position = new Vector3f(8, HEIGHTS[0], 8);
         for (int i = 0; i < BONES.length; i++) {
-            if (i > 0) position.add(orientation.transform(new Vector3f(0, HEIGHTS[i] - HEIGHTS[i - 1] + (i == 7 ? extension : 0), 0)));
+            if (i > 0) position.add(orientation.transform(new Vector3f(0, HEIGHTS[i] - HEIGHTS[i - 1] + (i == 2 || i == 7 ? extension / 2 : 0), 0)));
             positions[i].set(position);
+            worldAxes[i].set(AXES[i] == 'x' ? 1 : 0, AXES[i] == 'y' ? 1 : 0, AXES[i] == 'z' ? 1 : 0);
+            orientation.transform(worldAxes[i]);
             switch (AXES[i]) {
                 case 'x' -> orientation.rotateX(angles[i]);
                 case 'y' -> orientation.rotateY(angles[i]);
                 default -> orientation.rotateZ(angles[i]);
             }
         }
-        tip.set(position).add(orientation.transform(new Vector3f(0, constrained ? 0 : 131 - HEIGHTS[HEIGHTS.length - 1], 0)));
+        tip.set(position).add(orientation.transform(new Vector3f(0, constrained ? 0 : 121 - HEIGHTS[HEIGHTS.length - 1], 0)));
     }
 
     public static Quaternionf orientation(Pose pose) {
@@ -232,5 +243,6 @@ public final class RobotArmIk {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
+    /** Extension is the combined travel of both equally extended pistons, in pixels. */
     public record Pose(float[] angles, float extension, Vector3f tip, Vector3f wrist) {}
 }

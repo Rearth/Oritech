@@ -90,7 +90,8 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         if (visual.kind() == 1 && visual.phase() == 2 && visual.active()) motion.spin += seconds * 16;
         var item = new ItemStackRenderState();
         var block = new BlockModelRenderState();
-        var visible = !visual.held().isEmpty() && (visual.kind() == 0 && (visual.phase() == 1 && progress >= .2f || visual.phase() == 2) || visual.phase() == 3);
+        var visible = !visual.held().isEmpty() && (visual.kind() == 0 && (visual.phase() == 1 && progress >= .2f || visual.phase() == 2)
+                || visual.kind() == 2 && (visual.phase() == 1 || visual.phase() == 2) || visual.phase() == 3);
         if (visible) {
             var minecraft = Minecraft.getInstance();
             if (visual.held().getItem() instanceof BlockItem blockItem) {
@@ -131,8 +132,11 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
             var axis = RobotArmIk.AXES[i];
             bones.ifPresent(RobotArmIk.BONES[i], bone -> bone.setRotation(axis == 'x' ? angle : 0, axis == 'y' ? angle : 0, axis == 'z' ? angle : 0));
         }
-        bones.ifPresent("extendedY", bone -> bone.setTranslateY(frame.pose.extension()));
-        bones.ifPresent("piston", bone -> bone.setScaleY(1 + frame.pose.extension() / 8));
+        var extension = frame.pose.extension() / 2;
+        bones.ifPresent("extendedY", bone -> bone.setTranslateY(extension));
+        bones.ifPresent("piston", bone -> bone.setScaleY(1 + extension / 7));
+        bones.ifPresent("extendedY2", bone -> bone.setTranslateY(extension));
+        bones.ifPresent("piston2", bone -> bone.setScaleY(1 + extension / 8));
         bones.ifPresent("left", bone -> bone.setTranslateZ(frame.closure));
         bones.ifPresent("right", bone -> bone.setTranslateZ(-frame.closure));
         bones.ifPresent("rotY3", bone -> bone.setRotY(frame.spin));
