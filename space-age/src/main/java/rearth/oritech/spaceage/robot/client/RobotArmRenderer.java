@@ -35,8 +35,8 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
 
     private static final BlockDisplayContext BLOCK_CONTEXT = BlockDisplayContext.create();
     private static final DataTicket<Frame> FRAME = DataTicket.create("robot_arm_frame", Frame.class);
-    private static final Vector3f WARP = new Vector3f(16, 23, 8);
-    private static final Vector3f DROP = new Vector3f(16, 48, 8);
+    private static final Vector3f WARP = new Vector3f(8, 22, -5);
+    private static final Vector3f DROP = new Vector3f(8, 47, -5);
     private final Map<RobotArmBlockEntity, Motion> motions = new WeakHashMap<>();
 
     public RobotArmRenderer(BlockEntityRendererProvider.Context context) {
@@ -82,7 +82,7 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         }
         // The wrist, not the cargo pivot, supplies the required endpoint orientation.
         motion.target.lerp(destination, 1 - (float) Math.exp(-seconds * 24));
-        var pose = RobotArmIk.interpolate(motion.pose, motion.ik.solve(motion.target, rotation, seconds), seconds);
+        var pose = RobotArmIk.interpolate(motion.pose, motion.ik.solve(motion.target, rotation), seconds);
         motion.pose = pose;
         motion.phase = visual.phase();
         var closure = visual.phase() == 0 ? 0 : visual.kind() == 1 ? 7 : visual.kind() == 2 ? 8 : 0;
@@ -132,17 +132,19 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
             var axis = RobotArmIk.AXES[i];
             bones.ifPresent(RobotArmIk.BONES[i], bone -> bone.setRotation(axis == 'x' ? angle : 0, axis == 'y' ? angle : 0, axis == 'z' ? angle : 0));
         }
-        var extension = frame.pose.extension() / 2;
+        var extension = frame.pose.extension() / 3;
         bones.ifPresent("extendedY", bone -> bone.setTranslateY(extension));
         bones.ifPresent("piston", bone -> bone.setScaleY(1 + extension / 7));
         bones.ifPresent("extendedY2", bone -> bone.setTranslateY(extension));
-        bones.ifPresent("piston2", bone -> bone.setScaleY(1 + extension / 8));
+        bones.ifPresent("piston2", bone -> bone.setScaleY(1 + extension / 6));
+        bones.ifPresent("extendedY3", bone -> bone.setTranslateY(extension));
+        bones.ifPresent("piston3", bone -> bone.setScaleY(1 + extension / 8));
         bones.ifPresent("left", bone -> bone.setTranslateZ(frame.closure));
         bones.ifPresent("right", bone -> bone.setTranslateZ(-frame.closure));
-        bones.ifPresent("rotY3", bone -> bone.setRotY(frame.spin));
+        bones.ifPresent("rotY5", bone -> bone.setRotY(frame.spin));
         if (frame.pose.wrist() != null) {
             var wrist = frame.pose.wrist();
-            bones.ifPresent("rotX2", bone -> bone.setRotation(wrist.x, wrist.y, wrist.z));
+            bones.ifPresent("rotX4", bone -> bone.setRotation(wrist.x, wrist.y, wrist.z));
         }
     }
 

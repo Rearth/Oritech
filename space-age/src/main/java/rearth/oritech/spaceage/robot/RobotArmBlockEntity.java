@@ -213,7 +213,7 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
 
     private void warpParticles(ServerLevel world) {
 
-        var offset = new Vec3(1, 23 / 16d, .5).yRot(switch (getFacing()) {
+        var offset = new Vec3(.5, 22 / 16d, -5 / 16d).yRot(switch (getFacing()) {
             case SOUTH -> (float) Math.PI;
             case WEST -> (float) Math.PI / 2;
             case EAST -> (float) -Math.PI / 2;
