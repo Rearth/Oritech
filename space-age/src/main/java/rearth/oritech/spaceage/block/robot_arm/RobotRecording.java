@@ -112,14 +112,17 @@ public final class RobotRecording {
         if (click != null && !(click.action.item().getItem() instanceof BlockItem)) return;
         if (click != null) click.placed = true;
         var state = event.getPlacedBlock();
+        var previous = event.getBlockSnapshot().getState();
         var pos = event.getPos().immutable();
         // Placements keep the clicked face and hit point, relative to the placed block.
         var action = click == null
                 ? record(player, Kind.PLACE, pos, state, Direction.UP, CENTER, new ItemStack(state.getBlock()))
                 : record(player, Kind.PLACE, pos, state, click.action.face(),
                 Vec3.atLowerCornerOf(click.action.pos()).add(click.action.hit()).subtract(Vec3.atLowerCornerOf(pos)), click.action.item());
+        // Blocks may turn into another block once placed (e.g. pipes next to machines), so only check that the placement stuck.
         PENDING.add(() -> {
-            if (!event.isCanceled() && player.level().getBlockState(pos).is(state.getBlock())) append(player, card, action);
+            var current = player.level().getBlockState(pos);
+            if (!event.isCanceled() && !current.isAir() && !current.equals(previous)) append(player, card, action);
         });
     }
 

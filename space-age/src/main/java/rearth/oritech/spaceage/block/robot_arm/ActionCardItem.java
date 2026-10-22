@@ -58,6 +58,7 @@ public final class ActionCardItem extends Item {
 
         var program = stack.getOrDefault(SpaceAgeComponents.ROBOT_PROGRAM.get(), RobotProgram.EMPTY);
         tooltip.accept(Component.translatable("tooltip.oritech_space_age.action_card"));
+        tooltip.accept(Component.translatable("tooltip.oritech_space_age.action_card.offhand"));
         program.binding().ifPresent(binding -> tooltip.accept(Component.literal(binding.pos().toShortString())));
         tooltip.accept(Component.translatable("screen.oritech_space_age.robot.actions", program.actions().size()));
     }

@@ -21,7 +21,7 @@ public final class ActionCardScreen extends OritechWidgetScreen<ActionCardMenu> 
 
     public ActionCardScreen(ActionCardMenu menu, Inventory inventory, Component title) {
 
-        super(menu, inventory, title, 236, 210);
+        super(menu, inventory, title, 236, 220);
     }
 
     private static Component text(String key, Object... args) {
@@ -51,7 +51,7 @@ public final class ActionCardScreen extends OritechWidgetScreen<ActionCardMenu> 
         list.scrollTo(scroll);
         addComponent(list.scroll);
         addComponent(SpaceAgeButtons.panel(10, 148, 116, 18, text("clear"), ignored -> click(ActionCardMenu.CLEAR_BUTTON)));
-        addComponent(new LabelWidget(10, 174, 216, 27, text("record_help")).withDarkColor().withWrap(true));
+        addComponent(new LabelWidget(10, 174, 216, 37, text("record_help")).withDarkColor().withWrap(true));
     }
 
     @Override

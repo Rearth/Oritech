@@ -8,6 +8,7 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
+import rearth.oritech.spaceage.client.starmap.StarMapLineRenderer;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -62,21 +63,38 @@ final class FlightPlannerCards {
         }.withTooltip(reason).withZIndex(2);
     }
 
+    // Drops straight down from the parent card, then bends smoothly into the branch card's left edge.
     static UIComponent branchConnector(int startX, int startY, int endX, int endY) {
 
-        return new UIComponent(Math.min(startX, endX), Math.min(startY, endY),
-                Math.max(1, Math.abs(endX - startX)), Math.max(1, Math.abs(endY - startY))) {
+        var lines = new ArrayList<StarMapLineRenderer.Line>();
+        var dx = endX - startX;
+        var bend = Math.min(endY - startY, dx * 1.6);
+        var bendY = endY - bend;
+        var color = 0xFFD58A32;
+        lines.add(new StarMapLineRenderer.Line(startX, startY, startX, bendY, color, 2, true));
+        var previousX = (double) startX;
+        var previousY = bendY;
+        for (var step = 1; step <= 12; step++) {
+            var t = step / 12d;
+            var u = 1 - t;
+            // Cubic with a vertical start tangent and a horizontal end tangent.
+            var x = u * u * u * startX + 3 * u * u * t * startX + 3 * u * t * t * (startX + dx * 0.3) + t * t * t * endX;
+            var y = u * u * u * bendY + 3 * u * u * t * (endY - bend * 0.3) + 3 * u * t * t * endY + t * t * t * endY;
+            lines.add(new StarMapLineRenderer.Line(previousX, previousY, x, y, color, 2, true));
+            previousX = x;
+            previousY = y;
+        }
+
+        var left = Math.min(startX, endX) - 2;
+        var top = startY;
+        return new UIComponent(left, top, Math.abs(dx) + 4, Math.max(1, endY - startY + 2)) {
 
             @Override
             protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 
-                var cornerY = Math.min(endY, startY + 7);
-                var color = 0xFFD58A32;
-                graphics.fill(startX - 1, startY, startX + 1, cornerY + 1, color);
-                graphics.fill(Math.min(startX, endX), cornerY - 1, Math.max(startX, endX) + 1, cornerY + 1, color);
-                graphics.fill(endX - 1, cornerY, endX + 1, endY, color);
+                StarMapLineRenderer.submitConnected(graphics, lines, left, top, Math.abs(dx) + 4, Math.max(1, endY - startY + 2));
             }
-        };
+        }.withZIndex(-1);
     }
 
     static UIComponent addonConnector(int lineX, int startY, int endY) {
@@ -123,7 +141,7 @@ final class FlightPlannerCards {
                 branchX = connectorX + 18;
                 var guideY = branchStartY + parentRow * rowHeight
                         + (parentAction != null && parentAction.isGenerated() ? 68 : CARD_HEIGHT);
-                scroll.addChild(FlightPlannerCards.branchConnector(connectorX, guideY, branchX, rowY + 17));
+                scroll.addChild(FlightPlannerCards.branchConnector(connectorX, guideY, branchX + 1, rowY + 34));
             }
             xByBranch.put(branch.id(), branchX);
 
