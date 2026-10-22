@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
+import rearth.oritech.init.TagContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
@@ -31,14 +32,16 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
     @Override
     protected void buildRecipes() {
 
+        // Same layout as the Oritech placer and destroyer, built around a placer.
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.ROBOT_ARM)
-                .pattern("sps").pattern("mcm").pattern("sfs")
-                .define('s', ItemContent.STEEL_INGOT).define('p', Items.PISTON).define('m', ItemContent.MOTOR)
-                .define('c', ItemContent.PROCESSING_UNIT).define('f', BlockContent.MACHINE_FRAME)
-                .unlockedBy("has_motor", has(ItemContent.MOTOR)).save(output);
+                .pattern("psp").pattern("mcm").pattern("bbb")
+                .define('p', ItemContent.PROCESSING_UNIT).define('s', ItemContent.ADVANCED_COMPUTING_ENGINE)
+                .define('m', ItemContent.MOTOR).define('c', BlockContent.PLACER).define('b', TagContent.PLATING_BLOCKS)
+                .unlockedBy("has_placer", has(BlockContent.PLACER)).save(output);
+        // Redstone keeps this apart from the mission card, which otherwise shares the layout.
         shaped(RecipeCategory.MISC, SpaceAgeItems.ACTION_CARD)
-                .pattern("pp").pattern("sc").define('p', Items.PAPER).define('s', ItemContent.STEEL_INGOT)
-                .define('c', ItemContent.PROCESSING_UNIT).unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
+                .pattern("pp").pattern("rc").define('p', Items.PAPER).define('r', Items.REDSTONE)
+                .define('c', ItemContent.PROCESSING_UNIT).unlockedBy("has_robot_arm", has(SpaceAgeBlocks.ROBOT_ARM)).save(output);
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.VACUUM_CRAFTER)
                 .pattern("sps").pattern("aca").pattern("sbs")
                 .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.ADVANCED_COMPUTING_ENGINE)

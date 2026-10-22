@@ -6,16 +6,18 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.BeamApertureMenu;
-import rearth.oritech.spaceage.block.MissionControlMenu;
-import rearth.oritech.spaceage.block.VacuumCrafterMenu;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
-import rearth.oritech.spaceage.client.BeamApertureScreen;
-import rearth.oritech.spaceage.client.MissionControlScreen;
-import rearth.oritech.spaceage.client.RocketAssemblerScreen;
-import rearth.oritech.spaceage.client.VacuumCrafterScreen;
-import rearth.oritech.spaceage.robot.RobotMenu;
-import rearth.oritech.spaceage.robot.client.RobotScreen;
+import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
+import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
+import rearth.oritech.spaceage.block.robot_arm.ActionCardMenu;
+import rearth.oritech.spaceage.block.robot_arm.RobotMenu;
+import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
+import rearth.oritech.spaceage.client.assembler.RocketAssemblerScreen;
+import rearth.oritech.spaceage.client.beam_aperture.BeamApertureScreen;
+import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
+import rearth.oritech.spaceage.client.robot_arm.ActionCardScreen;
+import rearth.oritech.spaceage.client.robot_arm.RobotScreen;
+import rearth.oritech.spaceage.client.vacuum_crafter.VacuumCrafterScreen;
 
 import java.util.function.Supplier;
 
@@ -36,18 +38,22 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<BeamApertureMenu>> BEAM_APERTURE =
             MENUS.register("beam_aperture", () -> IMenuTypeExtension.create(BeamApertureMenu::new));
 
+    public static final Supplier<MenuType<RobotMenu>> ROBOT =
+            MENUS.register("robot_arm", () -> IMenuTypeExtension.create(RobotMenu::new));
+
+    public static final Supplier<MenuType<ActionCardMenu>> ACTION_CARD =
+            MENUS.register("action_card", () -> IMenuTypeExtension.create(ActionCardMenu::new));
+
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
         event.register(ROBOT.get(), RobotScreen::new);
+        event.register(ACTION_CARD.get(), ActionCardScreen::new);
         event.register(BEAM_APERTURE.get(), BeamApertureScreen::new);
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
         event.register(VACUUM_CRAFTER.get(), VacuumCrafterScreen::new);
         event.register(MISSION_CONTROL.get(), MissionControlScreen::new);
-    }    public static final Supplier<MenuType<RobotMenu>> ROBOT = MENUS.register("robot_arm", () -> IMenuTypeExtension.create(RobotMenu::new));
+    }
 
     private SpaceAgeMenus() {
     }
-
-
-
 }

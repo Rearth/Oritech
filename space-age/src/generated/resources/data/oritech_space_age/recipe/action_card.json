@@ -4,11 +4,11 @@
   "key": {
     "c": "oritech:processing_unit",
     "p": "minecraft:paper",
-    "s": "oritech:steel_ingot"
+    "r": "minecraft:redstone"
   },
   "pattern": [
     "pp",
-    "sc"
+    "rc"
   ],
   "result": {
     "id": "oritech_space_age:action_card"

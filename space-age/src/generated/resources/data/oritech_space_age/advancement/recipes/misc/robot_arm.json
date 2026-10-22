@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_motor": {
+    "has_placer": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:motor"
+            "items": "oritech:placer"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_motor"
+      "has_placer"
     ]
   ],
   "rewards": {

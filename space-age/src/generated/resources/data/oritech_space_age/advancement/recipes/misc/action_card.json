@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_processor": {
+    "has_robot_arm": {
       "conditions": {
         "items": [
           {
-            "items": "oritech:processing_unit"
+            "items": "oritech_space_age:robot_arm"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_processor"
+      "has_robot_arm"
     ]
   ],
   "rewards": {

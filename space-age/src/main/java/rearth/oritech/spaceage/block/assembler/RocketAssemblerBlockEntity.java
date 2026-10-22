@@ -18,15 +18,38 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import rearth.oritech.init.recipes.RecipeContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.BlockPairController;
-import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
+import rearth.oritech.spaceage.block.vacuum_crafter.BlockPairController;
+import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.init.SpaceAgeRecipes;
-import rearth.oritech.spaceage.simulation.*;
+import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.RocketDocking;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
+import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
+import rearth.oritech.spaceage.simulation.rocket.RocketExplosives;
+import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
+import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
+import rearth.oritech.spaceage.simulation.rocket.RocketStorageScan;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.service.PhysicalCrafting;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -72,9 +95,9 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         }
 
         var system = SpaceSimulationSavedData.getForPlayer(player);
-        var validation = RocketFlightPlanRules.inspect(plan, preview, system.createObjectData(), true, null,
-                ((ServerLevel) level).recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get()),
-                RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()));
+        var recipes = VacuumRecipe.all(player.level().getServer());
+        var stations = RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID());
+        var validation = RocketFlightPlanRules.inspect(plan, preview, system.createObjectData(), true, null, recipes, stations);
         if (!validation.valid()) {
             player.sendOverlayMessage(validation.issues().getFirst().description());
             return false;
@@ -88,9 +111,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         if (first.type() != SpaceSimulation.ActionType.NAVIGATE_TO)
             return false;
         var firstPlan = validated.withBranches(List.of(validated.root().withActions(List.of(first))));
-        var predicted = RocketFlightPathCalculator.calculateFrom(preview, system.createObjectData(), firstPlan, null,
-                ((ServerLevel) level).recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get()),
-                RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()));
+        var predicted = RocketFlightPathCalculator.calculateFrom(preview, system.createObjectData(), firstPlan, null, recipes, stations);
         if (predicted.paths().isEmpty() || predicted.paths().getFirst().terminalState().preventsLaunch()) return false;
         var result = gatherRocketData(start, true);
         if (result == null) {

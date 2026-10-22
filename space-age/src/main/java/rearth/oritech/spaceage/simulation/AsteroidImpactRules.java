@@ -2,7 +2,11 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.util.Mth;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Shared, deliberately small balancing model for planner collision and landing predictions.

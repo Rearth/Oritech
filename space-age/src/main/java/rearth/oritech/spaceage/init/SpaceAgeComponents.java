@@ -8,7 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.robot.RobotProgram;
+import rearth.oritech.spaceage.block.robot_arm.RobotProgram;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.UUID;

@@ -12,14 +12,27 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.MissionControlMenu;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
-import rearth.oritech.spaceage.client.MissionControlScreen;
+import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.client.MissionNotifications;
+import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
-import rearth.oritech.spaceage.init.SpaceAgeRecipes;
-import rearth.oritech.spaceage.simulation.*;
+import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.mission.DockingTarget;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.mission.MissionForecast;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.mission.RocketDocking;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
+import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
 
 import java.util.HashSet;
 import java.util.List;
@@ -95,7 +108,7 @@ public final class MissionNetworking {
         var data = MissionSavedData.get(player.level().getServer());
         var tick = MissionController.missionTime(player.level().getServer());
         var system = SpaceSimulationSavedData.getForPlayer(player);
-        var recipes = player.level().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
+        var recipes = VacuumRecipe.all(player.level().getServer());
         var details = new HashSet<UUID>();
         if (player.containerMenu instanceof MissionControlMenu menu) {
             if (menu.selected != null) details.add(menu.selected);
@@ -156,7 +169,7 @@ public final class MissionNetworking {
 
         var data = MissionSavedData.get(player.level().getServer());
         var system = SpaceSimulationSavedData.getForPlayer(player);
-        var recipes = player.level().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
+        var recipes = VacuumRecipe.all(player.level().getServer());
         var stations = RocketDocking.targets(data, player.getUUID());
         var mission = data.craft.get(menu.selected);
         var accepted = mission != null && mission.owner.equals(player.getUUID())
@@ -270,6 +283,8 @@ public final class MissionNetworking {
     public record FleetRequest(UUID selected, boolean edit) implements CustomPacketPayload {
 
         public static final Type<FleetRequest> TYPE = new Type<>(OritechSpaceAge.id("fleet_request"));
+        // Periodic telemetry refresh that keeps the current selection.
+        public static final FleetRequest POLL = new FleetRequest(new UUID(0, 0), false);
 
         public Type<? extends CustomPacketPayload> type() {
 

@@ -293,6 +293,10 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
 
     public abstract BlockState getTitleState();
 
+    public Component getTitleText() {
+        return getTitleState().getBlock().getName();
+    }
+
     public ItemStack getTitleIcon() {
         return new ItemStack(getTitleState().getBlock());
     }
@@ -306,7 +310,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
     }
 
     protected void addTitle(int panelWidth) {
-        var blockTitle = getTitleState().getBlock().getName();
+        var blockTitle = getTitleText();
         var icon = getTitleIcon();
 
         var iconWidget = new ItemWidget(0, 0, 28, icon);

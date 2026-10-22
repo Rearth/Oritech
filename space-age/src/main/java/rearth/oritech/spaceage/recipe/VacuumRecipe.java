@@ -4,11 +4,22 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.*;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategories;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeInput;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Two unordered physical blocks become two identical result states at the source cells.
@@ -24,6 +35,12 @@ public record VacuumRecipe(BlockIngredient first, BlockIngredient second, BlockS
             Codec.INT.fieldOf("ticks").forGetter(VacuumRecipe::ticks),
             Codec.INT.fieldOf("rf_per_tick").forGetter(VacuumRecipe::rfPerTick)
     ).apply(i, VacuumRecipe::new));
+
+    /** Missions also run without a server in tests; they simply have no recipes there. */
+    public static Collection<RecipeHolder<VacuumRecipe>> all(MinecraftServer server) {
+
+        return server == null ? List.of() : server.overworld().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
+    }
 
     public static RecipeSerializer<VacuumRecipe> serializer() {
 

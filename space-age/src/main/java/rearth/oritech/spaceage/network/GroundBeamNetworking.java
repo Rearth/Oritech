@@ -7,9 +7,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.client.GroundBeamRenderer;
-import rearth.oritech.spaceage.simulation.SpacePowerService;
-import rearth.oritech.spaceage.simulation.SpacePowerService.SurfaceBeam;
+import rearth.oritech.spaceage.client.beam_aperture.GroundBeamRenderer;
+import rearth.oritech.spaceage.simulation.power.SpacePowerService;
+import rearth.oritech.spaceage.simulation.power.SpacePowerService.SurfaceBeam;
 
 import java.util.List;
 

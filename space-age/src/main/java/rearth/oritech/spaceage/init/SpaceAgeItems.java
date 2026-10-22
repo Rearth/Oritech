@@ -7,8 +7,8 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.robot_arm.ActionCardItem;
 import rearth.oritech.spaceage.item.MissionCardItem;
-import rearth.oritech.spaceage.robot.ActionCardItem;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 public final class SpaceAgeItems {

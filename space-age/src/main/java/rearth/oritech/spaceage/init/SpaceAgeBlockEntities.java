@@ -4,11 +4,11 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.BeamApertureBlockEntity;
-import rearth.oritech.spaceage.block.GroundStationBlockEntity;
-import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
-import rearth.oritech.spaceage.robot.RobotArmBlockEntity;
+import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
+import rearth.oritech.spaceage.block.mission_control.GroundStationBlockEntity;
+import rearth.oritech.spaceage.block.robot_arm.RobotArmBlockEntity;
+import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 
 import java.util.function.Supplier;
 

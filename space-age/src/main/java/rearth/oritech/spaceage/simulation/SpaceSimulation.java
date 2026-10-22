@@ -14,8 +14,23 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Vector2f;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.mission.DockingTarget;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
+import rearth.oritech.spaceage.simulation.survey.SurveyKnowledge;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -38,30 +53,12 @@ public class SpaceSimulation {
             SurveyKnowledge.CODEC.optionalFieldOf("earth_knowledge").forGetter(simulation -> Optional.of(simulation.earthKnowledge))
     ).apply(instance, SpaceSimulation::new));
 
-    private static final Set<SpaceObjects.SimulatedObject> CELESTIAL_OBJECTS = new HashSet<>();
-
-    static {
-        var sun = new SpaceObjects.SimulatedObject(SUN_ID, SpaceObjects.ObjectType.SUN);
-        sun.currentPosition = new Vector2f(0, 0);
-        sun.radius = 250_000;
-        sun.surfaceGravity = 274;
-        sun.currentState = SpaceObjects.DetectionState.PRECISE;
-        CELESTIAL_OBJECTS.add(sun);
-
-        var earth = new SpaceObjects.SimulatedObject(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH);
-        earth.currentPosition = new Vector2f(-3_000_000, 0);
-        earth.radius = 60_000;
-        earth.surfaceGravity = 9.81f;
-        earth.currentState = SpaceObjects.DetectionState.PRECISE;
-        CELESTIAL_OBJECTS.add(earth);
-
-        var mars = new SpaceObjects.SimulatedObject(MARS_ID, SpaceObjects.ObjectType.MARS);
-        mars.currentPosition = new Vector2f(5_000_000, 1_500_000);
-        mars.radius = 45_000;
-        mars.surfaceGravity = 3.71f;
-        mars.currentState = SpaceObjects.DetectionState.PRECISE;
-        CELESTIAL_OBJECTS.add(mars);
-    }
+    private static final SpaceObjects.SimulatedObject EARTH = celestial(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+            SpaceObjects.EARTH_X, 0, SpaceObjects.EARTH_RADIUS, 9.81f);
+    private static final List<SpaceObjects.SimulatedObject> CELESTIAL_OBJECTS = List.of(
+            celestial(SUN_ID, SpaceObjects.ObjectType.SUN, 0, 0, 250_000, 274),
+            EARTH,
+            celestial(MARS_ID, SpaceObjects.ObjectType.MARS, 5_000_000, 1_500_000, 45_000, 3.71f));
 
     public final SurveyKnowledge earthKnowledge;
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
@@ -85,6 +82,17 @@ public class SpaceSimulation {
         generateRandomObjects();
     }
 
+    private static SpaceObjects.SimulatedObject celestial(UUID id, SpaceObjects.ObjectType type, float x, float y,
+                                                         float radius, float gravity) {
+
+        var object = new SpaceObjects.SimulatedObject(id, type);
+        object.currentPosition = new Vector2f(x, y);
+        object.radius = radius;
+        object.surfaceGravity = gravity;
+        object.currentState = SpaceObjects.DetectionState.PRECISE;
+        return object;
+    }
+
     private static List<SpaceObjects.AsteroidMaterial> sampleMaterials(float mass, int variant) {
 
         var blocks = Math.max(8, Math.round(mass * 12));
@@ -98,11 +106,6 @@ public class SpaceSimulation {
         return List.of(
                 new SpaceObjects.AsteroidMaterial(Identifier.parse(stone), blocks * 4 / 5),
                 new SpaceObjects.AsteroidMaterial(Identifier.parse(ore), Math.max(1, blocks / 5)));
-    }
-
-    private static void deliverAsteroid(ServerLevel level, AsteroidImpactRules.ImpactPrediction impact) {
-
-        deliverAsteroid(level, impact, true);
     }
 
     private static void deliverAsteroid(ServerLevel level, AsteroidImpactRules.ImpactPrediction impact, boolean explode) {
@@ -172,7 +175,6 @@ public class SpaceSimulation {
             if (asteroid.weight <= 0) asteroid.weight = Math.max(1, (asteroid.radius - 1_500) / 35);
             if (asteroid.materials.isEmpty())
                 asteroid.materials = sampleMaterials(asteroid.weight, asteroid.id.hashCode());
-
         }
     }
 
@@ -242,16 +244,15 @@ public class SpaceSimulation {
         for (var object : nonCelestialObjects) {
             if (!(object instanceof SpaceObjects.Asteroid asteroid) || asteroid.velocity.lengthSquared() == 0) continue;
             asteroid.currentPosition.add(asteroid.velocity.x / 20, asteroid.velocity.y / 20);
-            if (Math.hypot(asteroid.currentPosition.x + 3_000_000, asteroid.currentPosition.y) > 60_000) continue;
+            if (SpaceObjects.earthAltitude(asteroid.currentPosition.x, asteroid.currentPosition.y) > 0) continue;
             var action = asteroid.landing == null ? FlightPlanAction.create(ActionType.NAVIGATE_TO) : asteroid.landing;
             var pos = new BlockPos(action.landingX() + action.landingOffsetX(), 0, action.landingZ() + action.landingOffsetZ());
             if (!level.hasChunkAt(pos)) {
                 asteroid.currentPosition.sub(asteroid.velocity.x / 20, asteroid.velocity.y / 20);
                 continue;
             }
-            var earth = toData(CELESTIAL_OBJECTS.stream().filter(o -> o.id.equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow());
-            var impact = AsteroidImpactRules.predictArrival(0, earth, asteroid.velocity.length(), toData(asteroid), action);
-            deliverAsteroid(level, impact);
+            var impact = AsteroidImpactRules.predictArrival(0, toData(EARTH), asteroid.velocity.length(), toData(asteroid), action);
+            deliverAsteroid(level, impact, true);
             removed.add(asteroid);
         }
         nonCelestialObjects.removeAll(removed);
@@ -317,14 +318,10 @@ public class SpaceSimulation {
         return debris.id;
     }
 
+    /** A carried asteroid lands with its craft, whose own impact already handled the explosion. */
     public void recoverAsteroid(ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact) {
 
-        recoverAsteroid(level, id, impact, true);
-    }
-
-    public void recoverAsteroid(ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact, boolean explode) {
-
-        if (nonCelestialObjects.removeIf(o -> o.id.equals(id))) deliverAsteroid(level, impact, explode);
+        if (nonCelestialObjects.removeIf(o -> o.id.equals(id))) deliverAsteroid(level, impact, false);
     }
 
     public boolean updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
@@ -396,6 +393,12 @@ public class SpaceSimulation {
         UNDOCK;
 
         public static final Codec<ActionType> CODEC = StringRepresentable.fromEnum(ActionType::values);
+
+        /** Stationary cards that run until a duration or resource condition ends them. */
+        public boolean stationKeeping() {
+
+            return this == MAINTAIN_POSITION || this == BEAM_POWER;
+        }
 
         @Override
         public String getSerializedName() {
@@ -534,6 +537,22 @@ public class SpaceSimulation {
 
             return new SegmentRef(segment.planAnchor());
         }
+
+        /** Bottom-to-top order behind the default S1, S2, ... segment names. */
+        public static List<SegmentRef> displayOrder(ActiveRocketData rocket) {
+
+            return rocket.getStaticSegments().values().stream().map(SegmentRef::of)
+                    .sorted(Comparator.comparingInt((SegmentRef ref) -> ref.anchor().getY())
+                            .thenComparingInt(ref -> ref.anchor().getX())
+                            .thenComparingInt(ref -> ref.anchor().getZ()))
+                    .toList();
+        }
+
+        public static String defaultName(SegmentRef ref, ActiveRocketData rocket) {
+
+            var index = displayOrder(rocket).indexOf(ref);
+            return index < 0 ? "?" : "S" + (index + 1);
+        }
     }
 
     /**
@@ -611,6 +630,12 @@ public class SpaceSimulation {
 
             return branches.stream().filter(FlightPlanBranch::isRoot).findFirst()
                     .orElseGet(FlightPlanBranch::root);
+        }
+
+        /** The first editable card of the root program; generated booster markers are skipped. */
+        public FlightPlanAction currentAction() {
+
+            return root().actions().stream().filter(action -> !action.isGenerated()).findFirst().orElse(null);
         }
 
         public FlightPlan withBranches(List<FlightPlanBranch> newBranches) {

@@ -16,15 +16,22 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.slf4j.Logger;
 import rearth.oritech.Oritech;
-import rearth.oritech.spaceage.init.*;
+import rearth.oritech.spaceage.block.robot_arm.RobotRecording;
+import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.init.SpaceAgeComponents;
+import rearth.oritech.spaceage.init.SpaceAgeCreativeTabs;
+import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
+import rearth.oritech.spaceage.init.SpaceAgeItems;
+import rearth.oritech.spaceage.init.SpaceAgeMenus;
+import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.RobotNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
-import rearth.oritech.spaceage.robot.RobotNetworking;
-import rearth.oritech.spaceage.robot.RobotRecording;
-import rearth.oritech.spaceage.simulation.MissionController;
-import rearth.oritech.spaceage.simulation.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceAgeGameTests;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 
 import java.util.List;
 

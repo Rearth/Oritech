@@ -1,0 +1,291 @@
+package rearth.oritech.spaceage.client.planner;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.flight.ParachuteLanding;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.power.BeamAperture;
+import rearth.oritech.spaceage.simulation.power.SolarPower;
+import rearth.oritech.spaceage.simulation.power.SpacePowerHardware;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.util.TooltipHelper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
+
+/**
+ * Shared planner text and validation, kept apart from screen layout.
+ */
+final class FlightPlannerLabels {
+
+    private FlightPlannerLabels() {
+    }
+
+    static List<Component> beamPreview(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
+                                       SpaceSimulation.FlightPlannerSnapshot snapshot, RocketFlightPathCalculator.FlightPath flight) {
+
+        var sample = flight.paths().stream().flatMap(path -> path.samples().stream())
+                .filter(point -> point.actionId().equals(action.id())).findFirst().orElse(null);
+        if (sample == null) return List.of(Component.translatable("screen.oritech_space_age.beam.preview_unavailable"));
+        var hardware = SpacePowerHardware.scan(rocket.getStaticSegments().values().stream()
+                .filter(segment -> sample.connectedSegments().contains(SpaceSimulation.SegmentRef.of(segment))).toList());
+        var result = new ArrayList<Component>();
+        var generation = hardware.solar() * SolarPower.multiplier(sample.x(), sample.y());
+        result.add(Component.translatable("screen.oritech_space_age.beam.solar_generation", TooltipHelper.getEnergyText((long) generation)));
+        var ground = action.targetId().equals(SpaceObjects.EARTH_ID);
+        var target = snapshot.stations().stream().filter(station -> station.id().equals(action.targetId())).findFirst().orElse(null);
+        if (!ground && target == null) {
+            result.add(Component.translatable("screen.oritech_space_age.beam.preview_unavailable"));
+            return result;
+        }
+        var distance = ground ? SpaceObjects.earthAltitude(sample.x(), sample.y())
+                : Math.hypot(sample.x() - target.position().x(), sample.y() - target.position().y());
+        var efficiency = BeamAperture.idealEfficiency(distance, hardware.focus(), ground);
+        result.add(Component.translatable("screen.oritech_space_age.beam.ideal_efficiency", String.format(Locale.ROOT, "%.1f", efficiency * 100)));
+        result.add(Component.translatable("screen.oritech_space_age.beam.ideal_arrival", TooltipHelper.getEnergyText((long) (hardware.throughput() * efficiency))));
+        if (ground) result.add(Component.translatable("screen.oritech_space_age.beam.radius",
+                String.format(Locale.ROOT, "%.1f", BeamAperture.footprint(distance, hardware.focus(), ground))));
+        return result;
+    }
+
+    static Component actionName(SpaceSimulation.ActionType type) {
+
+        return Component.translatable("screen.oritech_space_age.action." + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component actionTooltip(SpaceSimulation.ActionType type) {
+
+        return Component.translatable("screen.oritech_space_age.action.tooltip."
+                + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component blockedTooltip(RocketFlightPathCalculator.TerminalState state) {
+
+        return Component.translatable("screen.oritech_space_age.blocked." + state.name().toLowerCase(Locale.ROOT))
+                .withStyle(ChatFormatting.RED);
+    }
+
+    static Component blockedTooltip(RocketFlightPathCalculator.FlightPath flight, UUID actionId,
+                                    RocketFlightPathCalculator.TerminalState state) {
+
+        var processing = flight.processingEstimates().stream().filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
+        if (processing != null && !processing.issue().isEmpty())
+            return Component.translatable("status.oritech_space_age." + processing.issue()).withStyle(ChatFormatting.RED);
+        return flight.paths().stream().filter(path -> path.actionMoments().stream().anyMatch(moment -> moment.actionId().equals(actionId)))
+                .flatMap(path -> path.failure().stream()).findFirst().<Component>map(failure -> failure.description().withStyle(ChatFormatting.RED))
+                .orElseGet(() -> blockedTooltip(state));
+    }
+
+    static RocketFlightPathCalculator.ScanEstimate scanEstimate(RocketFlightPathCalculator.FlightPath flight, UUID actionId) {
+
+        return flight.scanEstimates().stream().filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    static RocketFlightPathCalculator.StationKeepingEstimate stationKeepingEstimate(
+            RocketFlightPathCalculator.FlightPath flight, UUID actionId) {
+
+        return flight.stationKeepingEstimates().stream()
+                .filter(estimate -> estimate.actionId().equals(actionId)).findFirst().orElse(null);
+    }
+
+    static Component stationKeepingDuration(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
+
+        if (estimate != null && estimate.end() == RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE)
+            return Component.translatable("screen.oritech_space_age.power.sustainable");
+        if (estimate == null || !Double.isFinite(estimate.durationSeconds()))
+            return Component.translatable("screen.oritech_space_age.action.station_keeping_unavailable");
+        return Component.translatable("screen.oritech_space_age.action.station_keeping_estimate",
+                String.format(Locale.ROOT, "%.2f", estimate.durationSeconds() / 1_200d));
+    }
+
+    static Component stationKeepingEnd(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
+
+        if (estimate == null) return Component.empty();
+        return Component.translatable("screen.oritech_space_age.action.station_keeping_ends",
+                Component.translatable("screen.oritech_space_age.action.station_keeping_end."
+                        + estimate.end().name().toLowerCase(Locale.ROOT)));
+    }
+
+    static Component scanEnergyLabel(RocketFlightPathCalculator.ScanEstimate estimate) {
+
+        return estimate == null
+                ? Component.translatable("screen.oritech_space_age.scan.energy_unknown")
+                : Component.translatable("screen.oritech_space_age.scan.energy_estimate",
+                TooltipHelper.getEnergyText(SpaceBalance.SCAN_RF));
+    }
+
+    static List<Component> scanEnergyTooltip(RocketFlightPathCalculator.ScanEstimate estimate) {
+
+        var lines = new ArrayList<Component>();
+        lines.add(scanEnergyLabel(estimate));
+        if (estimate != null) {
+            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
+                    String.format(Locale.ROOT, "%,d", SpaceBalance.SCAN_RF)));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_available", String.format(Locale.ROOT, "%,d", estimate.availableRF())));
+            lines.add(Component.translatable("screen.oritech_space_age.scan.scanners", estimate.scanners()));
+        }
+        lines.add(Component.translatable("screen.oritech_space_age.scan.energy_help"));
+        return lines;
+    }
+
+    static Component actionVelocity(SpaceSimulation.FlightPlanAction action) {
+
+        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO) {
+            return Component.translatable("screen.oritech_space_age.action.no_velocity");
+        }
+        return switch (action.velocityMode()) {
+            case ZERO -> Component.translatable("screen.oritech_space_age.action.velocity_zero");
+            case MAXIMUM -> Component.translatable("screen.oritech_space_age.action.velocity_maximum");
+            case CUSTOM ->
+                    Component.translatable("screen.oritech_space_age.action.velocity_custom", action.targetVelocity());
+        };
+    }
+
+    static boolean isEarthSurface(SpaceSimulation.FlightPlanAction action) {
+
+        return action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                && action.targetId().equals(SpaceObjects.EARTH_ID)
+                && action.orbit() == SpaceSimulation.OrbitBand.SURFACE;
+    }
+
+    static Component addonTypeName(SpaceSimulation.ActionAddonType type) {
+
+        return Component.translatable("screen.oritech_space_age.action.condition." + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component addonUnit(SpaceSimulation.ActionAddonType type) {
+
+        return Component.translatable("screen.oritech_space_age.action.condition_unit." + type.name().toLowerCase(Locale.ROOT));
+    }
+
+    static Component addonSummary(SpaceSimulation.ActionAddon addon) {
+
+        return Component.translatable("screen.oritech_space_age.action.condition_summary."
+                + addon.type().name().toLowerCase(Locale.ROOT), addon.value());
+    }
+
+    static List<Component> addonTooltip(SpaceSimulation.ActionAddonType type) {
+
+        return List.of(Component.translatable("screen.oritech_space_age.action.abort_tooltip"),
+                Component.translatable("screen.oritech_space_age.action.condition_tooltip."
+                        + type.name().toLowerCase(Locale.ROOT)));
+    }
+
+    static String formatAddonValue(SpaceSimulation.ActionAddonType type, double value) {
+
+        return switch (type) {
+            case DISTANCE_FROM_TARGET -> String.format(Locale.ROOT, "%.0f m", value);
+            case TIME_BEFORE_ARRIVAL, DURATION -> String.format(Locale.ROOT, "%.0f s", value);
+            case DESIRED_UNCERTAINTY -> String.format(Locale.ROOT, "±%.0f blocks", value);
+            case LOW_RF, LOW_FUEL -> String.format(Locale.ROOT, "%.0f%%", value);
+        };
+    }
+
+    static Integer parseSpeedLimit(String text) {
+
+        var value = text.strip().toLowerCase(Locale.ROOT);
+        if (value.equals("max") || value.equals("maximum")) return 0;
+        if (value.endsWith("m/s")) value = value.substring(0, value.length() - 3).strip();
+        try {
+            var speed = Integer.parseInt(value);
+            return speed > 0 && speed <= 100_000 ? speed : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    static Integer parseInteger(String text) {
+
+        try {
+            return Integer.parseInt(text.strip());
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    static Integer parseArrivalVelocity(String text) {
+
+        var value = text.strip().toLowerCase(Locale.ROOT);
+        if (value.endsWith("m/s")) value = value.substring(0, value.length() - 3).strip();
+        try {
+            var speed = Integer.parseInt(value);
+            return speed >= 0 && speed <= 100_000 ? speed : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    static Integer parseAddonValue(SpaceSimulation.ActionAddonType type, String value) {
+
+        try {
+            var result = Integer.parseInt(value.strip());
+            return result > 0 && RocketFlightPlanRules.clampAddonValue(type, result) == result
+                    ? result : null;
+        } catch (NumberFormatException ignored) {
+            return null;
+        }
+    }
+
+    static List<Component> parachuteTooltip(ParachuteLanding.Result result) {
+
+        if (result.parachutes() == 0) return List.of();
+        var lines = new ArrayList<Component>();
+        lines.add(Component.translatable("screen.oritech_space_age.parachute.stats", result.parachutes(),
+                String.format(Locale.ROOT, "%.0f", result.mass())));
+        lines.add(Component.translatable("screen.oritech_space_age.parachute.braking", String.format(Locale.ROOT, "%.1f", result.deltaVReduction())));
+        return lines;
+    }
+
+    static List<Component> arrivalTooltip(AsteroidImpactRules.ImpactPrediction prediction) {
+
+        var lines = new ArrayList<Component>();
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_outcome."
+                + prediction.outcome().name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD));
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_relative_speed",
+                String.format(Locale.ROOT, "%.1f", prediction.relativeSpeedMetersPerSecond())));
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_energy",
+                String.format(Locale.ROOT, "%.2f", prediction.kineticEnergyJoules() / 1_000_000),
+                String.format(Locale.ROOT, "%.2f", prediction.explosiveEnergyJoules() / 1_000_000),
+                String.format(Locale.ROOT, "%.2f", prediction.totalEnergyJoules() / 1_000_000)));
+        lines.add(Component.translatable("screen.oritech_space_age.arrival_position", prediction.landingX(), prediction.landingZ()));
+        if (prediction.craterRadiusBlocks() > 0)
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_crater", prediction.craterRadiusBlocks()));
+        if (prediction.fragmentCount() > 0) {
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_fragments."
+                    + prediction.fragmentationMode().name().toLowerCase(Locale.ROOT), prediction.fragmentCount()));
+            for (int index = 0; index < prediction.fragments().size(); index++) {
+                var fragment = prediction.fragments().get(index);
+                lines.add(Component.translatable("screen.oritech_space_age.arrival_fragment", index + 1,
+                        String.format(Locale.ROOT, "%.0f", fragment.mass() * 1_000), String.format(Locale.ROOT, "%.0f", fragment.radius())));
+            }
+            if (prediction.remainingTargetMass() > 0) {
+                lines.add(Component.translatable("screen.oritech_space_age.arrival_remaining_asteroid",
+                        String.format(Locale.ROOT, "%.0f", prediction.remainingTargetMass() * 1_000)));
+            }
+        }
+        if (!prediction.recoverableMaterials().isEmpty()) {
+            lines.add(Component.translatable("screen.oritech_space_age.arrival_recoverable"));
+            prediction.recoverableMaterials().forEach(material -> lines.add(Component.literal("• " + material.block() + " × " + material.amount())));
+        }
+        return lines;
+    }
+
+    static List<Component> releasedAsteroidTooltip(RocketFlightPathCalculator.AsteroidPath path) {
+
+        if (path.earthImpact() == null) {
+            return List.of(Component.translatable("screen.oritech_space_age.released_asteroid_miss"),
+                    Component.translatable("screen.oritech_space_age.action.predicted_uncertainty",
+                            path.landingUncertaintyBlocks()));
+        }
+        var lines = new ArrayList<>(arrivalTooltip(path.earthImpact()));
+        lines.add(Component.translatable("screen.oritech_space_age.action.predicted_uncertainty", path.landingUncertaintyBlocks()));
+        return lines;
+    }
+}

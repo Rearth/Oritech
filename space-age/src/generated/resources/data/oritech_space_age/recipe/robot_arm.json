@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "c": "oritech:processing_unit",
-    "f": "oritech:machine_frame",
+    "b": "#oritech:plating",
+    "c": "oritech:placer",
     "m": "oritech:motor",
-    "p": "minecraft:piston",
-    "s": "oritech:steel_ingot"
+    "p": "oritech:processing_unit",
+    "s": "oritech:advanced_computing_engine"
   },
   "pattern": [
-    "sps",
+    "psp",
     "mcm",
-    "sfs"
+    "bbb"
   ],
   "result": {
     "id": "oritech_space_age:robot_arm"

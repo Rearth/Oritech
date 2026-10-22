@@ -15,6 +15,15 @@ import java.util.UUID;
 public class SpaceObjects {
 
     public static final UUID EARTH_ID = UUID.fromString("00000000-0000-0000-0000-000000000001");
+    // Earth is fixed on the plane's X axis; ground infrastructure sits on its far side from the Sun.
+    public static final float EARTH_X = -3_000_000;
+    public static final float EARTH_RADIUS = 60_000;
+    public static final double EARTH_SURFACE_X = EARTH_X - EARTH_RADIUS;
+
+    public static double earthAltitude(double x, double y) {
+
+        return Math.max(0, Math.hypot(x - EARTH_X, y) - EARTH_RADIUS);
+    }
 
     public enum ObjectType implements StringRepresentable {
 

@@ -8,6 +8,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
 import java.util.HashMap;
 import java.util.Map;

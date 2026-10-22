@@ -1,6 +1,5 @@
 package rearth.oritech.spaceage.client;
 
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
@@ -18,15 +17,25 @@ public final class SpaceAgeButtons {
     private SpaceAgeButtons() {
     }
 
-    static List<ButtonWidget> missionTabs(int selected, Runnable fleet, Runnable craft, Runnable plan) {
+    public static List<ButtonWidget> missionTabs(int selected, Runnable fleet, Runnable craft, Runnable plan) {
 
-        var keys = List.of("screen.oritech_space_age.mission.fleet", "screen.oritech_space_age.craft.title",
-                "screen.oritech_space_age.flight_plan");
-        var actions = List.of(fleet, craft, plan);
+        return tabs(selected, 76, 80, List.of("screen.oritech_space_age.mission.fleet", "screen.oritech_space_age.craft.title",
+                "screen.oritech_space_age.flight_plan"), List.of(fleet, craft, plan));
+    }
+
+    public static List<ButtonWidget> assemblerTabs(int selected, Runnable rocket, Runnable plan) {
+
+        return tabs(selected, 92, 92, List.of("screen.oritech_space_age.rocket", "screen.oritech_space_age.flight_plan"),
+                List.of(rocket, plan));
+    }
+
+    /** The selected tab is drawn pressed and disabled; the others switch screens. */
+    private static List<ButtonWidget> tabs(int selected, int width, int spacing, List<String> keys, List<Runnable> actions) {
+
         var tabs = new ArrayList<ButtonWidget>();
         for (var index = 0; index < keys.size(); index++) {
             var action = actions.get(index);
-            var tab = panel(9 + index * 80, 9, 76, 20, Component.translatable(keys.get(index)), ignored -> action.run());
+            var tab = panel(9 + index * spacing, 9, width, 20, Component.translatable(keys.get(index)), ignored -> action.run());
             if (index == selected) {
                 tab.withDisabledSurface(OritechSurface.PANEL_PRESSED).withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
                 tab.setActive(false);
@@ -41,47 +50,22 @@ public final class SpaceAgeButtons {
         return colors(ButtonWidget.panel(x, y, width, height, label, onPress));
     }
 
-    static ButtonWidget darkPanel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
+    public static ButtonWidget darkPanel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
 
         return colors(ButtonWidget.darkPanel(x, y, width, height, label, onPress))
                 .withTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
     }
 
-    static ButtonWidget orangePanel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
+    public static ButtonWidget orangePanel(int x, int y, int width, int height, Component label, Consumer<ButtonWidget> onPress) {
 
         return colors(ButtonWidget.orangePanel(x, y, width, height, label, onPress));
     }
 
-    static ButtonWidget close(int x, int y, Consumer<ButtonWidget> onPress) {
+    public static ButtonWidget close(int x, int y, Consumer<ButtonWidget> onPress) {
 
         var button = darkPanel(x, y, 18, 16, Component.literal("×"), onPress);
         button.withTooltip(Component.translatable("screen.oritech_space_age.close"));
         return button;
-    }
-
-    static ButtonWidget collapse(int x, int y, boolean collapsed, Consumer<ButtonWidget> onPress) {
-
-        // Draw familiar window controls directly, independent of the font's available glyphs.
-        var button = new ButtonWidget(x, y, 16, 16, Component.empty(), onPress) {
-
-            @Override
-            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
-
-                super.renderContent(graphics, mouseX, mouseY, delta);
-                var iconX = getX() + 4;
-                var iconY = getY() + 4;
-                var color = LabelWidget.DARK_TEXT;
-                if (collapsed) {
-                    graphics.fill(iconX, iconY, iconX + 8, iconY + 2, color);
-                    graphics.fill(iconX, iconY + 7, iconX + 8, iconY + 8, color);
-                    graphics.fill(iconX, iconY, iconX + 1, iconY + 8, color);
-                    graphics.fill(iconX + 7, iconY, iconX + 8, iconY + 8, color);
-                } else graphics.fill(iconX, iconY + 7, iconX + 8, iconY + 9, color);
-            }
-        };
-        button.withTooltip(Component.translatable(collapsed
-                ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"));
-        return colors(button);
     }
 
     private static ButtonWidget colors(ButtonWidget button) {

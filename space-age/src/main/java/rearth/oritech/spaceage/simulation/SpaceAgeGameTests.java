@@ -26,21 +26,52 @@ import org.joml.Vector2i;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
-import rearth.oritech.spaceage.block.BeamApertureBlockEntity;
-import rearth.oritech.spaceage.block.BeamApertureMenu.Snapshot;
-import rearth.oritech.spaceage.block.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
+import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
+import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
+import rearth.oritech.spaceage.block.robot_arm.RobotGameTests;
+import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.GroundBeamNetworking.Beams;
 import rearth.oritech.spaceage.recipe.BlockIngredient;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.robot.RobotGameTests;
-import rearth.oritech.spaceage.simulation.SpacePowerService.SurfaceBeam;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.*;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentConfiguration;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.mission.RocketDocking;
+import rearth.oritech.spaceage.simulation.power.BeamAperture;
+import rearth.oritech.spaceage.simulation.power.SolarPower;
+import rearth.oritech.spaceage.simulation.power.SpacePowerService.SurfaceBeam;
+import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
+import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
+import rearth.oritech.spaceage.simulation.rocket.RocketFlight;
+import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
+import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
+import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
+import rearth.oritech.spaceage.simulation.service.VacuumProcessing;
+import rearth.oritech.spaceage.simulation.survey.SurveyKnowledge;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -57,6 +88,7 @@ public final class SpaceAgeGameTests {
     static {
         FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
         FUNCTIONS.register("robot_tools", () -> RobotGameTests::toolsAndDoors);
+        FUNCTIONS.register("robot_bonemeal", () -> RobotGameTests::bonemeal);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -72,6 +104,7 @@ public final class SpaceAgeGameTests {
         var info = new TestData<>(environment, Identifier.parse("minecraft:empty"), 20, 1, true);
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
+        event.registerTest(OritechSpaceAge.id("robot_bonemeal"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_bonemeal")), info));
         event.registerTest(RECOVERY.identifier(), new FunctionGameTestInstance(RECOVERY, info));
         event.registerTest(CONTENT.identifier(), new FunctionGameTestInstance(CONTENT, info));
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));
@@ -108,7 +141,7 @@ public final class SpaceAgeGameTests {
         var rocket = new ActiveRocketData(Map.of(id, structure), Map.of(id, resources));
         return new MissionState(owner, rocket, FlightPlan.empty(), new MissionState.Position(x, 0, 0, 0, SpaceObjects.EARTH_ID,
                 SpaceSimulation.OrbitBand.LOW, -1, 1, SpaceSimulation.FlightPlanAction.NO_TARGET, SpaceSimulation.SegmentRef.of(structure)),
-                new SurveyKnowledge(), BlockPos.ZERO, 0);
+                new SurveyKnowledge(), BlockPos.ZERO);
     }
 
     private static void beamProgram(MissionState source, MissionState target) {
@@ -573,7 +606,7 @@ public final class SpaceAgeGameTests {
             var partial = RocketSimulationController.getActiveRockets(level).get(malformed.getRocketId());
             test.assertTrue(partial != null && partial.getFlight() == null, "Broken saved flight decodes as a partial rocket");
             var mission = new MissionState(UUID.randomUUID(), partial, FlightPlan.empty(), MissionState.Position.surface(),
-                    new SurveyKnowledge(), origin, 0);
+                    new SurveyKnowledge(), origin);
             missions.craft.put(partial.getRocketId(), mission);
             var player = FakePlayerFactory.getMinecraft(level);
             player.setPos(origin.getX() + 1000, origin.getY(), origin.getZ() + 1000);

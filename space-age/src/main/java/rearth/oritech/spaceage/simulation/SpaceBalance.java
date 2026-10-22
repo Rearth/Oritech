@@ -1,5 +1,6 @@
 package rearth.oritech.spaceage.simulation;
 
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -56,6 +57,15 @@ public final class SpaceBalance {
 
         if (body.equals(SpaceSimulation.SUN_ID)) return orbit == SpaceSimulation.OrbitBand.SOLAR ? 200 : 0;
         return body.equals(SpaceObjects.EARTH_ID) ? slots(orbit) : 0;
+    }
+
+    /** Keeps the requested slot while it is free, otherwise takes the lowest free one. */
+    public static int freeSlot(int requested, Set<Integer> occupied) {
+
+        if (requested >= 0 && !occupied.contains(requested)) return requested;
+        var slot = 0;
+        while (occupied.contains(slot)) slot++;
+        return slot;
     }
 
     public static boolean hasSlots(UUID body, SpaceSimulation.OrbitBand orbit) {

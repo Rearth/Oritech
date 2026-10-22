@@ -18,6 +18,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.ReflectiveCodecBuilder;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -25,7 +28,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpaceSimulationPersistenceTest {
 
