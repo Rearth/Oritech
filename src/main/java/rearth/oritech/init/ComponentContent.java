@@ -9,7 +9,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
+import rearth.oritech.block.entity.addons.ShrunkAddonData;
 
 import java.util.function.Supplier;
 
@@ -34,7 +34,7 @@ public class ComponentContent {
             "stored_fluid", builder -> builder.persistent(SimpleFluidContent.CODEC).networkSynchronized(SimpleFluidContent.STREAM_CODEC)
     );
 
-    public static final Supplier<DataComponentType<AddonSplicerBlockEntity.ShrunkAddonData>> ADDON_DATA = COMPONENTS.registerComponentType(
-            "addon_data", builder -> builder.persistent(AddonSplicerBlockEntity.ShrunkAddonData.CODEC).networkSynchronized(AddonSplicerBlockEntity.ShrunkAddonData.STREAM_CODEC)
+    public static final Supplier<DataComponentType<ShrunkAddonData>> ADDON_DATA = COMPONENTS.registerComponentType(
+            "addon_data", builder -> builder.persistent(ShrunkAddonData.CODEC).networkSynchronized(ShrunkAddonData.STREAM_CODEC)
     );
 }

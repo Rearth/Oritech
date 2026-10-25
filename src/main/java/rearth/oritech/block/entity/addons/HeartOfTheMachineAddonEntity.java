@@ -5,13 +5,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock;
-import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.util.MachineAddonController;
 
 public class HeartOfTheMachineAddonEntity extends AddonBlockEntity {
 
-    public AddonSplicerBlockEntity.ShrunkAddonData storedData;
+    public ShrunkAddonData storedData;
 
     public HeartOfTheMachineAddonEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.HEART_OF_THE_MACHINE_ADDON.get(), pos, state);
@@ -22,14 +21,14 @@ public class HeartOfTheMachineAddonEntity extends AddonBlockEntity {
         super.saveAdditional(output);
 
         if (this.storedData != null) {
-            output.store("data", AddonSplicerBlockEntity.ShrunkAddonData.CODEC, this.storedData);
+            output.store("data", ShrunkAddonData.CODEC, this.storedData);
         }
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        this.storedData = input.read("data", AddonSplicerBlockEntity.ShrunkAddonData.CODEC).orElse(null);
+        this.storedData = input.read("data", ShrunkAddonData.CODEC).orElse(null);
 
     }
 

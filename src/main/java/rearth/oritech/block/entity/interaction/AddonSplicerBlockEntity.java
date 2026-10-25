@@ -6,15 +6,12 @@ import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.animation.AnimationController;
 import com.geckolib.animation.RawAnimation;
 import com.geckolib.util.GeckoLibUtil;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -26,8 +23,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
@@ -37,13 +32,15 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.splicer.SplicerBehaviors;
+import rearth.oritech.api.splicer.SplicerContext;
+import rearth.oritech.api.splicer.SplicerOperation;
+import rearth.oritech.api.splicer.SplicerPreview;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.item.ItemProvider;
@@ -52,9 +49,7 @@ import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
-import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.BlockEntitiesContent;
-import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.*;
 import rearth.oritech.client.init.ParticleContent;
 
@@ -95,9 +90,14 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
     private BaseAddonData addonData = BaseAddonData.DEFAULT_ADDON_DATA;
 
     @SyncField(SyncType.GUI_OPEN)
-    public ShrunkAddonData currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, 0, false, false);
+    public SplicerPreview currentPreview = SplicerPreview.EMPTY;
+
+    // resolved from the registered splicer behaviors, not persisted
+    @Nullable
+    private SplicerOperation currentOperation;
 
     private boolean wasRedstoneActive = false;
+    private long lastGuiTick = Long.MIN_VALUE;
 
     public AddonSplicerBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ADDON_SPLICER.get(), pos, state);
@@ -115,33 +115,56 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
 
         wasRedstoneActive = currentRedstone;
 
+        // keep the preview up to date while someone has the screen open, targets may change without notifying the splicer
+        var time = serverLevel.getGameTime();
+        if (time - lastGuiTick < 5 && time % 20 == 0) {
+            var oldPreview = currentPreview;
+            refreshOperation();
+            if (!oldPreview.matches(currentPreview))
+                this.sendUpdate(SyncType.GUI_OPEN);
+        }
+
+    }
+
+    public void refreshOperation() {
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        var facing = getFacingForAddon();
+        var targetPos = new BlockPos(Geometry.offsetToWorldPosition(facing, getAddonSlots().getFirst(), worldPosition));
+        var context = new SplicerContext(serverLevel, worldPosition, facing, targetPos, this);
+
+        currentOperation = SplicerBehaviors.findOperation(context).orElse(null);
+        currentPreview = currentOperation == null ? SplicerPreview.EMPTY : SplicerPreview.of(currentOperation, getEnergyCost(currentOperation));
+    }
+
+    private long getEnergyCost(SplicerOperation operation) {
+        return Math.clamp(operation.getEnergyCost(), 0, energyStorage.capacity);
     }
 
     public void doShrink() {
 
-        if (energyStorage.energy < getDefaultCapacity()) return;
+        if (!(level instanceof ServerLevel serverLevel)) return;
 
-        initAddons();
+        initAddons();   // also refreshes the operation
 
-        if (currentCandidate == null || connectedAddons.isEmpty() || !inventory.isEmpty()) return;
+        var operation = currentOperation;
+        if (operation == null || !inventory.isEmpty() || operation.getBlockingReason().isPresent()) return;
 
-        energyStorage.set(energyStorage.energy - getDefaultCapacity());
+        var cost = getEnergyCost(operation);
+        if (energyStorage.energy < cost) return;
 
-        var createdStack = new ItemStack(BlockContent.HEART_OF_THE_MACHINE_ADDON.asItem());
-        createdStack.set(ComponentContent.ADDON_DATA.get(), currentCandidate);
+        var affected = operation.getAffectedPositions();
+        var createdStack = operation.execute(serverLevel);
+        if (createdStack.isEmpty()) return;
 
-        inventory.set(0, ItemResource.of(createdStack), 1);
+        energyStorage.set(energyStorage.energy - cost);
+        inventory.set(0, ItemResource.of(createdStack), createdStack.getCount());
 
-        for (var addonPos : connectedAddons.reversed()) {
-
-            level.setBlock(addonPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
-
-            if (level instanceof ServerLevel serverLevel) {
-                var spawnAt = addonPos.getCenter();
-                ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
-                serverLevel.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
-            }
+        for (var affectedPos : affected) {
+            var spawnAt = affectedPos.getCenter();
+            ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, spawnAt.x, spawnAt.y, spawnAt.z, 1, 0, 0.1f, 0, 0.5f);
         }
+        serverLevel.playSound(null, worldPosition, SoundEvents.SMALL_AMETHYST_BUD_PLACE, SoundSource.BLOCKS, 2f, 0.5f);
 
         triggerAnim("machine", "work");
 
@@ -152,31 +175,18 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
     @Override
     public void gatherAddonStats(List<AddonBlock> addons) {
         MachineAddonController.super.gatherAddonStats(addons);
+        refreshOperation();
+    }
 
-        if (addons.isEmpty()) {
-            currentCandidate = new ShrunkAddonData(BaseAddonData.DEFAULT_ADDON_DATA, false, 0, 0, 0, false, false);
-            return;
+    @Override
+    public void preNetworkUpdate(SyncType type) {
+        super.preNetworkUpdate(type);
+
+        if (type == SyncType.GUI_OPEN) {
+            refreshOperation();
+        } else if (type == SyncType.GUI_TICK && level != null) {
+            lastGuiTick = level.getGameTime();
         }
-
-        // collect all data
-        var data = getBaseAddonData();
-        var fluid = false;
-        var quarryCount = 0;
-        var hunterCount = 0;
-        var yieldCount = 0;
-        var cropFilter = false;
-        var silk = false;
-
-        for (var addon : addons) {
-            if (addon.addonBlock().equals(BlockContent.MACHINE_FLUID_ADDON.get())) fluid = true;
-            if (addon.addonBlock().equals(BlockContent.QUARRY_ADDON.get())) quarryCount++;
-            if (addon.addonBlock().equals(BlockContent.MACHINE_HUNTER_ADDON.get())) hunterCount++;
-            if (addon.addonBlock().equals(BlockContent.MACHINE_YIELD_ADDON.get())) yieldCount++;
-            if (addon.addonBlock().equals(BlockContent.CROP_FILTER_ADDON.get())) cropFilter = true;
-            if (addon.addonBlock().equals(BlockContent.MACHINE_SILK_TOUCH_ADDON.get())) silk = true;
-        }
-
-        currentCandidate = new ShrunkAddonData(data, fluid, quarryCount, hunterCount, yieldCount, cropFilter, silk);
     }
 
     @Override
@@ -185,7 +195,6 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
         inventory.serialize(output);
         serializeMultiblock(output);
         serializeAddonData(output);
-        if (currentCandidate != null) output.store("shrunk_addon", ShrunkAddonData.CODEC, currentCandidate);
         serializeColor(output);
         output.putLong("energy_stored", energyStorage.energy);
         output.putBoolean("redstone", wasRedstoneActive);
@@ -197,7 +206,6 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
         inventory.deserialize(input);
         deserializeMultiblock(input);
         deserializeAddonData(input);
-        currentCandidate = input.read("shrunk_addon", ShrunkAddonData.CODEC).orElse(null);
         deserializeColor(input);
 
         energyStorage.energy = input.getLongOr("energy_stored", 0);
@@ -451,35 +459,6 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
     @Override
     public boolean hasRedstoneControlAvailable() {
         return true;
-    }
-
-    public record ShrunkAddonData(BaseAddonData data, boolean fluid, int quarryCount, int hunterCount, int yieldCount,
-                                  boolean cropFilter, boolean silk) {
-
-        public static final Codec<ShrunkAddonData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                BaseAddonData.CODEC.fieldOf("data").forGetter(ShrunkAddonData::data),
-                Codec.BOOL.fieldOf("fluid").forGetter(ShrunkAddonData::fluid),
-                Codec.INT.fieldOf("quarry_count").forGetter(ShrunkAddonData::quarryCount),
-                Codec.INT.optionalFieldOf("hunter_count", 0).forGetter(ShrunkAddonData::hunterCount),
-                Codec.INT.fieldOf("yield_count").forGetter(ShrunkAddonData::yieldCount),
-                Codec.BOOL.fieldOf("crop_filter").forGetter(ShrunkAddonData::cropFilter),
-                Codec.BOOL.fieldOf("silk").forGetter(ShrunkAddonData::silk)
-        ).apply(instance, ShrunkAddonData::new));
-
-        public static final StreamCodec<RegistryFriendlyByteBuf, ShrunkAddonData> STREAM_CODEC = NetworkManager.getAutoCodec(ShrunkAddonData.class);
-
-        @Override
-        public @NotNull String toString() {
-            return "ShrunkAddonData{" +
-                    "data=" + data +
-                    ", fluid=" + fluid +
-                    ", quarryCount=" + quarryCount +
-                    ", hunterCount=" + hunterCount +
-                    ", yieldCount=" + yieldCount +
-                    ", cropFilter=" + cropFilter +
-                    ", silk=" + silk +
-                    '}';
-        }
     }
 
     public record AddonSplicerPlayerUsePacket(BlockPos pos) implements CustomPacketPayload {

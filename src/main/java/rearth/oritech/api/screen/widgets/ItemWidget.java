@@ -18,6 +18,10 @@ public class ItemWidget extends UIComponent {
     private ItemStack stack;
     private boolean showOverlay = true;
     private boolean tooltipFromStack = true;
+    private boolean ghost = false;
+
+    // same translucent overlay vanilla uses for ghost recipe items
+    private static final int GHOST_OVERLAY_COLOR = 0x808B8B8B;
 
     public ItemWidget(int x, int y, ItemStack stack) {
         super(x, y, 16, 16);
@@ -44,6 +48,14 @@ public class ItemWidget extends UIComponent {
 
     public ItemWidget withTooltipFromStack(boolean fromStack) {
         this.tooltipFromStack = fromStack;
+        return this;
+    }
+
+    /**
+     * Renders the item faded, e.g. to preview a result in an empty slot.
+     */
+    public ItemWidget withGhost(boolean ghost) {
+        this.ghost = ghost;
         return this;
     }
 
@@ -83,6 +95,9 @@ public class ItemWidget extends UIComponent {
             if (showOverlay)
                 graphics.itemDecorations(Minecraft.getInstance().font, stack, cx, cy);
         }
+
+        if (ghost)
+            graphics.fill(cx, cy, cx + cw, cy + ch, GHOST_OVERLAY_COLOR);
     }
 
     @Override

@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.behavior.EndericLaserBlockBehavior;
 import rearth.oritech.block.behavior.EndericLaserEntityBehavior;
+import rearth.oritech.block.behavior.MachineAddonSplicerBehavior;
 import rearth.oritech.block.blocks.pipes.energy.EnergyPipeBlock;
 import rearth.oritech.block.blocks.pipes.energy.SuperConductorBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
@@ -131,6 +132,7 @@ public final class Oritech {
 
             EndericLaserBlockBehavior.registerDefaults();
             EndericLaserEntityBehavior.registerDefaults();
+            MachineAddonSplicerBehavior.registerDefaults();
             BlockContent.registerDispenserBehaviors();
         });
 

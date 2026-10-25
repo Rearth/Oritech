@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
-import rearth.oritech.block.entity.interaction.AddonSplicerBlockEntity;
+import rearth.oritech.block.entity.addons.ShrunkAddonData;
 import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.TooltipHelper;
 
@@ -62,7 +62,7 @@ public class HeartOfTheMachineAddonBlock extends MachineAddonBlock {
         }
     }
 
-    public static @NotNull ArrayList<Component> getShrinkTooltip(AddonSplicerBlockEntity.ShrunkAddonData data) {
+    public static @NotNull ArrayList<Component> getShrinkTooltip(ShrunkAddonData data) {
         var usedSettings = data.data();
         var foundTexts = new ArrayList<Component>();
 

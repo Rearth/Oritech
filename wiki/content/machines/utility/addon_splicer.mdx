@@ -40,3 +40,32 @@ and output a single combined block in its inventory.
     Additionally, a "Heart of the Machine" cannot be combined with 
     other addons—it must be the only installed addon.
 </Callout>
+
+---
+
+**Mod Developer Info**
+
+Other mods can add their own compaction targets to the splicer by registering a
+`SplicerBehavior` (package `rearth.oritech.api.splicer`) during common setup:
+
+```java
+SplicerBehaviors.register(Identifier.fromNamespaceAndPath("mymod", "my_target"), 10, context -> {
+    // inspect context.level(), context.targetPos(), context.facing() or context.splicer()
+    return Optional.empty(); // or Optional.of(new MySplicerOperation(...))
+});
+```
+
+Behaviors are queried from highest to lowest priority, and the first returned
+`SplicerOperation` is used. The built-in addon compaction is registered as
+`oritech:machine_addons` with priority 0.
+
+A `SplicerOperation` provides:
+- `getTooltip()`: lines shown on the compact button
+- `getPreviewResult()`: the item that will be created, shown faded in the empty output slot
+- `getEnergyCost()`: RF used (defaults to the splicer capacity config, clamped to the buffer size)
+- `getBlockingReason()`: optional message shown when the operation is currently not possible
+- `getAffectedPositions()`: positions used for particles
+- `execute(level)`: performs the compaction (e.g. removes the blocks) and returns the resulting item
+
+Operations are resolved again right before compacting, and periodically while the
+splicer screen is open, so they can hold a snapshot of the world.
