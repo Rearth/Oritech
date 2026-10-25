@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "Nieprawidłowe: Komponenty wnętrza reaktora muszą być identyczne na wszystkich warstwach Y i wymagają odpowiednich portów na górze",
   "config.jade.plugin_oritech.machine_core_controller": "Widok Łącza Kontrolera Oritech",
   "text.oritech.shrink": "Kompaktuj!",
-  "text.oritech.shrink_no_addon": "Brakuje podłączonych dodatków.",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "Niewystarczająca energia.",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "Liczba prętów: %s",
