@@ -151,7 +151,8 @@ public class ToolsContent {
             props -> new EndericRailgunItem(props
                     .stacksTo(1)
                     .rarity(Rarity.EPIC)
-                    .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
+                    .component(DataComponents.UNBREAKABLE, Unit.INSTANCE)
+                    .enchantable(20))
     );
 
     public static final DeferredItem<Item> ELECTRIC_MACE = EQUIPMENT.registerItem(
@@ -162,7 +163,8 @@ public class ToolsContent {
                     .rarity(Rarity.EPIC)
                     .component(DataComponents.TOOL, MaceItem.createToolProperties())
                     .component(DataComponents.WEAPON, new Weapon(1))
-                    .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
+                    .component(DataComponents.UNBREAKABLE, Unit.INSTANCE)
+                    .enchantable(15))
     );
 
     public static final DeferredItem<Item> CHAINSAW = EQUIPMENT.registerItem(
