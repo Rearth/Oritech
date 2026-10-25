@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "Geçersiz: Reaktör İç Bileşenlerinin tüm Y-Katmanlarında benzer olmalı ve üstte karşılık gelen bağlantı noktalarına sahip olması gerekir",
   "config.jade.plugin_oritech.machine_core_controller": "Oritech Denetleyici Bağlantı Görünümü",
   "text.oritech.shrink": "Compact!",
-  "text.oritech.shrink_no_addon": "Missing connected addons.",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "Not enough energy.",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "Çubuk Sayısı: %s",
