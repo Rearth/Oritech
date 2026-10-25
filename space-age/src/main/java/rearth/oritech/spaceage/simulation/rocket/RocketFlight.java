@@ -26,7 +26,8 @@ public record RocketFlight(
         long reentryTick,
         long impactTick,
         BlockPos takeoffCollisionPosition,
-        long takeoffCollisionTick) {
+        long takeoffCollisionTick,
+        RocketAscent ascent) {
 
     private static final Codec<Vector2i> ORBIT_POSITION_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("x").forGetter(Vector2i::x),
@@ -47,13 +48,15 @@ public record RocketFlight(
             Codec.LONG.fieldOf("reentry_tick").forGetter(RocketFlight::reentryTick),
             Codec.LONG.fieldOf("impact_tick").forGetter(RocketFlight::impactTick),
             BlockPos.CODEC.optionalFieldOf("takeoff_collision_position").forGetter(flight -> Optional.ofNullable(flight.takeoffCollisionPosition)),
-            Codec.LONG.optionalFieldOf("takeoff_collision_tick", -1L).forGetter(RocketFlight::takeoffCollisionTick)
+            Codec.LONG.optionalFieldOf("takeoff_collision_tick", -1L).forGetter(RocketFlight::takeoffCollisionTick),
+            RocketAscent.CODEC.optionalFieldOf("ascent").forGetter(flight -> Optional.of(flight.ascent()))
     ).apply(instance, (canReachOrbit, failureReason, dimension, performance, launchPosition, orbitPosition,
                        impactPosition, targetOrbit, requiredDeltaV, impactSpeed, orbitArrivalTick, reentryTick,
-                       impactTick, takeoffCollisionPosition, takeoffCollisionTick) ->
+                       impactTick, takeoffCollisionPosition, takeoffCollisionTick, ascent) ->
             new RocketFlight(canReachOrbit, failureReason.orElse(null), dimension, performance, launchPosition,
                     orbitPosition, impactPosition, targetOrbit, requiredDeltaV, impactSpeed, orbitArrivalTick,
-                    reentryTick, impactTick, takeoffCollisionPosition.orElse(null), takeoffCollisionTick)));
+                    reentryTick, impactTick, takeoffCollisionPosition.orElse(null), takeoffCollisionTick,
+                    ascent.orElseGet(() -> RocketAscent.launch(performance, 0)))));
 
     public RocketFlight {
 
@@ -65,7 +68,7 @@ public record RocketFlight(
                                Vector2i targetOrbit, String reason) {
 
         return new RocketFlight(false, reason, dimension, performance, launchPosition, orbitPosition, impactPosition,
-                targetOrbit, 0, 0, -1, -1, -1, null, -1);
+                targetOrbit, 0, 0, -1, -1, -1, null, -1, RocketAscent.launch(performance, 0));
     }
 
     RocketFlight scheduledAt(long launchTick) {
@@ -74,7 +77,13 @@ public record RocketFlight(
                 impactPosition, targetOrbit, requiredDeltaVMetersPerSecond, impactSpeedMetersPerSecond,
                 launchTick + orbitArrivalTick, reentryTick < 0 ? -1 : launchTick + reentryTick,
                 impactTick < 0 ? -1 : launchTick + impactTick, takeoffCollisionPosition,
-                takeoffCollisionTick < 0 ? -1 : launchTick + takeoffCollisionTick);
+                takeoffCollisionTick < 0 ? -1 : launchTick + takeoffCollisionTick, ascent);
+    }
+
+    public long launchTick() {
+
+        var height = Math.max(0, orbitPosition.getY() - launchPosition.getY());
+        return orbitArrivalTick - (long) Math.ceil(ascent.secondsTo(height) * RocketSimulationController.TICKS_PER_SECOND);
     }
 
     public boolean isInSpace(double gameTime) {
@@ -86,6 +95,6 @@ public record RocketFlight(
 
         return new RocketFlight(canReachOrbit, failureReason, dimension, performance, launchPosition, orbitPosition,
                 impactPosition, targetOrbit, requiredDeltaVMetersPerSecond, impactSpeedMetersPerSecond,
-                orbitArrivalTick, reentryTick, impactTick, position, relativeCollisionTick);
+                orbitArrivalTick, reentryTick, impactTick, position, relativeCollisionTick, ascent);
     }
 }

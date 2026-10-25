@@ -9,6 +9,7 @@ import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.block.dispatch.Variant;
+import com.geckolib.renderer.internal.GeckolibItemSpecialRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
@@ -71,7 +72,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
 
-        createHorizontalModelBlock(SpaceAgeBlocks.ROBOT_ARM.get(), blockModels);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(SpaceAgeBlocks.ROBOT_ARM.get(),
+                        BlockModelGenerators.variant(new Variant(OritechSpaceAge.id("block/robot_arm"))))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        itemModels.itemModelOutput.accept(SpaceAgeBlocks.ROBOT_ARM.asItem(),
+                ItemModelUtils.specialModel(OritechSpaceAge.id("item/robot_arm"), new GeckolibItemSpecialRenderer.Unbaked()));
         itemModels.itemModelOutput.accept(SpaceAgeItems.ACTION_CARD.get(), ItemModelUtils.plainModel(OritechSpaceAge.id("item/action_card")));
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
@@ -92,6 +97,8 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createPairBlock(SpaceAgeBlocks.CARGO.get(), blockModels);
         createPairBlock(SpaceAgeBlocks.BEAM_APERTURE.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.CRYSTAL_GLASS.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.CUBE_SAT.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.LAUNCH_RAMP.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.ANTENNA.get(), blockModels);

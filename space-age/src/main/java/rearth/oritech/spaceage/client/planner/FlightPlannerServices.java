@@ -78,10 +78,10 @@ final class FlightPlannerServices {
         return hosts().stream().filter(t -> t.id().equals(id)).findFirst().orElse(null);
     }
 
-    private ActiveRocketData rocket(UUID id) {
+    private ActiveRocketData rocket(UUID id, FlightPlanAction action) {
 
         var host = host(id);
-        return host == null ? editors.flightPlanRocket() : host.rocket();
+        return host == null ? editors.hardwareFor(action) : host.rocket();
     }
 
     private Component hostName(UUID id) {
@@ -147,7 +147,7 @@ final class FlightPlannerServices {
 
     private void timeout(FlightPlanAction action, int x, int y, int width) {
 
-        var computer = NavigationComputerRules.computers(editors.flightPlanRocket(), NavigationComputerRules.allSegments(editors.flightPlanRocket())) > 0;
+        var computer = NavigationComputerRules.computers(editors.hardwareFor(action), NavigationComputerRules.allSegments(editors.hardwareFor(action))) > 0;
         var button = SpaceAgeButtons.panel(x, y - 4, width, 18, text("timeout", action.service().timeoutTicks() / 20), ignored ->
                 editors.changeService(action, new ServiceSettings(action.service().durationTicks(), action.service().timeoutTicks() == 0 ? 1200 : 0, action.service().slot())));
         button.setActive(computer);
@@ -158,6 +158,7 @@ final class FlightPlannerServices {
     int build(FlightPlanAction action, int px, int y, int popupWidth, int x, int width, int rowSpacing) {
 
         var targets = hosts();
+        var localRocket = editors.hardwareFor(action);
         if (action.type() == ActionType.PROCESS) {
             var processing = action.settings().processing();
             var hostIds = new ArrayList<UUID>();
@@ -165,13 +166,13 @@ final class FlightPlannerServices {
             targets.forEach(t -> hostIds.add(t.id()));
             button(x, y, width, hostName(processing.host()), hostIds.size() > 1, () -> {
                 var id = next(hostIds, processing.host());
-                var modules = RocketProcessingService.modules(rocket(id));
+                var modules = RocketProcessingService.modules(rocket(id, action));
                 set(action, action.settings().withProcessing(new Processing(modules.isEmpty() ? List.of() : List.of(modules.getFirst()), processing.scope(), id)));
             });
             y += rowSpacing;
-            var modules = RocketProcessingService.modules(rocket(processing.host()));
+            var modules = RocketProcessingService.modules(rocket(processing.host(), action));
             var selected = processing.modules().isEmpty() ? null : processing.modules().getFirst();
-            button(x, y, width, module(selected, rocket(processing.host())), !modules.isEmpty(), () ->
+            button(x, y, width, module(selected, rocket(processing.host(), action)), !modules.isEmpty(), () ->
                     set(action, action.settings().withProcessing(new Processing(List.of(next(modules, selected)), processing.scope(), processing.host()))));
             y += rowSpacing;
             button(x, y, width, text("parallel", processing.modules().size()), modules.size() > 1, () -> {
@@ -199,7 +200,7 @@ final class FlightPlannerServices {
             details.add(estimate != null && estimate.conditional() ? text("host_budget", estimate.remainingModuleCraftRF()) : text("local_budget"));
             if (estimate != null) {
                 estimate.assignments().forEach(a -> details.add(text("assignment", a.machine().position().toShortString(), a.source().controller().position().toShortString(),
-                        a.source().rocket().equals(editors.flightPlanRocket().getRocketId()) ? text("local") : text("station"))));
+                        a.source().rocket().equals(localRocket.getRocketId()) ? text("local") : text("station"))));
                 estimate.skipped().forEach(issue -> details.add(Component.literal(issue)));
             }
             editors.addPopupComponent(new LabelWidget(px + 10, y, popupWidth - 20, cost).withBrightColor().withTooltip(details).withZIndex(FlightPlannerPopups.CONTROL_Z));
@@ -209,7 +210,7 @@ final class FlightPlannerServices {
         } else if (action.type() == ActionType.DOCK) {
             var docking = action.settings().docking();
             var host = host(docking.host());
-            var localPorts = RocketDocking.ports(editors.flightPlanRocket());
+            var localPorts = RocketDocking.ports(localRocket);
             // The previous navigation chooses the host; this card only configures attachment and exchange.
             editors.addPopupComponent(new LabelWidget(x, y, width, host == null ? text("choose_host") : Component.literal(host.name()))
                     .withBrightColor().withTooltip(Component.translatable("screen.oritech_space_age.action.dock_requires_arrival")).withZIndex(FlightPlannerPopups.CONTROL_Z));
@@ -235,7 +236,7 @@ final class FlightPlannerServices {
                     .withTooltip(text("cargo_exchange_help"));
             var filters = new ArrayList<Identifier>();
             filters.add(Identifier.parse("minecraft:air"));
-            for (var rocket : Stream.concat(Stream.of(editors.flightPlanRocket()), targets.stream().map(DockingTarget::rocket)).toList())
+            for (var rocket : Stream.concat(Stream.of(localRocket), targets.stream().map(DockingTarget::rocket)).toList())
                 rocket.getStaticSegments().values().stream().flatMap(seg -> seg.blocks().stream()).filter(block -> !block.state().isAir())
                         .map(block -> BuiltInRegistries.BLOCK.getKey(block.state().getBlock())).distinct().forEach(id -> {
                             if (!filters.contains(id)) filters.add(id);
@@ -244,13 +245,13 @@ final class FlightPlannerServices {
                     () -> set(action, action.settings().withExchange(new Exchange(exchange.cargo(), exchange.local(), exchange.remote(), next(filters,
                             exchange.filter()), exchange.fuel(), exchange.rf()))));
             y += rowSpacing;
-            var local = RocketLayout.controllers(editors.flightPlanRocket(), false);
+            var local = RocketLayout.controllers(localRocket, false);
             var host = exchangeHost(action);
             var remote = host == null ? List.<HardwareRef>of() : RocketLayout.controllers(host.rocket(), false);
-            button(x, y, width / 2 - 2, text("cargo_local", selection(exchange.local(), editors.flightPlanRocket())), !local.isEmpty(), () -> set(action,
+            button(x, y, width / 2 - 2, text("cargo_local", selection(exchange.local(), localRocket)), !local.isEmpty(), () -> set(action,
                     action.settings().withExchange(
                     new Exchange(exchange.cargo(), nextSelection(local, exchange.local()), exchange.remote(), exchange.filter(), exchange.fuel(), exchange.rf()))));
-            var remoteRocket = host == null ? editors.flightPlanRocket() : host.rocket();
+            var remoteRocket = host == null ? localRocket : host.rocket();
             button(x + width / 2 + 2, y, width / 2 - 2, text("cargo_remote", selection(exchange.remote(), remoteRocket)), !remote.isEmpty(), () -> set(action,
                     action.settings().withExchange(
                     new Exchange(exchange.cargo(), exchange.local(), nextSelection(remote, exchange.remote()), exchange.filter(), exchange.fuel(), exchange.rf()))));

@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.behavior.AcceleratorBlockImpactBehavior;
 import rearth.oritech.block.behavior.EndericLaserBlockBehavior;
 import rearth.oritech.block.behavior.EndericLaserEntityBehavior;
 import rearth.oritech.block.behavior.MachineAddonSplicerBehavior;
@@ -133,6 +134,7 @@ public final class Oritech {
             EndericLaserBlockBehavior.registerDefaults();
             EndericLaserEntityBehavior.registerDefaults();
             MachineAddonSplicerBehavior.registerDefaults();
+            AcceleratorBlockImpactBehavior.registerDefaults();
             BlockContent.registerDispenserBehaviors();
         });
 

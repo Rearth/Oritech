@@ -237,6 +237,10 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
         controllers.add(new AnimationController<>("machine", 0, state -> {
+            if (state.isCurrentAnimation(SHRINK) && isActive(getBlockState()) && !state.controller().hasAnimationFinished()) {
+                return state.setAndContinue(SHRINK);
+            }
+
             if (state.isCurrentAnimation(SETUP)) {
                 if (state.controller().hasAnimationFinished()) {
                     state.setAndContinue(IDLE);
@@ -253,6 +257,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
         })
                 .triggerableAnim("work", SHRINK)
                 .triggerableAnim("deploy", MachineBlockEntity.SETUP)
+                .receiveTriggeredAnimations()
                 .setSoundKeyframeHandler(new MachineSoundHandler<>()));
     }
 

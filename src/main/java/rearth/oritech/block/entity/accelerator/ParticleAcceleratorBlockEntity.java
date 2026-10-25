@@ -354,7 +354,8 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         return inflictedDamage;
     }
 
-    public float handleParticleBlockCollision(BlockPos checkPos, AcceleratorParticleLogic.ActiveParticle particle, long remainingMomentum, BlockState hitState) {
+    // returns the amount of momentum used. Called by the default particle impact behavior.
+    public float handleParticleBlockCollision(BlockPos checkPos, long remainingMomentum, BlockState hitState) {
 
         var blockHardness = hitState.getDestroySpeed(level, checkPos);
 

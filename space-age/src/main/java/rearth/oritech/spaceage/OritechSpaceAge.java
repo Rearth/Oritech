@@ -7,6 +7,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -16,6 +17,8 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.slf4j.Logger;
 import rearth.oritech.Oritech;
+import rearth.oritech.spaceage.block.cubesat.CubeSatSplicerBehavior;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampImpactBehavior;
 import rearth.oritech.spaceage.block.robot_arm.RobotRecording;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -53,6 +56,10 @@ public final class OritechSpaceAge {
         NeoForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
         modEventBus.addListener(this::addNetworkHandlers);
         modEventBus.addListener(SpaceAgeDataMaps::register);
+        modEventBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
+            CubeSatSplicerBehavior.register();
+            LaunchRampImpactBehavior.register();
+        }));
         modEventBus.addListener((RegisterCapabilitiesEvent event) ->
                 event.registerBlockEntity(Capabilities.Energy.BLOCK,
                         SpaceAgeBlockEntities.BEAM_APERTURE.get(), (entity, side) -> entity.energy));

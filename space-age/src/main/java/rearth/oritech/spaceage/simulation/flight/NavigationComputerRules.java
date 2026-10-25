@@ -1,17 +1,15 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +35,16 @@ public final class NavigationComputerRules {
     public static Set<SegmentRef> allSegments(ActiveRocketData rocket) {
 
         return rocket.getStaticSegments().values().stream().map(SegmentRef::of).collect(Collectors.toSet());
+    }
+
+    /**
+     * Folded cube-sats don't add memory. Their programs are stored by the host until they are deployed.
+     */
+    private static Set<SegmentRef> hostSegments(ActiveRocketData rocket) {
+
+        var result = new HashSet<>(allSegments(rocket));
+        result.removeAll(RocketPayloads.segments(rocket));
+        return result;
     }
 
     public static int capacity(ActiveRocketData rocket) {
@@ -79,8 +87,8 @@ public final class NavigationComputerRules {
         var issues = new ArrayList<RocketFlightPlanRules.Issue>();
         for (var branch : plan.branches()) {
             var path = forecast.paths().stream().filter(p -> p.branchId().equals(branch.id())).findFirst().orElse(null);
-            var connected = branch.isRoot() ? allSegments(rocket)
-                    : path == null || path.samples().isEmpty() ? branchSegments(plan, branch, rocket, new HashSet<>()) : path.samples().getFirst().connectedSegments();
+            var connected = branch.isRoot() ? hostSegments(rocket)
+                    : path == null || path.samples().isEmpty() ? FlightPlanHardware.branchSegments(plan, branch, rocket, new HashSet<>()) : path.samples().getFirst().connectedSegments();
             if (connected.isEmpty()) continue;
             checkCapacity(issues, branch.id(), FlightPlanAction.NO_TARGET, unfinished(plan, branch, 0), computers(rocket, connected));
             for (int i = 0; i < branch.actions().size(); i++) {
@@ -88,58 +96,11 @@ public final class NavigationComputerRules {
                 if (requiresComputer(action) && computers(rocket, connected) == 0)
                     issues.add(new RocketFlightPlanRules.Issue(branch.id(), action.id(), "computer_required", 1, 0));
                 var moment = path == null ? null : path.actionMoments().stream().filter(m -> m.actionId().equals(action.id())).findFirst().orElse(null);
-                connected = moment == null ? retainedAfter(action, connected, rocket) : moment.connectedSegments();
+                connected = moment == null ? FlightPlanHardware.retainedAfter(action, connected, rocket) : moment.connectedSegments();
                 checkCapacity(issues, branch.id(), action.id(), unfinished(plan, branch, i + 1), computers(rocket, connected));
             }
         }
         return issues.stream().distinct().toList();
-    }
-
-    private static Set<SegmentRef> branchSegments(FlightPlan plan, FlightPlanBranch branch, ActiveRocketData rocket,
-                                                  Set<UUID> visited) {
-
-        if (branch.isRoot()) return allSegments(rocket);
-        if (!visited.add(branch.id())) return Set.of();
-        for (var parent : plan.branches())
-            for (var action : parent.actions()) {
-                if (!action.id().equals(branch.parentSeparationAction())) continue;
-                var connected = new HashSet<>(branchSegments(plan, parent, rocket, visited));
-                for (var prior : parent.actions()) {
-                    if (prior.id().equals(action.id())) break;
-                    connected = new HashSet<>(retainedAfter(prior, connected, rocket));
-                }
-                if (action.type() == ActionType.DECOUPLE && action.segments().size() == 2)
-                    return component(action.segments().get(1), connected, rocket, action.segments());
-                if (action.isGenerated() && !action.segments().isEmpty()) return Set.of(action.segments().getFirst());
-            }
-        return Set.of();
-    }
-
-    private static Set<SegmentRef> retainedAfter(FlightPlanAction action, Set<SegmentRef> connected, ActiveRocketData rocket) {
-
-        if (action.type() != ActionType.DECOUPLE || action.segments().size() != 2) return connected;
-        return component(action.segments().getFirst(), connected, rocket, action.segments());
-    }
-
-    private static Set<SegmentRef> component(SegmentRef start, Set<SegmentRef> connected, ActiveRocketData rocket, List<SegmentRef> cut) {
-
-        var refs = new HashMap<UUID, SegmentRef>();
-        rocket.getStaticSegments().forEach((id, s) -> refs.put(id, SegmentRef.of(s)));
-        var result = new HashSet<SegmentRef>();
-        var open = new ArrayDeque<SegmentRef>();
-        open.add(start);
-        while (!open.isEmpty()) {
-            var current = open.removeFirst();
-            if (!connected.contains(current) || !result.add(current)) continue;
-            rocket.getStaticSegments().forEach((id, segment) -> {
-                if (!SegmentRef.of(segment).equals(current)) return;
-                for (var neighbor : rocket.getDynamicSegments().get(id).getConnectedSegments()) {
-                    var ref = refs.get(neighbor);
-                    if (ref != null && !(cut.contains(current) && cut.contains(ref))) open.add(ref);
-                }
-            });
-        }
-        return result;
     }
 
     private static void checkCapacity(List<RocketFlightPlanRules.Issue> issues, UUID branch, UUID action, int used, int computers) {

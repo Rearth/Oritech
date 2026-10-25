@@ -12,6 +12,7 @@ import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
 
@@ -74,36 +75,39 @@ public final class RocketFlightPlanRules {
             issues.add(new Issue(plan.root().id(), SpaceSimulation.FlightPlanAction.NO_TARGET, "invalid_plan", 0, 0));
             return new Validation(plan, issues);
         }
+        if (forecast == null)
+            forecast = RocketFlightPathCalculator.calculateFrom(rocket, objects, normalized, position, recipes, stations);
         var actions = new HashMap<UUID, SpaceSimulation.FlightPlanAction>();
         normalized.branches().forEach(b -> b.actions().forEach(a -> actions.put(a.id(), a)));
         var seen = new HashSet<UUID>();
         for (var branch : plan.branches())
             for (var action : branch.actions()) {
                 var accepted = actions.get(action.id());
+                var hardware = action.type() == SpaceSimulation.ActionType.PROCESS || action.type() == SpaceSimulation.ActionType.DOCK
+                        ? FlightPlanHardware.before(normalized, branch, action.id(), rocket, forecast) : rocket;
                 if (action.type() == SpaceSimulation.ActionType.PROCESS) {
                     var modules = action.settings().processing().modules();
                     if (modules.isEmpty() || new HashSet<>(modules).size() != modules.size()
                             || action.settings().processing().host().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)
-                            && modules.stream().anyMatch(ref -> RocketProcessingService.controller(rocket, ref) == null))
+                            && modules.stream().anyMatch(ref -> RocketProcessingService.controller(hardware, ref) == null))
                         issues.add(new Issue(branch.id(), action.id(), "invalid_action", 0, 0));
                 }
                 if (action.asteroidTarget().closest() && !action.asteroidTarget().valid())
                     issues.add(new Issue(branch.id(), action.id(), "asteroid_size_invalid", 0, 0));
-                var serviceIssue = serviceIssue(action, rocket, stations);
+                var serviceIssue = serviceIssue(action, hardware, stations);
                 if (!serviceIssue.isEmpty()) issues.add(new Issue(branch.id(), action.id(), serviceIssue, 0, 0));
                 if (!seen.add(action.id()) || accepted == null || !accepted.addons().equals(action.addons()))
                     issues.add(new Issue(branch.id(), action.id(), "invalid_action", 0, 0));
             }
         if (normalized.branches().size() < plan.branches().size())
             issues.add(new Issue(plan.root().id(), SpaceSimulation.FlightPlanAction.NO_TARGET, "invalid_plan", 0, 0));
-        if (forecast == null)
-            forecast = RocketFlightPathCalculator.calculateFrom(rocket, objects, normalized, position, recipes, stations);
-        issues.addAll(NavigationComputerRules.issues(normalized, rocket, forecast));
+        issues.addAll(NavigationComputerRules.issues(normalized, RocketPayloads.planView(rocket), forecast));
         for (var path : forecast.paths()) {
             if (!path.terminalState().preventsLaunch() || path.actionMoments().isEmpty()) continue;
             var moment = path.actionMoments().getLast();
             var action = actions.get(moment.actionId());
-            if (action != null && action.type() == SpaceSimulation.ActionType.NAVIGATE_TO)
+            if (action != null && (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO
+                    || action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT))
                 issues.add(new Issue(path.branchId(), action.id(), "navigation_" + path.terminalState().name().toLowerCase(Locale.ROOT), 0, 0, path.failure().orElse(null)));
         }
         // Preserve invalid instructions in editable drafts; callers decide whether to accept them.
@@ -203,8 +207,10 @@ public final class RocketFlightPlanRules {
 
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
         objects.forEach(object -> objectsById.put(object.id(), object));
+        // Carried cube-sats bring their own segments into the plan.
+        var view = RocketPayloads.planView(rocket);
         var segmentIds = new HashMap<SpaceSimulation.SegmentRef, UUID>();
-        rocket.getStaticSegments().forEach((id, segment) -> segmentIds.put(SpaceSimulation.SegmentRef.of(segment), id));
+        view.getStaticSegments().forEach((id, segment) -> segmentIds.put(SpaceSimulation.SegmentRef.of(segment), id));
 
         var configurations = new ArrayList<SpaceSimulation.SegmentConfiguration>();
         var configuredSegments = new HashSet<SpaceSimulation.SegmentRef>();
@@ -230,7 +236,7 @@ public final class RocketFlightPlanRules {
             if (!branchIds.add(branch.id())) continue;
             var actions = new ArrayList<SpaceSimulation.FlightPlanAction>();
             for (var action : branch.actions()) {
-                if (!actionIds.add(action.id()) || !segmentsValid(action, segmentIds, rocket)) continue;
+                if (!actionIds.add(action.id()) || !segmentsValid(action, segmentIds, view)) continue;
                 var validatedAction = action;
                 if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
                     var target = objectsById.get(action.targetId());
@@ -380,6 +386,8 @@ public final class RocketFlightPlanRules {
                                          Map<SpaceSimulation.SegmentRef, UUID> segmentIds,
                                          ActiveRocketData rocket) {
 
+        if (action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT)
+            return action.segments().size() == 1 && RocketPayloads.all(rocket).containsKey(action.payload());
         if (!action.segments().stream().allMatch(segmentIds::containsKey)) return false;
         if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) return action.segments().size() == 1;
         if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
@@ -426,7 +434,7 @@ public final class RocketFlightPlanRules {
         result.add(branch);
         for (var action : branch.actions()) {
             var separatesCraft = action.type() == SpaceSimulation.ActionType.DECOUPLE
-                    && action.segments().size() == 2;
+                    && action.segments().size() == 2 || action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT;
             var generatedBooster = action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER
                     && action.segments().size() == 1;
             if (!separatesCraft && !generatedBooster) continue;

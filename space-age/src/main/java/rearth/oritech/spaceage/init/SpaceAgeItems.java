@@ -7,7 +7,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.cubesat.CubeSatItem;
 import rearth.oritech.spaceage.block.robot_arm.ActionCardItem;
+import rearth.oritech.spaceage.block.robot_arm.RobotArmItem;
 import rearth.oritech.spaceage.item.MissionCardItem;
 import rearth.oritech.util.RegistryReflectionUtil;
 
@@ -31,7 +33,12 @@ public final class SpaceAgeItems {
 
             var block = (DeferredBlock<? extends Block>) value;
             var name = block.unwrapKey().orElseThrow().identifier().getPath();
-            ITEMS.registerSimpleBlockItem(name, block);
+            // Each cube-sat holds a whole rocket.
+            if (block == SpaceAgeBlocks.CUBE_SAT) ITEMS.registerItem(name, properties -> new CubeSatItem(block.get(), properties),
+                    () -> new Item.Properties().stacksTo(1).useBlockDescriptionPrefix());
+            else if (block == SpaceAgeBlocks.ROBOT_ARM) ITEMS.registerItem(name, properties -> new RobotArmItem(block.get(), properties),
+                    () -> new Item.Properties().useBlockDescriptionPrefix());
+            else ITEMS.registerSimpleBlockItem(name, block);
         });
     }
 }

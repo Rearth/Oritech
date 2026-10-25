@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "f": "oritech:machine_frame",
+    "m": "oritech:accelerator_motor",
+    "p": "oritech_space_age:rocket_pad",
+    "r": "oritech:accelerator_ring",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "sms",
+    "rpr",
+    "sfs"
+  ],
+  "result": {
+    "id": "oritech_space_age:launch_ramp"
+  }
+}

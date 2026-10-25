@@ -17,6 +17,7 @@ import org.joml.Vector2f;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.survey.SurveyKnowledge;
@@ -207,6 +208,12 @@ public class SpaceSimulation {
                 flightPlans.getOrDefault(assemblerPosition, FlightPlan.empty()));
     }
 
+    /** The plan stored for an assembler or launch ramp, or an empty plan. */
+    public FlightPlan flightPlan(GlobalPos position) {
+
+        return flightPlans.getOrDefault(position, FlightPlan.empty());
+    }
+
     public List<SpaceObjectData> createObjectData() {
 
         return knownObjects(earthKnowledge);
@@ -390,7 +397,9 @@ public class SpaceSimulation {
         DISCARD_CRAFT,
         PROCESS,
         DOCK,
-        UNDOCK;
+        UNDOCK,
+        // Releases a carried cube-sat like a decouple. Its single segment reference holds the cube's cell in the host.
+        DEPLOY_CUBESAT;
 
         public static final Codec<ActionType> CODEC = StringRepresentable.fromEnum(ActionType::values);
 
@@ -551,7 +560,13 @@ public class SpaceSimulation {
         public static String defaultName(SegmentRef ref, ActiveRocketData rocket) {
 
             var index = displayOrder(rocket).indexOf(ref);
-            return index < 0 ? "?" : "S" + (index + 1);
+            if (index >= 0) return "S" + (index + 1);
+            // Segments of carried cube-sats are numbered within their cube.
+            var payload = RocketPayloads.owner(rocket, ref);
+            if (payload == null) return "?";
+            var cube = payload.getValue();
+            var cubeIndex = displayOrder(RocketPayloads.unfold(payload.getKey(), cube)).indexOf(ref);
+            return (cube.name().isBlank() ? "Cube" : cube.name()) + " S" + (cubeIndex + 1);
         }
     }
 
@@ -833,6 +848,12 @@ public class SpaceSimulation {
         public boolean isGenerated() {
 
             return type == ActionType.DISCONNECT_BOOSTER;
+        }
+
+        /** The host cell of the cube-sat released by a deploy card. */
+        public BlockPos payload() {
+
+            return segments.isEmpty() ? BlockPos.ZERO : segments.getFirst().anchor();
         }
     }
 

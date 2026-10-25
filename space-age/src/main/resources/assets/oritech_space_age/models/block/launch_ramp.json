@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "oritech:block/accelerator_motor",
+    "side": "oritech:block/carbon_plating",
+    "bottom": "oritech:block/carbon_plating"
+  }
+}

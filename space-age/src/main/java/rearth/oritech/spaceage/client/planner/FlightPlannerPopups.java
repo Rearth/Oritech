@@ -23,6 +23,7 @@ import rearth.oritech.spaceage.simulation.flight.NavigationComputerRules;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -105,7 +106,7 @@ final class FlightPlannerPopups {
             case NAVIGATE_TO -> 4 + (survey || craft ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
-            case CONNECT_ASTEROID, DECOUPLE -> 2;
+            case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
             case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
             case BEAM_POWER -> action.targetId().equals(SpaceObjects.EARTH_ID) ? 4 : 3;
             case PROCESS -> 7;
@@ -115,7 +116,7 @@ final class FlightPlannerPopups {
         };
         var popupWidth = Math.min(380, editors.panelWidth() - 12);
         var beamStats = action.type() == SpaceSimulation.ActionType.BEAM_POWER
-                ? FlightPlannerLabels.beamPreview(action, editors.flightPlanRocket(), editors.currentDraftSnapshot(), editors.calculatedFlight()) : List.<Component>of();
+                ? FlightPlannerLabels.beamPreview(action, editors.hardwareFor(action), editors.currentDraftSnapshot(), editors.calculatedFlight()) : List.<Component>of();
         var statsHeight = beamStats.stream().mapToInt(line -> font.split(line, popupWidth - 20).size() * font.lineHeight + 4).sum();
         var rowSpacing = Math.clamp((editors.panelHeight() - 68 - statsHeight) / Math.max(1, settingCount), 18, 25);
         var popupHeight = 56 + settingCount * rowSpacing + statsHeight;
@@ -178,7 +179,7 @@ final class FlightPlannerPopups {
                     ignored -> editors.editServiceNumber(action));
             timeoutButton.withTooltip(Component.translatable("screen.oritech_space_age.action.timeout_tooltip"));
             timeoutButton.setZIndex(CONTROL_Z);
-            var computer = NavigationComputerRules.computers(editors.flightPlanRocket(), NavigationComputerRules.allSegments(editors.flightPlanRocket())) > 0;
+            var computer = NavigationComputerRules.computers(editors.hardwareFor(action), NavigationComputerRules.allSegments(editors.hardwareFor(action))) > 0;
             timeoutButton.setActive(computer);
             if (!computer)
                 timeoutButton.withTooltip(Component.translatable("screen.oritech_space_age.validation.computer_required"));
@@ -258,6 +259,12 @@ final class FlightPlannerPopups {
                             ignored -> editors.openSpeedEditor(action))
                     .withTooltip(Component.translatable("screen.oritech_space_age.action.cruise_tooltip"))
                     .withZIndex(CONTROL_Z));
+            rowY += rowSpacing;
+        } else if (action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT) {
+            addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.cube_sat");
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                            editors.actionParameter(action, editors.flightPlanRocket()), ignored -> editors.cycleEditedParameter(action.id()))
+                    .withTooltip(Component.translatable("screen.oritech_space_age.action.cube_sat_tooltip")).withZIndex(CONTROL_Z));
             rowY += rowSpacing;
         } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
                 || action.type() == SpaceSimulation.ActionType.DECOUPLE) {
@@ -448,20 +455,21 @@ final class FlightPlannerPopups {
                 .findFirst().orElse(null)
                 : editors.findBranch(editors.newActionBranch);
         var beforeAction = editedAction == null ? null : editedAction.id();
+        var craft = editors.hardwareBefore(editedBranch, beforeAction);
         var canConnectAsteroid = editedBranch != null
-                && !RocketFlightPlanRules.asteroidAnchorSegments(editors.flightPlanRocket()).isEmpty()
+                && !RocketFlightPlanRules.asteroidAnchorSegments(craft).isEmpty()
                 && editors.asteroidArrivalBefore(editedBranch, beforeAction) != null
                 && editors.connectedAsteroidBefore(editedBranch, beforeAction) == null;
-        var hardware = editors.flightPlanRocket().getStaticSegments().values().stream()
+        var hardware = craft.getStaticSegments().values().stream()
                 .map(RocketHardware::of).toList();
         var hasScanner = hardware.stream().anyMatch(item -> item.scanners() > 0);
         var hasAntenna = hardware.stream().anyMatch(item -> item.antennas() > 0);
         var dockTarget = editors.dockingTargetBefore(editedBranch, beforeAction);
-        var canDock = dockTarget != null && !dockTarget.ports().isEmpty() && !RocketDocking.ports(editors.flightPlanRocket()).isEmpty();
+        var canDock = dockTarget != null && !dockTarget.ports().isEmpty() && !RocketDocking.ports(craft).isEmpty();
         var typeList = new ScrollWidget(px + 6, py + 26, popupWidth - 12, popupHeight - 32).withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
         typeList.withSurface(OritechSurface.NONE);
         typeList.setZIndex(CONTROL_Z);
-        var hasAperture = editors.flightPlanRocket().powerHardware().throughput() > 0;
+        var hasAperture = craft.powerHardware().throughput() > 0;
         var types = Arrays.stream(FlightPlannerEditors.EDITABLE_ACTION_TYPES)
                 .filter(type -> type != SpaceSimulation.ActionType.BEAM_POWER || hasAperture).toList();
         for (int index = 0; index < types.size(); index++) {
@@ -479,6 +487,8 @@ final class FlightPlannerPopups {
             }
             if (type == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
                 available &= hasAntenna;
+            if (type == SpaceSimulation.ActionType.DEPLOY_CUBESAT)
+                available &= !RocketPayloads.all(craft).isEmpty();
             if (editedAction != null && type == editedAction.type()) selectListButton(button, true);
             else button.setActive(available);
             typeList.addChild(button);

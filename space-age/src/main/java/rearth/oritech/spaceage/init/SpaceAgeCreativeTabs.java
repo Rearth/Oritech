@@ -22,7 +22,9 @@ public final class SpaceAgeCreativeTabs {
             .title(Component.translatable("itemgroup.oritech_space_age.main"))
             .icon(() -> new ItemStack(SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get()))
             .displayItems((parameters, output) -> {
-                SpaceAgeItems.ITEMS.getEntries().forEach(item -> output.accept(item.get()));
+                // Empty cube-sats are useless, they only come from the addon splicer.
+                SpaceAgeItems.ITEMS.getEntries().stream().filter(item -> item.get() != SpaceAgeBlocks.CUBE_SAT.get().asItem())
+                        .forEach(item -> output.accept(item.get()));
                 var paintings = parameters.holders().lookupOrThrow(Registries.PAINTING_VARIANT);
                 for (var name : List.of("earth", "mars", "sun")) {
                     var painting = new ItemStack(Items.PAINTING);

@@ -10,6 +10,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.beam_aperture.GroundBeamRenderer;
+import rearth.oritech.spaceage.client.cubesat.CubeSatRenderer;
 import rearth.oritech.spaceage.client.robot_arm.RobotArmRenderer;
 import rearth.oritech.spaceage.client.robot_arm.RobotWorkArea;
 import rearth.oritech.spaceage.client.rocket.RocketRenderer;
@@ -47,6 +48,7 @@ public final class OritechSpaceAgeClient {
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::submit);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::clear);
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.ROBOT_ARM.get(), RobotArmRenderer::new));
+        modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.CUBE_SAT.get(), CubeSatRenderer::new));
         NeoForge.EVENT_BUS.addListener(RobotWorkArea::extract);
         NeoForge.EVENT_BUS.addListener(RobotWorkArea::submit);
         modEventBus.addListener(SpaceAgeDataGenerators::gatherData);

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
-import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -39,7 +38,7 @@ public final class RocketAssemblerClientController {
      */
     public static void submitFlightPlanIfDirty(RocketAssemblerMenu menu) {
 
-        if (menu instanceof MissionControlMenu) return;
+        if (!menu.savesOnClose()) return;
         var rocket = menu.getRocket();
         var plan = menu.getDraftFlightPlan();
         if (!menu.isDraftFlightPlanDirty() || rocket == null || plan == null) return;

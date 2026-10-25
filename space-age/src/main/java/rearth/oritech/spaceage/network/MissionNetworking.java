@@ -31,6 +31,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
 
@@ -231,7 +232,7 @@ public final class MissionNetworking {
 
     private static SpaceSimulation.FlightPlan validateCard(RocketAssemblerMenu menu, SpaceSimulation.FlightPlan plan, SpaceSimulation system) {
 
-        var anchors = menu.getRocket().getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
+        var anchors = RocketPayloads.planView(menu.getRocket()).getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
         if (plan.segmentConfigurations().stream().anyMatch(c -> !anchors.contains(c.segment()))) return null;
         if (plan.branches().size() > RocketFlightPlanRules.MAX_BRANCHES || plan.branches().stream().mapToInt(b -> b.actions().size()).sum() > RocketFlightPlanRules.MAX_ACTIONS)
             return null;

@@ -10,6 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.robot_arm.RobotProgram;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
 
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -19,6 +20,8 @@ public final class SpaceAgeComponents {
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, OritechSpaceAge.MOD_ID);
     public static final Supplier<DataComponentType<MissionCard>> MISSION = COMPONENTS.registerComponentType("mission", b ->
             b.persistent(MissionCard.CODEC).networkSynchronized(ByteBufCodecs.fromCodec(MissionCard.CODEC)));
+    public static final Supplier<DataComponentType<CubeSatData>> CUBE_SAT = COMPONENTS.registerComponentType("cube_sat", b ->
+            b.persistent(CubeSatData.CODEC).networkSynchronized(CubeSatData.STREAM_CODEC));
     public static final Supplier<DataComponentType<RobotProgram>> ROBOT_PROGRAM = COMPONENTS.registerComponentType("robot_program", b -> b.persistent(RobotProgram.CODEC).networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(RobotProgram.CODEC)));
 
     private SpaceAgeComponents() {

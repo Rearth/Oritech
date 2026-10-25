@@ -14,6 +14,7 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
@@ -54,6 +55,11 @@ public final class RocketNetworking {
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlannerSnapshot.class);
 
+        NetworkManager.getAutoCodec(LaunchRampMenu.Status.class);
+        registrar.playToClient(RampStatusPayload.TYPE, NetworkManager.getAutoCodec(RampStatusPayload.class), (payload, context) -> context.enqueueWork(() -> {
+            if (context.player().containerMenu instanceof LaunchRampMenu menu && menu.containerId == payload.menuId())
+                menu.receiveStatus(payload.status());
+        }));
         registrar.playToServer(NameControllerPayload.TYPE, NetworkManager.getAutoCodec(NameControllerPayload.class), (payload, context) -> context.enqueueWork(() -> {
             var player = context.player();
             if (player.containerMenu instanceof VacuumCrafterMenu menu && menu.pos.equals(payload.position()) && menu.stillValid(player)
@@ -172,16 +178,10 @@ public final class RocketNetworking {
         var rocket = menu.getRocket();
         if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
 
-        if (menu instanceof MissionControlMenu control) {
-            MissionNetworking.submit(player, control, payload.plan());
-            return;
-        }
-        // Only complete drafts cross the network. SpaceSimulation sanitizes the client-authored plan before storing it.
-        SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), menu.blockPos),
-                payload.plan(), rocket);
+        menu.saveFlightPlan(player, payload.plan());
     }
 
-    private static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
+    public static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
 
         var rocket = menu.getRocket();
         if (rocket == null) return;
@@ -214,6 +214,17 @@ public final class RocketNetworking {
             serverPlayer.closeContainer();
         } else {
             serverPlayer.sendOverlayMessage(Component.translatable("message.oritech_space_age.rocket_invalid"));
+        }
+    }
+
+    public record RampStatusPayload(int menuId, LaunchRampMenu.Status status) implements CustomPacketPayload {
+
+        public static final Type<RampStatusPayload> TYPE = new Type<>(OritechSpaceAge.id("ramp_status"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
         }
     }
 

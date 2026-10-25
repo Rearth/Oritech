@@ -7,6 +7,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.Blocks;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
@@ -24,6 +26,8 @@ import rearth.oritech.spaceage.simulation.power.SpacePowerHardware;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.service.RocketServiceForecast;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
@@ -92,7 +96,7 @@ public final class RocketFlightPathCalculator {
         plan.branches().stream().filter(branch -> !branch.isRoot())
                 .forEach(branch -> branchesByParent.put(branch.parentSeparationAction(), branch));
         var configurations = new HashMap<SpaceSimulation.SegmentRef, SpaceSimulation.SegmentConfiguration>();
-        rocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
+        RocketPayloads.planView(rocket).getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of)
                 .forEach(ref -> configurations.put(ref, plan.configurationFor(ref)));
 
         var context = new Context(objectsById, branchesByParent, configurations,
@@ -221,6 +225,7 @@ public final class RocketFlightPathCalculator {
                         state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET) && RocketFlightNavigation.navigate(action, state, context);
                 case CONNECT_ASTEROID -> connectAsteroid(action, state, context);
                 case DECOUPLE -> separate(action, state, context);
+                case DEPLOY_CUBESAT -> deploy(action, state, context);
                 case MAINTAIN_POSITION, BEAM_POWER -> {
                     if (action.type() == SpaceSimulation.ActionType.BEAM_POWER && !beamAvailable(action, state, context)) yield false;
                     maintainPosition(action, state, context);
@@ -522,6 +527,44 @@ public final class RocketFlightPathCalculator {
         return true;
     }
 
+    /**
+     * Releases a carried cube-sat like a decouple. The host loses the folded mass, and the cube continues from the
+     * host's position and velocity with its real mass and the resources captured when it was shrunk.
+     */
+    private static boolean deploy(SpaceSimulation.FlightPlanAction action, Craft state, Context context) {
+
+        var holder = state.segments.values().stream().filter(segment -> segment.physical != null
+                && segment.physical.payloads.containsKey(action.payload())).findFirst().orElse(null);
+        if (holder == null) {
+            state.blockedState = TerminalState.NO_PAYLOAD;
+            return false;
+        }
+        var cube = holder.physical.payloads.remove(action.payload());
+        holder.physical.layout.put(action.payload(), Blocks.AIR.defaultBlockState());
+        holder.dryMass = Math.max(0, holder.dryMass - RocketLayout.mass(SpaceAgeBlocks.CUBE_SAT.get().defaultBlockState())
+                * RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT);
+        state.addSample(PathPhase.COAST, state.currentTarget, action.id());
+
+        var child = context.branchesByParent.get(action.id());
+        if (child == null) child = new SpaceSimulation.FlightPlanBranch(action.id(), action.id(), List.of());
+        var deployed = createInitialCraft(RocketPayloads.unfold(action.payload(), cube), context.objects.get(SpaceObjects.EARTH_ID),
+                child, context.objects);
+        deployed.x = state.x;
+        deployed.y = state.y;
+        deployed.time = state.time;
+        deployed.velocityX = state.velocityX;
+        deployed.velocityY = state.velocityY;
+        deployed.headingX = state.headingX;
+        deployed.headingY = state.headingY;
+        deployed.atmosphere = state.atmosphere;
+        deployed.currentTarget = state.currentTarget;
+        deployed.currentOrbit = state.currentOrbit;
+        deployed.lastEarthSurfaceAction = state.lastEarthSurfaceAction;
+        assignChildJobs(deployed, child.id());
+        simulateBranch(child, deployed, context);
+        return true;
+    }
+
     private static void assignChildJobs(Craft craft, UUID childId) {
 
         var previous = craft.craftId;
@@ -565,6 +608,7 @@ public final class RocketFlightPathCalculator {
         UNSAFE_ASTEROID_APPROACH,
         NO_ASTEROID_ANCHOR,
         NO_COUPLING,
+        NO_PAYLOAD,
         NO_SCAN_TARGET,
         SCAN_OUT_OF_RANGE,
         NO_SCANNER,

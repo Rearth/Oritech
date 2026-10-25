@@ -5,12 +5,15 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import oshi.util.tuples.Pair;
+import rearth.oritech.api.accelerator.ParticleImpactBehaviors;
+import rearth.oritech.api.accelerator.ParticleImpactContext;
 import rearth.oritech.block.blocks.accelerator.AcceleratorPassthroughBlock;
 import rearth.oritech.block.blocks.accelerator.AcceleratorRingBlock;
 import rearth.oritech.config.OritechConfig;
@@ -196,6 +199,7 @@ public class AcceleratorParticleLogic {
         if (searchStart == null) searchStart = particle.lastGate;
 
         var remainingMomentum = particle.velocity;
+        var particleItem = entity.activeItemParticle.copy();
 
         for (int i = 1; i <= searchDist; i++) {
             var checkPos = searchStart.offset(searchDirection.multiply(i));
@@ -212,8 +216,14 @@ public class AcceleratorParticleLogic {
             var block = level.getBlockState(checkPos);
             var targetableBlock = !block.isAir() && !(block.getBlock() instanceof AcceleratorPassthroughBlock);
             if (targetableBlock) {
-                var usedMomentum = entity.handleParticleBlockCollision(checkPos, particle, remainingMomentum, block);
-                remainingMomentum -= usedMomentum;
+                var context = new ParticleImpactContext(level, pos, checkPos, block, direction, reason, remainingMomentum, particleItem, entity);
+                var result = ParticleImpactBehaviors.onImpact(context);
+                if (result.isEmpty()) continue;
+                remainingMomentum -= result.get().usedMomentum();
+                if (result.get().consumedItem()) {
+                    particleItem = ItemStack.EMPTY;
+                    entity.activeItemParticle = ItemStack.EMPTY;
+                }
 
                 if (remainingMomentum <= 0.1f) return;
             }

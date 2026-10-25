@@ -1,4 +1,4 @@
-// 26.1.2	2026-10-22T19:54:34.4246453	Oritech: Space Age Recipes
+// 26.1.2	2026-10-25T19:32:27.8925958	Oritech: Space Age Recipes
 5aa5a78e921f291d9061e4e3a4a5fdfbedd91f3c data/oritech_space_age/advancement/recipes/building_blocks/crystal_glass.json
 5052b08574e211de45638d49068d4a12293d29b6 data/oritech_space_age/advancement/recipes/misc/action_card.json
 91677dd8cff88ca5394e69fdd19479a1be1da57c data/oritech_space_age/advancement/recipes/misc/antenna.json
@@ -7,6 +7,7 @@ c1441a2ffc935af9d33d03b1dd760138a1ea3ab9 data/oritech_space_age/advancement/reci
 9e73d2a26a0fc84a9b7e22992403f7a6cc2d5450 data/oritech_space_age/advancement/recipes/misc/beam_aperture.json
 40530c14ebcd2564322c2777b46f0487ccd5b4df data/oritech_space_age/advancement/recipes/misc/cargo.json
 bce9a503e2298286520e379ed2a294dec2c2280a data/oritech_space_age/advancement/recipes/misc/ion_booster_rocket.json
+07b8160678c7869967ad4630fe238f6272f86dde data/oritech_space_age/advancement/recipes/misc/launch_ramp.json
 4c38f40b27b76329d5db14bdf8a9606f27f3a799 data/oritech_space_age/advancement/recipes/misc/mission_card.json
 61f938dd9b1800edb1d0fd12443f4faba936d1a2 data/oritech_space_age/advancement/recipes/misc/mission_control.json
 7f748123a767e9b241cfa155243d430bd0a22a0a data/oritech_space_age/advancement/recipes/misc/navigation_computer.json
@@ -25,6 +26,7 @@ d494a85cc1acae013f2e4a6e9b2bd3597fbdedba data/oritech_space_age/advancement/reci
 f553b1a33c0b3d13e2288d29bb8a69f971446c44 data/oritech_space_age/recipe/cargo.json
 0ff70a9f5bc9e52f837054dd526a424edee2d8c7 data/oritech_space_age/recipe/crystal_glass.json
 c7089928b297430ad1eecfd8f63347529dc81543 data/oritech_space_age/recipe/ion_booster_rocket.json
+d2d61fcd2e43eac098c7f686134085b3ab2cbb77 data/oritech_space_age/recipe/launch_ramp.json
 a2c4a650c8269253872b9f1a03f977692b275f42 data/oritech_space_age/recipe/mission_card.json
 dfbea3317839738bf55fc738f5f89b890e9c13fc data/oritech_space_age/recipe/mission_control.json
 518250dbf5208024dcf91a7bf196e0b825db4882 data/oritech_space_age/recipe/navigation_computer.json

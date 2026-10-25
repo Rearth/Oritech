@@ -8,12 +8,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.block.robot_arm.ActionCardMenu;
 import rearth.oritech.spaceage.block.robot_arm.RobotMenu;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerScreen;
 import rearth.oritech.spaceage.client.beam_aperture.BeamApertureScreen;
+import rearth.oritech.spaceage.client.launch_ramp.LaunchRampScreen;
 import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
 import rearth.oritech.spaceage.client.robot_arm.ActionCardScreen;
 import rearth.oritech.spaceage.client.robot_arm.RobotScreen;
@@ -44,7 +46,12 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<ActionCardMenu>> ACTION_CARD =
             MENUS.register("action_card", () -> IMenuTypeExtension.create(ActionCardMenu::new));
 
+    public static final Supplier<MenuType<LaunchRampMenu>> LAUNCH_RAMP =
+            MENUS.register("launch_ramp", () -> IMenuTypeExtension.create(LaunchRampMenu::new));
+
     public static void registerScreens(RegisterMenuScreensEvent event) {
+
+        event.register(LAUNCH_RAMP.get(), LaunchRampScreen::new);
 
         event.register(ROBOT.get(), RobotScreen::new);
         event.register(ACTION_CARD.get(), ActionCardScreen::new);

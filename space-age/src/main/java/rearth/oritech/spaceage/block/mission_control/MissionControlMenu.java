@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.block.mission_control;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
@@ -45,6 +46,24 @@ public class MissionControlMenu extends RocketAssemblerMenu {
     public MissionControlMenu(int id, Inventory inventory, BlockPos pos) {
 
         super(SpaceAgeMenus.MISSION_CONTROL.get(), id, pos);
+    }
+
+    @Override
+    public boolean savesOnClose() {
+
+        return false;
+    }
+
+    @Override
+    public boolean canLaunch() {
+
+        return false;
+    }
+
+    @Override
+    public void saveFlightPlan(ServerPlayer player, SpaceSimulation.FlightPlan plan) {
+
+        MissionNetworking.submit(player, this, plan);
     }
 
     @Override

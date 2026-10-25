@@ -29,6 +29,13 @@ public final class SpaceAgeButtons {
                 List.of(rocket, plan));
     }
 
+    /** Launch ramps add their own tab in front of the reused assembler tabs. */
+    public static List<ButtonWidget> rampTabs(int selected, Runnable ramp, Runnable rocket, Runnable plan) {
+
+        return tabs(selected, 70, 72, List.of("screen.oritech_space_age.launch_ramp.tab", "screen.oritech_space_age.rocket",
+                "screen.oritech_space_age.flight_plan"), List.of(ramp, rocket, plan));
+    }
+
     /** The selected tab is drawn pressed and disabled; the others switch screens. */
     private static List<ButtonWidget> tabs(int selected, int width, int spacing, List<String> keys, List<Runnable> actions) {
 

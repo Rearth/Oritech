@@ -29,6 +29,9 @@ public class DynamicRocketSegment {
             StaticRocketSegment.BlockData.CODEC.listOf().xmap(
                     blocks -> blocks.stream().collect(Collectors.toMap(StaticRocketSegment.BlockData::relativePos, StaticRocketSegment.BlockData::state)),
                     map -> map.entrySet().stream().map(e -> new StaticRocketSegment.BlockData(e.getKey(), e.getValue())).toList());
+    private static final Codec<Map<BlockPos, CubeSatData>> PAYLOADS_CODEC = PayloadEntry.CODEC.listOf().xmap(
+            entries -> entries.stream().collect(Collectors.toMap(PayloadEntry::pos, PayloadEntry::cube)),
+            map -> map.entrySet().stream().map(e -> new PayloadEntry(e.getKey(), e.getValue())).toList());
     public static final Codec<DynamicRocketSegment> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.LONG.fieldOf("fuel_burn_ticks").forGetter(segment -> segment.availableFuelBurnTimeTicks),
             Codec.LONG.fieldOf("available_rf").forGetter(segment -> (long) segment.rf()),
@@ -42,7 +45,8 @@ public class DynamicRocketSegment {
             CraftPass.CODEC.optionalFieldOf("craft_pass").forGetter(segment -> Optional.ofNullable(segment.pass)),
             RocketCargoTransfer.Result.CODEC.optionalFieldOf("exchange_report").forGetter(segment -> Optional.ofNullable(segment.lastExchange)),
             Codec.DOUBLE.optionalFieldOf("fuel_fraction", 0.0).forGetter(segment -> segment.fuelFraction),
-            Codec.DOUBLE.optionalFieldOf("rf_fraction", 0.0).forGetter(segment -> segment.rf() - (long) segment.rf())
+            Codec.DOUBLE.optionalFieldOf("rf_fraction", 0.0).forGetter(segment -> segment.rf() - (long) segment.rf()),
+            PAYLOADS_CODEC.optionalFieldOf("payloads", Map.of()).forGetter(segment -> segment.payloads)
     ).apply(instance, DynamicRocketSegment::new));
     // Only changed cells are stored here; unchanged cells come from the launch structure.
     public final Map<BlockPos, BlockState> layout = new HashMap<>();
@@ -50,6 +54,8 @@ public class DynamicRocketSegment {
     public final Map<BlockPos, BlockState> reserved = new HashMap<>();
     // Cargo controllers share names with crafters, but never own a processing job.
     public final Map<BlockPos, RocketControllerState> crafters = new HashMap<>();
+    // Folded cube-sats carried at these cells until they are deployed.
+    public final Map<BlockPos, CubeSatData> payloads = new HashMap<>();
     // if a segment is connected, all couplings to it are still coupled/connected, and vice versa
     private final Set<UUID> connectedSegments = new HashSet<>();
     public CraftPass pass;
@@ -66,10 +72,11 @@ public class DynamicRocketSegment {
     public DynamicRocketSegment(long fuel, long rf, double mass, Set<UUID> connections, Map<BlockPos, RocketControllerState> crafters,
                                 long fuelCapacity, long rfCapacity, Map<BlockPos, BlockState> layout,
                                 Map<BlockPos, BlockState> reserved, Optional<CraftPass> pass, Optional<RocketCargoTransfer.Result> lastExchange,
-                                double fuelFraction, double rfFraction) {
+                                double fuelFraction, double rfFraction, Map<BlockPos, CubeSatData> payloads) {
 
         this(fuel, rf, mass, connections, crafters, fuelCapacity, rfCapacity);
         this.layout.putAll(layout);
+        this.payloads.putAll(payloads);
         this.reserved.putAll(reserved);
         this.pass = pass.map(CraftPass::copy).orElse(null);
         this.lastExchange = lastExchange.orElse(null);
@@ -105,7 +112,8 @@ public class DynamicRocketSegment {
 
         // Forecasts and detached craft must not share mutable passes, controllers or cell maps.
         return new DynamicRocketSegment(availableFuelBurnTimeTicks, (long) rf(), currentFuelWeight, connectedSegments, crafters,
-                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange), fuelFraction, rf() - (long) rf());
+                fuelCapacity, rfCapacity, layout, reserved, Optional.ofNullable(pass), Optional.ofNullable(lastExchange), fuelFraction, rf() - (long) rf(),
+                payloads);
     }
 
     /**
@@ -172,6 +180,14 @@ public class DynamicRocketSegment {
     public void removeConnection(UUID segmentId) {
 
         connectedSegments.remove(segmentId);
+    }
+
+    public record PayloadEntry(BlockPos pos, CubeSatData cube) {
+
+        public static final Codec<PayloadEntry> CODEC = RecordCodecBuilder.create(i -> i.group(
+                BlockPos.CODEC.fieldOf("position").forGetter(PayloadEntry::pos),
+                CubeSatData.CODEC.fieldOf("cube").forGetter(PayloadEntry::cube)
+        ).apply(i, PayloadEntry::new));
     }
 
     public record CargoEntry(BlockPos pos, RocketControllerState cargo) {

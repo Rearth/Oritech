@@ -13,3 +13,25 @@ with visuals aligning correctly. Any item can be inserted into the controller to
 Once inserted, the particle travels along a route defined by the guide rings.
 
 For detailed information on particle acceleration mechanics, see the [particle accelerator guide]($particle_accelerator).
+
+---
+
+**Mod Developer Info**
+
+Other mods can react to particles that leave the ring (no next gate, or a curve taken too fast) by registering a
+`ParticleImpactBehavior` (package `rearth.oritech.api.accelerator`) during common setup:
+
+```java
+ParticleImpactBehaviors.register(Identifier.fromNamespaceAndPath("mymod", "my_target"), 10, context -> {
+    // inspect context.hitPos(), context.hitState(), context.speed() or context.particleItem()
+    return Optional.empty(); // or Optional.of(ParticleImpactResult.absorbed(context, true))
+});
+```
+
+The behaviors are called for every non-air block along the exit path, from highest to lowest priority, and the
+first returned `ParticleImpactResult` is used. Entities in the path are hit first and reduce the remaining speed.
+The built-in behavior (black holes from portals, breaking blocks) is registered as `oritech:block_impact` with priority 0.
+
+A `ParticleImpactResult` contains:
+- `usedMomentum`: momentum absorbed by the block. The particle stops once nothing is left.
+- `consumedItem`: whether the behavior took the particle item. Later blocks along the path then see an empty item.

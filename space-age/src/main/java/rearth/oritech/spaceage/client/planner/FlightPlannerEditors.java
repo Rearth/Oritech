@@ -17,11 +17,13 @@ import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.flight.FlightPlanHardware;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings.Docking;
@@ -40,7 +42,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     // Generated booster cards cannot be selected as a manual action type.
     protected static final SpaceSimulation.ActionType[] EDITABLE_ACTION_TYPES = {
             SpaceSimulation.ActionType.NAVIGATE_TO, SpaceSimulation.ActionType.CONNECT_ASTEROID,
-            SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.MAINTAIN_POSITION, SpaceSimulation.ActionType.BEAM_POWER,
+            SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.DEPLOY_CUBESAT, SpaceSimulation.ActionType.MAINTAIN_POSITION,
+            SpaceSimulation.ActionType.BEAM_POWER,
             SpaceSimulation.ActionType.DISCARD_CRAFT, SpaceSimulation.ActionType.SCAN,
             SpaceSimulation.ActionType.PROCESS, SpaceSimulation.ActionType.DOCK,
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
@@ -99,6 +102,17 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
         var adjusted = RocketFlightPlanRules.applyLandingUncertainty(action);
         return new int[]{adjusted.landingOffsetX(), adjusted.landingOffsetZ()};
+    }
+
+    protected ActiveRocketData hardwareBefore(SpaceSimulation.FlightPlanBranch branch, UUID actionId) {
+
+        return FlightPlanHardware.before(draftPlan(), branch == null ? draftPlan().root() : branch, actionId,
+                flightPlanRocket(), calculatedFlight());
+    }
+
+    protected ActiveRocketData hardwareFor(SpaceSimulation.FlightPlanAction action) {
+
+        return hardwareBefore(findBranchContaining(action), action.id());
     }
 
     // The screen retains mission and map state; the editor only requests it through these hooks.
@@ -367,10 +381,11 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                                                                SpaceSimulation.FlightPlanBranch branch,
                                                                UUID beforeAction) {
 
+        var hardware = hardwareBefore(branch, beforeAction);
         if (type == SpaceSimulation.ActionType.BEAM_POWER) {
             changed = changed.withTarget(SpaceObjects.EARTH_ID).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
         } else if (type == SpaceSimulation.ActionType.DOCK) {
-            var ports = RocketDocking.ports(flightPlanRocket());
+            var ports = RocketDocking.ports(hardware);
             var host = dockingTargetBefore(branch, beforeAction);
             if (host != null && !host.ports().isEmpty() && !ports.isEmpty())
                 changed = changed.withSettings(changed.settings().withDocking(host.rendezvous(ports.getFirst(), host.ports().getFirst())));
@@ -382,11 +397,11 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                 changed = changed.withLanding(0, 0, offset[0], offset[1]);
             }
         } else if (type == SpaceSimulation.ActionType.PROCESS) {
-            var modules = RocketProcessingService.modules(flightPlanRocket());
+            var modules = RocketProcessingService.modules(hardware);
             if (!modules.isEmpty()) changed = changed.withSettings(changed.settings().withProcessing(
                     new RocketServiceSettings.Processing(List.of(modules.getFirst()), RocketServiceSettings.SourceScope.BOTH, SpaceSimulation.FlightPlanAction.NO_TARGET)));
         } else if (type == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
-            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(flightPlanRocket());
+            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(hardware);
             var arrival = asteroidArrivalBefore(branch, beforeAction);
             var asteroid = arrival == null ? selectedObject() : currentDraftSnapshot().objects().stream()
                     .filter(object -> object.id().equals(arrival.targetId())).findFirst().orElse(null);
@@ -403,13 +418,17 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             var orbit = arrival == null ? RocketFlightPlanRules.compatibleOrbit(asteroid.type(), selectedTarget().orbit())
                     : arrival.orbit();
             changed = changed.withTarget(asteroid.id()).withOrbit(orbit).withSegments(List.of(anchors.getFirst()));
+        } else if (type == SpaceSimulation.ActionType.DEPLOY_CUBESAT) {
+            var payloads = RocketPayloads.all(hardware);
+            if (payloads.isEmpty()) return null;
+            changed = changed.withSegments(List.of(new SpaceSimulation.SegmentRef(payloads.keySet().iterator().next())));
         } else if (type == SpaceSimulation.ActionType.DECOUPLE) {
             var connected = connectedAsteroidBefore(branch, beforeAction);
             if (connected != null) {
                 changed = changed.withTarget(connected.targetId()).withOrbit(connected.orbit())
                         .withSegments(connected.segments());
             } else {
-                var pairs = connectedPairs(flightPlanRocket());
+                var pairs = connectedPairs(hardware);
                 if (!pairs.isEmpty()) changed = changed.withSegments(pairs.getFirst());
             }
         }
@@ -662,7 +681,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         var action = findAction(actionId);
         if (action == null || action.type() != SpaceSimulation.ActionType.DECOUPLE
                 || !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) return;
-        var pairs = connectedPairs(flightPlanRocket());
+        var pairs = connectedPairs(hardwareFor(action));
         if (pairs.isEmpty()) return;
         closeNestedEditorState();
         decoupleAction = actionId;
@@ -692,7 +711,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected List<SpaceSimulation.SegmentRef> decoupleCandidates() {
 
-        return connectedPairs(flightPlanRocket()).stream().flatMap(List::stream).distinct()
+        return connectedPairs(hardwareFor(findAction(decoupleAction))).stream().flatMap(List::stream).distinct()
                 .sorted(Comparator.comparing(ref -> segmentName(ref, flightPlanRocket()), String.CASE_INSENSITIVE_ORDER))
                 .toList();
     }
@@ -700,7 +719,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected List<SpaceSimulation.SegmentRef> decoupleNeighbors(SpaceSimulation.SegmentRef retained) {
 
         if (retained == null) return List.of();
-        return connectedPairs(flightPlanRocket()).stream().filter(pair -> pair.contains(retained))
+        return connectedPairs(hardwareFor(findAction(decoupleAction))).stream().filter(pair -> pair.contains(retained))
                 .map(pair -> pair.get(0).equals(retained) ? pair.get(1) : pair.get(0)).distinct()
                 .sorted(Comparator.comparing(ref -> segmentName(ref, flightPlanRocket()), String.CASE_INSENSITIVE_ORDER))
                 .toList();

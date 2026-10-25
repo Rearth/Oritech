@@ -13,11 +13,13 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerClientController;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerScreen;
+import rearth.oritech.spaceage.client.launch_ramp.LaunchRampScreen;
 import rearth.oritech.spaceage.client.mission_control.CraftStatusScreen;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
@@ -35,6 +37,8 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.MissionForecast;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
@@ -99,6 +103,9 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private final Map<UIComponent, List<Component>> powerTooltipCards = new HashMap<>();
     private LabelWidget capacityLabel;
     private int fleetTicks;
+    // Launch ramps: footer summary of the working particle speeds and the speed window it shows.
+    private LabelWidget speedLabel;
+    private int speedWindowRevision = -1;
     private int recipeRevision = -1;
     private boolean pendingMissionRefresh;
     // Unsent edits kept while the radio link is down, restored once commands are available again.
@@ -346,7 +353,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var branches = normalized.branches().stream().map(branch -> branch.withActions(branch.actions().stream()
                         .filter(action -> !action.isGenerated()).toList()))
                 .filter(branch -> branch.isRoot() || !branch.actions().isEmpty()).toList();
-        var segments = flightPlanRocket.getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
+        var segments = RocketPayloads.planView(flightPlanRocket).getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
         return new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations().stream()
                 .filter(configuration -> segments.contains(configuration.segment())).toList(), plan.name());
     }
@@ -433,6 +440,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     protected void buildComponents() {
 
         missionStateLabel = null;
+        speedLabel = null;
         powerTooltipCards.clear();
         capacityLabel = null;
         panelWidth = width - WINDOW_PADDING * 2;
@@ -447,12 +455,17 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                     () -> Minecraft.getInstance().setScreen(new MissionControlScreen(control, screenInventory, screenTitle)),
                     this::switchToRocketScreen, () -> {
                     }).forEach(this::addComponent);
+        } else if (menu instanceof LaunchRampMenu ramp) {
+            ramp.slotsVisible = false;
+            SpaceAgeButtons.rampTabs(2, () -> Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle)),
+                    this::switchToRocketScreen, () -> {
+                    }).forEach(this::addComponent);
         } else {
             SpaceAgeButtons.assemblerTabs(1, this::switchToRocketScreen, () -> {
             }).forEach(this::addComponent);
         }
         var compactHeader = menu instanceof MissionControlMenu && panelWidth < 505;
-        var actionsX = menu instanceof MissionControlMenu ? compactHeader ? 9 : 252 : 200;
+        var actionsX = menu instanceof MissionControlMenu ? compactHeader ? 9 : 252 : menu instanceof LaunchRampMenu ? 228 : 200;
         var actionsY = compactHeader ? 34 : 9;
         addComponent(SpaceAgeButtons.panel(actionsX, actionsY, 70, 20, Component.translatable("screen.oritech_space_age.mission.save_card"), ignored -> card(true)));
         var loadCard = SpaceAgeButtons.panel(actionsX + 73, actionsY, 70, 20, Component.translatable("screen.oritech_space_age.mission.load_card"), ignored -> card(false));
@@ -486,7 +499,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var rocket = menu.getRocket();
         var snapshot = menu.getFlightPlannerSnapshot();
         if (rocket == null) {
-            addMessagePanel(Component.translatable("screen.oritech_space_age.invalid_rocket"));
+            addMessagePanel(Component.translatable(menu instanceof LaunchRampMenu ? "screen.oritech_space_age.launch_ramp.no_pattern"
+                    : "screen.oritech_space_age.invalid_rocket"));
             return;
         }
         if (snapshot == null || !snapshot.rocketId().equals(rocket.getRocketId())) {
@@ -508,6 +522,14 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 .withDarkColor().withAlignment(LabelWidget.Alignment.RIGHT);
         updateCapacityLabel();
         addComponent(capacityLabel);
+        if (menu instanceof LaunchRampMenu ramp) {
+            speedWindowRevision = ramp.speedWindowRevision;
+            speedLabel = new LabelWidget(12, panelHeight - 17, panelWidth - 100, speedSummary(ramp)).withDarkColor();
+            var tooltip = new ArrayList<>(LaunchRampScreen.speedRules());
+            tooltip.add(Component.translatable("screen.oritech_space_age.launch_ramp.footer_help"));
+            speedLabel.withTooltip(tooltip);
+            addComponent(speedLabel);
+        }
         var availableHeight = panelHeight - mapY - 24;
         editorHeight = Math.min(Math.clamp(availableHeight / 3, 160, 270), Math.max(64, availableHeight - 112));
         var mapHeight = availableHeight - editorHeight - 6;
@@ -550,7 +572,24 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), forecastPlan, control.knownPosition,
                     SpaceAgeClientRecipes.vacuum(), snapshot.stations());
         }
-        return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), draftPlan, null, SpaceAgeClientRecipes.vacuum(), snapshot.stations());
+        return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), draftPlan, menu.launchPosition(snapshot.objects()),
+                SpaceAgeClientRecipes.vacuum(), snapshot.stations());
+    }
+
+    private static Component speedSummary(LaunchRampMenu ramp) {
+
+        return LaunchRampScreen.windowSummary(ramp).append(Component.translatable("screen.oritech_space_age.launch_ramp.chip.preview",
+                LaunchRampScreen.number(ramp.previewSpeed())));
+    }
+
+    /** Shares the ramp's speed window search and redraws the preview when its expected speed follows the window. */
+    private void tickRamp(LaunchRampMenu ramp) {
+
+        LaunchRampScreen.tickSpeedWindow(ramp);
+        if (speedWindowRevision == ramp.speedWindowRevision) return;
+        speedWindowRevision = ramp.speedWindowRevision;
+        if (speedLabel != null) speedLabel.setText(speedSummary(ramp));
+        if (ramp.expectedSpeed < 0 && !hasOpenPopup()) refreshFlightPlanner();
     }
 
     private void card(boolean save) {
@@ -577,7 +616,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private void updateValidation() {
 
         validationIssues = RocketFlightPlanRules.inspect(draftPlan, flightPlanRocket, currentDraftSnapshot().objects(),
-                !(menu instanceof MissionControlMenu), menu instanceof MissionControlMenu c ? c.knownPosition : null,
+                !(menu instanceof MissionControlMenu), menu instanceof MissionControlMenu c ? c.knownPosition : menu.launchPosition(currentDraftSnapshot().objects()),
                 SpaceAgeClientRecipes.vacuum(), currentDraftSnapshot().stations(), calculatedFlight).issues();
     }
 
@@ -665,7 +704,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             selectedTarget = new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit());
             replaceAction(branchId, action.id(), changed, rocket);
         } else if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
-            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(rocket);
+            var anchors = RocketFlightPlanRules.asteroidAnchorSegments(hardwareFor(action));
             if (anchors.isEmpty()) return;
             var current = action.segments().isEmpty() ? null : action.segments().getFirst();
             var anchorIndex = anchors.indexOf(current);
@@ -673,10 +712,15 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                     List.of(anchors.get((anchorIndex + 1) % anchors.size()))), rocket);
         } else if (action.type() == SpaceSimulation.ActionType.DECOUPLE) {
             if (!action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) return;
-            var pairs = connectedPairs(rocket);
+            var pairs = connectedPairs(hardwareFor(action));
             if (pairs.isEmpty()) return;
             var current = pairs.indexOf(action.segments());
             replaceAction(branchId, action.id(), action.withSegments(pairs.get((current + 1) % pairs.size())), rocket);
+        } else if (action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT) {
+            var payloads = List.copyOf(RocketPayloads.all(hardwareFor(action)).keySet());
+            if (payloads.isEmpty()) return;
+            var current = payloads.indexOf(action.payload());
+            replaceAction(branchId, action.id(), action.withSegments(List.of(new SpaceSimulation.SegmentRef(payloads.get((current + 1) % payloads.size())))), rocket);
         }
     }
 
@@ -769,6 +813,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (action.type() == SpaceSimulation.ActionType.DOCK)
             return currentDraftSnapshot().stations().stream().filter(t -> t.id().equals(action.settings().docking().host())).findFirst()
                     .map(t -> Component.literal(t.name())).orElse(Component.translatable("screen.oritech_space_age.service.choose_host"));
+        if (action.type() == SpaceSimulation.ActionType.DEPLOY_CUBESAT) {
+            var cube = RocketPayloads.all(rocket).get(action.payload());
+            return cube == null ? Component.translatable("screen.oritech_space_age.action.no_cube_sat")
+                    : Component.translatable("screen.oritech_space_age.action.deploy_summary", cubeName(cube));
+        }
         if (action.type() == SpaceSimulation.ActionType.UNDOCK)
             return Component.translatable("screen.oritech_space_age.service.undock_help");
         if (action.type() == SpaceSimulation.ActionType.SCAN)
@@ -838,10 +887,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     @Override
     protected List<List<SpaceSimulation.SegmentRef>> connectedPairs(ActiveRocketData rocket) {
 
+        var view = rocket;
         var refsById = new HashMap<UUID, SpaceSimulation.SegmentRef>();
-        rocket.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
+        view.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
         var pairs = new ArrayList<List<SpaceSimulation.SegmentRef>>();
-        rocket.getStaticSegments().forEach((id, segment) -> segment.getConnectedSegments().forEach(connected -> {
+        view.getStaticSegments().forEach((id, segment) -> segment.getConnectedSegments().forEach(connected -> {
             var first = refsById.get(id);
             var second = refsById.get(connected);
             if (first != null && second != null) pairs.add(List.of(first, second));
@@ -849,6 +899,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         pairs.sort(Comparator.comparingLong((List<SpaceSimulation.SegmentRef> pair) -> pair.get(0).anchor().asLong())
                 .thenComparingLong(pair -> pair.get(1).anchor().asLong()));
         return pairs;
+    }
+
+    static String cubeName(CubeSatData cube) {
+
+        return cube.name().isBlank() ? Component.translatable("block.oritech_space_age.cube_sat").getString() : cube.name();
     }
 
     private void addMessagePanel(Component message) {
@@ -883,6 +938,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             flightPlanActionScrollX = flightPlanActionScroll.getScrollX();
             flightPlanActionScrollY = flightPlanActionScroll.getScrollY();
         }
+        if (menu instanceof LaunchRampMenu ramp) tickRamp(ramp);
         if (menu instanceof MissionControlMenu control) {
             if (++fleetTicks >= 20) {
                 fleetTicks = 0;
@@ -915,7 +971,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     @Override
     public BlockState getTitleState() {
 
-        return SpaceAgeBlocks.ROCKET_ASSEMBLER.get().defaultBlockState();
+        return (menu instanceof LaunchRampMenu ? SpaceAgeBlocks.LAUNCH_RAMP : SpaceAgeBlocks.ROCKET_ASSEMBLER).get().defaultBlockState();
     }
 
     @Override
@@ -942,13 +998,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     protected boolean canAddNavigationAddon(SpaceSimulation.FlightPlanBranch branch,
                                             SpaceSimulation.FlightPlanAction action) {
 
-        var path = branchPath(branch.id());
-        if (path == null) return false;
-        var moment = path.actionMoments().stream().filter(item -> item.actionId().equals(action.id()))
-                .findFirst().orElse(null);
-        return NavigationComputerRules.computers(flightPlanRocket,
-                moment == null ? NavigationComputerRules.allSegments(flightPlanRocket)
-                        : moment.connectedSegments()) > 0;
+        var hardware = hardwareBefore(branch, action.id());
+        return NavigationComputerRules.computers(hardware, NavigationComputerRules.allSegments(hardware)) > 0;
     }
 
     @Override

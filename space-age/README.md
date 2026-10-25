@@ -52,3 +52,21 @@ in place; optional Dock/Undock exchanges supply or collect whole pairs, fuel and
 
 Ordinary blocks land freshly placed without NBT or contents. Current physical product blocks and controller names survive; energy/fluid storage resets.
 Dock/Undock can exchange whole Cargo pairs and finite fuel/RF pools instantly.
+
+## Cube-sats and the particle launch ramp
+
+An addon splicer facing a rocket pad compacts the rocket standing on it into a cube-sat item. The rocket's
+longest axis may be at most the splicer's core quality, and cube-sats never contain other cube-sats. The
+cube keeps the rocket's blocks, fuel/RF and controller names; its tooltip shows mass, delta-V and hardware.
+Shrinking is one-way: cubes only become blocks again by landing.
+
+A cube built into a rocket has a constant folded mass (`cubeSatMass`) and no hardware. The host's
+Deploy Cube-Sat card releases it like a decouple, on its own branch. A host landing with an undeployed
+cube brings the cube back intact.
+
+A particle launch ramp hit by an accelerator particle launches cube-sats straight up with the particle's
+speed as starting velocity (by default a tenth of the particle speed in m/s, see `launchSpeedFactor` and
+`launchSpeedCap`). The pattern slot on the ramp's first tab holds the cube its plan is made for; the plan applies to every cube with the same layout and belongs to the last player
+who saved it. The planner shows the particle speed range in which the plan works. Cubes without a matching
+plan, or which can't fly the first leg, stay in low Earth orbit if fast enough and otherwise fall back next
+to the ramp.

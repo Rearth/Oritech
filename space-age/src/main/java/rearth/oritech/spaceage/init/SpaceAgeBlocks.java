@@ -6,6 +6,7 @@ import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import rearth.oritech.init.BlockContent.NoAutoDrop;
 import rearth.oritech.init.BlockContent.NoBlockItem;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
@@ -17,6 +18,8 @@ import rearth.oritech.spaceage.block.basic.RocketCouplingBlock;
 import rearth.oritech.spaceage.block.basic.RocketEngineBlock;
 import rearth.oritech.spaceage.block.basic.RocketPadBlock;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlock;
+import rearth.oritech.spaceage.block.cubesat.CubeSatBlock;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlock;
 import rearth.oritech.spaceage.block.mission_control.MissionControlBlock;
 import rearth.oritech.spaceage.block.mission_control.SurveyModuleBlock;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlock;
@@ -97,6 +100,14 @@ public final class SpaceAgeBlocks {
 
     public static final DeferredBlock<BlockPairController> CARGO = BLOCKS.registerBlock(
             "cargo", BlockPairController::new, SpaceAgeBlocks::machineProperties);
+
+    // Drops itself with its contents through a custom loot table.
+    @NoAutoDrop
+    public static final DeferredBlock<CubeSatBlock> CUBE_SAT = BLOCKS.registerBlock(
+            "cube_sat", CubeSatBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).strength(1.5F, 6.0F).noOcclusion());
+
+    public static final DeferredBlock<LaunchRampBlock> LAUNCH_RAMP = BLOCKS.registerBlock(
+            "launch_ramp", LaunchRampBlock::new, SpaceAgeBlocks::machineProperties);
 
     private SpaceAgeBlocks() {
     }

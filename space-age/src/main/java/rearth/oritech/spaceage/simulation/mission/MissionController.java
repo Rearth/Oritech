@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
@@ -29,6 +30,7 @@ import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
@@ -62,19 +64,33 @@ public final class MissionController {
 
     public static void launch(ServerLevel level, UUID owner, ActiveRocketData rocket, FlightPlan plan, BlockPos launch) {
 
+        launch(level, owner, rocket, plan, launch, 0);
+    }
+
+    /**
+     * @param speed initial velocity pointing away from Earth, e.g. from a particle launch ramp
+     */
+    public static void launch(ServerLevel level, UUID owner, ActiveRocketData rocket, FlightPlan plan, BlockPos launch, double speed) {
+
         rocket.setLaunchPosition(launch);
         var system = SpaceSimulationSavedData.get(level.getServer()).getOrCreate(owner);
         plan = resolveOrbitSlots(plan, MissionSavedData.get(level.getServer()), owner, rocket.getRocketId());
         var objects = new HashMap<UUID, SpaceObjectData>();
         system.createObjectData().forEach(o -> objects.put(o.id(), o));
         var initial = RocketFlightPathCalculator.createInitialCraft(rocket, objects.get(SpaceObjects.EARTH_ID), plan.root(), objects);
-        var position = new MissionState.Position(initial.x, initial.y, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.SURFACE,
-                -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var position = launchPosition(initial.x, initial.y, launch, speed);
         var state = new MissionState(owner, rocket, plan, position, system.earthKnowledge.copy(), launch);
         var data = MissionSavedData.get(level.getServer());
         data.craft.put(rocket.getRocketId(), state);
         data.setDirty();
-        RocketSimulationController.launchMissionVisual(level, rocket, launch);
+        RocketSimulationController.launchMissionVisual(level, rocket, launch, speed);
+    }
+
+    public static MissionState.Position launchPosition(double x, double y, BlockPos launch, double speed) {
+
+        var angle = SpaceBalance.surfaceAngle(launch.getX(), launch.getZ());
+        return new MissionState.Position(x, y, Math.cos(angle) * speed, Math.sin(angle) * speed, SpaceObjects.EARTH_ID, OrbitBand.SURFACE,
+                -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
     }
 
     public static void tick(MinecraftServer server) {
@@ -209,6 +225,7 @@ public final class MissionController {
             case NAVIGATE_TO -> MissionNavigation.tick(server, data, state, system, action, tick);
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
             case DECOUPLE -> decouple(data, state, system, action, tick);
+            case DEPLOY_CUBESAT -> deploy(data, state, action);
             case BEAM_POWER -> SpacePowerService.step(data, state);
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
             case DISCARD_CRAFT -> {
@@ -396,10 +413,7 @@ public final class MissionController {
         });
         childDynamic.values().forEach(r -> r.getConnectedSegments().retainAll(detached));
         parentDynamic.values().forEach(r -> r.getConnectedSegments().removeAll(detached));
-        var child = state.plan.branches().stream().filter(b -> b.parentSeparationAction().equals(action)).findFirst().orElse(new FlightPlanBranch(UUID.randomUUID(), action, List.of()));
-        var childBranches = new ArrayList<FlightPlanBranch>();
-        childBranches.add(new FlightPlanBranch(child.id(), FlightPlanBranch.NO_PARENT, child.actions()));
-        state.plan.branches().stream().filter(b -> !b.isRoot() && !b.id().equals(child.id())).forEach(childBranches::add);
+        var child = childBranch(state, action);
         var position = state.position;
         var attachment = state.transfer == null ? position : state.transfer.start.position();
         var takesAsteroid = childStatic.values().stream().anyMatch(s -> SegmentRef.of(s).equals(attachment.anchor()));
@@ -408,11 +422,65 @@ public final class MissionController {
         var rocket = new ActiveRocketData(child.id(), childStatic, childDynamic, null);
         rocket.copyLaunchFrom(state.rocket);
         childDynamic.values().forEach(r -> r.crafters.values().forEach(c -> c.reassignOperator(state.rocket.getRocketId(), rocket.getRocketId())));
-        var childRefs = childStatic.values().stream().map(SegmentRef::of).toList();
-        var childSettings = state.plan.segmentConfigurations().stream().filter(c -> childRefs.contains(c.segment())).toList();
-        var mission = new MissionState(state.owner, rocket, RocketFlightPlanRules.normalize(new FlightPlan(childBranches, childSettings, state.plan.name())),
+        var mission = new MissionState(state.owner, rocket, takeChildProgram(state, child, rocket, state.plan.name()),
                 childPosition, state.knowledge.copy(), state.launch);
         data.craft.put(rocket.getRocketId(), mission);
+        var parent = new ActiveRocketData(state.rocket.getRocketId(), parentStatic, parentDynamic, state.rocket.getFlight());
+        parent.copyLaunchFrom(state.rocket);
+        state.rocket = parent;
+        var parentRefs = planRefs(parent);
+        state.plan = state.plan.withSegmentConfigurations(state.plan.segmentConfigurations().stream().filter(c -> parentRefs.contains(c.segment())).toList());
+    }
+
+    /**
+     * Releases a carried cube-sat as its own craft, like a decouple. It keeps the plan anchors it had inside the host,
+     * so the deploy branch still matches its segments.
+     */
+    private static void deploy(MissionSavedData data, MissionState state, FlightPlanAction action) {
+
+        var holder = state.rocket.getDynamicSegments().values().stream().filter(r -> r.payloads.containsKey(action.payload())).findFirst().orElse(null);
+        if (holder == null) {
+            state.status = "status.oritech_space_age.no_payload";
+            return;
+        }
+        var cube = holder.payloads.remove(action.payload());
+        holder.layout.put(action.payload(), Blocks.AIR.defaultBlockState());
+        var child = childBranch(state, action.id());
+        var rocket = cube.unfold(child.id(), action.payload());
+        rocket.copyLaunchFrom(state.rocket);
+        var cubeName = cube.name().isBlank() ? "Cube-Sat" : cube.name();
+        var name = state.plan.name().isBlank() ? cubeName : state.plan.name() + " · " + cubeName;
+        var p = state.position;
+        var position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), p.slot(), 1,
+                FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO), p.headingX(), p.headingY());
+        var mission = new MissionState(state.owner, rocket, takeChildProgram(state, child, rocket,
+                name.substring(0, Math.min(name.length(), RocketFlightPlanRules.MAX_ROCKET_NAME_LENGTH))), position, state.knowledge.copy(), state.launch);
+        data.craft.put(rocket.getRocketId(), mission);
+        var parentRefs = planRefs(state.rocket);
+        state.plan = state.plan.withSegmentConfigurations(state.plan.segmentConfigurations().stream().filter(c -> parentRefs.contains(c.segment())).toList());
+        state.complete();
+    }
+
+    private static FlightPlanBranch childBranch(MissionState state, UUID action) {
+
+        return state.plan.branches().stream().filter(b -> b.parentSeparationAction().equals(action)).findFirst()
+                .orElse(new FlightPlanBranch(UUID.randomUUID(), action, List.of()));
+    }
+
+    /** Segment references of a craft and of the cube-sats it still carries. */
+    private static Set<SegmentRef> planRefs(ActiveRocketData rocket) {
+
+        return RocketPayloads.planView(rocket).getStaticSegments().values().stream().map(SegmentRef::of).collect(Collectors.toSet());
+    }
+
+    /** Moves a separated branch and its descendants into the program of the new craft. */
+    private static FlightPlan takeChildProgram(MissionState state, FlightPlanBranch child, ActiveRocketData rocket, String name) {
+
+        var childBranches = new ArrayList<FlightPlanBranch>();
+        childBranches.add(new FlightPlanBranch(child.id(), FlightPlanBranch.NO_PARENT, child.actions()));
+        state.plan.branches().stream().filter(b -> !b.isRoot() && !b.id().equals(child.id())).forEach(childBranches::add);
+        var childRefs = planRefs(rocket);
+        var childSettings = state.plan.segmentConfigurations().stream().filter(c -> childRefs.contains(c.segment())).toList();
         // The launched child owns its program now; it no longer occupies the parent's memory.
         var childBranchIds = new HashSet<UUID>();
         childBranchIds.add(child.id());
@@ -429,11 +497,7 @@ public final class MissionController {
                 }
         } while (found);
         state.plan = state.plan.withBranches(state.plan.branches().stream().filter(b -> !childBranchIds.contains(b.id())).toList());
-        var parent = new ActiveRocketData(state.rocket.getRocketId(), parentStatic, parentDynamic, state.rocket.getFlight());
-        parent.copyLaunchFrom(state.rocket);
-        state.rocket = parent;
-        var parentRefs = parentStatic.values().stream().map(SegmentRef::of).toList();
-        state.plan = state.plan.withSegmentConfigurations(state.plan.segmentConfigurations().stream().filter(c -> parentRefs.contains(c.segment())).toList());
+        return RocketFlightPlanRules.normalize(new FlightPlan(childBranches, childSettings, name));
     }
 
     public static FlightPlan resolveOrbitSlots(FlightPlan plan, MissionSavedData data, UUID owner, UUID self) {

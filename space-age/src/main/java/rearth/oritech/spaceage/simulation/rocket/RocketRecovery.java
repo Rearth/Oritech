@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
+import rearth.oritech.spaceage.block.cubesat.CubeSatBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.simulation.service.PhysicalCrafting;
 
@@ -38,11 +39,16 @@ public final class RocketRecovery {
             var pos = origin.offset(block.relativePos());
             level.setBlock(pos, block.state(), 3);
         }
-        // Generic block entities are freshly placed. Only controller names are explicitly restored.
-        rocket.getDynamicSegments().values().forEach(resources -> resources.crafters.forEach((relative, machine) -> {
-            if (level.getBlockEntity(origin.offset(relative)) instanceof VacuumCrafterBlockEntity controller)
-                controller.setName(machine.name);
-        }));
+        // Generic block entities are freshly placed. Only controller names and undeployed cube-sats are explicitly restored.
+        rocket.getDynamicSegments().values().forEach(resources -> {
+            resources.crafters.forEach((relative, machine) -> {
+                if (level.getBlockEntity(origin.offset(relative)) instanceof VacuumCrafterBlockEntity controller)
+                    controller.setName(machine.name);
+            });
+            resources.payloads.forEach((relative, cube) -> {
+                if (level.getBlockEntity(origin.offset(relative)) instanceof CubeSatBlockEntity entity) entity.setData(cube);
+            });
+        });
         return true;
     }
 

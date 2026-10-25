@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation.rocket;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.spaceage.SpaceAgeConfig;
 import rearth.oritech.spaceage.block.vacuum_crafter.BlockPairController;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
@@ -89,6 +90,7 @@ public final class RocketLayout {
 
     public static double mass(BlockState state) {
 
+        if (state.is(SpaceAgeBlocks.CUBE_SAT)) return SpaceAgeConfig.cubeSatMass();
         return Math.max(0, (long) state.getBlock().defaultDestroyTime());
     }
 

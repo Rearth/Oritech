@@ -2,6 +2,8 @@ package rearth.oritech.spaceage.block.assembler;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,8 +13,11 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
+import java.util.List;
 import java.util.UUID;
 
 public class RocketAssemblerMenu extends AbstractContainerMenu {
@@ -137,6 +142,31 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     public void markDraftFlightPlanSaved() {
 
         draftFlightPlanDirty = false;
+    }
+
+    /**
+     * Where previews of this menu's craft start. Null starts at rest on the scanned launch pad.
+     */
+    public @Nullable MissionState.Position launchPosition(List<SpaceSimulation.SpaceObjectData> objects) {
+
+        return null;
+    }
+
+    public boolean savesOnClose() {
+
+        return true;
+    }
+
+    public boolean canLaunch() {
+
+        return true;
+    }
+
+    /** Server-side destination of this source's draft. */
+    public void saveFlightPlan(ServerPlayer player, SpaceSimulation.FlightPlan plan) {
+
+        if (rocket != null)
+            SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), blockPos), plan, rocket);
     }
 
     @Override

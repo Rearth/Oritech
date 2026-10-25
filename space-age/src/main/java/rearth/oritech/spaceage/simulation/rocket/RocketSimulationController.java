@@ -29,17 +29,20 @@ public final class RocketSimulationController {
     public static final int ORBIT_HEIGHT_BLOCKS = RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS;
 
     // physics settings
-    private static final double STANDARD_GRAVITY = RocketPerformanceCalculator.STANDARD_GRAVITY;
     private static final double ROCKET_PACKET_RANGE_BLOCKS = 500;
     private static final double ROCKET_PACKET_RANGE_SQUARED = ROCKET_PACKET_RANGE_BLOCKS * ROCKET_PACKET_RANGE_BLOCKS;
 
-    public static void launchMissionVisual(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition) {
+    /**
+     * @param launchSpeed starting velocity, e.g. from a particle launch ramp. A fast start shortens the visible ascent.
+     */
+    public static void launchMissionVisual(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition, double launchSpeed) {
 
         var performance = RocketPerformanceCalculator.calculate(rocket);
-        var ascentSeconds = Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / Math.max(0.1, performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY));
+        var ascent = RocketAscent.launch(performance, launchSpeed);
+        var ascentSeconds = ascent.secondsTo(ORBIT_HEIGHT_BLOCKS);
         var flight = new RocketFlight(true, null, level.dimension(), performance, launchPosition,
                 launchPosition.above(ORBIT_HEIGHT_BLOCKS), launchPosition, new Vector2i(0, ORBIT_HEIGHT_BLOCKS),
-                0, 0, secondsToTicks(ascentSeconds), -1, -1, null, -1);
+                0, 0, secondsToTicks(ascentSeconds), -1, -1, null, -1, ascent);
         flight = handleTakeoffCollisions(level, rocket, flight).scheduledAt(level.getGameTime());
         rocket.setFlight(flight);
         var saved = getSavedData(level);
@@ -54,7 +57,7 @@ public final class RocketSimulationController {
         if (speed <= 12) ticks = Math.max(200, ticks);
         rocket.setFlight(new RocketFlight(true, null, level.dimension(), RocketPerformanceCalculator.calculate(rocket),
                 landing, landing.above(ORBIT_HEIGHT_BLOCKS), landing, new Vector2i(0, 0), 0, speed,
-                now - 1, now, now + ticks, null, -1));
+                now - 1, now, now + ticks, null, -1, new RocketAscent(0, .1)));
         var data = getSavedData(level);
         data.rockets.put(rocket.getRocketId(), rocket);
         data.setDirty();
@@ -99,12 +102,10 @@ public final class RocketSimulationController {
 
             if (flight.takeoffCollisionPosition() != null && gameTime >= flight.takeoffCollisionTick()) {
                 OritechSpaceAge.LOGGER.debug("Rocket {} hit an ascent obstruction at {} on tick {}", rocket.getRocketId(), flight.takeoffCollisionPosition(), gameTime);
-                var seconds = Math.max(0, (gameTime - (flight.orbitArrivalTick()
-                        - secondsToTicks(Math.sqrt(2 * ORBIT_HEIGHT_BLOCKS / Math.max(.1,
-                                flight.performance().liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY))))) / 20.0);
-                var speed = Math.max(0, flight.performance().liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY) * seconds;
+                var seconds = Math.max(0, (flight.takeoffCollisionTick() - flight.launchTick()) / 20.0);
+                var speed = flight.ascent().speed(seconds);
                 var strength = RocketExplosives.worldStrength(.5 * flight.performance().wetMassKilograms() * speed * speed + RocketExplosives.remaining(rocket));
-                sendTakeoffCollisionDataToClients(level, rocket, flight.takeoffCollisionPosition(), strength);
+                sendTakeoffCollisionDataToClients(level, rocket, flight.takeoffCollisionPosition(), speed, strength);
                 explodeOnTakeoffCollision(level, flight.takeoffCollisionPosition(), strength);
                 var mission = MissionSavedData.get(server).craft.get(rocket.getRocketId());
                 if (mission != null) {
@@ -165,12 +166,10 @@ public final class RocketSimulationController {
         }
 
         if (gameTime < flight.orbitArrivalTick()) {
-            var netAcceleration = flight.performance().liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
-            var ascentHeight = Math.max(0, flight.orbitPosition().getY() - flight.launchPosition().getY());
-            var ascentSeconds = Math.sqrt(2 * ascentHeight / netAcceleration);
-            var launchTick = flight.orbitArrivalTick() - secondsToTicks(ascentSeconds);
-            var progress = Mth.clamp((gameTime - launchTick) / Math.max(1, flight.orbitArrivalTick() - launchTick), 0, 1);
-            return launchPosition.lerp(orbitPosition, progress * progress);
+            var ascentHeight = Math.max(1, flight.orbitPosition().getY() - flight.launchPosition().getY());
+            var seconds = Math.max(0, (gameTime - flight.launchTick()) / TICKS_PER_SECOND);
+            var progress = Mth.clamp(flight.ascent().height(seconds) / ascentHeight, 0, 1);
+            return launchPosition.lerp(orbitPosition, progress);
         }
 
         if (flight.isInSpace(gameTime)) {
@@ -235,8 +234,7 @@ public final class RocketSimulationController {
             return flight;
         }
 
-        var netAcceleration = flight.performance().liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
-        var collisionSeconds = Math.sqrt(2 * collisionDistance / netAcceleration);
+        var collisionSeconds = flight.ascent().secondsTo(collisionDistance);
         OritechSpaceAge.LOGGER.debug("Rocket {} ascent collision planned at {} after {} blocks / {} seconds", rocket.getRocketId(), collisionPosition,
                 collisionDistance, collisionSeconds);
         return flight.withTakeoffCollision(collisionPosition, Math.max(1, secondsToTicks(collisionSeconds)));
@@ -268,10 +266,10 @@ public final class RocketSimulationController {
         logClientSelection("reentry", rocket, position, recipients);
     }
 
-    private static void sendTakeoffCollisionDataToClients(ServerLevel level, ActiveRocketData rocket, BlockPos collisionPosition, float explosionStrength) {
+    private static void sendTakeoffCollisionDataToClients(ServerLevel level, ActiveRocketData rocket, BlockPos collisionPosition, double speed, float explosionStrength) {
 
         var recipients = sendToPlayersNearRocket(level, collisionPosition, player -> RocketNetworking.sendCollision(player, rocket.getRocketId(),
-                collisionPosition, 0, explosionStrength, false));
+                collisionPosition, speed, explosionStrength, false));
         logClientSelection("takeoff collision", rocket, collisionPosition, recipients);
     }
 

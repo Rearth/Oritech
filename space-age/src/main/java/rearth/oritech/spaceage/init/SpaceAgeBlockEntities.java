@@ -6,6 +6,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
+import rearth.oritech.spaceage.block.cubesat.CubeSatBlockEntity;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlockEntity;
 import rearth.oritech.spaceage.block.mission_control.GroundStationBlockEntity;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
@@ -37,6 +39,12 @@ public final class SpaceAgeBlockEntities {
                     BeamApertureBlockEntity::new, SpaceAgeBlocks.BEAM_APERTURE.get()));
 
     public static final Supplier<BlockEntityType<RobotArmBlockEntity>> ROBOT_ARM = BLOCK_ENTITY_TYPES.register("robot_arm", () -> new BlockEntityType<>(RobotArmBlockEntity::new, SpaceAgeBlocks.ROBOT_ARM.get()));
+
+    public static final Supplier<BlockEntityType<CubeSatBlockEntity>> CUBE_SAT = BLOCK_ENTITY_TYPES.register("cube_sat", () -> new BlockEntityType<>(
+            CubeSatBlockEntity::new, SpaceAgeBlocks.CUBE_SAT.get()));
+
+    public static final Supplier<BlockEntityType<LaunchRampBlockEntity>> LAUNCH_RAMP = BLOCK_ENTITY_TYPES.register("launch_ramp", () -> new BlockEntityType<>(
+            LaunchRampBlockEntity::new, SpaceAgeBlocks.LAUNCH_RAMP.get()));
 
     private SpaceAgeBlockEntities() {
     }

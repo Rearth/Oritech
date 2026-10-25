@@ -25,6 +25,8 @@
     "oritech_space_age:vacuum_crafter",
     "oritech_space_age:crystal_glass",
     "oritech_space_age:beam_aperture",
-    "oritech_space_age:cargo"
+    "oritech_space_age:cargo",
+    "oritech_space_age:cube_sat",
+    "oritech_space_age:launch_ramp"
   ]
 }

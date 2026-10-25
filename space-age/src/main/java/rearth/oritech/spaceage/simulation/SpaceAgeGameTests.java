@@ -29,6 +29,7 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
+import rearth.oritech.spaceage.block.cubesat.CubeSatGameTests;
 import rearth.oritech.spaceage.block.robot_arm.RobotGameTests;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -57,6 +58,7 @@ import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
+import rearth.oritech.spaceage.simulation.rocket.RocketAscent;
 import rearth.oritech.spaceage.simulation.rocket.RocketFlight;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
@@ -96,6 +98,9 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("visual_reload", () -> SpaceAgeGameTests::visualReload);
         FUNCTIONS.register("gallery_light", () -> SpaceAgeGameTests::galleryLight);
         FUNCTIONS.register("space_power", () -> SpaceAgeGameTests::spacePower);
+        FUNCTIONS.register("cube_sat_shrink", () -> CubeSatGameTests::shrink);
+        FUNCTIONS.register("cube_sat_contents", () -> CubeSatGameTests::contents);
+        FUNCTIONS.register("launch_ramp", () -> CubeSatGameTests::launchRamp);
     }
 
     public static void register(RegisterGameTestsEvent event) {
@@ -116,6 +121,8 @@ public final class SpaceAgeGameTests {
                 OritechSpaceAge.id("space_power")), info));
         event.registerTest(OritechSpaceAge.id("gallery_light"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
                 OritechSpaceAge.id("gallery_light")), info));
+        for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp"))
+            event.registerTest(OritechSpaceAge.id(name), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name)), info));
     }
 
     private static MissionState beamStation(UUID owner, double x, long rf) {
@@ -592,7 +599,7 @@ public final class SpaceAgeGameTests {
         valid = new ActiveRocketData(UUID.randomUUID(), valid.getStaticSegments(), valid.getDynamicSegments(), null);
         var performance = RocketPerformanceCalculator.calculate(malformed);
         var flight = new RocketFlight(true, null, level.dimension(), performance, origin, origin.above(1000), origin,
-                new Vector2i(0, 1000), 0, 0, level.getGameTime() + 100, -1, -1, null, -1);
+                new Vector2i(0, 1000), 0, 0, level.getGameTime() + 100, -1, -1, null, -1, RocketAscent.launch(performance, 0));
         malformed.setFlight(flight);
         valid.setFlight(flight);
         var json = ActiveRocketData.CODEC.listOf().encodeStart(JsonOps.INSTANCE, List.of(malformed, valid)).getOrThrow();
