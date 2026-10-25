@@ -43,7 +43,7 @@ public abstract class ExtractablePipeConnectionBlock extends GenericPipeConnecti
 
         var property = directionToProperty(interactDir);
         var connection = state.getValue(property);
-        level.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_KNOWN_SHAPE, 0);
+        level.setBlock(pos, state.setValue(property, connection != EXTRACT ? EXTRACT : CONNECTION), Block.UPDATE_CLIENTS | Block.UPDATE_KNOWN_SHAPE, 0);
 
         level.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
 
