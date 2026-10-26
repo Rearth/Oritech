@@ -14,9 +14,9 @@ class RocketAscentTest {
     @Test
     void ascentTimesAgreeWithIndependentlyIntegratedVelocity() {
 
-        for (var acceleration : new double[]{0, 2, 20}) {
+        for (var acceleration : new double[]{-20, 0, 2, 20}) {
             for (var speed : new double[]{0, 500, 1500}) {
-                if (acceleration == 0 && speed == 0) continue;
+                if (acceleration <= 0 && speed == 0) continue;
                 var ascent = new RocketAscent(speed, acceleration);
                 var seconds = ascent.secondsTo(1000);
                 var step = seconds / 10_000;
@@ -47,10 +47,14 @@ class RocketAscentTest {
         assertEquals(500, decoded.ascent().initialSpeed());
         assertTrue(decoded.takeoffCollisionTick() > decoded.launchTick());
         assertTrue(decoded.takeoffCollisionTick() < decoded.orbitArrivalTick());
+        // An unpowered craft coasts upwards against surface gravity.
+        assertEquals(-RocketPerformanceCalculator.STANDARD_GRAVITY, ascent.acceleration(), 1e-9);
         assertEquals(origin.getY(), RocketSimulationController.getRocketPosition(decoded, 100).y, 1e-6);
-        assertEquals(origin.getY() + 500, RocketSimulationController.getRocketPosition(decoded, 120).y, 1e-6);
-        assertEquals(origin.getY() + 1000, RocketSimulationController.getRocketPosition(decoded, 140).y, 1e-6);
-        assertEquals(500, decoded.ascent().speed((decoded.takeoffCollisionTick() - decoded.launchTick()) / 20.0));
+        assertEquals(origin.getY() + 500 - RocketPerformanceCalculator.STANDARD_GRAVITY / 2,
+                RocketSimulationController.getRocketPosition(decoded, 120).y, 1e-6);
+        assertEquals(origin.getY() + 1000, RocketSimulationController.getRocketPosition(decoded, 100 + duration).y, 1e-6);
+        var collisionSpeed = decoded.ascent().speed((decoded.takeoffCollisionTick() - decoded.launchTick()) / 20.0);
+        assertTrue(collisionSpeed < 500 && collisionSpeed > 490);
     }
 
     @Test
@@ -62,5 +66,15 @@ class RocketAscentTest {
         assertTrue(assisted.secondsTo(100) < powered.secondsTo(100));
         assertTrue(assisted.secondsTo(100) < assisted.secondsTo(1000));
         assertTrue(assisted.speed(assisted.secondsTo(100)) >= 1500);
+    }
+
+    @Test
+    void slowBallisticLaunchStillReachesOrbitHeight() {
+
+        var performance = new RocketPerformance(1000, 0, 1000, 0, 0, 0, 0, 0);
+        var ascent = RocketAscent.launch(performance, 50);
+        var seconds = ascent.secondsTo(RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS);
+        assertTrue(Double.isFinite(seconds));
+        assertTrue(ascent.speed(seconds) >= 50 / Math.sqrt(2) - 1e-9);
     }
 }

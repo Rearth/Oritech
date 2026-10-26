@@ -687,6 +687,7 @@
   "screen.oritech_space_age.transfer.time_limit": "Estimated leg: %s MC days; limit: %s MC days (%s MC days over). Raise the speed cap or add propulsion/RF.",
   "screen.oritech_space_age.transfer.departure_thrust": "Effective engine acceleration: %s m/s²; opposing gravity: %s m/s². More thrust or less mass is needed, regardless of remaining delta-V.",
   "screen.oritech_space_age.transfer.braking_thrust": "Effective braking acceleration: %s m/s²; gravity along this leg: %s m/s². The engines cannot brake against gravity. Add thrust, reduce mass, or allow a faster arrival.",
+  "screen.oritech_space_age.transfer.climb_speed": "Highest reachable speed: %s m/s; coasting this climb against gravity needs about %s m/s. Raise the speed cap, launch faster, or add propulsion.",
   "screen.oritech_space_age.transfer.arrival_cap": "Requested arrival speed: %s m/s; speed cap: %s m/s. Raise the cap or lower the arrival speed.",
   "screen.oritech_space_age.transfer.braking_budget": "Effective remaining delta-V: %s m/s; speed to shed for arrival: %s m/s. Reserve more propulsion for braking.",
   "screen.oritech_space_age.transfer.radio_budget": "Ion propulsion cannot complete this leg after reserving antenna power. Estimated antenna use: %s RF; stored RF: %s. Add RF or shorten the flight.",

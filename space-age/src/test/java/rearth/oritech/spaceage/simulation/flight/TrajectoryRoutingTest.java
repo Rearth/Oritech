@@ -201,7 +201,8 @@ class TrajectoryRoutingTest {
         var mars = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
                 5_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
         for (var ionSeconds : new double[]{25, 1000, 10_000}) {
-            for (var speedCap : new int[]{0, 500, 2000}) {
+            // Leaving Earth needs ~700 m/s here, so lower caps can't coast out of its gravity.
+            for (var speedCap : new int[]{0, 1200, 2000}) {
                 for (var antennas : new int[]{1, 4}) {
                     var craft = craft(-3_120_000, 0);
                     craft.velocityX = 500;
@@ -219,6 +220,13 @@ class TrajectoryRoutingTest {
                 }
             }
         }
+        var craft = craft(-3_120_000, 0);
+        craft.velocityX = 500;
+        assertFalse(RocketFlightNavigation.navigate(action(mars.id(), 804).withOrbit(OrbitBand.HIGH).withMaxSpeed(500),
+                craft, context(earth, mars)));
+        assertEquals("climb_speed", craft.navigationFailure.reason());
+        assertEquals(500, craft.navigationFailure.actual(), 1e-9);
+        assertTrue(craft.navigationFailure.limit() > 500);
     }
 
     @Test
@@ -437,8 +445,8 @@ class TrajectoryRoutingTest {
         assertTrue(RocketFlightNavigation.navigate(landing, craft, context));
         assertTrue(craft.samples.stream().noneMatch(s -> s.phase() == PathPhase.ACCELERATE),
                 "an approach extended to accommodate braking must not accelerate into the extra distance");
-        assertTrue(craft.samples.stream().allMatch(s -> s.speedMetersPerSecond() <= 1500 + 1e-5));
-    }
+        assertTrue(craft.samples.stream().allMatch(s -> s.speedMetersPerSecond() <= 1500 + 1e-3),
+                "only gravity over the residual coast may add speed");    }
 
     @Test
     void longerLandingApproachesStillRequireEnoughFuelAndThrust() {

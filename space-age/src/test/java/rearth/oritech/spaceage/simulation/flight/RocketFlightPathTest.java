@@ -141,7 +141,8 @@ public final class RocketFlightPathTest {
     @Test
     void marsArrivalDoesNotOvershootWhenBoosterRunsDryDuringBraking() {
 
-        checkMarsArrival(15_000_000, 1000);
+        // The uphill coast out of Earth orbit slows the craft, so less braking is left for the booster.
+        checkMarsArrival(12_000_000, 1000);
     }
 
     @Test

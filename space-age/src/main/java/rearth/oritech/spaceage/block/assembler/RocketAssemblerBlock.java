@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
@@ -44,6 +45,15 @@ public class RocketAssemblerBlock extends Block implements EntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 
         return new RocketAssemblerBlockEntity(pos, state);
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+        if (level.isClientSide()) return;
+        level.getBlockEntity(pos, SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get())
+                .ifPresent(assembler -> assembler.updateRedstone(level.hasNeighborSignal(pos)));
     }
 
     @Override

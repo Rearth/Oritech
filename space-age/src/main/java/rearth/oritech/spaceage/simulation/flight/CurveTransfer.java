@@ -1,7 +1,8 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 /**
- * Full-power burn/coast/burn timing along a curve. Coasting does not spend engine time.
+ * Full-power burn/coast/burn timing along a curve. Coasting does not spend engine time, but the leg's averaged
+ * gravity keeps acting on it, so the whole leg conserves energy against the gravitational potential.
  */
 final class CurveTransfer {
 
@@ -20,29 +21,92 @@ final class CurveTransfer {
                       double gravity, double brakingCredit) {
 
         if (distance <= 0 || !(speedLimit > 0) || !freeArrival && arrival > speedLimit) return null;
-        if (profile.intervals().isEmpty())
-            return initial > 0 && initial <= speedLimit && (freeArrival || Math.abs(initial - arrival) < 1e-7)
-                    ? new Plan(0, distance / initial, 0, 1, 1) : null;
+        if (profile.intervals().isEmpty()) {
+            if (!(initial > 0) || initial > speedLimit) return null;
+            var end = coastSpeed(initial, gravity, distance);
+            // Without engines a climb the launch speed can't make stalls, and only free arrival can be exact.
+            if (end < 0 || !freeArrival && Math.abs(end - arrival) >= 1e-7) return null;
+            return new Plan(0, coastSeconds(initial, end, distance), 0, 1, 1);
+        }
         var minimum = Math.max(Math.min(initial, speedLimit), freeArrival ? 0 : arrival);
         var totalBurnTime = profile.intervals().stream().mapToDouble(RocketBurnProfile.Interval::seconds).sum();
         var maximum = Math.min(speedLimit, minimum + profile.deltaV() * engineEfficiency
                 + Math.max(0, gravity) * totalBurnTime);
-        Candidate best = candidate(minimum, initial, arrival, freeArrival, profile,
+        var lowest = attempt(minimum, distance, initial, arrival, freeArrival, profile,
                 engineEfficiency, gravity, brakingCredit);
-        if (best == null || best.distance > distance + 1e-6) return null;
+        if (lowest.fit == Fit.LONG) return null;
+        var best = lowest.plan;
+        // The fastest flight uses the highest peak which still fits. Peaks too slow to finish an uphill coast
+        // lie below that one, so they also move the search upwards.
         for (int iteration = 0; iteration < 80; iteration++) {
             var middle = (minimum + maximum) * .5;
-            var candidate = candidate(middle, initial, arrival, freeArrival, profile,
+            var attempt = attempt(middle, distance, initial, arrival, freeArrival, profile,
                     engineEfficiency, gravity, brakingCredit);
-            if (candidate != null && candidate.distance <= distance) {
+            if (attempt.fit == Fit.LONG) maximum = middle;
+            else {
                 minimum = middle;
-                best = candidate;
-            } else maximum = middle;
+                if (attempt.fit == Fit.FITS) best = attempt.plan;
+            }
         }
-        if (best.peak <= 1e-9) return null;
-        var coast = Math.max(0, (distance - best.distance) / best.peak);
-        return new Plan(best.first.seconds, coast, best.last.seconds, best.brakingFuelFactor,
-                best.peak < initial ? -1 : 1);
+        return best;
+    }
+
+    /**
+     * Places the coast between the two burns for one peak speed. Gravity changes the coasting speed and so the
+     * final braking burn.
+     */
+    private static Attempt attempt(double peak, double distance, double initial, double arrival, boolean freeArrival,
+                                   RocketBurnProfile profile, double efficiency, double gravity, double brakingCredit) {
+
+        var candidate = candidate(peak, initial, arrival, freeArrival, profile, efficiency, gravity, brakingCredit);
+        if (candidate == null || candidate.distance > distance + 1e-6) return Attempt.LONG;
+        if (peak <= 1e-9) return Attempt.SLOW;
+        var direction = peak < initial ? -1 : 1;
+        var remaining = Math.max(0, distance - candidate.firstDistance);
+        var end = coastSpeed(peak, gravity, remaining);
+        if (freeArrival) {
+            if (end < 0) return Attempt.SLOW;
+            return new Attempt(Fit.FITS, new Plan(candidate.first.seconds, coastSeconds(peak, end, remaining), 0,
+                    candidate.brakingFuelFactor, direction));
+        }
+        if (end < arrival) return Attempt.SLOW;
+        // Coast plus braking distance grows with the coast length, whichever way gravity pulls. Braking away
+        // speed gained while falling may exceed the remaining engine time.
+        var elapsed = candidate.first.seconds * (direction < 0 ? candidate.brakingFuelFactor : 1);
+        var low = 0d;
+        var high = remaining;
+        var last = candidate.last;
+        var covered = candidate.distance - candidate.firstDistance;
+        for (int iteration = 0; iteration < 80; iteration++) {
+            var middle = (low + high) * .5;
+            var speed = coastSpeed(peak, gravity, middle);
+            var braking = burn(profile, elapsed, Math.max(0, speed - arrival), efficiency, -gravity, candidate.brakingFuelFactor);
+            if (braking == null) {
+                high = middle;
+                continue;
+            }
+            var total = middle + speed * braking.seconds - braking.distance;
+            if (total <= remaining) {
+                low = middle;
+                last = braking;
+                covered = total;
+            } else high = middle;
+        }
+        if (remaining - covered > 1e-4) return Attempt.LONG;
+        return new Attempt(Fit.FITS, new Plan(candidate.first.seconds, coastSeconds(peak, coastSpeed(peak, gravity, low), low),
+                last.seconds, candidate.brakingFuelFactor, direction));
+    }
+
+    /** Speed after coasting a distance under constant gravity, negative if the craft stalls first. */
+    static double coastSpeed(double speed, double gravity, double distance) {
+
+        var squared = speed * speed + 2 * gravity * distance;
+        return squared < 0 ? -1 : Math.sqrt(squared);
+    }
+
+    private static double coastSeconds(double start, double end, double distance) {
+
+        return distance <= 0 ? 0 : 2 * distance / (start + end);
     }
 
     private static Candidate candidate(double peak, double initial, double arrival, boolean freeArrival,
@@ -57,9 +121,9 @@ final class CurveTransfer {
         var last = freeArrival ? new Burn(0, 0, 0)
                 : burn(profile, first.seconds * firstFactor, Math.max(0, peak - arrival), efficiency, -gravity, brakingFuelFactor);
         if (last == null) return null;
-        var distance = initial * first.seconds + (peak < initial ? -first.distance : first.distance)
-                + peak * last.seconds - last.distance;
-        return new Candidate(peak, first, last, distance, brakingFuelFactor);
+        var firstDistance = initial * first.seconds + (peak < initial ? -first.distance : first.distance);
+        var distance = firstDistance + peak * last.seconds - last.distance;
+        return new Candidate(first, last, firstDistance, distance, brakingFuelFactor);
     }
 
     static double brakingDistance(double initial, double arrival, RocketBurnProfile profile,
@@ -114,7 +178,21 @@ final class CurveTransfer {
 
     }
 
-    private record Candidate(double peak, Burn first, Burn last, double distance, double brakingFuelFactor) {
+    private record Candidate(Burn first, Burn last, double firstDistance, double distance, double brakingFuelFactor) {
 
+    }
+
+    private enum Fit {
+        /** Stalls on an uphill coast or arrives too slowly; a higher peak may fit. */
+        SLOW,
+        FITS,
+        /** Needs more distance or engine time than available; only a lower peak may fit. */
+        LONG
+    }
+
+    private record Attempt(Fit fit, Plan plan) {
+
+        static final Attempt SLOW = new Attempt(Fit.SLOW, null);
+        static final Attempt LONG = new Attempt(Fit.LONG, null);
     }
 }

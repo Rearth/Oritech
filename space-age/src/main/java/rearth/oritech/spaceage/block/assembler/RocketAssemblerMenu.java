@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -165,8 +166,9 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     /** Server-side destination of this source's draft. */
     public void saveFlightPlan(ServerPlayer player, SpaceSimulation.FlightPlan plan) {
 
-        if (rocket != null)
-            SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), blockPos), plan, rocket);
+        if (rocket == null) return;
+        SpaceSimulationSavedData.updateFlightPlan(player, GlobalPos.of(player.level().dimension(), blockPos), plan, rocket);
+        player.level().getBlockEntity(blockPos, SpaceAgeBlockEntities.ROCKET_ASSEMBLER.get()).ifPresent(assembler -> assembler.setOwner(player));
     }
 
     @Override

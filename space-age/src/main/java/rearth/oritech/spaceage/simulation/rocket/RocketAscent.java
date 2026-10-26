@@ -13,9 +13,12 @@ public record RocketAscent(double initialSpeed, double acceleration) {
 
     public static RocketAscent launch(RocketPerformance performance, double speed) {
 
-        // This short world visual does not simulate orbital gravity; weak craft coast on their launch velocity.
         var acceleration = performance.liftoffAccelerationMetersPerSecondSquared() - RocketPerformanceCalculator.STANDARD_GRAVITY;
-        return new RocketAscent(speed, Math.max(speed > 0 ? 0 : .1, acceleration));
+        if (speed <= 0) return new RocketAscent(0, Math.max(.1, acceleration));
+        // Weak craft slow down under surface gravity. The space simulation already decided this craft reaches space,
+        // so the slowdown is capped to keep at least ~70% of the launch speed at orbit height.
+        var slowest = -speed * speed / (4 * RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS);
+        return new RocketAscent(speed, Math.max(slowest, acceleration));
     }
 
     public double secondsTo(double height) {

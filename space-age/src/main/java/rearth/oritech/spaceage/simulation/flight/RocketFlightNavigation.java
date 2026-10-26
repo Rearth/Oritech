@@ -183,8 +183,8 @@ final class RocketFlightNavigation {
 
             var phase = !command.burning ? PathPhase.COAST
                     : command.directionX > 0 ? PathPhase.ACCELERATE : PathPhase.BRAKE;
-            var gravity = command.burning ? transferPlan.transfer.gravity() : 0;
-            var signedAcceleration = command.burning ? command.directionX * acceleration + gravity : 0;
+            // Gravity also acts while coasting, matching the transfer solver.
+            var signedAcceleration = (command.burning ? command.directionX * acceleration : 0) + transferPlan.transfer.gravity();
             travelled += speed * stepSeconds + .5 * signedAcceleration * stepSeconds * stepSeconds;
             speed = Math.max(0, speed + signedAcceleration * stepSeconds);
             craft.time += stepSeconds;

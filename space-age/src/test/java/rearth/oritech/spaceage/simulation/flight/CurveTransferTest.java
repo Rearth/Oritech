@@ -29,7 +29,9 @@ class CurveTransferTest {
             var remaining = durations[phase];
             assertTrue(remaining >= 0 && Double.isFinite(remaining));
             if (phase == 1) {
-                x += speed * remaining;
+                x += speed * remaining + gravity * remaining * remaining / 2;
+                speed += gravity * remaining;
+                assertTrue(speed >= -1e-9, "coasting must not stall");
                 continue;
             }
             var factor = directions[phase] < 0 ? plan.brakingFuelFactor() : 1;
@@ -47,7 +49,7 @@ class CurveTransferTest {
                     spent = 0;
                 }
             }
-            assertTrue(speed <= cap + 1e-5, "inherited excess speed must be shed before coasting");
+            if (phase == 0) assertTrue(speed <= cap + 1e-5, "inherited excess speed must be shed before coasting");
         }
         assertEquals(distance, x, .001);
         if (!free) assertEquals(arrival, speed, 1e-6);
@@ -86,6 +88,24 @@ class CurveTransferTest {
     }
 
     @Test
+    void coastingConservesEnergyAgainstGravity() {
+
+        var empty = new RocketBurnProfile(List.of());
+        // An unpowered climb arrives with v^2 = v0^2 + 2 g d and stalls when it can't make it.
+        var climb = check(10_000, 500, 0, true, empty, 1_000, -10, 0);
+        assertEquals(2 * 10_000 / (500 + Math.sqrt(500 * 500 - 2 * 10 * 10_000)), climb.coastSeconds(), 1e-9);
+        assertNull(CurveTransfer.solve(20_000, 500, 0, true, 1_000, empty, 1, -10));
+        // Powered legs slow down during their coast and need a shorter braking burn.
+        var profile = new RocketBurnProfile(List.of(new RocketBurnProfile.Interval(10, 100)));
+        var flat = check(100_000, 0, 0, false, profile, 300, 0, 0);
+        var uphill = check(100_000, 0, 0, false, profile, 300, -.2, 0);
+        assertTrue(uphill.lastSeconds() < flat.lastSeconds());
+        assertTrue(uphill.coastSeconds() > flat.coastSeconds());
+        // A climb steeper than the coast can carry is infeasible even with engines left for braking.
+        assertNull(CurveTransfer.solve(1_000_000, 0, 0, false, 300, profile, 1, -.2));
+    }
+
+    @Test
     void variedStageProfilesIntegrateToTheRequestedArrival() {
 
         var random = new Random(721);
@@ -96,8 +116,9 @@ class CurveTransferTest {
                         20 + random.nextDouble() * 400));
             var profile = new RocketBurnProfile(intervals);
             var cap = profile.deltaV() * .2;
+            // Coasting gravity over the long leg may cost at most a quarter of the cap's kinetic energy.
             check(cap * 10_000, random.nextDouble() * cap * 2, random.nextDouble() * cap * .1,
-                    example % 2 == 0, profile, cap, random.nextDouble() - .5, example % 3 == 0 ? 200 : 0);
+                    example % 2 == 0, profile, cap, (random.nextDouble() - .5) * cap / 40_000, example % 3 == 0 ? 200 : 0);
         }
     }
 }

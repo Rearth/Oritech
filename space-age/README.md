@@ -22,10 +22,12 @@ a deterministic 12-20 degree departure offset. Planet discs do not obstruct tran
 only explicitly targeted surfaces have arrival/impact consequences.
 
 The existing stage-aware full-power burn/coast/burn solver controls speed over the
-curve's length. Maximum arrival omits final braking. Near planets, inverse-square
-gravity is projected onto the departure and arrival curve tangents. It changes powered
-acceleration and braking time, consumes the resulting extra engine time, and prevents
-a stage below local gravity from departing. Gravity between those endpoint regions,
+curve's length. Maximum arrival omits final braking. Each leg applies the average
+inverse-square gravitational work per metre along the curve during burns and coasts
+alike, so the speed change over a whole leg conserves energy: coasting uphill slows
+down and stalls (`climb_speed`) when the launch speed or speed cap is too low, and
+coasting downhill speeds up, even past the speed cap. Local gravity at the curve's
+endpoints prevents a stage below it from departing or landing. Speed along the way,
 orbital motion, and curved coasting remain deliberate approximations. Atmospheric legs
 conservatively use reduced ion thrust throughout. This is not an exact orbital solver.
 
@@ -66,7 +68,8 @@ cube brings the cube back intact.
 
 A particle launch ramp hit by an accelerator particle launches cube-sats straight up with the particle's
 speed as starting velocity (by default a tenth of the particle speed in m/s, see `launchSpeedFactor` and
-`launchSpeedCap`). The pattern slot on the ramp's first tab holds the cube its plan is made for; the plan applies to every cube with the same layout and belongs to the last player
+`launchSpeedCap`). Cubes then slow down against Earth's gravity like any coasting craft; at least
+`orbitVelocity` is needed to coast up to low Earth orbit. The pattern slot on the ramp's first tab holds the cube its plan is made for; the plan applies to every cube with the same layout and belongs to the last player
 who saved it. The planner shows the particle speed range in which the plan works. Cubes without a matching
 plan, or which can't fly the first leg, stay in low Earth orbit if fast enough and otherwise fall back next
 to the ramp.

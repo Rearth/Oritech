@@ -162,6 +162,11 @@ public final class RocketTransferRoute {
                 craft.navigationFailure = new NavigationFailure("braking_thrust", strongest, gravity);
             else if (gravity < 0 && strongest <= -gravity)
                 craft.navigationFailure = new NavigationFailure("departure_thrust", strongest, -gravity);
+            else if (gravity < 0 && climbSpeed(curve.length(), freeArrival ? 0 : arrival, gravity)
+                    > Math.min(cap, speed + burnProfile.deltaV() * curveEfficiency))
+                // Coasting slows down uphill; a speed cap or launch speed below this stalls before arriving.
+                craft.navigationFailure = new NavigationFailure("climb_speed", Math.min(cap, speed + burnProfile.deltaV() * curveEfficiency),
+                        climbSpeed(curve.length(), freeArrival ? 0 : arrival, gravity));
             else if (!freeArrival && arrival > cap)
                 craft.navigationFailure = new NavigationFailure("arrival_cap", arrival, cap);
             else if (speed > arrival && !freeArrival && burnProfile.deltaV() * efficiency < speed - arrival)
@@ -186,7 +191,8 @@ public final class RocketTransferRoute {
 
     /**
      * Average gravitational work per metre. A long loop cannot accumulate surface gravity forever.
-     * Gravity during coasts remains omitted; this is guidance, not an orbital integrator.
+     * Applied over the whole leg, it gives the exact energy change between the endpoints, but not the speed along
+     * the way; this is guidance, not an orbital integrator.
      */
     static double gravityForLeg(Context context, FlightCurve curve, double time) {
 
@@ -200,6 +206,12 @@ public final class RocketTransferRoute {
             work += gravityPotential(body, to) - gravityPotential(body, from);
         }
         return work / curve.length();
+    }
+
+    /** Speed needed to coast a whole uphill leg and still arrive with the given speed. */
+    private static double climbSpeed(double length, double arrival, double gravity) {
+
+        return Math.sqrt(arrival * arrival - 2 * gravity * length);
     }
 
     private static double gravityPotential(SpaceSimulation.SpaceObjectData body, double distance) {

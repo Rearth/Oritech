@@ -288,7 +288,7 @@ class MissionSystemsTest {
     }
 
     @Test
-    void missionValidationReportsHowFarTheEstimatedFlightExceedsTheTimeLimit() {
+    void missionValidationReportsTheSpeedACappedClimbOutOfEarthOrbitNeeds() {
 
         var system = new SpaceSimulation();
         var craft = rocket(false, 1_000_000, 0);
@@ -300,9 +300,10 @@ class MissionSystemsTest {
         assertFalse(validation.valid());
         var issue = validation.issues().stream().filter(item -> item.actionId().equals(navigation.id())).findFirst().orElseThrow();
         assertNotNull(issue.failure());
-        assertEquals("time_limit", issue.failure().reason());
-        assertTrue(issue.failure().actual() > issue.failure().limit());
-        assertTrue(issue.failure().actual() / 1200 > 1000);
+        // A 1 m/s cruise stalls long before leaving Earth's gravity; the time limit is never reached.
+        assertEquals("climb_speed", issue.failure().reason());
+        assertEquals(1, issue.failure().actual(), 1e-9);
+        assertTrue(issue.failure().limit() > 500);
         var state = new MissionState(OWNER, craft, plan(FlightPlanAction.create(ActionType.MAINTAIN_POSITION)), position,
                 new SurveyKnowledge(), BlockPos.ZERO);
         state.connected = true;
