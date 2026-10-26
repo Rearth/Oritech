@@ -85,9 +85,9 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<MissionControlBlock> MISSION_CONTROL =
             BLOCKS.registerBlock("mission_control", MissionControlBlock::new, SpaceAgeBlocks::machineProperties);
     public static final DeferredBlock<SurveyModuleBlock> SPACE_SCANNER =
-            BLOCKS.registerBlock("space_scanner", SurveyModuleBlock::new, SpaceAgeBlocks::machineProperties);
+            BLOCKS.registerBlock("space_scanner", properties -> new SurveyModuleBlock(properties, SurveyModuleBlock.SCANNER_SHAPE), () -> machineProperties().noOcclusion());
     public static final DeferredBlock<SurveyModuleBlock> ANTENNA =
-            BLOCKS.registerBlock("antenna", SurveyModuleBlock::new, SpaceAgeBlocks::machineProperties);
+            BLOCKS.registerBlock("antenna", properties -> new SurveyModuleBlock(properties, SurveyModuleBlock.ANTENNA_SHAPE), () -> machineProperties().noOcclusion());
 
     public static final DeferredBlock<VacuumCrafterBlock> VACUUM_CRAFTER = BLOCKS.registerBlock(
             "vacuum_crafter", VacuumCrafterBlock::new, SpaceAgeBlocks::machineProperties);
