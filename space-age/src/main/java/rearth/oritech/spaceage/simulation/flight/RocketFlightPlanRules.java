@@ -207,6 +207,7 @@ public final class RocketFlightPlanRules {
 
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
         objects.forEach(object -> objectsById.put(object.id(), object));
+        NavigationWaypoint.targets(plan).forEach(object -> objectsById.put(object.id(), object));
         // Carried cube-sats bring their own segments into the plan.
         var view = RocketPayloads.planView(rocket);
         var segmentIds = new HashMap<SpaceSimulation.SegmentRef, UUID>();
@@ -364,7 +365,7 @@ public final class RocketFlightPlanRules {
     public static List<SpaceSimulation.OrbitBand> availableOrbits(SpaceObjects.ObjectType type) {
 
         if (type == SpaceObjects.ObjectType.SUN) return List.of(SpaceSimulation.OrbitBand.SOLAR);
-        if (type == SpaceObjects.ObjectType.SURVEY_REGION || type == SpaceObjects.ObjectType.CRAFT)
+        if (type == SpaceObjects.ObjectType.SURVEY_REGION || type == SpaceObjects.ObjectType.CRAFT || type == SpaceObjects.ObjectType.WAYPOINT)
             return List.of(SpaceSimulation.OrbitBand.SURFACE);
         return type == SpaceObjects.ObjectType.ASTEROID ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
     }

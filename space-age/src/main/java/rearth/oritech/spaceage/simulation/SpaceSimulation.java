@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Vector2f;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
+import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
@@ -522,6 +523,7 @@ public class SpaceSimulation {
         public List<SpaceObjectData> mapObjects() {
 
             var result = new ArrayList<>(objects);
+            result.addAll(NavigationWaypoint.targets(plan));
             stations.stream().filter(t -> !t.id().equals(rocketId)).map(DockingTarget::point).forEach(result::add);
             return List.copyOf(result);
         }
@@ -785,7 +787,14 @@ public class SpaceSimulation {
         public FlightPlanAction withTarget(UUID target) {
 
             return new FlightPlanAction(id, type, segments, target, orbit, velocityMode, targetVelocity, maxSpeed,
-                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service, settings, asteroidTarget);
+                    landingX, landingZ, landingOffsetX, landingOffsetZ, addons, service,
+                    target.equals(id) ? settings : settings.withWaypoint(Optional.empty()), asteroidTarget);
+        }
+
+        public FlightPlanAction withWaypoint(NavigationWaypoint point) {
+
+            return withTarget(id).withOrbit(OrbitBand.SURFACE).withAsteroidTarget(AsteroidTarget.DEFAULT)
+                    .withSettings(settings.withWaypoint(Optional.of(point)));
         }
 
         public FlightPlanAction withOrbit(OrbitBand newOrbit) {

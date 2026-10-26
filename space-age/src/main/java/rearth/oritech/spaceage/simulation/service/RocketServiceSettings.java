@@ -6,25 +6,38 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.resources.Identifier;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
  * Typed parameters for explicit rocket services. A reference always belongs to its containing segment.
  */
-public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam) {
+public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam, Optional<NavigationWaypoint> waypoint) {
 
     public static final RocketServiceSettings DEFAULT = new RocketServiceSettings(Processing.DEFAULT, Docking.DEFAULT, Exchange.DEFAULT);
     public static final Codec<RocketServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
             Processing.CODEC.fieldOf("processing").forGetter(RocketServiceSettings::processing), Docking.CODEC.fieldOf("docking").forGetter(RocketServiceSettings::docking),
-            Exchange.CODEC.fieldOf("exchange").forGetter(RocketServiceSettings::exchange), Beam.CODEC.optionalFieldOf("beam", Beam.DEFAULT).forGetter(RocketServiceSettings::beam)
+            Exchange.CODEC.fieldOf("exchange").forGetter(RocketServiceSettings::exchange), Beam.CODEC.optionalFieldOf("beam", Beam.DEFAULT).forGetter(RocketServiceSettings::beam),
+            NavigationWaypoint.CODEC.optionalFieldOf("waypoint").forGetter(RocketServiceSettings::waypoint)
     ).apply(i, RocketServiceSettings::new));
 
     public RocketServiceSettings(Processing processing, Docking docking, Exchange exchange) {
 
         this(processing, docking, exchange, Beam.DEFAULT);
+    }
+
+    public RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam) {
+
+        this(processing, docking, exchange, beam, Optional.empty());
+    }
+
+    public RocketServiceSettings withWaypoint(Optional<NavigationWaypoint> value) {
+
+        return new RocketServiceSettings(processing, docking, exchange, beam, value);
     }
 
     public record Beam(int reservePercent) {
@@ -42,22 +55,22 @@ public record RocketServiceSettings(Processing processing, Docking docking, Exch
 
     public RocketServiceSettings withBeam(Beam value) {
 
-        return new RocketServiceSettings(processing, docking, exchange, value);
+        return new RocketServiceSettings(processing, docking, exchange, value, waypoint);
     }
 
     public RocketServiceSettings withProcessing(Processing value) {
 
-        return new RocketServiceSettings(value, docking, exchange, beam);
+        return new RocketServiceSettings(value, docking, exchange, beam, waypoint);
     }
 
     public RocketServiceSettings withDocking(Docking value) {
 
-        return new RocketServiceSettings(processing, value, exchange, beam);
+        return new RocketServiceSettings(processing, value, exchange, beam, waypoint);
     }
 
     public RocketServiceSettings withExchange(Exchange value) {
 
-        return new RocketServiceSettings(processing, docking, value, beam);
+        return new RocketServiceSettings(processing, docking, value, beam, waypoint);
     }
 
     public enum SourceScope {

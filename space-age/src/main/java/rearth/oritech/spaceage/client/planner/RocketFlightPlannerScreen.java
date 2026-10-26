@@ -825,6 +825,10 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
             return Component.translatable("screen.oritech_space_age.action.upload_survey_data");
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.BEAM_POWER) {
+            if (action.settings().waypoint().isPresent()) {
+                var point = action.settings().waypoint().get();
+                return Component.translatable("screen.oritech_space_age.waypoint", Math.round(point.x()), Math.round(point.y()));
+            }
             if (action.asteroidTarget().closest()) {
                 var resolved = calculatedFlight.paths().stream().flatMap(path -> path.samples().stream())
                         .filter(sample -> sample.actionId().equals(action.id())).map(sample -> findObject(sample.targetId()))
@@ -868,6 +872,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             return Component.translatable("screen.oritech_space_age.action.asteroid_connection_range",
                     (int) AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED);
         }
+        if (action.settings().waypoint().isPresent())
+            return Component.translatable("screen.oritech_space_age.waypoint.fixed");
         var target = findObject(action.targetId());
         if (target != null && target.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             return Component.translatable("screen.oritech_space_age.region_boundary");

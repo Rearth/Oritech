@@ -27,6 +27,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 
 import java.util.UUID;
 
@@ -39,6 +40,7 @@ public final class RocketNetworking {
     public static void register(PayloadRegistrar registrar) {
 
         NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(ActiveRocketData.CODEC), ActiveRocketData.class);
+        NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(RocketServiceSettings.CODEC), RocketServiceSettings.class);
         NetworkManager.registerCodec(Snapshot.STREAM_CODEC, Snapshot.class);
         registrar.playToClient(AperturePayload.TYPE, NetworkManager.getAutoCodec(AperturePayload.class), (payload, context) -> context.enqueueWork(() -> {
             if (context.player().containerMenu instanceof BeamApertureMenu menu

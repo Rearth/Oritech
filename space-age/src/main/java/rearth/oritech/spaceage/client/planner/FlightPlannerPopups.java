@@ -101,9 +101,10 @@ final class FlightPlannerPopups {
         var target = editors.currentDraftSnapshot().mapObjects().stream().filter(o -> o.id().equals(action.targetId())).findFirst().orElse(null);
         var survey = target != null && target.type() == SpaceObjects.ObjectType.SURVEY_REGION;
         var craft = target != null && target.type() == SpaceObjects.ObjectType.CRAFT;
+        var waypoint = action.settings().waypoint().isPresent();
         var deployment = SpaceBalance.hasSlots(action.targetId(), action.orbit());
         var settingCount = switch (action.type()) {
-            case NAVIGATE_TO -> 4 + (survey || craft ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
+            case NAVIGATE_TO -> 4 + (survey || craft || waypoint ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
@@ -203,7 +204,7 @@ final class FlightPlannerPopups {
                     .withZIndex(CONTROL_Z));
             rowY += rowSpacing;
 
-            if (!survey && !craft) {
+            if (!survey && !craft && !waypoint) {
                 addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.orbit");
                 var destinationMenuY = rowY + 16;
                 editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,

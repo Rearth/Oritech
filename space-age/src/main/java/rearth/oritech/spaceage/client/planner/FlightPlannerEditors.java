@@ -16,6 +16,7 @@ import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.FlightPlanHardware;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
@@ -391,7 +392,10 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                 changed = changed.withSettings(changed.settings().withDocking(host.rendezvous(ports.getFirst(), host.ports().getFirst())));
         } else if (type == SpaceSimulation.ActionType.NAVIGATE_TO) {
             changed = changed.withTarget(selectedTarget().objectId()).withOrbit(selectedTarget().orbit());
+            if (selectedTarget().waypoint() != null) changed = changed.withWaypoint(selectedTarget().waypoint());
             changed = freezeNavigationTarget(changed);
+            if (changed.settings().waypoint().isPresent())
+                setSelectedTarget(new RocketStarMapWidget.NavigationSelection(changed.targetId(), changed.orbit()));
             if (FlightPlannerLabels.isEarthSurface(changed)) {
                 var offset = landingOffset(changed);
                 changed = changed.withLanding(0, 0, offset[0], offset[1]);
@@ -437,9 +441,12 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     private SpaceSimulation.FlightPlanAction freezeNavigationTarget(SpaceSimulation.FlightPlanAction action) {
 
+        var point = currentDraftSnapshot().mapObjects().stream().filter(target -> target.id().equals(action.targetId())
+                && target.type() == SpaceObjects.ObjectType.WAYPOINT).findFirst().orElse(null);
+        var navigation = point == null ? action : action.withWaypoint(new NavigationWaypoint(point.x(), point.y()));
         var station = currentDraftSnapshot().stations().stream().filter(target -> target.id().equals(action.targetId())).findFirst().orElse(null);
         var docking = station == null ? Docking.DEFAULT : station.rendezvous(HardwareRef.NONE, HardwareRef.NONE);
-        var changed = action.withSettings(action.settings().withDocking(docking));
+        var changed = navigation.withSettings(navigation.settings().withDocking(docking));
         return station == null ? changed : changed.withOrbit(SpaceSimulation.OrbitBand.SURFACE)
                 .withVelocity(SpaceSimulation.ArrivalVelocityMode.ZERO, 0);
     }

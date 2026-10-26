@@ -25,6 +25,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
@@ -52,6 +53,63 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MissionSystemsTest {
 
     private static final UUID OWNER = new UUID(1, 1);
+
+    @Test
+    void coordinateWaypointsSurviveSavingAndLiveNavigationMatchesThePreview() {
+
+        var waypoint = new NavigationWaypoint(-3_121_000, 2_000);
+        var action = FlightPlanAction.create(ActionType.NAVIGATE_TO).withWaypoint(waypoint);
+        var program = plan(action);
+        var codec = ReflectiveCodecBuilder.create(FlightPlan.class);
+        var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY, ConnectionType.NEOFORGE);
+        codec.encode(buffer, program);
+        assertEquals(program, codec.decode(buffer));
+        buffer.release();
+        var system = new SpaceSimulation();
+        var craft = rocket(false, 100_000, 0);
+        var position = new MissionState.Position(-3_120_000, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.HIGH, -1, 1,
+                FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var validation = RocketFlightPlanRules.inspect(program, craft, system.createObjectData(), false, position);
+        assertTrue(validation.valid(), () -> validation.issues().toString());
+        var preview = RocketFlightPathCalculator.calculateFrom(craft, system.createObjectData(), program, position);
+        var path = preview.paths().getFirst();
+        assertFalse(path.terminalState().isFailure(), path.terminalState().name());
+        var arrival = path.samples().getLast();
+        assertEquals(waypoint.x(), arrival.x(), .01);
+        assertEquals(waypoint.y(), arrival.y(), .01);
+        assertEquals(0, arrival.speedMetersPerSecond(), 1e-6);
+
+        var mission = new MissionState(OWNER, craft, program, position, new SurveyKnowledge(), BlockPos.ZERO);
+        var data = new MissionSavedData();
+        MissionNavigation.tick(null, data, mission, system, action, 0);
+        var saved = MissionState.CODEC.encodeStart(NbtOps.INSTANCE, mission).getOrThrow();
+        mission = MissionState.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+        assertEquals(waypoint, mission.plan.root().actions().getFirst().settings().waypoint().orElseThrow());
+        for (int tick = 1; tick < 10_000 && mission.action() != null; tick++)
+            MissionNavigation.tick(null, data, mission, system, mission.action(), tick);
+        assertNull(mission.action(), mission.status);
+        assertEquals(arrival.x(), mission.position.x(), .01);
+        assertEquals(arrival.y(), mission.position.y(), .01);
+        assertEquals(action.id(), mission.position.target());
+        assertEquals(0, Math.hypot(mission.position.vx(), mission.position.vy()), 1e-6);
+        assertTrue(action.withTarget(SpaceObjects.EARTH_ID).settings().waypoint().isEmpty());
+    }
+
+    @Test
+    void coastingThroughAWaypointAtSpeedDoesNotCauseASurfaceImpact() {
+
+        var point = new NavigationWaypoint(-3_122_000, 0);
+        var action = FlightPlanAction.create(ActionType.NAVIGATE_TO).withWaypoint(point)
+                .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
+        var position = new MissionState.Position(-3_120_000, 0, -500, 0, SpaceObjects.EARTH_ID, OrbitBand.HIGH, -1, 1,
+                FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var flight = RocketFlightPathCalculator.calculateFrom(rocket(false, 0, 0), new SpaceSimulation().createObjectData(), plan(action), position);
+        var path = flight.paths().getFirst();
+        assertFalse(path.terminalState().isFailure(), path.terminalState().name());
+        assertEquals(point.x(), path.samples().getLast().x(), .01);
+        assertEquals(500, path.samples().getLast().speedMetersPerSecond(), 1e-6);
+        assertTrue(flight.arrivalPredictions().isEmpty(), "A coordinate has no surface to collide with");
+    }
 
     private static ActiveRocketData rocket(boolean ion, long fuel, long rf) {
 

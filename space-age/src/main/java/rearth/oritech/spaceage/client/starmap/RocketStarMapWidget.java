@@ -21,6 +21,7 @@ import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.FlightMotion;
+import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
@@ -173,6 +174,8 @@ public final class RocketStarMapWidget extends UIComponent {
 
     public static Component objectName(SpaceSimulation.SpaceObjectData object) {
 
+        if (object.type() == SpaceObjects.ObjectType.WAYPOINT)
+            return Component.translatable("screen.oritech_space_age.waypoint", Math.round(object.x()), Math.round(object.y()));
         return object.name().isBlank() ? objectName(object.type()) : Component.literal(object.name());
     }
 
@@ -642,7 +645,8 @@ public final class RocketStarMapWidget extends UIComponent {
 
         if (selectedTarget == null) return null;
         var object = mapObjects.byId(selectedTarget.objectId);
-        if (object != null && object.data().type() == SpaceObjects.ObjectType.SURVEY_REGION)
+        if (object != null && (object.data().type() == SpaceObjects.ObjectType.SURVEY_REGION
+                || object.data().type() == SpaceObjects.ObjectType.WAYPOINT))
             return objectName(object.data());
         return object == null ? null : Component.translatable("screen.oritech_space_age.selected_target",
                 objectName(object.data()), orbitName(selectedTarget.orbit));
@@ -687,6 +691,13 @@ public final class RocketStarMapWidget extends UIComponent {
         if (!isInsideViewport(mouseX, mouseY)) return false;
         if (button == 1 && hoveredSelection != null) {
             contextMenuListener.accept(new NavigationContextRequest(hoveredSelection, (int) mouseX, (int) mouseY));
+            return true;
+        }
+        if (button == 1) {
+            var point = camera.unproject(mouseX, mouseY, viewportX(), viewportY(), viewportWidth(), viewportHeight());
+            var selection = new NavigationSelection(UUID.randomUUID(), SpaceSimulation.OrbitBand.SURFACE,
+                    new NavigationWaypoint(point.x(), point.y()));
+            contextMenuListener.accept(new NavigationContextRequest(selection, (int) mouseX, (int) mouseY));
             return true;
         }
         if (button != 0) return false;
@@ -803,7 +814,12 @@ public final class RocketStarMapWidget extends UIComponent {
      * @param objectId Selected celestial object.
      * @param orbit    Selected surface or orbit band.
      */
-    public record NavigationSelection(UUID objectId, SpaceSimulation.OrbitBand orbit) {
+    public record NavigationSelection(UUID objectId, SpaceSimulation.OrbitBand orbit, NavigationWaypoint waypoint) {
+
+        public NavigationSelection(UUID objectId, SpaceSimulation.OrbitBand orbit) {
+
+            this(objectId, orbit, null);
+        }
 
     }
 

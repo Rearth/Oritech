@@ -87,6 +87,7 @@ public final class RocketFlightPathCalculator {
 
         var objectsById = new HashMap<UUID, SpaceSimulation.SpaceObjectData>();
         objects.forEach(object -> objectsById.put(object.id(), object));
+        NavigationWaypoint.targets(plan).forEach(object -> objectsById.put(object.id(), object));
         stations.stream().filter(target -> !target.id().equals(rocket.getRocketId()))
                 .forEach(target -> objectsById.put(target.id(), target.point()));
         var earth = objectsById.get(SpaceObjects.EARTH_ID);

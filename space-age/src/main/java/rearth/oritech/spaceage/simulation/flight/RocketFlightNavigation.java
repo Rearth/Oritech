@@ -254,7 +254,7 @@ final class RocketFlightNavigation {
         craft.currentTarget = target.id();
         craft.currentOrbit = action.orbit();
         if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE && target.type() != SpaceObjects.ObjectType.SURVEY_REGION
-                && target.type() != SpaceObjects.ObjectType.CRAFT) {
+                && target.type() != SpaceObjects.ObjectType.CRAFT && target.type() != SpaceObjects.ObjectType.WAYPOINT) {
             if (target.id().equals(SpaceObjects.EARTH_ID)) craft.lastEarthSurfaceAction = action;
             var relativeSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
             var prediction = AsteroidImpactRules.predictArrival(craft.rocketMass(), target, relativeSpeed,

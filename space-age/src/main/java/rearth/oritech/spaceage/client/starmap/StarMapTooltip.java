@@ -75,7 +75,8 @@ final class StarMapTooltip {
         if (selection != null && selection.orbit() != SpaceSimulation.OrbitBand.SURFACE) {
             lines.add(Component.translatable("screen.oritech_space_age.orbit_selection", RocketStarMapWidget.orbitName(selection.orbit())));
         }
-        if (selection != null && object.type() != SpaceObjects.ObjectType.ASTEROID && object.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
+        if (selection != null && object.type() != SpaceObjects.ObjectType.ASTEROID && object.type() != SpaceObjects.ObjectType.SURVEY_REGION
+                && object.type() != SpaceObjects.ObjectType.WAYPOINT) {
             var gravity = gravityAtOrbit(object, selection.orbit());
             var percentage = object.surfaceGravity() <= 0 ? 0 : gravity / object.surfaceGravity() * 100;
             lines.add(Component.translatable("screen.oritech_space_age.orbit_gravity", String.format(Locale.ROOT, "%.2f", gravity),

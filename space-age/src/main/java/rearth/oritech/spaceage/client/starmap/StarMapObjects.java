@@ -46,6 +46,7 @@ final class StarMapObjects {
     private final Map<UUID, StarMapTooltip.ArrivalPosition> displayedPositions = new HashMap<>();
     private Set<UUID> fleetMarkers = Set.of();
     private final ItemStack craftIcon = new ItemStack(Items.FIREWORK_ROCKET);
+    private final ItemStack waypointIcon = new ItemStack(Items.ENDER_EYE);
 
     void setFleetMarkers(Set<UUID> craftIds) {
 
@@ -85,7 +86,7 @@ final class StarMapObjects {
             case MARS -> SpaceAgeBlocks.MARS.get().defaultBlockState();
             case SURVEY_REGION -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
             case ASTEROID -> asteroidBlock(object);
-            case CRAFT -> SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState();
+            case CRAFT, WAYPOINT -> SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState();
         };
     }
 
@@ -226,7 +227,7 @@ final class StarMapObjects {
                 case MARS -> 0x66975D4C;
                 case ASTEROID -> 0x666F675E;
                 case SURVEY_REGION -> 0x407F858D;
-                case CRAFT -> 0x6693D7C8;
+                case CRAFT, WAYPOINT -> 0x6693D7C8;
             };
             var radiusX = object.data.radius() * camera.zoom();
             var radiusY = radiusX * StarMapCamera.PLANE_TILT;
@@ -328,7 +329,7 @@ final class StarMapObjects {
         for (var object : objects) {
             if (hiddenIcons.contains(object.data.id()) || object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) continue;
             var position = project(camera, viewport, x(object), y(object));
-            if (object.data.type() == SpaceObjects.ObjectType.CRAFT) {
+            if (object.data.type() == SpaceObjects.ObjectType.CRAFT || object.data.type() == SpaceObjects.ObjectType.WAYPOINT) {
                 if (!fleetMarkers.contains(object.data.id()) && intersects(viewport, position.x(), position.y(), 8, 8))
                     visible.add(object.data.id());
                 continue;
@@ -362,11 +363,12 @@ final class StarMapObjects {
         Entry hovered = null;
         for (var object : objects) {
             var position = project(camera, viewport, x(object), y(object));
-            if (object.data.type() == SpaceObjects.ObjectType.CRAFT) {
+            if (object.data.type() == SpaceObjects.ObjectType.CRAFT || object.data.type() == SpaceObjects.ObjectType.WAYPOINT) {
                 // Fleet markers already draw these craft; standalone docking targets use the same icon.
                 if (!intersects(viewport, position.x(), position.y(), 8, 8)) continue;
                 if (visibleIcons.contains(object.data.id())) {
-                    graphics.item(craftIcon, (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
+                    graphics.item(object.data.type() == SpaceObjects.ObjectType.WAYPOINT ? waypointIcon : craftIcon,
+                            (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
                     if (camera.zoom() >= CRAFT_NAME_ZOOM) graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                             (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
                 }
