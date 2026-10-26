@@ -27,6 +27,8 @@ import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.client.renderers.blocks.MachineRenderer;
+import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlockEntity;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlockEntity.Phase;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlockEntity.Visual;
@@ -41,7 +43,8 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
 
     private static final BlockDisplayContext BLOCK_CONTEXT = BlockDisplayContext.create();
     private static final DataTicket<Frame> FRAME = DataTicket.create("robot_arm_frame", Frame.class);
-    // Resting point above the warp port, where the arm waits and drops carried items.
+    private static final Vector3fc REST = new Vector3f(RobotArmReach.WARP).add(0, 12, 0);
+    // Cargo returns above the port before sinking into it.
     private static final Vector3fc DROP = new Vector3f(8, 47, -5);
     private static final float HALF_TURN = (float) Math.PI;
     // Placing spends the first fifth of the approach picking the block up from the warp port.
@@ -58,6 +61,20 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
     public void addRenderData(RobotArmBlockEntity arm, Void related, R state, float partialTick) {
 
         super.addRenderData(arm, related, state, partialTick);
+        state.addGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, arm.getCurrentColor());
+        // Render states are reused. A packaged/idle arm must not retain the previous IK frame.
+        state.addGeckolibData(FRAME, null);
+        if (!arm.isAssembled(arm.getBlockState()) || !arm.visual.active()) {
+            motions.remove(arm);
+            return;
+        }
+        var controller = arm.getAnimatableInstanceCache().getManagerForId(getInstanceId(arm, related)).getAnimationControllers().get("machine");
+        // Authored deployment must finish before procedural motion takes over the joints.
+        var animation = controller.getCurrentRawAnimation();
+        if (RobotArmBlockEntity.PACKAGED.equals(animation) || RobotArmBlockEntity.SETUP.equals(animation)) {
+            motions.remove(arm);
+            return;
+        }
         var visual = arm.visual;
         var motion = motions.computeIfAbsent(arm, ignored -> new Motion());
         var seconds = motion.advance(visual, arm.getLevel().getGameTime() + partialTick);
@@ -96,7 +113,7 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         var target = modelPosition(arm, visual.target(), yaw);
         return switch (visual.phase()) {
             case APPROACH -> {
-                if (placing && progress < PICKUP) yield new Vector3f(DROP).lerp(RobotArmReach.WARP, RobotArmIk.ease(progress / PICKUP));
+                if (placing && progress < PICKUP) yield new Vector3f(REST).lerp(RobotArmReach.WARP, RobotArmIk.ease(progress / PICKUP));
                 if (placing) yield RobotArmIk.travel(RobotArmReach.WARP, target, (progress - PICKUP) / (1 - PICKUP));
                 yield RobotArmIk.travel(start(arm, visual, yaw), target, progress);
             }
@@ -136,7 +153,7 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
 
     private static Vector3f start(RobotArmBlockEntity arm, Visual visual, float yaw) {
 
-        return visual.start().equals(arm.getBlockPos()) ? new Vector3f(DROP) : modelPosition(arm, visual.start(), yaw);
+        return visual.start().equals(arm.getBlockPos()) ? new Vector3f(REST) : modelPosition(arm, visual.start(), yaw);
     }
 
     private static Vector3f modelPosition(RobotArmBlockEntity arm, BlockPos pos, float yaw) {
@@ -144,6 +161,16 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         var origin = arm.getBlockPos();
         var delta = pos.getCenter().subtract(origin.getX() + .5, origin.getY(), origin.getZ() + .5);
         return new Vector3f((float) delta.x * 16, (float) delta.y * 16, (float) delta.z * 16).rotateY(-yaw);
+    }
+
+    @Override
+    public void applyAnimationControllers(RenderPassInfo<R> pass, BoneSnapshots bones) {
+
+        // Authored clips start from the original model, including bones they don't keyframe.
+        for (var name : pass.model().boneLookup().get().keySet()) {
+            bones.ifPresent(name, bone -> bone.setScale(1, 1, 1).setRotation(0, 0, 0).setTranslation(0, 0, 0));
+        }
+        super.applyAnimationControllers(pass, bones);
     }
 
     @Override
@@ -217,7 +244,11 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         public Identifier getModelResource(GeoRenderState state) { return OritechSpaceAge.id("robot_arm"); }
 
         @Override
-        public Identifier getTextureResource(GeoRenderState state) { return OritechSpaceAge.id("textures/models/robot_arm.png"); }
+        public Identifier getTextureResource(GeoRenderState state) {
+
+            var color = state.getOrDefaultGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, ColorableMachine.ColorVariant.ORANGE);
+            return ColorableMachine.getTextureForColor(OritechSpaceAge.id("textures/models/robot_arm.png"), color);
+        }
 
         @Override
         public Identifier getAnimationResource(RobotArmBlockEntity arm) { return OritechSpaceAge.id("robot_arm"); }
@@ -227,11 +258,11 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
     private static final class Motion {
 
         final RobotArmIk ik = new RobotArmIk();
-        final Vector3f target = new Vector3f(DROP);
+        final Vector3f target = new Vector3f(REST);
         final Quaternionf cargoRotation = new Quaternionf();
         BlockPos actionTarget = BlockPos.ZERO;
         Phase phase = Phase.PREPARE;
-        RobotArmIk.Pose pose;
+        RobotArmIk.Pose pose = ik.solve(target, null);
         double lastTime = -1;
         float elapsed;
         float closure;

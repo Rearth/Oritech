@@ -1,8 +1,7 @@
 package rearth.oritech.spaceage.block.robot_arm;
 
-import com.geckolib.animatable.manager.AnimatableManager;
-import com.geckolib.animation.AnimationController;
-import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.state.AnimationTest;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
@@ -39,6 +38,7 @@ import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.block.entity.addons.HeartOfTheMachineAddonEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.recipes.OritechRecipe;
@@ -623,13 +623,31 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+    public PlayState onAnimationUpdate(AnimationTest<MachineBlockEntity> state) {
 
-        controllers.add(new AnimationController<>("machine", 0, test -> test.setAndContinue(RawAnimation.begin().thenLoop("idle"))));
+        var controller = state.controller();
+        controller.setTransitionTicks(0);
+        state.setControllerSpeed(1);
+        if (!isAssembled(getBlockState())) {
+            controller.stopTriggeredAnimation();
+            return state.setAndContinue(PACKAGED);
+        }
+        if (state.isCurrentAnimation(PACKAGED)) return state.setAndContinue(SETUP);
+        if (state.isCurrentAnimation(SETUP) && !controller.hasAnimationFinished()) return PlayState.CONTINUE;
+        return state.setAndContinue(IDLE);
     }
 
     @Override
-    public void triggerSetupAnimation() {}
+    public void triggerSetupAnimation() {
+
+        // Like the laser, deployment follows the synced assembled state on the client.
+    }
+
+    @Override
+    public boolean isActivelyWorking() { return false; }
+
+    @Override
+    protected float getAnimationSpeed() { return 1; }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {

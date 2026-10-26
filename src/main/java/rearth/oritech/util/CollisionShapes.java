@@ -98,7 +98,7 @@ public class CollisionShapes {
         if (state.getBlock() instanceof HangarDoorBlock && state.getValue(HangarDoorBlock.OPENED)) return null;
 
         var id = BuiltInRegistries.BLOCK.getKey(state.getBlock());
-        var shapes = SHAPES.computeIfAbsent(id, CollisionShapes::load);
+        var shapes = SHAPES.computeIfAbsent(id, key -> load(key, state.getBlock().getClass()));
         if (shapes.isEmpty()) return null;
 
         // These models are authored upright and use custom renderer transforms, not horizontal facing.
@@ -157,11 +157,12 @@ public class CollisionShapes {
         }
     }
 
-    private static Map<Direction, Map<BlockPos, VoxelShape>> load(Identifier id) {
+    private static Map<Direction, Map<BlockPos, VoxelShape>> load(Identifier id, Class<?> resourceOwner) {
         var path = "/assets/" + id.getNamespace() + "/collision/block/models/" + id.getPath() + ".collision.json";
 
         // A client resource manager cannot supply server collision. Read the bundled asset on both sides.
-        try (var stream = CollisionShapes.class.getResourceAsStream(path)) {
+        // Addon assets belong to their own module, so resolve through the block's class.
+        try (var stream = resourceOwner.getResourceAsStream(path)) {
             if (stream == null) return Map.of();
 
             var file = GSON.fromJson(new InputStreamReader(stream, StandardCharsets.UTF_8), CollisionFile.class);

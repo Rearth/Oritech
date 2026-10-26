@@ -244,6 +244,7 @@ public final class OritechClient {
     }
 
     private void onBlockOutlinesRendered(ExtractBlockOutlineRenderStateEvent event) {
+        MachineOutlineRenderer.onExtractBlockOutline(event);
         BlockOutlineRenderer.onOutlineExtract(event);
     }
 }

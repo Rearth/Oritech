@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "oritech_space_age:block/robot_arm"
+    "type": "minecraft:special",
+    "base": "oritech_space_age:item/robot_arm",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
   }
 }

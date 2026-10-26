@@ -25,6 +25,8 @@ import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import rearth.oritech.api.networking.NetworkManager;
@@ -38,6 +40,7 @@ import rearth.oritech.spaceage.block.robot_arm.RobotProgram.Match;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
+import rearth.oritech.util.CollisionShapes;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +58,15 @@ public final class RobotGameTests {
         var state = SpaceAgeBlocks.ROBOT_ARM.get().defaultBlockState().setValue(MultiblockMachine.ASSEMBLED, true);
         level.setBlock(pos, state, 3);
         var arm = (RobotArmBlockEntity) level.getBlockEntity(pos);
+        var outline = CollisionShapes.getOutlineShape(state);
+        test.assertTrue(outline != null && outline.bounds().maxX > 1, "Addon collision asset supplies the full machine outline");
+        var shape = state.getShape(level, pos);
+        test.assertTrue(!shape.isEmpty() && Shapes.joinIsNotEmpty(shape, Shapes.block(), BooleanOp.NOT_SAME),
+                "Controller targeting uses its authored collision section");
+        test.assertTrue(!Shapes.joinIsNotEmpty(shape, state.getCollisionShape(level, pos), BooleanOp.NOT_SAME),
+                "Targeting and physical collision use the same authored shape");
+        test.assertTrue(CollisionShapes.getOutlineShape(state.setValue(MultiblockMachine.ASSEMBLED, false)) == null,
+                "Packaged blocks retain their single-block outline");
         var range = RobotArmBlockEntity.RANGE;
         test.assertTrue(arm.inRange(pos.above().east(range)), "Work area reaches its calculated horizontal radius");
         test.assertTrue(arm.inRange(pos.above().below(range)), "Work area is centred one block above the controller");
