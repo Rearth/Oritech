@@ -59,7 +59,7 @@ final class CurveTransfer {
                                    RocketBurnProfile profile, double efficiency, double gravity, double brakingCredit) {
 
         var candidate = candidate(peak, initial, arrival, freeArrival, profile, efficiency, gravity, brakingCredit);
-        if (candidate == null || candidate.distance > distance + 1e-6) return Attempt.LONG;
+        if (candidate == null || candidate.firstDistance > distance + 1e-6) return Attempt.LONG;
         if (peak <= 1e-9) return Attempt.SLOW;
         var direction = peak < initial ? -1 : 1;
         var remaining = Math.max(0, distance - candidate.firstDistance);
@@ -75,14 +75,16 @@ final class CurveTransfer {
         var elapsed = candidate.first.seconds * (direction < 0 ? candidate.brakingFuelFactor : 1);
         var low = 0d;
         var high = remaining;
-        var last = candidate.last;
-        var covered = candidate.distance - candidate.firstDistance;
+        Burn last = null;
+        var covered = 0d;
         for (int iteration = 0; iteration < 80; iteration++) {
             var middle = (low + high) * .5;
             var speed = coastSpeed(peak, gravity, middle);
             var braking = burn(profile, elapsed, Math.max(0, speed - arrival), efficiency, -gravity, candidate.brakingFuelFactor);
             if (braking == null) {
-                high = middle;
+                // Uphill, a longer coast sheds speed and reduces the final burn's fuel demand.
+                if (gravity < 0) low = middle;
+                else high = middle;
                 continue;
             }
             var total = middle + speed * braking.seconds - braking.distance;
@@ -92,7 +94,7 @@ final class CurveTransfer {
                 covered = total;
             } else high = middle;
         }
-        if (remaining - covered > 1e-4) return Attempt.LONG;
+        if (last == null || remaining - covered > 1e-4) return Attempt.LONG;
         return new Attempt(Fit.FITS, new Plan(candidate.first.seconds, coastSeconds(peak, coastSpeed(peak, gravity, low), low),
                 last.seconds, candidate.brakingFuelFactor, direction));
     }
@@ -118,12 +120,8 @@ final class CurveTransfer {
         var first = burn(profile, 0, Math.abs(peak - initial), efficiency,
                 peak < initial ? -gravity : gravity, firstFactor);
         if (first == null) return null;
-        var last = freeArrival ? new Burn(0, 0, 0)
-                : burn(profile, first.seconds * firstFactor, Math.max(0, peak - arrival), efficiency, -gravity, brakingFuelFactor);
-        if (last == null) return null;
         var firstDistance = initial * first.seconds + (peak < initial ? -first.distance : first.distance);
-        var distance = firstDistance + peak * last.seconds - last.distance;
-        return new Candidate(first, last, firstDistance, distance, brakingFuelFactor);
+        return new Candidate(first, firstDistance, brakingFuelFactor);
     }
 
     static double brakingDistance(double initial, double arrival, RocketBurnProfile profile,
@@ -178,7 +176,7 @@ final class CurveTransfer {
 
     }
 
-    private record Candidate(Burn first, Burn last, double firstDistance, double distance, double brakingFuelFactor) {
+    private record Candidate(Burn first, double firstDistance, double brakingFuelFactor) {
 
     }
 

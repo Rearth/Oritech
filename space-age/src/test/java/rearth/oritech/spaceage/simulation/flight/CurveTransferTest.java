@@ -106,6 +106,19 @@ class CurveTransferTest {
     }
 
     @Test
+    void launchedCraftCoastsUphillBeforeSpendingItsSmallBrakingBudget() {
+
+        var profile = new RocketBurnProfile(List.of(new RocketBurnProfile.Interval(1, 100)));
+        // Gravity sheds nearly all of the launch velocity; the engine only handles the final correction.
+        var plan = check(999_000, 1_000, 0, false, profile, 1_000, -.5, 0);
+        assertEquals(0, plan.firstSeconds());
+        assertTrue(plan.coastSeconds() > 1_900);
+        assertTrue(plan.lastSeconds() > 0 && plan.lastSeconds() < 100);
+        assertNull(CurveTransfer.solve(900_000, 1_000, 0, false, 1_000, profile, 1, -.5),
+                "a shorter climb still needs more braking fuel than available");
+    }
+
+    @Test
     void variedStageProfilesIntegrateToTheRequestedArrival() {
 
         var random = new Random(721);

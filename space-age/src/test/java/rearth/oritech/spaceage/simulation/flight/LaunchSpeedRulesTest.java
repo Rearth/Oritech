@@ -1,13 +1,59 @@
 package rearth.oritech.spaceage.simulation.flight;
 
+import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.SpaceAgeConfig;
+import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ArrivalVelocityMode;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LaunchSpeedRulesTest {
+
+    @Test
+    void laterNavigationCannotChangeTheLaunchWindowOrFirstLeg() {
+
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                SpaceAgeBlocks.NAVIGATION_COMPUTER.get().defaultBlockState())), Map.of(), 1, 0);
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, new DynamicRocketSegment(0, 0, 0, Set.of())));
+        rocket.setLaunchPosition(BlockPos.ZERO);
+        var objects = new SpaceSimulation().createObjectData();
+        var first = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID)
+                .withOrbit(OrbitBand.HIGH).withVelocity(ArrivalVelocityMode.MAXIMUM, 0);
+        var later = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.MARS_ID).withOrbit(OrbitBand.HIGH);
+        var empty = FlightPlan.empty();
+        var single = empty.withBranches(List.of(empty.root().withActions(List.of(first))));
+        var extended = single.withBranches(List.of(single.root().withActions(List.of(first, later))));
+
+        assertTrue(LaunchSpeedRules.valid(single, rocket, objects, 10_000, List.of(), List.of()));
+        assertTrue(LaunchSpeedRules.valid(extended, rocket, objects, 10_000, List.of(), List.of()));
+        assertEquals(LaunchSpeedRules.window(single, rocket, objects, List.of(), List.of()),
+                LaunchSpeedRules.window(extended, rocket, objects, List.of(), List.of()));
+        assertEquals(single, LaunchSpeedRules.firstLeg(extended));
+
+        var position = LaunchSpeedRules.position(objects, BlockPos.ZERO, 10_000);
+        var firstPath = RocketFlightPathCalculator.calculateFrom(rocket, objects, single, position, List.of(), List.of()).paths().getFirst();
+        var fullPath = RocketFlightPathCalculator.calculateFrom(rocket, objects, extended, position, List.of(), List.of()).paths().getFirst();
+        assertEquals(firstPath.actionMoments().getFirst(), fullPath.actionMoments().getFirst());
+        assertTrue(fullPath.terminalState().isFailure(), "The unpowered craft must still fail the later stop at Mars");
+    }
 
     @Test
     void windowFindsBothBoundsWhenTooFastAlsoFails() {

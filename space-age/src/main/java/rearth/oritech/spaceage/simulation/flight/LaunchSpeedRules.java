@@ -73,13 +73,21 @@ public final class LaunchSpeedRules {
     public static boolean valid(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket, List<SpaceSimulation.SpaceObjectData> objects,
                                 long particleSpeed, Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
 
+        var first = plan.root().actions().isEmpty() ? null : plan.root().actions().getFirst();
+        if (first == null || first.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return false;
         var position = position(objects, rocket.getLaunchPosition(), particleSpeed);
-        return !plan.root().actions().isEmpty()
-                && RocketFlightPlanRules.inspect(plan, rocket, objects, true, position, recipes, stations).valid();
+        var predicted = RocketFlightPathCalculator.calculateFrom(rocket, objects, firstLeg(plan), position, recipes, stations);
+        return !predicted.paths().isEmpty() && !predicted.paths().getFirst().terminalState().preventsLaunch();
+    }
+
+    /** Only the initial navigation leg determines which particle speeds can launch the craft. */
+    public static SpaceSimulation.FlightPlan firstLeg(SpaceSimulation.FlightPlan plan) {
+
+        return plan.withBranches(List.of(plan.root().withActions(plan.root().actions().stream().limit(1).toList())));
     }
 
     /**
-     * The lowest sampled range for which the whole plan validates. Narrow ranges between samples may be missed.
+     * The lowest sampled range for which the first leg flies. Narrow ranges between samples may be missed.
      */
     public static Window window(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket, List<SpaceSimulation.SpaceObjectData> objects,
                                 Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
@@ -120,7 +128,7 @@ public final class LaunchSpeedRules {
     }
 
     /**
-     * @param max Long.MAX_VALUE when the plan still works at the velocity cap
+     * @param max Long.MAX_VALUE when the first leg still works at the velocity cap
      */
     public record Window(long min, long max) {
 

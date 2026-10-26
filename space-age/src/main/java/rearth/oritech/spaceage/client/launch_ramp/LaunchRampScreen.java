@@ -75,7 +75,7 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         var rocket = menu.getRocket();
         var snapshot = menu.getFlightPlannerSnapshot();
         if (rocket == null || snapshot == null || !snapshot.rocketId().equals(rocket.getRocketId())) return;
-        var plan = menu.getDraftFlightPlan() == null ? snapshot.plan() : menu.getDraftFlightPlan();
+        var plan = LaunchSpeedRules.firstLeg(menu.getDraftFlightPlan() == null ? snapshot.plan() : menu.getDraftFlightPlan());
         var changed = !plan.equals(menu.speedWindowPlan) || menu.speedWindowPreviewRevision != menu.getPreviewRevision();
         if (changed) {
             menu.speedWindowKnown = false;

@@ -119,7 +119,7 @@ class TrajectoryRoutingTest {
         assertNotNull(route);
         assertNull(craft.navigationFailure);
         assertTrue(route.duration() < SpaceBalance.MAX_TRANSFER_SECONDS);
-        assertTrue(route.gravity() < 0, "Earth departure gravity still applies, without a Sun braking penalty");
+        assertEquals(0, route.gravity(), 1e-12, "Both endpoints are outside the celestial gravity fields");
     }
 
     @Test
@@ -137,8 +137,9 @@ class TrajectoryRoutingTest {
         assertTrue(RocketTransferRoute.gravityAlong(context, inside, inside.length(), 0) > 0);
         var bodyEarth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
                 0, 0, 60_000, 9.81f, SpaceObjects.DetectionState.PRECISE);
-        assertTrue(RocketTransferRoute.gravityForLeg(context(bodyEarth), outside, 0) > 0,
-                "The Sun-only cutoff must not remove other bodies' gravity");
+        var earthApproach = FlightCurve.between(-120_000, 0, -60_000, 0, 1, 0, 1, 0, 20_000);
+        assertTrue(RocketTransferRoute.gravityForLeg(context(bodyEarth), earthApproach, 0) > 0,
+                "Earth gravity still applies inside its outer orbit");
         var craft = craft(-1_000_000, 0);
         craft.segments.put(new SegmentRef(BlockPos.ZERO), new RocketFlightPathState.Segment(
                 1_000_000, 1000, 0, 100_000, 0, new RocketHardware(1, 0, 0, 0)));
@@ -201,8 +202,8 @@ class TrajectoryRoutingTest {
         var mars = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
                 5_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
         for (var ionSeconds : new double[]{25, 1000, 10_000}) {
-            // Leaving Earth needs ~700 m/s here, so lower caps can't coast out of its gravity.
-            for (var speedCap : new int[]{0, 1200, 2000}) {
+            // Departure and arrival at outer orbits have no gravitational work to overcome.
+            for (var speedCap : new int[]{0, 500, 1200, 2000}) {
                 for (var antennas : new int[]{1, 4}) {
                     var craft = craft(-3_120_000, 0);
                     craft.velocityX = 500;
@@ -220,7 +221,7 @@ class TrajectoryRoutingTest {
                 }
             }
         }
-        var craft = craft(-3_120_000, 0);
+        var craft = craft(-3_070_000, 0);
         craft.velocityX = 500;
         assertFalse(RocketFlightNavigation.navigate(action(mars.id(), 804).withOrbit(OrbitBand.HIGH).withMaxSpeed(500),
                 craft, context(earth, mars)));
@@ -476,7 +477,7 @@ class TrajectoryRoutingTest {
         var action = action(earth.id(), 30).withOrbit(OrbitBand.LOW);
         var route = RocketTransferRoute.solve(craft, context, action, earth, 160_000, 0);
         assertNotNull(route);
-        assertEquals(-3.67875, route.gravity(), .001);
+        assertEquals(-2.943, route.gravity(), .001);
         assertTrue(route.burns().getFirst().seconds() > route.burns().getLast().seconds() * 1.5,
                 "gravity must lengthen outward acceleration and assist final braking");
 

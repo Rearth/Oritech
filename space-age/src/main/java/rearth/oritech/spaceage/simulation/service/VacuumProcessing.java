@@ -4,7 +4,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceGravity;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketTransferRoute;
 
@@ -54,8 +54,8 @@ public final class VacuumProcessing {
 
     private static double exclusionRadius(SpaceSimulation.SpaceObjectData object) {
 
-        // Low orbit sits exactly on this boundary; rounding a projected position must not disable crafting.
-        return object.radius() + (object.id().equals(SpaceObjects.EARTH_ID) ? 10_000 : 1_000) - .01;
+        // Outer orbits sit on this boundary; rounding a projected position must not disable crafting.
+        return SpaceGravity.range(object) - .01;
     }
 
     public record Match(Identifier id, VacuumRecipe recipe, String issue) {

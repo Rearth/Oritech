@@ -685,10 +685,8 @@ public final class RocketStarMapWidget extends UIComponent {
             return true;
         }
         if (!isInsideViewport(mouseX, mouseY)) return false;
-        if (button == 1 && hoveredObject != null) {
-            contextMenuListener.accept(new NavigationContextRequest(
-                    new NavigationSelection(hoveredObject.data().id(), SpaceSimulation.OrbitBand.SURFACE),
-                    (int) mouseX, (int) mouseY));
+        if (button == 1 && hoveredSelection != null) {
+            contextMenuListener.accept(new NavigationContextRequest(hoveredSelection, (int) mouseX, (int) mouseY));
             return true;
         }
         if (button != 0) return false;

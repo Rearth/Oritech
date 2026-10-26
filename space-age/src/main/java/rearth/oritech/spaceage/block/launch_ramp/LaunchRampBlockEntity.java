@@ -28,7 +28,6 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.flight.LaunchSpeedRules;
-import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
@@ -39,7 +38,6 @@ import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -180,14 +178,9 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
     private boolean firstLegFlies(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, SpaceSimulation system, UUID launcher,
                                   long particleSpeed, ServerLevel level) {
 
-        var first = plan.root().actions().isEmpty() ? null : plan.root().actions().getFirst();
-        if (first == null || first.type() != SpaceSimulation.ActionType.NAVIGATE_TO) return false;
         var objects = system.createObjectData();
         var stations = RocketDocking.targets(MissionSavedData.get(level.getServer()), launcher);
-        var firstPlan = plan.withBranches(List.of(plan.root().withActions(List.of(first))));
-        var predicted = RocketFlightPathCalculator.calculateFrom(rocket, objects, firstPlan, LaunchSpeedRules.position(objects, launchPosition(), particleSpeed),
-                VacuumRecipe.all(level.getServer()), stations);
-        return !predicted.paths().isEmpty() && !predicted.paths().getFirst().terminalState().preventsLaunch();
+        return LaunchSpeedRules.valid(plan, rocket, objects, particleSpeed, VacuumRecipe.all(level.getServer()), stations);
     }
 
     /**

@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.client.starmap;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import rearth.oritech.spaceage.simulation.SpaceGravity;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
@@ -123,8 +124,7 @@ final class StarMapTooltip {
 
         var distance = object.radius() + orbit.altitude();
         if (distance <= 0) return 0;
-        var relativeDistance = object.radius() / distance;
-        return object.surfaceGravity() * relativeDistance * relativeDistance;
+        return SpaceGravity.acceleration(object, distance);
     }
 
     private static Component pathPhaseName(RocketFlightPathCalculator.PathPhase phase) {

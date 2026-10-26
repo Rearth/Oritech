@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceGravity;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.NavigationFailure;
@@ -203,7 +204,7 @@ public final class RocketTransferRoute {
             if (body.radius() <= 0 || body.surfaceGravity() <= 0) continue;
             var from = Math.max(body.radius(), Math.hypot(start.x() - body.xAt(time), start.y() - body.yAt(time)));
             var to = Math.max(body.radius(), Math.hypot(end.x() - body.xAt(time), end.y() - body.yAt(time)));
-            work += gravityPotential(body, to) - gravityPotential(body, from);
+            work += SpaceGravity.potential(body, to) - SpaceGravity.potential(body, from);
         }
         return work / curve.length();
     }
@@ -212,15 +213,6 @@ public final class RocketTransferRoute {
     private static double climbSpeed(double length, double arrival, double gravity) {
 
         return Math.sqrt(arrival * arrival - 2 * gravity * length);
-    }
-
-    private static double gravityPotential(SpaceSimulation.SpaceObjectData body, double distance) {
-
-        var inverseDistance = 1 / distance;
-        // The collector ring is a zero-Sun-gravity destination. Preserve gravity only inside it.
-        if (body.type() == SpaceObjects.ObjectType.SUN)
-            inverseDistance = Math.max(0, inverseDistance - 1 / (body.radius() + SpaceSimulation.OrbitBand.SOLAR.altitude()));
-        return body.surfaceGravity() * body.radius() * body.radius() * inverseDistance;
     }
 
     /**
@@ -238,11 +230,7 @@ public final class RocketTransferRoute {
             var dy = bodyY - position.y();
             var actualDistance = Math.hypot(dx, dy);
             if (actualDistance < 1e-6) continue;
-            if (body.type() == SpaceObjects.ObjectType.SUN
-                    && actualDistance >= body.radius() + SpaceSimulation.OrbitBand.SOLAR.altitude() - 1e-6) continue;
-            var boundedDistance = Math.max(body.radius(), actualDistance);
-            var acceleration = body.surfaceGravity() * body.radius() * body.radius()
-                    / (boundedDistance * boundedDistance);
+            var acceleration = SpaceGravity.acceleration(body, actualDistance);
             gravity += acceleration * (dx * position.vx() + dy * position.vy()) / actualDistance;
         }
         return gravity;

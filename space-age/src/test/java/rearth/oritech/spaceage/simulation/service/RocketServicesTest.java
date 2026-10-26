@@ -102,7 +102,8 @@ class RocketServicesTest {
         }
         var structure = new StaticRocketSegment(id, blocks, Map.of(), 20, 1, r.availableRF, r.availableFuelBurnTimeTicks);
         var rocket = new ActiveRocketData(Map.of(id, structure), Map.of(id, r));
-        return new MissionState(OWNER, rocket, FlightPlan.empty(), new MissionState.Position(-3090000, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.HIGH, -1, 1,
+        var outerX = SpaceObjects.EARTH_X - SpaceObjects.EARTH_RADIUS - OrbitBand.HIGH.altitude();
+        return new MissionState(OWNER, rocket, FlightPlan.empty(), new MissionState.Position(outerX, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.HIGH, -1, 1,
                 FlightPlanAction.NO_TARGET, SegmentRef.of(structure)), new SurveyKnowledge(), BlockPos.ZERO);
     }
 
@@ -165,33 +166,33 @@ class RocketServicesTest {
     }
 
     @Test
-    void lowOrbitAllowsCraftingAtEveryArrivalAngleDespiteCoordinateRounding() {
+    void outerOrbitAllowsCraftingAtEveryArrivalAngleDespiteCoordinateRounding() {
 
         var objects = new SpaceSimulation().createObjectData();
         var earth = objects.stream().filter(object -> object.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
-        var radius = earth.radius() + OrbitBand.LOW.altitude();
+        var radius = earth.radius() + OrbitBand.HIGH.altitude();
         for (var degree = 0; degree < 360; degree += 5) {
             var angle = Math.toRadians(degree);
             var x = earth.x() + Math.cos(angle) * radius;
             var y = earth.y() + Math.sin(angle) * radius;
-            assertTrue(VacuumProcessing.zeroG(x, y, objects), "Low-orbit angle " + degree);
+            assertTrue(VacuumProcessing.zeroG(x, y, objects), "Outer-orbit angle " + degree);
             assertTrue(VacuumProcessing.zeroGForDuration(x, y, 0, 0, 1200, objects));
             assertFalse(VacuumProcessing.zeroG(earth.x() + Math.cos(angle) * (radius - 1), earth.y() + Math.sin(angle) * (radius - 1), objects));
         }
     }
 
     @Test
-    void lowOrbitProcessingSucceedsAndInsufficientPowerReportsTheSpecificCause() {
+    void outerOrbitProcessingSucceedsAndInsufficientPowerReportsTheSpecificCause() {
 
         var state = mission(1, 0);
         var system = new SpaceSimulation();
         var objects = system.createObjectData();
         var earth = objects.stream().filter(object -> object.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
         var angle = Math.toRadians(65);
-        var radius = earth.radius() + OrbitBand.LOW.altitude();
+        var radius = earth.radius() + OrbitBand.HIGH.altitude();
         var p = state.position;
         state.position = new MissionState.Position(earth.x() + Math.cos(angle) * radius, earth.y() + Math.sin(angle) * radius,
-                0, 0, p.target(), OrbitBand.LOW, -1, p.stage(), p.asteroid(), p.anchor());
+                0, 0, p.target(), OrbitBand.HIGH, -1, p.stage(), p.asteroid(), p.anchor());
         load(state.rocket, RocketLayout.pair(state.rocket, RocketProcessingService.modules(state.rocket).getFirst()));
         craft(state, state);
         var forecast = RocketFlightPathCalculator.calculateFrom(state.rocket, objects, state.plan, state.position, List.of(recipe("a")));
