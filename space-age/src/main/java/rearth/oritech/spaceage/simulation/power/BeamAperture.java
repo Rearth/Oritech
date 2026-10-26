@@ -109,36 +109,25 @@ public final class BeamAperture {
         return collectionFraction(Math.pow(arm * 2 + 1, 2), footprint(distance, senderWidth, surface));
     }
 
-    /** Both craft and surface receivers collect their share of a uniform circular beam. */
+    /** Both craft and surface receivers collect their share of a uniform square beam; radius is its half-width. */
     public static double collectionFraction(double collectingArea, double radius) {
 
-        var fraction = Math.max(0, collectingArea) / (Math.PI * radius * radius);
+        var fraction = Math.max(0, collectingArea) / footprintArea(radius);
         // Exact coverage must not lose a whole RF to floating-point error at surface insertion.
         return fraction >= 1 - 1e-9 ? 1 : fraction;
     }
 
-    /** Area of one block's square face inside the circular beam, including partial edge cells. */
+    public static double footprintArea(double radius) {
+
+        return 4 * radius * radius;
+    }
+
+    /** Area of one block's face inside the axis-aligned square, including partial edges and corners. */
     public static double cellArea(double x, double z, double radius) {
 
-        if (Math.hypot(Math.abs(x) + .5, Math.abs(z) + .5) <= radius) return 1;
-        if (Math.hypot(Math.max(0, Math.abs(x) - .5), Math.max(0, Math.abs(z) - .5)) >= radius) return 0;
-        return Math.clamp(quadrantArea(x + .5, z + .5, radius) - quadrantArea(x - .5, z + .5, radius)
-                - quadrantArea(x + .5, z - .5, radius) + quadrantArea(x - .5, z - .5, radius), 0, 1);
-    }
-
-    /** Signed area from the circle centre to (x,z), used for rectangle inclusion/exclusion. */
-    private static double quadrantArea(double x, double z, double radius) {
-
-        var width = Math.min(radius, Math.abs(x));
-        var height = Math.min(radius, Math.abs(z));
-        var straight = Math.min(width, Math.sqrt(Math.max(0, radius * radius - height * height)));
-        var area = straight * height + circleIntegral(width, radius) - circleIntegral(straight, radius);
-        return Math.signum(x) * Math.signum(z) * area;
-    }
-
-    private static double circleIntegral(double x, double radius) {
-
-        return .5 * (x * Math.sqrt(Math.max(0, radius * radius - x * x)) + radius * radius * Math.asin(x / radius));
+        var width = Math.max(0, Math.min(x + .5, radius) - Math.max(x - .5, -radius));
+        var depth = Math.max(0, Math.min(z + .5, radius) - Math.max(z - .5, -radius));
+        return width * depth;
     }
 
     public static double footprint(double distance, double width, boolean surface) {

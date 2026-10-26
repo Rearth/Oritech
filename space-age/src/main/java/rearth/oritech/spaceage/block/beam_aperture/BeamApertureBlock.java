@@ -23,14 +23,15 @@ public class BeamApertureBlock extends Block implements EntityBlock {
 
     public BeamApertureBlock(Properties properties) {
 
-        super(properties);
-        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.FACING, Direction.UP));
+        super(properties.lightLevel(state -> state.getValue(BlockStateProperties.POWERED) ? 15 : 0));
+        registerDefaultState(stateDefinition.any().setValue(BlockStateProperties.FACING, Direction.UP)
+                .setValue(BlockStateProperties.POWERED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
 
-        builder.add(BlockStateProperties.FACING);
+        builder.add(BlockStateProperties.FACING, BlockStateProperties.POWERED);
     }
 
     @Override

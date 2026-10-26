@@ -1,11 +1,11 @@
-// 26.1.2	2026-10-25T21:49:54.6265401	Model Definitions - oritech_space_age
+// 26.1.2	2026-10-26T22:03:17.8368969	Model Definitions - oritech_space_age
 30027ccd40761e66318b62065bc443676335fe92 assets/oritech_space_age/blockstates/antenna.json
 84513150db63c4eeed32a416e1b18828a8cb84de assets/oritech_space_age/blockstates/asteroid_1.json
 0f11287d0cd41a8d8fad37660581672bab69775e assets/oritech_space_age/blockstates/asteroid_2.json
 c392e7247b68d9ba472e0e04cea44e8ae44d9221 assets/oritech_space_age/blockstates/asteroid_3.json
 7fcd2d9be0fe6567c7f5ecd0c308545bd509fd3d assets/oritech_space_age/blockstates/asteroid_anchor.json
 29db540ea059e1426e36dbaf8d754e43497d368f assets/oritech_space_age/blockstates/basic_booster_rocket.json
-699d0d97db9aa29c895cb89df09c0f2ecdce7674 assets/oritech_space_age/blockstates/beam_aperture.json
+b158f2b158f5d314489ad327cbae7c80f846ee92 assets/oritech_space_age/blockstates/beam_aperture.json
 ef77b491672e723af200f4b16e94ba358880155b assets/oritech_space_age/blockstates/cargo.json
 998c9e922c68ac9d2b830fec4e937b3cf77f7632 assets/oritech_space_age/blockstates/crystal_glass.json
 18d55790d1b56ee9d5bdda2eb915045d830b4ae0 assets/oritech_space_age/blockstates/cube_sat.json

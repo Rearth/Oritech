@@ -64,12 +64,13 @@ public final class SurfaceBeamData extends SavedData {
     public BeamReception deliver(ServerLevel level, int x, int z, double radius, double incident) {
 
         if (!loaded(level, x, z, radius)) return BeamReception.EMPTY;
-        var footprint = Math.PI * radius * radius;
+        var footprint = BeamAperture.footprintArea(radius);
         if (incident > 0 && level.getGameTime() % 20 == 0) {
             for (int part = 0; part < 16; part++) {
-                var angle = part * Math.PI * 2 / 16;
-                var px = (int) Math.floor(x + Math.cos(angle) * radius);
-                var pz = (int) Math.floor(z + Math.sin(angle) * radius);
+                var along = (part % 4 + .5) / 4 * 2 - 1;
+                var side = part / 4;
+                var px = (int) Math.floor(x + .5 + radius * (side == 0 ? -1 : side == 2 ? 1 : along));
+                var pz = (int) Math.floor(z + .5 + radius * (side == 1 ? -1 : side == 3 ? 1 : along));
                 var surface = level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, new BlockPos(px, 0, pz));
                 level.sendParticles(ParticleTypes.ELECTRIC_SPARK, px + .5, surface.getY() + .2, pz + .5, 1, 0, 0, 0, 0);
             }

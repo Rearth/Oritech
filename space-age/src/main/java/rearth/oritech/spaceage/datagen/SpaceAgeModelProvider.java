@@ -95,7 +95,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.PARACHUTE.get(), blockModels);
         createPairBlock(SpaceAgeBlocks.VACUUM_CRAFTER.get(), blockModels);
         createPairBlock(SpaceAgeBlocks.CARGO.get(), blockModels);
-        createPairBlock(SpaceAgeBlocks.BEAM_APERTURE.get(), blockModels);
+        var aperture = SpaceAgeBlocks.BEAM_APERTURE.get();
+        var apertureModel = ModelLocationUtils.getModelLocation(aperture);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(aperture, BlockModelGenerators.variant(new Variant(apertureModel)))
+                .with(BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING));
+        blockModels.registerSimpleItemModel(aperture, apertureModel);
         createCustomModelBlock(SpaceAgeBlocks.CRYSTAL_GLASS.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.CUBE_SAT.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.LAUNCH_RAMP.get(), blockModels);

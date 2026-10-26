@@ -382,7 +382,11 @@ class SpacePowerTest {
         assertEquals(1, BeamAperture.cellArea(2, 0, 4), 1e-12, "The plating cross collects");
         assertEquals(1, BeamAperture.cellArea(2, 2, 4), 1e-12, "Glass collects the same geometric area");
         assertEquals(0, BeamAperture.cellArea(5, 0, 4), 1e-12);
-        assertEquals(Math.PI / 4, BeamAperture.cellArea(0, 0, .5), 1e-12);
+        assertEquals(1, BeamAperture.cellArea(0, 0, .5), 1e-12);
+        assertEquals(1, BeamAperture.cellArea(3, 3, 4), 1e-12, "Square corners collect even outside the old circle");
+        assertEquals(.5, BeamAperture.cellArea(4, 0, 4), 1e-12);
+        assertEquals(.25, BeamAperture.cellArea(4, 4, 4), 1e-12, "Corner overlap is partial on both axes");
+        assertEquals(0, BeamAperture.cellArea(4.5, 4, 4), 1e-12);
         for (var radius : new double[]{1, 1.25, 2, 4, 4.25}) {
             var area = 0d;
             for (int x = -5; x <= 5; x++) {
@@ -393,11 +397,11 @@ class SpacePowerTest {
                     area += cell;
                 }
             }
-            assertEquals(Math.PI * radius * radius, area, 1e-10);
+            assertEquals(4 * radius * radius, area, 1e-10);
             assertEquals(1, BeamAperture.collectionFraction(area, radius), "A contained beam has exact 100% coverage");
         }
         var edge = BeamAperture.cellArea(4, 0, 4);
-        assertTrue(edge > 0 && edge < 1, "Partial blocks at the circular edge must not count as a whole block");
+        assertTrue(edge > 0 && edge < 1, "Partial blocks at the square edge must not count as a whole block");
     }
 
     @Test

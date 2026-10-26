@@ -33,6 +33,7 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
     public final DynamicEnergyStorage energy = new DynamicEnergyStorage(CAPACITY, 0, MAX_OUTPUT, 0, this::setChanged, false);
     private BeamAperture.Array array;
     private long received;
+    private boolean receivingPower;
     private long exported;
     private double receiveRate;
     private double exportRate;
@@ -59,6 +60,11 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
 
     public void tick() {
 
+        var state = getBlockState();
+        if (state.getValue(BlockStateProperties.POWERED) != receivingPower) {
+            level.setBlockAndUpdate(worldPosition, state.setValue(BlockStateProperties.POWERED, receivingPower));
+        }
+        receivingPower = false;
         if (!(level instanceof ServerLevel server) || level.dimension() != Level.OVERWORLD) return;
         if (level.getGameTime() % 20 == 0 || array == null) refresh();
         SurfaceBeamData.get(server).receivers.put(worldPosition, this);
@@ -98,7 +104,10 @@ public class BeamApertureBlockEntity extends BlockEntity implements MenuProvider
         var accepted = (long) Math.min(Math.floor(amount + 1e-6), energy.capacity - energy.energy);
         energy.energy += accepted;
         received += accepted;
-        if (accepted > 0) setChanged();
+        if (accepted > 0) {
+            receivingPower = true;
+            setChanged();
+        }
         return accepted;
     }
 

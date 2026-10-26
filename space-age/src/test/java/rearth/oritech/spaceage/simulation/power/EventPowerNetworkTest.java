@@ -124,7 +124,7 @@ class EventPowerNetworkTest {
         var data = new MissionSavedData();
         var source = station(new ControlledRocket(0, 1000, 211_000_000, 118, 1));
         var target = station(new ControlledRocket(1, 0, 211_000_000, 0, 1));
-        ((ControlledRocket) source.rocket).power = new SpacePowerHardware(118, 1083, 3, Math.PI);
+        ((ControlledRocket) source.rocket).power = new SpacePowerHardware(118, 1083, 3, 4d);
         program(source, target, 0);
         data.craft.put(source.rocket.getRocketId(), source);
         data.craft.put(target.rocket.getRocketId(), target);
@@ -216,11 +216,11 @@ class EventPowerNetworkTest {
         var rocket = (ControlledRocket) source.rocket;
         if (time == .125) segment.spendRF(700);
         else if (time == 1) segment.receiveRF(123.25);
-        else if (time == 2.75) rocket.power = new SpacePowerHardware(0, 123, 3, Math.PI * .1);
+        else if (time == 2.75) rocket.power = new SpacePowerHardware(0, 123, 3, 4d * .1);
         else if (time == 5) {
             var p = source.position;
             source.position = new MissionState.Position(-1_500_000, 0, 0, 0, p.target(), p.orbit(), p.slot(), p.stage(), p.asteroid(), p.anchor());
-        } else if (time == 11.5) rocket.power = new SpacePowerHardware(137.125, 750, 5, Math.PI);
+        } else if (time == 11.5) rocket.power = new SpacePowerHardware(137.125, 750, 5, 4d);
         else if (time == 20) program(source, states.get((seed + 1) % states.size()), 20);
         else if (time == 33) source.plan = FlightPlan.empty();
         else if (time == 50) program(source, states.get((seed + 2) % states.size()), 0);
@@ -337,7 +337,7 @@ class EventPowerNetworkTest {
                     Blocks.GLASS.defaultBlockState())), Map.of(), 1, 0, rf, 0)),
                     Map.of(id, new DynamicRocketSegment(0, rf, 0, Set.of(), Map.of(), 0, capacity)), null);
             segment = id;
-            power = new SpacePowerHardware(generation, 1000 + id.getLeastSignificantBits() * 23, 3, Math.PI * capture);
+            power = new SpacePowerHardware(generation, 1000 + id.getLeastSignificantBits() * 23, 3, 4d * capture);
         }
 
         @Override

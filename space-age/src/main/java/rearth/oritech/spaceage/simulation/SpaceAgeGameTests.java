@@ -174,9 +174,9 @@ public final class SpaceAgeGameTests {
         distantData.craft.put(distantSource.rocket.getRocketId(), distantSource);
         distantData.craft.put(distantReceiver.rocket.getRocketId(), distantReceiver);
         powerTick(test, distantData);
-        var expectedCollection = 40_000 * 9 / (Math.PI * Math.pow(1_000_000d / (100_000 * 3), 2));
+        var expectedCollection = 40_000 * 9 / (4 * Math.pow(1_000_000d / (100_000 * 3), 2));
         test.assertTrue(Math.abs(distantReceiver.powerReport.incoming() - expectedCollection) < 1e-6,
-                "Space receivers collect full aperture area divided by the circular beam footprint");
+                "Space receivers collect full aperture area divided by the square beam footprint");
         test.assertTrue(distantSource.powerReport.overflow() > 0, "Missed space power is accounted as harmless overflow");
         var smallSolarCraft = beamStation(owner, -3_120_000, 50_000_000);
         var original = smallSolarCraft.rocket.getOriginalSegments().values().iterator().next();
@@ -298,7 +298,7 @@ public final class SpaceAgeGameTests {
                 "Multiple beams share a receiver's world-tick intake capacity");
         heat.tick(level);
         test.assertTrue(accepted > 0 && accepted < 100_000, "Receiver intercepts its share of the footprint");
-        test.assertTrue(accepted == (long) (100_000 * 9 / (Math.PI * 16)),
+        test.assertTrue(accepted == (long) (100_000 * 9 / (4d * 16)),
                 "Ground receivers use the same collecting fraction, including the physical controller and plating cross");
         test.assertTrue(heat.temperature(origin) > 0, "Unaccepted surface energy heats the chunk");
         var pulse = beamStation(owner, -3_070_000, 1000);
@@ -315,10 +315,10 @@ public final class SpaceAgeGameTests {
         test.assertTrue(pulse.rocket.getDynamicSegments().values().iterator().next().rf() == 0, "Analytic ground pulse drains its finite battery");
         var beforePulse = receiver.energy.energy;
         pulseData.power.surface(level.getServer());
-        test.assertTrue(receiver.energy.energy - beforePulse == (long) (1000 * 9 / (Math.PI * 16)),
+        test.assertTrue(receiver.energy.energy - beforePulse == (long) (1000 * 9 / (4d * 16)),
                 "A pulse ending between world ticks is delivered exactly once, even when current sending is zero");
         pulseData.power.surface(level.getServer());
-        test.assertTrue(receiver.energy.energy - beforePulse == (long) (1000 * 9 / (Math.PI * 16)), "Physical delivery cannot replay a settled pulse");
+        test.assertTrue(receiver.energy.energy - beforePulse == (long) (1000 * 9 / (4d * 16)), "Physical delivery cannot replay a settled pulse");
         var beforeHeat = heat.temperature(origin);
         var heatSaved = SurfaceBeamData.CODEC.encodeStart(JsonOps.INSTANCE, heat).getOrThrow();
         var restoredHeat = SurfaceBeamData.CODEC.parse(JsonOps.INSTANCE, heatSaved).getOrThrow();
@@ -383,7 +383,7 @@ public final class SpaceAgeGameTests {
         heat.tick(level);
         var reported = heat.deliver(level, origin.getX(), origin.getZ(), 4, 975);
         test.assertTrue(reported.accepted() == 975 && reported.coverage() == 1,
-                "A radius-four beam inside the 11x11 aperture has 100% coverage and accepts all 975 RF");
+                "A square beam with half-width four inside the 11x11 aperture has 100% coverage and accepts all 975 RF");
         test.assertTrue(reported.capacityLoss() == 0 && reported.storageLoss() == 0 && reported.missed() == 0,
                 "A contained beam loses no RF on its controller, plating or partial edge cells");
         surfaceClockRegression(test, owner, receiver, origin);

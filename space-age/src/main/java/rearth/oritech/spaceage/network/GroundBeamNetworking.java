@@ -31,7 +31,7 @@ public final class GroundBeamNetworking {
         var range = server.getPlayerList().getViewDistance() * 16d;
         for (var player : server.getPlayerList().getPlayers()) {
             if (player.level().dimension() != Level.OVERWORLD) continue;
-            var nearby = targets.stream().filter(beam -> Math.hypot(beam.target().getX() + .5 - player.getX(), beam.target().getZ() + .5 - player.getZ()) <= range + beam.radius()).toList();
+            var nearby = targets.stream().filter(beam -> Math.hypot(beam.target().getX() + .5 - player.getX(), beam.target().getZ() + .5 - player.getZ()) <= range + Math.sqrt(2) * beam.radius()).toList();
             PacketDistributor.sendToPlayer(player, new Beams(nearby));
         }
     }
