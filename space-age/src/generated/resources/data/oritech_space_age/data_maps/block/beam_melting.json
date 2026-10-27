@@ -1,0 +1,100 @@
+{
+  "values": {
+    "minecraft:andesite": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:basalt": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:blackstone": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:blue_ice": {
+      "Name": "minecraft:air"
+    },
+    "minecraft:cobbled_deepslate": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:cobblestone": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:deepslate": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:diorite": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:granite": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:ice": {
+      "Name": "minecraft:air"
+    },
+    "minecraft:netherrack": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:obsidian": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:packed_ice": {
+      "Name": "minecraft:air"
+    },
+    "minecraft:red_sand": {
+      "Name": "minecraft:glass"
+    },
+    "minecraft:sand": {
+      "Name": "minecraft:glass"
+    },
+    "minecraft:smooth_basalt": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:snow": {
+      "Name": "minecraft:air"
+    },
+    "minecraft:snow_block": {
+      "Name": "minecraft:air"
+    },
+    "minecraft:stone": {
+      "Name": "minecraft:lava",
+      "Properties": {
+        "level": "0"
+      }
+    },
+    "minecraft:water": {
+      "Name": "minecraft:air"
+    }
+  }
+}

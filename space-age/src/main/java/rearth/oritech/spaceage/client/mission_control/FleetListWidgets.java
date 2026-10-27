@@ -15,7 +15,7 @@ final class FleetListWidgets {
     }
 
     static UIComponent section(int x, int y, int width, Component title, int count, boolean collapsed,
-                               Runnable toggle, Runnable delete) {
+                               Runnable toggle, Runnable actions) {
 
         return new UIComponent(x, y, width, 24) {
 
@@ -33,8 +33,8 @@ final class FleetListWidgets {
                 graphics.text(font, name, x + 19, y + 8, TEXT, false);
                 graphics.fill(countX, y + 5, countX + countWidth, y + 19, 0xFF343C44);
                 graphics.text(font, countText, countX + 5, y + 8, MUTED, false);
-                if (delete != null && hovered)
-                    graphics.text(font, "×", x + width - 14, y + 8,
+                if (actions != null && hovered)
+                    graphics.text(font, "...", x + width - 17, y + 8,
                             mouseX >= x + width - 21 ? 0xFFFFA5A5 : MUTED, false);
             }
 
@@ -42,12 +42,13 @@ final class FleetListWidgets {
             public boolean handleClick(double mouseX, double mouseY, int button) {
 
                 if (button != 0) return false;
-                if (delete != null && mouseX >= x + width - 21) delete.run();
+                if (actions != null && mouseX >= x + width - 21) actions.run();
                 else toggle.run();
                 return true;
             }
         }.withTooltip(title, Component.translatable(collapsed
-                ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"));
+                ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"),
+                Component.translatable("screen.oritech_space_age.fleet.actions_hint"));
     }
 
     static UIComponent row(int x, int y, int width, int height, Runnable toggle, Runnable context) {

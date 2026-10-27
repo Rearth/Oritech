@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.datagen;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.DataMapProvider;
@@ -32,6 +33,16 @@ public final class SpaceAgeDataMapProvider extends DataMapProvider {
         scorching.add(Blocks.DIRT.builtInRegistryHolder(), Blocks.COARSE_DIRT.defaultBlockState(), false);
         scorching.add(Blocks.SAND.builtInRegistryHolder(), Blocks.GLASS.defaultBlockState(), false);
         scorching.add(Blocks.STONE.builtInRegistryHolder(), Blocks.BLACKSTONE.defaultBlockState(), false);
+        var melting = builder(SpaceAgeDataMaps.BEAM_MELTING);
+        for (var block : new Block[]{Blocks.STONE, Blocks.COBBLESTONE, Blocks.BLACKSTONE,
+                Blocks.DEEPSLATE, Blocks.COBBLED_DEEPSLATE, Blocks.GRANITE, Blocks.DIORITE, Blocks.ANDESITE,
+                Blocks.BASALT, Blocks.SMOOTH_BASALT, Blocks.OBSIDIAN, Blocks.NETHERRACK})
+            melting.add(block.builtInRegistryHolder(), Blocks.LAVA.defaultBlockState(), false);
+        for (var block : new Block[]{Blocks.WATER, Blocks.ICE, Blocks.PACKED_ICE,
+                Blocks.BLUE_ICE, Blocks.SNOW, Blocks.SNOW_BLOCK})
+            melting.add(block.builtInRegistryHolder(), Blocks.AIR.defaultBlockState(), false);
+        melting.add(Blocks.SAND.builtInRegistryHolder(), Blocks.GLASS.defaultBlockState(), false);
+        melting.add(Blocks.RED_SAND.builtInRegistryHolder(), Blocks.GLASS.defaultBlockState(), false);
         var explosives = builder(SpaceAgeDataMaps.ROCKET_EXPLOSIVES);
         explosives.add(Blocks.TNT.builtInRegistryHolder(), SpaceBalance.TNT_ENERGY_JOULES, false);
         explosives.add(BlockContent.LOW_YIELD_NUCLEAR_EXPLOSION_DEVICE.getId(), SpaceBalance.TNT_ENERGY_JOULES * 100, false);

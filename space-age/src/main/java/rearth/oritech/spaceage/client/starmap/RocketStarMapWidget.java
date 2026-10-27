@@ -59,6 +59,7 @@ public final class RocketStarMapWidget extends UIComponent {
     private final Map<UUID, SpaceSimulation.FlightPlanAction> actionsById = new HashMap<>();
     // Stable fallback labels shared with the assembler's segment ordering.
     private final Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames = new HashMap<>();
+    private Map<UUID, Map<SpaceSimulation.SegmentRef, String>> branchSegmentNames = Map.of();
     // Tell the planner when the player selects a surface or orbit.
     private final Consumer<NavigationSelection> selectionListener;
     // Ask the planner to open the target's right-click menu.
@@ -74,6 +75,7 @@ public final class RocketStarMapWidget extends UIComponent {
     // Simplified draw geometry is reused while the player is looking at a stationary map.
     private List<StarMapLineRenderer.Line> cachedLines = List.of();
     private List<StarMapLineRenderer.Line> cachedFlightLines = List.of();
+    private List<StarMapBeamRenderer.Link> cachedBeamLinks = List.of();
     private View cachedView;
     // A stationary pointer does not need another search through all trajectory samples every frame.
     private PathHover cachedPathHover;
@@ -346,6 +348,7 @@ public final class RocketStarMapWidget extends UIComponent {
                 isInsideViewport(mouseX, mouseY), visibleIcons);
         graphics.nextStratum();
         StarMapLineRenderer.submit(graphics, cachedFlightLines, viewportX, viewportY, viewportWidth, viewportHeight);
+        StarMapBeamRenderer.submit(graphics, cachedBeamLinks, viewportX, viewportY, viewportWidth, viewportHeight);
         if (isInsideViewport(mouseX, mouseY))
             hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject, visibleIcons);
         if (hoveredPathPoint != null && hoveredObject != null
@@ -383,6 +386,7 @@ public final class RocketStarMapWidget extends UIComponent {
         cachedLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         lines.clear();
         addFlightPaths(lines);
+        cachedBeamLinks = List.of();
         if (showBeams) addBeamLinks(lines, viewport);
         cachedFlightLines = StarMapLineSimplifier.simplify(lines, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         cachedView = view;
@@ -391,20 +395,34 @@ public final class RocketStarMapWidget extends UIComponent {
 
     private void addBeamLinks(List<StarMapLineRenderer.Line> lines, StarMapObjects.Viewport viewport) {
 
+        var links = new ArrayList<StarMapBeamRenderer.Link>();
+        var targets = snapshot.mapObjects().stream().collect(Collectors.toMap(target -> target.id(), target -> target, (first, second) -> first));
         for (var branch : snapshot.plan().branches()) {
             var action = branch.actions().stream().filter(a -> !a.isGenerated()).findFirst().orElse(null);
             if (action == null || action.type() != SpaceSimulation.ActionType.BEAM_POWER) continue;
             var path = pathsByBranch.get(branch.id());
             if (path == null || path.samples().isEmpty()) continue;
             var sample = path.samples().getFirst();
-            var target = snapshot.mapObjects().stream().filter(o -> o.id().equals(action.targetId())).findFirst().orElse(null);
+            var target = targets.get(action.targetId());
             if (target == null) continue;
             var from = camera.project(sample.x(), sample.y(), viewport.x(), viewport.y(), viewport.width(), viewport.height());
             var to = camera.project(target.x(), target.y(), viewport.x(), viewport.y(), viewport.width(), viewport.height());
             var selected = branch.id().equals(selectedBranch);
-            lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), selected ? 0xFF66F5D1 : 0x8866F5D1,
-                    selected ? 2.0f : 1.0f, true));
+            if (!StarMapLineSimplifier.intersects(from.x(), from.y(), to.x(), to.y(),
+                    viewport.x(), viewport.y(), viewport.width(), viewport.height(), 4)) continue;
+            if (selected) lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), 0x2467DEFF, 4, true));
+            lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), selected ? 0xDD67DEFF : 0x7267DEFF,
+                    selected ? 1.6f : 1.0f, true));
+            var link = StarMapBeamRenderer.project(from.x(), from.y(), to.x(), to.y(), branch.id(), selected,
+                    viewport.x(), viewport.y(), viewport.width(), viewport.height());
+            if (link != null) links.add(link);
         }
+        cachedBeamLinks = List.copyOf(links);
+    }
+
+    public void setBranchSegmentNames(Map<UUID, Map<SpaceSimulation.SegmentRef, String>> names) {
+
+        branchSegmentNames = Map.copyOf(names);
     }
 
     public void setCraftLabels(Map<UUID, Component> labels) {
@@ -633,7 +651,7 @@ public final class RocketStarMapWidget extends UIComponent {
                     // Samples describe the interval ending at that sample, matching the path's colour.
                     var sampleProgress = segment.sampleProgressFrom
                             + (segment.sampleProgressTo - segment.sampleProgressFrom) * progress;
-                    hoveredPathPoint = new StarMapTooltip.PathPoint(segment.secondSample,
+                    hoveredPathPoint = new StarMapTooltip.PathPoint(path.branchId(), segment.secondSample,
                             interpolatePathSpeed(segment.firstSample, segment.secondSample, sampleProgress));
                 }
             }
@@ -766,7 +784,7 @@ public final class RocketStarMapWidget extends UIComponent {
                 : new StarMapTooltip.Separation(hoveredSeparation.stage, hoveredSeparation.timeSeconds, hoveredSeparation.segments);
         return StarMapTooltip.build(separation, object == null ? null : object.data(), hoveredSelection,
                 object == null ? null : mapObjects.arrivalPosition(object.data().id()), hoveredPathPoint,
-                snapshot.plan(), defaultSegmentNames, id -> {
+                snapshot.plan(), defaultSegmentNames, branchSegmentNames, id -> {
                     var found = mapObjects.byId(id);
                     return found == null ? null : found.data();
                 });

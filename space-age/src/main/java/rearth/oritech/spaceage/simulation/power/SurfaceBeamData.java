@@ -9,6 +9,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.saveddata.SavedData;
@@ -55,8 +56,8 @@ public final class SurfaceBeamData extends SavedData {
     public static boolean loaded(ServerLevel level, int x, int z, double radius) {
 
         if (radius > 512) return false;
-        for (int cx = (int) Math.floor((x - radius) / 16); cx <= (int) Math.floor((x + radius) / 16); cx++)
-            for (int cz = (int) Math.floor((z - radius) / 16); cz <= (int) Math.floor((z + radius) / 16); cz++)
+        for (int cx = (int) Math.floor((x + .5 - radius) / 16); cx < (int) Math.ceil((x + .5 + radius) / 16); cx++)
+            for (int cz = (int) Math.floor((z + .5 - radius) / 16); cz < (int) Math.ceil((z + .5 + radius) / 16); cz++)
                 if (!level.hasChunk(cx, cz)) return false;
         return true;
     }
@@ -98,8 +99,8 @@ public final class SurfaceBeamData extends SavedData {
         }
         var overflow = Math.max(0, incident - reception.accepted());
         var chunks = new HashSet<Long>();
-        for (int cx = (int) Math.floor((x - radius) / 16); cx <= (int) Math.floor((x + radius) / 16); cx++)
-            for (int cz = (int) Math.floor((z - radius) / 16); cz <= (int) Math.floor((z + radius) / 16); cz++)
+        for (int cx = (int) Math.floor((x + .5 - radius) / 16); cx < (int) Math.ceil((x + .5 + radius) / 16); cx++)
+            for (int cz = (int) Math.floor((z + .5 - radius) / 16); cz < (int) Math.ceil((z + .5 + radius) / 16); cz++)
                 chunks.add(ChunkPos.pack(cx, cz));
         for (var chunk : chunks) heat.merge(chunk, overflow / Math.max(1, footprint) / 100_000, Double::sum);
         setDirty();
@@ -129,13 +130,22 @@ public final class SurfaceBeamData extends SavedData {
             for (var entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(chunk.getMinBlockX(), pos.getY(), chunk.getMinBlockZ(),
                     chunk.getMaxBlockX() + 1, level.getMaxY(), chunk.getMaxBlockZ() + 1)))
                 if (level.canSeeSky(entity.blockPosition())) entity.hurtServer(level, level.damageSources().onFire(), 2);
-            var state = level.getBlockState(pos);
-            if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS)) level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-            else if (temperature >= 10 || state.is(Blocks.GRASS_BLOCK)) {
-                var result = state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_SCORCHING);
-                if (result != null) level.setBlockAndUpdate(pos, result);
-            }
+            var result = heatedState(level.getBlockState(pos), temperature);
+            if (result != null) level.setBlockAndUpdate(pos, result);
         }
         if (!heat.isEmpty()) setDirty();
+    }
+
+    static BlockState heatedState(BlockState state, double temperature) {
+
+        if (temperature >= 25) {
+            var melted = state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_MELTING);
+            if (melted != null) return melted;
+        }
+        if (temperature < 5) return null;
+        if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS)) return Blocks.AIR.defaultBlockState();
+        if (temperature >= 10 || state.is(Blocks.GRASS_BLOCK))
+            return state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_SCORCHING);
+        return null;
     }
 }

@@ -147,7 +147,7 @@ public final class RocketFlightPlanRules {
 
         var result = new ArrayList<SpaceSimulation.FlightPlanBranch>();
         addBranchAndChildren(root, byParentAction, result, new HashSet<>());
-        return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations(), plan.name());
+        return new SpaceSimulation.FlightPlan(result, plan.segmentConfigurations(), plan.name(), plan.category());
     }
 
     /**
@@ -194,7 +194,7 @@ public final class RocketFlightPlanRules {
             }
             branches.add(branch.withActions(actions));
         }
-        return normalize(new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations(), plan.name()));
+        return normalize(new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations(), plan.name(), plan.category()));
     }
 
     private static SpaceSimulation.FlightPlan normalizeAndValidate(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket,
@@ -274,7 +274,7 @@ public final class RocketFlightPlanRules {
 
         var rocketName = plan.name().strip();
         if (rocketName.length() > MAX_ROCKET_NAME_LENGTH) rocketName = rocketName.substring(0, MAX_ROCKET_NAME_LENGTH);
-        var normalized = normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations, rocketName));
+        var normalized = normalize(new SpaceSimulation.FlightPlan(validatedBranches, configurations, rocketName, plan.category()));
         if (launch) normalized = trimEngineStageGaps(normalized, segmentIds.keySet());
         return normalized.branches().size() <= MAX_BRANCHES ? normalized : null;
     }

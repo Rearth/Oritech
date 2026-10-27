@@ -497,7 +497,7 @@ public final class MissionController {
                 }
         } while (found);
         state.plan = state.plan.withBranches(state.plan.branches().stream().filter(b -> !childBranchIds.contains(b.id())).toList());
-        return RocketFlightPlanRules.normalize(new FlightPlan(childBranches, childSettings, name));
+        return RocketFlightPlanRules.normalize(new FlightPlan(childBranches, childSettings, name, state.plan.category()));
     }
 
     public static FlightPlan resolveOrbitSlots(FlightPlan plan, MissionSavedData data, UUID owner, UUID self) {
@@ -522,6 +522,27 @@ public final class MissionController {
             var settings = action.service();
             return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
         }).toList())).toList());
+    }
+
+    public static boolean redirectBeam(MissionState state, UUID target, int x, int z, SpaceSimulation system,
+                                       Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
+
+        var action = state.action();
+        if (!state.canUpdateMission() || action == null || action.type() != ActionType.BEAM_POWER
+                || target.equals(state.rocket.getRocketId())) return false;
+        if (!target.equals(SpaceObjects.EARTH_ID) && stations.stream().noneMatch(station -> station.id().equals(target))) return false;
+        var redirected = action.withTarget(target).withLanding(x, z, 0, 0);
+        var root = state.plan.root();
+        var plan = state.plan.withBranches(state.plan.branches().stream().map(branch -> branch.id().equals(root.id())
+                ? branch.withActions(branch.actions().stream().map(card -> card.id().equals(action.id()) ? redirected : card).toList())
+                : branch).toList());
+        state.knowledge.merge(system.earthKnowledge);
+        var validation = RocketFlightPlanRules.inspect(plan, state.rocket, system.knownObjects(state.knowledge), false, state.position, recipes, stations);
+        if (!validation.valid()) return false;
+        // Changing the beam destination keeps the current action's elapsed time and completion conditions.
+        state.plan = validation.plan();
+        state.status = MissionState.STATUS_UPDATE_ACCEPTED;
+        return true;
     }
 
     public static boolean replace(MissionState state, FlightPlan plan, SpaceSimulation system) {

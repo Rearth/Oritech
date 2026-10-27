@@ -1,5 +1,7 @@
 package rearth.oritech.spaceage.client.rocket;
 
+import com.geckolib.constant.DataTickets;
+import com.geckolib.renderer.base.GeoRenderState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -12,12 +14,14 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import org.jspecify.annotations.Nullable;
+import rearth.oritech.client.ui.render.BlockPreviewEntities;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -28,11 +32,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class RocketRenderer {
 
     private static final ContextKey<RocketRenderData> ROCKET_DATA = new ContextKey<>(OritechSpaceAge.id("rockets"));
     private static final BlockDisplayContext DISPLAY_CONTEXT = BlockDisplayContext.create();
+    private static final Map<UUID, Map<BlockPos, BlockEntity>> VISUAL_ENTITIES = new HashMap<>();
+
+    static void clearVisualEntities() {
+
+        VISUAL_ENTITIES.clear();
+    }
 
     public static void onExtractRenderState(ExtractLevelRenderStateEvent event) {
 
@@ -45,6 +56,7 @@ public final class RocketRenderer {
         var blockEntityDispatcher = minecraft.getBlockEntityRenderDispatcher();
         var modelCache = new HashMap<BlockState, BlockModelRenderState>();
         var rockets = new ArrayList<RenderedRocket>();
+        var visibleRockets = new HashSet<UUID>();
 
         for (var rocket : RocketClientController.getActiveRockets()) {
             var flight = rocket.getFlight();
@@ -52,7 +64,9 @@ public final class RocketRenderer {
                 continue;
 
             var position = RocketSimulationController.getRocketPosition(flight, gameTime);
-            var blocks = collectBlocks(rocket, position, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
+            visibleRockets.add(rocket.getRocketId());
+            var visualEntities = VISUAL_ENTITIES.computeIfAbsent(rocket.getRocketId(), ignored -> new HashMap<>());
+            var blocks = collectBlocks(rocket, position, partialTick, level, modelResolver, blockEntityDispatcher, modelCache, visualEntities);
             if (flight.impactSpeedMetersPerSecond() <= 12 && flight.reentryTick() >= 0 && gameTime >= flight.reentryTick()) {
                 // Placeholder folded hardware opens into a broad white canopy with four ropes.
                 var seen = new HashSet<BlockPos>();
@@ -64,19 +78,20 @@ public final class RocketRenderer {
                             for (int z = -2; z <= 2; z++)
                                 addBlock(blocks, seen, canopy.offset(x, Math.abs(x) == 2 || Math.abs(z) == 2 ? 0 : 1, z),
                                         Blocks.WHITE_CARPET.defaultBlockState(), BlockPos.containing(position), partialTick,
-                                        level, modelResolver, blockEntityDispatcher, modelCache);
+                                        level, modelResolver, blockEntityDispatcher, modelCache, visualEntities);
                         for (int y = 1; y < 5; y++)
                             for (int x : new int[]{-1, 1})
                                 for (int z : new int[]{-1, 1})
                                     addBlock(blocks, seen, block.relativePos().offset(x, y, z),
                                             Blocks.IRON_CHAIN.defaultBlockState(), BlockPos.containing(position), partialTick,
-                                            level, modelResolver, blockEntityDispatcher, modelCache);
+                                            level, modelResolver, blockEntityDispatcher, modelCache, visualEntities);
                     }
             }
             var light = LevelRenderer.getLightCoords(level, BlockPos.containing(position));
             rockets.add(new RenderedRocket(position, light, blocks));
         }
 
+        VISUAL_ENTITIES.keySet().retainAll(visibleRockets);
         if (!rockets.isEmpty()) {
             event.getRenderState().setRenderData(ROCKET_DATA, new RocketRenderData(rockets, event.getCamera().position()));
         }
@@ -114,7 +129,7 @@ public final class RocketRenderer {
     private static List<RenderedBlock> collectBlocks(ActiveRocketData rocket, Vec3 rocketPosition, float partialTick,
                                                      ClientLevel level, BlockModelResolver modelResolver,
                                                      BlockEntityRenderDispatcher blockEntityDispatcher,
-                                                     Map<BlockState, BlockModelRenderState> modelCache) {
+                                                     Map<BlockState, BlockModelRenderState> modelCache, Map<BlockPos, BlockEntity> visualEntities) {
 
         var blocks = new ArrayList<RenderedBlock>();
         var renderedPositions = new HashSet<BlockPos>();
@@ -123,7 +138,7 @@ public final class RocketRenderer {
         for (var entry : rocket.getStaticSegments().entrySet()) {
             var segment = entry.getValue();
             for (var block : segment.blocks()) {
-                addBlock(blocks, renderedPositions, block.relativePos(), block.state(), rocketBlockPosition, partialTick, level, modelResolver, blockEntityDispatcher, modelCache);
+                addBlock(blocks, renderedPositions, block.relativePos(), block.state(), rocketBlockPosition, partialTick, level, modelResolver, blockEntityDispatcher, modelCache, visualEntities);
             }
 
             // couplings are separate from segment blocks and only exist while the segments are connected
@@ -133,37 +148,59 @@ public final class RocketRenderer {
                 if (couplings == null) continue;
                 for (var coupling : couplings) {
                     addBlock(blocks, renderedPositions, coupling.relativePos(), coupling.state(), rocketBlockPosition, partialTick, level, modelResolver,
-                            blockEntityDispatcher, modelCache);
+                            blockEntityDispatcher, modelCache, visualEntities);
                 }
             }
         }
 
+        visualEntities.keySet().retainAll(renderedPositions);
         return blocks;
     }
 
     private static void addBlock(List<RenderedBlock> blocks, HashSet<BlockPos> renderedPositions, BlockPos position,
                                   BlockState state, BlockPos rocketBlockPosition, float partialTick, ClientLevel level,
                                   BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher,
-                                  Map<BlockState, BlockModelRenderState> modelCache) {
+                                  Map<BlockState, BlockModelRenderState> modelCache, Map<BlockPos, BlockEntity> visualEntities) {
 
         if (state.isAir() || !renderedPositions.add(position)) return;
 
         var model = modelCache.computeIfAbsent(state, ignored -> {
             var result = new BlockModelRenderState();
-            modelResolver.update(result, state, DISPLAY_CONTEXT);
+            if (state.getRenderShape() != RenderShape.INVISIBLE)
+                modelResolver.update(result, state, DISPLAY_CONTEXT);
             return result;
         });
 
-        BlockEntityRenderState blockEntityState = null;
-        if (state.getBlock() instanceof EntityBlock entityBlock) {
-            var blockEntity = entityBlock.newBlockEntity(rocketBlockPosition.offset(position), state);
-            if (blockEntity != null) {
-                blockEntity.setLevel(level);
-                blockEntityState = blockEntityDispatcher.tryExtractRenderState(blockEntity, partialTick, null, null);
-            }
+        var blockEntity = visualEntities.get(position);
+        if (blockEntity == null || blockEntity.getLevel() != level || blockEntity.getBlockState() != state) {
+            blockEntity = BlockPreviewEntities.create(rocketBlockPosition.offset(position), state, level);
+            if (blockEntity != null) visualEntities.put(position, blockEntity);
+            else visualEntities.remove(position);
         }
+        var blockEntityState = extractBlockEntity(blockEntity, rocketBlockPosition.offset(position), partialTick,
+                level, blockEntityDispatcher);
 
         blocks.add(new RenderedBlock(position, model, blockEntityState));
+    }
+
+    private static @Nullable BlockEntityRenderState extractBlockEntity(@Nullable BlockEntity entity, BlockPos position,
+                                                                      float partialTick, ClientLevel level,
+                                                                      BlockEntityRenderDispatcher dispatcher) {
+
+        if (entity == null) return null;
+        var renderer = dispatcher.<BlockEntity, BlockEntityRenderState>getRenderer(entity);
+        if (renderer == null) return null;
+
+        // Detached entities keep a fixed animation identity; visibility and lighting follow the moving rocket.
+        var state = renderer.createRenderState();
+        renderer.extractRenderState(entity, state, partialTick, Minecraft.getInstance().gameRenderer.getMainCamera().position(), null);
+        state.blockPos = position;
+        state.lightCoords = LevelRenderer.getLightCoords(level, position);
+        if (state instanceof GeoRenderState geo) {
+            geo.addGeckolibData(DataTickets.PACKED_LIGHT, state.lightCoords);
+            geo.addGeckolibData(DataTickets.POSITION, Vec3.atCenterOf(position));
+        }
+        return state;
     }
 
     private record RocketRenderData(List<RenderedRocket> rockets, Vec3 cameraPosition) {

@@ -17,7 +17,8 @@ public final class AsteroidImpactRules {
     public static final double SPACE_DRAG_PER_SECOND = 0.000002;
     public static final double MAX_ASTEROID_CONNECTION_SPEED = 12;
     private static final double SAFE_ASTEROID_SPEED = 6;
-    private static final double ASTEROID_CHIP_ENERGY_PER_KILOGRAM = 30_000;
+    private static final double ASTEROID_CHIP_ENERGY_PER_KILOGRAM = 3_000;
+    private static final double MIN_CHIPPED_MASS_KILOGRAMS = 8_000;
     private static final double ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM = 180_000;
     private static final double HEAVY_IMPACT_ENERGY = 100_000_000;
 
@@ -58,7 +59,10 @@ public final class AsteroidImpactRules {
         if (target.type() == SpaceObjects.ObjectType.ASTEROID) {
             var targetMass = Math.max(1, target.mass() * KILOGRAMS_PER_ASTEROID_MASS);
             var energyPerKilogram = energy / targetMass;
-            if (energyPerKilogram >= ASTEROID_CHIP_ENERGY_PER_KILOGRAM) {
+            // Excavating a small piece does not require energizing the entire deposit.
+            var minimumChipEnergy = Math.min(MIN_CHIPPED_MASS_KILOGRAMS, targetMass * 0.04)
+                    * ASTEROID_CHIP_ENERGY_PER_KILOGRAM;
+            if (relativeSpeed > safeSpeed && energy >= minimumChipEnergy) {
                 var mode = energyPerKilogram >= ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM
                         ? FragmentationMode.CATASTROPHIC : FragmentationMode.CHIPPING;
                 var fragments = createFragments(target, energy, energyPerKilogram, mode);
@@ -97,13 +101,11 @@ public final class AsteroidImpactRules {
     private static List<AsteroidFragment> createFragments(SpaceSimulation.SpaceObjectData target, double energy,
                                                           double energyPerKilogram, FragmentationMode mode) {
 
-        var count = mode == FragmentationMode.CHIPPING
-                ? Mth.clamp(2 + (int) (energyPerKilogram / 75_000), 2, 4)
-                : Mth.clamp(4 + (int) (energyPerKilogram / 250_000), 4, 8);
         var fragmentedFraction = mode == FragmentationMode.CATASTROPHIC ? 1
-                : Mth.clamp(0.04 + (energyPerKilogram - ASTEROID_CHIP_ENERGY_PER_KILOGRAM)
-                                   / (ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM - ASTEROID_CHIP_ENERGY_PER_KILOGRAM) * 0.16,
-                0.04, 0.2);
+                : Math.min(0.2, energyPerKilogram / ASTEROID_CHIP_ENERGY_PER_KILOGRAM);
+        var count = mode == FragmentationMode.CHIPPING
+                ? Mth.clamp(2 + (int) (fragmentedFraction / 0.075), 2, 4)
+                : Mth.clamp(4 + (int) (energyPerKilogram / 250_000), 4, 8);
         var random = new Random(target.id().getMostSignificantBits() ^ target.id().getLeastSignificantBits()
                 ^ Double.doubleToLongBits(energy));
         var weights = new double[count];

@@ -97,7 +97,8 @@ public class SpaceSimulation {
 
     private static List<SpaceObjects.AsteroidMaterial> sampleMaterials(float mass, int variant) {
 
-        var blocks = Math.max(8, Math.round(mass * 12));
+        // One mass unit is one tonne of recoverable blocks, including the stone matrix.
+        var blocks = Math.max(1, Math.round(mass));
         var stone = variant % 2 == 0 ? "minecraft:stone" : "minecraft:deepslate";
         var ore = switch (Math.floorMod(variant, 4)) {
             case 0 -> "minecraft:iron_ore";
@@ -106,8 +107,8 @@ public class SpaceSimulation {
             default -> "minecraft:redstone_ore";
         };
         return List.of(
-                new SpaceObjects.AsteroidMaterial(Identifier.parse(stone), blocks * 4 / 5),
-                new SpaceObjects.AsteroidMaterial(Identifier.parse(ore), Math.max(1, blocks / 5)));
+                new SpaceObjects.AsteroidMaterial(Identifier.parse(stone), blocks - blocks / 5),
+                new SpaceObjects.AsteroidMaterial(Identifier.parse(ore), blocks / 5));
     }
 
     private static void deliverAsteroid(ServerLevel level, AsteroidImpactRules.ImpactPrediction impact, boolean explode) {
@@ -194,9 +195,10 @@ public class SpaceSimulation {
             var asteroid = new SpaceObjects.Asteroid();
             asteroid.currentPosition = new Vector2f((float) (x + Math.cos(angle) * offset), (float) (y + Math.sin(angle) * offset));
             asteroid.currentState = SpaceObjects.DetectionState.HIDDEN;
-            asteroid.weight = (float) (1 + Math.random() * 80);
-            asteroid.radius = 1_500 + asteroid.weight * 35;
-            asteroid.surfaceGravity = asteroid.weight * 0.0002f;
+            var size = (float) Math.random();
+            asteroid.weight = 50_000 + size * 200_000;
+            asteroid.radius = 1_535 + size * 2_800;
+            asteroid.surfaceGravity = 0.0002f + size * 0.016f;
             asteroid.materials = sampleMaterials(asteroid.weight, index);
             nonCelestialObjects.add(asteroid);
         }
@@ -304,7 +306,7 @@ public class SpaceSimulation {
             child.weight = fragment.mass();
             child.radius = fragment.radius();
             child.materials = fragment.materials();
-            child.surfaceGravity = child.weight * 0.0002f;
+            child.surfaceGravity = asteroid.surfaceGravity * child.radius / asteroid.radius;
             child.name = destroyed ? "Fragment " + (index + 1) + " of destroyed " + targetName
                     : targetName + " impact fragment " + (index + 1);
             debrisRadius = Math.max(debrisRadius, offset + child.radius * 1.5f);
@@ -315,7 +317,13 @@ public class SpaceSimulation {
             double fraction = impact.remainingTargetMass() / asteroid.weight;
             asteroid.weight = impact.remainingTargetMass();
             asteroid.radius *= (float) Math.cbrt(fraction);
-            asteroid.materials = AsteroidImpactRules.scaleMaterials(asteroid.materials, fraction);
+            asteroid.surfaceGravity *= (float) Math.cbrt(fraction);
+            asteroid.materials = asteroid.materials.stream().map(material -> {
+                var removed = impact.fragments().stream().flatMap(fragment -> fragment.materials().stream())
+                        .filter(part -> part.block().equals(material.block()))
+                        .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
+                return new SpaceObjects.AsteroidMaterial(material.block(), material.amount() - removed);
+            }).filter(material -> material.amount() > 0).toList();
         }
         var debris = new SpaceObjects.SimulatedObject(UUID.randomUUID(), SpaceObjects.ObjectType.SURVEY_REGION);
         debris.currentPosition = targetPosition;
@@ -617,13 +625,14 @@ public class SpaceSimulation {
     }
 
     public record FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations,
-                             String name) {
+                             String name, String category) {
 
         public static final Codec<FlightPlan> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 FlightPlanBranch.CODEC.listOf().fieldOf("branches").forGetter(FlightPlan::branches),
                 SegmentConfiguration.CODEC.listOf().optionalFieldOf("segments", List.of())
                         .forGetter(FlightPlan::segmentConfigurations),
-                Codec.STRING.optionalFieldOf("name", "").forGetter(FlightPlan::name)
+                Codec.STRING.optionalFieldOf("name", "").forGetter(FlightPlan::name),
+                Codec.STRING.optionalFieldOf("category", "").forGetter(FlightPlan::category)
         ).apply(instance, FlightPlan::new));
 
         public FlightPlan {
@@ -631,6 +640,12 @@ public class SpaceSimulation {
             branches = List.copyOf(branches);
             segmentConfigurations = List.copyOf(segmentConfigurations);
             name = name == null ? "" : name;
+            category = category == null ? "" : category;
+        }
+
+        public FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations, String name) {
+
+            this(branches, segmentConfigurations, name, "");
         }
 
         public FlightPlan(List<FlightPlanBranch> branches, List<SegmentConfiguration> segmentConfigurations) {
@@ -657,17 +672,22 @@ public class SpaceSimulation {
 
         public FlightPlan withBranches(List<FlightPlanBranch> newBranches) {
 
-            return new FlightPlan(newBranches, segmentConfigurations, name);
+            return new FlightPlan(newBranches, segmentConfigurations, name, category);
         }
 
         public FlightPlan withSegmentConfigurations(List<SegmentConfiguration> newConfigurations) {
 
-            return new FlightPlan(branches, newConfigurations, name);
+            return new FlightPlan(branches, newConfigurations, name, category);
         }
 
         public FlightPlan withName(String newName) {
 
-            return new FlightPlan(branches, segmentConfigurations, newName);
+            return new FlightPlan(branches, segmentConfigurations, newName, category);
+        }
+
+        public FlightPlan withCategory(String newCategory) {
+
+            return new FlightPlan(branches, segmentConfigurations, name, newCategory);
         }
 
         public SegmentConfiguration configurationFor(SegmentRef segment) {

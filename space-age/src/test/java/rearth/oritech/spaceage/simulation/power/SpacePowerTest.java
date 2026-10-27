@@ -37,6 +37,7 @@ import rearth.oritech.spaceage.simulation.mission.DockingLink;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
@@ -114,6 +115,49 @@ class SpacePowerTest {
         assertTrue(data.craft.containsKey(visitor.rocket.getRocketId()));
         assertTrue(data.craft.containsKey(foreign.rocket.getRocketId()));
         assertTrue(data.dockingLinks.isEmpty());
+    }
+
+    @Test
+    void redirectingOnlyCurrentBeamsKeepsSettingsTimersAndFutureActions() {
+
+        var source = station(UUID.randomUUID(), 500_000);
+        var receiver = station(source.owner, 600_000);
+        var original = source.rocket.getOriginalSegments().values().iterator().next();
+        var blocks = new HashSet<>(original.blocks());
+        blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.BEAM_APERTURE.get().defaultBlockState()));
+        var structure = new StaticRocketSegment(original.segmentId(), blocks, Map.of(), 100, 0);
+        source.rocket = new ActiveRocketData(Map.of(structure.segmentId(), structure), source.rocket.getDynamicSegments());
+        var beam = FlightPlanAction.create(ActionType.BEAM_POWER).withTarget(SpaceObjects.EARTH_ID)
+                .withSettings(RocketServiceSettings.DEFAULT.withBeam(new RocketServiceSettings.Beam(37)));
+        var future = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
+        source.plan = source.plan.withBranches(List.of(source.plan.root().withActions(List.of(beam, future))))
+                .withName("Solar sender").withCategory("solar");
+        source.connected = true;
+        source.advanceAction();
+        var system = new SpaceSimulation();
+        var data = new MissionSavedData();
+        data.craft.put(source.rocket.getRocketId(), source);
+        data.craft.put(receiver.rocket.getRocketId(), receiver);
+        var targets = RocketDocking.targets(data, source.owner);
+        assertTrue(MissionController.redirectBeam(source, receiver.rocket.getRocketId(), 0, 0, system, List.of(), targets));
+        assertEquals(receiver.rocket.getRocketId(), source.action().targetId());
+        assertEquals(beam.id(), source.action().id());
+        assertEquals(37, source.action().settings().beam().reservePercent());
+        assertEquals(future, source.plan.root().actions().getLast());
+        assertEquals(1, source.actionTicks());
+        assertEquals("solar", source.plan.category());
+        assertEquals("Solar sender", source.plan.name());
+        assertTrue(MissionController.redirectBeam(source, SpaceObjects.EARTH_ID, 123, -456, system, List.of(), targets));
+        assertEquals(123, source.action().landingX());
+        assertEquals(-456, source.action().landingZ());
+        var accepted = source.plan;
+        source.connected = false;
+        assertFalse(MissionController.redirectBeam(source, receiver.rocket.getRocketId(), 0, 0, system, List.of(), targets));
+        assertEquals(accepted, source.plan);
+        receiver.connected = true;
+        var idlePlan = receiver.plan;
+        assertFalse(MissionController.redirectBeam(receiver, SpaceObjects.EARTH_ID, 0, 0, system, List.of(), targets));
+        assertEquals(idlePlan, receiver.plan);
     }
 
     private static void powerTick(MissionSavedData data) {

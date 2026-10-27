@@ -50,6 +50,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
     };
     protected final List<TargetOption> targetOptions = new ArrayList<>();
+    boolean categoryEditor;
     // Timeline card currently open in the action configuration popup.
     protected UUID actionEditorAction;
     // Shared numeric popup: edited card, edited value, live field and text retained across rebuilds.
@@ -118,6 +119,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     // The screen retains mission and map state; the editor only requests it through these hooks.
     protected abstract SpaceSimulation.FlightPlan draftPlan();
+
+    protected abstract void changeLaunchCategory(String category);
 
     protected abstract RocketFlightPathCalculator.FlightPath calculatedFlight();
 
@@ -252,7 +255,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected boolean hasOpenPopup() {
 
-        return actionEditorAction != null || numberAction != null || actionTypeAction != null || newActionBranch != null || targetAction != null
+        return categoryEditor || actionEditorAction != null || numberAction != null || actionTypeAction != null || newActionBranch != null || targetAction != null
                 || arrivalAction != null || destinationAction != null || addonAction != null || decoupleAction != null
                 || mapContextRequest != null;
     }
@@ -782,6 +785,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     protected void closeEditorState() {
 
+        categoryEditor = false;
         actionEditorAction = null;
         closeNestedEditorState();
         mapContextRequest = null;
@@ -882,7 +886,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             else if (addonValueField != null) addonValueField.keyPressed(event);
             return true;
         }
-        if (actionTypeAction != null || newActionBranch != null || mapContextRequest != null) {
+        if (categoryEditor || actionTypeAction != null || newActionBranch != null || mapContextRequest != null) {
             if (event.isEscape()) closeEditors();
             return true;
         }

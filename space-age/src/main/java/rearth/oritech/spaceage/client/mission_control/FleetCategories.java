@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.chat.Component;
 import rearth.oritech.spaceage.OritechSpaceAge;
 
 import java.io.IOException;
@@ -18,10 +19,10 @@ import java.util.Map;
 import java.util.UUID;
 
 /** Local fleet organization; assignments are independent of missions and their changing locations. */
-final class FleetCategories {
+public final class FleetCategories {
 
-    static final String UNCATEGORIZED = "uncategorized";
-    static final String SUN = "sun";
+    public static final String UNCATEGORIZED = "uncategorized";
+    public static final String SUN = "sun";
     private final Path file;
     private final List<Category> categories = new ArrayList<>();
     private final Map<UUID, String> assignments = new HashMap<>();
@@ -44,7 +45,7 @@ final class FleetCategories {
             categories.addFirst(new Category(UNCATEGORIZED, "", false));
     }
 
-    List<Category> categories() {
+    public List<Category> categories() {
 
         return List.copyOf(categories);
     }
@@ -85,8 +86,13 @@ final class FleetCategories {
 
     String category(UUID craft, boolean sunOrbit) {
 
+        return category(craft, sunOrbit, "");
+    }
+
+    String category(UUID craft, boolean sunOrbit, String launchCategory) {
+
         if (sunOrbit) return SUN;
-        var assigned = assignments.get(craft);
+        var assigned = assignments.getOrDefault(craft, launchCategory);
         if (assigned != null && !assigned.equals(SUN) && contains(assigned)) return assigned;
         return UNCATEGORIZED;
     }
@@ -98,6 +104,14 @@ final class FleetCategories {
         assignments.replaceAll((craft, category) -> category.equals(id) ? UNCATEGORIZED : category);
         members.forEach(craft -> assignments.put(craft, UNCATEGORIZED));
         save();
+    }
+
+    public Component label(String id) {
+
+        if (id.equals(SUN)) return Component.translatable("screen.oritech_space_age.fleet.sun");
+        return categories.stream().filter(category -> category.id().equals(id) && !id.equals(UNCATEGORIZED))
+                .map(category -> Component.literal(category.name())).findFirst()
+                .orElseGet(() -> Component.translatable("screen.oritech_space_age.fleet.uncategorized"));
     }
 
     private boolean contains(String id) {
@@ -116,7 +130,7 @@ final class FleetCategories {
         }
     }
 
-    record Category(String id, String name, boolean collapsed) {
+    public record Category(String id, String name, boolean collapsed) {
 
         private static final Codec<Category> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf("id").forGetter(Category::id),

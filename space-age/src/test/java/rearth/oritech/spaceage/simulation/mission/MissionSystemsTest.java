@@ -686,9 +686,12 @@ class MissionSystemsTest {
         var second = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID, -3_140_000, 0, 2_000, 0, SpaceObjects.DetectionState.PRECISE);
         var navigate = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(first.id())
                 .withOrbit(OrbitBand.TIGHT).withAsteroidTarget(new AsteroidTarget(true, 1_000, 2_000));
-        var card = new MissionCard(UUID.randomUUID(), "Asteroid run", plan(navigate));
+        var card = new MissionCard(UUID.randomUUID(), "Asteroid run", plan(navigate).withCategory("automated").withName("Probe"));
         var loaded = MissionCard.CODEC.parse(NbtOps.INSTANCE, MissionCard.CODEC.encodeStart(NbtOps.INSTANCE, card).getOrThrow()).getOrThrow();
         assertEquals(card, loaded);
+        assertEquals("automated", RocketFlightPlanRules.normalize(loaded.plan()).category());
+        assertEquals("automated", loaded.plan().withName("Renamed").withBranches(loaded.plan().branches())
+                .withSegmentConfigurations(List.of()).category());
         var codec = ReflectiveCodecBuilder.create(FlightPlan.class);
         var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY, ConnectionType.NEOFORGE);
         codec.encode(buffer, loaded.plan());

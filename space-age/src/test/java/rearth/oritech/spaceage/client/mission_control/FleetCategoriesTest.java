@@ -20,6 +20,24 @@ class FleetCategoriesTest {
     Path directory;
 
     @Test
+    void launchCategoriesApplyUntilManuallyOverriddenAndRespectAutomaticSunGrouping() {
+
+        var file = directory.resolve("categories.json");
+        var preferences = new FleetCategories(file);
+        var launchCategory = preferences.create("Automated satellites");
+        var craft = UUID.randomUUID();
+        assertEquals(launchCategory, preferences.category(craft, false, launchCategory));
+        var loaded = new FleetCategories(file);
+        assertEquals(launchCategory, loaded.category(craft, false, launchCategory));
+        assertEquals(FleetCategories.SUN, loaded.category(craft, true, launchCategory));
+        loaded.assign(craft, FleetCategories.UNCATEGORIZED);
+        assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(craft, false, launchCategory));
+        var another = UUID.randomUUID();
+        loaded.delete(launchCategory, List.of());
+        assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(another, false, launchCategory));
+    }
+
+    @Test
     void automaticSectionsAndManualOverridesSurviveRestart() {
 
         var file = directory.resolve("categories.json");

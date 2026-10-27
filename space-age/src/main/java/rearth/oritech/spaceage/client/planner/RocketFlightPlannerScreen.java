@@ -355,7 +355,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 .filter(branch -> branch.isRoot() || !branch.actions().isEmpty()).toList();
         var segments = RocketPayloads.planView(flightPlanRocket).getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
         return new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations().stream()
-                .filter(configuration -> segments.contains(configuration.segment())).toList(), plan.name());
+                .filter(configuration -> segments.contains(configuration.segment())).toList(), plan.name(), plan.category());
     }
 
     private void updateSendButton() {
@@ -370,6 +370,13 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         }
         sendMissionButton.withTooltip(Component.translatable(!control.connected ? "screen.oritech_space_age.mission.send_unavailable"
                 : hasMissionChanges() ? "screen.oritech_space_age.mission.send_tooltip" : "screen.oritech_space_age.mission.no_changes"));
+    }
+
+    @Override
+    protected void changeLaunchCategory(String category) {
+
+        draftPlan = draftPlan.withCategory(category);
+        menu.setDraftFlightPlan(draftPlan);
     }
 
     @Override
@@ -480,6 +487,19 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
         }
         buildFlightPlanTab();
+        if (!(menu instanceof MissionControlMenu) && draftPlan != null) {
+            var label = Component.translatable("screen.oritech_space_age.fleet.launch_category_value",
+                    FleetViewPreferences.CATEGORIES.label(draftPlan.category()));
+            var categoryWidth = Math.max(36, Math.min(150, panelWidth - actionsX - 158));
+            var categoryButton = SpaceAgeButtons.panel(actionsX + 146, actionsY, categoryWidth, 20,
+                    Component.literal(font.plainSubstrByWidth(label.getString(), categoryWidth - 8)), ignored -> {
+                        closeEditorState();
+                        categoryEditor = true;
+                        rebuildComponents();
+                    });
+            categoryButton.withTooltip(label, Component.translatable("screen.oritech_space_age.fleet.launch_category_help"));
+            addComponent(categoryButton);
+        }
         updateSendButton();
         if (menu instanceof MissionControlMenu control && control.selectedTelemetry != null) {
             missionStateLabel = new LabelWidget(12, compactHeader ? 61 : 36, panelWidth - 24, 22,

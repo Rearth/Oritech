@@ -69,6 +69,16 @@ public final class RocketSimulationController {
         return Map.copyOf(getSavedData(level).rockets);
     }
 
+    public static void discard(MinecraftServer server, List<UUID> ids) {
+
+        var saved = getSavedData(server);
+        for (var id : ids) {
+            if (saved.rockets.remove(id) != null)
+                server.getPlayerList().getPlayers().forEach(player -> RocketNetworking.unloadRocket(player, id));
+        }
+        if (!ids.isEmpty()) saved.setDirty();
+    }
+
     public static void syncActiveRocketsToPlayer(ServerPlayer player) {
 
         var savedData = getSavedData(player.level());

@@ -25,6 +25,9 @@ public final class SpaceAgeDataMaps {
     public static final DataMapType<Block, BlockState> BEAM_SCORCHING = DataMapType.builder(
             OritechSpaceAge.id("beam_scorching"), Registries.BLOCK, BlockState.CODEC)
             .synced(BlockState.CODEC, false).build();
+    public static final DataMapType<Block, BlockState> BEAM_MELTING = DataMapType.builder(
+            OritechSpaceAge.id("beam_melting"), Registries.BLOCK, BlockState.CODEC)
+            .synced(BlockState.CODEC, false).build();
 
     private SpaceAgeDataMaps() {
     }
@@ -35,5 +38,6 @@ public final class SpaceAgeDataMaps {
         event.register(SPACE_SOLAR_GENERATORS);
         event.register(BEAM_APERTURE_MATERIALS);
         event.register(BEAM_SCORCHING);
+        event.register(BEAM_MELTING);
     }
 }

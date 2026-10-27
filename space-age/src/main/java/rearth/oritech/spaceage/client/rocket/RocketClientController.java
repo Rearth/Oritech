@@ -31,6 +31,7 @@ public final class RocketClientController {
 
     public static void clearRockets() {
         ACTIVE_ROCKETS.clear();
+        RocketRenderer.clearVisualEntities();
         OritechSpaceAge.LOGGER.debug("Cleared client rocket snapshots");
     }
 }

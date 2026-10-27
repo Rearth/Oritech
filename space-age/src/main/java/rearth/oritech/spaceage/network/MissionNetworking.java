@@ -21,6 +21,8 @@ import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
@@ -90,7 +92,30 @@ public final class MissionNetworking {
         registrar.playToServer(DeleteCrafts.TYPE, NetworkManager.getAutoCodec(DeleteCrafts.class), (payload, context) -> {
             if (!(context.player() instanceof ServerPlayer player)
                     || !(player.containerMenu instanceof MissionControlMenu menu) || !menu.stillValid(player)) return;
-            MissionSavedData.get(player.level().getServer()).deleteCrafts(player.getUUID(), payload.ids());
+            var server = player.level().getServer();
+            var removed = MissionSavedData.get(server).deleteCrafts(player.getUUID(), payload.ids());
+            RocketSimulationController.discard(server, removed);
+            sendFleet(player);
+        });
+        registrar.playToServer(RedirectBeams.TYPE, NetworkManager.getAutoCodec(RedirectBeams.class), (payload, context) -> {
+            if (!(context.player() instanceof ServerPlayer player)
+                    || !(player.containerMenu instanceof MissionControlMenu menu) || !menu.stillValid(player)) return;
+            var server = player.level().getServer();
+            var data = MissionSavedData.get(server);
+            var stations = RocketDocking.targets(data, player.getUUID());
+            if (!payload.target().equals(SpaceObjects.EARTH_ID)
+                    && stations.stream().noneMatch(station -> station.id().equals(payload.target()))) return;
+            var system = SpaceSimulationSavedData.getForPlayer(player);
+            var recipes = VacuumRecipe.all(server);
+            data.power.changed();
+            var changed = 0;
+            for (var id : payload.ids().stream().distinct().toList()) {
+                var state = data.craft.get(id);
+                if (state != null && state.owner.equals(player.getUUID())
+                        && MissionController.redirectBeam(state, payload.target(), payload.x(), payload.z(), system, recipes, stations)) changed++;
+            }
+            if (changed > 0) data.setDirty();
+            player.sendOverlayMessage(Component.translatable("message.oritech_space_age.beams_redirected", changed, payload.ids().size()));
             sendFleet(player);
         });
         registrar.playToServer(CardRequest.TYPE, NetworkManager.getAutoCodec(CardRequest.class), MissionNetworking::card);
@@ -328,6 +353,16 @@ public final class MissionNetworking {
     public record CancelCrafting(UUID id) implements CustomPacketPayload {
 
         public static final Type<CancelCrafting> TYPE = new Type<>(OritechSpaceAge.id("cancel_crafting"));
+
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+    }
+
+    public record RedirectBeams(List<UUID> ids, UUID target, int x, int z) implements CustomPacketPayload {
+
+        public static final Type<RedirectBeams> TYPE = new Type<>(OritechSpaceAge.id("redirect_beams"));
 
         public Type<? extends CustomPacketPayload> type() {
 

@@ -14,6 +14,7 @@ import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
+import rearth.oritech.spaceage.client.mission_control.FleetCategories;
 import rearth.oritech.spaceage.client.planner.FlightPlannerEditors.NumberKind;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -82,6 +83,10 @@ final class FlightPlannerPopups {
 
     void build() {
 
+        if (editors.categoryEditor) {
+            buildCategoryMenu();
+            return;
+        }
         if (editors.actionEditorAction != null && !editors.hasNestedEditor()) buildActionEditor();
         if (editors.numberAction != null) buildNumberEditor();
         else if (editors.actionTypeAction != null || editors.newActionBranch != null) buildActionTypeMenu();
@@ -91,6 +96,32 @@ final class FlightPlannerPopups {
         else if (editors.addonAction != null) buildAddonEditor();
         else if (editors.decoupleAction != null) buildDecoupleEditor();
         else if (editors.actionEditorAction == null && editors.mapContextRequest != null) buildMapContextMenu();
+    }
+
+    private void buildCategoryMenu() {
+
+        var categories = FleetViewPreferences.CATEGORIES;
+        var popupWidth = Math.min(260, editors.panelWidth() - 12);
+        var popupHeight = Math.min(editors.panelHeight() - 12, 44 + categories.categories().size() * 24);
+        var px = (editors.panelWidth() - popupWidth) / 2;
+        var py = (editors.panelHeight() - popupHeight) / 2;
+        addDropdown(px, py, popupWidth, popupHeight, "screen.oritech_space_age.fleet.launch_category", true);
+        var list = new ScrollWidget(px + 8, py + 29, popupWidth - 16, popupHeight - 37).withVerticalScroll(true);
+        list.setZIndex(CONTROL_Z);
+        var row = 0;
+        for (var category : categories.categories()) {
+            if (category.id().equals(FleetCategories.SUN)) continue;
+            var button = SpaceAgeButtons.panel(2, row, popupWidth - 32, 20, categories.label(category.id()), ignored -> {
+                editors.changeLaunchCategory(category.id());
+                editors.closeEditors();
+            });
+            var selected = editors.draftPlan().category().isBlank() ? FleetCategories.UNCATEGORIZED : editors.draftPlan().category();
+            selectListButton(button, selected.equals(category.id()));
+            list.addChild(button);
+            row += 24;
+        }
+        list.setContentDimensions(popupWidth - 32, row);
+        editors.addPopupComponent(list);
     }
 
     private void buildActionEditor() {

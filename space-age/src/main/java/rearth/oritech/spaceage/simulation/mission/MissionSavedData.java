@@ -50,7 +50,7 @@ public final class MissionSavedData extends SavedData {
         return server.overworld().getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public void deleteCrafts(UUID owner, List<UUID> ids) {
+    public List<UUID> deleteCrafts(UUID owner, List<UUID> ids) {
 
         var owned = ids.stream().distinct().filter(id -> craft.containsKey(id) && craft.get(id).owner.equals(owner)).toList();
         // Restore remote crafting inputs before either side and its docking links disappear.
@@ -59,6 +59,7 @@ public final class MissionSavedData extends SavedData {
         owned.forEach(craft::remove);
         power.changed();
         setDirty();
+        return owned;
     }
 
     public boolean dismiss(UUID owner, UUID craftId) {

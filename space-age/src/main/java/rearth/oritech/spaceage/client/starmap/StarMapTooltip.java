@@ -28,6 +28,7 @@ final class StarMapTooltip {
                                  RocketStarMapWidget.NavigationSelection selection, ArrivalPosition arrival,
                                  PathPoint pathPoint, SpaceSimulation.FlightPlan plan,
                                  Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames,
+                                 Map<UUID, Map<SpaceSimulation.SegmentRef, String>> branchSegmentNames,
                                  Function<UUID, SpaceSimulation.SpaceObjectData> objectById) {
 
         if (separation != null) {
@@ -41,10 +42,12 @@ final class StarMapTooltip {
         if (pathPoint == null) return List.of();
 
         var sample = pathPoint.sample();
+        var segmentNames = branchSegmentNames.getOrDefault(pathPoint.branchId(), defaultSegmentNames);
         var lines = new ArrayList<Component>();
         lines.add(Component.translatable("screen.oritech_space_age.path_state", sample.stage(), pathPhaseName(sample.phase())).withStyle(ChatFormatting.BOLD));
         lines.add(Component.translatable("screen.oritech_space_age.path_speed", formatSpeed(pathPoint.speedMetersPerSecond())));
         for (var branch : plan.branches()) {
+            if (!branch.id().equals(pathPoint.branchId())) continue;
             for (int i = 0; i < branch.actions().size(); i++) {
                 var action = branch.actions().get(i);
                 if (!action.id().equals(sample.actionId())) continue;
@@ -54,7 +57,7 @@ final class StarMapTooltip {
             }
         }
         lines.add(Component.translatable("screen.oritech_space_age.path_connected"));
-        addSegmentNames(lines, sample.connectedSegments(), plan, defaultSegmentNames);
+        addSegmentNames(lines, sample.connectedSegments(), plan, segmentNames);
         if (!sample.attachedAsteroidId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
             var asteroid = objectById.apply(sample.attachedAsteroidId());
             if (asteroid != null) lines.add(Component.translatable("screen.oritech_space_age.path.attached_asteroid",
@@ -62,7 +65,7 @@ final class StarMapTooltip {
         }
         lines.add(Component.translatable("screen.oritech_space_age.path_firing"));
         if (sample.firingSegments().isEmpty()) lines.add(Component.translatable("screen.oritech_space_age.path_none"));
-        else addSegmentNames(lines, sample.firingSegments(), plan, defaultSegmentNames);
+        else addSegmentNames(lines, sample.firingSegments(), plan, segmentNames);
         return lines;
     }
 
@@ -160,7 +163,7 @@ final class StarMapTooltip {
     /**
      * Original sample state and interpolated speed at the hovered point.
      */
-    record PathPoint(RocketFlightPathCalculator.PathSample sample, double speedMetersPerSecond) {
+    record PathPoint(UUID branchId, RocketFlightPathCalculator.PathSample sample, double speedMetersPerSecond) {
 
     }
 }
