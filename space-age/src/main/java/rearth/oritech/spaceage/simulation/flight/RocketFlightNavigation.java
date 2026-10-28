@@ -258,7 +258,7 @@ final class RocketFlightNavigation {
             if (target.id().equals(SpaceObjects.EARTH_ID)) craft.lastEarthSurfaceAction = action;
             var relativeSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
             var prediction = AsteroidImpactRules.predictArrival(craft.rocketMass(), target, relativeSpeed,
-                    craft.attachedAsteroid, action, craft.explosiveEnergy());
+                    craft.attachedAsteroid, action, craft.explosiveEnergy(), craft.craftId);
             context.arrivalPredictions.add(new ArrivalPrediction(action.id(), craft.branchId,
                     target.id(), prediction, route == null ? ParachuteLanding.Result.NONE : route.parachutes()));
             if (prediction.outcome() != AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH) craft.destroyed = true;

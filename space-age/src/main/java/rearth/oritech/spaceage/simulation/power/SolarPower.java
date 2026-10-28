@@ -8,6 +8,7 @@ import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
@@ -25,15 +26,12 @@ import java.util.Map;
 
 public final class SolarPower {
 
-    public static final double EARTH_DISTANCE = 3_000_000;
-    public static final double MIN_DISTANCE = 500_000;
-
     private SolarPower() {
     }
 
     public static double multiplier(double x, double y) {
 
-        var ratio = EARTH_DISTANCE / Math.max(MIN_DISTANCE, Math.hypot(x, y));
+        var ratio = SpaceBalance.SOLAR_REFERENCE_DISTANCE / Math.max(SpaceBalance.SOLAR_MIN_DISTANCE, Math.hypot(x, y));
         return ratio * ratio;
     }
 
@@ -64,7 +62,7 @@ public final class SolarPower {
 
     public static boolean sunRegion(MissionState.Position position) {
 
-        return position.target().equals(SpaceSimulation.SUN_ID) || Math.hypot(position.x(), position.y()) <= MIN_DISTANCE + 1;
+        return position.target().equals(SpaceSimulation.SUN_ID) || Math.hypot(position.x(), position.y()) <= SpaceBalance.SOLAR_MIN_DISTANCE + 1;
     }
 
     public static boolean stationary(MissionState state) {

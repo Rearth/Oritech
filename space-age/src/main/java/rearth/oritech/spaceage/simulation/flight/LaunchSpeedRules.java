@@ -11,7 +11,6 @@ import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 
 import java.util.Collection;
 import java.util.List;
@@ -52,7 +51,7 @@ public final class LaunchSpeedRules {
         if (SpaceAgeConfig.orbitSpeed() > 0) return SpaceAgeConfig.orbitSpeed();
         var radius = SpaceObjects.EARTH_RADIUS;
         var altitude = SpaceSimulation.OrbitBand.LOW.altitude();
-        return Math.sqrt(2 * RocketPerformanceCalculator.STANDARD_GRAVITY * radius * altitude / (radius + altitude));
+        return Math.sqrt(2 * SpaceBalance.STANDARD_GRAVITY * radius * altitude / (radius + altitude));
     }
 
     public static long orbitParticleSpeed() {

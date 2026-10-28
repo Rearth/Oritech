@@ -27,8 +27,8 @@ import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.NavigationComputerRules;
@@ -130,7 +130,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
         return switch (action.velocityMode()) {
             case ZERO -> true;
-            case CUSTOM -> action.targetVelocity() <= AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED;
+            case CUSTOM -> action.targetVelocity() <= SpaceBalance.MAX_ASTEROID_CONNECTION_SPEED;
             case MAXIMUM -> false;
         };
     }
@@ -890,7 +890,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         }
         if (action.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID) {
             return Component.translatable("screen.oritech_space_age.action.asteroid_connection_range",
-                    (int) AsteroidImpactRules.MAX_ASTEROID_CONNECTION_SPEED);
+                    (int) SpaceBalance.MAX_ASTEROID_CONNECTION_SPEED);
         }
         if (action.settings().waypoint().isPresent())
             return Component.translatable("screen.oritech_space_age.waypoint.fixed");

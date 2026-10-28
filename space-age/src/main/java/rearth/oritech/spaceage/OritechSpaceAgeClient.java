@@ -19,7 +19,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
-import rearth.oritech.spaceage.simulation.power.BeamAperture;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.Locale;
@@ -35,7 +35,7 @@ public final class OritechSpaceAgeClient {
             if (event.getItemStack().getItem() instanceof BlockItem item) {
                 var quality = item.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_APERTURE_MATERIALS);
                 if (quality != null && quality > 0) event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.aperture_glass",
-                        String.format(Locale.ROOT, "%.2f", quality), TooltipHelper.getEnergyText((long) (quality * BeamAperture.RF_PER_GLASS))));
+                        String.format(Locale.ROOT, "%.2f", quality), TooltipHelper.getEnergyText((long) (quality * SpaceBalance.BEAM_RF_PER_GLASS))));
             }
             if (event.getItemStack().is(SpaceAgeBlocks.BEAM_APERTURE.get().asItem())) {
                 event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.beam_aperture.structure"));

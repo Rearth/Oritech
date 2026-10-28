@@ -2,7 +2,6 @@ package rearth.oritech.spaceage.simulation.flight;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceObjects.DetectionState;
@@ -206,7 +205,7 @@ class TransferFeasibilityTest {
             for (int parachutes : new int[]{0, 3}) {
                 var asteroid = new SpaceObjectData(new UUID(5, asteroidMass), ObjectType.ASTEROID,
                         300_000, 0, 0, 0, 100, 0, asteroidMass, DetectionState.PRECISE, "Cargo", List.of());
-                var mass = 8_000 + asteroidMass * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS;
+                var mass = 8_000 + asteroidMass * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS;
                 var segment = chemical(8_000, 40 * mass / 8_000);
                 segment.parachutes = parachutes;
                 var craft = craft(70_000, 0, 1_500, Math.PI, segment);

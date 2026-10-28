@@ -1,0 +1,22 @@
+{
+  "name": "Nyx",
+  "description": "A distant dark body holding uranium and precious crystals.",
+  "x": 8400000,
+  "y": -4700000,
+  "radius": 40000,
+  "model_block": "oritech_space_age:nyx",
+  "resources": [
+    {
+      "block": "oritech:deepslate_uranium_ore",
+      "amount": 40
+    },
+    {
+      "block": "minecraft:diamond_ore",
+      "amount": 35
+    },
+    {
+      "block": "minecraft:emerald_ore",
+      "amount": 25
+    }
+  ]
+}

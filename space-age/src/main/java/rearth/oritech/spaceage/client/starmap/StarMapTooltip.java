@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.client.starmap;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.spaceage.simulation.SpaceGravity;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -96,6 +97,15 @@ final class StarMapTooltip {
         if (object.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             lines.add(Component.translatable("screen.oritech_space_age.object.unsurveyed_help"));
         }
+        if (object.type() == SpaceObjects.ObjectType.RESOURCE_BODY) {
+            var definition = StarMapObjects.resourceBodyDefinition(object);
+            if (definition != null) lines.add(StarMapObjects.resourceBodyText(object, "description", definition.description()));
+            lines.add(Component.translatable("screen.oritech_space_age.object.infinite_deposit"));
+            var totalWeight = object.materials().stream().mapToDouble(material -> material.amount()).sum();
+            object.materials().forEach(material -> lines.add(Component.translatable(
+                    "screen.oritech_space_age.object.resource_weight", BuiltInRegistries.BLOCK.getValue(material.block()).getName(),
+                    String.format(Locale.ROOT, "%.0f", material.amount() / totalWeight * 100))));
+        }
         if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
             lines.add(Component.translatable("screen.oritech_space_age.object.mass", format(object.mass() * 1_000)));
             lines.add(Component.translatable("screen.oritech_space_age.object.velocity",
@@ -103,9 +113,9 @@ final class StarMapTooltip {
             lines.add(Component.translatable("screen.oritech_space_age.object.materials"));
             object.materials().forEach(material -> lines.add(material.amount() > 0
                     ? Component.translatable("screen.oritech_space_age.object.material_known",
-                    material.block().toString(), material.amount())
+                    BuiltInRegistries.BLOCK.getValue(material.block()).getName(), material.amount())
                     : Component.translatable("screen.oritech_space_age.object.material_unknown",
-                    material.block().toString())));
+                    BuiltInRegistries.BLOCK.getValue(material.block()).getName())));
         }
         return lines;
     }

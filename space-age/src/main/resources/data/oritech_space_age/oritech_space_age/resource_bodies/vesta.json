@@ -1,0 +1,22 @@
+{
+  "name": "Vesta",
+  "description": "A metallic mega asteroid veined with nickel and platinum.",
+  "x": -4500000,
+  "y": 4200000,
+  "radius": 32000,
+  "model_block": "oritech_space_age:vesta",
+  "resources": [
+    {
+      "block": "oritech:nickel_ore",
+      "amount": 45
+    },
+    {
+      "block": "oritech:deepslate_platinum_ore",
+      "amount": 30
+    },
+    {
+      "block": "minecraft:gold_ore",
+      "amount": 25
+    }
+  ]
+}

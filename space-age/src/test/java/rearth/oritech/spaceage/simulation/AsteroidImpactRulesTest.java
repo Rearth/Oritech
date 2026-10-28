@@ -47,7 +47,7 @@ class AsteroidImpactRulesTest {
                 .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum());
 
         var breakup = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action,
-                target.mass() * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS * 180_000);
+                target.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS * 180_000);
         assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, breakup.fragmentationMode());
         assertEquals(0, breakup.remainingTargetMass());
         var safe = AsteroidImpactRules.predictArrival(1_000_000_000, target, 12, null, action, 1e15);

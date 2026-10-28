@@ -367,7 +367,8 @@ public final class RocketFlightPlanRules {
         if (type == SpaceObjects.ObjectType.SUN) return List.of(SpaceSimulation.OrbitBand.SOLAR);
         if (type == SpaceObjects.ObjectType.SURVEY_REGION || type == SpaceObjects.ObjectType.CRAFT || type == SpaceObjects.ObjectType.WAYPOINT)
             return List.of(SpaceSimulation.OrbitBand.SURFACE);
-        return type == SpaceObjects.ObjectType.ASTEROID ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
+        return type == SpaceObjects.ObjectType.ASTEROID || type == SpaceObjects.ObjectType.RESOURCE_BODY
+                ? ASTEROID_DESTINATIONS : CELESTIAL_DESTINATIONS;
     }
 
     /**
@@ -379,7 +380,7 @@ public final class RocketFlightPlanRules {
         var available = availableOrbits(type);
         if (available.contains(requested)) return requested;
         if (available.size() == 1) return available.getFirst();
-        return type == SpaceObjects.ObjectType.ASTEROID
+        return type == SpaceObjects.ObjectType.ASTEROID || type == SpaceObjects.ObjectType.RESOURCE_BODY
                 ? SpaceSimulation.OrbitBand.TIGHT : SpaceSimulation.OrbitBand.LOW;
     }
 

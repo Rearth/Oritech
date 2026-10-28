@@ -46,7 +46,7 @@ class SpaceSimulationPersistenceTest {
             assertTrue(ore >= 10_000 && ore <= 50_000);
             assertEquals(Math.round(asteroid.mass()), asteroid.materials().stream()
                     .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum());
-            assertTrue(asteroid.mass() * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS >= 50_000_000);
+            assertTrue(asteroid.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS >= 50_000_000);
         }
     }
 

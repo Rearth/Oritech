@@ -41,7 +41,7 @@ final class SunOrbitRules {
                     continue;
                 }
                 var angle = Math.PI + slot * Math.PI * 2 / SpaceBalance.slots(SpaceSimulation.SUN_ID, OrbitBand.SOLAR);
-                state.position = state.position.placed(Math.cos(angle) * SolarPower.MIN_DISTANCE, Math.sin(angle) * SolarPower.MIN_DISTANCE,
+                state.position = state.position.placed(Math.cos(angle) * SpaceBalance.SOLAR_MIN_DISTANCE, Math.sin(angle) * SpaceBalance.SOLAR_MIN_DISTANCE,
                         0, 0, SpaceSimulation.SUN_ID, OrbitBand.SOLAR, slot);
             }
             used.add(slot);

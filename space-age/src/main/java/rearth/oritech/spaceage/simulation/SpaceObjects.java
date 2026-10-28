@@ -27,7 +27,7 @@ public class SpaceObjects {
 
     public enum ObjectType implements StringRepresentable {
 
-        EARTH, SUN, MARS, SURVEY_REGION, ASTEROID, CRAFT, WAYPOINT;
+        EARTH, SUN, MARS, SURVEY_REGION, ASTEROID, CRAFT, WAYPOINT, RESOURCE_BODY;
 
         public static final Codec<ObjectType> CODEC = StringRepresentable.fromEnum(ObjectType::values);
 

@@ -2,6 +2,8 @@ package rearth.oritech.spaceage.client.starmap;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
@@ -13,6 +15,8 @@ import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import rearth.oritech.spaceage.client.starmap.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.ResourceBodies;
+import rearth.oritech.spaceage.simulation.ResourceBodies.Definition;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
@@ -86,8 +90,30 @@ final class StarMapObjects {
             case MARS -> SpaceAgeBlocks.MARS.get().defaultBlockState();
             case SURVEY_REGION -> Blocks.GRAY_STAINED_GLASS.defaultBlockState();
             case ASTEROID -> asteroidBlock(object);
+            case RESOURCE_BODY -> {
+                var definition = resourceBodyDefinition(object);
+                yield definition == null ? SpaceAgeBlocks.ASTEROID_1.get().defaultBlockState()
+                        : BuiltInRegistries.BLOCK.getValue(definition.modelBlock()).defaultBlockState();
+            }
             case CRAFT, WAYPOINT -> SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState();
         };
+    }
+
+    static Definition resourceBodyDefinition(SpaceSimulation.SpaceObjectData object) {
+
+        var connection = Minecraft.getInstance().getConnection();
+        return connection == null ? null : ResourceBodies.find(connection.registryAccess(), object.id());
+    }
+
+    static Component resourceBodyText(SpaceSimulation.SpaceObjectData object, String field, String fallback) {
+
+        var connection = Minecraft.getInstance().getConnection();
+        if (connection == null) return Component.literal(fallback);
+        return connection.registryAccess().lookupOrThrow(ResourceBodies.REGISTRY).listElements()
+                .filter(holder -> ResourceBodies.id(holder.key().identifier()).equals(object.id()))
+                .map(holder -> Component.translatableWithFallback(
+                        holder.key().identifier().toLanguageKey("resource_body", field), fallback))
+                .findFirst().orElseGet(() -> Component.literal(fallback));
     }
 
     private static BlockState asteroidBlock(SpaceSimulation.SpaceObjectData object) {
@@ -123,7 +149,7 @@ final class StarMapObjects {
     private static boolean isPlanet(SpaceObjects.ObjectType type) {
 
         return type == SpaceObjects.ObjectType.SUN || type == SpaceObjects.ObjectType.EARTH
-                || type == SpaceObjects.ObjectType.MARS;
+                || type == SpaceObjects.ObjectType.MARS || type == SpaceObjects.ObjectType.RESOURCE_BODY;
     }
 
     RocketMapPaths.Point surfacePosition(RocketMapPaths.Point point) {
@@ -154,8 +180,7 @@ final class StarMapObjects {
                     && snapshot.plan().branches().stream().flatMap(branch -> branch.actions().stream()).noneMatch(action -> action.targetId().equals(object.id()))) continue;
             var widget = new BlockWidget(0, 0, ICON_TEXTURE_SIZE, iconBlock(object));
             // Normalize the two-block celestial models to the same unit as asteroid models.
-            if (object.type() == SpaceObjects.ObjectType.EARTH || object.type() == SpaceObjects.ObjectType.SUN
-                    || object.type() == SpaceObjects.ObjectType.MARS) widget.withScale(.5f).withRenderPadding(PLANET_TEXTURE_PADDING);
+            if (isPlanet(object.type())) widget.withScale(.5f).withRenderPadding(PLANET_TEXTURE_PADDING);
             if (object.type() != SpaceObjects.ObjectType.EARTH && object.type() != SpaceObjects.ObjectType.SUN)
                 widget.withCachedRendering();
             objects.add(new Entry(object, widget, isPlanet(object.type()) ? PlanetSurfaceProjection.outline(widget) : List.of()));
@@ -225,7 +250,7 @@ final class StarMapObjects {
                 case SUN -> 0x66D7A438;
                 case EARTH -> 0x665A91B8;
                 case MARS -> 0x66975D4C;
-                case ASTEROID -> 0x666F675E;
+                case ASTEROID, RESOURCE_BODY -> 0x666F675E;
                 case SURVEY_REGION -> 0x407F858D;
                 case CRAFT, WAYPOINT -> 0x6693D7C8;
             };
@@ -256,7 +281,6 @@ final class StarMapObjects {
 
         var sun = byId(SpaceSimulation.SUN_ID);
         if (sun != null) for (var object : objects) {
-            if (!visibleIcons.contains(object.data.id())) continue;
             if (object.data.type() == SpaceObjects.ObjectType.EARTH || object.data.type() == SpaceObjects.ObjectType.MARS) {
                 addCircle(lines, camera, viewport, sun.data.x(), sun.data.y(),
                         Math.hypot(object.data.x() - sun.data.x(), object.data.y() - sun.data.y()), 0x553C5368, 0.55f);
@@ -277,8 +301,8 @@ final class StarMapObjects {
         }
         // Match the original draw order: solar orbits, surfaces, motion guides, then local orbits.
         addMotionLines(lines, camera, viewport);
+        // An offscreen body can still have an orbit crossing the viewport.
         for (var object : objects) {
-            if (!visibleIcons.contains(object.data.id())) continue;
             var objectX = x(object);
             var objectY = y(object);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
@@ -349,7 +373,7 @@ final class StarMapObjects {
     private static float iconSize(Entry object, StarMapCamera camera) {
 
         var diameterScale = switch (object.data.type()) {
-            case SUN, EARTH, MARS -> 1;
+            case SUN, EARTH, MARS, RESOURCE_BODY -> 1;
             case ASTEROID -> 1.3;
             default -> 2;
         };
@@ -425,13 +449,12 @@ final class StarMapObjects {
     }
 
     RocketStarMapWidget.NavigationSelection findHoveredOrbit(double mouseX, double mouseY, StarMapCamera camera,
-                                                             Viewport viewport, Entry hoveredObject, Set<UUID> visibleIcons) {
+                                                             Viewport viewport, Entry hoveredObject) {
 
         var world = camera.unproject(mouseX, mouseY, viewport.x(), viewport.y(), viewport.width(), viewport.height());
         var closestDistance = 5d;
         RocketStarMapWidget.NavigationSelection closest = null;
         for (var object : objects) {
-            if (!visibleIcons.contains(object.data.id())) continue;
             var offsetX = world.x() - x(object);
             var offsetY = world.y() - y(object);
             var angle = Math.atan2(offsetY, offsetX);

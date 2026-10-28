@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
@@ -9,9 +10,6 @@ import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
  * Mass-scaled braking credit for parachutes deployed along the normal landing curve.
  */
 public final class ParachuteLanding {
-
-    public static final double DELTA_V_PER_PARACHUTE = 200;
-    public static final double REFERENCE_MASS = 8_000;
 
     private ParachuteLanding() {
     }
@@ -30,7 +28,7 @@ public final class ParachuteLanding {
 
     public static double deltaVReduction(double mass, int count) {
 
-        return DELTA_V_PER_PARACHUTE * count * REFERENCE_MASS / Math.max(1, mass);
+        return SpaceBalance.PARACHUTE_DELTA_V * count * SpaceBalance.PARACHUTE_REFERENCE_MASS / Math.max(1, mass);
     }
 
     static double fuelFactor(double credit, double brakingDeltaV) {

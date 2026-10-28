@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -299,7 +298,7 @@ public final class MissionController {
             state.status = MissionState.STATUS_ASTEROID_ATTACHED;
             return;
         }
-        if (target == null || !state.knowledge.precise(action.targetId())) {
+        if (target == null || target.type() != SpaceObjects.ObjectType.ASTEROID || !state.knowledge.precise(action.targetId())) {
             state.status = MissionState.STATUS_PRECISE_REQUIRED;
             return;
         }
@@ -383,7 +382,7 @@ public final class MissionController {
             if (!state.position.asteroid().equals(FlightPlanAction.NO_TARGET)) {
                 mass += system.truth().stream()
                         .filter(object -> object.id().equals(state.position.asteroid()))
-                        .mapToDouble(object -> object.mass() * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS)
+                        .mapToDouble(object -> object.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS)
                         .findFirst().orElse(0);
             }
             var correctionSeconds = SpaceBalance.stationKeepingBurnSecondsPerSecond(

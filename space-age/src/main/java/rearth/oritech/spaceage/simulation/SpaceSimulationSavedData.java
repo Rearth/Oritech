@@ -11,6 +11,7 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ public class SpaceSimulationSavedData extends SavedData {
             OritechSpaceAge.id("space_simulations"), SpaceSimulationSavedData::new, CODEC, null);
 
     private final Map<UUID, SpaceSimulation> simulations = new HashMap<>();
+    private List<SpaceSimulation.SpaceObjectData> resourceBodies = List.of();
 
     public SpaceSimulationSavedData() {
     }
@@ -37,12 +39,14 @@ public class SpaceSimulationSavedData extends SavedData {
 
     public static SpaceSimulationSavedData get(MinecraftServer server) {
 
-        return server.overworld().getDataStorage().computeIfAbsent(TYPE);
+        var data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
+        data.resourceBodies = ResourceBodies.objects(server.registryAccess());
+        return data;
     }
 
     private static SpaceSimulationSavedData get(ServerPlayer player) {
 
-        return player.level().getServer().overworld().getDataStorage().computeIfAbsent(TYPE);
+        return get(player.level().getServer());
     }
 
     public static SpaceSimulation getForPlayer(ServerPlayer player) {
@@ -64,6 +68,7 @@ public class SpaceSimulationSavedData extends SavedData {
             simulations.put(player, simulation);
             setDirty();
         }
+        simulation.setResourceBodies(resourceBodies);
         return simulation;
     }
 

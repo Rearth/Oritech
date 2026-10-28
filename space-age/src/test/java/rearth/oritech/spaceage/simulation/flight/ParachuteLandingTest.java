@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import org.junit.jupiter.api.Test;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ArrivalVelocityMode;
@@ -22,7 +23,7 @@ class ParachuteLandingTest {
         var single = ParachuteLanding.deltaVReduction(248_140, 1);
         assertEquals(single * 3, ParachuteLanding.deltaVReduction(248_140, 3), 1e-9);
         assertEquals(single / 2, ParachuteLanding.deltaVReduction(496_280, 1), 1e-9);
-        assertEquals(ParachuteLanding.DELTA_V_PER_PARACHUTE, ParachuteLanding.deltaVReduction(ParachuteLanding.REFERENCE_MASS, 1));
+        assertEquals(SpaceBalance.PARACHUTE_DELTA_V, ParachuteLanding.deltaVReduction(SpaceBalance.PARACHUTE_REFERENCE_MASS, 1));
         assertEquals(.8, ParachuteLanding.fuelFactor(20, 100), 1e-9);
         assertEquals(0, ParachuteLanding.fuelFactor(200, 100));
     }

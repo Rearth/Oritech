@@ -1,0 +1,22 @@
+{
+  "name": "Luna",
+  "description": "Earth's cratered moon, rich in iron, copper and redstone.",
+  "x": -3250000,
+  "y": 300000,
+  "radius": 18000,
+  "model_block": "oritech_space_age:luna",
+  "resources": [
+    {
+      "block": "minecraft:iron_ore",
+      "amount": 45
+    },
+    {
+      "block": "minecraft:copper_ore",
+      "amount": 35
+    },
+    {
+      "block": "minecraft:redstone_ore",
+      "amount": 20
+    }
+  ]
+}

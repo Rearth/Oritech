@@ -171,8 +171,8 @@ public final class RocketFlightPathCalculator {
             var performance = RocketPerformanceCalculator.calculate(segmentRocket);
             var hardware = RocketHardware.of(entry.getValue());
             var previewSegment = new Segment(performance.wetMassKilograms(),
-                    hardware.chemical() * RocketPerformanceCalculator.ENGINE_THRUST_NEWTONS,
-                    hardware.ion() * RocketPerformanceCalculator.ENGINE_THRUST_NEWTONS,
+                    hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS,
+                    hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS,
                     hardware.chemicalSeconds(dynamic), hardware.ionSeconds(dynamic), hardware);
             previewSegment.structure = rocket.getOriginalSegments().get(entry.getKey());
             previewSegment.physical = dynamic.copy();
@@ -543,7 +543,7 @@ public final class RocketFlightPathCalculator {
         var cube = holder.physical.payloads.remove(action.payload());
         holder.physical.layout.put(action.payload(), Blocks.AIR.defaultBlockState());
         holder.dryMass = Math.max(0, holder.dryMass - RocketLayout.mass(SpaceAgeBlocks.CUBE_SAT.get().defaultBlockState())
-                * RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT);
+                * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT);
         state.addSample(PathPhase.COAST, state.currentTarget, action.id());
 
         var child = context.branchesByParent.get(action.id());

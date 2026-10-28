@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.Block;
 import rearth.oritech.spaceage.SpaceAgeConfig;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.ParachuteLanding;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -61,7 +62,7 @@ public class CubeSatItem extends BlockItem {
                 number(performance.availableDeltaVMetersPerSecond())).withStyle(ChatFormatting.GRAY));
         var selfLaunch = RocketPerformanceCalculator.getLaunchReadiness(performance) == RocketPerformanceCalculator.LaunchReadiness.READY;
         tooltip.accept(Component.translatable("tooltip.oritech_space_age.cube_sat.thrust_to_weight",
-                number(performance.liftoffAccelerationMetersPerSecondSquared() / RocketPerformanceCalculator.STANDARD_GRAVITY)).withStyle(ChatFormatting.GRAY));
+                number(performance.liftoffAccelerationMetersPerSecondSquared() / SpaceBalance.STANDARD_GRAVITY)).withStyle(ChatFormatting.GRAY));
         tooltip.accept(Component.translatable(selfLaunch ? "tooltip.oritech_space_age.cube_sat.self_launch"
                 : "tooltip.oritech_space_age.cube_sat.needs_launcher").withStyle(selfLaunch ? ChatFormatting.GREEN : ChatFormatting.GOLD));
 

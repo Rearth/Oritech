@@ -1,0 +1,22 @@
+{
+  "name": "Ceres",
+  "description": "An isolated ice-grey dwarf body with blue mineral-rich crust.",
+  "x": 1800000,
+  "y": -3100000,
+  "radius": 26000,
+  "model_block": "oritech_space_age:ceres",
+  "resources": [
+    {
+      "block": "minecraft:lapis_ore",
+      "amount": 40
+    },
+    {
+      "block": "minecraft:redstone_ore",
+      "amount": 35
+    },
+    {
+      "block": "minecraft:copper_ore",
+      "amount": 25
+    }
+  ]
+}

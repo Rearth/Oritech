@@ -13,6 +13,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2i;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.network.RocketNetworking;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 
@@ -25,8 +26,8 @@ import java.util.function.Consumer;
 public final class RocketSimulationController {
 
     // config
-    public static final int TICKS_PER_SECOND = RocketPerformanceCalculator.TICKS_PER_SECOND;
-    public static final int ORBIT_HEIGHT_BLOCKS = RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS;
+    public static final int TICKS_PER_SECOND = SpaceBalance.TICKS_PER_SECOND;
+    public static final int ORBIT_HEIGHT_BLOCKS = SpaceBalance.LAUNCH_ORBIT_HEIGHT_BLOCKS;
 
     // physics settings
     private static final double ROCKET_PACKET_RANGE_BLOCKS = 500;

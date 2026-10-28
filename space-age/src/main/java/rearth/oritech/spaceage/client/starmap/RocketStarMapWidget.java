@@ -178,6 +178,8 @@ public final class RocketStarMapWidget extends UIComponent {
 
         if (object.type() == SpaceObjects.ObjectType.WAYPOINT)
             return Component.translatable("screen.oritech_space_age.waypoint", Math.round(object.x()), Math.round(object.y()));
+        if (object.type() == SpaceObjects.ObjectType.RESOURCE_BODY)
+            return StarMapObjects.resourceBodyText(object, "name", object.name());
         return object.name().isBlank() ? objectName(object.type()) : Component.literal(object.name());
     }
 
@@ -350,7 +352,7 @@ public final class RocketStarMapWidget extends UIComponent {
         StarMapLineRenderer.submit(graphics, cachedFlightLines, viewportX, viewportY, viewportWidth, viewportHeight);
         StarMapBeamRenderer.submit(graphics, cachedBeamLinks, viewportX, viewportY, viewportWidth, viewportHeight);
         if (isInsideViewport(mouseX, mouseY))
-            hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject, visibleIcons);
+            hoveredSelection = mapObjects.findHoveredOrbit(mouseX, mouseY, camera, viewport, hoveredObject);
         if (hoveredPathPoint != null && hoveredObject != null
                 && hoveredObject.data().type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             hoveredObject = null;

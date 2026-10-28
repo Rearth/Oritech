@@ -1,0 +1,22 @@
+{
+  "name": "Phobos",
+  "description": "A rusty moon of Mars with iron, gold and nickel seams.",
+  "x": 5180000,
+  "y": 1680000,
+  "radius": 10000,
+  "model_block": "oritech_space_age:phobos",
+  "resources": [
+    {
+      "block": "minecraft:iron_ore",
+      "amount": 40
+    },
+    {
+      "block": "minecraft:gold_ore",
+      "amount": 30
+    },
+    {
+      "block": "oritech:nickel_ore",
+      "amount": 30
+    }
+  ]
+}

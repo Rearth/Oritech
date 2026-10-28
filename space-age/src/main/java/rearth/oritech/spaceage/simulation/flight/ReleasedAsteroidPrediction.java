@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.AsteroidPath;
@@ -49,7 +50,7 @@ final class ReleasedAsteroidPrediction {
             var previousTime = time;
             var previousVelocityX = velocityX;
             var previousVelocityY = velocityY;
-            var drag = Math.exp(-AsteroidImpactRules.SPACE_DRAG_PER_SECOND * seconds);
+            var drag = Math.exp(-SpaceBalance.SPACE_DRAG_PER_SECOND * seconds);
             x += velocityX * seconds;
             y += velocityY * seconds;
             velocityX *= drag;
@@ -61,7 +62,7 @@ final class ReleasedAsteroidPrediction {
                 x = previousX + (x - previousX) * hitFraction;
                 y = previousY + (y - previousY) * hitFraction;
                 time = previousTime + seconds * hitFraction;
-                var hitDrag = Math.exp(-AsteroidImpactRules.SPACE_DRAG_PER_SECOND * seconds * hitFraction);
+                var hitDrag = Math.exp(-SpaceBalance.SPACE_DRAG_PER_SECOND * seconds * hitFraction);
                 velocityX = previousVelocityX * hitDrag;
                 velocityY = previousVelocityY * hitDrag;
                 samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));

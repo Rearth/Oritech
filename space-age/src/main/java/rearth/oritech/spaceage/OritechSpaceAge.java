@@ -33,6 +33,7 @@ import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RobotNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceAgeGameTests;
+import rearth.oritech.spaceage.simulation.ResourceBodies;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 
@@ -56,6 +57,7 @@ public final class OritechSpaceAge {
         NeoForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
         modEventBus.addListener(this::addNetworkHandlers);
         modEventBus.addListener(SpaceAgeDataMaps::register);
+        modEventBus.addListener(ResourceBodies::register);
         modEventBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
             CubeSatSplicerBehavior.register();
             LaunchRampImpactBehavior.register();

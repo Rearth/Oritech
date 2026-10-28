@@ -1,0 +1,26 @@
+{
+  "generator": "built-in image_gen",
+  "textures": [
+    {
+      "name": "luna",
+      "prompt": "Use case: stylized-concept. Asset type: Minecraft celestial cube block surface texture. Generate ONE square seamless full-bleed tile of Luna, Earth's grey moon: cool silver grey regolith, scattered dark basalt plains and many round impact craters, subtle copper brown mineral flecks. Top down orthographic albedo surface, completely fills canvas edge to edge. Minecraft pixel art, coherent chunky pixel clusters, readable at 128 by 128 pixels, restrained 12-color palette, detailed geological forms rather than random noise. Even flat illumination, no cast shadows or global light gradient. This is the flat surface texture to wrap around a simple cube, NOT an image of a planet or cube. No space, no stars, no text, no borders, no transparency."
+    },
+    {
+      "name": "phobos",
+      "prompt": "Use case: stylized-concept. Asset type: Minecraft celestial cube block surface texture. Generate ONE square seamless full-bleed tile of Phobos, Mars's rusty moon: dark reddish brown rocky regolith, broad worn craters and charcoal fractures with muted gold mineral seams. Top down orthographic albedo surface, completely fills canvas edge to edge. Minecraft pixel art, coherent chunky pixel clusters, readable at 128 by 128 pixels, restrained 12-color palette, detailed geological forms rather than random noise. Even flat illumination, no cast shadows or global light gradient. This is the flat surface texture to wrap around a simple cube, NOT an image of a planet or cube. No space, no stars, no text, no borders, no transparency."
+    },
+    {
+      "name": "ceres",
+      "prompt": "Use case: stylized-concept. Asset type: Minecraft celestial cube block surface texture. Generate ONE square seamless full-bleed tile of Ceres, an icy dwarf asteroid: blue grey rock, pale icy salt deposits, gentle craters and bright white mineral patches, subtle blue lapis flecks. Top down orthographic albedo surface, completely fills canvas edge to edge. Minecraft pixel art, coherent chunky pixel clusters, readable at 128 by 128 pixels, restrained 12-color palette, detailed geological forms rather than random noise. Even flat illumination, no cast shadows or global light gradient. This is the flat surface texture to wrap around a simple cube, NOT an image of a planet or cube. No space, no stars, no text, no borders, no transparency."
+    },
+    {
+      "name": "vesta",
+      "prompt": "Use case: stylized-concept. Asset type: Minecraft celestial cube block surface texture. Generate ONE square seamless full-bleed tile of Vesta, a metallic mega asteroid: dark slate basalt, irregular steel grey metallic veins, copper orange seams and violet mineral specks, worn impact craters. Top down orthographic albedo surface, completely fills canvas edge to edge. Minecraft pixel art, coherent chunky pixel clusters, readable at 128 by 128 pixels, restrained 12-color palette, detailed geological forms rather than random noise. Even flat illumination, no cast shadows or global light gradient. This is the flat surface texture to wrap around a simple cube, NOT an image of a planet or cube. No space, no stars, no text, no borders, no transparency."
+    },
+    {
+      "name": "nyx",
+      "prompt": "Use case: precise-object-edit. Edit this existing flat Minecraft Nyx celestial surface texture. Remove ALL crystals, gemstones, green deposits, bright turquoise ice channels, vivid cyan fractures and bright purple mineral veins. Replace them naturally with dark weathered rocky terrain. Keep the existing dark charcoal-purple palette, round impact craters, chunky pixel-art style, and overall density of rocky details. Subtle muted lavender-grey rock variations only; absolutely no luminous minerals, crystals or colorful channels. Full-bleed square flat surface/albedo tile to repeat on a simple cube, evenly lit, not a picture of a cube or planet. No perspective, no atmosphere, no text, no border. Match the reference's pixel-art scale, readable as a 128x128 game texture.",
+      "reference": "Previous Nyx texture, edited to remove crystals and bright mineral channels"
+    }
+  ]
+}

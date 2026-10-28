@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import org.joml.Vector2i;
 import org.junit.jupiter.api.Test;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -48,9 +49,9 @@ class RocketAscentTest {
         assertTrue(decoded.takeoffCollisionTick() > decoded.launchTick());
         assertTrue(decoded.takeoffCollisionTick() < decoded.orbitArrivalTick());
         // An unpowered craft coasts upwards against surface gravity.
-        assertEquals(-RocketPerformanceCalculator.STANDARD_GRAVITY, ascent.acceleration(), 1e-9);
+        assertEquals(-SpaceBalance.STANDARD_GRAVITY, ascent.acceleration(), 1e-9);
         assertEquals(origin.getY(), RocketSimulationController.getRocketPosition(decoded, 100).y, 1e-6);
-        assertEquals(origin.getY() + 500 - RocketPerformanceCalculator.STANDARD_GRAVITY / 2,
+        assertEquals(origin.getY() + 500 - SpaceBalance.STANDARD_GRAVITY / 2,
                 RocketSimulationController.getRocketPosition(decoded, 120).y, 1e-6);
         assertEquals(origin.getY() + 1000, RocketSimulationController.getRocketPosition(decoded, 100 + duration).y, 1e-6);
         var collisionSpeed = decoded.ascent().speed((decoded.takeoffCollisionTick() - decoded.launchTick()) / 20.0);
@@ -73,7 +74,7 @@ class RocketAscentTest {
 
         var performance = new RocketPerformance(1000, 0, 1000, 0, 0, 0, 0, 0);
         var ascent = RocketAscent.launch(performance, 50);
-        var seconds = ascent.secondsTo(RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS);
+        var seconds = ascent.secondsTo(SpaceBalance.LAUNCH_ORBIT_HEIGHT_BLOCKS);
         assertTrue(Double.isFinite(seconds));
         assertTrue(ascent.speed(seconds) >= 50 / Math.sqrt(2) - 1e-9);
     }

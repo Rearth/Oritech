@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.simulation.service;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState.Context;
@@ -11,7 +12,6 @@ import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
-import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 
 import java.util.ArrayList;
@@ -161,7 +161,7 @@ public final class RocketServiceForecast {
         craft.segments.values().forEach(segment -> {
             var r = segment.physical.copy();
             r.setResources(segment.fuelTicks, segment.rf);
-            r.currentFuelWeight = segment.fuelMass / RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT;
+            r.currentFuelWeight = segment.fuelMass / SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
             r.crafters.clear();
             segment.crafters.forEach((pos, c) -> r.crafters.put(pos, c.copy()));
             structures.put(segment.structure.segmentId(), segment.structure);
@@ -181,11 +181,11 @@ public final class RocketServiceForecast {
             r.crafters.forEach((pos, c) -> segment.crafters.put(pos, c.copy()));
             segment.rf = r.rf();
             segment.fuelTicks = r.fuel();
-            segment.fuelMass = r.currentFuelWeight * RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT;
+            segment.fuelMass = r.currentFuelWeight * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
             segment.chemicalSeconds = segment.hardware.chemicalSeconds(r);
             segment.ionSeconds = segment.hardware.ionSeconds(r);
             var current = rocket.getStaticSegments().get(id);
-            segment.dryMass = current.staticWeight() * RocketPerformanceCalculator.KILOGRAMS_PER_WEIGHT_UNIT;
+            segment.dryMass = current.staticWeight() * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
             segment.payloadEnergy = current.payloadEnergyJoules();
             segment.wetMass = segment.dryMass + segment.fuelMass;
         });

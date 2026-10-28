@@ -7,20 +7,12 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 /**
  * Shared, deliberately small balancing model for planner collision and landing predictions.
  */
 public final class AsteroidImpactRules {
-
-    public static final double KILOGRAMS_PER_ASTEROID_MASS = 1_000;
-    public static final double SPACE_DRAG_PER_SECOND = 0.000002;
-    public static final double MAX_ASTEROID_CONNECTION_SPEED = 12;
-    private static final double SAFE_ASTEROID_SPEED = 6;
-    private static final double ASTEROID_CHIP_ENERGY_PER_KILOGRAM = 3_000;
-    private static final double MIN_CHIPPED_MASS_KILOGRAMS = 8_000;
-    private static final double ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM = 180_000;
-    private static final double HEAVY_IMPACT_ENERGY = 100_000_000;
 
     private AsteroidImpactRules() {
     }
@@ -33,7 +25,7 @@ public final class AsteroidImpactRules {
 
     public static boolean canConnectAsteroid(double relativeSpeed) {
 
-        return relativeSpeed <= MAX_ASTEROID_CONNECTION_SPEED;
+        return relativeSpeed <= SpaceBalance.MAX_ASTEROID_CONNECTION_SPEED;
     }
 
     public static ImpactPrediction predictArrival(double rocketMass, SpaceSimulation.SpaceObjectData target,
@@ -47,23 +39,37 @@ public final class AsteroidImpactRules {
                                                   double relativeSpeed, SpaceSimulation.SpaceObjectData attached,
                                                   SpaceSimulation.FlightPlanAction action, double explosiveEnergy) {
 
-        var asteroidMass = attached == null ? 0 : attached.mass() * KILOGRAMS_PER_ASTEROID_MASS;
+        return predictArrival(rocketMass, target, relativeSpeed, attached, action, explosiveEnergy, action.id());
+    }
+
+    public static ImpactPrediction predictArrival(double rocketMass, SpaceSimulation.SpaceObjectData target,
+                                                  double relativeSpeed, SpaceSimulation.SpaceObjectData attached,
+                                                  SpaceSimulation.FlightPlanAction action, double explosiveEnergy, UUID impactorId) {
+
+        var asteroidMass = attached == null ? 0 : attached.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS;
         var combinedMass = Math.max(1, rocketMass + asteroidMass);
         var kinetic = combinedMass * relativeSpeed * relativeSpeed * 0.5;
-        var safeSpeed = attached == null ? MAX_ASTEROID_CONNECTION_SPEED : SAFE_ASTEROID_SPEED;
+        var safeSpeed = attached == null ? SpaceBalance.MAX_ASTEROID_CONNECTION_SPEED : SpaceBalance.SAFE_ASTEROID_SPEED;
         var explosive = relativeSpeed > safeSpeed ? Math.max(0, explosiveEnergy) : 0;
         var energy = kinetic + explosive;
         var landingX = action.landingX() + action.landingOffsetX();
         var landingZ = action.landingZ() + action.landingOffsetZ();
 
+        if (target.type() == SpaceObjects.ObjectType.RESOURCE_BODY) {
+            var fragments = relativeSpeed > safeSpeed ? createResourceFragments(target, energy, action, impactorId) : List.<AsteroidFragment>of();
+            return new ImpactPrediction(fragments.isEmpty() ? ArrivalOutcome.SAFE_APPROACH : ArrivalOutcome.ASTEROID_FRAGMENTATION,
+                    relativeSpeed, kinetic, 0, fragments.isEmpty() ? FragmentationMode.NONE : FragmentationMode.CHIPPING,
+                    fragments, 0, List.of(), landingX, landingZ, explosive);
+        }
+
         if (target.type() == SpaceObjects.ObjectType.ASTEROID) {
-            var targetMass = Math.max(1, target.mass() * KILOGRAMS_PER_ASTEROID_MASS);
+            var targetMass = Math.max(1, target.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS);
             var energyPerKilogram = energy / targetMass;
             // Excavating a small piece does not require energizing the entire deposit.
-            var minimumChipEnergy = Math.min(MIN_CHIPPED_MASS_KILOGRAMS, targetMass * 0.04)
-                    * ASTEROID_CHIP_ENERGY_PER_KILOGRAM;
+            var minimumChipEnergy = Math.min(SpaceBalance.MIN_CHIPPED_MASS_KILOGRAMS, targetMass * 0.04)
+                    * SpaceBalance.ASTEROID_CHIP_ENERGY_PER_KILOGRAM;
             if (relativeSpeed > safeSpeed && energy >= minimumChipEnergy) {
-                var mode = energyPerKilogram >= ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM
+                var mode = energyPerKilogram >= SpaceBalance.ASTEROID_BREAKUP_ENERGY_PER_KILOGRAM
                         ? FragmentationMode.CATASTROPHIC : FragmentationMode.CHIPPING;
                 var fragments = createFragments(target, energy, energyPerKilogram, mode);
                 var fragmentedMass = fragments.stream().mapToDouble(AsteroidFragment::mass).sum();
@@ -79,10 +85,10 @@ public final class AsteroidImpactRules {
         }
 
         ArrivalOutcome outcome = relativeSpeed <= safeSpeed ? ArrivalOutcome.SAFE_APPROACH
-                : energy >= HEAVY_IMPACT_ENERGY || attached != null
+                : energy >= SpaceBalance.HEAVY_IMPACT_ENERGY || attached != null
                   ? ArrivalOutcome.HEAVY_IMPACT : ArrivalOutcome.ROCKET_DESTRUCTION;
         var craterRadius = outcome == ArrivalOutcome.HEAVY_IMPACT
-                ? Mth.clamp((int) Math.round(3 * Math.cbrt(energy / HEAVY_IMPACT_ENERGY)), 3, 48) : 0;
+                ? Mth.clamp((int) Math.round(3 * Math.cbrt(energy / SpaceBalance.HEAVY_IMPACT_ENERGY)), 3, 48) : 0;
         var recovery = relativeSpeed <= safeSpeed ? 1 : Mth.clamp(0.85 - relativeSpeed / 500, 0.15, 0.8);
         var recovered = attached == null ? List.<SpaceObjects.AsteroidMaterial>of()
                 : scaleMaterials(attached.materials(), recovery);
@@ -102,7 +108,7 @@ public final class AsteroidImpactRules {
                                                           double energyPerKilogram, FragmentationMode mode) {
 
         var fragmentedFraction = mode == FragmentationMode.CATASTROPHIC ? 1
-                : Math.min(0.2, energyPerKilogram / ASTEROID_CHIP_ENERGY_PER_KILOGRAM);
+                : Math.min(0.2, energyPerKilogram / SpaceBalance.ASTEROID_CHIP_ENERGY_PER_KILOGRAM);
         var count = mode == FragmentationMode.CHIPPING
                 ? Mth.clamp(2 + (int) (fragmentedFraction / 0.075), 2, 4)
                 : Mth.clamp(4 + (int) (energyPerKilogram / 250_000), 4, 8);
@@ -129,6 +135,58 @@ public final class AsteroidImpactRules {
         return List.copyOf(fragments);
     }
 
+    private static List<AsteroidFragment> createResourceFragments(SpaceSimulation.SpaceObjectData target, double energy,
+                                                                  SpaceSimulation.FlightPlanAction action, UUID impactorId) {
+
+        // Each craft gets its own collision, while forecasts and reloaded execution agree.
+        var random = new Random(target.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits()
+                ^ impactorId.getMostSignificantBits() ^ impactorId.getLeastSignificantBits() ^ Double.doubleToLongBits(energy));
+        var count = 1 + random.nextInt(3);
+        var totalBlocks = Math.max(count, (int) (energy / (SpaceBalance.ASTEROID_CHIP_ENERGY_PER_KILOGRAM * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS)));
+        var weights = new double[count];
+        for (int index = 0; index < count; index++) weights[index] = 0.1 + random.nextDouble();
+        var blocks = partition(totalBlocks - count, weights);
+        var composition = target.materials().stream().mapToDouble(SpaceObjects.AsteroidMaterial::amount).toArray();
+        var fragments = new ArrayList<AsteroidFragment>();
+        for (int index = 0; index < count; index++) {
+            // Every ejected chunk has at least one block and remains an ordinary finite asteroid.
+            var amount = blocks[index] + 1;
+            var resources = partition(amount, composition);
+            var materials = new ArrayList<SpaceObjects.AsteroidMaterial>();
+            for (int resource = 0; resource < resources.length; resource++) {
+                if (resources[resource] > 0) materials.add(new SpaceObjects.AsteroidMaterial(
+                        target.materials().get(resource).block(), resources[resource]));
+            }
+            fragments.add(new AsteroidFragment(amount, (float) (40 * Math.cbrt(amount)), materials));
+        }
+        fragments.sort(Comparator.comparingDouble(AsteroidFragment::mass).reversed());
+        return List.copyOf(fragments);
+    }
+
+    private static int[] partition(int amount, double[] weights) {
+
+        var totalWeight = Arrays.stream(weights).sum();
+        var amounts = new int[weights.length];
+        var remainders = new double[weights.length];
+        var assigned = 0;
+        for (int index = 0; index < weights.length; index++) {
+            var exact = amount * weights[index] / totalWeight;
+            amounts[index] = (int) Math.floor(exact);
+            remainders[index] = exact - amounts[index];
+            assigned += amounts[index];
+        }
+        while (assigned < amount) {
+            var largest = 0;
+            for (int index = 1; index < remainders.length; index++) {
+                if (remainders[index] > remainders[largest]) largest = index;
+            }
+            amounts[largest]++;
+            remainders[largest] = -1;
+            assigned++;
+        }
+        return amounts;
+    }
+
     private static List<List<SpaceObjects.AsteroidMaterial>> distributeMaterials(
             List<SpaceObjects.AsteroidMaterial> source, double[] fractions) {
 
@@ -137,24 +195,7 @@ public final class AsteroidImpactRules {
         var fragmentedFraction = Arrays.stream(fractions).sum();
         for (var material : source) {
             var fragmentedAmount = (int) Math.round(material.amount() * fragmentedFraction);
-            var amounts = new int[fractions.length];
-            var remainders = new double[fractions.length];
-            var assigned = 0;
-            for (int index = 0; index < fractions.length; index++) {
-                var exact = fragmentedAmount * fractions[index] / fragmentedFraction;
-                amounts[index] = (int) Math.floor(exact);
-                remainders[index] = exact - amounts[index];
-                assigned += amounts[index];
-            }
-            while (assigned < fragmentedAmount) {
-                var largest = 0;
-                for (int index = 1; index < remainders.length; index++) {
-                    if (remainders[index] > remainders[largest]) largest = index;
-                }
-                amounts[largest]++;
-                remainders[largest] = -1;
-                assigned++;
-            }
+            var amounts = partition(fragmentedAmount, fractions);
             for (int index = 0; index < amounts.length; index++) {
                 if (amounts[index] > 0) result.get(index).add(
                         new SpaceObjects.AsteroidMaterial(material.block(), amounts[index]));

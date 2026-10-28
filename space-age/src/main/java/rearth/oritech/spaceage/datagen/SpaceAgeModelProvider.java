@@ -81,6 +81,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.LUNA.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.PHOBOS.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.CERES.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.VESTA.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.NYX.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);

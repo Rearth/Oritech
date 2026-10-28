@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
@@ -20,8 +21,6 @@ import java.util.stream.Collectors;
  * Program memory belongs to connected hardware; completed instructions never occupy it.
  */
 public final class NavigationComputerRules {
-
-    public static final int BASE_STEPS = 3;
 
     private NavigationComputerRules() {
     }
@@ -54,7 +53,7 @@ public final class NavigationComputerRules {
 
     private static int capacity(int computers) {
 
-        return Math.min(RocketFlightPlanRules.MAX_ACTIONS, BASE_STEPS + computers);
+        return Math.min(RocketFlightPlanRules.MAX_ACTIONS, SpaceBalance.BASE_NAVIGATION_STEPS + computers);
     }
 
     public static boolean requiresComputer(FlightPlanAction action) {

@@ -66,6 +66,7 @@ public class SpaceSimulation {
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
     private final Map<GlobalPos, FlightPlan> flightPlans = new HashMap<>();
+    private List<SpaceObjectData> resourceBodies = List.of();
 
     private SpaceSimulation(UUID loadedSimulationId, List<SpaceObjects.SimulatedObject> loadedObjects,
                             List<StoredFlightPlan> loadedPlans, Optional<SurveyKnowledge> knowledge) {
@@ -243,9 +244,15 @@ public class SpaceSimulation {
 
         var objects = new ArrayList<SpaceObjectData>();
         CELESTIAL_OBJECTS.stream().map(SpaceSimulation::toData).forEach(objects::add);
+        objects.addAll(resourceBodies);
         nonCelestialObjects.stream().map(SpaceSimulation::toData).forEach(objects::add);
         objects.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
         return objects;
+    }
+
+    public void setResourceBodies(List<SpaceObjectData> bodies) {
+
+        resourceBodies = List.copyOf(bodies);
     }
 
     public void tickAsteroids(ServerLevel level) {
@@ -286,12 +293,14 @@ public class SpaceSimulation {
 
     public UUID applyAsteroidImpact(UUID targetId, AsteroidImpactRules.ImpactPrediction impact) {
 
-        var target = nonCelestialObjects.stream().filter(o -> o.id.equals(targetId)).findFirst().orElse(null);
-        if (!(target instanceof SpaceObjects.Asteroid asteroid) || impact.fragments().isEmpty()) return null;
-        var destroyed = impact.remainingTargetMass() <= 0;
-        earthKnowledge.forget(targetId);
-        var targetPosition = new Vector2f(asteroid.currentPosition);
-        var targetName = asteroid.name.isBlank() ? "Unnamed asteroid" : asteroid.name;
+        var target = truth().stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
+        if (target == null || impact.fragments().isEmpty()) return null;
+        var infinite = target.type() == SpaceObjects.ObjectType.RESOURCE_BODY;
+        if (!infinite && target.type() != SpaceObjects.ObjectType.ASTEROID) return null;
+        var destroyed = !infinite && impact.remainingTargetMass() <= 0;
+        if (!infinite) earthKnowledge.forget(targetId);
+        var targetPosition = new Vector2f(target.x(), target.y());
+        var targetName = target.name().isBlank() ? "Unnamed asteroid" : target.name();
         // The old region was already surveyed to reveal this target. Replace it with the new debris field.
         nonCelestialObjects.removeIf(object -> object.type == SpaceObjects.ObjectType.SURVEY_REGION
                 && Math.hypot(object.currentPosition.x - targetPosition.x,
@@ -301,19 +310,22 @@ public class SpaceSimulation {
             var fragment = impact.fragments().get(index);
             var child = new SpaceObjects.Asteroid();
             var angle = index * Math.PI * 2 / impact.fragments().size();
-            var offset = (asteroid.radius + fragment.radius()) * 1.25f;
+            var offset = (target.radius() + fragment.radius()) * 1.25f;
             child.currentPosition = new Vector2f(targetPosition).add((float) Math.cos(angle) * offset, (float) Math.sin(angle) * offset);
             child.weight = fragment.mass();
             child.radius = fragment.radius();
             child.materials = fragment.materials();
-            child.surfaceGravity = asteroid.surfaceGravity * child.radius / asteroid.radius;
+            child.surfaceGravity = target.surfaceGravity() * child.radius / target.radius();
             child.name = destroyed ? "Fragment " + (index + 1) + " of destroyed " + targetName
                     : targetName + " impact fragment " + (index + 1);
             debrisRadius = Math.max(debrisRadius, offset + child.radius * 1.5f);
             nonCelestialObjects.add(child);
         }
+        var asteroid = nonCelestialObjects.stream().filter(object -> object.id.equals(targetId))
+                .filter(object -> object instanceof SpaceObjects.Asteroid).map(object -> (SpaceObjects.Asteroid) object)
+                .findFirst().orElse(null);
         if (destroyed) nonCelestialObjects.remove(asteroid);
-        else {
+        else if (!infinite) {
             double fraction = impact.remainingTargetMass() / asteroid.weight;
             asteroid.weight = impact.remainingTargetMass();
             asteroid.radius *= (float) Math.cbrt(fraction);

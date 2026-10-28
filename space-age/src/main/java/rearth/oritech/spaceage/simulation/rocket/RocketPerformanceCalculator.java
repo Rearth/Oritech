@@ -8,13 +8,6 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
  */
 public final class RocketPerformanceCalculator {
 
-    public static final double STANDARD_GRAVITY = 9.80665;
-    public static final int TICKS_PER_SECOND = 20;
-    public static final int LAUNCH_ORBIT_HEIGHT_BLOCKS = 1_000;
-
-    public static final double KILOGRAMS_PER_WEIGHT_UNIT = 1_000;
-    public static final double ENGINE_THRUST_NEWTONS = 250_000;
-
     private RocketPerformanceCalculator() {
     }
 
@@ -33,12 +26,12 @@ public final class RocketPerformanceCalculator {
             var segment = entry.getValue();
             var resources = rocket.getDynamicSegments().get(entry.getKey());
             var hardware = RocketHardware.of(segment);
-            var dry = segment.staticWeight() * KILOGRAMS_PER_WEIGHT_UNIT;
-            var fuel = resources.currentFuelWeight * KILOGRAMS_PER_WEIGHT_UNIT;
+            var dry = segment.staticWeight() * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
+            var fuel = resources.currentFuelWeight * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
             var chemicalTime = hardware.chemicalSeconds(resources);
             var ionTime = hardware.ionSeconds(resources);
-            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * ENGINE_THRUST_NEWTONS : 0;
-            var ionThrust = ionTime > 0 ? hardware.ion() * ENGINE_THRUST_NEWTONS : 0;
+            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS : 0;
+            var ionThrust = ionTime > 0 ? hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS : 0;
             dryMass += dry;
             fuelMass += fuel;
             thrust += chemicalThrust + ionThrust;
@@ -65,8 +58,8 @@ public final class RocketPerformanceCalculator {
             var hardware = RocketHardware.of(entry.getValue());
             var chemicalTime = hardware.chemicalSeconds(resources);
             var ionTime = hardware.ionSeconds(resources);
-            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * ENGINE_THRUST_NEWTONS : 0;
-            var ionThrust = ionTime > 0 ? hardware.ion() * ENGINE_THRUST_NEWTONS * SpaceBalance.ION_ATMOSPHERE : 0;
+            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS : 0;
+            var ionThrust = ionTime > 0 ? hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS * SpaceBalance.ION_ATMOSPHERE : 0;
             engines += hardware.chemical() + hardware.ion();
             thrust += chemicalThrust + ionThrust;
             burnSeconds = Math.max(burnSeconds, Math.max(chemicalTime, ionTime));
@@ -86,12 +79,12 @@ public final class RocketPerformanceCalculator {
 
         if (performance.engineCount() == 0) return LaunchReadiness.NO_ENGINES;
         if (performance.wetMassKilograms() <= 0) return LaunchReadiness.NO_MASS;
-        if (performance.liftoffAccelerationMetersPerSecondSquared() <= STANDARD_GRAVITY) {
+        if (performance.liftoffAccelerationMetersPerSecondSquared() <= SpaceBalance.STANDARD_GRAVITY) {
             return LaunchReadiness.INSUFFICIENT_THRUST;
         }
 
-        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - STANDARD_GRAVITY;
-        var ascentSeconds = Math.sqrt(2 * LAUNCH_ORBIT_HEIGHT_BLOCKS / netAcceleration);
+        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - SpaceBalance.STANDARD_GRAVITY;
+        var ascentSeconds = Math.sqrt(2 * SpaceBalance.LAUNCH_ORBIT_HEIGHT_BLOCKS / netAcceleration);
         var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
         if (performance.availableBurnSeconds() < ascentSeconds
                 || performance.availableDeltaVMetersPerSecond() < requiredDeltaV) {

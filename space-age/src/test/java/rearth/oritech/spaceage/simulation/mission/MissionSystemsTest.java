@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeComponents.MissionCard;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
+import rearth.oritech.spaceage.simulation.ResourceBodies.Definition;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -53,6 +55,48 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MissionSystemsTest {
 
     private static final UUID OWNER = new UUID(1, 1);
+
+    @Test
+    void fixedBodyCollisionMatchesForecastAfterReloadAndProducesTuggableAsteroids() {
+
+        var system = new SpaceSimulation();
+        var definition = new Definition("Test moon", "A fixed deposit", -3_130_000, 0, 2_000,
+                Identifier.parse("oritech_space_age:luna"), List.of(
+                new SpaceObjects.AsteroidMaterial(Identifier.parse("minecraft:iron_ore"), 3),
+                new SpaceObjects.AsteroidMaterial(Identifier.parse("minecraft:copper_ore"), 1)));
+        var body = definition.object(Identifier.parse("oritech_space_age:test_moon"));
+        system.setResourceBodies(List.of(body));
+        var craft = rocket(false, 0, 0);
+        var action = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(body.id()).withOrbit(OrbitBand.SURFACE)
+                .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
+        var program = plan(action);
+        var position = new MissionState.Position(-3_120_000, 0, -500, 0, SpaceObjects.EARTH_ID, OrbitBand.HIGH, -1, 1,
+                FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var forecast = RocketFlightPathCalculator.calculateFrom(craft, system.createObjectData(), program, position);
+        assertEquals(RocketFlightPathCalculator.TerminalState.DESTROYED, forecast.paths().getFirst().terminalState());
+        var impact = forecast.arrivalPredictions().getFirst().impact();
+        var mission = new MissionState(OWNER, craft, program, position, new SurveyKnowledge(), BlockPos.ZERO);
+        var data = new MissionSavedData();
+        MissionNavigation.tick(null, data, mission, system, action, 0);
+        mission = MissionState.CODEC.parse(NbtOps.INSTANCE,
+                MissionState.CODEC.encodeStart(NbtOps.INSTANCE, mission).getOrThrow()).getOrThrow();
+        for (int tick = 1; tick < 10_000 && !mission.ended; tick++)
+            MissionNavigation.tick(null, data, mission, system, mission.action(), tick);
+        assertTrue(mission.ended, mission.status);
+        assertEquals(body, system.truth().stream().filter(object -> object.id().equals(body.id())).findFirst().orElseThrow());
+        var chunks = system.truth().stream().filter(object -> object.name().startsWith("Test moon impact fragment")).toList();
+        assertEquals(impact.fragmentCount(), chunks.size());
+        assertEquals(impact.fragments().stream().mapToDouble(AsteroidImpactRules.AsteroidFragment::mass).sum(),
+                chunks.stream().mapToDouble(SpaceObjectData::mass).sum(), .001);
+        assertTrue(chunks.stream().allMatch(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
+                && object.surfaceGravity() == 0 && !object.materials().isEmpty()));
+
+        var attach = FlightPlanAction.create(ActionType.CONNECT_ASTEROID).withTarget(body.id())
+                .withSegments(List.of(SegmentRef.of(craft.getStaticSegments().values().iterator().next())));
+        var atBody = position.placed(body.x() + body.radius(), body.y(), 0, 0, body.id(), OrbitBand.SURFACE, -1);
+        var invalid = RocketFlightPathCalculator.calculateFrom(craft, system.createObjectData(), plan(attach), atBody);
+        assertEquals(RocketFlightPathCalculator.TerminalState.TARGET_UNAVAILABLE, invalid.paths().getFirst().terminalState());
+    }
 
     @Test
     void coordinateWaypointsSurviveSavingAndLiveNavigationMatchesThePreview() {

@@ -44,6 +44,26 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<PlanetBlock> MARS = BLOCKS.registerBlock("mars", PlanetBlock::new,
             () -> machineProperties().noOcclusion());
 
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> LUNA = BLOCKS.registerBlock("luna", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> PHOBOS = BLOCKS.registerBlock("phobos", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> CERES = BLOCKS.registerBlock("ceres", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> VESTA = BLOCKS.registerBlock("vesta", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> NYX = BLOCKS.registerBlock("nyx", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
     public static final DeferredBlock<GlobeBlock> MINI_EARTH = BLOCKS.registerBlock("mini_earth",
             GlobeBlock::new, () -> machineProperties().noOcclusion());
 

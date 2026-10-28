@@ -46,12 +46,12 @@ public record RocketHardware(int chemical, int ion, int scanners, int antennas) 
 
     public double fuelCost(double seconds) {
 
-        return seconds * 20 * chemical;
+        return seconds * SpaceBalance.CHEMICAL_FUEL_PER_SECOND * chemical;
     }
 
     public double rfCost(double seconds) {
 
-        return seconds * 20 * SpaceBalance.ION_RF * ion;
+        return seconds * SpaceBalance.TICKS_PER_SECOND * SpaceBalance.ION_RF * ion;
     }
 
     public void burn(DynamicRocketSegment resources, double seconds) {

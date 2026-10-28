@@ -16,7 +16,7 @@ import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.power.BeamAperture;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.List;
@@ -68,7 +68,7 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
         target.withTooltip(text("target", menu.pos.getX(), menu.pos.getZ()));
         addComponent(target);
         received = new ProgressBarWidget(rightX, 43, rightWidth, 22, Component.empty(),
-                () -> menu.snapshot.quality() > 0 ? (float) (menu.snapshot.received() / (menu.snapshot.quality() * BeamAperture.RF_PER_GLASS)) : 0f,
+                () -> menu.snapshot.quality() > 0 ? (float) (menu.snapshot.received() / (menu.snapshot.quality() * SpaceBalance.BEAM_RF_PER_GLASS)) : 0f,
                 () -> ProgressBarWidget.PRESET_GREEN).withTextColor(LabelWidget.DARK_TEXT);
         addComponent(received);
         coverage = new LabelWidget(rightX, 72, rightWidth, Component.empty()).withDarkColor();
@@ -110,7 +110,7 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
         status.withColor(issue.equals("receiving") || issue.equals("ready") ? 0xFF398332 : 0xFFAA5724);
         status.setTooltip(data.defect().map(pos -> List.of(text("missing", pos.toShortString()))).orElse(List.of()));
         received.setTitle(text("received", energy(data.received())));
-        received.withTooltip(text("capacity", energy(data.quality() * BeamAperture.RF_PER_GLASS)),
+        received.withTooltip(text("capacity", energy(data.quality() * SpaceBalance.BEAM_RF_PER_GLASS)),
                 text("rejected_capacity", energy(data.reception().capacityLoss())), text("rejected_storage", energy(data.reception().storageLoss())));
         coverage.setText(data.reception().incident() > 0 ? text("coverage", decimal(data.reception().coverage() * 100)) : text("coverage_idle"));
         coverage.withTooltip(text("incident", energy(data.reception().incident())), text("collected", energy(data.reception().collected())),

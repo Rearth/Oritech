@@ -3,7 +3,6 @@ package rearth.oritech.spaceage.simulation.flight;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
-import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ActionMoment;
@@ -254,7 +253,7 @@ public final class RocketFlightPathState {
         public double mass() {
 
             var asteroidMass = attachedAsteroid == null ? 0
-                    : attachedAsteroid.mass() * AsteroidImpactRules.KILOGRAMS_PER_ASTEROID_MASS;
+                    : attachedAsteroid.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS;
             return rocketMass() + asteroidMass + dockedVisitorMass;
         }
 

@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.simulation.rocket;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 
 /** Shared physical ascent for rendering, obstruction timing and collision energy. */
 public record RocketAscent(double initialSpeed, double acceleration) {
@@ -13,11 +14,11 @@ public record RocketAscent(double initialSpeed, double acceleration) {
 
     public static RocketAscent launch(RocketPerformance performance, double speed) {
 
-        var acceleration = performance.liftoffAccelerationMetersPerSecondSquared() - RocketPerformanceCalculator.STANDARD_GRAVITY;
+        var acceleration = performance.liftoffAccelerationMetersPerSecondSquared() - SpaceBalance.STANDARD_GRAVITY;
         if (speed <= 0) return new RocketAscent(0, Math.max(.1, acceleration));
         // Weak craft slow down under surface gravity. The space simulation already decided this craft reaches space,
         // so the slowdown is capped to keep at least ~70% of the launch speed at orbit height.
-        var slowest = -speed * speed / (4 * RocketPerformanceCalculator.LAUNCH_ORBIT_HEIGHT_BLOCKS);
+        var slowest = -speed * speed / (4 * SpaceBalance.LAUNCH_ORBIT_HEIGHT_BLOCKS);
         return new RocketAscent(speed, Math.max(slowest, acceleration));
     }
 

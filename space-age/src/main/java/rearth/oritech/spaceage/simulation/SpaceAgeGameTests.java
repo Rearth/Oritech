@@ -5,6 +5,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
@@ -365,7 +366,7 @@ public final class SpaceAgeGameTests {
                     layout.put(cell, material.getKey().defaultBlockState());
                 }
             }
-            test.assertTrue(receiver.snapshot().quality() * BeamAperture.RF_PER_GLASS == material.getValue(),
+            test.assertTrue(receiver.snapshot().quality() * SpaceBalance.BEAM_RF_PER_GLASS == material.getValue(),
                     "Physical receiver uses loaded glass qualities from the data map");
             test.assertTrue(upgraded.powerHardware().throughput() == material.getValue(),
                     "Spacecraft use the same glass upgrades and invalidate cached hardware");
@@ -660,6 +661,17 @@ public final class SpaceAgeGameTests {
 
     private static void content(GameTestHelper test) {
 
+        var bodies = ResourceBodies.objects(test.getLevel().registryAccess());
+        test.assertTrue(bodies.size() == 5, "Five default resource bodies load from datapacks");
+        var system = SpaceSimulationSavedData.get(test.getLevel().getServer()).getOrCreate(UUID.randomUUID());
+        test.assertTrue(system.createObjectData().containsAll(bodies), "Fixed deposits appear in player systems");
+        for (var body : bodies) {
+            test.assertTrue(body.surfaceGravity() == 0, "Resource bodies have no gravity");
+            for (var resource : body.materials())
+                test.assertTrue(BuiltInRegistries.BLOCK.containsKey(resource.block()), "Resource blocks exist");
+            var definition = ResourceBodies.find(test.getLevel().registryAccess(), body.id());
+            test.assertTrue(BuiltInRegistries.BLOCK.containsKey(definition.modelBlock()), "Display blocks exist");
+        }
         var recipes = test.getLevel().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
         test.assertTrue(recipes.size() == 2, "Both generated vacuum recipes load");
         test.assertTrue(Blocks.TNT.builtInRegistryHolder().getData(SpaceAgeDataMaps.ROCKET_EXPLOSIVES) > 0, "TNT explosive data map loads on server");

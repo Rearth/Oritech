@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.SpaceAgeConfig;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment.BlockData;
 
 import java.util.ArrayList;
@@ -23,9 +24,6 @@ import java.util.function.ToDoubleFunction;
 public final class BeamAperture {
 
     public static final TagKey<Block> FRAMES = TagKey.create(Registries.BLOCK, OritechSpaceAge.id("beam_aperture_frames"));
-    public static final double RF_PER_GLASS = 10_000;
-    private static final double METRES_PER_FOCUS = 100_000;
-    private static final double ATMOSPHERIC_SPREAD = 10;
 
     private BeamAperture() {
     }
@@ -132,9 +130,10 @@ public final class BeamAperture {
 
     public static double footprint(double distance, double width, boolean surface) {
 
-        var spread = Math.max(0, distance) / (METRES_PER_FOCUS * Math.max(1, width));
+        var spread = Math.max(0, distance) / (SpaceBalance.BEAM_METRES_PER_FOCUS * Math.max(1, width));
         // Atmosphere magnifies accumulated spread; a nearby relay starts a freshly focused final leg.
-        return Math.max(surface ? 4 : 1, spread * (surface ? ATMOSPHERIC_SPREAD : 1));
+        var minimum = surface ? SpaceBalance.BEAM_MIN_SURFACE_HALF_WIDTH : SpaceBalance.BEAM_MIN_SPACE_HALF_WIDTH;
+        return Math.max(minimum, spread * (surface ? SpaceBalance.BEAM_ATMOSPHERIC_SPREAD : 1));
     }
 
     public record Array(int width, int height, double quality, int area, Set<BlockPos> cells, BlockPos defect) {
@@ -146,7 +145,7 @@ public final class BeamAperture {
 
         public double throughput() {
 
-            return quality * RF_PER_GLASS;
+            return quality * SpaceBalance.BEAM_RF_PER_GLASS;
         }
 
         public int focus() {
