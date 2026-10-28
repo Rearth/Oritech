@@ -193,14 +193,14 @@ class MissionSystemsTest {
                 .availableDeltaVMetersPerSecond());
 
         var ion = RocketPerformanceCalculator.calculate(rocket(true, 0, 1_000_000));
-        assertEquals(ion.thrustNewtons() / ion.wetMassKilograms() * .1,
+        assertEquals(ion.thrustNewtons() / ion.wetMassKilograms() * SpaceBalance.ION_ATMOSPHERE,
                 ion.liftoffAccelerationMetersPerSecondSquared(), 1e-8);
 
         var chemical = rocket(false, 200, 1_234);
         var segment = chemical.getStaticSegments().values().iterator().next();
         var resources = chemical.getDynamicSegments().get(segment.segmentId());
         RocketHardware.of(segment).burn(resources, 1);
-        assertEquals(180, resources.availableFuelBurnTimeTicks);
+        assertEquals(200 - SpaceBalance.CHEMICAL_FUEL_PER_SECOND, resources.fuel(), 1e-9);
         assertEquals(1_234, resources.availableRF);
     }
 

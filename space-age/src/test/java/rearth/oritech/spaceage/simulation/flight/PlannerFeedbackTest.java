@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation.flight;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
@@ -46,7 +47,10 @@ class PlannerFeedbackTest {
                         .get().defaultBlockState()));
         if (scanner) blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(),
                 SpaceAgeBlocks.SPACE_SCANNER.get().defaultBlockState()));
-        var segment = new StaticRocketSegment(id, blocks, Map.of(), 5, 1);
+        // Keep ion acceleration near 5 m/s², below Earth gravity, even when its thrust is retuned.
+        var weight = Math.round(SpaceBalance.ION_THRUST_NEWTONS * SpaceBalance.ION_ATMOSPHERE
+                / (5 * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT));
+        var segment = new StaticRocketSegment(id, blocks, Map.of(), weight, 1);
         return new ActiveRocketData(Map.of(id, segment),
                 Map.of(id, new DynamicRocketSegment(100_000, rf, 0, Set.of())));
     }

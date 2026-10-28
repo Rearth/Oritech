@@ -4,6 +4,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddon;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState.Segment;
@@ -23,22 +24,24 @@ class RocketResourceAccountingTest {
     @Test
     void portableBatteriesGiveIonCraftUsefulVacuumEndurance() {
 
-        // One 250 kN engine, three default 1 MRF batteries, 20 tonnes including their mass.
+        // One engine, three default 1 MRF batteries, 20 tonnes including their mass.
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
                 SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())), Map.of(), 20, 1, 3_000_000, 0);
         var resources = new DynamicRocketSegment(0, 3_000_000, 0, Set.of());
         var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, resources));
         var performance = RocketPerformanceCalculator.calculate(rocket);
-        assertEquals(250_000, performance.thrustNewtons());
-        assertEquals(1_500, performance.availableBurnSeconds());
-        assertEquals(18_750, performance.availableDeltaVMetersPerSecond());
+        var burnSeconds = 3_000_000d / (SpaceBalance.TICKS_PER_SECOND * SpaceBalance.ION_RF);
+        assertEquals(SpaceBalance.ION_THRUST_NEWTONS, performance.thrustNewtons());
+        assertEquals(burnSeconds, performance.availableBurnSeconds());
+        assertEquals(SpaceBalance.ION_THRUST_NEWTONS * burnSeconds / 20_000,
+                performance.availableDeltaVMetersPerSecond());
         var hardware = RocketHardware.of(segment);
-        hardware.burn(resources, 1_500);
+        hardware.burn(resources, burnSeconds);
         assertEquals(0, resources.rf(), 1e-6);
         assertEquals(0, hardware.ionSeconds(resources));
         // Additional engines improve acceleration but share the same total stored RF impulse.
-        assertEquals(750, new RocketHardware(0, 2, 0, 0).ionSeconds(new DynamicRocketSegment(0, 3_000_000, 0, Set.of())));
+        assertEquals(burnSeconds / 2, new RocketHardware(0, 2, 0, 0).ionSeconds(new DynamicRocketSegment(0, 3_000_000, 0, Set.of())));
     }
 
     @Test
@@ -93,7 +96,7 @@ class RocketResourceAccountingTest {
         var budget = new StationServiceRules.Budget(hardware, 100, 1_000, 100, 1_000);
         var lowFuel = new ActionAddon(new UUID(1, 1), ActionAddonType.LOW_FUEL, 25);
         var estimate = StationServiceRules.estimate(List.of(budget), .01, lowFuel);
-        var expectedFuelSeconds = 75 / .2;
+        var expectedFuelSeconds = 75 / (SpaceBalance.CHEMICAL_FUEL_PER_SECOND * .01);
         var expectedRFSeconds = 1_000 / StationServiceRules.rfPerSecond(hardware, .01);
         assertEquals(Math.min(expectedFuelSeconds, expectedRFSeconds), estimate.seconds(), 1e-6);
         var chemicalOnly = new RocketHardware(1, 0, 0, 0);
@@ -103,7 +106,8 @@ class RocketResourceAccountingTest {
         assertTrue(estimate.conditionReached());
         assertFalse(StationServiceRules.conditionReached(List.of(budget), lowFuel, .01, expectedFuelSeconds - .05));
         var live = new DynamicRocketSegment(100, 0, 10, Set.of());
-        for (int i = 0; i < 375; i++) chemicalOnly.burn(live, .01);
+        // Split the threshold burn into small updates to exercise fractional accounting.
+        for (int i = 0; i < 1_000; i++) chemicalOnly.burn(live, expectedFuelSeconds * .01 / 1_000);
         var current = new StationServiceRules.Budget(chemicalOnly, live.fuel(), live.rf(), 100, 0);
         assertEquals(25, live.fuel(), 1e-9);
         assertTrue(StationServiceRules.conditionReached(List.of(current), lowFuel, 0, 0));

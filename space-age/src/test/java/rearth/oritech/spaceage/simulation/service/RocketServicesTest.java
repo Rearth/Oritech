@@ -28,6 +28,7 @@ import rearth.oritech.spaceage.block.vacuum_crafter.BlockPairController;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.BlockIngredient;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
@@ -516,7 +517,7 @@ class RocketServicesTest {
         var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, resources));
         var performance = RocketPerformanceCalculator.calculate(rocket);
         assertEquals(235140, performance.wetMassKilograms(), 1e-6);
-        assertEquals(4000000 / 235140d, performance.liftoffAccelerationMetersPerSecondSquared(), 1e-9);
+        assertEquals(16 * SpaceBalance.CHEMICAL_THRUST_NEWTONS / 235140d, performance.liftoffAccelerationMetersPerSecondSquared(), 1e-9);
         assertEquals(RocketPerformanceCalculator.LaunchReadiness.READY,
                 RocketPerformanceCalculator.getLaunchReadiness(rocket, FlightPlan.empty()));
     }

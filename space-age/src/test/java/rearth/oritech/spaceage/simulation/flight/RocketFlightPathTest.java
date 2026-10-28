@@ -69,12 +69,15 @@ public final class RocketFlightPathTest {
 
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        // Keep acceleration at 10 m/s² and endurance at 1,000 seconds so this route needs a coast.
+        var engineWeight = Math.round(SpaceBalance.ION_THRUST_NEWTONS / (10 * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT));
+        var batteryRF = 1_000L * SpaceBalance.TICKS_PER_SECOND * SpaceBalance.ION_RF;
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id,
                 Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
-                Map.of(), 25, 1);
+                Map.of(), engineWeight, 1);
         var rocket = new ActiveRocketData(Map.of(id, segment),
-                Map.of(id, new DynamicRocketSegment(0, 2_000_000, 0, Set.of())));
+                Map.of(id, new DynamicRocketSegment(0, batteryRF, 0, Set.of())));
         var objects = List.of(
                 new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
                         0, 0, 0, 0, SpaceObjects.DetectionState.PRECISE),
@@ -105,13 +108,13 @@ public final class RocketFlightPathTest {
 
         // Stage one drops a spent booster; the retained craft must finish the transfer at its new full power.
         var boosterId = UUID.randomUUID();
-        var core = new StaticRocketSegment(id, segment.blocks(), Map.of(boosterId, Set.of()), 25, 1);
+        var core = new StaticRocketSegment(id, segment.blocks(), Map.of(boosterId, Set.of()), engineWeight, 1);
         var booster = new StaticRocketSegment(boosterId,
                 Set.of(new StaticRocketSegment.BlockData(new BlockPos(2, 0, 0), SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
-                Map.of(id, Set.of()), 25, 1);
+                Map.of(id, Set.of()), engineWeight, 1);
         var stagedRocket = new ActiveRocketData(Map.of(id, core, boosterId, booster), Map.of(
-                id, new DynamicRocketSegment(0, 2_000_000, 0, Set.of(boosterId)),
-                boosterId, new DynamicRocketSegment(0, 2_000_000, 0, Set.of(id))));
+                id, new DynamicRocketSegment(0, batteryRF, 0, Set.of(boosterId)),
+                boosterId, new DynamicRocketSegment(0, batteryRF, 0, Set.of(id))));
         var stagedPlan = plan.withSegmentConfigurations(List.of(
                 new SpaceSimulation.SegmentConfiguration(SpaceSimulation.SegmentRef.of(core), "Core", false, List.of(2)),
                 new SpaceSimulation.SegmentConfiguration(SpaceSimulation.SegmentRef.of(booster), "Booster", true, List.of(1))));
@@ -121,8 +124,8 @@ public final class RocketFlightPathTest {
         require(staged.paths().getFirst().samples().stream().anyMatch(sample -> sample.stage() == 2), "second stage fires");
 
         var unequal = new ActiveRocketData(Map.of(id, core, boosterId, booster), Map.of(
-                id, new DynamicRocketSegment(0, 2_000_000, 0, Set.of(boosterId)),
-                boosterId, new DynamicRocketSegment(0, 4_000_000, 0, Set.of(id))));
+                id, new DynamicRocketSegment(0, batteryRF, 0, Set.of(boosterId)),
+                boosterId, new DynamicRocketSegment(0, batteryRF * 2, 0, Set.of(id))));
         var unequalPath = RocketFlightPathCalculator.calculate(unequal, objects, plan).paths().getFirst();
         ready(unequalPath);
         ready(RocketFlightPathCalculator.calculate(unequal, objects, capped).paths().getFirst());
@@ -426,15 +429,17 @@ public final class RocketFlightPathTest {
 
         SharedConstants.tryDetectVersion();
         Bootstrap.bootStrap();
+        // Fix thrust-to-mass ratios so the booster still runs dry during braking after balance changes.
+        var engineWeight = Math.round(SpaceBalance.ION_THRUST_NEWTONS / (10 * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT));
         var coreId = UUID.randomUUID();
         var boosterId = UUID.randomUUID();
         var core = new StaticRocketSegment(coreId,
                 Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())),
-                Map.of(boosterId, Set.of()), 100, 1);
+                Map.of(boosterId, Set.of()), engineWeight * 4, 1);
         var booster = new StaticRocketSegment(boosterId,
                 IntStream.range(2, 6).mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
                         SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState())).collect(Collectors.toSet()),
-                Map.of(coreId, Set.of()), 25, 4);
+                Map.of(coreId, Set.of()), engineWeight, 4);
         var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
                 coreId, new DynamicRocketSegment(0, 40_000_000, 0, Set.of(boosterId)),
                 boosterId, new DynamicRocketSegment(0, boosterRF * SpaceBalance.ION_RF / 1_000, 0, Set.of(coreId))));
