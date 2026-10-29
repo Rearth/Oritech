@@ -40,6 +40,21 @@ public class CubeSatItem extends BlockItem {
         super(block, properties);
     }
 
+    private static boolean has(ActiveRocketData rocket, Block block) {
+
+        return rocket.getStaticSegments().values().stream().anyMatch(segment -> segment.blocks().stream().anyMatch(cell -> cell.state().is(block)));
+    }
+
+    private static String capability(String key) {
+
+        return Component.translatable("tooltip.oritech_space_age.cube_sat.capability." + key).getString();
+    }
+
+    private static String number(double value) {
+
+        return String.format(Locale.ROOT, value >= 100 ? "%,.0f" : "%.1f", value);
+    }
+
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flag) {
 
@@ -68,15 +83,20 @@ public class CubeSatItem extends BlockItem {
 
         var capabilities = new ArrayList<String>();
         var segments = rocket.getStaticSegments().values();
-        if (segments.stream().anyMatch(segment -> RocketHardware.of(segment).antennas() > 0)) capabilities.add(capability("radio"));
-        if (segments.stream().anyMatch(segment -> RocketHardware.of(segment).scanners() > 0)) capabilities.add(capability("survey"));
+        if (segments.stream().anyMatch(segment -> RocketHardware.of(segment).antennas() > 0))
+            capabilities.add(capability("radio"));
+        if (segments.stream().anyMatch(segment -> RocketHardware.of(segment).scanners() > 0))
+            capabilities.add(capability("survey"));
         if (rocket.powerHardware().solar() > 0) capabilities.add(capability("solar"));
-        if (segments.stream().anyMatch(segment -> segment.payloadEnergyJoules() > 0)) capabilities.add(capability("explosive"));
-        if (segments.stream().anyMatch(segment -> ParachuteLanding.count(segment) > 0)) capabilities.add(capability("parachute"));
+        if (segments.stream().anyMatch(segment -> segment.payloadEnergyJoules() > 0))
+            capabilities.add(capability("explosive"));
+        if (segments.stream().anyMatch(segment -> ParachuteLanding.count(segment) > 0))
+            capabilities.add(capability("parachute"));
         if (has(rocket, SpaceAgeBlocks.CARGO.get())) capabilities.add(capability("cargo"));
         var computers = segments.stream().mapToLong(segment -> segment.blocks().stream()
                 .filter(block -> block.state().is(SpaceAgeBlocks.NAVIGATION_COMPUTER)).count()).sum();
-        if (computers > 0) capabilities.add(Component.translatable("tooltip.oritech_space_age.cube_sat.capability.computers", computers).getString());
+        if (computers > 0)
+            capabilities.add(Component.translatable("tooltip.oritech_space_age.cube_sat.capability.computers", computers).getString());
         if (!capabilities.isEmpty())
             tooltip.accept(Component.translatable("tooltip.oritech_space_age.cube_sat.capabilities", String.join(", ", capabilities)).withStyle(ChatFormatting.GRAY));
         tooltip.accept(Component.translatable("tooltip.oritech_space_age.cube_sat.size", size.getX(), size.getY(), size.getZ(),
@@ -97,22 +117,8 @@ public class CubeSatItem extends BlockItem {
         }
     }
 
-    private record Summary(CubeSatData data, ActiveRocketData rocket, RocketPerformance performance, Vec3i size, int blocks) {
+    private record Summary(CubeSatData data, ActiveRocketData rocket, RocketPerformance performance, Vec3i size,
+                           int blocks) {
 
-    }
-
-    private static boolean has(ActiveRocketData rocket, Block block) {
-
-        return rocket.getStaticSegments().values().stream().anyMatch(segment -> segment.blocks().stream().anyMatch(cell -> cell.state().is(block)));
-    }
-
-    private static String capability(String key) {
-
-        return Component.translatable("tooltip.oritech_space_age.cube_sat.capability." + key).getString();
-    }
-
-    private static String number(double value) {
-
-        return String.format(Locale.ROOT, value >= 100 ? "%,.0f" : "%.1f", value);
     }
 }

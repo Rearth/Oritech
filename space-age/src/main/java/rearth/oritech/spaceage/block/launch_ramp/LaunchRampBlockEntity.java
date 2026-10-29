@@ -72,6 +72,12 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         super(SpaceAgeBlockEntities.LAUNCH_RAMP.get(), pos, state);
     }
 
+    private static String name(CubeSatData cube, SpaceSimulation.FlightPlan plan) {
+
+        if (!cube.name().isBlank()) return cube.name();
+        return plan.name().isBlank() ? "Cube-Sat" : plan.name();
+    }
+
     public long lastSpeed() {
 
         return lastSpeed;
@@ -87,14 +93,18 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         return ownerName;
     }
 
-    /** Whether the saved plan was made for the current pattern's layout. */
+    /**
+     * Whether the saved plan was made for the current pattern's layout.
+     */
     public boolean planForPattern() {
 
         var data = CubeSatBlock.data(pattern.getItem(0));
         return owner != null && data != null && data.fingerprint() == planFingerprint;
     }
 
-    /** Particles that aren't cube-sats are stopped and lost. */
+    /**
+     * Particles that aren't cube-sats are stopped and lost.
+     */
     public void absorb(long particleSpeed) {
 
         record(particleSpeed, Outcome.LOST);
@@ -112,7 +122,9 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         return worldPosition.above();
     }
 
-    /** The pattern's rocket as previewed in the planner. Its ID only depends on the layout. */
+    /**
+     * The pattern's rocket as previewed in the planner. Its ID only depends on the layout.
+     */
     public @Nullable ActiveRocketData createPreview() {
 
         var data = CubeSatBlock.data(pattern.getItem(0));
@@ -127,7 +139,9 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         return rocket;
     }
 
-    /** Saving a plan makes the player the owner, since the plan's targets come from their solar system. */
+    /**
+     * Saving a plan makes the player the owner, since the plan's targets come from their solar system.
+     */
     public void savePlan(ServerPlayer player, UUID previewId, SpaceSimulation.FlightPlan plan) {
 
         var data = CubeSatBlock.data(pattern.getItem(0));
@@ -192,7 +206,8 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         if (velocity < LaunchSpeedRules.orbitVelocity()) {
             var x = worldPosition.getX() + (int) Math.round(direction.x * FALLBACK_DISTANCE);
             var z = worldPosition.getZ() + (int) Math.round(direction.z * FALLBACK_DISTANCE);
-            if (RocketRecovery.restore(level, rocket, RocketRecovery.landingPosition(level, rocket, x, z))) return Outcome.FELL_BACK;
+            if (RocketRecovery.restore(level, rocket, RocketRecovery.landingPosition(level, rocket, x, z)))
+                return Outcome.FELL_BACK;
             Containers.dropItemStack(level, x + .5, worldPosition.getY() + 1, z + .5, CubeSatBlock.createStack(cube));
             return Outcome.DROPPED;
         }
@@ -211,12 +226,6 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         data.setDirty();
         RocketSimulationController.launchMissionVisual(level, rocket, launchPosition(), velocity);
         return Outcome.ORBIT;
-    }
-
-    private static String name(CubeSatData cube, SpaceSimulation.FlightPlan plan) {
-
-        if (!cube.name().isBlank()) return cube.name();
-        return plan.name().isBlank() ? "Cube-Sat" : plan.name();
     }
 
     @Override
@@ -262,7 +271,9 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         return new LaunchRampMenu(id, inventory, this);
     }
 
-    /** What happened to the last particle that hit the ramp. */
+    /**
+     * What happened to the last particle that hit the ramp.
+     */
     public enum Outcome {
 
         NONE,

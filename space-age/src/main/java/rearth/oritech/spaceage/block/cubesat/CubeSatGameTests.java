@@ -43,7 +43,8 @@ public final class CubeSatGameTests {
     private static BlockPos buildRocket(ServerLevel level, BlockPos pad) {
 
         for (int dx = -1; dx <= 1; dx++)
-            for (int dz = -1; dz <= 1; dz++) level.setBlockAndUpdate(pad.offset(dx, 0, dz), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState());
+            for (int dz = -1; dz <= 1; dz++)
+                level.setBlockAndUpdate(pad.offset(dx, 0, dz), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState());
         var engine = pad.above();
         level.setBlockAndUpdate(engine, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState());
         level.setBlockAndUpdate(engine.above(), BlockContent.PORTABLE_ENERGY_STORAGE.get().defaultBlockState());

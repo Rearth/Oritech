@@ -13,7 +13,9 @@ import rearth.oritech.spaceage.block.robot_arm.RobotMenu;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 
-/** Edits the playbook of a held action card, using the same rows as the arm. */
+/**
+ * Edits the playbook of a held action card, using the same rows as the arm.
+ */
 public final class ActionCardScreen extends OritechWidgetScreen<ActionCardMenu> {
 
     private RobotActionList list;

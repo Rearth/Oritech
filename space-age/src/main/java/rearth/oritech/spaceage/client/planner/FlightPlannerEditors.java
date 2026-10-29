@@ -50,7 +50,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
     };
     protected final List<TargetOption> targetOptions = new ArrayList<>();
-    boolean categoryEditor;
+    // Modal lists receive wheel input before the map and timeline behind them.
+    private final List<ScrollWidget> popupScrolls = new ArrayList<>();
     // Timeline card currently open in the action configuration popup.
     protected UUID actionEditorAction;
     // Shared numeric popup: edited card, edited value, live field and text retained across rebuilds.
@@ -67,8 +68,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     protected EditBox targetSearchField;
     protected String targetSearch = "";
     protected ScrollWidget targetList;
-    // Modal lists receive wheel input before the map and timeline behind them.
-    private final List<ScrollWidget> popupScrolls = new ArrayList<>();
     // Arrival-speed popup: edited card, live field and retained text.
     protected UUID arrivalAction;
     protected EditBox arrivalField;
@@ -94,6 +93,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     // Dropdown origin in panel coordinates after accounting for card scrolling.
     protected int dropdownX;
     protected int dropdownY;
+    boolean categoryEditor;
 
     protected FlightPlannerEditors(RocketAssemblerMenu menu, Inventory inventory, Component title) {
 
@@ -232,7 +232,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
     Integer parseEditorNumber(String text) {
 
-        if (numberKind == NumberKind.SPEED || numberKind == NumberKind.SERVICE_TIME) return FlightPlannerLabels.parseSpeedLimit(text);
+        if (numberKind == NumberKind.SPEED || numberKind == NumberKind.SERVICE_TIME)
+            return FlightPlannerLabels.parseSpeedLimit(text);
         var value = FlightPlannerLabels.parseInteger(text);
         return value != null && value >= 0 && (numberKind != NumberKind.BEAM_RESERVE || value <= 100) ? value : null;
     }
@@ -470,7 +471,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
                         .flatMap(path -> path.actionMoments().stream()).anyMatch(moment -> moment.actionId().equals(action.id()) && moment.completed());
                 var aborted = calculatedFlight().navigationAborts().stream().anyMatch(moment -> moment.actionId().equals(action.id()));
                 targetId = stopped && arrived && !aborted ? action.targetId() : SpaceSimulation.FlightPlanAction.NO_TARGET;
-            } else if (action.type() == SpaceSimulation.ActionType.DOCK) targetId = SpaceSimulation.FlightPlanAction.NO_TARGET;
+            } else if (action.type() == SpaceSimulation.ActionType.DOCK)
+                targetId = SpaceSimulation.FlightPlanAction.NO_TARGET;
         }
         var id = targetId;
         return currentDraftSnapshot().stations().stream().filter(target -> target.id().equals(id)
@@ -904,7 +906,9 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         return super.keyPressed(event);
     }
 
-    /** Values edited through the shared numeric popup. */
+    /**
+     * Values edited through the shared numeric popup.
+     */
     protected enum NumberKind {
 
         SPEED,

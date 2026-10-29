@@ -92,6 +92,9 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
         FUNCTIONS.register("robot_tools", () -> RobotGameTests::toolsAndDoors);
         FUNCTIONS.register("robot_bonemeal", () -> RobotGameTests::bonemeal);
+        FUNCTIONS.register("dense_mining", () -> AsteroidGameTests::denseMining);
+        FUNCTIONS.register("asteroid_landing", () -> AsteroidGameTests::landingAndProtection);
+        FUNCTIONS.register("large_asteroid_delivery", () -> AsteroidGameTests::largeDelivery);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -111,6 +114,11 @@ public final class SpaceAgeGameTests {
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
         event.registerTest(OritechSpaceAge.id("robot_bonemeal"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_bonemeal")), info));
+        for (var name : List.of("dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
+            var key = ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name));
+            event.registerTest(key.identifier(), new FunctionGameTestInstance(key,
+                    new TestData<>(environment, Identifier.parse("minecraft:empty"), 6000, 1, true)));
+        }
         event.registerTest(RECOVERY.identifier(), new FunctionGameTestInstance(RECOVERY, info));
         event.registerTest(CONTENT.identifier(), new FunctionGameTestInstance(CONTENT, info));
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));
@@ -140,7 +148,8 @@ public final class SpaceAgeGameTests {
         for (int dx = -1; dx <= 1; dx++) {
             for (int dz = -1; dz <= 1; dz++) {
                 blocks.add(new StaticRocketSegment.BlockData(panel.offset(dx, 1, dz), BlockContent.MACHINE_CORE_1.get().defaultBlockState()));
-                if (dx != 0) blocks.add(new StaticRocketSegment.BlockData(panel.offset(dx, 0, dz), BlockContent.MACHINE_CORE_1.get().defaultBlockState()));
+                if (dx != 0)
+                    blocks.add(new StaticRocketSegment.BlockData(panel.offset(dx, 0, dz), BlockContent.MACHINE_CORE_1.get().defaultBlockState()));
             }
         }
         var structure = new StaticRocketSegment(id, blocks, Map.of(), 100, 0, rf, 0);
@@ -345,7 +354,7 @@ public final class SpaceAgeGameTests {
             Snapshot.STREAM_CODEC.encode(buffer, dashboard);
             test.assertTrue(dashboard.equals(Snapshot.STREAM_CODEC.decode(buffer)), "Receiver dashboard survives network encoding");
             var beams = new Beams(List.of(new SurfaceBeam(origin, 4), new SurfaceBeam(origin.offset(10, 0, 10), 37.25)));
-            var beamCodec = NetworkManager.<Beams>getAutoCodec(Beams.class);
+            var beamCodec = NetworkManager.getAutoCodec(Beams.class);
             beamCodec.encode(buffer, beams);
             test.assertTrue(beams.equals(beamCodec.decode(buffer)), "Beam snapshots preserve target positions and full footprint radii");
         } finally {
@@ -544,7 +553,8 @@ public final class SpaceAgeGameTests {
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH), 3);
         level.setBlock(assemblerPos.south(), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState(), 3);
         for (int dx = -1; dx <= 1; dx++)
-            for (int dz = 0; dz <= 2; dz++) level.setBlock(assemblerPos.south().offset(dx, 0, dz), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState(), 3);
+            for (int dz = 0; dz <= 2; dz++)
+                level.setBlock(assemblerPos.south().offset(dx, 0, dz), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState(), 3);
         var enginePos = assemblerPos.south().above();
         level.setBlock(enginePos, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState(), 3);
         level.setBlock(enginePos.east(), BlockContent.PORTABLE_ENERGY_STORAGE.get().defaultBlockState(), 3);
@@ -574,7 +584,8 @@ public final class SpaceAgeGameTests {
         var persisted = ActiveRocketData.CODEC.parse(JsonOps.INSTANCE, ActiveRocketData.CODEC.encodeStart(JsonOps.INSTANCE, preview).getOrThrow()).getOrThrow();
         test.assertTrue(persisted.getLaunchPadCenter().equals(pad), "Launch pad centre survives saved and network craft snapshots");
         for (var segment : preview.getStaticSegments().values())
-            for (var block : segment.blocks()) level.setBlock(preview.getLaunchPosition().offset(block.relativePos()), Blocks.AIR.defaultBlockState(), 3);
+            for (var block : segment.blocks())
+                level.setBlock(preview.getLaunchPosition().offset(block.relativePos()), Blocks.AIR.defaultBlockState(), 3);
         var landing = RocketRecovery.landingPosition(level, preview, pad.getX(), pad.getZ());
         var centre = RocketRecovery.footprintCenter(preview);
         test.assertTrue(landing.getX() + centre.getX() == pad.getX() && landing.getZ() + centre.getZ() == pad.getZ(),
@@ -662,7 +673,7 @@ public final class SpaceAgeGameTests {
     private static void content(GameTestHelper test) {
 
         var bodies = ResourceBodies.objects(test.getLevel().registryAccess());
-        test.assertTrue(bodies.size() == 5, "Five default resource bodies load from datapacks");
+        test.assertTrue(bodies.size() == 6, "Six default resource bodies load from datapacks");
         var system = SpaceSimulationSavedData.get(test.getLevel().getServer()).getOrCreate(UUID.randomUUID());
         test.assertTrue(system.createObjectData().containsAll(bodies), "Fixed deposits appear in player systems");
         for (var body : bodies) {

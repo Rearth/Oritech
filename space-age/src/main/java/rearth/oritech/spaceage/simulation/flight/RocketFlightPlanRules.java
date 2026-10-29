@@ -279,7 +279,9 @@ public final class RocketFlightPlanRules {
         return normalized.branches().size() <= MAX_BRANCHES ? normalized : null;
     }
 
-    /** Each card keeps at most one condition of a type it supports, clamped to its limits. */
+    /**
+     * Each card keeps at most one condition of a type it supports, clamped to its limits.
+     */
     private static List<SpaceSimulation.ActionAddon> validAddons(SpaceSimulation.FlightPlanAction action) {
 
         var type = action.type();
@@ -446,7 +448,8 @@ public final class RocketFlightPlanRules {
         }
     }
 
-    public record Issue(UUID branchId, UUID actionId, String code, int required, int available, NavigationFailure failure) {
+    public record Issue(UUID branchId, UUID actionId, String code, int required, int available,
+                        NavigationFailure failure) {
 
         public Issue(UUID branchId, UUID actionId, String code, int required, int available) {
 

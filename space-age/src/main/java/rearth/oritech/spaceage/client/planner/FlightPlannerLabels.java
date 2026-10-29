@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.client.planner;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -272,7 +273,8 @@ final class FlightPlannerLabels {
         }
         if (!prediction.recoverableMaterials().isEmpty()) {
             lines.add(Component.translatable("screen.oritech_space_age.arrival_recoverable"));
-            prediction.recoverableMaterials().forEach(material -> lines.add(Component.literal("• " + material.block() + " × " + material.amount())));
+            prediction.recoverableMaterials().forEach(material -> lines.add(Component.translatable(
+                    "screen.oritech_space_age.object.material_known", BuiltInRegistries.BLOCK.getValue(material.block()).getName(), material.amount())));
         }
         return lines;
     }

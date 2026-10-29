@@ -56,12 +56,18 @@ public final class RobotArmItem extends BlockItem implements GeoItem {
     private static final class Model extends GeoModel<RobotArmItem> {
 
         @Override
-        public Identifier getModelResource(GeoRenderState state) { return OritechSpaceAge.id("robot_arm"); }
+        public Identifier getModelResource(GeoRenderState state) {
+            return OritechSpaceAge.id("robot_arm");
+        }
 
         @Override
-        public Identifier getTextureResource(GeoRenderState state) { return OritechSpaceAge.id("textures/models/robot_arm.png"); }
+        public Identifier getTextureResource(GeoRenderState state) {
+            return OritechSpaceAge.id("textures/models/robot_arm.png");
+        }
 
         @Override
-        public Identifier getAnimationResource(RobotArmItem item) { return OritechSpaceAge.id("robot_arm"); }
+        public Identifier getAnimationResource(RobotArmItem item) {
+            return OritechSpaceAge.id("robot_arm");
+        }
     }
 }

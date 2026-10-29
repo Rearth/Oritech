@@ -33,16 +33,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-/** Piecewise-linear power network. Only boundary/input events settle batteries and solve new flow rates. */
+/**
+ * Piecewise-linear power network. Only boundary/input events settle batteries and solve new flow rates.
+ */
 public final class SpacePowerService {
 
     private static final double EPSILON = 1e-6;
     private final Map<UUID, Input> inputs = new LinkedHashMap<>();
     private final Map<UUID, Account> accounts = new LinkedHashMap<>();
+    private final Map<GroundLink, Double> groundEnergy = new LinkedHashMap<>();
     private double now;
     private double epoch;
     private double groundEpoch;
-    private final Map<GroundLink, Double> groundEnergy = new LinkedHashMap<>();
     private double nextEvent = Double.POSITIVE_INFINITY;
     private boolean dirty = true;
     private long revisions;
@@ -50,6 +52,34 @@ public final class SpacePowerService {
     private MinecraftServer server;
     private int speed = 1;
     private long groundCheckTick = Long.MIN_VALUE;
+
+    public static void step(MissionSavedData data, MissionState state) {
+
+        var action = state.action();
+        if (!SolarPower.stationary(state)) {
+            state.status = "status.oritech_space_age.beam_stationary_required";
+            return;
+        }
+        var timeout = action.addons().stream().filter(a -> a.type() == ActionAddonType.DURATION).findFirst().orElse(null);
+        var condition = action.addons().stream().filter(a -> a.type().isStationaryCondition()).findFirst().orElse(null);
+        if (timeout != null && state.actionTicks() >= timeout.value() * 20L
+                || condition != null && StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), condition, 0, state.actionTicks() / 20d)) {
+            state.complete();
+            return;
+        }
+        if (!StationServiceRules.available(state)) {
+            state.complete();
+            state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
+            return;
+        }
+        if (state.advanceAction() % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0)
+            StationServiceRules.upkeep(state, RocketDocking.mass(data, state), SpaceBalance.STATION_KEEPING_INTERVAL_TICKS);
+    }
+
+    public static Account account(ActiveRocketData rocket) {
+
+        return rocket.getDynamicSegments().values().stream().map(s -> s.powerAccount).filter(Objects::nonNull).findFirst().orElse(null);
+    }
 
     public long revisions() {
 
@@ -61,7 +91,9 @@ public final class SpacePowerService {
         return nextEvent;
     }
 
-    /** Clock advancement is O(1) between events; RF reads project the established linear rates. */
+    /**
+     * Clock advancement is O(1) between events; RF reads project the established linear rates.
+     */
     public void advance(double tick) {
 
         while (!dirty && nextEvent <= tick) {
@@ -87,7 +119,8 @@ public final class SpacePowerService {
             for (var ref : state.rocket.processingModules()) {
                 var machine = RocketProcessingService.controller(state.rocket, ref);
                 if (machine.job != null && (server == null || VacuumProcessing.zeroG(state.position.x(), state.position.y(),
-                        SpaceSimulationSavedData.get(server).getOrCreate(state.owner).truth()))) jobs.put(ref, machine.job);
+                        SpaceSimulationSavedData.get(server).getOrCreate(state.owner).truth())))
+                    jobs.put(ref, machine.job);
             }
             next.put(state.rocket.getRocketId(), new Input(state, state.rocket, state.position, state.action(), state.rocket.powerHardware(),
                     state.rocket.hardware().values().stream().mapToInt(RocketHardware::antennas).sum(), Map.copyOf(jobs),
@@ -132,7 +165,9 @@ public final class SpacePowerService {
         solve();
     }
 
-    /** External resource changes commit the old interval before changing its inputs. */
+    /**
+     * External resource changes commit the old interval before changing its inputs.
+     */
     public void changed() {
 
         if (dirty) return;
@@ -200,7 +235,8 @@ public final class SpacePowerService {
             if (account.net > EPSILON && account.stored < account.reserve - EPSILON) boundary = account.reserve;
             if (account.net < -EPSILON && account.stored > account.reserve + EPSILON) boundary = account.reserve;
             if (Math.abs(account.net) <= EPSILON) account.net = 0;
-            if (Math.abs(account.net) > EPSILON) nextEvent = Math.min(nextEvent, now + Math.max(EPSILON, (boundary - account.stored) / account.net));
+            if (Math.abs(account.net) > EPSILON)
+                nextEvent = Math.min(nextEvent, now + Math.max(EPSILON, (boundary - account.stored) / account.net));
             for (var ref : account.jobSpeeds.keySet()) {
                 var start = account.jobStarts.get(ref);
                 nextEvent = Math.min(nextEvent, now + Math.max(EPSILON, (start.job.duration() - start.job.elapsed() - start.fraction) / account.jobSpeeds.get(ref)));
@@ -236,13 +272,12 @@ public final class SpacePowerService {
             if (current != null && link.action.equals(current.action)) {
                 current.outgoing = incident > 0 ? reception.scaled(current.sent / incident) : BeamReception.EMPTY;
                 current.publish();
-                if (reception.accepted() < incident && current.sent > 0) current.state.status = "status.oritech_space_age.surface_overflow";
+                if (reception.accepted() < incident && current.sent > 0)
+                    current.state.status = "status.oritech_space_age.surface_overflow";
             }
         }
         groundEnergy.clear();
     }
-
-    private record GroundLink(MissionState source, FlightPlanAction action, double radius) {}
 
     public List<SurfaceBeam> surfaceTargets(MinecraftServer server) {
 
@@ -255,38 +290,53 @@ public final class SpacePowerService {
         return result;
     }
 
-    public record SurfaceBeam(BlockPos target, double radius) {}
-
-    public static void step(MissionSavedData data, MissionState state) {
-
-        var action = state.action();
-        if (!SolarPower.stationary(state)) {
-            state.status = "status.oritech_space_age.beam_stationary_required";
-            return;
-        }
-        var timeout = action.addons().stream().filter(a -> a.type() == ActionAddonType.DURATION).findFirst().orElse(null);
-        var condition = action.addons().stream().filter(a -> a.type().isStationaryCondition()).findFirst().orElse(null);
-        if (timeout != null && state.actionTicks() >= timeout.value() * 20L
-                || condition != null && StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), condition, 0, state.actionTicks() / 20d)) {
-            state.complete();
-            return;
-        }
-        if (!StationServiceRules.available(state)) {
-            state.complete();
-            state.status = MissionState.STATUS_STATION_KEEPING_EXHAUSTED;
-            return;
-        }
-        if (state.advanceAction() % SpaceBalance.STATION_KEEPING_INTERVAL_TICKS == 0)
-            StationServiceRules.upkeep(state, RocketDocking.mass(data, state), SpaceBalance.STATION_KEEPING_INTERVAL_TICKS);
+    private record GroundLink(MissionState source, FlightPlanAction action, double radius) {
     }
 
-    public static Account account(ActiveRocketData rocket) {
-
-        return rocket.getDynamicSegments().values().stream().map(s -> s.powerAccount).filter(Objects::nonNull).findFirst().orElse(null);
+    public record SurfaceBeam(BlockPos target, double radius) {
     }
 
-    private record Input(MissionState state, ActiveRocketData rocket, MissionState.Position position, FlightPlanAction action,
-                         SpacePowerHardware hardware, int antennas, Map<HardwareRef, Job> jobs, double capacity) {}
+    private record Input(MissionState state, ActiveRocketData rocket, MissionState.Position position,
+                         FlightPlanAction action,
+                         SpacePowerHardware hardware, int antennas, Map<HardwareRef, Job> jobs, double capacity) {
+    }
+
+    public record Report(double solar, double incoming, double sent, BeamReception outgoing, BeamReception receiving,
+                         String reason, double services, double net) {
+
+        public static final Codec<Report> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.DOUBLE.fieldOf("solar").forGetter(Report::solar), Codec.DOUBLE.fieldOf("incoming").forGetter(Report::incoming),
+                Codec.DOUBLE.fieldOf("sent").forGetter(Report::sent), BeamReception.CODEC.fieldOf("outgoing").forGetter(Report::outgoing),
+                BeamReception.CODEC.fieldOf("receiving").forGetter(Report::receiving), Codec.STRING.fieldOf("reason").forGetter(Report::reason),
+                Codec.DOUBLE.fieldOf("services").forGetter(Report::services), Codec.DOUBLE.fieldOf("net").forGetter(Report::net)
+        ).apply(i, Report::new));
+        public static final Report EMPTY = new Report(0, 0, 0, BeamReception.EMPTY, BeamReception.EMPTY, "", 0, 0);
+
+        /**
+         * Convert simulation-tick rates to the physical world-tick rates used by block screens.
+         */
+        public Report perWorldTick(int simulationSpeed) {
+
+            return new Report(solar * simulationSpeed, incoming * simulationSpeed, sent * simulationSpeed,
+                    outgoing.scaled(simulationSpeed), receiving.scaled(simulationSpeed), reason,
+                    services * simulationSpeed, net * simulationSpeed);
+        }
+
+        public double delivered() {
+
+            return sent;
+        }
+
+        public double accepted() {
+
+            return outgoing.accepted();
+        }
+
+        public double overflow() {
+
+            return Math.max(0, outgoing.incident() - outgoing.accepted());
+        }
+    }
 
     public final class Account {
 
@@ -302,6 +352,7 @@ public final class SpacePowerService {
         private final double capacity;
         private final double solar;
         private final double reserve;
+        private final double readyAt;
         private double stored;
         private double incoming;
         private double nextIncoming;
@@ -311,7 +362,6 @@ public final class SpacePowerService {
         private BeamReception receiving = BeamReception.EMPTY;
         private double net;
         private double radius;
-        private double readyAt;
         private boolean ground;
         private boolean loaded;
         private Account target;
@@ -406,8 +456,6 @@ public final class SpacePowerService {
             return completed;
         }
 
-        private record JobStart(Job job, double fraction) {}
-
         public void changed() {
 
             SpacePowerService.this.changed();
@@ -444,7 +492,8 @@ public final class SpacePowerService {
                     || capacity <= 0 || reserve >= capacity) return;
             var limit = hardware.throughput() / (ground ? speed : 1);
             if (stored > reserve + EPSILON) sent = limit;
-            else if (stored >= reserve - EPSILON && now >= readyAt) sent = Math.min(limit, Math.max(0, supply - services));
+            else if (stored >= reserve - EPSILON && now >= readyAt)
+                sent = Math.min(limit, Math.max(0, supply - services));
         }
 
         private void publish() {
@@ -453,44 +502,13 @@ public final class SpacePowerService {
                     ? ground ? "screen.oritech_space_age.beam.ground_overflow" : "screen.oritech_space_age.beam.space_overflow" : "";
             state.powerReport = new Report(solar, incoming, sent, outgoing, receiving, reason, services, net);
             if (action != null && action.type() == ActionType.BEAM_POWER) state.status = !loaded ? ground
-                    ? "status.oritech_space_age.beam_target_unloaded" : "status.oritech_space_age.beam_target_unavailable"
+                                                                                                   ? "status.oritech_space_age.beam_target_unloaded" : "status.oritech_space_age.beam_target_unavailable"
                     : hardware.throughput() <= 0 ? "status.oritech_space_age.beam_no_aperture"
-                    : sent <= EPSILON ? "status.oritech_space_age.beam_reserve"
-                    : sent < hardware.throughput() / (ground ? speed : 1) - EPSILON ? "status.oritech_space_age.beam_source_limited" : "status.oritech_space_age.beaming";
-        }
-    }
-
-    public record Report(double solar, double incoming, double sent, BeamReception outgoing, BeamReception receiving, String reason, double services, double net) {
-
-        public static final Codec<Report> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.DOUBLE.fieldOf("solar").forGetter(Report::solar), Codec.DOUBLE.fieldOf("incoming").forGetter(Report::incoming),
-                Codec.DOUBLE.fieldOf("sent").forGetter(Report::sent), BeamReception.CODEC.fieldOf("outgoing").forGetter(Report::outgoing),
-                BeamReception.CODEC.fieldOf("receiving").forGetter(Report::receiving), Codec.STRING.fieldOf("reason").forGetter(Report::reason),
-                Codec.DOUBLE.fieldOf("services").forGetter(Report::services), Codec.DOUBLE.fieldOf("net").forGetter(Report::net)
-        ).apply(i, Report::new));
-        public static final Report EMPTY = new Report(0, 0, 0, BeamReception.EMPTY, BeamReception.EMPTY, "", 0, 0);
-
-        /** Convert simulation-tick rates to the physical world-tick rates used by block screens. */
-        public Report perWorldTick(int simulationSpeed) {
-
-            return new Report(solar * simulationSpeed, incoming * simulationSpeed, sent * simulationSpeed,
-                    outgoing.scaled(simulationSpeed), receiving.scaled(simulationSpeed), reason,
-                    services * simulationSpeed, net * simulationSpeed);
+                      : sent <= EPSILON ? "status.oritech_space_age.beam_reserve"
+                        : sent < hardware.throughput() / (ground ? speed : 1) - EPSILON ? "status.oritech_space_age.beam_source_limited" : "status.oritech_space_age.beaming";
         }
 
-        public double delivered() {
-
-            return sent;
-        }
-
-        public double accepted() {
-
-            return outgoing.accepted();
-        }
-
-        public double overflow() {
-
-            return Math.max(0, outgoing.incident() - outgoing.accepted());
+        private record JobStart(Job job, double fraction) {
         }
     }
 }

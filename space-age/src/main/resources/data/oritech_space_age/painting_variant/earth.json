@@ -2,5 +2,7 @@
   "width": 4,
   "height": 2,
   "asset_id": "oritech_space_age:earth",
-  "title": {"translate": "painting.oritech_space_age.earth.title"}
+  "title": {
+    "translate": "painting.oritech_space_age.earth.title"
+  }
 }

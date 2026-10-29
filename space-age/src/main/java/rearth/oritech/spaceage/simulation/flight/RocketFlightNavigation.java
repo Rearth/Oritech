@@ -54,7 +54,9 @@ final class RocketFlightNavigation {
         return navigateLeg(action, craft, context, angle);
     }
 
-    /** Only solar craft may approach the Sun collector ring or stations inside it. */
+    /**
+     * Only solar craft may approach the Sun collector ring or stations inside it.
+     */
     private static boolean missingSolar(SpaceSimulation.SpaceObjectData target, Craft craft, Context context) {
 
         var station = context.stations.get(target.id());
@@ -114,7 +116,8 @@ final class RocketFlightNavigation {
             targetVelocityY = target.velocityY() - Math.sin(destinationAngle) * targetSpeed;
         }
         var samples = new ArrayList<PathSample>();
-        if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, null)) return true;
+        if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, null))
+            return true;
         var route = RocketTransferRoute.solve(craft, context, action, target, destination.x, destination.y);
         if (exceedsTimeLimit(route, craft)) return false;
         if (route == null) return fail(craft, samples, TerminalState.NO_FEASIBLE_TRANSFER);
@@ -170,7 +173,8 @@ final class RocketFlightNavigation {
         }
         craft.atmosphere = false;
         destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
-        if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, route)) return true;
+        if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, route))
+            return true;
         return fail(craft, samples, TerminalState.NO_FEASIBLE_TRANSFER);
     }
 
@@ -178,7 +182,8 @@ final class RocketFlightNavigation {
                                         SpaceSimulation.SpaceObjectData target, Point destination,
                                         TransferPlan plan, EventTransfer.Event event) {
 
-        if (action.addons().isEmpty() || !action.addons().getFirst().type().isNavigationCondition()) return event.seconds();
+        if (action.addons().isEmpty() || !action.addons().getFirst().type().isNavigationCondition())
+            return event.seconds();
         var addon = action.addons().getFirst();
         if (addon.type() == SpaceSimulation.ActionAddonType.TIME_BEFORE_ARRIVAL)
             return Math.min(event.seconds(), Math.max(0, plan.transfer.duration() - (craft.time - plan.startTime) - addon.value()));

@@ -78,7 +78,9 @@ public final class StationServiceRules {
         return new Estimate(Double.isFinite(duration) ? duration : 0, end);
     }
 
-    /** Beam output throttles itself at the reserve; only ordinary services can drain below it. */
+    /**
+     * Beam output throttles itself at the reserve; only ordinary services can drain below it.
+     */
     public static Estimate beamEstimate(List<Budget> budgets, double solar, double services, double limit, double reserve, ActionAddon condition) {
 
         var rf = budgets.stream().mapToDouble(Budget::rf).sum();
@@ -181,7 +183,7 @@ public final class StationServiceRules {
         }
         var duration = Math.min(propulsionSeconds, antennaSeconds);
         if (antennaSeconds <= propulsionSeconds) end = StationKeepingEnd.RF;
-        if (condition != null && conditionReached(budgets, condition, correctionRate, duration)) {
+        if (conditionReached(budgets, condition, correctionRate, duration)) {
             var low = 0d;
             var high = duration;
             for (int i = 0; i < 64; i++) {
@@ -211,18 +213,6 @@ public final class StationServiceRules {
             remaining += Math.max(0, (rf ? budget.rf : budget.fuel) - rate * seconds);
         }
         return initial > 0 && remaining * 100 <= initial * condition.value();
-    }
-
-    public record Budget(RocketHardware hardware, double fuel, double rf, double initialFuel, double initialRF) {
-
-    }
-
-    public record Estimate(double seconds, StationKeepingEnd end) {
-
-        public boolean conditionReached() {
-
-            return end == StationKeepingEnd.LOW_RF || end == StationKeepingEnd.LOW_FUEL || end == StationKeepingEnd.DURATION;
-        }
     }
 
     public static boolean forecast(RocketFlightPathState.Craft craft, double ticks) {
@@ -288,5 +278,17 @@ public final class StationServiceRules {
         if (performance.availableBurnSeconds() < seconds) return false;
         state.rocket.getStaticSegments().forEach((id, segment) -> RocketHardware.of(segment).burn(state.rocket.getDynamicSegments().get(id), seconds));
         return true;
+    }
+
+    public record Budget(RocketHardware hardware, double fuel, double rf, double initialFuel, double initialRF) {
+
+    }
+
+    public record Estimate(double seconds, StationKeepingEnd end) {
+
+        public boolean conditionReached() {
+
+            return end == StationKeepingEnd.LOW_RF || end == StationKeepingEnd.LOW_FUEL || end == StationKeepingEnd.DURATION;
+        }
     }
 }

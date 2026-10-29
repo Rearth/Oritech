@@ -119,9 +119,10 @@ class TransferFeasibilityTest {
                     craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
                     var action = action(target, mode, mode == ArrivalVelocityMode.CUSTOM ? 100 : 0, cap).withOrbit(OrbitBand.TIGHT);
                     arrives(craft, context(target), action, target, "moving cap=" + cap + " heading=" + heading + " mode=" + mode);
-                    if (cap > 0) assertTrue(Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()) <= cap + 1e-5,
-                            "moving cap=" + cap + " heading=" + heading + " mode=" + mode
-                                    + " actual=" + Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()));
+                    if (cap > 0)
+                        assertTrue(Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()) <= cap + 1e-5,
+                                "moving cap=" + cap + " heading=" + heading + " mode=" + mode
+                                        + " actual=" + Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()));
                     assertFalse(craft.destroyed);
                 }
             }

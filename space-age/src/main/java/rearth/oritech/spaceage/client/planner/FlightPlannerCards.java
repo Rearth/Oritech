@@ -367,8 +367,8 @@ final class FlightPlannerCards {
         scroll.addChild(addonConnector(cursorX + 66, rowY + CARD_HEIGHT, rowY + 89));
         if (action.addons().isEmpty()) {
             var button = SpaceAgeButtons.orangePanel(cursorX + 18, rowY + 89, 96, 20,
-                            Component.translatable("screen.oritech_space_age.action.add_abort"),
-                            ignored -> screen.addNavigationAddon(branch.id(), action.id(), rocket));
+                    Component.translatable("screen.oritech_space_age.action.add_abort"),
+                    ignored -> screen.addNavigationAddon(branch.id(), action.id(), rocket));
             var available = screen.canAddNavigationAddon(branch, action);
             button.setActive(available);
             button.withTooltip(Component.translatable(available

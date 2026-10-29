@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-/** Physical delivery and heating run once per world tick, never once per creative simulation step. */
+/**
+ * Physical delivery and heating run once per world tick, never once per creative simulation step.
+ */
 public final class SurfaceBeamData extends SavedData {
 
     public static final Codec<SurfaceBeamData> CODEC = Codec.unboundedMap(Codec.STRING, Codec.DOUBLE).xmap(SurfaceBeamData::new,
@@ -48,11 +50,6 @@ public final class SurfaceBeamData extends SavedData {
         return level.getDataStorage().computeIfAbsent(TYPE);
     }
 
-    public double temperature(BlockPos pos) {
-
-        return heat.getOrDefault(ChunkPos.pack(pos), 0d);
-    }
-
     public static boolean loaded(ServerLevel level, int x, int z, double radius) {
 
         if (radius > 512) return false;
@@ -60,6 +57,24 @@ public final class SurfaceBeamData extends SavedData {
             for (int cz = (int) Math.floor((z + .5 - radius) / 16); cz < (int) Math.ceil((z + .5 + radius) / 16); cz++)
                 if (!level.hasChunk(cx, cz)) return false;
         return true;
+    }
+
+    static BlockState heatedState(BlockState state, double temperature) {
+
+        if (temperature >= 25) {
+            var melted = state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_MELTING);
+            if (melted != null) return melted;
+        }
+        if (temperature < 5) return null;
+        if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS)) return Blocks.AIR.defaultBlockState();
+        if (temperature >= 10 || state.is(Blocks.GRASS_BLOCK))
+            return state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_SCORCHING);
+        return null;
+    }
+
+    public double temperature(BlockPos pos) {
+
+        return heat.getOrDefault(ChunkPos.pack(pos), 0d);
     }
 
     public BeamReception deliver(ServerLevel level, int x, int z, double radius, double incident) {
@@ -120,7 +135,8 @@ public final class SurfaceBeamData extends SavedData {
             var temperature = Math.max(0, heat.get(key) - .002);
             if (temperature == 0) heat.remove(key);
             else heat.put(key, temperature);
-            if (!level.hasChunk(chunk.x(), chunk.z()) || temperature < 1 || effects >= 8 || level.getGameTime() % 20 != 0) continue;
+            if (!level.hasChunk(chunk.x(), chunk.z()) || temperature < 1 || effects >= 8 || level.getGameTime() % 20 != 0)
+                continue;
             effects++;
             var x = chunk.getMinBlockX() + level.getRandom().nextInt(16);
             var z = chunk.getMinBlockZ() + level.getRandom().nextInt(16);
@@ -129,23 +145,11 @@ public final class SurfaceBeamData extends SavedData {
             if (temperature < 5) continue;
             for (var entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(chunk.getMinBlockX(), pos.getY(), chunk.getMinBlockZ(),
                     chunk.getMaxBlockX() + 1, level.getMaxY(), chunk.getMaxBlockZ() + 1)))
-                if (level.canSeeSky(entity.blockPosition())) entity.hurtServer(level, level.damageSources().onFire(), 2);
+                if (level.canSeeSky(entity.blockPosition()))
+                    entity.hurtServer(level, level.damageSources().onFire(), 2);
             var result = heatedState(level.getBlockState(pos), temperature);
             if (result != null) level.setBlockAndUpdate(pos, result);
         }
         if (!heat.isEmpty()) setDirty();
-    }
-
-    static BlockState heatedState(BlockState state, double temperature) {
-
-        if (temperature >= 25) {
-            var melted = state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_MELTING);
-            if (melted != null) return melted;
-        }
-        if (temperature < 5) return null;
-        if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS)) return Blocks.AIR.defaultBlockState();
-        if (temperature >= 10 || state.is(Blocks.GRASS_BLOCK))
-            return state.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_SCORCHING);
-        return null;
     }
 }

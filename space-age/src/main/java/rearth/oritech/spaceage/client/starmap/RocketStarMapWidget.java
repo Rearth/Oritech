@@ -52,14 +52,12 @@ public final class RocketStarMapWidget extends UIComponent {
     private final List<SeparationMarker> separationMarkers = new ArrayList<>();
     // Find a branch preview for selection and statistics.
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> pathsByBranch = new HashMap<>();
-    private Set<UUID> hiddenBranches = Set.of();
     // Full visible path detail for tooltips, rebuilt only when the view or flight changes.
     private final Map<UUID, List<RenderedPathSegment>> renderedPathsByBranch = new HashMap<>();
     // Find the card behind a sample or arrival event.
     private final Map<UUID, SpaceSimulation.FlightPlanAction> actionsById = new HashMap<>();
     // Stable fallback labels shared with the assembler's segment ordering.
     private final Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames = new HashMap<>();
-    private Map<UUID, Map<SpaceSimulation.SegmentRef, String>> branchSegmentNames = Map.of();
     // Tell the planner when the player selects a surface or orbit.
     private final Consumer<NavigationSelection> selectionListener;
     // Ask the planner to open the target's right-click menu.
@@ -70,6 +68,8 @@ public final class RocketStarMapWidget extends UIComponent {
     private final ButtonWidget fitRouteButton;
     private final ToggleWidget beamsButton;
     private final ToggleWidget sunButton;
+    private Set<UUID> hiddenBranches = Set.of();
+    private Map<UUID, Map<SpaceSimulation.SegmentRef, String>> branchSegmentNames = Map.of();
     private boolean showBeams = true;
     private Runnable sunVisibilityListener;
     // Simplified draw geometry is reused while the player is looking at a stationary map.
@@ -113,12 +113,12 @@ public final class RocketStarMapWidget extends UIComponent {
     private double commandAltitude = -2;
 
     public RocketStarMapWidget(int x, int y, int width, int height,
-                        SpaceSimulation.FlightPlannerSnapshot snapshot,
-                        RocketFlightPathCalculator.FlightPath flightPath,
-                        ActiveRocketData rocket,
-                        UUID selectedBranch, NavigationSelection selectedTarget,
-                        Consumer<NavigationSelection> selectionListener,
-                        Consumer<NavigationContextRequest> contextMenuListener) {
+                               SpaceSimulation.FlightPlannerSnapshot snapshot,
+                               RocketFlightPathCalculator.FlightPath flightPath,
+                               ActiveRocketData rocket,
+                               UUID selectedBranch, NavigationSelection selectedTarget,
+                               Consumer<NavigationSelection> selectionListener,
+                               Consumer<NavigationContextRequest> contextMenuListener) {
 
         super(x, y, width, height);
         surface = OritechSurface.NONE;
@@ -127,18 +127,18 @@ public final class RocketStarMapWidget extends UIComponent {
         this.selectedTarget = selectedTarget;
         beamsButton = new ToggleWidget(0, 0, 130,
                 Component.translatable("screen.oritech_space_age.map.beams"), showBeams, (toggle, value) -> {
-                    showBeams = value;
-                    cachedView = null;
-                }).withTextColor(0xFFCAD8E5);
+            showBeams = value;
+            cachedView = null;
+        }).withTextColor(0xFFCAD8E5);
         beamsButton.withTooltip(Component.translatable("screen.oritech_space_age.map.beams_tooltip"));
         sunButton = new ToggleWidget(0, 0, 180, Component.translatable("screen.oritech_space_age.sun_filter"),
                 FleetViewPreferences.showSun(), (toggle, value) -> {
-                    FleetViewPreferences.toggleSun();
-                    var currentSnapshot = this.snapshot;
-                    this.snapshot = null;
-                    updateFlightPath(currentSnapshot, this.flightPath, this.selectedBranch);
-                    if (sunVisibilityListener != null) sunVisibilityListener.run();
-                }).withTextColor(0xFFCAD8E5);
+            FleetViewPreferences.toggleSun();
+            var currentSnapshot = this.snapshot;
+            this.snapshot = null;
+            updateFlightPath(currentSnapshot, this.flightPath, this.selectedBranch);
+            if (sunVisibilityListener != null) sunVisibilityListener.run();
+        }).withTextColor(0xFFCAD8E5);
         sunButton.withTooltip(Component.translatable("screen.oritech_space_age.sun_filter_tooltip"));
         fitSystemButton = SpaceAgeButtons.darkPanel(x + width - 118, y + 3, 52, 14,
                 Component.translatable("screen.oritech_space_age.map.fit_system"), ignored -> fitSystem());
@@ -188,9 +188,16 @@ public final class RocketStarMapWidget extends UIComponent {
         return Component.translatable("screen.oritech_space_age.orbit." + orbit.name().toLowerCase(Locale.ROOT));
     }
 
+    private static BranchMarker rocketMarker(UUID branchId, double timeSeconds, double x, double y) {
+
+        var widget = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
+        widget.withShowOverlay(false).withTooltipFromStack(false);
+        return new BranchMarker(branchId, timeSeconds, x, y, widget);
+    }
+
     public void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
-                          RocketFlightPathCalculator.FlightPath flightPath,
-                          UUID selectedBranch) {
+                                 RocketFlightPathCalculator.FlightPath flightPath,
+                                 UUID selectedBranch) {
 
         if (flightPath.equals(this.flightPath) && Objects.equals(selectedBranch, this.selectedBranch)
                 && this.snapshot != null && snapshot.objects().equals(this.snapshot.objects())
@@ -225,13 +232,6 @@ public final class RocketStarMapWidget extends UIComponent {
             var last = path.samples().getLast();
             rocketMarkers.add(rocketMarker(path.branchId(), last.timeSeconds(), last.x(), last.y()));
         }
-    }
-
-    private static BranchMarker rocketMarker(UUID branchId, double timeSeconds, double x, double y) {
-
-        var widget = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
-        widget.withShowOverlay(false).withTooltipFromStack(false);
-        return new BranchMarker(branchId, timeSeconds, x, y, widget);
     }
 
     private void updateSeparationMarkers() {
@@ -374,8 +374,8 @@ public final class RocketStarMapWidget extends UIComponent {
         }
         hoveredMapControl = fitSystemButton.isMouseOver(mouseX, mouseY) ? fitSystemButton
                 : fitRouteButton.isMouseOver(mouseX, mouseY) ? fitRouteButton
-                        : legendExpanded && beamsButton.isMouseOver(mouseX, mouseY) ? beamsButton
-                        : legendExpanded && sunButton.isMouseOver(mouseX, mouseY) ? sunButton : null;
+                  : legendExpanded && beamsButton.isMouseOver(mouseX, mouseY) ? beamsButton
+                    : legendExpanded && sunButton.isMouseOver(mouseX, mouseY) ? sunButton : null;
     }
 
     private void prepareLines(StarMapObjects.Viewport viewport, Set<UUID> visibleIcons) {
@@ -412,7 +412,8 @@ public final class RocketStarMapWidget extends UIComponent {
             var selected = branch.id().equals(selectedBranch);
             if (!StarMapLineSimplifier.intersects(from.x(), from.y(), to.x(), to.y(),
                     viewport.x(), viewport.y(), viewport.width(), viewport.height(), 4)) continue;
-            if (selected) lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), 0x2467DEFF, 4, true));
+            if (selected)
+                lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), 0x2467DEFF, 4, true));
             lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), selected ? 0xDD67DEFF : 0x7267DEFF,
                     selected ? 1.6f : 1.0f, true));
             var link = StarMapBeamRenderer.project(from.x(), from.y(), to.x(), to.y(), branch.id(), selected,
@@ -780,7 +781,8 @@ public final class RocketStarMapWidget extends UIComponent {
     public List<Component> getTooltip() {
 
         if (!tooltipsEnabled) return List.of();
-        if (hoveredMapControl != null) return hoveredMapControl.hasTooltip() ? hoveredMapControl.getTooltip() : List.of();
+        if (hoveredMapControl != null)
+            return hoveredMapControl.hasTooltip() ? hoveredMapControl.getTooltip() : List.of();
         StarMapObjects.Entry object = hoveredSelection == null ? hoveredObject : mapObjects.byId(hoveredSelection.objectId);
         var separation = hoveredSeparation == null ? null
                 : new StarMapTooltip.Separation(hoveredSeparation.stage, hoveredSeparation.timeSeconds, hoveredSeparation.segments);
@@ -855,7 +857,8 @@ public final class RocketStarMapWidget extends UIComponent {
     /**
      * Camera revision, panel bounds, selected ring and visible icons determine projected line geometry.
      */
-    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target, Set<UUID> visibleIcons) {
+    private record View(long cameraRevision, int x, int y, int width, int height, NavigationSelection target,
+                        Set<UUID> visibleIcons) {
 
     }
 

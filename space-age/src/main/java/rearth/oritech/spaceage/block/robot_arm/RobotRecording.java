@@ -37,7 +37,8 @@ public final class RobotRecording {
     private static final Map<UUID, Click> CLICKS = new HashMap<>();
     private static final Vec3 CENTER = new Vec3(.5, .5, .5);
 
-    private RobotRecording() {}
+    private RobotRecording() {
+    }
 
     public static void register() {
 
@@ -60,7 +61,8 @@ public final class RobotRecording {
         if (data == null || data.binding().isEmpty() || data.actions().size() >= RobotProgram.LIMIT) return;
         var binding = data.binding().get();
         if (binding.dimension() != player.level().dimension() || !player.level().hasChunkAt(binding.pos())) return;
-        if (!(player.level().getBlockEntity(binding.pos()) instanceof RobotArmBlockEntity arm) || !arm.inRange(action.pos())) return;
+        if (!(player.level().getBlockEntity(binding.pos()) instanceof RobotArmBlockEntity arm) || !arm.inRange(action.pos()))
+            return;
         var actions = new ArrayList<>(data.actions());
         actions.add(action);
         card.set(SpaceAgeComponents.ROBOT_PROGRAM.get(), data.withActions(actions));
@@ -92,7 +94,9 @@ public final class RobotRecording {
         });
     }
 
-    /** The arm at the clicked position, also when clicking one of its machine cores. */
+    /**
+     * The arm at the clicked position, also when clicking one of its machine cores.
+     */
     @Nullable
     private static RobotArmBlockEntity arm(Level level, BlockPos pos) {
 

@@ -55,7 +55,8 @@ public final class SolarPower {
 
         for (var offset : BigSolarPanelEntity.CORE_POSITIONS) {
             var pos = centre.offset(Geometry.rotatePosition(offset, Direction.NORTH));
-            if (!(blocks.getOrDefault(pos, Blocks.AIR.defaultBlockState()).getBlock() instanceof MachineCoreBlock)) return false;
+            if (!(blocks.getOrDefault(pos, Blocks.AIR.defaultBlockState()).getBlock() instanceof MachineCoreBlock))
+                return false;
         }
         return true;
     }
@@ -109,7 +110,8 @@ public final class SolarPower {
     public static double output(RocketFlightPathState.Craft craft) {
 
         if (craft.currentOrbit == OrbitBand.SURFACE && (craft.currentTarget.equals(SpaceObjects.EARTH_ID)
-                || craft.currentTarget.equals(SpaceSimulation.MARS_ID) || craft.currentTarget.equals(SpaceSimulation.SUN_ID))) return 0;
+                || craft.currentTarget.equals(SpaceSimulation.MARS_ID) || craft.currentTarget.equals(SpaceSimulation.SUN_ID)))
+            return 0;
         return rating(structures(craft)) * multiplier(craft.x, craft.y);
     }
 }

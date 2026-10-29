@@ -63,6 +63,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     // Title retained when switching to the assembler screen.
     private final Component screenTitle;
     private final List<LabelWidget> currentActionLabels = new ArrayList<>();
+    private final Map<UIComponent, List<Component>> powerTooltipCards = new HashMap<>();
     // Last assembler preview displayed; a new revision replaces the rocket model.
     private int previewRevision = -1;
     // Last server planner snapshot displayed.
@@ -105,7 +106,6 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private int editorHeight;
     private ButtonWidget sendMissionButton;
     private LabelWidget missionStateLabel;
-    private final Map<UIComponent, List<Component>> powerTooltipCards = new HashMap<>();
     private LabelWidget capacityLabel;
     private int fleetTicks;
     // Launch ramps: footer summary of the working particle speeds and the speed window it shows.
@@ -138,6 +138,17 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             case CUSTOM -> action.targetVelocity() <= SpaceBalance.MAX_ASTEROID_CONNECTION_SPEED;
             case MAXIMUM -> false;
         };
+    }
+
+    private static Component speedSummary(LaunchRampMenu ramp) {
+
+        return LaunchRampScreen.windowSummary(ramp).append(Component.translatable("screen.oritech_space_age.launch_ramp.chip.preview",
+                LaunchRampScreen.number(ramp.previewSpeed())));
+    }
+
+    static String cubeName(CubeSatData cube) {
+
+        return cube.name().isBlank() ? Component.translatable("block.oritech_space_age.cube_sat").getString() : cube.name();
     }
 
     boolean isReadOnly() {
@@ -195,7 +206,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     }
 
     public void receiveLiveMission(SpaceSimulation.FlightPlannerSnapshot snapshot, ActiveRocketData rocket,
-                            boolean structureChanged) {
+                                   boolean structureChanged) {
 
         menu.updatePreviewData(rocket);
         menu.updateFlightPlannerSnapshotData(snapshot);
@@ -601,13 +612,9 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 SpaceAgeClientRecipes.vacuum(), snapshot.stations());
     }
 
-    private static Component speedSummary(LaunchRampMenu ramp) {
-
-        return LaunchRampScreen.windowSummary(ramp).append(Component.translatable("screen.oritech_space_age.launch_ramp.chip.preview",
-                LaunchRampScreen.number(ramp.previewSpeed())));
-    }
-
-    /** Shares the ramp's speed window search and redraws the preview when its expected speed follows the window. */
+    /**
+     * Shares the ramp's speed window search and redraws the preview when its expected speed follows the window.
+     */
     private void tickRamp(LaunchRampMenu ramp) {
 
         LaunchRampScreen.tickSpeedWindow(ramp);
@@ -947,11 +954,6 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         pairs.sort(Comparator.comparingLong((List<SpaceSimulation.SegmentRef> pair) -> pair.get(0).anchor().asLong())
                 .thenComparingLong(pair -> pair.get(1).anchor().asLong()));
         return pairs;
-    }
-
-    static String cubeName(CubeSatData cube) {
-
-        return cube.name().isBlank() ? Component.translatable("block.oritech_space_age.cube_sat").getString() : cube.name();
     }
 
     private void addMessagePanel(Component message) {

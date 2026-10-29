@@ -36,6 +36,31 @@ final class RocketMapPaths {
         flight.paths().forEach(path -> buildTransforms(path, departures));
     }
 
+    private static void subdivide(List<RenderedPathSegment> result, FlightMotion motion, Point a, Point b, Point c, Point d,
+                                  double from, double to, double x, double y, double width, double height, int depth) {
+
+        if (Math.max(Math.max(a.x, b.x), Math.max(c.x, d.x)) < x - 6
+                || Math.min(Math.min(a.x, b.x), Math.min(c.x, d.x)) > x + width + 6
+                || Math.max(Math.max(a.y, b.y), Math.max(c.y, d.y)) < y - 6
+                || Math.min(Math.min(a.y, b.y), Math.min(c.y, d.y)) > y + height + 6) return;
+        var first = a.lerp(d, 1.0 / 3);
+        var second = a.lerp(d, 2.0 / 3);
+        var error = Math.max(Math.hypot(b.x - first.x, b.y - first.y), Math.hypot(c.x - second.x, c.y - second.y));
+        if (error <= .75 || depth >= 18) {
+            result.add(new RenderedPathSegment(a, d, motion.start(), motion.end(), from, to));
+            return;
+        }
+        var ab = a.lerp(b, .5);
+        var bc = b.lerp(c, .5);
+        var cd = c.lerp(d, .5);
+        var abc = ab.lerp(bc, .5);
+        var bcd = bc.lerp(cd, .5);
+        var middle = abc.lerp(bcd, .5);
+        var time = (from + to) * .5;
+        subdivide(result, motion, a, ab, abc, middle, from, time, x, y, width, height, depth + 1);
+        subdivide(result, motion, middle, bcd, cd, d, time, to, x, y, width, height, depth + 1);
+    }
+
     private void buildTransforms(RocketFlightPathCalculator.CraftPath path, Map<UUID, BoosterEvent> departures) {
 
         if (transforms.containsKey(path.branchId())) return;
@@ -60,10 +85,11 @@ final class RocketMapPaths {
         var initial = new Point(samples.getFirst().x(), samples.getFirst().y());
         var initialTime = samples.getFirst().timeSeconds();
         result.add(LegTransform.between(initial, initial, mappedInitial, mappedInitial, initialTime, initialTime));
-        for (var first = 1; first < samples.size();) {
+        for (var first = 1; first < samples.size(); ) {
             var last = first;
             // Phase, staging and time samples belong to one curve, not independent surface departures.
-            while (last + 1 < samples.size() && samples.get(last + 1).actionId().equals(samples.get(first).actionId())) last++;
+            while (last + 1 < samples.size() && samples.get(last + 1).actionId().equals(samples.get(first).actionId()))
+                last++;
             var start = new Point(samples.get(first - 1).x(), samples.get(first - 1).y());
             var end = new Point(samples.get(last).x(), samples.get(last).y());
             var startTime = samples.get(first - 1).timeSeconds();
@@ -75,31 +101,6 @@ final class RocketMapPaths {
             first = last + 1;
         }
         return List.copyOf(result);
-    }
-
-    private static void subdivide(List<RenderedPathSegment> result, FlightMotion motion, Point a, Point b, Point c, Point d,
-                                  double from, double to, double x, double y, double width, double height, int depth) {
-
-        if (Math.max(Math.max(a.x, b.x), Math.max(c.x, d.x)) < x - 6
-                || Math.min(Math.min(a.x, b.x), Math.min(c.x, d.x)) > x + width + 6
-                || Math.max(Math.max(a.y, b.y), Math.max(c.y, d.y)) < y - 6
-                || Math.min(Math.min(a.y, b.y), Math.min(c.y, d.y)) > y + height + 6) return;
-        var first = a.lerp(d, 1.0 / 3);
-        var second = a.lerp(d, 2.0 / 3);
-        var error = Math.max(Math.hypot(b.x - first.x, b.y - first.y), Math.hypot(c.x - second.x, c.y - second.y));
-        if (error <= .75 || depth >= 18) {
-            result.add(new RenderedPathSegment(a, d, motion.start(), motion.end(), from, to));
-            return;
-        }
-        var ab = a.lerp(b, .5);
-        var bc = b.lerp(c, .5);
-        var cd = c.lerp(d, .5);
-        var abc = ab.lerp(bc, .5);
-        var bcd = bc.lerp(cd, .5);
-        var middle = abc.lerp(bcd, .5);
-        var time = (from + to) * .5;
-        subdivide(result, motion, a, ab, abc, middle, from, time, x, y, width, height, depth + 1);
-        subdivide(result, motion, middle, bcd, cd, d, time, to, x, y, width, height, depth + 1);
     }
 
     List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
@@ -161,7 +162,9 @@ final class RocketMapPaths {
         return transforms.get(branch).get(index).apply(new Point(state.x(), state.y()), time);
     }
 
-    /** A cubic endpoint offset preserves waypoint velocities without rotating or scaling overshoots. */
+    /**
+     * A cubic endpoint offset preserves waypoint velocities without rotating or scaling overshoots.
+     */
     private record LegTransform(Point startOffset, Point endOffset, double startTime, double endTime) {
 
         static LegTransform between(Point start, Point end, Point mappedStart, Point mappedEnd, double startTime, double endTime) {

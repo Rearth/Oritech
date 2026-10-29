@@ -28,13 +28,6 @@ public class CubeSatSplicerBehavior implements SplicerBehavior {
         SplicerBehaviors.register(OritechSpaceAge.id("cube_sat"), 10, new CubeSatSplicerBehavior());
     }
 
-    @Override
-    public Optional<SplicerOperation> findOperation(SplicerContext context) {
-
-        if (!context.level().getBlockState(context.targetPos()).is(SpaceAgeBlocks.ROCKET_PAD)) return Optional.empty();
-        return Optional.of(operation(context.level(), context.targetPos(), (int) Math.floor(context.splicer().getCoreQuality())));
-    }
-
     static SplicerOperation operation(ServerLevel level, BlockPos pad, int maxSize) {
 
         var scan = RocketStructureScan.scan(level, pad, true);
@@ -42,12 +35,21 @@ public class CubeSatSplicerBehavior implements SplicerBehavior {
         return new ShrinkOperation(scan, data, maxSize);
     }
 
-    private record ShrinkOperation(RocketStructureScan.Result scan, CubeSatData data, int maxSize) implements SplicerOperation {
+    @Override
+    public Optional<SplicerOperation> findOperation(SplicerContext context) {
+
+        if (!context.level().getBlockState(context.targetPos()).is(SpaceAgeBlocks.ROCKET_PAD)) return Optional.empty();
+        return Optional.of(operation(context.level(), context.targetPos(), (int) Math.floor(context.splicer().getCoreQuality())));
+    }
+
+    private record ShrinkOperation(RocketStructureScan.Result scan, CubeSatData data,
+                                   int maxSize) implements SplicerOperation {
 
         @Override
         public List<Component> getTooltip() {
 
-            if (data == null) return List.of(Component.translatable("tooltip.oritech_space_age.cube_sat.splicer_action"));
+            if (data == null)
+                return List.of(Component.translatable("tooltip.oritech_space_age.cube_sat.splicer_action"));
             var size = data.size();
             return List.of(Component.translatable("tooltip.oritech_space_age.cube_sat.splicer_action"),
                     Component.translatable("tooltip.oritech_space_age.cube_sat.size", size.getX(), size.getY(), size.getZ(), data.blockCount()));
@@ -72,7 +74,8 @@ public class CubeSatSplicerBehavior implements SplicerBehavior {
                     ? "status.oritech_space_age.cube_sat_no_rocket" : scan.issue()));
             var size = data.size();
             var longest = Math.max(size.getX(), Math.max(size.getY(), size.getZ()));
-            if (longest > maxSize) return Optional.of(Component.translatable("status.oritech_space_age.cube_sat_too_large", longest, maxSize));
+            if (longest > maxSize)
+                return Optional.of(Component.translatable("status.oritech_space_age.cube_sat_too_large", longest, maxSize));
             return Optional.empty();
         }
 

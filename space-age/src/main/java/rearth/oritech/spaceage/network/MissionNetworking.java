@@ -112,7 +112,8 @@ public final class MissionNetworking {
             for (var id : payload.ids().stream().distinct().toList()) {
                 var state = data.craft.get(id);
                 if (state != null && state.owner.equals(player.getUUID())
-                        && MissionController.redirectBeam(state, payload.target(), payload.x(), payload.z(), system, recipes, stations)) changed++;
+                        && MissionController.redirectBeam(state, payload.target(), payload.x(), payload.z(), system, recipes, stations))
+                    changed++;
             }
             if (changed > 0) data.setDirty();
             player.sendOverlayMessage(Component.translatable("message.oritech_space_age.beams_redirected", changed, payload.ids().size()));
@@ -140,11 +141,12 @@ public final class MissionNetworking {
             if (menu.selected != null) details.add(menu.selected);
             if (menu.detailTarget != null) details.add(menu.detailTarget);
             var selected = data.craft.get(menu.selected);
-            if (selected != null) selected.plan.branches().stream().flatMap(branch -> branch.actions().stream()).forEach(action -> {
-                details.add(action.targetId());
-                details.add(action.settings().docking().host());
-                details.add(action.settings().processing().host());
-            });
+            if (selected != null)
+                selected.plan.branches().stream().flatMap(branch -> branch.actions().stream()).forEach(action -> {
+                    details.add(action.targetId());
+                    details.add(action.settings().docking().host());
+                    details.add(action.settings().processing().host());
+                });
         }
         var stations = RocketDocking.targets(data, player.getUUID(), details);
 

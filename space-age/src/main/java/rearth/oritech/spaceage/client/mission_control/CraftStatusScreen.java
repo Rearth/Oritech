@@ -26,7 +26,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** Live craft dashboard sharing the mission menu and its unsent editor draft. */
+/**
+ * Live craft dashboard sharing the mission menu and its unsent editor draft.
+ */
 public class CraftStatusScreen extends OritechWidgetScreen<MissionControlMenu> {
 
     private final Inventory inventory;
@@ -43,6 +45,20 @@ public class CraftStatusScreen extends OritechWidgetScreen<MissionControlMenu> {
         screenTitle = title;
     }
 
+    private static Map<BlockPos, BlockState> blocks(ActiveRocketData rocket) {
+
+        var blocks = new HashMap<BlockPos, BlockState>();
+        rocket.getStaticSegments().forEach((id, segment) -> {
+            var resources = rocket.getDynamicSegments().get(id);
+            segment.blocks().forEach(block -> blocks.put(block.relativePos(),
+                    resources.reserved.getOrDefault(block.relativePos(), block.state())));
+            segment.originalCouplings().values().forEach(couplings -> couplings.forEach(coupling ->
+                    blocks.putIfAbsent(coupling.relativePos(), coupling.state())));
+        });
+        blocks.values().removeIf(BlockState::isAir);
+        return blocks;
+    }
+
     @Override
     protected void buildComponents() {
 
@@ -53,7 +69,8 @@ public class CraftStatusScreen extends OritechWidgetScreen<MissionControlMenu> {
         addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
         SpaceAgeButtons.missionTabs(1,
                 () -> Minecraft.getInstance().setScreen(new MissionControlScreen(menu, inventory, screenTitle)),
-                () -> {}, this::openEditor).forEach(this::addComponent);
+                () -> {
+                }, this::openEditor).forEach(this::addComponent);
         addCraftHeader(panelWidth);
         preview = new BlockPreviewWidget(9, 52, (panelWidth - 27) / 3, panelHeight - 61);
         preview.withSurface(OritechSurface.PANEL_INSET);
@@ -113,20 +130,6 @@ public class CraftStatusScreen extends OritechWidgetScreen<MissionControlMenu> {
         preview.clearBlocks();
         blocks.forEach((pos, state) -> preview.addBlock(state,
                 BlockPreviewEntities.create(rocket.getLaunchPosition().offset(pos), state, minecraft.level), pos));
-    }
-
-    private static Map<BlockPos, BlockState> blocks(ActiveRocketData rocket) {
-
-        var blocks = new HashMap<BlockPos, BlockState>();
-        rocket.getStaticSegments().forEach((id, segment) -> {
-            var resources = rocket.getDynamicSegments().get(id);
-            segment.blocks().forEach(block -> blocks.put(block.relativePos(),
-                    resources.reserved.getOrDefault(block.relativePos(), block.state())));
-            segment.originalCouplings().values().forEach(couplings -> couplings.forEach(coupling ->
-                    blocks.putIfAbsent(coupling.relativePos(), coupling.state())));
-        });
-        blocks.values().removeIf(BlockState::isAir);
-        return blocks;
     }
 
     @Override

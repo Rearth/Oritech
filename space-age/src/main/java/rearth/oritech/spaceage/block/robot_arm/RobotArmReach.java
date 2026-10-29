@@ -17,12 +17,17 @@ public final class RobotArmReach {
     public static final float MAX_EXTENSION = 3 * MAX_PISTON_EXTENSION;
     // Centre is (0, 24, 0), while the swivel is at (8, 19, 8). Reserve room for curved joints.
     public static final int RADIUS = (int) ((LENGTH + MAX_EXTENSION - Math.sqrt(8 * 8 + 5 * 5 + 8 * 8) - 32) / 16);
-    /** The port where carried items appear and vanish. */
+    /**
+     * The port where carried items appear and vanish.
+     */
     public static final Vector3fc WARP = new Vector3f(8, 22, -5);
 
-    private RobotArmReach() {}
+    private RobotArmReach() {
+    }
 
-    /** Rotation from model space (facing north) to world space around the Y axis. */
+    /**
+     * Rotation from model space (facing north) to world space around the Y axis.
+     */
     public static float facingYaw(Direction facing) {
 
         return switch (facing) {

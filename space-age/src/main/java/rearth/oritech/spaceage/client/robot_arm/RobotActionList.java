@@ -67,6 +67,43 @@ final class RobotActionList {
         scroll.setContentDimensions(rowWidth, actions.size() * ROW_HEIGHT);
     }
 
+    private static MutableComponent text(String key, Object... args) {
+
+        return Component.translatable("screen.oritech_space_age.robot." + key, args);
+    }
+
+    /**
+     * Sneaking changes what a click does, e.g. placing against a chest or shift-using a wrench.
+     */
+    private static UIComponent kindLabel(int x, int y, int width, Action action) {
+
+        var kind = text(action.kind().name().toLowerCase(Locale.ROOT));
+        var label = new LabelWidget(x, y, width, kind).withDarkColor();
+        if (action.kind() == Kind.DESTROY) return label;
+        if (action.sneaking()) label.setText(kind.copy().append(text("sneaking").withColor(SNEAK_COLOR)));
+        return label.withTooltip(text(action.sneaking() ? "sneaking.tooltip" : "standing.tooltip"));
+    }
+
+    private static UIComponent blockIcon(int x, int y, BlockState state) {
+
+        var tooltip = new ArrayList<Component>();
+        tooltip.add(state.getBlock().getName());
+        state.getValues().forEach(value -> tooltip.add(Component.literal(value.property().getName() + ": " + value.valueName())
+                .withStyle(ChatFormatting.GRAY)));
+        // Entity-rendered blocks such as chests have no block model to preview.
+        UIComponent icon = state.getRenderShape() == RenderShape.MODEL
+                ? new BlockWidget(x, y, 18, state)
+                : new ItemWidget(x + 1, y + 1, new ItemStack(state.getBlock())).withShowOverlay(false).withTooltipFromStack(false);
+        return icon.withTooltip(tooltip);
+    }
+
+    private static Component fit(String text, int width) {
+
+        var font = Minecraft.getInstance().font;
+        if (font.width(text) <= width) return Component.literal(text);
+        return Component.literal(font.plainSubstrByWidth(text, width - font.width("…")) + "…");
+    }
+
     void setCursor(int cursor) {
 
         for (int i = 0; i < highlights.size(); i++) highlights.get(i).setVisible(i == cursor);
@@ -75,11 +112,6 @@ final class RobotActionList {
     void scrollTo(float scrollY) {
 
         scroll.setScrollPosition(0, scrollY);
-    }
-
-    private static MutableComponent text(String key, Object... args) {
-
-        return Component.translatable("screen.oritech_space_age.robot." + key, args);
     }
 
     private void addRow(int index, Action action, int width, BiConsumer<Integer, Match> onMatch, @Nullable IntConsumer onDelete) {
@@ -124,37 +156,9 @@ final class RobotActionList {
         }
     }
 
-    /** Sneaking changes what a click does, e.g. placing against a chest or shift-using a wrench. */
-    private static UIComponent kindLabel(int x, int y, int width, Action action) {
-
-        var kind = text(action.kind().name().toLowerCase(Locale.ROOT));
-        var label = new LabelWidget(x, y, width, kind).withDarkColor();
-        if (action.kind() == Kind.DESTROY) return label;
-        if (action.sneaking()) label.setText(kind.copy().append(text("sneaking").withColor(SNEAK_COLOR)));
-        return label.withTooltip(text(action.sneaking() ? "sneaking.tooltip" : "standing.tooltip"));
-    }
-
-    private static UIComponent blockIcon(int x, int y, BlockState state) {
-
-        var tooltip = new ArrayList<Component>();
-        tooltip.add(state.getBlock().getName());
-        state.getValues().forEach(value -> tooltip.add(Component.literal(value.property().getName() + ": " + value.valueName())
-                .withStyle(ChatFormatting.GRAY)));
-        // Entity-rendered blocks such as chests have no block model to preview.
-        UIComponent icon = state.getRenderShape() == RenderShape.MODEL
-                ? new BlockWidget(x, y, 18, state)
-                : new ItemWidget(x + 1, y + 1, new ItemStack(state.getBlock())).withShowOverlay(false).withTooltipFromStack(false);
-        return icon.withTooltip(tooltip);
-    }
-
-    private static Component fit(String text, int width) {
-
-        var font = Minecraft.getInstance().font;
-        if (font.width(text) <= width) return Component.literal(text);
-        return Component.literal(font.plainSubstrByWidth(text, width - font.width("…")) + "…");
-    }
-
-    /** Draws the match option as a comparison glyph: a wildcard, equal to the block, or identical to the state. */
+    /**
+     * Draws the match option as a comparison glyph: a wildcard, equal to the block, or identical to the state.
+     */
     private static final class MatchButton extends ButtonWidget {
 
         private final Match match;

@@ -13,10 +13,13 @@ import rearth.oritech.spaceage.simulation.power.SpacePowerService.SurfaceBeam;
 
 import java.util.List;
 
-/** Physical beams are visible to nearby players independently of Mission Control and craft ownership. */
+/**
+ * Physical beams are visible to nearby players independently of Mission Control and craft ownership.
+ */
 public final class GroundBeamNetworking {
 
-    private GroundBeamNetworking() {}
+    private GroundBeamNetworking() {
+    }
 
     public static void register(PayloadRegistrar registrar) {
 

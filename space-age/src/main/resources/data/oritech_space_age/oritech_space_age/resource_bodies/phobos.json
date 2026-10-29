@@ -7,15 +7,15 @@
   "model_block": "oritech_space_age:phobos",
   "resources": [
     {
-      "block": "minecraft:iron_ore",
+      "block": "oritech_space_age:superdense_iron_ore",
       "amount": 40
     },
     {
-      "block": "minecraft:gold_ore",
+      "block": "oritech_space_age:superdense_gold_ore",
       "amount": 30
     },
     {
-      "block": "oritech:nickel_ore",
+      "block": "oritech_space_age:superdense_nickel_ore",
       "amount": 30
     }
   ]

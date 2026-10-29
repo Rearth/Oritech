@@ -46,10 +46,16 @@ public final class RocketRecovery {
                     controller.setName(machine.name);
             });
             resources.payloads.forEach((relative, cube) -> {
-                if (level.getBlockEntity(origin.offset(relative)) instanceof CubeSatBlockEntity entity) entity.setData(cube);
+                if (level.getBlockEntity(origin.offset(relative)) instanceof CubeSatBlockEntity entity)
+                    entity.setData(cube);
             });
         });
         return true;
+    }
+
+    public static int highestBlockY(ActiveRocketData rocket, BlockPos origin) {
+
+        return origin.getY() + restorationBlocks(rocket).stream().mapToInt(block -> block.relativePos().getY()).max().orElse(0);
     }
 
     public static BlockPos landingPosition(ServerLevel level, ActiveRocketData rocket, int x, int z) {
@@ -70,7 +76,9 @@ public final class RocketRecovery {
         return center(restorationBlocks(rocket).stream().map(StaticRocketSegment.BlockData::relativePos).toList());
     }
 
-    /** Nearest block-grid centre; differing even/odd footprints can only align to half a block. */
+    /**
+     * Nearest block-grid centre; differing even/odd footprints can only align to half a block.
+     */
     public static BlockPos center(Collection<BlockPos> positions) {
 
         if (positions.isEmpty()) return BlockPos.ZERO;

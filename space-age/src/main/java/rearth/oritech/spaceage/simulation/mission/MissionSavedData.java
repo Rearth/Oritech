@@ -30,10 +30,10 @@ public final class MissionSavedData extends SavedData {
     public final List<DockingLink> dockingLinks = new ArrayList<>();
     public final Map<UUID, MissionState> craft = new LinkedHashMap<>();
     public final Map<GlobalPos, GroundStationBlockEntity> stations = new HashMap<>();
+    public final SpacePowerService power = new SpacePowerService();
     public List<SpaceCommunications.Node> networkNodes = List.of();
     public long extraTicks;
     public int debugSpeed = 1;
-    public final SpacePowerService power = new SpacePowerService();
 
     public MissionSavedData() {
     }

@@ -46,9 +46,9 @@ class SurfaceBeamHeatTest {
             assertNull(SurfaceBeamData.heatedState(Blocks.BEDROCK.defaultBlockState(), 100));
         } finally {
             if (previousScorching == null) maps.remove(SpaceAgeDataMaps.BEAM_SCORCHING);
-            else maps.put(SpaceAgeDataMaps.BEAM_SCORCHING, (Map) previousScorching);
+            else maps.put(SpaceAgeDataMaps.BEAM_SCORCHING, previousScorching);
             if (previousMelting == null) maps.remove(SpaceAgeDataMaps.BEAM_MELTING);
-            else maps.put(SpaceAgeDataMaps.BEAM_MELTING, (Map) previousMelting);
+            else maps.put(SpaceAgeDataMaps.BEAM_MELTING, previousMelting);
         }
     }
 }

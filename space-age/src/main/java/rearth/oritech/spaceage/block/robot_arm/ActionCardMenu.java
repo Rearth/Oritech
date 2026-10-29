@@ -15,7 +15,9 @@ import rearth.oritech.spaceage.network.RobotNetworking;
 
 import java.util.List;
 
-/** Edits the playbook stored on a held action card. */
+/**
+ * Edits the playbook stored on a held action card.
+ */
 public final class ActionCardMenu extends AbstractContainerMenu implements RobotNetworking.Receiver {
 
     public static final int CLEAR_BUTTON = 0;

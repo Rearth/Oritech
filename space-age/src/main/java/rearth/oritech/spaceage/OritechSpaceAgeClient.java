@@ -2,6 +2,7 @@ package rearth.oritech.spaceage;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -20,6 +21,8 @@ import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.DenseOres;
+import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.Locale;
@@ -33,9 +36,15 @@ public final class OritechSpaceAgeClient {
 
         NeoForge.EVENT_BUS.addListener((ItemTooltipEvent event) -> {
             if (event.getItemStack().getItem() instanceof BlockItem item) {
+                var dense = DenseOres.family(BuiltInRegistries.BLOCK.getKey(item.getBlock()));
+                if (dense != null) {
+                    event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.superdense_yield", new ItemStack(dense.output()).getHoverName()));
+                    event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.superdense_mass", (int) (dense.mass * 1_000)));
+                }
                 var quality = item.getBlock().builtInRegistryHolder().getData(SpaceAgeDataMaps.BEAM_APERTURE_MATERIALS);
-                if (quality != null && quality > 0) event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.aperture_glass",
-                        String.format(Locale.ROOT, "%.2f", quality), TooltipHelper.getEnergyText((long) (quality * SpaceBalance.BEAM_RF_PER_GLASS))));
+                if (quality != null && quality > 0)
+                    event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.aperture_glass",
+                            String.format(Locale.ROOT, "%.2f", quality), TooltipHelper.getEnergyText((long) (quality * SpaceBalance.BEAM_RF_PER_GLASS))));
             }
             if (event.getItemStack().is(SpaceAgeBlocks.BEAM_APERTURE.get().asItem())) {
                 event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.beam_aperture.structure"));

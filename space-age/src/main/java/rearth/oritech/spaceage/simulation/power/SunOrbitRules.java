@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-/** Slots describe stationary destinations, rather than propagated physical orbits. */
+/**
+ * Slots describe stationary destinations, rather than propagated physical orbits.
+ */
 final class SunOrbitRules {
 
     private SunOrbitRules() {

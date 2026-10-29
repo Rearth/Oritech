@@ -20,6 +20,7 @@ import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
+import rearth.oritech.spaceage.simulation.DenseOres.Family;
 
 public class SpaceAgeModelProvider extends ModelProvider {
 
@@ -86,6 +87,8 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.CERES.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.VESTA.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.NYX.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.ECHO.get(), blockModels);
+        for (var family : Family.values()) blockModels.createTrivialCube(family.block());
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);

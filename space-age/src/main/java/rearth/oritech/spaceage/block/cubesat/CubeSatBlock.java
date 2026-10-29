@@ -31,7 +31,9 @@ public class CubeSatBlock extends Block implements EntityBlock {
         return stack;
     }
 
-    /** The cube stored in a stack, named after the stack's current (anvil) name. */
+    /**
+     * The cube stored in a stack, named after the stack's current (anvil) name.
+     */
     public static @Nullable CubeSatData data(ItemStack stack) {
 
         var data = stack.get(SpaceAgeComponents.CUBE_SAT.get());

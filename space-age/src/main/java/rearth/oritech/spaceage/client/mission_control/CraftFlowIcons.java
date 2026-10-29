@@ -4,7 +4,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.renderer.RenderPipelines;
 import rearth.oritech.spaceage.OritechSpaceAge;
 
-/** Uniform 32-pixel sprites, enlarged for readable flow categories. */
+/**
+ * Uniform 32-pixel sprites, enlarged for readable flow categories.
+ */
 final class CraftFlowIcons {
 
     static final int SIZE = 24;

@@ -250,11 +250,11 @@ final class FlightPlannerServices {
             var remote = host == null ? List.<HardwareRef>of() : RocketLayout.controllers(host.rocket(), false);
             button(x, y, width / 2 - 2, text("cargo_local", selection(exchange.local(), localRocket)), !local.isEmpty(), () -> set(action,
                     action.settings().withExchange(
-                    new Exchange(exchange.cargo(), nextSelection(local, exchange.local()), exchange.remote(), exchange.filter(), exchange.fuel(), exchange.rf()))));
+                            new Exchange(exchange.cargo(), nextSelection(local, exchange.local()), exchange.remote(), exchange.filter(), exchange.fuel(), exchange.rf()))));
             var remoteRocket = host == null ? localRocket : host.rocket();
             button(x + width / 2 + 2, y, width / 2 - 2, text("cargo_remote", selection(exchange.remote(), remoteRocket)), !remote.isEmpty(), () -> set(action,
                     action.settings().withExchange(
-                    new Exchange(exchange.cargo(), exchange.local(), nextSelection(remote, exchange.remote()), exchange.filter(), exchange.fuel(), exchange.rf()))));
+                            new Exchange(exchange.cargo(), exchange.local(), nextSelection(remote, exchange.remote()), exchange.filter(), exchange.fuel(), exchange.rf()))));
             y += rowSpacing;
             resource(action, exchange, true, x, y, width);
             y += rowSpacing;

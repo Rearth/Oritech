@@ -22,7 +22,9 @@ import rearth.oritech.util.TooltipHelper;
 import java.util.List;
 import java.util.Locale;
 
-/** Compact, read-only ground receiver screen, following the machine screen layout. */
+/**
+ * Compact, read-only ground receiver screen, following the machine screen layout.
+ */
 public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMenu> {
 
     private BlockPreviewWidget preview;
@@ -38,6 +40,21 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
     public BeamApertureScreen(BeamApertureMenu menu, Inventory inventory, Component title) {
 
         super(menu, inventory, title, 404, 196);
+    }
+
+    private static String energy(double value) {
+
+        return TooltipHelper.getEnergyText((long) value) + " RF";
+    }
+
+    private static String decimal(double value) {
+
+        return String.format(Locale.ROOT, "%.1f", value);
+    }
+
+    private static Component text(String key, Object... args) {
+
+        return Component.translatable("screen.oritech_space_age.aperture." + key, args);
     }
 
     @Override
@@ -104,8 +121,8 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
         }
         displayed = data;
         var issue = data.blocks().isEmpty() ? "loading" : !data.overworld() ? "space" : !data.upward() ? "facing" : data.defect().isPresent() ? "incomplete"
-                : data.heat() >= 5 ? "hot" : data.energy() >= BeamApertureBlockEntity.CAPACITY ? "full"
-                : data.received() > 0 ? "receiving" : "ready";
+                                                                                                                    : data.heat() >= 5 ? "hot" : data.energy() >= BeamApertureBlockEntity.CAPACITY ? "full"
+                                                                                                                                                 : data.received() > 0 ? "receiving" : "ready";
         status.setText(text("status." + issue));
         status.withColor(issue.equals("receiving") || issue.equals("ready") ? 0xFF398332 : 0xFFAA5724);
         status.setTooltip(data.defect().map(pos -> List.of(text("missing", pos.toShortString()))).orElse(List.of()));
@@ -124,21 +141,6 @@ public final class BeamApertureScreen extends OritechWidgetScreen<BeamApertureMe
         var heatState = text(data.heat() >= 10 ? "scorching" : data.heat() >= 5 ? "hot" : data.heat() >= 1 ? "warm" : "cool");
         heat.setText(text("heat", decimal(data.heat()), heatState));
         heat.withColor(data.heat() >= 5 ? 0xFFAA5724 : LabelWidget.DARK_TEXT);
-    }
-
-    private static String energy(double value) {
-
-        return TooltipHelper.getEnergyText((long) value) + " RF";
-    }
-
-    private static String decimal(double value) {
-
-        return String.format(Locale.ROOT, "%.1f", value);
-    }
-
-    private static Component text(String key, Object... args) {
-
-        return Component.translatable("screen.oritech_space_age.aperture." + key, args);
     }
 
     @Override

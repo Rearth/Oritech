@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-/** Maps simulation surface points to the solid cube's outline in the star map. */
+/**
+ * Maps simulation surface points to the solid cube's outline in the star map.
+ */
 final class PlanetSurfaceProjection {
 
     private PlanetSurfaceProjection() {

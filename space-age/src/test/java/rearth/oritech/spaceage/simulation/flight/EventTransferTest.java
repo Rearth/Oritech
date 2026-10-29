@@ -22,8 +22,10 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.Term
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+
 import java.util.LinkedHashMap;
 import java.util.HashMap;
+
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 
@@ -97,8 +99,9 @@ class EventTransferTest {
 
         var id = new UUID(900, 1);
         var blocks = new HashSet<StaticRocketSegment.BlockData>();
-        for (int i = 0; i < 8; i++) blocks.add(new StaticRocketSegment.BlockData(new BlockPos(i, 0, 0),
-                SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()));
+        for (int i = 0; i < 8; i++)
+            blocks.add(new StaticRocketSegment.BlockData(new BlockPos(i, 0, 0),
+                    SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()));
         blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.NAVIGATION_COMPUTER.get().defaultBlockState()));
         blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()));
         var structure = new StaticRocketSegment(id, blocks, Map.of(), 247, 8);

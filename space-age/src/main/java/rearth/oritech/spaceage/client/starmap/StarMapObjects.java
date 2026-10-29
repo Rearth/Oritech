@@ -48,14 +48,9 @@ final class StarMapObjects {
     private final List<FogPatch> fogBridges = new ArrayList<>();
     // Asteroids move only for the selected craft's completed navigation events.
     private final Map<UUID, StarMapTooltip.ArrivalPosition> displayedPositions = new HashMap<>();
-    private Set<UUID> fleetMarkers = Set.of();
     private final ItemStack craftIcon = new ItemStack(Items.FIREWORK_ROCKET);
     private final ItemStack waypointIcon = new ItemStack(Items.ENDER_EYE);
-
-    void setFleetMarkers(Set<UUID> craftIds) {
-
-        fleetMarkers = Set.copyOf(craftIds);
-    }
+    private Set<UUID> fleetMarkers = Set.of();
 
     private static void addCircle(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
                                   double centerX, double centerY, double radius, int color, float width) {
@@ -152,6 +147,28 @@ final class StarMapObjects {
                 || type == SpaceObjects.ObjectType.MARS || type == SpaceObjects.ObjectType.RESOURCE_BODY;
     }
 
+    private static boolean circleIntersects(Viewport viewport, StarMapCamera camera, double x, double y, double radius) {
+
+        var center = project(camera, viewport, x, y);
+        var radiusX = radius * camera.zoom();
+        return intersects(viewport, center.x(), center.y(), radiusX, radiusX * StarMapCamera.PLANE_TILT);
+    }
+
+    private static float iconSize(Entry object, StarMapCamera camera) {
+
+        var diameterScale = switch (object.data.type()) {
+            case SUN, EARTH, MARS, RESOURCE_BODY -> 1;
+            case ASTEROID -> 1.3;
+            default -> 2;
+        };
+        return (float) (object.data.radius() * camera.zoom() * diameterScale);
+    }
+
+    void setFleetMarkers(Set<UUID> craftIds) {
+
+        fleetMarkers = Set.copyOf(craftIds);
+    }
+
     RocketMapPaths.Point surfacePosition(RocketMapPaths.Point point) {
 
         for (var object : objects) {
@@ -163,13 +180,6 @@ final class StarMapObjects {
         return point;
     }
 
-    private static boolean circleIntersects(Viewport viewport, StarMapCamera camera, double x, double y, double radius) {
-
-        var center = project(camera, viewport, x, y);
-        var radiusX = radius * camera.zoom();
-        return intersects(viewport, center.x(), center.y(), radiusX, radiusX * StarMapCamera.PLANE_TILT);
-    }
-
     void setSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
 
         objects.clear();
@@ -177,7 +187,8 @@ final class StarMapObjects {
             if (!FleetViewPreferences.showSun() && object.type() == SpaceObjects.ObjectType.CRAFT
                     && snapshot.stations().stream().anyMatch(station -> station.id().equals(object.id())
                     && station.position().target().equals(SpaceSimulation.SUN_ID))
-                    && snapshot.plan().branches().stream().flatMap(branch -> branch.actions().stream()).noneMatch(action -> action.targetId().equals(object.id()))) continue;
+                    && snapshot.plan().branches().stream().flatMap(branch -> branch.actions().stream()).noneMatch(action -> action.targetId().equals(object.id())))
+                continue;
             var widget = new BlockWidget(0, 0, ICON_TEXTURE_SIZE, iconBlock(object));
             // Normalize the two-block celestial models to the same unit as asteroid models.
             if (isPlanet(object.type())) widget.withScale(.5f).withRenderPadding(PLANET_TEXTURE_PADDING);
@@ -287,7 +298,8 @@ final class StarMapObjects {
             }
         }
         for (var object : objects) {
-            if (!visibleIcons.contains(object.data.id()) && object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION) continue;
+            if (!visibleIcons.contains(object.data.id()) && object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION)
+                continue;
             if (isPlanet(object.data.type())) continue;
             var objectX = x(object);
             var objectY = y(object);
@@ -331,7 +343,7 @@ final class StarMapObjects {
     }
 
     List<Icon> groupIcons(StarMapCamera camera, Viewport viewport,
-                                           RocketStarMapWidget.NavigationSelection selectedTarget) {
+                          RocketStarMapWidget.NavigationSelection selectedTarget) {
 
         var icons = new ArrayList<Icon>();
         for (var object : objects) {
@@ -351,7 +363,8 @@ final class StarMapObjects {
         var visible = new HashSet<UUID>();
         var drawnIcons = new HashSet<IconKey>();
         for (var object : objects) {
-            if (hiddenIcons.contains(object.data.id()) || object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) continue;
+            if (hiddenIcons.contains(object.data.id()) || object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION)
+                continue;
             var position = project(camera, viewport, x(object), y(object));
             if (object.data.type() == SpaceObjects.ObjectType.CRAFT || object.data.type() == SpaceObjects.ObjectType.WAYPOINT) {
                 if (!fleetMarkers.contains(object.data.id()) && intersects(viewport, position.x(), position.y(), 8, 8))
@@ -370,16 +383,6 @@ final class StarMapObjects {
         return Set.copyOf(visible);
     }
 
-    private static float iconSize(Entry object, StarMapCamera camera) {
-
-        var diameterScale = switch (object.data.type()) {
-            case SUN, EARTH, MARS, RESOURCE_BODY -> 1;
-            case ASTEROID -> 1.3;
-            default -> 2;
-        };
-        return (float) (object.data.radius() * camera.zoom() * diameterScale);
-    }
-
     Entry renderIcons(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport,
                       RocketStarMapWidget.NavigationSelection selectedTarget, int mouseX, int mouseY, float delta,
                       boolean pointerInViewport, Set<UUID> visibleIcons) {
@@ -393,8 +396,9 @@ final class StarMapObjects {
                 if (visibleIcons.contains(object.data.id())) {
                     graphics.item(object.data.type() == SpaceObjects.ObjectType.WAYPOINT ? waypointIcon : craftIcon,
                             (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
-                    if (camera.zoom() >= CRAFT_NAME_ZOOM) graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
-                            (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
+                    if (camera.zoom() >= CRAFT_NAME_ZOOM)
+                        graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
+                                (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);
                 }
                 if (pointerInViewport && Math.abs(mouseX - position.x()) <= 8 && Math.abs(mouseY - position.y()) <= 8)
                     hovered = object;
@@ -422,8 +426,9 @@ final class StarMapObjects {
             }
             if (pointerInViewport && (isPlanet(object.data.type())
                     ? PlanetSurfaceProjection.contains(object.outline,
-                            new RocketMapPaths.Point((mouseX - position.x()) / size, (mouseY - position.y()) / size))
-                    : Math.abs(mouseX - position.x()) <= radius && Math.abs(mouseY - position.y()) <= radius)) hovered = object;
+                    new RocketMapPaths.Point((mouseX - position.x()) / size, (mouseY - position.y()) / size))
+                    : Math.abs(mouseX - position.x()) <= radius && Math.abs(mouseY - position.y()) <= radius))
+                hovered = object;
             if (object.data.type() != SpaceObjects.ObjectType.ASTEROID) {
                 graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                         (int) Math.round(position.x() + size / 2d + 3), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);

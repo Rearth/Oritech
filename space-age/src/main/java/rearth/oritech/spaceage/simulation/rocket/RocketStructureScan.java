@@ -14,6 +14,8 @@ import rearth.oritech.spaceage.block.cubesat.CubeSatBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.BlockPairController;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.DenseOres;
+import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.spaceage.simulation.service.PhysicalCrafting;
 
 import java.util.ArrayList;
@@ -252,7 +254,8 @@ public final class RocketStructureScan {
             }
 
             // weight scan, folded cube-sats have a constant mass
-            staticWeight += worldState.is(SpaceAgeBlocks.CUBE_SAT) ? (long) RocketLayout.mass(worldState)
+            staticWeight += worldState.is(SpaceAgeBlocks.CUBE_SAT) || DenseOres.family(BuiltInRegistries.BLOCK.getKey(worldState.getBlock())) != null
+                    ? (long) RocketLayout.mass(worldState)
                     : (long) Math.max(worldState.getDestroySpeed(level, worldPos), 0);
 
         }

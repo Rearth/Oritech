@@ -28,7 +28,7 @@ public final class StarMapLineRenderer {
     }
 
     public static void submitConnected(GuiGraphicsExtractor graphics, List<Line> lines,
-                                int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
+                                       int viewportX, int viewportY, int viewportWidth, int viewportHeight) {
 
         submit(graphics, lines, viewportX, viewportY, viewportWidth, viewportHeight, true);
     }
@@ -47,18 +47,6 @@ public final class StarMapLineRenderer {
         graphics.submitGuiElementRenderState(new RenderState(List.copyOf(lines), pose, edgeWidth, connected, scissor, clippedBounds));
     }
 
-    /**
-     * Screen-space endpoints, packed ARGB color, GUI thickness, and whether to soften the edges.
-     */
-    public record Line(double fromX, double fromY, double toX, double toY, int color, float width, boolean antialiased) {
-
-        // Reference rings and guides keep their existing appearance; trajectories opt into smoothing.
-        Line(double fromX, double fromY, double toX, double toY, int color, float width) {
-
-            this(fromX, fromY, toX, toY, color, width, false);
-        }
-    }
-
     private static boolean touches(Line first, Line second) {
 
         return first.toX == second.fromX && first.toY == second.fromY;
@@ -75,6 +63,19 @@ public final class StarMapLineRenderer {
         var by = (second.toX - second.fromX) / secondLength;
         var divisor = Math.max(.25, 1 + ax * bx + ay * by);
         return new Join((ax + bx) / divisor, (ay + by) / divisor, (first.width + second.width) * .5f);
+    }
+
+    /**
+     * Screen-space endpoints, packed ARGB color, GUI thickness, and whether to soften the edges.
+     */
+    public record Line(double fromX, double fromY, double toX, double toY, int color, float width,
+                       boolean antialiased) {
+
+        // Reference rings and guides keep their existing appearance; trajectories opt into smoothing.
+        Line(double fromX, double fromY, double toX, double toY, int color, float width) {
+
+            this(fromX, fromY, toX, toY, color, width, false);
+        }
     }
 
     record Join(double x, double y, float width) {
@@ -100,8 +101,10 @@ public final class StarMapLineRenderer {
                 var normalY = dx / length;
                 var start = new Join(normalX, normalY, line.width);
                 var end = start;
-                if (connected && index > 0 && touches(lines.get(index - 1), line)) start = join(lines.get(index - 1), line);
-                if (connected && index + 1 < lines.size() && touches(line, lines.get(index + 1))) end = join(line, lines.get(index + 1));
+                if (connected && index > 0 && touches(lines.get(index - 1), line))
+                    start = join(lines.get(index - 1), line);
+                if (connected && index + 1 < lines.size() && touches(line, lines.get(index + 1)))
+                    end = join(line, lines.get(index + 1));
                 if (!line.antialiased) {
                     band(consumer, line, start, end, -start.width * 0.5f, start.width * 0.5f, -end.width * 0.5f, end.width * 0.5f,
                             line.color, line.color);

@@ -57,63 +57,14 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         withRenderLayer(new HeldLayer<>(this));
     }
 
-    @Override
-    public void addRenderData(RobotArmBlockEntity arm, Void related, R state, float partialTick) {
-
-        super.addRenderData(arm, related, state, partialTick);
-        state.addGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, arm.getCurrentColor());
-        // Render states are reused. A packaged/idle arm must not retain the previous IK frame.
-        state.addGeckolibData(FRAME, null);
-        if (!arm.isAssembled(arm.getBlockState()) || !arm.visual.active()) {
-            motions.remove(arm);
-            return;
-        }
-        var controller = arm.getAnimatableInstanceCache().getManagerForId(getInstanceId(arm, related)).getAnimationControllers().get("machine");
-        // Authored deployment must finish before procedural motion takes over the joints.
-        var animation = controller.getCurrentRawAnimation();
-        if (RobotArmBlockEntity.PACKAGED.equals(animation) || RobotArmBlockEntity.SETUP.equals(animation)) {
-            motions.remove(arm);
-            return;
-        }
-        var visual = arm.visual;
-        var motion = motions.computeIfAbsent(arm, ignored -> new Motion());
-        var seconds = motion.advance(visual, arm.getLevel().getGameTime() + partialTick);
-        var progress = Math.clamp(motion.elapsed / visual.duration(), 0, 1);
-        var yaw = RobotArmReach.facingYaw(arm.getFacingForMultiblock());
-
-        var rotation = graspRotation(visual, motion, yaw, progress);
-        // The wrist, not the cargo pivot, supplies the required endpoint orientation.
-        motion.target.lerp(destination(arm, visual, yaw, progress), 1 - (float) Math.exp(-seconds * 24));
-        var pose = RobotArmIk.interpolate(motion.pose, motion.ik.solve(motion.target, rotation), seconds);
-        motion.pose = pose;
-        motion.phase = visual.phase();
-
-        var closure = visual.phase() == Phase.PREPARE ? 0 : switch (visual.kind()) {
-            case DESTROY -> 7;
-            case INTERACT -> 8;
-            case PLACE -> 0;
-        };
-        motion.closure += (closure - motion.closure) * (1 - (float) Math.exp(-seconds * 12));
-        if (visual.kind() == Kind.DESTROY && visual.phase() == Phase.WORK && visual.active()) motion.spin += seconds * 16;
-
-        var spin = rotation != null ? 0 : motion.spin;
-        Held held = null;
-        if (holdsCargo(visual, progress)) {
-            // Returning cargo sinks into the warp port at the very end of the retraction.
-            var sink = visual.phase() == Phase.RETRACT && visual.returnToWarp() ? -25 * RobotArmIk.ease((progress - .8f) / .2f) : 0;
-            var offset = sink == 0 ? new Vector3f() : RobotArmIk.orientation(pose).rotateY(spin).invert().transform(new Vector3f(0, sink / 16, 0));
-            held = Held.of(arm, visual, offset);
-        }
-        state.addGeckolibData(FRAME, new Frame(pose, motion.closure, spin, held));
-    }
-
     private static Vector3f destination(RobotArmBlockEntity arm, Visual visual, float yaw, float progress) {
 
         var placing = visual.kind() == Kind.PLACE;
         var target = modelPosition(arm, visual.target(), yaw);
         return switch (visual.phase()) {
             case APPROACH -> {
-                if (placing && progress < PICKUP) yield new Vector3f(REST).lerp(RobotArmReach.WARP, RobotArmIk.ease(progress / PICKUP));
+                if (placing && progress < PICKUP)
+                    yield new Vector3f(REST).lerp(RobotArmReach.WARP, RobotArmIk.ease(progress / PICKUP));
                 if (placing) yield RobotArmIk.travel(RobotArmReach.WARP, target, (progress - PICKUP) / (1 - PICKUP));
                 yield RobotArmIk.travel(start(arm, visual, yaw), target, progress);
             }
@@ -123,7 +74,9 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         };
     }
 
-    /** Placed blocks turn from the warp port's facing to the arm's facing; returning cargo turns upright. */
+    /**
+     * Placed blocks turn from the warp port's facing to the arm's facing; returning cargo turns upright.
+     */
     private static @Nullable Quaternionf graspRotation(Visual visual, Motion motion, float yaw, float progress) {
 
         if (visual.kind() == Kind.PLACE) {
@@ -161,6 +114,57 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         var origin = arm.getBlockPos();
         var delta = pos.getCenter().subtract(origin.getX() + .5, origin.getY(), origin.getZ() + .5);
         return new Vector3f((float) delta.x * 16, (float) delta.y * 16, (float) delta.z * 16).rotateY(-yaw);
+    }
+
+    @Override
+    public void addRenderData(RobotArmBlockEntity arm, Void related, R state, float partialTick) {
+
+        super.addRenderData(arm, related, state, partialTick);
+        state.addGeckolibData(MachineRenderer.TEXTURE_OVERRIDE_TICKET, arm.getCurrentColor());
+        // Render states are reused. A packaged/idle arm must not retain the previous IK frame.
+        state.addGeckolibData(FRAME, null);
+        if (!arm.isAssembled(arm.getBlockState()) || !arm.visual.active()) {
+            motions.remove(arm);
+            return;
+        }
+        var controller = arm.getAnimatableInstanceCache().getManagerForId(getInstanceId(arm, related)).getAnimationControllers().get("machine");
+        // Authored deployment must finish before procedural motion takes over the joints.
+        var animation = controller.getCurrentRawAnimation();
+        if (RobotArmBlockEntity.PACKAGED.equals(animation) || RobotArmBlockEntity.SETUP.equals(animation)) {
+            motions.remove(arm);
+            return;
+        }
+        var visual = arm.visual;
+        var motion = motions.computeIfAbsent(arm, ignored -> new Motion());
+        var seconds = motion.advance(visual, arm.getLevel().getGameTime() + partialTick);
+        var progress = Math.clamp(motion.elapsed / visual.duration(), 0, 1);
+        var yaw = RobotArmReach.facingYaw(arm.getFacingForMultiblock());
+
+        var rotation = graspRotation(visual, motion, yaw, progress);
+        // The wrist, not the cargo pivot, supplies the required endpoint orientation.
+        motion.target.lerp(destination(arm, visual, yaw, progress), 1 - (float) Math.exp(-seconds * 24));
+        var pose = RobotArmIk.interpolate(motion.pose, motion.ik.solve(motion.target, rotation), seconds);
+        motion.pose = pose;
+        motion.phase = visual.phase();
+
+        var closure = visual.phase() == Phase.PREPARE ? 0 : switch (visual.kind()) {
+            case DESTROY -> 7;
+            case INTERACT -> 8;
+            case PLACE -> 0;
+        };
+        motion.closure += (closure - motion.closure) * (1 - (float) Math.exp(-seconds * 12));
+        if (visual.kind() == Kind.DESTROY && visual.phase() == Phase.WORK && visual.active())
+            motion.spin += seconds * 16;
+
+        var spin = rotation != null ? 0 : motion.spin;
+        Held held = null;
+        if (holdsCargo(visual, progress)) {
+            // Returning cargo sinks into the warp port at the very end of the retraction.
+            var sink = visual.phase() == Phase.RETRACT && visual.returnToWarp() ? -25 * RobotArmIk.ease((progress - .8f) / .2f) : 0;
+            var offset = sink == 0 ? new Vector3f() : RobotArmIk.orientation(pose).rotateY(spin).invert().transform(new Vector3f(0, sink / 16, 0));
+            held = Held.of(arm, visual, offset);
+        }
+        state.addGeckolibData(FRAME, new Frame(pose, motion.closure, spin, held));
     }
 
     @Override
@@ -241,7 +245,9 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
     private static final class Model extends GeoModel<RobotArmBlockEntity> {
 
         @Override
-        public Identifier getModelResource(GeoRenderState state) { return OritechSpaceAge.id("robot_arm"); }
+        public Identifier getModelResource(GeoRenderState state) {
+            return OritechSpaceAge.id("robot_arm");
+        }
 
         @Override
         public Identifier getTextureResource(GeoRenderState state) {
@@ -251,10 +257,14 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         }
 
         @Override
-        public Identifier getAnimationResource(RobotArmBlockEntity arm) { return OritechSpaceAge.id("robot_arm"); }
+        public Identifier getAnimationResource(RobotArmBlockEntity arm) {
+            return OritechSpaceAge.id("robot_arm");
+        }
     }
 
-    /** Client-side smoothing state per arm, advanced on the render clock. */
+    /**
+     * Client-side smoothing state per arm, advanced on the render clock.
+     */
     private static final class Motion {
 
         final RobotArmIk ik = new RobotArmIk();
@@ -268,7 +278,9 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         float closure;
         float spin;
 
-        /** Follows the server's phase progress and returns the frame time in seconds. */
+        /**
+         * Follows the server's phase progress and returns the frame time in seconds.
+         */
         float advance(Visual visual, double time) {
 
             var seconds = lastTime < 0 ? .05f : (float) Math.clamp((time - lastTime) / 20, 0, .1);
@@ -301,5 +313,6 @@ public final class RobotArmRenderer<R extends BlockEntityRenderState & GeoRender
         }
     }
 
-    private record Frame(RobotArmIk.Pose pose, float closure, float spin, @Nullable Held held) {}
+    private record Frame(RobotArmIk.Pose pose, float closure, float spin, @Nullable Held held) {
+    }
 }

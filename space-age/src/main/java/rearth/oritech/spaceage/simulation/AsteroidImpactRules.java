@@ -125,9 +125,11 @@ public final class AsteroidImpactRules {
             fractions[index] = fragmentedFraction * weights[index] / totalWeight;
 
         var materials = distributeMaterials(target.materials(), fractions);
+        var sourceMass = DenseOres.mass(target.materials());
         var fragments = new ArrayList<AsteroidFragment>();
         for (int index = 0; index < count; index++) {
-            var mass = (float) (target.mass() * fractions[index]);
+            var mass = sourceMass == 0 ? (float) (target.mass() * fractions[index])
+                    : target.mass() * DenseOres.mass(materials.get(index)) / sourceMass;
             var radius = (float) (target.radius() * Math.cbrt(fractions[index]));
             fragments.add(new AsteroidFragment(mass, radius, materials.get(index)));
         }
@@ -142,11 +144,13 @@ public final class AsteroidImpactRules {
         var random = new Random(target.id().getMostSignificantBits() ^ action.id().getLeastSignificantBits()
                 ^ impactorId.getMostSignificantBits() ^ impactorId.getLeastSignificantBits() ^ Double.doubleToLongBits(energy));
         var count = 1 + random.nextInt(3);
-        var totalBlocks = Math.max(count, (int) (energy / (SpaceBalance.ASTEROID_CHIP_ENERGY_PER_KILOGRAM * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS)));
+        var composition = target.materials().stream().mapToDouble(SpaceObjects.AsteroidMaterial::amount).toArray();
+        var averageDensity = DenseOres.mass(target.materials()) / Arrays.stream(composition).sum();
+        var totalBlocks = Math.max(count, (int) (energy / (SpaceBalance.ASTEROID_CHIP_ENERGY_PER_KILOGRAM
+                * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS * averageDensity)));
         var weights = new double[count];
         for (int index = 0; index < count; index++) weights[index] = 0.1 + random.nextDouble();
         var blocks = partition(totalBlocks - count, weights);
-        var composition = target.materials().stream().mapToDouble(SpaceObjects.AsteroidMaterial::amount).toArray();
         var fragments = new ArrayList<AsteroidFragment>();
         for (int index = 0; index < count; index++) {
             // Every ejected chunk has at least one block and remains an ordinary finite asteroid.
@@ -157,7 +161,7 @@ public final class AsteroidImpactRules {
                 if (resources[resource] > 0) materials.add(new SpaceObjects.AsteroidMaterial(
                         target.materials().get(resource).block(), resources[resource]));
             }
-            fragments.add(new AsteroidFragment(amount, (float) (40 * Math.cbrt(amount)), materials));
+            fragments.add(new AsteroidFragment(DenseOres.mass(materials), (float) (40 * Math.cbrt(amount)), materials));
         }
         fragments.sort(Comparator.comparingDouble(AsteroidFragment::mass).reversed());
         return List.copyOf(fragments);

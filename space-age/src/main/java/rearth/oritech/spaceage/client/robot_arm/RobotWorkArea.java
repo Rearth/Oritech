@@ -61,7 +61,8 @@ public final class RobotWorkArea {
         }
     }
 
-    private RobotWorkArea() {}
+    private RobotWorkArea() {
+    }
 
     private static boolean reachable(int x, int y, int z) {
 
@@ -129,7 +130,9 @@ public final class RobotWorkArea {
         });
     }
 
-    /** Undirected, so the two faces meeting at a corner add the edge once. */
+    /**
+     * Undirected, so the two faces meeting at a corner add the edge once.
+     */
     private record Edge(Vector3i from, Vector3i to) {
 
         static Edge of(Vector3i a, Vector3i b) {

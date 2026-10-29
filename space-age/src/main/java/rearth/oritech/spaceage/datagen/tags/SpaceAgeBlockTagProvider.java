@@ -8,6 +8,8 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.simulation.DenseOres;
+import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.util.RegistryReflectionUtil;
 
@@ -31,7 +33,9 @@ public class SpaceAgeBlockTagProvider extends BlockTagsProvider {
         RegistryReflectionUtil.IterateFields(SpaceAgeBlocks.class, DeferredBlock.class, (field, identifier, value) -> {
             var block = ((DeferredBlock<? extends Block>) value).get();
             pickaxeTag.add(block);
-            if (block != SpaceAgeBlocks.CRYSTAL_GLASS.get()) ironToolTag.add(block);
+            var family = DenseOres.family(BuiltInRegistries.BLOCK.getKey(block));
+            if (family != null && family.diamondTool) tag(BlockTags.NEEDS_DIAMOND_TOOL).add(block);
+            else if (block != SpaceAgeBlocks.CRYSTAL_GLASS.get()) ironToolTag.add(block);
         });
     }
 }

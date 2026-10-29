@@ -163,7 +163,9 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
         return true;
     }
 
-    /** Server-side destination of this source's draft. */
+    /**
+     * Server-side destination of this source's draft.
+     */
     public void saveFlightPlan(ServerPlayer player, SpaceSimulation.FlightPlan plan) {
 
         if (rocket == null) return;

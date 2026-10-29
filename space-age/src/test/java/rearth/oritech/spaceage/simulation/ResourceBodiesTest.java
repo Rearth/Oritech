@@ -24,11 +24,25 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ResourceBodiesTest {
 
+    private static int blocks(AsteroidImpactRules.ImpactPrediction prediction) {
+
+        return prediction.fragments().stream().flatMap(fragment -> fragment.materials().stream())
+                .mapToInt(AsteroidMaterial::amount).sum();
+    }
+
+    private static Definition definition() {
+
+        return new Definition("Test body", "A fixed deposit", -3_130_000, 0, 2_000,
+                OritechSpaceAge.id("luna"), List.of(
+                new AsteroidMaterial(Identifier.parse("minecraft:iron_ore"), 3),
+                new AsteroidMaterial(Identifier.parse("minecraft:copper_ore"), 1)));
+    }
+
     @Test
     void defaultDefinitionsHaveValidAssetsResourcesAndTwoNearbyMoons() throws Exception {
 
         var moons = 0;
-        for (var key : List.of("luna", "phobos", "ceres", "vesta", "nyx")) {
+        for (var key : List.of("luna", "phobos", "ceres", "vesta", "nyx", "echo")) {
             var path = "/data/oritech_space_age/oritech_space_age/resource_bodies/" + key + ".json";
             try (var reader = new InputStreamReader(getClass().getResourceAsStream(path), StandardCharsets.UTF_8)) {
                 var json = JsonParser.parseReader(reader);
@@ -77,7 +91,7 @@ class ResourceBodiesTest {
             assertEquals(300, impact.fragments().stream().mapToDouble(AsteroidImpactRules.AsteroidFragment::mass).sum());
             for (var fragment : impact.fragments()) {
                 assertTrue(fragment.mass() > 0);
-                assertEquals(fragment.mass(), fragment.materials().stream().mapToInt(AsteroidMaterial::amount).sum());
+                assertEquals(fragment.mass(), DenseOres.mass(fragment.materials()));
                 assertTrue(fragment.materials().stream().allMatch(material -> body.materials().stream()
                         .anyMatch(source -> source.block().equals(material.block()))));
             }
@@ -102,29 +116,15 @@ class ResourceBodiesTest {
         var faster = AsteroidImpactRules.predictArrival(20_000, body, 600, null, action);
         var heavier = AsteroidImpactRules.predictArrival(40_000, body, 300, null, action);
         var payload = AsteroidImpactRules.predictArrival(20_000, body, 300, null, action, 900_000_000);
-        assertEquals(300, blocks(normal));
-        assertEquals(1_200, blocks(faster));
-        assertEquals(600, blocks(heavier));
-        assertEquals(600, blocks(payload));
+        assertEquals(75, blocks(normal));
+        assertEquals(300, blocks(faster));
+        assertEquals(150, blocks(heavier));
+        assertEquals(150, blocks(payload));
         var safe = AsteroidImpactRules.predictArrival(20_000, body, 12, null, action, 1e15);
         assertEquals(AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH, safe.outcome());
         assertTrue(safe.fragments().isEmpty());
         var tiny = AsteroidImpactRules.predictArrival(1, body, 13, null, action);
         assertTrue(tiny.fragmentCount() >= 1 && tiny.fragmentCount() <= 3);
         assertTrue(tiny.fragments().stream().allMatch(fragment -> !fragment.materials().isEmpty()));
-    }
-
-    private static int blocks(AsteroidImpactRules.ImpactPrediction prediction) {
-
-        return prediction.fragments().stream().flatMap(fragment -> fragment.materials().stream())
-                .mapToInt(AsteroidMaterial::amount).sum();
-    }
-
-    private static Definition definition() {
-
-        return new Definition("Test body", "A fixed deposit", -3_130_000, 0, 2_000,
-                OritechSpaceAge.id("luna"), List.of(
-                new AsteroidMaterial(Identifier.parse("minecraft:iron_ore"), 3),
-                new AsteroidMaterial(Identifier.parse("minecraft:copper_ore"), 1)));
     }
 }

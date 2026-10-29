@@ -43,7 +43,7 @@ public final class RocketCargoTransfer {
                 // Air is the card's "all cargo" filter; matching either cell moves the complete pair.
                 if (!settings.filter().equals(Identifier.parse("minecraft:air"))
                         && !BuiltInRegistries.BLOCK.getKey(first.getBlock()).equals(settings.filter())
-                                && !BuiltInRegistries.BLOCK.getKey(second.getBlock()).equals(settings.filter()))
+                        && !BuiltInRegistries.BLOCK.getKey(second.getBlock()).equals(settings.filter()))
                     continue;
                 if (RocketLayout.busy(source, pair)) {
                     remaining++;

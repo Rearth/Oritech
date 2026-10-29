@@ -46,21 +46,6 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
         this(id, blocks, couplings, weight, engines, rf, fuel, energy, blockAnchor(blocks));
     }
 
-    private static BlockPos blockAnchor(Set<BlockData> blocks) {
-
-        return blocks.stream().map(BlockData::relativePos).min(Comparator.comparingInt((BlockPos pos) -> pos.getY())
-                .thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ)).orElse(BlockPos.ZERO);
-    }
-
-    /** The segment's side of its first connection stays fixed when ordinary blocks are edited. */
-    public static BlockPos couplingAnchor(Map<UUID, Set<CouplingData>> couplings) {
-
-        return couplings.values().stream().flatMap(Set::stream)
-                .map(coupling -> coupling.relativePos().offset(coupling.relativePos().subtract(coupling.oppositeSide())))
-                .min(Comparator.comparingInt((BlockPos pos) -> pos.getY()).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ))
-                .orElse(BlockPos.ZERO);
-    }
-
     public StaticRocketSegment(UUID id, Set<BlockData> blocks, Map<UUID, Set<CouplingData>> couplings, long weight, int engines, long rf, long fuel) {
 
         this(id, blocks, couplings, weight, engines, rf, fuel, 0);
@@ -78,6 +63,23 @@ public record StaticRocketSegment(UUID segmentId, Set<BlockData> blocks, Map<UUI
         var copiedCouplings = new HashMap<UUID, Set<CouplingData>>();
         originalCouplings.forEach((connectedSegment, couplings) -> copiedCouplings.put(connectedSegment, Set.copyOf(couplings)));
         originalCouplings = Map.copyOf(copiedCouplings);
+    }
+
+    private static BlockPos blockAnchor(Set<BlockData> blocks) {
+
+        return blocks.stream().map(BlockData::relativePos).min(Comparator.comparingInt((BlockPos pos) -> pos.getY())
+                .thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ)).orElse(BlockPos.ZERO);
+    }
+
+    /**
+     * The segment's side of its first connection stays fixed when ordinary blocks are edited.
+     */
+    public static BlockPos couplingAnchor(Map<UUID, Set<CouplingData>> couplings) {
+
+        return couplings.values().stream().flatMap(Set::stream)
+                .map(coupling -> coupling.relativePos().offset(coupling.relativePos().subtract(coupling.oppositeSide())))
+                .min(Comparator.comparingInt((BlockPos pos) -> pos.getY()).thenComparingInt(BlockPos::getX).thenComparingInt(BlockPos::getZ))
+                .orElse(BlockPos.ZERO);
     }
 
     public Set<UUID> getConnectedSegments() {

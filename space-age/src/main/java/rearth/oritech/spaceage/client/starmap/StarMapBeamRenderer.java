@@ -14,7 +14,9 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-/** Cached beam projections; all moving highlights share one GUI render state. */
+/**
+ * Cached beam projections; all moving highlights share one GUI render state.
+ */
 final class StarMapBeamRenderer {
 
     private static final long ANIMATION_START = System.nanoTime();
@@ -22,10 +24,6 @@ final class StarMapBeamRenderer {
     private static final double SPEED = 70;
 
     private StarMapBeamRenderer() {
-    }
-
-    record Link(double x, double y, double dx, double dy, double length, double start, double end,
-                double phase, double spacing, boolean selected) {
     }
 
     static @Nullable Link project(double fromX, double fromY, double toX, double toY, UUID id, boolean selected,
@@ -73,6 +71,10 @@ final class StarMapBeamRenderer {
         var edge = 1f / Math.max(1, scale);
         var seconds = (System.nanoTime() - ANIMATION_START) / 1_000_000_000d;
         graphics.submitGuiElementRenderState(new PulseState(links, pose, seconds, edge, scissor, clipped));
+    }
+
+    record Link(double x, double y, double dx, double dy, double length, double start, double end,
+                double phase, double spacing, boolean selected) {
     }
 
     private record PulseState(List<Link> links, Matrix3x2f pose, double seconds, float edge,

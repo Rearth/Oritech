@@ -44,7 +44,8 @@ public final class RocketNetworking {
         NetworkManager.registerCodec(Snapshot.STREAM_CODEC, Snapshot.class);
         registrar.playToClient(AperturePayload.TYPE, NetworkManager.getAutoCodec(AperturePayload.class), (payload, context) -> context.enqueueWork(() -> {
             if (context.player().containerMenu instanceof BeamApertureMenu menu
-                    && menu.containerId == payload.menuId() && menu.pos.equals(payload.position())) menu.snapshot = payload.snapshot();
+                    && menu.containerId == payload.menuId() && menu.pos.equals(payload.position()))
+                menu.snapshot = payload.snapshot();
         }));
         NetworkManager.getAutoCodec(SpaceObjects.AsteroidMaterial.class);
         NetworkManager.getAutoCodec(SpaceSimulation.SpaceObjectData.class);

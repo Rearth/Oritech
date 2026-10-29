@@ -19,7 +19,9 @@ import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 import java.util.HashSet;
 import java.util.UUID;
 
-/** Owns orbit placement, reentry, recovery and impacts once guidance reaches its destination. */
+/**
+ * Owns orbit placement, reentry, recovery and impacts once guidance reaches its destination.
+ */
 final class MissionArrival {
 
     private MissionArrival() {
@@ -52,7 +54,7 @@ final class MissionArrival {
                 && Math.hypot(p.vx(), p.vy()) <= 12) {
             var occupied = new HashSet<Integer>();
             data.craft.values().stream().filter(c -> c != state && !c.ended && c.owner.equals(state.owner)
-                    && c.position.target().equals(action.targetId()) && c.position.orbit() == action.orbit())
+                            && c.position.target().equals(action.targetId()) && c.position.orbit() == action.orbit())
                     .forEach(c -> occupied.add(c.position.slot()));
             slot = SpaceBalance.freeSlot(action.service().slot(), occupied);
             if (slot >= SpaceBalance.slots(action.targetId(), action.orbit())) {
@@ -123,7 +125,9 @@ final class MissionArrival {
         }
         if (earthLanding && state.ended && !p.asteroid().equals(FlightPlanAction.NO_TARGET)) {
             state.transfer.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID)).findFirst()
-                    .ifPresent(arrival -> system.recoverAsteroid(server.overworld(), p.asteroid(), arrival.impact()));
+                    .ifPresent(arrival -> system.recoverAsteroid(server.overworld(), p.asteroid(), arrival.impact(),
+                            state.status.equals(MissionState.STATUS_RECOVERED)
+                                    ? RocketRecovery.highestBlockY(state.rocket, state.transfer.landing) : null));
         }
         state.complete();
     }

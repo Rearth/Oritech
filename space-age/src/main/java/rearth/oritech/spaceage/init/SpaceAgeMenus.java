@@ -27,27 +27,11 @@ public final class SpaceAgeMenus {
 
     public static final DeferredRegister<MenuType<?>> MENUS =
             DeferredRegister.create(Registries.MENU, OritechSpaceAge.MOD_ID);
-
-    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
-            MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
-
-    public static final Supplier<MenuType<MissionControlMenu>> MISSION_CONTROL =
-            MENUS.register("mission_control", () -> IMenuTypeExtension.create(MissionControlMenu::new));
-
-    public static final Supplier<MenuType<VacuumCrafterMenu>> VACUUM_CRAFTER =
-            MENUS.register("vacuum_crafter", () -> IMenuTypeExtension.create(VacuumCrafterMenu::new));
-
-    public static final Supplier<MenuType<BeamApertureMenu>> BEAM_APERTURE =
-            MENUS.register("beam_aperture", () -> IMenuTypeExtension.create(BeamApertureMenu::new));
-
     public static final Supplier<MenuType<RobotMenu>> ROBOT =
             MENUS.register("robot_arm", () -> IMenuTypeExtension.create(RobotMenu::new));
-
-    public static final Supplier<MenuType<ActionCardMenu>> ACTION_CARD =
-            MENUS.register("action_card", () -> IMenuTypeExtension.create(ActionCardMenu::new));
-
-    public static final Supplier<MenuType<LaunchRampMenu>> LAUNCH_RAMP =
-            MENUS.register("launch_ramp", () -> IMenuTypeExtension.create(LaunchRampMenu::new));
+    private SpaceAgeMenus() {
+    }    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
+            MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
@@ -61,6 +45,23 @@ public final class SpaceAgeMenus {
         event.register(MISSION_CONTROL.get(), MissionControlScreen::new);
     }
 
-    private SpaceAgeMenus() {
-    }
+    public static final Supplier<MenuType<MissionControlMenu>> MISSION_CONTROL =
+            MENUS.register("mission_control", () -> IMenuTypeExtension.create(MissionControlMenu::new));
+
+
+
+    public static final Supplier<MenuType<VacuumCrafterMenu>> VACUUM_CRAFTER =
+            MENUS.register("vacuum_crafter", () -> IMenuTypeExtension.create(VacuumCrafterMenu::new));
+
+    public static final Supplier<MenuType<BeamApertureMenu>> BEAM_APERTURE =
+            MENUS.register("beam_aperture", () -> IMenuTypeExtension.create(BeamApertureMenu::new));
+
+
+    public static final Supplier<MenuType<ActionCardMenu>> ACTION_CARD =
+            MENUS.register("action_card", () -> IMenuTypeExtension.create(ActionCardMenu::new));
+
+    public static final Supplier<MenuType<LaunchRampMenu>> LAUNCH_RAMP =
+            MENUS.register("launch_ramp", () -> IMenuTypeExtension.create(LaunchRampMenu::new));
+
+
 }

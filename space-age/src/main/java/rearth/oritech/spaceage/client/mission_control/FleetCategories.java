@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Local fleet organization; assignments are independent of missions and their changing locations. */
+/**
+ * Local fleet organization; assignments are independent of missions and their changing locations.
+ */
 public final class FleetCategories {
 
     public static final String UNCATEGORIZED = "uncategorized";
@@ -45,14 +47,14 @@ public final class FleetCategories {
             categories.addFirst(new Category(UNCATEGORIZED, "", false));
     }
 
-    public List<Category> categories() {
-
-        return List.copyOf(categories);
-    }
-
     static boolean permanent(String id) {
 
         return id.equals(UNCATEGORIZED) || id.equals(SUN);
+    }
+
+    public List<Category> categories() {
+
+        return List.copyOf(categories);
     }
 
     boolean collapsed(String id) {

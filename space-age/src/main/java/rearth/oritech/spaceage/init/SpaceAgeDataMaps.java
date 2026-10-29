@@ -23,10 +23,10 @@ public final class SpaceAgeDataMaps {
             OritechSpaceAge.id("beam_aperture_materials"), Registries.BLOCK, Codec.DOUBLE).synced(Codec.DOUBLE, false).build();
 
     public static final DataMapType<Block, BlockState> BEAM_SCORCHING = DataMapType.builder(
-            OritechSpaceAge.id("beam_scorching"), Registries.BLOCK, BlockState.CODEC)
+                    OritechSpaceAge.id("beam_scorching"), Registries.BLOCK, BlockState.CODEC)
             .synced(BlockState.CODEC, false).build();
     public static final DataMapType<Block, BlockState> BEAM_MELTING = DataMapType.builder(
-            OritechSpaceAge.id("beam_melting"), Registries.BLOCK, BlockState.CODEC)
+                    OritechSpaceAge.id("beam_melting"), Registries.BLOCK, BlockState.CODEC)
             .synced(BlockState.CODEC, false).build();
 
     private SpaceAgeDataMaps() {

@@ -38,33 +38,6 @@ public class CubeSatRenderer implements BlockEntityRenderer<CubeSatBlockEntity, 
     public CubeSatRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-    @Override
-    public State createRenderState() {
-
-        return new State();
-    }
-
-    @Override
-    public void extractRenderState(CubeSatBlockEntity entity, State state, float partialTick, Vec3 cameraPosition,
-                                   ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-
-        BlockEntityRenderer.super.extractRenderState(entity, state, partialTick, cameraPosition, breakProgress);
-        var data = entity.data();
-        if (data == null) {
-            state.cells = List.of();
-            return;
-        }
-        var miniature = miniatures.get(data.fingerprint());
-        if (miniature == null) {
-            miniature = miniature(data);
-            if (miniatures.size() >= 64) miniatures.remove(miniatures.keySet().iterator().next());
-            miniatures.put(data.fingerprint(), miniature);
-        }
-        state.cells = miniature.cells();
-        state.scale = miniature.scale();
-        state.offset = miniature.offset();
-    }
-
     private static Miniature miniature(CubeSatData data) {
 
         var size = data.size();
@@ -90,6 +63,33 @@ public class CubeSatRenderer implements BlockEntityRenderer<CubeSatBlockEntity, 
             resolver.update(result, state, DISPLAY_CONTEXT);
             return result;
         });
+    }
+
+    @Override
+    public State createRenderState() {
+
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(CubeSatBlockEntity entity, State state, float partialTick, Vec3 cameraPosition,
+                                   ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+
+        BlockEntityRenderer.super.extractRenderState(entity, state, partialTick, cameraPosition, breakProgress);
+        var data = entity.data();
+        if (data == null) {
+            state.cells = List.of();
+            return;
+        }
+        var miniature = miniatures.get(data.fingerprint());
+        if (miniature == null) {
+            miniature = miniature(data);
+            if (miniatures.size() >= 64) miniatures.remove(miniatures.keySet().iterator().next());
+            miniatures.put(data.fingerprint(), miniature);
+        }
+        state.cells = miniature.cells();
+        state.scale = miniature.scale();
+        state.offset = miniature.offset();
     }
 
     @Override

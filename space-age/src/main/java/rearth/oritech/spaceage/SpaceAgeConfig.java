@@ -2,7 +2,9 @@ package rearth.oritech.spaceage;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
-/** Construction limits are synced with the server so previews use the same bounds. */
+/**
+ * Construction limits are synced with the server so previews use the same bounds.
+ */
 public final class SpaceAgeConfig {
 
     public static final ModConfigSpec SPEC;
@@ -28,6 +30,9 @@ public final class SpaceAgeConfig {
         ORBIT_SPEED = builder.comment("Launch velocity in m/s at which a cube-sat without a matching plan stays in Earth orbit. 0 derives it from Earth's gravity.")
                 .defineInRange("orbitSpeed", 0, 0, 100_000);
         SPEC = builder.build();
+    }
+
+    private SpaceAgeConfig() {
     }
 
     public static int apertureArmLimit() {
@@ -58,8 +63,5 @@ public final class SpaceAgeConfig {
     public static int orbitSpeed() {
 
         return SPEC.isLoaded() ? ORBIT_SPEED.get() : ORBIT_SPEED.getDefault();
-    }
-
-    private SpaceAgeConfig() {
     }
 }

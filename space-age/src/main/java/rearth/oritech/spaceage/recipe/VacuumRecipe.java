@@ -36,7 +36,9 @@ public record VacuumRecipe(BlockIngredient first, BlockIngredient second, BlockS
             Codec.INT.fieldOf("rf_per_tick").forGetter(VacuumRecipe::rfPerTick)
     ).apply(i, VacuumRecipe::new));
 
-    /** Missions also run without a server in tests; they simply have no recipes there. */
+    /**
+     * Missions also run without a server in tests; they simply have no recipes there.
+     */
     public static Collection<RecipeHolder<VacuumRecipe>> all(MinecraftServer server) {
 
         return server == null ? List.of() : server.overworld().recipeAccess().recipeMap().byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());

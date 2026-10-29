@@ -19,6 +19,9 @@ public final class SpaceAgeBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
             DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, OritechSpaceAge.MOD_ID);
 
+    private SpaceAgeBlockEntities() {
+    }
+
     public static final Supplier<BlockEntityType<RocketAssemblerBlockEntity>> ROCKET_ASSEMBLER =
             BLOCK_ENTITY_TYPES.register("rocket_assembler", () -> new BlockEntityType<>(
                     RocketAssemblerBlockEntity::new,
@@ -46,7 +49,5 @@ public final class SpaceAgeBlockEntities {
     public static final Supplier<BlockEntityType<LaunchRampBlockEntity>> LAUNCH_RAMP = BLOCK_ENTITY_TYPES.register("launch_ramp", () -> new BlockEntityType<>(
             LaunchRampBlockEntity::new, SpaceAgeBlocks.LAUNCH_RAMP.get()));
 
-    private SpaceAgeBlockEntities() {
-    }
 
 }

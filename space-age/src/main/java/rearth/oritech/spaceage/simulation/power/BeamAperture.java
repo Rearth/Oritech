@@ -20,7 +20,9 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
-/** One bounded construction scan, shared by physical receivers and spacecraft. */
+/**
+ * One bounded construction scan, shared by physical receivers and spacecraft.
+ */
 public final class BeamAperture {
 
     public static final TagKey<Block> FRAMES = TagKey.create(Registries.BLOCK, OritechSpaceAge.id("beam_aperture_frames"));
@@ -48,9 +50,11 @@ public final class BeamAperture {
         var limit = SpaceAgeConfig.apertureArmLimit();
         BlockPos defect = null;
         if (width == 0 || width < oppositeWidth) defect = centre.relative(horizontal, width + 1);
-        else if (oppositeWidth == 0 || oppositeWidth < width) defect = centre.relative(horizontal.getOpposite(), oppositeWidth + 1);
+        else if (oppositeWidth == 0 || oppositeWidth < width)
+            defect = centre.relative(horizontal.getOpposite(), oppositeWidth + 1);
         else if (height == 0 || height < oppositeHeight) defect = centre.relative(vertical, height + 1);
-        else if (oppositeHeight == 0 || oppositeHeight < height) defect = centre.relative(vertical.getOpposite(), oppositeHeight + 1);
+        else if (oppositeHeight == 0 || oppositeHeight < height)
+            defect = centre.relative(vertical.getOpposite(), oppositeHeight + 1);
         else if (width > limit) defect = centre.relative(horizontal, limit + 1);
         else if (height > limit) defect = centre.relative(vertical, limit + 1);
         if (defect != null) return new Array(0, 0, 0, 0, Set.of(), defect);
@@ -72,11 +76,14 @@ public final class BeamAperture {
     private static int arm(BlockPos centre, Direction direction, Function<BlockPos, BlockState> blocks, Predicate<BlockState> frame) {
 
         var length = 0;
-        while (length <= SpaceAgeConfig.apertureArmLimit() && frame.test(blocks.apply(centre.relative(direction, length + 1)))) length++;
+        while (length <= SpaceAgeConfig.apertureArmLimit() && frame.test(blocks.apply(centre.relative(direction, length + 1))))
+            length++;
         return length;
     }
 
-    /** Includes partial construction so the receiver screen can explain an incomplete array. */
+    /**
+     * Includes partial construction so the receiver screen can explain an incomplete array.
+     */
     public static List<BlockData> preview(BlockPos centre, Direction facing, Function<BlockPos, BlockState> blocks) {
 
         var horizontal = facing.getAxis() == Direction.Axis.X ? Direction.SOUTH : Direction.EAST;
@@ -100,14 +107,18 @@ public final class BeamAperture {
         return Math.min(throughput, Math.max(0, stored - capacity * reservePercent / 100d));
     }
 
-    /** Fixed reference collecting area, never dependent on the chosen receiver's installed hardware. */
+    /**
+     * Fixed reference collecting area, never dependent on the chosen receiver's installed hardware.
+     */
     public static double idealEfficiency(double distance, double senderWidth, boolean surface) {
 
         var arm = SpaceAgeConfig.apertureArmLimit();
         return collectionFraction(Math.pow(arm * 2 + 1, 2), footprint(distance, senderWidth, surface));
     }
 
-    /** Both craft and surface receivers collect their share of a uniform square beam; radius is its half-width. */
+    /**
+     * Both craft and surface receivers collect their share of a uniform square beam; radius is its half-width.
+     */
     public static double collectionFraction(double collectingArea, double radius) {
 
         var fraction = Math.max(0, collectingArea) / footprintArea(radius);
@@ -120,7 +131,9 @@ public final class BeamAperture {
         return 4 * radius * radius;
     }
 
-    /** Area of one block's face inside the axis-aligned square, including partial edges and corners. */
+    /**
+     * Area of one block's face inside the axis-aligned square, including partial edges and corners.
+     */
     public static double cellArea(double x, double z, double radius) {
 
         var width = Math.max(0, Math.min(x + .5, radius) - Math.max(x - .5, -radius));

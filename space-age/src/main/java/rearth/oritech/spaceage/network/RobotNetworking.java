@@ -10,7 +10,8 @@ import rearth.oritech.spaceage.block.robot_arm.RobotProgram;
 
 public final class RobotNetworking {
 
-    private RobotNetworking() {}
+    private RobotNetworking() {
+    }
 
     public static void register(PayloadRegistrar registrar) {
 
@@ -20,7 +21,9 @@ public final class RobotNetworking {
         }));
     }
 
-    /** A menu showing a playbook, either on an arm or on a held card. */
+    /**
+     * A menu showing a playbook, either on an arm or on a held card.
+     */
     public interface Receiver {
 
         void receive(Snapshot snapshot);

@@ -16,6 +16,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RobotArmIkTest {
 
+    private static Vector3f modelPivot(JsonObject bone) {
+
+        var pivot = bone.getAsJsonArray("pivot");
+        return new Vector3f(-pivot.get(0).getAsFloat(), pivot.get(1).getAsFloat(), pivot.get(2).getAsFloat());
+    }
+
     @Test
     void handHeadingWindingCannotChangeThePoseForTheSameWorkTarget() {
 
@@ -76,12 +82,6 @@ class RobotArmIkTest {
                 assertTrue(position.distance(pose.tip()) < .01f, "Solver and model disagree");
             }
         }
-    }
-
-    private static Vector3f modelPivot(JsonObject bone) {
-
-        var pivot = bone.getAsJsonArray("pivot");
-        return new Vector3f(-pivot.get(0).getAsFloat(), pivot.get(1).getAsFloat(), pivot.get(2).getAsFloat());
     }
 
     @Test
@@ -267,7 +267,8 @@ class RobotArmIkTest {
             var pose = solver.solve(target, rotation);
             assertTrue(pose.tip().distance(target) < .1f);
             assertTrue(Math.abs(RobotArmIk.orientation(pose).dot(rotation)) > .99999f);
-            if (previous != null) assertTrue(Math.abs(pose.angles()[8] - previous.angles()[8]) < .05f, "rotX3 snapped across a twist seam");
+            if (previous != null)
+                assertTrue(Math.abs(pose.angles()[8] - previous.angles()[8]) < .05f, "rotX3 snapped across a twist seam");
             previous = pose;
         }
     }

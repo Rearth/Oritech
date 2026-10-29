@@ -1,6 +1,8 @@
 package rearth.oritech.spaceage.simulation.rocket;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
+import rearth.oritech.spaceage.simulation.DenseOres;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.spaceage.SpaceAgeConfig;
@@ -91,6 +93,8 @@ public final class RocketLayout {
     public static double mass(BlockState state) {
 
         if (state.is(SpaceAgeBlocks.CUBE_SAT)) return SpaceAgeConfig.cubeSatMass();
+        var dense = DenseOres.family(BuiltInRegistries.BLOCK.getKey(state.getBlock()));
+        if (dense != null) return dense.mass * 1_000;
         return Math.max(0, (long) state.getBlock().defaultDestroyTime());
     }
 

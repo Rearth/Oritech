@@ -184,9 +184,10 @@ class TrajectoryRoutingTest {
                         craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
                         var action = action(mars.id(), 803).withOrbit(OrbitBand.HIGH);
                         var success = RocketFlightNavigation.navigate(action, craft, context(earth, mars));
-                        if (!success) failures.add("a=" + acceleration + " initial=" + initialSpeed + " start=" + startTime
-                                + " radio=" + poweredRadio + " status=" + craft.blockedState + " velocity=" + Math.hypot(craft.velocityX, craft.velocityY)
-                                + " time=" + craft.time + " deltaV=" + craft.availableDeltaV(context(earth, mars)));
+                        if (!success)
+                            failures.add("a=" + acceleration + " initial=" + initialSpeed + " start=" + startTime
+                                    + " radio=" + poweredRadio + " status=" + craft.blockedState + " velocity=" + Math.hypot(craft.velocityX, craft.velocityY)
+                                    + " time=" + craft.time + " deltaV=" + craft.availableDeltaV(context(earth, mars)));
                     }
                 }
             }
@@ -447,7 +448,8 @@ class TrajectoryRoutingTest {
         assertTrue(craft.samples.stream().noneMatch(s -> s.phase() == PathPhase.ACCELERATE),
                 "an approach extended to accommodate braking must not accelerate into the extra distance");
         assertTrue(craft.samples.stream().allMatch(s -> s.speedMetersPerSecond() <= 1500 + 1e-3),
-                "only gravity over the residual coast may add speed");    }
+                "only gravity over the residual coast may add speed");
+    }
 
     @Test
     void longerLandingApproachesStillRequireEnoughFuelAndThrust() {
@@ -479,7 +481,7 @@ class TrajectoryRoutingTest {
         assertNotNull(route);
         assertEquals(-2.943, RocketTransferRoute.gravityForLeg(context, route.curve(), 0), .001);
         assertTrue(route.events().stream().filter(event -> event.direction() > 0).mapToDouble(EventTransfer.Event::seconds).sum()
-                > route.events().stream().filter(event -> event.direction() < 0).mapToDouble(EventTransfer.Event::seconds).sum() * 1.5,
+                        > route.events().stream().filter(event -> event.direction() < 0).mapToDouble(EventTransfer.Event::seconds).sum() * 1.5,
                 "gravity must lengthen outward acceleration and assist final braking");
 
         var weakProfile = new RocketBurnProfile(List.of(new RocketBurnProfile.Interval(9, 10_000)));

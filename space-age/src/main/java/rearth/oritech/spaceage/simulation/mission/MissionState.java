@@ -81,7 +81,6 @@ public final class MissionState {
     public ActiveRocketData rocket;
     public SpaceSimulation.FlightPlan plan;
     public Position position;
-    private long serviceTicks;
     public ActiveTransfer transfer;
     public long positionRevision;
     public int serviceProgress;
@@ -95,6 +94,7 @@ public final class MissionState {
     public UUID powerAction;
     public double powerReadyAt;
     public SpacePowerService.Report powerReport = SpacePowerService.Report.EMPTY;
+    private long serviceTicks;
 
     private MissionState(UUID owner, ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position,
                          SurveyKnowledge knowledge, long ticks, String status,
@@ -232,7 +232,8 @@ public final class MissionState {
             return action.addons().stream().filter(addon -> addon.type() == SpaceSimulation.ActionAddonType.DURATION)
                     .mapToLong(addon -> addon.value() * 20L).findFirst().orElse(0);
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION) return action.service().timeoutTicks();
-        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || transfer == null || transfer.path == null) return 0;
+        if (action.type() != SpaceSimulation.ActionType.NAVIGATE_TO || transfer == null || transfer.path == null)
+            return 0;
         return transfer.path.paths().stream().filter(item -> item.branchId().equals(plan.root().id())).findFirst()
                 .map(item -> Math.max(1L, Math.round(item.durationSeconds() * 20))).orElse(0L);
     }
@@ -265,7 +266,9 @@ public final class MissionState {
                     -1, 1, SpaceSimulation.FlightPlanAction.NO_TARGET, new SpaceSimulation.SegmentRef(BlockPos.ZERO));
         }
 
-        /** Moves or parks the craft, keeping its stage, carried asteroid and heading. */
+        /**
+         * Moves or parks the craft, keeping its stage, carried asteroid and heading.
+         */
         public Position placed(double newX, double newY, double newVx, double newVy, UUID newTarget,
                                SpaceSimulation.OrbitBand newOrbit, int newSlot) {
 
@@ -281,7 +284,8 @@ public final class MissionState {
     public record Telemetry(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position,
                             long tick, String status, List<SpaceSimulation.FlightPlanAction> completed,
                             long actionTicks,
-                            long actionDurationTicks, int serviceProgress, SpacePowerService.Report power, boolean fullLayout) {
+                            long actionDurationTicks, int serviceProgress, SpacePowerService.Report power,
+                            boolean fullLayout) {
 
         public static final Codec<Telemetry> CODEC = RecordCodecBuilder.create(i -> i.group(
                 ActiveRocketData.CODEC.fieldOf("rocket").forGetter(Telemetry::rocket),

@@ -46,10 +46,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/** Exercises real placement, harvesting, interaction, and an in-flight save/reload. */
+/**
+ * Exercises real placement, harvesting, interaction, and an in-flight save/reload.
+ */
 public final class RobotGameTests {
 
-    private RobotGameTests() {}
+    private RobotGameTests() {
+    }
 
     public static void playback(GameTestHelper test) {
 
@@ -143,7 +146,8 @@ public final class RobotGameTests {
         arm.redstoneMode = 0;
         arm.program = arm.program.withActions(List.of(action(Kind.DESTROY, target, ItemStack.EMPTY)));
         level.setBlock(target, Blocks.DIRT.defaultBlockState(), 3);
-        for (int slot = 1; slot < arm.getInventorySize(); slot++) arm.inventory.set(slot, ItemResource.of(Items.COBBLESTONE), 64);
+        for (int slot = 1; slot < arm.getInventorySize(); slot++)
+            arm.inventory.set(slot, ItemResource.of(Items.COBBLESTONE), 64);
         arm.restart();
         tick(arm, 85);
         test.assertTrue(arm.status.equals("inventory_full") && level.getBlockState(target).isAir() && arm.visual.held().is(Items.DIRT),
@@ -220,12 +224,12 @@ public final class RobotGameTests {
         test.assertTrue(arm.visual.held().is(ItemContent.WRENCH.get()), "The real inventory wrench is available for rendering");
         tick(arm, 30);
         test.assertTrue(level.getBlockState(target).getValue(GenericPipeBlock.EAST) == 0
-                && level.getBlockState(target.east()).getValue(GenericPipeBlock.WEST) == 0,
+                        && level.getBlockState(target.east()).getValue(GenericPipeBlock.WEST) == 0,
                 "Recorded wrench hit disconnects the selected pipe side");
         arm.restart();
         tick(arm, 58);
         test.assertTrue(level.getBlockState(target).getValue(GenericPipeBlock.EAST) == 1
-                && level.getBlockState(target.east()).getValue(GenericPipeBlock.WEST) == 1,
+                        && level.getBlockState(target.east()).getValue(GenericPipeBlock.WEST) == 1,
                 "The same block-only wrench action reconnects the pipe after its cooldown: " + arm.status + " " + level.getBlockState(target) + " / " + level.getBlockState(target.east()));
 
         var sneakingWrench = new Action(Kind.INTERACT, target, level.getBlockState(target), Direction.EAST,
@@ -250,7 +254,7 @@ public final class RobotGameTests {
             try {
                 var recorded = card.get(SpaceAgeComponents.ROBOT_PROGRAM.get());
                 test.assertTrue(recorded.actions().size() == 1 && recorded.actions().getFirst().kind() == Kind.INTERACT
-                        && recorded.actions().getFirst().item().is(Items.IRON_AXE) && recorded.actions().getFirst().sneaking(),
+                                && recorded.actions().getFirst().item().is(Items.IRON_AXE) && recorded.actions().getFirst().sneaking(),
                         "Shift-axe stripping records an item interaction and its sneaking state");
                 var axe = new ItemStack(Items.IRON_AXE);
                 axe.setDamageValue(17);
@@ -263,7 +267,7 @@ public final class RobotGameTests {
                 test.assertTrue(arm.visual.held().getDamageValue() == 17, "Rendering uses the actual tool rather than the recorded snapshot");
                 tick(arm, 30);
                 test.assertTrue(level.getBlockState(target).is(Blocks.STRIPPED_BIRCH_LOG)
-                        && arm.inventory.getItem(1).getDamageValue() == 18,
+                                && arm.inventory.getItem(1).getDamageValue() == 18,
                         "Recorded axe use transforms the new block and returns the damaged tool");
                 arm.inventory.set(1, ItemResource.EMPTY, 0);
                 level.setBlock(target, Blocks.OAK_LOG.defaultBlockState(), 3);
@@ -311,7 +315,7 @@ public final class RobotGameTests {
             try {
                 var recorded = card.get(SpaceAgeComponents.ROBOT_PROGRAM.get());
                 test.assertTrue(recorded.actions().size() == 2 && recorded.actions().stream().allMatch(action ->
-                        action.kind() == Kind.INTERACT && action.item().is(Items.BONE_MEAL)),
+                                action.kind() == Kind.INTERACT && action.item().is(Items.BONE_MEAL)),
                         "Both effective and no-op bonemeal clicks record as item use");
                 level.setBlock(pos, state, 3);
                 level.setBlock(target, Blocks.WHEAT.defaultBlockState(), 3);
@@ -350,10 +354,12 @@ public final class RobotGameTests {
         new ServerGamePacketListenerImpl(level.getServer(), new Connection(PacketFlow.SERVERBOUND), player,
                 CommonListenerCookie.createInitial(profile, false)) {
             @Override
-            public void send(Packet<?> packet) {}
+            public void send(Packet<?> packet) {
+            }
 
             @Override
-            public void send(Packet<?> packet, ChannelFutureListener listener) {}
+            public void send(Packet<?> packet, ChannelFutureListener listener) {
+            }
         };
         return player;
     }
@@ -366,6 +372,7 @@ public final class RobotGameTests {
 
     private static void tick(RobotArmBlockEntity arm, int count) {
 
-        for (int i = 0; i < count; i++) arm.serverTick((ServerLevel) arm.getLevel(), arm.getBlockPos(), arm.getBlockState(), arm);
+        for (int i = 0; i < count; i++)
+            arm.serverTick((ServerLevel) arm.getLevel(), arm.getBlockPos(), arm.getBlockState(), arm);
     }
 }

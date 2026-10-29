@@ -59,7 +59,8 @@ class CubeSatDeployTest {
         var id = UUID.randomUUID();
         var blocks = new HashSet<StaticRocketSegment.BlockData>();
         blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()));
-        if (carriesCube) blocks.add(new StaticRocketSegment.BlockData(PAYLOAD, SpaceAgeBlocks.CUBE_SAT.get().defaultBlockState()));
+        if (carriesCube)
+            blocks.add(new StaticRocketSegment.BlockData(PAYLOAD, SpaceAgeBlocks.CUBE_SAT.get().defaultBlockState()));
         var segment = new StaticRocketSegment(id, blocks, Map.of(), 25, 1);
         var resources = new DynamicRocketSegment(0, 2_000_000, 0, Set.of());
         if (carriesCube) resources.payloads.put(PAYLOAD, CubeSatData.of(ionRocket(false)));

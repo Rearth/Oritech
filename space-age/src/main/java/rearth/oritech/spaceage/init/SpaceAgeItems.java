@@ -34,10 +34,12 @@ public final class SpaceAgeItems {
             var block = (DeferredBlock<? extends Block>) value;
             var name = block.unwrapKey().orElseThrow().identifier().getPath();
             // Each cube-sat holds a whole rocket.
-            if (block == SpaceAgeBlocks.CUBE_SAT) ITEMS.registerItem(name, properties -> new CubeSatItem(block.get(), properties),
-                    () -> new Item.Properties().stacksTo(1).useBlockDescriptionPrefix());
-            else if (block == SpaceAgeBlocks.ROBOT_ARM) ITEMS.registerItem(name, properties -> new RobotArmItem(block.get(), properties),
-                    () -> new Item.Properties().useBlockDescriptionPrefix());
+            if (block == SpaceAgeBlocks.CUBE_SAT)
+                ITEMS.registerItem(name, properties -> new CubeSatItem(block.get(), properties),
+                        () -> new Item.Properties().stacksTo(1).useBlockDescriptionPrefix());
+            else if (block == SpaceAgeBlocks.ROBOT_ARM)
+                ITEMS.registerItem(name, properties -> new RobotArmItem(block.get(), properties),
+                        () -> new Item.Properties().useBlockDescriptionPrefix());
             else ITEMS.registerSimpleBlockItem(name, block);
         });
     }

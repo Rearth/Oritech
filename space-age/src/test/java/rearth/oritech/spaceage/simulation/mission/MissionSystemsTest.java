@@ -56,6 +56,35 @@ class MissionSystemsTest {
 
     private static final UUID OWNER = new UUID(1, 1);
 
+    private static ActiveRocketData rocket(boolean ion, long fuel, long rf) {
+
+        var id = UUID.randomUUID();
+        var block = ion ? SpaceAgeBlocks.ION_BOOSTER_ROCKET : SpaceAgeBlocks.BASIC_BOOSTER_ROCKET;
+        var segment = new StaticRocketSegment(id,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, block.get().defaultBlockState())),
+                Map.of(), 5, 1, rf, fuel);
+        return new ActiveRocketData(Map.of(id, segment),
+                Map.of(id, new DynamicRocketSegment(fuel, rf, 0, Set.of())));
+    }
+
+    private static FlightPlan plan(FlightPlanAction... actions) {
+
+        var plan = FlightPlan.empty();
+        return plan.withBranches(List.of(plan.root().withActions(List.of(actions))));
+    }
+
+    private static ActiveRocketData stationKeepingRocket(int engines) {
+
+        var id = UUID.randomUUID();
+        var blocks = IntStream.range(0, engines)
+                .mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                        SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()))
+                .collect(Collectors.toSet());
+        var segment = new StaticRocketSegment(id, blocks, Map.of(), 25, engines, 0, 20_000);
+        return new ActiveRocketData(Map.of(id, segment),
+                Map.of(id, new DynamicRocketSegment(20_000, 0, 1_000, Set.of())));
+    }
+
     @Test
     void fixedBodyCollisionMatchesForecastAfterReloadAndProducesTuggableAsteroids() {
 
@@ -153,35 +182,6 @@ class MissionSystemsTest {
         assertEquals(point.x(), path.samples().getLast().x(), .01);
         assertEquals(500, path.samples().getLast().speedMetersPerSecond(), 1e-6);
         assertTrue(flight.arrivalPredictions().isEmpty(), "A coordinate has no surface to collide with");
-    }
-
-    private static ActiveRocketData rocket(boolean ion, long fuel, long rf) {
-
-        var id = UUID.randomUUID();
-        var block = ion ? SpaceAgeBlocks.ION_BOOSTER_ROCKET : SpaceAgeBlocks.BASIC_BOOSTER_ROCKET;
-        var segment = new StaticRocketSegment(id,
-                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, block.get().defaultBlockState())),
-                Map.of(), 5, 1, rf, fuel);
-        return new ActiveRocketData(Map.of(id, segment),
-                Map.of(id, new DynamicRocketSegment(fuel, rf, 0, Set.of())));
-    }
-
-    private static FlightPlan plan(FlightPlanAction... actions) {
-
-        var plan = FlightPlan.empty();
-        return plan.withBranches(List.of(plan.root().withActions(List.of(actions))));
-    }
-
-    private static ActiveRocketData stationKeepingRocket(int engines) {
-
-        var id = UUID.randomUUID();
-        var blocks = IntStream.range(0, engines)
-                .mapToObj(x -> new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
-                        SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()))
-                .collect(Collectors.toSet());
-        var segment = new StaticRocketSegment(id, blocks, Map.of(), 25, engines, 0, 20_000);
-        return new ActiveRocketData(Map.of(id, segment),
-                Map.of(id, new DynamicRocketSegment(20_000, 0, 1_000, Set.of())));
     }
 
     @Test
@@ -608,9 +608,10 @@ class MissionSystemsTest {
             SpaceCommunications.poweredAntennas(state, true);
             MissionController.step(null, data, state, system, tick);
             if (state.status.equals(MissionState.STATUS_REPLANNING)) replans++;
-            if (replans >= 5 || state.navigationBlocked()) throw new AssertionError("status=" + state.status + " tick=" + tick
-                    + " rf=" + craft.getDynamicSegments().get(id).rf() + " actionTicks=" + state.actionTicks()
-                    + " position=" + state.position);
+            if (replans >= 5 || state.navigationBlocked())
+                throw new AssertionError("status=" + state.status + " tick=" + tick
+                        + " rf=" + craft.getDynamicSegments().get(id).rf() + " actionTicks=" + state.actionTicks()
+                        + " position=" + state.position);
         }
         assertNull(state.action(), "Live guidance must finish; status=" + state.status + " position=" + state.position);
         assertEquals(0, replans, "Planned ion burnout must not invalidate the chemical continuation");
@@ -647,6 +648,9 @@ class MissionSystemsTest {
         assertEquals(100, origin.getX() + centre.getX());
         assertEquals(-200, origin.getZ() + centre.getZ());
         assertEquals(72, origin.getY());
+        assertEquals(74, RocketRecovery.highestBlockY(craft, origin));
+        craft.getDynamicSegments().get(id).reserved.put(new BlockPos(0, 5, 0), Blocks.IRON_BLOCK.defaultBlockState());
+        assertEquals(77, RocketRecovery.highestBlockY(craft, origin), "Reserved physical inputs also determine asteroid clearance");
         assertEquals(new BlockPos(-4, 0, -6), RocketRecovery.center(List.of(new BlockPos(-5, 0, -7), new BlockPos(-2, 0, -4))),
                 "Even footprints use a stable nearest block-grid alignment, including negative coordinates");
     }

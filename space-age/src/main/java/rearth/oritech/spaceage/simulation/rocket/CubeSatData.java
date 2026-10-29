@@ -29,16 +29,15 @@ import java.util.stream.Collectors;
  */
 public record CubeSatData(String name, long fingerprint, List<Part> parts) {
 
-    // Payload segments get plan anchors far outside any rocket, so references of host and cube never collide.
-    private static final int PAYLOAD_ANCHOR_OFFSET = 1_000_000;
-    private static final int PAYLOAD_ANCHOR_SPACING = 16;
-
     public static final Codec<CubeSatData> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.optionalFieldOf("name", "").forGetter(CubeSatData::name),
             Codec.LONG.fieldOf("fingerprint").forGetter(CubeSatData::fingerprint),
             Part.CODEC.listOf().fieldOf("parts").forGetter(CubeSatData::parts)
     ).apply(i, CubeSatData::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, CubeSatData> STREAM_CODEC = ByteBufCodecs.fromCodecWithRegistries(CODEC);
+    // Payload segments get plan anchors far outside any rocket, so references of host and cube never collide.
+    private static final int PAYLOAD_ANCHOR_OFFSET = 1_000_000;
+    private static final int PAYLOAD_ANCHOR_SPACING = 16;
 
     public CubeSatData {
 
@@ -69,6 +68,12 @@ public record CubeSatData(String name, long fingerprint, List<Part> parts) {
     public static BlockPos payloadAnchor(BlockPos payload, BlockPos anchor) {
 
         return anchor.offset(payload.multiply(PAYLOAD_ANCHOR_SPACING)).offset(PAYLOAD_ANCHOR_OFFSET, 0, 0);
+    }
+
+    private static int span(Set<BlockPos> positions, int axis) {
+
+        var values = positions.stream().mapToInt(pos -> axis == 0 ? pos.getX() : axis == 1 ? pos.getY() : pos.getZ()).summaryStatistics();
+        return values.getMax() - values.getMin() + 1;
     }
 
     public CubeSatData withName(String newName) {
@@ -111,7 +116,9 @@ public record CubeSatData(String name, long fingerprint, List<Part> parts) {
         return positions().size();
     }
 
-    /** Bounding box of all blocks, used for the splicer size limit and the miniature. */
+    /**
+     * Bounding box of all blocks, used for the splicer size limit and the miniature.
+     */
     public Vec3i size() {
 
         var positions = positions();
@@ -129,16 +136,11 @@ public record CubeSatData(String name, long fingerprint, List<Part> parts) {
         return positions;
     }
 
-    private static int span(Set<BlockPos> positions, int axis) {
-
-        var values = positions.stream().mapToInt(pos -> axis == 0 ? pos.getX() : axis == 1 ? pos.getY() : pos.getZ()).summaryStatistics();
-        return values.getMax() - values.getMin() + 1;
-    }
-
     /**
      * One captured segment with the resources it had when it was shrunk.
      */
-    public record Part(StaticRocketSegment structure, long fuel, long rf, double fuelWeight, long fuelCapacity, long rfCapacity,
+    public record Part(StaticRocketSegment structure, long fuel, long rf, double fuelWeight, long fuelCapacity,
+                       long rfCapacity,
                        List<NamedCell> names) {
 
         public static final Codec<Part> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -165,7 +167,9 @@ public record CubeSatData(String name, long fingerprint, List<Part> parts) {
         }
     }
 
-    /** Controller names are explicit configuration and survive shrinking, like on launch. */
+    /**
+     * Controller names are explicit configuration and survive shrinking, like on launch.
+     */
     public record NamedCell(BlockPos pos, String name) {
 
         public static final Codec<NamedCell> CODEC = RecordCodecBuilder.create(i -> i.group(

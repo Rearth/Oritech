@@ -19,6 +19,7 @@ public final class SurveyKnowledge {
     public static final Codec<SurveyKnowledge> CODEC = Measurement.CODEC.listOf().fieldOf("measurements")
             .xmap(SurveyKnowledge::new, knowledge -> List.copyOf(knowledge.measurements.values())).codec();
     private final Map<UUID, Measurement> measurements = new HashMap<>();
+
     public SurveyKnowledge() {
     }
 

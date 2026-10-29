@@ -233,7 +233,8 @@ class RocketServicesTest {
         var data = fleet(state);
         for (var tick = 0; tick < 12; tick++) {
             RocketProcessingService.tickJobs(data, owner -> system.truth());
-            if (state.action() != null) RocketProcessingService.process(data, state, system, action, List.of(recipe("a")));
+            if (state.action() != null)
+                RocketProcessingService.process(data, state, system, action, List.of(recipe("a")));
         }
         assertNull(state.action());
         assertTrue(RocketLayout.state(state.rocket, pair.controller().segment(), pair.left()).is(Blocks.GOLD_BLOCK));

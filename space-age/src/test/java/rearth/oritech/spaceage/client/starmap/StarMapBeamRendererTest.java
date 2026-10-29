@@ -11,6 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StarMapBeamRendererTest {
 
+    private static double wrap(double value, double period) {
+
+        return value - Math.floor(value / period) * period;
+    }
+
     @Test
     void clipsCrossingLinksAndRejectsShortOrOffscreenLinks() {
 
@@ -54,10 +59,5 @@ class StarMapBeamRendererTest {
                 assertTrue(count <= 3, "Geometry stays bounded even with distant endpoints and a large viewport");
             }
         }
-    }
-
-    private static double wrap(double value, double period) {
-
-        return value - Math.floor(value / period) * period;
     }
 }

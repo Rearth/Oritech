@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Compiles and plays one navigation card; arrival effects belong to MissionArrival. */
+/**
+ * Compiles and plays one navigation card; arrival effects belong to MissionArrival.
+ */
 final class MissionNavigation {
 
     private MissionNavigation() {

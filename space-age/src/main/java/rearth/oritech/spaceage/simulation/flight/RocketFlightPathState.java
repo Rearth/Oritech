@@ -56,20 +56,20 @@ public final class RocketFlightPathState {
 
         // Targets, child programs, and stage settings read by every branch.
         public final Map<UUID, SpaceSimulation.SpaceObjectData> objects;
+        public final Map<UUID, DockingTarget> stations = new HashMap<>();
+        public final Map<UUID, Craft> stationCraft = new HashMap<>();
+        public final Map<UUID, Set<RocketServiceSettings.HardwareRef>> claimedPorts = new HashMap<>();
+        public final List<RocketFlightPathCalculator.ProcessingEstimate> processingEstimates = new ArrayList<>();
         final Map<UUID, SpaceSimulation.FlightPlanBranch> branchesByParent;
         final Map<SpaceSimulation.SegmentRef, SpaceSimulation.SegmentConfiguration> configurations;
         // Last configured stage stops empty-stage skipping from running forever.
         final int stageCount;
-        public final Map<UUID, DockingTarget> stations = new HashMap<>();
-        public final Map<UUID, Craft> stationCraft = new HashMap<>();
-        public final Map<UUID, Set<RocketServiceSettings.HardwareRef>> claimedPorts = new HashMap<>();
         // Results collected while branches split and finish.
         final Map<UUID, CraftPath> paths = new LinkedHashMap<>();
         final List<BoosterEvent> boosterEvents = new ArrayList<>();
         final List<ArrivalPrediction> arrivalPredictions = new ArrayList<>();
         final List<AsteroidPath> asteroidPaths = new ArrayList<>();
         final List<NavigationAbortMoment> navigationAborts = new ArrayList<>();
-        public final List<RocketFlightPathCalculator.ProcessingEstimate> processingEstimates = new ArrayList<>();
         final List<RocketFlightPathCalculator.ScanEstimate> scanEstimates = new ArrayList<>();
         final List<RocketFlightPathCalculator.StationKeepingEstimate> stationKeepingEstimates = new ArrayList<>();
         public Collection<RecipeHolder<VacuumRecipe>> recipes = List.of();
@@ -98,15 +98,14 @@ public final class RocketFlightPathState {
     public static final class Segment {
 
         public final Map<BlockPos, RocketControllerState> crafters = new HashMap<>();
+        public final RocketHardware hardware;
         final double chemicalThrust;
         final double ionThrust;
-        public final RocketHardware hardware;
         public double wetMass;
         public double fuelMass;
         public double dryMass;
         public double payloadEnergy;
         public double fuelTicks;
-        int parachutes;
         public StaticRocketSegment structure;
         public DynamicRocketSegment physical;
         public double chemicalSeconds;
@@ -114,9 +113,10 @@ public final class RocketFlightPathState {
         public double rf;
         public double initialRF;
         public double initialFuelTicks;
+        int parachutes;
 
         public Segment(double mass, double chemicalThrust, double ionThrust, double chemicalSeconds, double ionSeconds,
-                RocketHardware hardware) {
+                       RocketHardware hardware) {
 
             this.wetMass = mass;
             this.chemicalThrust = chemicalThrust;
@@ -163,7 +163,9 @@ public final class RocketFlightPathState {
             ionSeconds = Math.max(0, ionSeconds - seconds);
         }
 
-        /** Current layouts may have changed their battery capacity since launch. */
+        /**
+         * Current layouts may have changed their battery capacity since launch.
+         */
         public double rfCapacity() {
 
             return physical == null ? initialRF : physical.rfCapacity;
@@ -200,25 +202,30 @@ public final class RocketFlightPathState {
 
         // Attached parts and their coupling graph. Separations split this graph.
         public final Map<SpaceSimulation.SegmentRef, Segment> segments;
+        public final Set<SpaceSimulation.SegmentRef> occupiedPortSegments = new HashSet<>();
         final Map<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>> connections;
         // Only this branch's visual history and card outcomes.
         final List<PathSample> samples = new ArrayList<>();
         final List<ActionMoment> actionMoments = new ArrayList<>();
-        public final Set<SpaceSimulation.SegmentRef> occupiedPortSegments = new HashSet<>();
-        // Branch currently writing this state.
-        UUID branchId;
         public UUID craftId;
         public UUID dockedHost = SpaceSimulation.FlightPlanAction.NO_TARGET;
         public RocketServiceSettings.HardwareRef dockedHostPort = RocketServiceSettings.HardwareRef.NONE;
-        double dockedVisitorMass;
         // Shared-plane position, clock, and velocity carried between cards.
         public double x;
         public double y;
         public double time;
-        double headingX;
-        double headingY;
         public double velocityX;
         public double velocityY;
+        // Latest successful destination validates later asteroid connections.
+        public UUID currentTarget = SpaceSimulation.FlightPlanAction.NO_TARGET;
+        public SpaceSimulation.OrbitBand currentOrbit = SpaceSimulation.OrbitBand.LOW;
+        // Failure reason shown when a card cannot complete.
+        public TerminalState blockedState = TerminalState.PLAN_BLOCKED;
+        // Branch currently writing this state.
+        UUID branchId;
+        double dockedVisitorMass;
+        double headingX;
+        double headingY;
         // One-based stage selects which configured engines may fire.
         int currentStage = 1;
         // Terminal cards and unsafe arrivals stop this branch.
@@ -226,16 +233,11 @@ public final class RocketFlightPathState {
         boolean maintainingPosition;
         boolean discarded;
         boolean destroyed;
-        // Latest successful destination validates later asteroid connections.
-        public UUID currentTarget = SpaceSimulation.FlightPlanAction.NO_TARGET;
-        public SpaceSimulation.OrbitBand currentOrbit = SpaceSimulation.OrbitBand.LOW;
         // Attached asteroid and its anchor segment, if this craft carries one.
         SpaceSimulation.SpaceObjectData attachedAsteroid;
         SpaceSimulation.SegmentRef asteroidAnchor;
         // Landing settings stay with a released asteroid for its impact prediction.
         SpaceSimulation.FlightPlanAction lastEarthSurfaceAction;
-        // Failure reason shown when a card cannot complete.
-        public TerminalState blockedState = TerminalState.PLAN_BLOCKED;
         NavigationFailure navigationFailure;
 
         Craft(Map<SpaceSimulation.SegmentRef, Segment> segments,

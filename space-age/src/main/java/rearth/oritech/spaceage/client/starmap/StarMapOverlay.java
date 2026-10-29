@@ -104,9 +104,6 @@ final class StarMapOverlay {
         return new LegendLayout(16 + columns * cellWidth, 64 + (LEGEND_KEYS.length / columns) * 12, columns, cellWidth);
     }
 
-    private record LegendLayout(int width, int height, int columns, int cellWidth) {
-    }
-
     private static void entry(GuiGraphicsExtractor graphics, int x, int y, int color, String key) {
 
         graphics.fill(x, y + 3, x + 13, y + 5, color);
@@ -118,5 +115,8 @@ final class StarMapOverlay {
 
         for (int part = 0; part < 3; part++) graphics.fill(x + part * 5, y + 3, x + part * 5 + 3, y + 5, color);
         graphics.text(Minecraft.getInstance().font, Component.translatable(key), x + 18, y, 0xFFCAD8E5, false);
+    }
+
+    private record LegendLayout(int width, int height, int columns, int cellWidth) {
     }
 }

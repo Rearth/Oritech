@@ -22,6 +22,9 @@ public final class FleetViewPreferences {
     private static final Path SUN_FILE = FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-show-sun.txt");
     private static boolean showSun = loadSun();
 
+    private FleetViewPreferences() {
+    }
+
     public static boolean showSun() {
 
         return showSun;
@@ -44,9 +47,6 @@ public final class FleetViewPreferences {
         } catch (IOException exception) {
             return false;
         }
-    }
-
-    private FleetViewPreferences() {
     }
 
     static boolean collapsed(UUID craft) {

@@ -58,14 +58,100 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SpacePowerTest {
 
     private Map<?, ?> previousSolar;
+
+    private static MissionState station(UUID owner, double x) {
+
+        var id = UUID.randomUUID();
+        var structure = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                Blocks.DAYLIGHT_DETECTOR.defaultBlockState())), Map.of(), 100, 0, 0, 0);
+        var resources = new DynamicRocketSegment(0, 0, 0, Set.of());
+        resources.rfCapacity = 100_000;
+        var rocket = new ActiveRocketData(Map.of(id, structure), Map.of(id, resources));
+        var action = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
+        var plan = new FlightPlan(List.of(new FlightPlanBranch(UUID.randomUUID(), FlightPlanBranch.NO_PARENT, List.of(action))), List.of());
+        return new MissionState(owner, rocket, plan, new MissionState.Position(x, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW,
+                -1, 1, FlightPlanAction.NO_TARGET, SegmentRef.of(structure)), new SurveyKnowledge(), BlockPos.ZERO);
+    }
+
+    private static void powerTick(MissionSavedData data) {
+
+        data.power.update(null, data, data.extraTicks);
+        data.power.advance(++data.extraTicks);
+    }
+
+    private static void checkSunFlightAfterSeparation(boolean retainCore, boolean reload) {
+
+        var coreId = new UUID(32, 1);
+        var boosterId = new UUID(32, 2);
+        var core = new StaticRocketSegment(coreId, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), Blocks.DAYLIGHT_DETECTOR.defaultBlockState())),
+                Map.of(boosterId, Set.of()), 100, 1, 50_000_000, 0);
+        var boosterBlocks = new HashSet<StaticRocketSegment.BlockData>();
+        for (int x = 2; x < 10; x++)
+            boosterBlocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                    SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()));
+        var booster = new StaticRocketSegment(boosterId, boosterBlocks, Map.of(coreId, Set.of()), 10, 8, 0, 200_000);
+        var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
+                coreId, new DynamicRocketSegment(0, 50_000_000, 0, Set.of(boosterId)),
+                boosterId, new DynamicRocketSegment(200_000, 0, 0, Set.of(coreId))));
+        var ascent = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.HIGH)
+                .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
+        var separate = FlightPlanAction.create(ActionType.DECOUPLE).withSegments(retainCore
+                ? List.of(SegmentRef.of(core), SegmentRef.of(booster)) : List.of(SegmentRef.of(booster), SegmentRef.of(core)));
+        var sun = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.SUN_ID).withOrbit(OrbitBand.SOLAR);
+        var base = FlightPlan.empty();
+        var child = new FlightPlanBranch(new UUID(32, 3), separate.id(), retainCore ? List.of() : List.of(sun));
+        var plan = base.withBranches(List.of(base.root().withActions(retainCore ? List.of(ascent, separate, sun) : List.of(ascent, separate)), child))
+                .withSegmentConfigurations(List.of(
+                        new SpaceSimulation.SegmentConfiguration(SegmentRef.of(core), "Core", false, List.of(2)),
+                        new SpaceSimulation.SegmentConfiguration(SegmentRef.of(booster), "Booster", true, List.of(1))));
+        var system = new SpaceSimulation();
+        var forecast = RocketFlightPathCalculator.calculate(rocket, system.truth(), plan).paths().stream()
+                .filter(path -> path.branchId().equals(retainCore ? plan.root().id() : child.id())).findFirst().orElseThrow();
+        assertEquals(RocketFlightPathCalculator.TerminalState.READY, forecast.terminalState());
+        var state = new MissionState(UUID.randomUUID(), rocket, plan, MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO);
+        var data = new MissionSavedData();
+        data.craft.put(rocket.getRocketId(), state);
+        var ticks = 0;
+        while (!state.completed.contains(separate) && ticks < 100_000) {
+            SpaceCommunications.poweredAntennas(state, true);
+            MissionController.step(null, data, state, system, ticks++);
+        }
+        assertTrue(state.completed.contains(separate));
+        if (!retainCore) state = data.craft.get(child.id());
+        if (reload) {
+            var encoded = MissionState.CODEC.encodeStart(JsonOps.INSTANCE, state).getOrThrow();
+            state = MissionState.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+            data.craft.put(state.rocket.getRocketId(), state);
+        }
+        assertEquals(sun.id(), state.action().id());
+        assertEquals(1, state.rocket.getStaticSegments().size());
+        assertTrue(state.rocket.getDynamicSegments().get(coreId).rf() > 0);
+        assertTrue(Math.hypot(state.position.vx(), state.position.vy()) > 0);
+        MissionController.step(null, data, state, system, ticks);
+        assertEquals(RocketFlightPathCalculator.TerminalState.READY, state.transfer.path.paths().getFirst().terminalState(),
+                "After separation, live guidance must still reach the core's configured second stage");
+        assertEquals(2, state.position.stage());
+        assertEquals(MissionState.STATUS_IN_FLIGHT, state.status);
+        var deadline = ticks + Math.ceil(state.transfer.path.paths().getFirst().durationSeconds() * 20) + 100;
+        while (state.action() != null && ticks < deadline) {
+            SpaceCommunications.poweredAntennas(state, true);
+            MissionController.step(null, data, state, system, ++ticks);
+            if (state.navigationBlocked() || state.status.equals(MissionState.STATUS_REPLANNING))
+                throw new AssertionError("Live Sun flight stopped at " + ticks + ": " + state.status);
+        }
+        assertNull(state.action(), "Core must finish the Sun transfer");
+        assertEquals(SpaceSimulation.SUN_ID, state.position.target());
+        assertEquals(0, Math.hypot(state.position.vx(), state.position.vy()), 1e-5);
+        assertTrue(state.rocket.getDynamicSegments().get(coreId).rf() > 0);
+    }
 
     @BeforeEach
     void solarData() {
@@ -83,20 +169,6 @@ class SpacePowerTest {
         var maps = ((BaseMappedRegistry<Block>) BuiltInRegistries.BLOCK).getDataMaps();
         if (previousSolar == null) maps.remove(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS);
         else maps.put(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS, (Map) previousSolar);
-    }
-
-    private static MissionState station(UUID owner, double x) {
-
-        var id = UUID.randomUUID();
-        var structure = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
-                Blocks.DAYLIGHT_DETECTOR.defaultBlockState())), Map.of(), 100, 0, 0, 0);
-        var resources = new DynamicRocketSegment(0, 0, 0, Set.of());
-        resources.rfCapacity = 100_000;
-        var rocket = new ActiveRocketData(Map.of(id, structure), Map.of(id, resources));
-        var action = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
-        var plan = new FlightPlan(List.of(new FlightPlanBranch(UUID.randomUUID(), FlightPlanBranch.NO_PARENT, List.of(action))), List.of());
-        return new MissionState(owner, rocket, plan, new MissionState.Position(x, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW,
-                -1, 1, FlightPlanAction.NO_TARGET, SegmentRef.of(structure)), new SurveyKnowledge(), BlockPos.ZERO);
     }
 
     @Test
@@ -160,86 +232,12 @@ class SpacePowerTest {
         assertEquals(idlePlan, receiver.plan);
     }
 
-    private static void powerTick(MissionSavedData data) {
-
-        data.power.update(null, data, data.extraTicks);
-        data.power.advance(++data.extraTicks);
-    }
-
     @Test
     void sunFlightKeepsItsIonStageThroughSeparationAndReload() {
 
         for (var retainCore : List.of(false, true)) {
             for (var reload : List.of(false, true)) checkSunFlightAfterSeparation(retainCore, reload);
         }
-    }
-
-    private static void checkSunFlightAfterSeparation(boolean retainCore, boolean reload) {
-
-        var coreId = new UUID(32, 1);
-        var boosterId = new UUID(32, 2);
-        var core = new StaticRocketSegment(coreId, Set.of(
-                new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
-                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()),
-                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), Blocks.DAYLIGHT_DETECTOR.defaultBlockState())),
-                Map.of(boosterId, Set.of()), 100, 1, 50_000_000, 0);
-        var boosterBlocks = new HashSet<StaticRocketSegment.BlockData>();
-        for (int x = 2; x < 10; x++) boosterBlocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
-                SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()));
-        var booster = new StaticRocketSegment(boosterId, boosterBlocks, Map.of(coreId, Set.of()), 10, 8, 0, 200_000);
-        var rocket = new ActiveRocketData(Map.of(coreId, core, boosterId, booster), Map.of(
-                coreId, new DynamicRocketSegment(0, 50_000_000, 0, Set.of(boosterId)),
-                boosterId, new DynamicRocketSegment(200_000, 0, 0, Set.of(coreId))));
-        var ascent = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.HIGH)
-                .withVelocity(SpaceSimulation.ArrivalVelocityMode.MAXIMUM, 0);
-        var separate = FlightPlanAction.create(ActionType.DECOUPLE).withSegments(retainCore
-                ? List.of(SegmentRef.of(core), SegmentRef.of(booster)) : List.of(SegmentRef.of(booster), SegmentRef.of(core)));
-        var sun = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.SUN_ID).withOrbit(OrbitBand.SOLAR);
-        var base = FlightPlan.empty();
-        var child = new FlightPlanBranch(new UUID(32, 3), separate.id(), retainCore ? List.of() : List.of(sun));
-        var plan = base.withBranches(List.of(base.root().withActions(retainCore ? List.of(ascent, separate, sun) : List.of(ascent, separate)), child))
-                .withSegmentConfigurations(List.of(
-                        new SpaceSimulation.SegmentConfiguration(SegmentRef.of(core), "Core", false, List.of(2)),
-                        new SpaceSimulation.SegmentConfiguration(SegmentRef.of(booster), "Booster", true, List.of(1))));
-        var system = new SpaceSimulation();
-        var forecast = RocketFlightPathCalculator.calculate(rocket, system.truth(), plan).paths().stream()
-                .filter(path -> path.branchId().equals(retainCore ? plan.root().id() : child.id())).findFirst().orElseThrow();
-        assertEquals(RocketFlightPathCalculator.TerminalState.READY, forecast.terminalState());
-        var state = new MissionState(UUID.randomUUID(), rocket, plan, MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO);
-        var data = new MissionSavedData();
-        data.craft.put(rocket.getRocketId(), state);
-        var ticks = 0;
-        while (!state.completed.contains(separate) && ticks < 100_000) {
-            SpaceCommunications.poweredAntennas(state, true);
-            MissionController.step(null, data, state, system, ticks++);
-        }
-        assertTrue(state.completed.contains(separate));
-        if (!retainCore) state = data.craft.get(child.id());
-        if (reload) {
-            var encoded = MissionState.CODEC.encodeStart(JsonOps.INSTANCE, state).getOrThrow();
-            state = MissionState.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
-            data.craft.put(state.rocket.getRocketId(), state);
-        }
-        assertEquals(sun.id(), state.action().id());
-        assertEquals(1, state.rocket.getStaticSegments().size());
-        assertTrue(state.rocket.getDynamicSegments().get(coreId).rf() > 0);
-        assertTrue(Math.hypot(state.position.vx(), state.position.vy()) > 0);
-        MissionController.step(null, data, state, system, ticks);
-        assertEquals(RocketFlightPathCalculator.TerminalState.READY, state.transfer.path.paths().getFirst().terminalState(),
-                "After separation, live guidance must still reach the core's configured second stage");
-        assertEquals(2, state.position.stage());
-        assertEquals(MissionState.STATUS_IN_FLIGHT, state.status);
-        var deadline = ticks + Math.ceil(state.transfer.path.paths().getFirst().durationSeconds() * 20) + 100;
-        while (state.action() != null && ticks < deadline) {
-            SpaceCommunications.poweredAntennas(state, true);
-            MissionController.step(null, data, state, system, ++ticks);
-            if (state.navigationBlocked() || state.status.equals(MissionState.STATUS_REPLANNING))
-                throw new AssertionError("Live Sun flight stopped at " + ticks + ": " + state.status);
-        }
-        assertTrue(state.action() == null, "Core must finish the Sun transfer");
-        assertEquals(SpaceSimulation.SUN_ID, state.position.target());
-        assertEquals(0, Math.hypot(state.position.vx(), state.position.vy()), 1e-5);
-        assertTrue(state.rocket.getDynamicSegments().get(coreId).rf() > 0);
     }
 
     @Test
@@ -311,7 +309,7 @@ class SpacePowerTest {
         assertEquals(5, RocketProcessingService.controller(craft.rocket, module).job.elapsed());
         restored.power.update(null, restored, 50.5);
         restored.power.advance(100);
-        assertTrue(RocketProcessingService.controller(craft.rocket, module).job == null);
+        assertNull(RocketProcessingService.controller(craft.rocket, module).job);
         assertTrue(RocketLayout.state(craft.rocket, pair.controller().segment(), pair.left()).is(Blocks.GOLD_BLOCK));
         assertEquals(0, craft.rocket.getDynamicSegments().values().iterator().next().rf(), 1e-5);
         restored.power.advance(110);
@@ -612,7 +610,7 @@ class SpacePowerTest {
         var launchNavigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.SUN_ID).withOrbit(OrbitBand.SOLAR);
         var launchPlan = mission.plan.withBranches(List.of(mission.plan.root().withActions(List.of(launchNavigation))));
         var solarDeparture = RocketFlightPathCalculator.calculateFrom(mission.rocket, system.createObjectData(), launchPlan, MissionState.Position.surface());
-        assertFalse(solarDeparture.paths().getFirst().terminalState() == RocketFlightPathCalculator.TerminalState.SOLAR_REQUIRED);
+        assertNotSame(solarDeparture.paths().getFirst().terminalState(), RocketFlightPathCalculator.TerminalState.SOLAR_REQUIRED);
         var resources = mission.rocket.getDynamicSegments().values().iterator().next();
         resources.layout.put(BlockPos.ZERO, Blocks.AIR.defaultBlockState());
         var navigation = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.SUN_ID).withOrbit(OrbitBand.SOLAR);
@@ -650,7 +648,8 @@ class SpacePowerTest {
                 var blocks = new HashSet<>(original.blocks());
                 blocks.add(new StaticRocketSegment.BlockData(new BlockPos(0, 1, 0), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()));
                 for (int x = 1; x <= 20; x++)
-                    for (int z = 1; z <= 20; z++) blocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, z), Blocks.GLASS.defaultBlockState()));
+                    for (int z = 1; z <= 20; z++)
+                        blocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, z), Blocks.GLASS.defaultBlockState()));
                 var structure = new StaticRocketSegment(original.segmentId(), blocks, Map.of(), 1000, 0, 0, 0);
                 station.rocket = new ActiveRocketData(station.rocket.getRocketId(), Map.of(structure.segmentId(), structure), station.rocket.getDynamicSegments(), null);
                 data.craft.put(station.rocket.getRocketId(), station);

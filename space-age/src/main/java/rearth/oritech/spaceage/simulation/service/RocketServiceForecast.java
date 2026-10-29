@@ -255,12 +255,14 @@ public final class RocketServiceForecast {
         if (ticks <= 0) return true;
         if (!craft.dockedHost.equals(FlightPlanAction.NO_TARGET)) {
             var host = context.stationCraft.get(craft.dockedHost);
-            if (host == null || !StationServiceRules.forecast(host, ticks, host.mass() + craft.mass(), false)) return false;
+            if (host == null || !StationServiceRules.forecast(host, ticks, host.mass() + craft.mass(), false))
+                return false;
             craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, ticks)));
             host.time += ticks / 20;
             return true;
         }
-        if (Math.hypot(craft.velocityX, craft.velocityY) <= .001) return StationServiceRules.forecast(craft, ticks, craft.mass(), false);
+        if (Math.hypot(craft.velocityX, craft.velocityY) <= .001)
+            return StationServiceRules.forecast(craft, ticks, craft.mass(), false);
         craft.segments.values().forEach(s -> s.spendRF(StationServiceRules.antennaRF(s.hardware, ticks)));
         return true;
     }

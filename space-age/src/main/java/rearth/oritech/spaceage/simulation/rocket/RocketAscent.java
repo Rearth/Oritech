@@ -4,7 +4,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 
-/** Shared physical ascent for rendering, obstruction timing and collision energy. */
+/**
+ * Shared physical ascent for rendering, obstruction timing and collision energy.
+ */
 public record RocketAscent(double initialSpeed, double acceleration) {
 
     public static final Codec<RocketAscent> CODEC = RecordCodecBuilder.create(i -> i.group(

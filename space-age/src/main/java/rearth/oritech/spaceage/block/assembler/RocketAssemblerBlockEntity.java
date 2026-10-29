@@ -58,7 +58,9 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         setChanged();
     }
 
-    /** A rising redstone edge launches the rocket on the pad with the plan stored for this assembler. */
+    /**
+     * A rising redstone edge launches the rocket on the pad with the plan stored for this assembler.
+     */
     public void updateRedstone(boolean signal) {
 
         if (signal == powered) return;

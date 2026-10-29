@@ -39,8 +39,6 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
 
     private final @Nullable LaunchRampBlockEntity ramp;
     private final Player player;
-    private long sentPattern = -1;
-    private @Nullable Status sentStatus;
     // Client state: synced ramp status, the expected particle speed (-1 uses the lowest working speed) and the speed window.
     public Status status = new Status(0, Outcome.NONE.ordinal(), "", false);
     public int statusRevision;
@@ -54,6 +52,8 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     public @Nullable CompletableFuture<LaunchSpeedRules.Window> speedWindowSearch;
     public int speedWindowDelay;
     public int speedWindowPreviewRevision = -1;
+    private long sentPattern = -1;
+    private @Nullable Status sentStatus;
 
     public LaunchRampMenu(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
 
@@ -96,7 +96,9 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
         return slots.getFirst().getItem();
     }
 
-    /** Particle speed used for the planner preview. */
+    /**
+     * Particle speed used for the planner preview.
+     */
     public long previewSpeed() {
 
         return expectedSpeed >= 0 ? expectedSpeed : speedWindow == null ? 0 : speedWindow.min();

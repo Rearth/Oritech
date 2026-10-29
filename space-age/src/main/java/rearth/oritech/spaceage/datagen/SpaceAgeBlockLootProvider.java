@@ -1,6 +1,12 @@
 package rearth.oritech.spaceage.datagen;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import rearth.oritech.spaceage.simulation.DenseOres.Family;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
@@ -48,6 +54,7 @@ public class SpaceAgeBlockLootProvider extends BlockLootSubProvider {
 
         var blocks = getAutoDropBlocks();
         blocks.add(SpaceAgeBlocks.CUBE_SAT.get());
+        for (var family : Family.values()) blocks.add(family.block());
         return blocks;
     }
 
@@ -55,6 +62,13 @@ public class SpaceAgeBlockLootProvider extends BlockLootSubProvider {
     protected void generate() {
 
         getAutoDropBlocks().forEach(this::dropSelf);
+        var fortune = registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.FORTUNE);
+        for (var family : Family.values()) {
+            var block = family.block();
+            add(block, createSilkTouchDispatchTable(block, applyExplosionDecay(block, LootItem.lootTableItem(family.output())
+                    .apply(SetItemCountFunction.setCount(UniformGenerator.between(30, 60)))
+                    .apply(ApplyBonusCount.addOreBonusCount(fortune)))));
+        }
         var cube = SpaceAgeBlocks.CUBE_SAT.get();
         add(cube, LootTable.lootTable().withPool(applyExplosionCondition(cube, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(cube).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)

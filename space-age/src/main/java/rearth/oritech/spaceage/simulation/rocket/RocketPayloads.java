@@ -21,7 +21,9 @@ public final class RocketPayloads {
     private RocketPayloads() {
     }
 
-    /** All carried cubes by their cell, in the host's local coordinates. */
+    /**
+     * All carried cubes by their cell, in the host's local coordinates.
+     */
     public static Map<BlockPos, CubeSatData> all(ActiveRocketData rocket) {
 
         var result = new LinkedHashMap<BlockPos, CubeSatData>();
@@ -29,7 +31,9 @@ public final class RocketPayloads {
         return result;
     }
 
-    /** The cube's rocket as it appears in the host's plan. Its IDs and plan anchors are stable for the cell. */
+    /**
+     * The cube's rocket as it appears in the host's plan. Its IDs and plan anchors are stable for the cell.
+     */
     public static ActiveRocketData unfold(BlockPos payload, CubeSatData cube) {
 
         var id = UUID.nameUUIDFromBytes(("payload/" + payload.asLong()).getBytes(StandardCharsets.UTF_8));
@@ -54,13 +58,17 @@ public final class RocketPayloads {
         return new ActiveRocketData(rocket.getRocketId(), structures, resources, null);
     }
 
-    /** Plan references of the segments inside one carried cube. */
+    /**
+     * Plan references of the segments inside one carried cube.
+     */
     public static Set<SegmentRef> segments(BlockPos payload, CubeSatData cube) {
 
         return unfold(payload, cube).getStaticSegments().values().stream().map(SegmentRef::of).collect(Collectors.toSet());
     }
 
-    /** Plan references of the segments inside all carried cubes. */
+    /**
+     * Plan references of the segments inside all carried cubes.
+     */
     public static Set<SegmentRef> segments(ActiveRocketData rocket) {
 
         var result = new HashSet<SegmentRef>();
@@ -68,12 +76,15 @@ public final class RocketPayloads {
         return result;
     }
 
-    /** The carried cube owning a payload segment reference, or null for the host's own segments. */
+    /**
+     * The carried cube owning a payload segment reference, or null for the host's own segments.
+     */
     public static Map.Entry<BlockPos, CubeSatData> owner(ActiveRocketData rocket, SegmentRef ref) {
 
         for (var entry : all(rocket).entrySet()) {
             var unfolded = unfold(entry.getKey(), entry.getValue());
-            if (unfolded.getStaticSegments().values().stream().anyMatch(segment -> SegmentRef.of(segment).equals(ref))) return entry;
+            if (unfolded.getStaticSegments().values().stream().anyMatch(segment -> SegmentRef.of(segment).equals(ref)))
+                return entry;
         }
         return null;
     }

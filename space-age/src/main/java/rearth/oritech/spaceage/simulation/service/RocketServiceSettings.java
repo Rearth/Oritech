@@ -16,7 +16,8 @@ import java.util.UUID;
 /**
  * Typed parameters for explicit rocket services. A reference always belongs to its containing segment.
  */
-public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam, Optional<NavigationWaypoint> waypoint) {
+public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam,
+                                    Optional<NavigationWaypoint> waypoint) {
 
     public static final RocketServiceSettings DEFAULT = new RocketServiceSettings(Processing.DEFAULT, Docking.DEFAULT, Exchange.DEFAULT);
     public static final Codec<RocketServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -38,19 +39,6 @@ public record RocketServiceSettings(Processing processing, Docking docking, Exch
     public RocketServiceSettings withWaypoint(Optional<NavigationWaypoint> value) {
 
         return new RocketServiceSettings(processing, docking, exchange, beam, value);
-    }
-
-    public record Beam(int reservePercent) {
-
-        public static final Beam DEFAULT = new Beam(20);
-        public static final Codec<Beam> CODEC = RecordCodecBuilder.create(i -> i.group(
-                Codec.INT.fieldOf("reserve_percent").forGetter(Beam::reservePercent)
-        ).apply(i, Beam::new));
-
-        public Beam {
-
-            reservePercent = Math.clamp(reservePercent, 0, 100);
-        }
     }
 
     public RocketServiceSettings withBeam(Beam value) {
@@ -83,6 +71,19 @@ public record RocketServiceSettings(Processing processing, Docking docking, Exch
 
         NONE, SEND, RECEIVE;
         public static final Codec<Direction> CODEC = Codec.STRING.xmap(Direction::valueOf, Direction::name);
+    }
+
+    public record Beam(int reservePercent) {
+
+        public static final Beam DEFAULT = new Beam(20);
+        public static final Codec<Beam> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.INT.fieldOf("reserve_percent").forGetter(Beam::reservePercent)
+        ).apply(i, Beam::new));
+
+        public Beam {
+
+            reservePercent = Math.clamp(reservePercent, 0, 100);
+        }
     }
 
     public record HardwareRef(SegmentRef segment, BlockPos position) {
@@ -124,6 +125,7 @@ public record RocketServiceSettings(Processing processing, Docking docking, Exch
                 Direction.CODEC.fieldOf("direction").forGetter(ResourceExchange::direction), Codec.LONG.fieldOf("limit").forGetter(ResourceExchange::limit),
                 Codec.LONG.fieldOf("reserve").forGetter(ResourceExchange::reserve)
         ).apply(i, ResourceExchange::new));
+
         public ResourceExchange {
 
             limit = Math.max(0, limit);

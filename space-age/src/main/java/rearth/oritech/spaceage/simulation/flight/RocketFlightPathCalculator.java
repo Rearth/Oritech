@@ -155,9 +155,9 @@ public final class RocketFlightPathCalculator {
     }
 
     public static Craft createInitialCraft(ActiveRocketData rocket,
-                                    SpaceSimulation.SpaceObjectData earth,
-                                    SpaceSimulation.FlightPlanBranch root,
-                                    Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
+                                           SpaceSimulation.SpaceObjectData earth,
+                                           SpaceSimulation.FlightPlanBranch root,
+                                           Map<UUID, SpaceSimulation.SpaceObjectData> objects) {
 
         var refsById = new HashMap<UUID, SpaceSimulation.SegmentRef>();
         rocket.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
@@ -228,7 +228,8 @@ public final class RocketFlightPathCalculator {
                 case DECOUPLE -> separate(action, state, context);
                 case DEPLOY_CUBESAT -> deploy(action, state, context);
                 case MAINTAIN_POSITION, BEAM_POWER -> {
-                    if (action.type() == SpaceSimulation.ActionType.BEAM_POWER && !beamAvailable(action, state, context)) yield false;
+                    if (action.type() == SpaceSimulation.ActionType.BEAM_POWER && !beamAvailable(action, state, context))
+                        yield false;
                     maintainPosition(action, state, context);
                     yield true;
                 }
@@ -383,7 +384,8 @@ public final class RocketFlightPathCalculator {
         var estimate = StationServiceRules.estimate(StationServiceRules.budgets(state), correctionBurnSecondsPerSecond, addon);
         if (beamOutput > 0) {
             var beamEstimate = StationServiceRules.beamEstimate(StationServiceRules.budgets(state), 0, serviceRF, beamOutput, reserve, addon);
-            if (beamEstimate.end() != StationKeepingEnd.SUSTAINABLE && beamEstimate.seconds() <= estimate.seconds()) estimate = beamEstimate;
+            if (beamEstimate.end() != StationKeepingEnd.SUSTAINABLE && beamEstimate.seconds() <= estimate.seconds())
+                estimate = beamEstimate;
         }
         var duration = estimate.seconds();
         var end = estimate.end();
@@ -657,21 +659,6 @@ public final class RocketFlightPathCalculator {
                              Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId,
                              Map<SpaceSimulation.SegmentRef, FlightResourceRate> resourceRates) {
 
-        public PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
-                          double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
-                          int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
-                          Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
-
-            this(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase, targetId, actionId,
-                    stage, connectedSegments, firingSegments, attachedAsteroidId, Map.of());
-        }
-
-        public PathSample withResourceRates(Map<SpaceSimulation.SegmentRef, FlightResourceRate> rates) {
-
-            return new PathSample(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase,
-                    targetId, actionId, stage, connectedSegments, firingSegments, attachedAsteroidId, rates);
-        }
-
         public static final Codec<PathSample> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.DOUBLE.fieldOf("timeSeconds").forGetter(PathSample::timeSeconds),
                 Codec.DOUBLE.fieldOf("x").forGetter(PathSample::x),
@@ -688,6 +675,21 @@ public final class RocketFlightPathCalculator {
                 UUIDUtil.STRING_CODEC.fieldOf("attachedAsteroidId").forGetter(PathSample::attachedAsteroidId),
                 FlightResourceRate.MAP_CODEC.fieldOf("resourceRates").forGetter(PathSample::resourceRates)
         ).apply(i, PathSample::new));
+
+        public PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
+                          double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
+                          int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
+                          Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
+
+            this(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase, targetId, actionId,
+                    stage, connectedSegments, firingSegments, attachedAsteroidId, Map.of());
+        }
+
+        public PathSample withResourceRates(Map<SpaceSimulation.SegmentRef, FlightResourceRate> rates) {
+
+            return new PathSample(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase,
+                    targetId, actionId, stage, connectedSegments, firingSegments, attachedAsteroidId, rates);
+        }
 
     }
 
@@ -748,13 +750,8 @@ public final class RocketFlightPathCalculator {
      */
     public record CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments,
                             List<PathSample> samples, List<ActionMoment> actionMoments,
-                            double durationSeconds, double remainingDeltaV, TerminalState terminalState, Optional<NavigationFailure> failure) {
-
-        public CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments, List<PathSample> samples,
-                         List<ActionMoment> actionMoments, double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
-
-            this(branchId, segments, samples, actionMoments, durationSeconds, remainingDeltaV, terminalState, Optional.empty());
-        }
+                            double durationSeconds, double remainingDeltaV, TerminalState terminalState,
+                            Optional<NavigationFailure> failure) {
 
         public static final Codec<CraftPath> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("branchId").forGetter(CraftPath::branchId),
@@ -767,9 +764,17 @@ public final class RocketFlightPathCalculator {
                 NavigationFailure.CODEC.optionalFieldOf("failure").forGetter(CraftPath::failure)
         ).apply(i, CraftPath::new));
 
+        public CraftPath(UUID branchId, Set<SpaceSimulation.SegmentRef> segments, List<PathSample> samples,
+                         List<ActionMoment> actionMoments, double durationSeconds, double remainingDeltaV, TerminalState terminalState) {
+
+            this(branchId, segments, samples, actionMoments, durationSeconds, remainingDeltaV, terminalState, Optional.empty());
+        }
+
     }
 
-    /** Numeric cause of an infeasible transfer, shared by cards, validation and network forecasts. */
+    /**
+     * Numeric cause of an infeasible transfer, shared by cards, validation and network forecasts.
+     */
     public record NavigationFailure(String reason, double actual, double limit) {
 
         public static final Codec<NavigationFailure> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -778,17 +783,17 @@ public final class RocketFlightPathCalculator {
                 Codec.DOUBLE.fieldOf("limit").forGetter(NavigationFailure::limit)
         ).apply(i, NavigationFailure::new));
 
+        private static String number(double value) {
+
+            return String.format(Locale.ROOT, "%.2f", value);
+        }
+
         public MutableComponent description() {
 
             var days = SpaceBalance.DAY / 20d;
             return reason.equals("time_limit") ? Component.translatable("screen.oritech_space_age.transfer.time_limit",
                     number(actual / days), number(limit / days), number((actual - limit) / days))
                     : Component.translatable("screen.oritech_space_age.transfer." + reason, number(actual), number(limit));
-        }
-
-        private static String number(double value) {
-
-            return String.format(Locale.ROOT, "%.2f", value);
         }
     }
 

@@ -73,7 +73,9 @@ public final class RocketDocking {
         return targets(data, owner, null);
     }
 
-    /** Null full layouts sends every target's complete layout. */
+    /**
+     * Null full layouts sends every target's complete layout.
+     */
     public static List<DockingTarget> targets(MissionSavedData data, UUID owner, Set<UUID> fullLayouts) {
 
         return data.craft.values().stream().filter(m -> m.owner.equals(owner) && stationary(m)
@@ -192,7 +194,9 @@ public final class RocketDocking {
         return true;
     }
 
-    /** Dock and Undock commit their exchange exactly once, together with the link change. */
+    /**
+     * Dock and Undock commit their exchange exactly once, together with the link change.
+     */
     private static void exchange(MissionState visitor, MissionState host, String status) {
 
         var result = RocketCargoTransfer.exchange(visitor.rocket, host.rocket, visitor.action().settings().exchange());

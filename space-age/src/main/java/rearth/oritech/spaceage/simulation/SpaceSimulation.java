@@ -5,14 +5,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Vector2f;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
@@ -86,7 +81,7 @@ public class SpaceSimulation {
     }
 
     private static SpaceObjects.SimulatedObject celestial(UUID id, SpaceObjects.ObjectType type, float x, float y,
-                                                         float radius, float gravity) {
+                                                          float radius, float gravity) {
 
         var object = new SpaceObjects.SimulatedObject(id, type);
         object.currentPosition = new Vector2f(x, y);
@@ -98,36 +93,14 @@ public class SpaceSimulation {
 
     private static List<SpaceObjects.AsteroidMaterial> sampleMaterials(float mass, int variant) {
 
-        // One mass unit is one tonne of recoverable blocks, including the stone matrix.
+        // The initial volume is independent of density and the later mining loot.
         var blocks = Math.max(1, Math.round(mass));
         var stone = variant % 2 == 0 ? "minecraft:stone" : "minecraft:deepslate";
-        var ore = switch (Math.floorMod(variant, 4)) {
-            case 0 -> "minecraft:iron_ore";
-            case 1 -> "minecraft:copper_ore";
-            case 2 -> "minecraft:gold_ore";
-            default -> "minecraft:redstone_ore";
-        };
+        var families = DenseOres.Family.values();
+        var ore = families[Math.floorMod(variant, families.length)].id();
         return List.of(
                 new SpaceObjects.AsteroidMaterial(Identifier.parse(stone), blocks - blocks / 5),
-                new SpaceObjects.AsteroidMaterial(Identifier.parse(ore), blocks / 5));
-    }
-
-    private static void deliverAsteroid(ServerLevel level, AsteroidImpactRules.ImpactPrediction impact, boolean explode) {
-
-        var pos = new BlockPos(impact.landingX(), level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                impact.landingX(), impact.landingZ()), impact.landingZ());
-        if (explode && impact.craterRadiusBlocks() > 0) level.explode(null, pos.getX(), pos.getY(), pos.getZ(),
-                Math.min(12, impact.craterRadiusBlocks()), Level.ExplosionInteraction.BLOCK);
-        for (var material : impact.recoverableMaterials()) {
-            var item = BuiltInRegistries.BLOCK.getValue(material.block()).asItem();
-            var remaining = material.amount();
-            while (remaining > 0) {
-                var count = Math.min(64, remaining);
-                remaining -= count;
-                level.addFreshEntity(new ItemEntity(level, pos.getX() + .5, pos.getY() + 1, pos.getZ() + .5,
-                        new ItemStack(item, count)));
-            }
-        }
+                new SpaceObjects.AsteroidMaterial(ore, blocks / 5));
     }
 
     private static SpaceObjectData toData(SpaceObjects.SimulatedObject object) {
@@ -177,8 +150,10 @@ public class SpaceSimulation {
             var asteroid = asteroids.get(index);
             if (asteroid.name.isBlank()) asteroid.name = "Asteroid " + String.format(Locale.ROOT, "%03d", index + 1);
             if (asteroid.weight <= 0) asteroid.weight = Math.max(1, (asteroid.radius - 1_500) / 35);
-            if (asteroid.materials.isEmpty())
+            if (asteroid.materials.isEmpty()) {
                 asteroid.materials = sampleMaterials(asteroid.weight, asteroid.id.hashCode());
+                asteroid.weight = DenseOres.mass(asteroid.materials);
+            }
         }
     }
 
@@ -201,6 +176,7 @@ public class SpaceSimulation {
             asteroid.radius = 1_535 + size * 2_800;
             asteroid.surfaceGravity = 0.0002f + size * 0.016f;
             asteroid.materials = sampleMaterials(asteroid.weight, index);
+            asteroid.weight = DenseOres.mass(asteroid.materials);
             nonCelestialObjects.add(asteroid);
         }
     }
@@ -212,7 +188,9 @@ public class SpaceSimulation {
                 flightPlans.getOrDefault(assemblerPosition, FlightPlan.empty()));
     }
 
-    /** The plan stored for an assembler or launch ramp, or an empty plan. */
+    /**
+     * The plan stored for an assembler or launch ramp, or an empty plan.
+     */
     public FlightPlan flightPlan(GlobalPos position) {
 
         return flightPlans.getOrDefault(position, FlightPlan.empty());
@@ -269,7 +247,7 @@ public class SpaceSimulation {
                 continue;
             }
             var impact = AsteroidImpactRules.predictArrival(0, toData(EARTH), asteroid.velocity.length(), toData(asteroid), action);
-            deliverAsteroid(level, impact, true);
+            AsteroidDeliveries.get(level).enqueue(level, impact, true, null);
             removed.add(asteroid);
         }
         nonCelestialObjects.removeAll(removed);
@@ -346,10 +324,18 @@ public class SpaceSimulation {
         return debris.id;
     }
 
-    /** A carried asteroid lands with its craft, whose own impact already handled the explosion. */
+    /**
+     * A carried asteroid lands with its craft, whose own impact already handled the explosion.
+     */
     public void recoverAsteroid(ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact) {
 
-        if (nonCelestialObjects.removeIf(o -> o.id.equals(id))) deliverAsteroid(level, impact, false);
+        recoverAsteroid(level, id, impact, null);
+    }
+
+    public void recoverAsteroid(ServerLevel level, UUID id, AsteroidImpactRules.ImpactPrediction impact, Integer rocketTop) {
+
+        if (nonCelestialObjects.removeIf(o -> o.id.equals(id)))
+            AsteroidDeliveries.get(level).enqueue(level, impact, false, rocketTop);
     }
 
     public boolean updateFlightPlan(GlobalPos assemblerPosition, FlightPlan plan, ActiveRocketData rocket) {
@@ -424,7 +410,9 @@ public class SpaceSimulation {
 
         public static final Codec<ActionType> CODEC = StringRepresentable.fromEnum(ActionType::values);
 
-        /** Stationary cards that run until a duration or resource condition ends them. */
+        /**
+         * Stationary cards that run until a duration or resource condition ends them.
+         */
         public boolean stationKeeping() {
 
             return this == MAINTAIN_POSITION || this == BEAM_POWER;
@@ -569,7 +557,9 @@ public class SpaceSimulation {
             return new SegmentRef(segment.planAnchor());
         }
 
-        /** Bottom-to-top order behind the default S1, S2, ... segment names. */
+        /**
+         * Bottom-to-top order behind the default S1, S2, ... segment names.
+         */
         public static List<SegmentRef> displayOrder(ActiveRocketData rocket) {
 
             return rocket.getStaticSegments().values().stream().map(SegmentRef::of)
@@ -676,7 +666,9 @@ public class SpaceSimulation {
                     .orElseGet(FlightPlanBranch::root);
         }
 
-        /** The first editable card of the root program; generated booster markers are skipped. */
+        /**
+         * The first editable card of the root program; generated booster markers are skipped.
+         */
         public FlightPlanAction currentAction() {
 
             return root().actions().stream().filter(action -> !action.isGenerated()).findFirst().orElse(null);
@@ -750,7 +742,8 @@ public class SpaceSimulation {
                                    UUID targetId, OrbitBand orbit,
                                    ArrivalVelocityMode velocityMode, int targetVelocity, int maxSpeed,
                                    int landingX, int landingZ, int landingOffsetX, int landingOffsetZ,
-                                   List<ActionAddon> addons, ServiceSettings service, RocketServiceSettings settings, AsteroidTarget asteroidTarget) {
+                                   List<ActionAddon> addons, ServiceSettings service, RocketServiceSettings settings,
+                                   AsteroidTarget asteroidTarget) {
 
         public static final UUID NO_TARGET = new UUID(0, 0);
         public static final UUID CLOSEST_ASTEROID = UUID.fromString("d1a720f4-a3b4-4b51-8bde-5f01421bf631");
@@ -891,7 +884,9 @@ public class SpaceSimulation {
             return type == ActionType.DISCONNECT_BOOSTER;
         }
 
-        /** The host cell of the cube-sat released by a deploy card. */
+        /**
+         * The host cell of the cube-sat released by a deploy card.
+         */
         public BlockPos payload() {
 
             return segments.isEmpty() ? BlockPos.ZERO : segments.getFirst().anchor();

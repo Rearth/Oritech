@@ -99,7 +99,8 @@ final class StarMapTooltip {
         }
         if (object.type() == SpaceObjects.ObjectType.RESOURCE_BODY) {
             var definition = StarMapObjects.resourceBodyDefinition(object);
-            if (definition != null) lines.add(StarMapObjects.resourceBodyText(object, "description", definition.description()));
+            if (definition != null)
+                lines.add(StarMapObjects.resourceBodyText(object, "description", definition.description()));
             lines.add(Component.translatable("screen.oritech_space_age.object.infinite_deposit"));
             var totalWeight = object.materials().stream().mapToDouble(material -> material.amount()).sum();
             object.materials().forEach(material -> lines.add(Component.translatable(

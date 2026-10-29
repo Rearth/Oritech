@@ -41,6 +41,111 @@ public final class RobotArmIk {
         for (int i = 0; i < BONES.length; i++) positions[i] = new Vector3f();
     }
 
+    public static Pose interpolate(Pose previous, Pose next, float seconds) {
+
+        if (previous == null) return next;
+        var blend = 1 - (float) Math.exp(-seconds * 32);
+        var maxStep = ROTATION_SPEED * seconds;
+        var rendered = next.angles().clone();
+        for (int i = 0; i < WRIST; i++) {
+            var delta = rendered[i] - previous.angles()[i];
+            // The shoulder is a hinge: crossing zero lifts it over the mount.
+            // Wrapping to the shorter angle can instead swing the piston through the floor.
+            var step = (i == 1 ? delta : (float) Math.atan2(Math.sin(delta), Math.cos(delta))) * blend;
+            rendered[i] = previous.angles()[i] + Math.clamp(step, -maxStep, maxStep);
+        }
+        var oldWrist = wristRotation(previous);
+        var newWrist = wristRotation(next);
+        var wristAngle = 2 * (float) Math.acos(Math.clamp(Math.abs(oldWrist.dot(newWrist)), 0, 1));
+        var wristBlend = Math.min(blend, maxStep / Math.max(wristAngle, .0001f));
+        var wrist = wristAngles(oldWrist.slerp(newWrist, wristBlend).normalize());
+        rendered[WRIST] = 0;
+        return new Pose(rendered, previous.extension() + (next.extension() - previous.extension()) * blend,
+                new Vector3f(previous.tip()).lerp(next.tip(), blend), wrist);
+    }
+
+    private static Vector3f wristAngles(Quaternionf rotation) {
+
+        var matrix = new Matrix3f().rotation(rotation);
+        // At +/-90-degree pitch, roll and yaw describe the same axis. Choose zero
+        // roll instead of extracting two undefined angles independently.
+        if (Math.abs(matrix.m02()) > .999999f) {
+            return new Vector3f(0, (float) Math.copySign(Math.PI / 2, -matrix.m02()),
+                    (float) Math.atan2(-matrix.m10(), matrix.m11()));
+        }
+        return rotation.getEulerAnglesZYX(new Vector3f());
+    }
+
+    private static Quaternionf wristRotation(Pose pose) {
+
+        return pose.wrist() == null ? new Quaternionf().rotationX(pose.angles()[WRIST])
+                : new Quaternionf().rotationZYX(pose.wrist().z, pose.wrist().y, pose.wrist().x);
+    }
+
+    private static void rotate(Quaternionf rotation, char axis, float angle) {
+
+        switch (axis) {
+            case 'x' -> rotation.rotateX(angle);
+            case 'y' -> rotation.rotateY(angle);
+            default -> rotation.rotateZ(angle);
+        }
+    }
+
+    public static Quaternionf orientation(Pose pose) {
+
+        var rotation = new Quaternionf();
+        for (int i = 0; i < WRIST; i++) rotate(rotation, AXES[i], pose.angles()[i]);
+        if (pose.wrist() != null) rotation.rotateZYX(pose.wrist().z, pose.wrist().y, pose.wrist().x);
+        else rotate(rotation, AXES[WRIST], pose.angles()[WRIST]);
+        return rotation;
+    }
+
+    /**
+     * Lift over the housing before traversing, then lower at the destination.
+     */
+    public static Vector3f travel(Vector3fc start, Vector3fc end, float progress) {
+
+        var t = Math.clamp(progress, 0, 1);
+        var clearance = 64 + Math.min(32, start.distance(end) * .25f);
+        var height = Math.max(clearance, Math.max(start.y(), end.y()) + 16);
+        var outerStart = outsideBase(start);
+        var outerEnd = outsideBase(end);
+        var raisedStart = new Vector3f(outerStart.x, height, outerStart.z);
+        var raisedEnd = new Vector3f(outerEnd.x, height, outerEnd.z);
+        if (t < .1f) return new Vector3f(start).lerp(outerStart, ease(t * 10));
+        if (t > .9f) return outerEnd.lerp(end, ease((t - .9f) * 10));
+        // A cubic arc avoids the stop-and-turn corners of separate lift/traverse legs.
+        var u = ease((t - .1f) / .8f);
+        var v = 1 - u;
+        return outerStart.mul(v * v * v).add(raisedStart.mul(3 * v * v * u))
+                .add(raisedEnd.mul(3 * v * u * u)).add(outerEnd.mul(u * u * u));
+    }
+
+    private static Vector3f outsideBase(Vector3fc point) {
+
+        var result = new Vector3f(point);
+        if (point.y() >= 30 || point.x() <= -40 || point.x() >= 48 || point.z() <= -40 || point.z() >= 48)
+            return result;
+        // Clear the housing along the same heading. Choosing a fixed X side
+        // makes the base turn away from the destination before turning back.
+        var x = point.x() - PIVOT;
+        var z = point.z() - PIVOT;
+        if (x == 0 && z == 0) {
+            result.x = 48;
+            return result;
+        }
+        var scaleX = x == 0 ? Float.POSITIVE_INFINITY : (x < 0 ? -48 : 40) / x;
+        var scaleZ = z == 0 ? Float.POSITIVE_INFINITY : (z < 0 ? -48 : 40) / z;
+        var scale = Math.min(scaleX, scaleZ);
+        return result.set(PIVOT + x * scale, point.y(), PIVOT + z * scale);
+    }
+
+    public static float ease(float value) {
+
+        var t = Math.clamp(value, 0, 1);
+        return t * t * t * (t * (t * 6 - 15) + 10);
+    }
+
     public Pose solve(Vector3f target, Quaternionf rotation) {
 
         constrained = rotation != null;
@@ -82,47 +187,6 @@ public final class RobotArmIk {
         angles[0] = heading + (float) Math.asin(Math.clamp(sideways / Math.max(radial, .001f), -1, 1));
         refine(target);
         forward();
-    }
-
-    public static Pose interpolate(Pose previous, Pose next, float seconds) {
-
-        if (previous == null) return next;
-        var blend = 1 - (float) Math.exp(-seconds * 32);
-        var maxStep = ROTATION_SPEED * seconds;
-        var rendered = next.angles().clone();
-        for (int i = 0; i < WRIST; i++) {
-            var delta = rendered[i] - previous.angles()[i];
-            // The shoulder is a hinge: crossing zero lifts it over the mount.
-            // Wrapping to the shorter angle can instead swing the piston through the floor.
-            var step = (i == 1 ? delta : (float) Math.atan2(Math.sin(delta), Math.cos(delta))) * blend;
-            rendered[i] = previous.angles()[i] + Math.clamp(step, -maxStep, maxStep);
-        }
-        var oldWrist = wristRotation(previous);
-        var newWrist = wristRotation(next);
-        var wristAngle = 2 * (float) Math.acos(Math.clamp(Math.abs(oldWrist.dot(newWrist)), 0, 1));
-        var wristBlend = Math.min(blend, maxStep / Math.max(wristAngle, .0001f));
-        var wrist = wristAngles(oldWrist.slerp(newWrist, wristBlend).normalize());
-        rendered[WRIST] = 0;
-        return new Pose(rendered, previous.extension() + (next.extension() - previous.extension()) * blend,
-                new Vector3f(previous.tip()).lerp(next.tip(), blend), wrist);
-    }
-
-    private static Vector3f wristAngles(Quaternionf rotation) {
-
-        var matrix = new Matrix3f().rotation(rotation);
-        // At +/-90-degree pitch, roll and yaw describe the same axis. Choose zero
-        // roll instead of extracting two undefined angles independently.
-        if (Math.abs(matrix.m02()) > .999999f) {
-            return new Vector3f(0, (float) Math.copySign(Math.PI / 2, -matrix.m02()),
-                    (float) Math.atan2(-matrix.m10(), matrix.m11()));
-        }
-        return rotation.getEulerAnglesZYX(new Vector3f());
-    }
-
-    private static Quaternionf wristRotation(Pose pose) {
-
-        return pose.wrist() == null ? new Quaternionf().rotationX(pose.angles()[WRIST])
-                : new Quaternionf().rotationZYX(pose.wrist().z, pose.wrist().y, pose.wrist().x);
     }
 
     private void refine(Vector3f target) {
@@ -171,67 +235,9 @@ public final class RobotArmIk {
         tip.set(cursor).add(frame.transform(link.set(0, constrained ? 0 : RobotArmReach.TIP_HEIGHT - HEIGHTS[WRIST], 0)));
     }
 
-    private static void rotate(Quaternionf rotation, char axis, float angle) {
-
-        switch (axis) {
-            case 'x' -> rotation.rotateX(angle);
-            case 'y' -> rotation.rotateY(angle);
-            default -> rotation.rotateZ(angle);
-        }
+    /**
+     * Extension is the combined travel of three equally extended pistons, in pixels.
+     */
+    public record Pose(float[] angles, float extension, Vector3f tip, Vector3f wrist) {
     }
-
-    public static Quaternionf orientation(Pose pose) {
-
-        var rotation = new Quaternionf();
-        for (int i = 0; i < WRIST; i++) rotate(rotation, AXES[i], pose.angles()[i]);
-        if (pose.wrist() != null) rotation.rotateZYX(pose.wrist().z, pose.wrist().y, pose.wrist().x);
-        else rotate(rotation, AXES[WRIST], pose.angles()[WRIST]);
-        return rotation;
-    }
-
-    /** Lift over the housing before traversing, then lower at the destination. */
-    public static Vector3f travel(Vector3fc start, Vector3fc end, float progress) {
-
-        var t = Math.clamp(progress, 0, 1);
-        var clearance = 64 + Math.min(32, start.distance(end) * .25f);
-        var height = Math.max(clearance, Math.max(start.y(), end.y()) + 16);
-        var outerStart = outsideBase(start);
-        var outerEnd = outsideBase(end);
-        var raisedStart = new Vector3f(outerStart.x, height, outerStart.z);
-        var raisedEnd = new Vector3f(outerEnd.x, height, outerEnd.z);
-        if (t < .1f) return new Vector3f(start).lerp(outerStart, ease(t * 10));
-        if (t > .9f) return outerEnd.lerp(end, ease((t - .9f) * 10));
-        // A cubic arc avoids the stop-and-turn corners of separate lift/traverse legs.
-        var u = ease((t - .1f) / .8f);
-        var v = 1 - u;
-        return outerStart.mul(v * v * v).add(raisedStart.mul(3 * v * v * u))
-                .add(raisedEnd.mul(3 * v * u * u)).add(outerEnd.mul(u * u * u));
-    }
-
-    private static Vector3f outsideBase(Vector3fc point) {
-
-        var result = new Vector3f(point);
-        if (point.y() >= 30 || point.x() <= -40 || point.x() >= 48 || point.z() <= -40 || point.z() >= 48) return result;
-        // Clear the housing along the same heading. Choosing a fixed X side
-        // makes the base turn away from the destination before turning back.
-        var x = point.x() - PIVOT;
-        var z = point.z() - PIVOT;
-        if (x == 0 && z == 0) {
-            result.x = 48;
-            return result;
-        }
-        var scaleX = x == 0 ? Float.POSITIVE_INFINITY : (x < 0 ? -48 : 40) / x;
-        var scaleZ = z == 0 ? Float.POSITIVE_INFINITY : (z < 0 ? -48 : 40) / z;
-        var scale = Math.min(scaleX, scaleZ);
-        return result.set(PIVOT + x * scale, point.y(), PIVOT + z * scale);
-    }
-
-    public static float ease(float value) {
-
-        var t = Math.clamp(value, 0, 1);
-        return t * t * t * (t * (t * 6 - 15) + 10);
-    }
-
-    /** Extension is the combined travel of three equally extended pistons, in pixels. */
-    public record Pose(float[] angles, float extension, Vector3f tip, Vector3f wrist) {}
 }

@@ -60,7 +60,9 @@ final class FlightPlannerPopups {
         this.topPos = topPos;
     }
 
-    /** Keeps a field's retained text, error colour and Done button in sync with its parser. */
+    /**
+     * Keeps a field's retained text, error colour and Done button in sync with its parser.
+     */
     private static void validateField(EditBox field, ButtonWidget apply, Predicate<String> valid, Consumer<String> changed) {
 
         var initial = valid.test(field.getValue());
@@ -135,7 +137,8 @@ final class FlightPlannerPopups {
         var waypoint = action.settings().waypoint().isPresent();
         var deployment = SpaceBalance.hasSlots(action.targetId(), action.orbit());
         var settingCount = switch (action.type()) {
-            case NAVIGATE_TO -> 4 + (survey || craft || waypoint ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
+            case NAVIGATE_TO ->
+                    4 + (survey || craft || waypoint ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
@@ -277,7 +280,7 @@ final class FlightPlannerPopups {
                 editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                                 Component.translatable("screen.oritech_space_age.action.deployment_slot",
                                         settings.slot() < 0 ? Component.translatable("screen.oritech_space_age.action.slot_auto") : settings.slot()),
-                                                ignored -> editors.changeService(action,
+                                ignored -> editors.changeService(action,
                                         new SpaceSimulation.ServiceSettings(settings.durationTicks(), settings.timeoutTicks(),
                                                 settings.slot() + 1 >= SpaceBalance.slots(action.targetId(), action.orbit()) ? -1 : settings.slot() + 1)))
                         .withTooltip(Component.translatable("screen.oritech_space_age.action.slot_tooltip")).withZIndex(CONTROL_Z));
@@ -390,7 +393,9 @@ final class FlightPlannerPopups {
         editors.addPopupComponent(list);
     }
 
-    /** Dropdown surface and title; only dropdowns without Done/Cancel get a close button. */
+    /**
+     * Dropdown surface and title; only dropdowns without Done/Cancel get a close button.
+     */
     private void addDropdown(int px, int py, int popupWidth, int popupHeight, String titleKey, boolean closeButton) {
 
         addContextMenuBackdrop();
@@ -515,7 +520,8 @@ final class FlightPlannerPopups {
             if (type == SpaceSimulation.ActionType.SCAN) available &= hasScanner;
             if (type == SpaceSimulation.ActionType.DOCK) {
                 available &= canDock;
-                if (!canDock) button.withTooltip(Component.translatable("screen.oritech_space_age.action.dock_requires_arrival"));
+                if (!canDock)
+                    button.withTooltip(Component.translatable("screen.oritech_space_age.action.dock_requires_arrival"));
             }
             if (type == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
                 available &= hasAntenna;
@@ -542,7 +548,7 @@ final class FlightPlannerPopups {
         editors.targetSearchField.setValue(editors.targetSearch);
         editors.addPopupComponent(new ToggleWidget(px + 10, py + 49, popupWidth - 20,
                 Component.translatable("screen.oritech_space_age.sun_filter"), FleetViewPreferences.showSun(), (toggle, value) ->
-                        editors.toggleSunStations()).withTextColor(LabelWidget.BRIGHT_TEXT).withZIndex(CONTROL_Z));
+                editors.toggleSunStations()).withTextColor(LabelWidget.BRIGHT_TEXT).withZIndex(CONTROL_Z));
         editors.targetList = new ScrollWidget(px + 10, py + 71, popupWidth - 20, popupHeight - 81)
                 .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
         editors.targetList.setZIndex(CONTROL_Z);
@@ -664,7 +670,7 @@ final class FlightPlannerPopups {
                     Component.translatable("screen.oritech_space_age.action.setting.coordinates"))
                     .withBrightColor().withZIndex(CONTROL_Z));
             editors.addPopupComponent(SpaceAgeButtons.panel(px + popupWidth - 130, rowY, 120, 18,
-                    Component.translatable("screen.oritech_space_age.action.launch_pad"), ignored -> editors.useLaunchPadCoordinates())
+                            Component.translatable("screen.oritech_space_age.action.launch_pad"), ignored -> editors.useLaunchPadCoordinates())
                     .withTooltip(Component.translatable("screen.oritech_space_age.action.launch_pad_tooltip")).withZIndex(CONTROL_Z));
             rowY += 20;
             editors.addPopupComponent(new LabelWidget(px + 10, rowY + 5, 18, Component.literal("X"))
@@ -760,7 +766,8 @@ final class FlightPlannerPopups {
         validateField(editors.addonValueField, apply, value -> FlightPlannerLabels.parseAddonValue(addon.type(), value) != null, value -> {
             editors.addonValueText = value;
             // Valid values preview immediately so the station-keeping estimate follows the input.
-            if (editors.previewAddonValue(value)) updateStationKeepingLabels(action, stationKeepingDuration, stationKeepingEnd);
+            if (editors.previewAddonValue(value))
+                updateStationKeepingLabels(action, stationKeepingDuration, stationKeepingEnd);
         });
         editors.focusPopup(editors.addonValueField);
     }

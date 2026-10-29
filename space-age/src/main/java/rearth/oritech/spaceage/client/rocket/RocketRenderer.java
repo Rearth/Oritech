@@ -158,9 +158,9 @@ public final class RocketRenderer {
     }
 
     private static void addBlock(List<RenderedBlock> blocks, HashSet<BlockPos> renderedPositions, BlockPos position,
-                                  BlockState state, BlockPos rocketBlockPosition, float partialTick, ClientLevel level,
-                                  BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher,
-                                  Map<BlockState, BlockModelRenderState> modelCache, Map<BlockPos, BlockEntity> visualEntities) {
+                                 BlockState state, BlockPos rocketBlockPosition, float partialTick, ClientLevel level,
+                                 BlockModelResolver modelResolver, BlockEntityRenderDispatcher blockEntityDispatcher,
+                                 Map<BlockState, BlockModelRenderState> modelCache, Map<BlockPos, BlockEntity> visualEntities) {
 
         if (state.isAir() || !renderedPositions.add(position)) return;
 
@@ -184,11 +184,11 @@ public final class RocketRenderer {
     }
 
     private static @Nullable BlockEntityRenderState extractBlockEntity(@Nullable BlockEntity entity, BlockPos position,
-                                                                      float partialTick, ClientLevel level,
-                                                                      BlockEntityRenderDispatcher dispatcher) {
+                                                                       float partialTick, ClientLevel level,
+                                                                       BlockEntityRenderDispatcher dispatcher) {
 
         if (entity == null) return null;
-        var renderer = dispatcher.<BlockEntity, BlockEntityRenderState>getRenderer(entity);
+        var renderer = dispatcher.getRenderer(entity);
         if (renderer == null) return null;
 
         // Detached entities keep a fixed animation identity; visibility and lighting follow the moving rocket.

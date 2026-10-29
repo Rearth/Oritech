@@ -18,7 +18,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
-/** Fixed, inexhaustible deposits loaded from the world's datapack registry. */
+/**
+ * Fixed, inexhaustible deposits loaded from the world's datapack registry.
+ */
 public final class ResourceBodies {
 
     public static final ResourceKey<Registry<Definition>> REGISTRY = ResourceKey.createRegistryKey(OritechSpaceAge.id("resource_bodies"));
@@ -66,7 +68,8 @@ public final class ResourceBodies {
 
         public Definition {
 
-            resources = List.copyOf(resources);
+            resources = resources.stream().map(material -> new AsteroidMaterial(
+                    DenseOres.denseVariant(material.block()), material.amount())).toList();
         }
 
         public SpaceObjectData object(Identifier key) {

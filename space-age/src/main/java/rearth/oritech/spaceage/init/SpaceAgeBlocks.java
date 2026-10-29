@@ -64,6 +64,62 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<PlanetBlock> NYX = BLOCKS.registerBlock("nyx", PlanetBlock::new,
             () -> machineProperties().noOcclusion());
 
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_COAL_ORE = BLOCKS.registerSimpleBlock("superdense_coal_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_IRON_ORE = BLOCKS.registerSimpleBlock("superdense_iron_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_COPPER_ORE = BLOCKS.registerSimpleBlock("superdense_copper_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_GOLD_ORE = BLOCKS.registerSimpleBlock("superdense_gold_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_REDSTONE_ORE = BLOCKS.registerSimpleBlock("superdense_redstone_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_LAPIS_ORE = BLOCKS.registerSimpleBlock("superdense_lapis_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_DIAMOND_ORE = BLOCKS.registerSimpleBlock("superdense_diamond_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_EMERALD_ORE = BLOCKS.registerSimpleBlock("superdense_emerald_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_QUARTZ_ORE = BLOCKS.registerSimpleBlock("superdense_quartz_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_ANCIENT_DEBRIS_ORE = BLOCKS.registerSimpleBlock("superdense_ancient_debris_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_NICKEL_ORE = BLOCKS.registerSimpleBlock("superdense_nickel_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_PLATINUM_ORE = BLOCKS.registerSimpleBlock("superdense_platinum_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoAutoDrop
+    public static final DeferredBlock<Block> SUPERDENSE_URANIUM_ORE = BLOCKS.registerSimpleBlock("superdense_uranium_ore",
+            () -> BlockBehaviour.Properties.ofFullCopy(Blocks.OBSIDIAN).strength(12.0F, 30.0F).requiresCorrectToolForDrops());
+
+    @NoBlockItem
+    public static final DeferredBlock<PlanetBlock> ECHO = BLOCKS.registerBlock("echo", PlanetBlock::new,
+            () -> machineProperties().noOcclusion());
+
     public static final DeferredBlock<GlobeBlock> MINI_EARTH = BLOCKS.registerBlock("mini_earth",
             GlobeBlock::new, () -> machineProperties().noOcclusion());
 

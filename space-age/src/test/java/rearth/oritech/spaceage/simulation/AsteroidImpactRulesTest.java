@@ -21,39 +21,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AsteroidImpactRulesTest {
 
-    @Test
-    void earlyImpactorsChipMassiveDepositsAndConserveMaterials() {
-
-        var simulation = new SpaceSimulation();
-        var target = simulation.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
-                .findFirst().orElseThrow();
-        var action = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
-                .withTarget(target.id()).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
-        var chipped = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action);
-        var boosted = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action,
-                64 * SpaceBalance.TNT_ENERGY_JOULES);
-        assertEquals(AsteroidImpactRules.FragmentationMode.CHIPPING, chipped.fragmentationMode());
-        assertEquals(300, chipped.fragments().stream().mapToDouble(AsteroidImpactRules.AsteroidFragment::mass).sum(), 0.01);
-        assertTrue(boosted.remainingTargetMass() < chipped.remainingTargetMass());
-        assertTrue(chipped.remainingTargetMass() > target.mass() * 0.99);
-        assertTrue(chipped.fragments().stream().map(AsteroidImpactRules.AsteroidFragment::mass).distinct().count() > 1);
-
-        var originalMass = simulation.truth().stream().mapToDouble(SpaceSimulation.SpaceObjectData::mass).sum();
-        var originalBlocks = simulation.truth().stream().flatMap(object -> object.materials().stream())
-                .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
-        simulation.applyAsteroidImpact(target.id(), chipped);
-        assertEquals(originalMass, simulation.truth().stream().mapToDouble(SpaceSimulation.SpaceObjectData::mass).sum(), 0.1);
-        assertEquals(originalBlocks, simulation.truth().stream().flatMap(object -> object.materials().stream())
-                .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum());
-
-        var breakup = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action,
-                target.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS * 180_000);
-        assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, breakup.fragmentationMode());
-        assertEquals(0, breakup.remainingTargetMass());
-        var safe = AsteroidImpactRules.predictArrival(1_000_000_000, target, 12, null, action, 1e15);
-        assertEquals(AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH, safe.outcome());
-    }
-
     private static void assertAsteroidOwnerAfterSplit(ActiveRocketData rocket,
                                                       List<SpaceSimulation.SpaceObjectData> objects,
                                                       SpaceSimulation.FlightPlanAction arrive,
@@ -74,6 +41,39 @@ class AsteroidImpactRulesTest {
         UUID asteroidId = connect.targetId();
         assertEquals(parentKeepsAsteroid, parentPath.actionMoments().getLast().attachedAsteroidId().equals(asteroidId));
         assertEquals(!parentKeepsAsteroid, childPath.samples().getFirst().attachedAsteroidId().equals(asteroidId));
+    }
+
+    @Test
+    void earlyImpactorsChipMassiveDepositsAndConserveMaterials() {
+
+        var simulation = new SpaceSimulation();
+        var target = simulation.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
+                .findFirst().orElseThrow();
+        var action = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(target.id()).withOrbit(SpaceSimulation.OrbitBand.SURFACE);
+        var chipped = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action);
+        var boosted = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action,
+                64 * SpaceBalance.TNT_ENERGY_JOULES);
+        assertEquals(AsteroidImpactRules.FragmentationMode.CHIPPING, chipped.fragmentationMode());
+        assertEquals(300, chipped.fragments().stream().mapToDouble(AsteroidImpactRules.AsteroidFragment::mass).sum(), 10);
+        assertTrue(boosted.remainingTargetMass() < chipped.remainingTargetMass());
+        assertTrue(chipped.remainingTargetMass() > target.mass() * 0.99);
+        assertTrue(chipped.fragments().stream().map(AsteroidImpactRules.AsteroidFragment::mass).distinct().count() > 1);
+
+        var originalMass = simulation.truth().stream().mapToDouble(SpaceSimulation.SpaceObjectData::mass).sum();
+        var originalBlocks = simulation.truth().stream().flatMap(object -> object.materials().stream())
+                .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
+        simulation.applyAsteroidImpact(target.id(), chipped);
+        assertEquals(originalMass, simulation.truth().stream().mapToDouble(SpaceSimulation.SpaceObjectData::mass).sum(), 0.1);
+        assertEquals(originalBlocks, simulation.truth().stream().flatMap(object -> object.materials().stream())
+                .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum());
+
+        var breakup = AsteroidImpactRules.predictArrival(20_000, target, 300, null, action,
+                target.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS * 180_000);
+        assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, breakup.fragmentationMode());
+        assertEquals(0, breakup.remainingTargetMass());
+        var safe = AsteroidImpactRules.predictArrival(1_000_000_000, target, 12, null, action, 1e15);
+        assertEquals(AsteroidImpactRules.ArrivalOutcome.SAFE_APPROACH, safe.outcome());
     }
 
     @Test

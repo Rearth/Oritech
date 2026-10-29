@@ -8,7 +8,9 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/** Constant resource rates during one navigation event, in burn ticks and RF per second. */
+/**
+ * Constant resource rates during one navigation event, in burn ticks and RF per second.
+ */
 public record FlightResourceRate(double fuel, double rf) {
 
     public static final Codec<FlightResourceRate> CODEC = RecordCodecBuilder.create(i -> i.group(

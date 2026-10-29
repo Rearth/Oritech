@@ -1,22 +1,26 @@
 {
-  "name": "Nyx",
-  "description": "A distant dark body holding uranium and precious crystals.",
+  "name": "Umbral",
+  "description": "A silent dark world of diamond seams, weeping stone and forgotten echoes.",
   "x": 8400000,
   "y": -4700000,
   "radius": 40000,
   "model_block": "oritech_space_age:nyx",
   "resources": [
     {
-      "block": "oritech:deepslate_uranium_ore",
-      "amount": 40
-    },
-    {
-      "block": "minecraft:diamond_ore",
-      "amount": 35
-    },
-    {
-      "block": "minecraft:emerald_ore",
+      "block": "oritech_space_age:superdense_diamond_ore",
       "amount": 25
+    },
+    {
+      "block": "minecraft:crying_obsidian",
+      "amount": 25
+    },
+    {
+      "block": "minecraft:sculk",
+      "amount": 30
+    },
+    {
+      "block": "minecraft:soul_sand",
+      "amount": 20
     }
   ]
 }

@@ -31,6 +31,15 @@ class StarMapTooltipTest {
             SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH, 0, 0, 60_000, 9.81f,
             SpaceObjects.DetectionState.PRECISE);
 
+    private static List<Component> tooltip(UUID branch, FlightPlanAction action, FlightPlan plan,
+                                           Map<SegmentRef, String> defaults, Map<UUID, Map<SegmentRef, String>> names) {
+
+        var sample = new PathSample(10, 0, 0, 100, 100, 0, PathPhase.BRAKE,
+                SpaceObjects.EARTH_ID, action.id(), 1, Set.of(SEGMENT), Set.of(SEGMENT), FlightPlanAction.NO_TARGET);
+        return StarMapTooltip.build(null, null, null, null, new StarMapTooltip.PathPoint(branch, sample, 100),
+                plan, defaults, names, id -> id.equals(EARTH.id()) ? EARTH : null);
+    }
+
     @Test
     void reusedPlansResolveActionsAndSegmentNamesWithinTheHoveredCraft() {
 
@@ -64,14 +73,5 @@ class StarMapTooltipTest {
         assertTrue(tooltip(branch, navigate, plan, Map.of(SEGMENT, "S1"), Map.of()).contains(Component.literal("• S1")));
         var named = plan.withSegmentConfigurations(List.of(new SegmentConfiguration(SEGMENT, "Booster", false, List.of(1))));
         assertTrue(tooltip(branch, navigate, named, Map.of(SEGMENT, "S1"), Map.of()).contains(Component.literal("• Booster")));
-    }
-
-    private static List<Component> tooltip(UUID branch, FlightPlanAction action, FlightPlan plan,
-                                            Map<SegmentRef, String> defaults, Map<UUID, Map<SegmentRef, String>> names) {
-
-        var sample = new PathSample(10, 0, 0, 100, 100, 0, PathPhase.BRAKE,
-                SpaceObjects.EARTH_ID, action.id(), 1, Set.of(SEGMENT), Set.of(SEGMENT), FlightPlanAction.NO_TARGET);
-        return StarMapTooltip.build(null, null, null, null, new StarMapTooltip.PathPoint(branch, sample, 100),
-                plan, defaults, names, id -> id.equals(EARTH.id()) ? EARTH : null);
     }
 }

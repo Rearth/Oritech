@@ -18,6 +18,7 @@ public final class RocketStorageScan {
 
     private final Set<Object> seen = Collections.newSetFromMap(new IdentityHashMap<>());
     private final Map<FluidResource, Double> fuels;
+
     public RocketStorageScan(Map<FluidResource, Double> fuels) {
 
         this.fuels = Map.copyOf(fuels);

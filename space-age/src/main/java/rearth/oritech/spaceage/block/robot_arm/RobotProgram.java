@@ -46,7 +46,7 @@ public record RobotProgram(Optional<GlobalPos> binding, List<Action> actions) {
         return withActions(updated);
     }
 
-    public enum Kind { PLACE, DESTROY, INTERACT }
+    public enum Kind {PLACE, DESTROY, INTERACT}
 
     /**
      * How strictly the block at the target has to match the recorded one before a destroy or use action.

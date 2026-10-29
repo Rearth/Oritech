@@ -20,12 +20,14 @@ import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment.BlockData;
 import java.util.List;
 import java.util.Optional;
 
-/** Read-only receiver dashboard; only viewers receive the bounded structure snapshot. */
+/**
+ * Read-only receiver dashboard; only viewers receive the bounded structure snapshot.
+ */
 public final class BeamApertureMenu extends AbstractContainerMenu {
 
     public final BlockPos pos;
-    public Snapshot snapshot;
     private final Player viewer;
+    public Snapshot snapshot;
     private int syncTicks = 19;
     private boolean initialSync = true;
 

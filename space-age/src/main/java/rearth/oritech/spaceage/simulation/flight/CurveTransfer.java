@@ -99,7 +99,9 @@ final class CurveTransfer {
                 last.seconds, candidate.brakingFuelFactor, direction));
     }
 
-    /** Speed after coasting a distance under constant gravity, negative if the craft stalls first. */
+    /**
+     * Speed after coasting a distance under constant gravity, negative if the craft stalls first.
+     */
     static double coastSpeed(double speed, double gravity, double distance) {
 
         var squared = speed * speed + 2 * gravity * distance;
@@ -162,6 +164,18 @@ final class CurveTransfer {
         return null;
     }
 
+    private enum Fit {
+        /**
+         * Stalls on an uphill coast or arrives too slowly; a higher peak may fit.
+         */
+        SLOW,
+        FITS,
+        /**
+         * Needs more distance or engine time than available; only a lower peak may fit.
+         */
+        LONG
+    }
+
     record Plan(double firstSeconds, double coastSeconds, double lastSeconds, double brakingFuelFactor,
                 double firstDirection) {
 
@@ -178,14 +192,6 @@ final class CurveTransfer {
 
     private record Candidate(Burn first, double firstDistance, double brakingFuelFactor) {
 
-    }
-
-    private enum Fit {
-        /** Stalls on an uphill coast or arrives too slowly; a higher peak may fit. */
-        SLOW,
-        FITS,
-        /** Needs more distance or engine time than available; only a lower peak may fit. */
-        LONG
     }
 
     private record Attempt(Fit fit, Plan plan) {

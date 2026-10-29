@@ -3,7 +3,9 @@ package rearth.oritech.spaceage.simulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 
-/** Shared gravity boundaries for flight guidance, orbit labels and zero-g processing. */
+/**
+ * Shared gravity boundaries for flight guidance, orbit labels and zero-g processing.
+ */
 public final class SpaceGravity {
 
     private SpaceGravity() {

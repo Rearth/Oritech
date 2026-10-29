@@ -15,7 +15,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-/** A transfer's frozen inputs and clock survive reloads; compiled guidance is rebuilt lazily. */
+/**
+ * A transfer's frozen inputs and clock survive reloads; compiled guidance is rebuilt lazily.
+ */
 public final class ActiveTransfer {
 
     static final Codec<ActiveTransfer> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -28,9 +30,9 @@ public final class ActiveTransfer {
     final Telemetry start;
     final List<SpaceObjectData> objects;
     final List<DockingTarget> stations;
+    public FlightPath path;
     long ticks;
     BlockPos landing;
-    public FlightPath path;
     private FlightPlan forecastPlan;
     private Collection<RecipeHolder<VacuumRecipe>> forecastRecipes;
     private MissionForecast.Navigation forecast = MissionForecast.Navigation.EMPTY;

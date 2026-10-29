@@ -54,7 +54,7 @@ public final class MissionForecast {
                     a.landingUncertaintyBlocks())).toList();
             return new Navigation(new RocketFlightPathCalculator.FlightPath(flight.paths(), flight.boosterEvents(),
                     flight.lastCommandSeconds(), arrivals, asteroids, flight.navigationAborts(), flight.scanEstimates(), flight.stationKeepingEstimates(),
-                            flight.processingEstimates()));
+                    flight.processingEstimates()));
         }
 
         private static AsteroidImpactRules.ImpactPrediction withoutMaterials(AsteroidImpactRules.ImpactPrediction impact) {

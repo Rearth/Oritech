@@ -22,11 +22,6 @@ public record AsteroidTarget(boolean closest, int minRadius, int maxRadius) {
             Codec.INT.fieldOf("max_radius").forGetter(AsteroidTarget::maxRadius)
     ).apply(i, AsteroidTarget::new));
 
-    public boolean valid() {
-
-        return minRadius >= 0 && maxRadius >= 0 && (maxRadius == 0 || minRadius <= maxRadius);
-    }
-
     public static FlightPlanAction resolve(FlightPlanAction action, Collection<SpaceObjectData> objects,
                                            double x, double y, double time, UUID currentTarget) {
 
@@ -42,5 +37,10 @@ public record AsteroidTarget(boolean closest, int minRadius, int maxRadius) {
         // Capture/release cards following a dynamic arrival refer to the asteroid actually reached.
         if (action.targetId().equals(FlightPlanAction.CLOSEST_ASTEROID)) return action.withTarget(currentTarget);
         return action;
+    }
+
+    public boolean valid() {
+
+        return minRadius >= 0 && maxRadius >= 0 && (maxRadius == 0 || minRadius <= maxRadius);
     }
 }

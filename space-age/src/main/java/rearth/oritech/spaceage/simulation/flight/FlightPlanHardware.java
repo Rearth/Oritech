@@ -19,7 +19,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/** Resolves the hardware attached to a branch immediately before an instruction. */
+/**
+ * Resolves the hardware attached to a branch immediately before an instruction.
+ */
 public final class FlightPlanHardware {
 
     private FlightPlanHardware() {
@@ -55,7 +57,7 @@ public final class FlightPlanHardware {
     }
 
     static Set<SegmentRef> branchSegments(FlightPlan plan, FlightPlanBranch branch, ActiveRocketData rocket,
-                                                  Set<UUID> visited) {
+                                          Set<UUID> visited) {
 
         if (branch.isRoot()) {
             var payloads = RocketPayloads.segments(rocket);

@@ -7,15 +7,15 @@
   "model_block": "oritech_space_age:ceres",
   "resources": [
     {
-      "block": "minecraft:lapis_ore",
+      "block": "oritech_space_age:superdense_lapis_ore",
       "amount": 40
     },
     {
-      "block": "minecraft:redstone_ore",
+      "block": "oritech_space_age:superdense_redstone_ore",
       "amount": 35
     },
     {
-      "block": "minecraft:copper_ore",
+      "block": "oritech_space_age:superdense_copper_ore",
       "amount": 25
     }
   ]

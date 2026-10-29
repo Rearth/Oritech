@@ -201,7 +201,7 @@
   "screen.oritech_space_age.arrival_fragments.catastrophic": "Expected: complete breakup into %s chunks",
   "screen.oritech_space_age.arrival_fragment": "• Chunk %s: %s kg · radius %s",
   "screen.oritech_space_age.arrival_remaining_asteroid": "Remaining asteroid mass: %s kg",
-  "screen.oritech_space_age.arrival_recoverable": "Recoverable blocks:",
+  "screen.oritech_space_age.arrival_recoverable": "Surviving blocks placed in the world:",
   "screen.oritech_space_age.branch.root": "Main",
   "screen.oritech_space_age.branch.number": "Branch %s",
   "screen.oritech_space_age.branch.segments": "Segments: %s",
@@ -890,5 +890,7 @@
   "block.oritech_space_age.superdense_ancient_debris_ore": "Superdense Ancient Debris Ore",
   "block.oritech_space_age.superdense_nickel_ore": "Superdense Nickel Ore",
   "block.oritech_space_age.superdense_platinum_ore": "Superdense Platinum Ore",
-  "block.oritech_space_age.superdense_uranium_ore": "Superdense Uranium Ore"
+  "block.oritech_space_age.superdense_uranium_ore": "Superdense Uranium Ore",
+  "tooltip.oritech_space_age.superdense_yield": "Mining: 30�60 %s. Fortune increases yield; Silk Touch preserves this block.",
+  "tooltip.oritech_space_age.superdense_mass": "Mass: %s kg per block"
 }

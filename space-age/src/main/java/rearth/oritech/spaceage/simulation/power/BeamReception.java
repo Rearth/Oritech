@@ -3,8 +3,11 @@ package rearth.oritech.spaceage.simulation.power;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-/** Separates missed aperture area, aperture throughput, and buffer rejection in one beam leg. */
-public record BeamReception(double incident, double collected, double capacityLoss, double storageLoss, double accepted, double radius) {
+/**
+ * Separates missed aperture area, aperture throughput, and buffer rejection in one beam leg.
+ */
+public record BeamReception(double incident, double collected, double capacityLoss, double storageLoss, double accepted,
+                            double radius) {
 
     public static final BeamReception EMPTY = new BeamReception(0, 0, 0, 0, 0, 0);
     public static final Codec<BeamReception> CODEC = RecordCodecBuilder.create(i -> i.group(

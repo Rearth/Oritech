@@ -30,13 +30,17 @@ public final class LaunchSpeedRules {
     private LaunchSpeedRules() {
     }
 
-    /** Launch velocity in m/s for a particle speed. */
+    /**
+     * Launch velocity in m/s for a particle speed.
+     */
     public static double velocity(long particleSpeed) {
 
         return Math.min(particleSpeed * SpaceAgeConfig.launchSpeedFactor(), SpaceAgeConfig.launchSpeedCap());
     }
 
-    /** The lowest particle speed reaching the velocity cap; faster particles don't launch any faster. */
+    /**
+     * The lowest particle speed reaching the velocity cap; faster particles don't launch any faster.
+     */
     public static long maxUsefulSpeed() {
 
         var factor = SpaceAgeConfig.launchSpeedFactor();
@@ -61,7 +65,9 @@ public final class LaunchSpeedRules {
         return factor <= 0 ? Long.MAX_VALUE : (long) Math.ceil(orbitVelocity() / factor);
     }
 
-    /** Surface position at the ramp, already moving away from Earth. */
+    /**
+     * Surface position at the ramp, already moving away from Earth.
+     */
     public static MissionState.Position position(List<SpaceSimulation.SpaceObjectData> objects, BlockPos launch, long particleSpeed) {
 
         var earth = objects.stream().filter(object -> object.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
@@ -80,7 +86,9 @@ public final class LaunchSpeedRules {
         return !predicted.paths().isEmpty() && !predicted.paths().getFirst().terminalState().preventsLaunch();
     }
 
-    /** Only the initial navigation leg determines which particle speeds can launch the craft. */
+    /**
+     * Only the initial navigation leg determines which particle speeds can launch the craft.
+     */
     public static SpaceSimulation.FlightPlan firstLeg(SpaceSimulation.FlightPlan plan) {
 
         return plan.withBranches(List.of(plan.root().withActions(plan.root().actions().stream().limit(1).toList())));

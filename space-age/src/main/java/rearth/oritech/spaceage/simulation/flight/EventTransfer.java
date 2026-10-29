@@ -17,7 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-/** Full-power event trials. Each interval is solved analytically, never by ticking the flight. */
+/**
+ * Full-power event trials. Each interval is solved analytically, never by ticking the flight.
+ */
 final class EventTransfer {
 
     private static final double SPEED_TOLERANCE = .01;
@@ -32,8 +34,8 @@ final class EventTransfer {
     private final double arrival;
     private final double efficiency;
     private final double credit;
-    private boolean eventLimitReached;
     private final Map<SegmentRef, Double> solar = new HashMap<>();
+    private boolean eventLimitReached;
 
     EventTransfer(Craft source, Context context, FlightCurve curve, double initial, double arrival, double efficiency, double credit) {
 
@@ -50,6 +52,25 @@ final class EventTransfer {
         source.segments.forEach((ref, segment) -> solar.put(ref,
                 segment.structure == null ? 0 : SolarPower.rating(List.of(segment.structure)) * 20));
         this.environment = FlightEnvironment.along(curve, context, source.time, solar.values().stream().anyMatch(value -> value > 0));
+    }
+
+    static void apply(Craft craft, Map<SegmentRef, FlightResourceRate> rates, double seconds) {
+
+        rates.forEach((ref, rate) -> {
+            var segment = craft.segments.get(ref);
+            if (segment == null) return;
+            var previousFuelMass = segment.fuelMass;
+            if (segment.hardware.chemical() > 0)
+                segment.consumeFuel(rate.fuel() * seconds / segment.hardware.fuelCost(1));
+            segment.wetMass -= previousFuelMass - segment.fuelMass;
+            segment.rf = Math.max(0, segment.rf - rate.rf() * seconds);
+            segment.ionSeconds = segment.hardware.ion() == 0 ? 0 : segment.rf / segment.hardware.rfCost(1);
+        });
+    }
+
+    static double duration(List<Event> events) {
+
+        return events.stream().mapToDouble(Event::seconds).sum();
     }
 
     List<Event> solve(double cap, boolean freeArrival) {
@@ -168,7 +189,8 @@ final class EventTransfer {
                         boundarySeconds = Math.min(boundarySeconds, segment.chemicalSeconds / fuelFactor * mass * .02 / segment.fuelMass);
                 }
                 if (rfRate > 0) boundarySeconds = Math.min(boundarySeconds, segment.rf / rfRate);
-                else if (rfRate < 0) boundarySeconds = Math.min(boundarySeconds, Math.max(0, capacity - segment.rf) / -rfRate);
+                else if (rfRate < 0)
+                    boundarySeconds = Math.min(boundarySeconds, Math.max(0, capacity - segment.rf) / -rfRate);
             }
             var engineAcceleration = thrust / mass * efficiency;
             if (engineAcceleration <= 1e-10) direction = 0;
@@ -185,7 +207,8 @@ final class EventTransfer {
                 seconds = Math.min(seconds, (wanted - speed) / acceleration);
             if (acceleration < 0 && speed > 0) seconds = Math.min(seconds, -speed / acceleration);
             if (!Double.isFinite(seconds) || seconds <= 1e-9) {
-                if (braking && speed <= arrival + SPEED_TOLERANCE) return new Trial(s - length, elapsed, peak, brakeAt, false, null);
+                if (braking && speed <= arrival + SPEED_TOLERANCE)
+                    return new Trial(s - length, elapsed, peak, brakeAt, false, null);
                 return new Trial(direction == 0 && speed <= .001 ? -length : length, elapsed, peak, brakeAt, false, null);
             }
             var nextS = Math.min(end, s + speed * seconds + .5 * acceleration * seconds * seconds);
@@ -250,24 +273,6 @@ final class EventTransfer {
             if (craft.currentStage >= context.stageCount) break;
             craft.currentStage++;
         }
-    }
-
-    static void apply(Craft craft, Map<SegmentRef, FlightResourceRate> rates, double seconds) {
-
-        rates.forEach((ref, rate) -> {
-            var segment = craft.segments.get(ref);
-            if (segment == null) return;
-            var previousFuelMass = segment.fuelMass;
-            if (segment.hardware.chemical() > 0) segment.consumeFuel(rate.fuel() * seconds / segment.hardware.fuelCost(1));
-            segment.wetMass -= previousFuelMass - segment.fuelMass;
-            segment.rf = Math.max(0, segment.rf - rate.rf() * seconds);
-            segment.ionSeconds = segment.hardware.ion() == 0 ? 0 : segment.rf / segment.hardware.rfCost(1);
-        });
-    }
-
-    static double duration(List<Event> events) {
-
-        return events.stream().mapToDouble(Event::seconds).sum();
     }
 
     record Event(double seconds, double start, double end, double initialSpeed, double endSpeed,

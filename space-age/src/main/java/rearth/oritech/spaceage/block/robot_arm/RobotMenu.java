@@ -46,7 +46,9 @@ public final class RobotMenu extends UpgradableOritechScreenHandler implements R
         arm = (RobotArmBlockEntity) blockEntity;
     }
 
-    /** Encodes a match mode change for an action, shared by the arm and card menus. */
+    /**
+     * Encodes a match mode change for an action, shared by the arm and card menus.
+     */
     public static int matchButton(int index, Match match) {
 
         return MATCH_BUTTON + index * Match.values().length + match.ordinal();

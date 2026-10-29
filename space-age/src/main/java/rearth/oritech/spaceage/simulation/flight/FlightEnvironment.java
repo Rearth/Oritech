@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-/** Spatial events, independent of flight duration. Gravity work is exact between cell endpoints. */
+/**
+ * Spatial events, independent of flight duration. Gravity work is exact between cell endpoints.
+ */
 final class FlightEnvironment {
 
     private FlightEnvironment() {

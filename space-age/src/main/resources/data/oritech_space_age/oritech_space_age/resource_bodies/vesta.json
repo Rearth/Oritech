@@ -1,21 +1,25 @@
 {
-  "name": "Vesta",
-  "description": "A metallic mega asteroid veined with nickel and platinum.",
+  "name": "Pyre",
+  "description": "A smouldering relic of a vanished world, with dense metals, ancient debris and magma.",
   "x": -4500000,
   "y": 4200000,
   "radius": 32000,
   "model_block": "oritech_space_age:vesta",
   "resources": [
     {
-      "block": "oritech:nickel_ore",
-      "amount": 45
+      "block": "oritech_space_age:superdense_nickel_ore",
+      "amount": 35
     },
     {
-      "block": "oritech:deepslate_platinum_ore",
-      "amount": 30
+      "block": "oritech_space_age:superdense_platinum_ore",
+      "amount": 25
     },
     {
-      "block": "minecraft:gold_ore",
+      "block": "oritech_space_age:superdense_ancient_debris_ore",
+      "amount": 15
+    },
+    {
+      "block": "minecraft:magma_block",
       "amount": 25
     }
   ]

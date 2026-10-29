@@ -5,7 +5,9 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import rearth.oritech.api.screen.UIComponent;
 
-/** Flat list furniture, kept separate from mission actions and category persistence. */
+/**
+ * Flat list furniture, kept separate from mission actions and category persistence.
+ */
 final class FleetListWidgets {
 
     private static final int TEXT = 0xFFE2E8ED;
@@ -47,7 +49,7 @@ final class FleetListWidgets {
                 return true;
             }
         }.withTooltip(title, Component.translatable(collapsed
-                ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"),
+                        ? "screen.oritech_space_age.mission.expand" : "screen.oritech_space_age.mission.collapse"),
                 Component.translatable("screen.oritech_space_age.fleet.actions_hint"));
     }
 

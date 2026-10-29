@@ -66,10 +66,7 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     private static final int DEFAULT_PHASE_TICKS = 20;
     private static final GameProfile ROBOT_PROFILE = new GameProfile(
             UUID.nameUUIDFromBytes("oritech_robot_arm".getBytes(StandardCharsets.UTF_8)), "[Oritech Robot]");
-
-    /** Each action moves out from the warp port or previous target, performs its work, then retracts. */
-    public enum Phase { PREPARE, APPROACH, WORK, RETRACT }
-
+    private final List<ItemStack> cargo = new ArrayList<>();
     public RobotProgram program = RobotProgram.EMPTY;
     public int cursor;
     public boolean running;
@@ -85,8 +82,6 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
 
     @SyncField({SyncType.INITIAL, SyncType.TICK})
     public Visual visual = new Visual(BlockPos.ZERO, Kind.PLACE, Phase.PREPARE, 0, DEFAULT_PHASE_TICKS, false, ItemStack.EMPTY, 0, BlockPos.ZERO, true);
-
-    private final List<ItemStack> cargo = new ArrayList<>();
     private Phase phase = Phase.PREPARE;
     private int elapsed;
     private int duration = DEFAULT_PHASE_TICKS;
@@ -104,15 +99,20 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         motionStart = pos;
     }
 
+    public static AABB workBounds(BlockPos pos) {
+
+        return new AABB(pos.above()).inflate(RANGE);
+    }
+
+    private static BlockHitResult hitResult(Action action) {
+
+        return new BlockHitResult(Vec3.atLowerCornerOf(action.pos()).add(action.hit()), action.face(), action.pos(), false);
+    }
+
     public boolean inRange(BlockPos pos) {
 
         return pos.distSqr(worldPosition.above()) <= RANGE * RANGE && !pos.equals(worldPosition)
                 && getCorePositions().stream().noneMatch(core -> worldPosition.offset(Geometry.rotatePosition(core, getFacing())).equals(pos));
-    }
-
-    public static AABB workBounds(BlockPos pos) {
-
-        return new AABB(pos.above()).inflate(RANGE);
     }
 
     @Override
@@ -153,12 +153,15 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         setChanged();
     }
 
-    /** Checks the target and reserves the needed item before the arm starts moving. */
+    /**
+     * Checks the target and reserves the needed item before the arm starts moving.
+     */
     private boolean prepare(ServerLevel world, Action action) {
 
         var issue = checkAction(action);
         var needsItem = action.kind() == Kind.PLACE || action.kind() == Kind.INTERACT && !action.item().isEmpty();
-        if (issue.isEmpty() && needsItem && !reserve(action.item(), action.kind() == Kind.PLACE)) issue = "missing_item";
+        if (issue.isEmpty() && needsItem && !reserve(action.item(), action.kind() == Kind.PLACE))
+            issue = "missing_item";
         if (!issue.isEmpty()) {
             status = issue;
             if (skipBlocked) advance();
@@ -213,7 +216,8 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
                     } else advance();
                 }
             }
-            default -> {}
+            default -> {
+            }
         }
         if (phase != Phase.PREPARE) duration = actionDuration(action, phase, returnToWarp);
     }
@@ -325,7 +329,8 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
 
         for (int slot = 1; slot < getInventorySize(); slot++) {
             var stack = inventory.getItem(slot);
-            if (!(exactComponents ? ItemStack.isSameItemSameComponents(stack, wanted) : ItemStack.isSameItem(stack, wanted))) continue;
+            if (!(exactComponents ? ItemStack.isSameItemSameComponents(stack, wanted) : ItemStack.isSameItem(stack, wanted)))
+                continue;
             var reserved = stack.copyWithCount(1);
             try (var transaction = Transaction.openRoot()) {
                 if (inventory.extract(slot, ItemResource.of(stack), 1, transaction) == 1) {
@@ -353,7 +358,9 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         return true;
     }
 
-    /** Places the robot player so that tools raycasting from its eyes hit the recorded spot. */
+    /**
+     * Places the robot player so that tools raycasting from its eyes hit the recorded spot.
+     */
     private FakePlayer positionRobot(Action action) {
 
         if (robot == null) {
@@ -412,7 +419,9 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         return "";
     }
 
-    /** Yield and silk touch addons work like on the destroyer: loot tables see an enchanted tool. */
+    /**
+     * Yield and silk touch addons work like on the destroyer: loot tables see an enchanted tool.
+     */
     private ItemStack harvestTool() {
 
         if (!silkTouch && yieldAddons == 0) return ItemStack.EMPTY;
@@ -464,11 +473,6 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         return "";
     }
 
-    private static BlockHitResult hitResult(Action action) {
-
-        return new BlockHitResult(Vec3.atLowerCornerOf(action.pos()).add(action.hit()), action.face(), action.pos(), false);
-    }
-
     private void updateVisual(boolean active) {
 
         var actions = program.actions();
@@ -495,7 +499,7 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         }
         var stage = Math.min(9, elapsed * 10 / duration);
         if (stage != breakingStage) {
-            ((ServerLevel) level).destroyBlockProgress(robot.getId(), breakingPos, stage);
+            level.destroyBlockProgress(robot.getId(), breakingPos, stage);
             breakingStage = stage;
         }
     }
@@ -543,8 +547,9 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
 
         if (silkTouch) return List.of(new Tuple<>(Component.translatable("enchantment.minecraft.silk_touch"),
                 Component.translatable("tooltip.oritech.machine.addon_silk_touch")));
-        if (yieldAddons > 0) return List.of(new Tuple<>(Component.translatable("title.oritech.machine.addon_fortune", yieldAddons),
-                Component.translatable("tooltip.oritech.machine.addon_fortune")));
+        if (yieldAddons > 0)
+            return List.of(new Tuple<>(Component.translatable("title.oritech.machine.addon_fortune", yieldAddons),
+                    Component.translatable("tooltip.oritech.machine.addon_fortune")));
         return super.getExtraExtensionLabels();
     }
 
@@ -644,10 +649,14 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    public boolean isActivelyWorking() { return false; }
+    public boolean isActivelyWorking() {
+        return false;
+    }
 
     @Override
-    protected float getAnimationSpeed() { return 1; }
+    protected float getAnimationSpeed() {
+        return 1;
+    }
 
     @Override
     public AbstractContainerMenu createMenu(int id, Inventory inventory, Player player) {
@@ -656,19 +665,29 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    public long getDefaultCapacity() { return 100_000; }
+    public long getDefaultCapacity() {
+        return 100_000;
+    }
 
     @Override
-    public long getDefaultInsertRate() { return 2_000; }
+    public long getDefaultInsertRate() {
+        return 2_000;
+    }
 
     @Override
-    protected RecipeType<OritechRecipe> getOwnRecipeType() { return null; }
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+        return null;
+    }
 
     @Override
-    public int getInventorySize() { return 19; }
+    public int getInventorySize() {
+        return 19;
+    }
 
     @Override
-    public ContainerSlotAssignment getSlotAssignments() { return new ContainerSlotAssignment(1, 18, 1, 18); }
+    public ContainerSlotAssignment getSlotAssignments() {
+        return new ContainerSlotAssignment(1, 18, 1, 18);
+    }
 
     @Override
     public List<GuiSlot> getGuiSlots() {
@@ -681,19 +700,29 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
     }
 
     @Override
-    public BarConfiguration getEnergyConfiguration() { return new BarConfiguration(8, 30, 18, 98); }
+    public BarConfiguration getEnergyConfiguration() {
+        return new BarConfiguration(8, 30, 18, 98);
+    }
 
     @Override
-    public boolean showProgress() { return false; }
+    public boolean showProgress() {
+        return false;
+    }
 
     @Override
-    public boolean inputOptionsEnabled() { return false; }
+    public boolean inputOptionsEnabled() {
+        return false;
+    }
 
     @Override
-    public MenuType<?> getScreenHandlerType() { return SpaceAgeMenus.ROBOT.get(); }
+    public MenuType<?> getScreenHandlerType() {
+        return SpaceAgeMenus.ROBOT.get();
+    }
 
     @Override
-    public int getTickUpdateInterval() { return 1; }
+    public int getTickUpdateInterval() {
+        return 1;
+    }
 
     @Override
     public List<Vec3i> getCorePositions() {
@@ -708,10 +737,17 @@ public final class RobotArmBlockEntity extends MultiblockMachineEntity {
         return List.of(new Vec3i(0, 0, -1), new Vec3i(1, 0, -1), new Vec3i(2, 0, 0), new Vec3i(2, 0, 1));
     }
 
+    /**
+     * Each action moves out from the warp port or previous target, performs its work, then retracts.
+     */
+    public enum Phase {PREPARE, APPROACH, WORK, RETRACT}
+
     public record Visual(BlockPos target, Kind kind, Phase phase, int elapsed, int duration, boolean active,
                          ItemStack held, long tick, BlockPos start, boolean returnToWarp) {
 
-        /** Ignores the timestamp, so an unchanged arm is not resent every tick. */
+        /**
+         * Ignores the timestamp, so an unchanged arm is not resent every tick.
+         */
         boolean sameMotion(Visual other) {
 
             return target.equals(other.target) && kind == other.kind && phase == other.phase && elapsed == other.elapsed

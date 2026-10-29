@@ -24,7 +24,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/** An evenly filled orbital energy shower with a gentle downward travelling pulse. */
+/**
+ * An evenly filled orbital energy shower with a gentle downward travelling pulse.
+ */
 public final class GroundBeamRenderer {
 
     private static final ContextKey<Frame> BEAMS = new ContextKey<>(OritechSpaceAge.id("ground_beam_render"));
@@ -38,7 +40,8 @@ public final class GroundBeamRenderer {
     private static double lastTime;
     private static List<SurfaceBeam> targets = List.of();
 
-    private GroundBeamRenderer() {}
+    private GroundBeamRenderer() {
+    }
 
     public static void clear(ClientPlayerNetworkEvent.LoggingOut event) {
 
@@ -78,7 +81,8 @@ public final class GroundBeamRenderer {
             if (Math.hypot(beam.target().getX() + .5 - camera.x, beam.target().getZ() + .5 - camera.z) <= range + Math.sqrt(2) * beam.radius())
                 visible.add(new VisibleBeam(beam, alpha));
         });
-        if (!visible.isEmpty()) event.getRenderState().setRenderData(BEAMS, new Frame(List.copyOf(visible), camera, level.getMaxY() + 512, time));
+        if (!visible.isEmpty())
+            event.getRenderState().setRenderData(BEAMS, new Frame(List.copyOf(visible), camera, level.getMaxY() + 512, time));
     }
 
     public static void submit(SubmitCustomGeometryEvent event) {
@@ -197,7 +201,9 @@ public final class GroundBeamRenderer {
                 .setOverlay(OverlayTexture.NO_OVERLAY).setLight(RenderHelpers.FULL_BRIGHT).setNormal(pose, 0, 1, 0);
     }
 
-    private record VisibleBeam(SurfaceBeam beam, double alpha) {}
+    private record VisibleBeam(SurfaceBeam beam, double alpha) {
+    }
 
-    private record Frame(List<VisibleBeam> targets, Vec3 camera, int top, double time) {}
+    private record Frame(List<VisibleBeam> targets, Vec3 camera, int top, double time) {
+    }
 }

@@ -65,9 +65,9 @@ public class DynamicRocketSegment {
     public long availableFuelBurnTimeTicks;
     public long availableRF;
     public double currentFuelWeight;
+    public SpacePowerService.Account powerAccount;
     private double fuelFraction;
     private double rfFraction;
-    public SpacePowerService.Account powerAccount;
 
     public DynamicRocketSegment(long fuel, long rf, double mass, Set<UUID> connections, Map<BlockPos, RocketControllerState> crafters,
                                 long fuelCapacity, long rfCapacity, Map<BlockPos, BlockState> layout,

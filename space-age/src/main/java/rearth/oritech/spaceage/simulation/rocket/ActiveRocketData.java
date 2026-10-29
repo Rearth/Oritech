@@ -54,6 +54,26 @@ public class ActiveRocketData {
     private Map<UUID, RocketHardware> hardware = Map.of();
     private List<HardwareRef> processingModules = List.of();
     private List<HardwareRef> couplingPorts = List.of();
+    private BlockPos launchPosition = BlockPos.ZERO;
+    private BlockPos launchPadCenter;
+
+    public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {
+
+        this(UUID.randomUUID(), staticSegments, dynamicSegments, null);
+    }
+
+    public ActiveRocketData(UUID rocketId, Map<UUID, StaticRocketSegment> staticSegments,
+                            Map<UUID, DynamicRocketSegment> dynamicSegments, RocketFlight flight) {
+
+        if (!staticSegments.keySet().equals(dynamicSegments.keySet())) {
+            throw new IllegalArgumentException("Static and dynamic rocket segments must have matching IDs");
+        }
+
+        this.rocketId = rocketId;
+        this.staticSegments.putAll(staticSegments);
+        this.dynamicSegments.putAll(dynamicSegments);
+        this.flight = flight;
+    }
 
     public SpacePowerHardware powerHardware() {
 
@@ -95,27 +115,6 @@ public class ActiveRocketData {
 
         powerHardware();
         return couplingPorts;
-    }
-
-    private BlockPos launchPosition = BlockPos.ZERO;
-    private BlockPos launchPadCenter;
-
-    public ActiveRocketData(Map<UUID, StaticRocketSegment> staticSegments, Map<UUID, DynamicRocketSegment> dynamicSegments) {
-
-        this(UUID.randomUUID(), staticSegments, dynamicSegments, null);
-    }
-
-    public ActiveRocketData(UUID rocketId, Map<UUID, StaticRocketSegment> staticSegments,
-                            Map<UUID, DynamicRocketSegment> dynamicSegments, RocketFlight flight) {
-
-        if (!staticSegments.keySet().equals(dynamicSegments.keySet())) {
-            throw new IllegalArgumentException("Static and dynamic rocket segments must have matching IDs");
-        }
-
-        this.rocketId = rocketId;
-        this.staticSegments.putAll(staticSegments);
-        this.dynamicSegments.putAll(dynamicSegments);
-        this.flight = flight;
     }
 
     public BlockPos getLaunchPosition() {

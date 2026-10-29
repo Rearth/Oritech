@@ -100,27 +100,40 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         menu.speedWindowRevision++;
     }
 
-    /** Short summary of the working particle speeds for the planner footer. */
+    /**
+     * Short summary of the working particle speeds for the planner footer.
+     */
     public static MutableComponent windowSummary(LaunchRampMenu menu) {
 
         var window = menu.speedWindow;
-        if (!menu.speedWindowKnown) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.computing");
-        if (window == null) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.unreachable").withStyle(ChatFormatting.DARK_RED);
+        if (!menu.speedWindowKnown)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.computing");
+        if (window == null)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.unreachable").withStyle(ChatFormatting.DARK_RED);
         if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
                 String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
                         ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
-        if (window.min() == 0 && window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.free");
-        if (window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.open", number(window.min()));
+        if (window.min() == 0 && window.max() == Long.MAX_VALUE)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.free");
+        if (window.max() == Long.MAX_VALUE)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.open", number(window.min()));
         return Component.translatable("screen.oritech_space_age.launch_ramp.chip.window", number(window.min()), number(window.max()));
     }
 
-    /** How particle speed becomes launch speed, and what happens to cube-sats without a plan. */
+    /**
+     * How particle speed becomes launch speed, and what happens to cube-sats without a plan.
+     */
     public static List<Component> speedRules() {
 
         return List.of(Component.translatable("screen.oritech_space_age.launch_ramp.conversion",
                         number(1000), number(Math.round(1000 * SpaceAgeConfig.launchSpeedFactor())), number(SpaceAgeConfig.launchSpeedCap())),
                 Component.translatable("screen.oritech_space_age.launch_ramp.orbit",
                         number(LaunchSpeedRules.orbitParticleSpeed()), number(Math.round(LaunchSpeedRules.orbitVelocity()))));
+    }
+
+    private static MutableComponent title(String key) {
+
+        return Component.translatable("screen.oritech_space_age.launch_ramp." + key).withStyle(ChatFormatting.BOLD);
     }
 
     @Override
@@ -185,11 +198,6 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         return y + 8;
     }
 
-    private static MutableComponent title(String key) {
-
-        return Component.translatable("screen.oritech_space_age.launch_ramp." + key).withStyle(ChatFormatting.BOLD);
-    }
-
     private void setExpectedSpeed(String text) {
 
         speedText = text;
@@ -212,7 +220,8 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
     private Component planText() {
 
         var status = menu.status;
-        if (menu.pattern().isEmpty()) return Component.translatable("screen.oritech_space_age.launch_ramp.plan_no_pattern");
+        if (menu.pattern().isEmpty())
+            return Component.translatable("screen.oritech_space_age.launch_ramp.plan_no_pattern");
         if (status.owner().isEmpty()) return Component.translatable("screen.oritech_space_age.launch_ramp.plan_none");
         return Component.translatable(status.planMatches() ? "screen.oritech_space_age.launch_ramp.plan_saved"
                 : "screen.oritech_space_age.launch_ramp.plan_other", status.owner());
@@ -222,12 +231,15 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
 
         var window = menu.speedWindow;
         if (menu.pattern().isEmpty() || !menu.speedWindowKnown) return windowSummary(menu);
-        if (window == null) return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.maxUsefulSpeed()));
+        if (window == null)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.maxUsefulSpeed()));
         if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
                 String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
                         ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
-        if (window.min() == 0 && window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.window_free");
-        if (window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.window_open", number(window.min()));
+        if (window.min() == 0 && window.max() == Long.MAX_VALUE)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.window_free");
+        if (window.max() == Long.MAX_VALUE)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.window_open", number(window.min()));
         return Component.translatable("screen.oritech_space_age.launch_ramp.window", number(window.min()), number(window.max()));
     }
 
@@ -237,7 +249,8 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         var outcome = Outcome.values()[status.outcome()];
         if (outcome == Outcome.NONE) return Component.translatable("screen.oritech_space_age.launch_ramp.last_none");
         var result = Component.translatable("screen.oritech_space_age.launch_ramp.outcome." + outcome.name().toLowerCase(Locale.ROOT));
-        if (outcome == Outcome.LOST) return Component.translatable("screen.oritech_space_age.launch_ramp.last_lost", number(status.lastSpeed()), result);
+        if (outcome == Outcome.LOST)
+            return Component.translatable("screen.oritech_space_age.launch_ramp.last_lost", number(status.lastSpeed()), result);
         return Component.translatable("screen.oritech_space_age.launch_ramp.last_launch", number(status.lastSpeed()),
                 number(Math.round(LaunchSpeedRules.velocity(status.lastSpeed()))), result);
     }
