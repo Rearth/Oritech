@@ -1,0 +1,26 @@
+{
+  "name": "Echo",
+  "description": "A luminous wanderer beyond the outer belt, holding quartz and strange crystalline ruins.",
+  "x": -10500000,
+  "y": -6500000,
+  "radius": 36000,
+  "model_block": "oritech_space_age:echo",
+  "resources": [
+    {
+      "block": "oritech_space_age:superdense_quartz_ore",
+      "amount": 40
+    },
+    {
+      "block": "minecraft:amethyst_block",
+      "amount": 25
+    },
+    {
+      "block": "minecraft:glowstone",
+      "amount": 20
+    },
+    {
+      "block": "minecraft:prismarine",
+      "amount": 15
+    }
+  ]
+}
