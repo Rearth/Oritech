@@ -8,7 +8,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
-import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
@@ -25,8 +24,6 @@ import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.power.SpacePowerHardware;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
-import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
-import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.service.RocketServiceForecast;
@@ -166,26 +163,7 @@ public final class RocketFlightPathCalculator {
         for (var entry : rocket.getStaticSegments().entrySet()) {
             var ref = refsById.get(entry.getKey());
             var dynamic = rocket.getDynamicSegments().get(entry.getKey());
-            var segmentRocket = new ActiveRocketData(Map.of(entry.getKey(), rocket.getOriginalSegments().get(entry.getKey())),
-                    Map.of(entry.getKey(), dynamic));
-            var performance = RocketPerformanceCalculator.calculate(segmentRocket);
-            var hardware = RocketHardware.of(entry.getValue());
-            var previewSegment = new Segment(performance.wetMassKilograms(),
-                    hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS,
-                    hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS,
-                    hardware.chemicalSeconds(dynamic), hardware.ionSeconds(dynamic), hardware);
-            previewSegment.structure = rocket.getOriginalSegments().get(entry.getKey());
-            previewSegment.physical = dynamic.copy();
-            previewSegment.rf = dynamic.rf();
-            previewSegment.fuelMass = performance.fuelMassKilograms();
-            previewSegment.dryMass = performance.dryMassKilograms();
-            previewSegment.payloadEnergy = entry.getValue().payloadEnergyJoules();
-            previewSegment.fuelTicks = dynamic.fuel();
-            previewSegment.parachutes = ParachuteLanding.count(entry.getValue());
-            dynamic.crafters.forEach((pos, cargo) -> previewSegment.crafters.put(pos, cargo.copy()));
-            previewSegment.initialRF = entry.getValue().initialRF();
-            previewSegment.initialFuelTicks = entry.getValue().initialFuel();
-            segments.put(ref, previewSegment);
+            segments.put(ref, new Segment(rocket.getOriginalSegments().get(entry.getKey()), dynamic));
 
             var neighbours = new LinkedHashSet<SpaceSimulation.SegmentRef>();
             dynamic.getConnectedSegments().stream().map(refsById::get).filter(Objects::nonNull)
@@ -216,7 +194,6 @@ public final class RocketFlightPathCalculator {
                     state.x, state.y, state.time, branch.actions().get(index).type() == SpaceSimulation.ActionType.DECOUPLE
                             && state.attachedAsteroid != null ? state.attachedAsteroid.id() : state.currentTarget);
             if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) continue;
-            state.segments.values().forEach(segment -> segment.wetMass = Math.max(1, segment.dryMass + segment.fuelMass));
             var requiresUndocking = (!state.occupiedPortSegments.isEmpty() || !state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET))
                     && (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.DOCK
                     || action.type() == SpaceSimulation.ActionType.DISCARD_CRAFT);
@@ -274,9 +251,9 @@ public final class RocketFlightPathCalculator {
             var step = Double.POSITIVE_INFINITY;
             for (var segment : state.segments.values()) {
                 var count = segment.hardware.antennas();
-                if (count == 0 || segment.rf < cost) continue;
+                if (count == 0 || segment.rf() < cost) continue;
                 modules += count;
-                step = Math.min(step, segment.rf / (count * (double) cost));
+                step = Math.min(step, segment.rf() / (count * (double) cost));
             }
             if (modules == 0) {
                 state.blockedState = TerminalState.NOT_ENOUGH_SERVICE_RF;
@@ -285,7 +262,7 @@ public final class RocketFlightPathCalculator {
             step = Math.min(step, remainingTicks);
             for (var segment : state.segments.values()) {
                 var count = segment.hardware.antennas();
-                if (count > 0 && segment.rf >= cost) segment.spendRF(count * cost * step);
+                if (count > 0 && segment.rf() >= cost) segment.spendRF(count * cost * step);
             }
             remainingTicks -= step;
             state.time += step / 20;
@@ -302,7 +279,7 @@ public final class RocketFlightPathCalculator {
                 ? state.currentTarget : action.targetId());
         var scanners = state.segments.values().stream().mapToInt(segment -> segment.hardware.scanners()).sum();
         var available = state.segments.values().stream().filter(segment -> segment.hardware.scanners() > 0)
-                .mapToDouble(segment -> segment.rf).sum();
+                .mapToDouble(segment -> segment.rf()).sum();
         context.scanEstimates.add(new ScanEstimate(action.id(), (long) Math.floor(available), scanners));
         if (scanners == 0) {
             state.blockedState = TerminalState.NO_SCANNER;
@@ -323,7 +300,7 @@ public final class RocketFlightPathCalculator {
         double remaining = SpaceBalance.SCAN_RF;
         for (var segment : state.segments.values()) {
             if (segment.hardware.scanners() == 0) continue;
-            var spent = Math.min(remaining, segment.rf);
+            var spent = Math.min(remaining, segment.rf());
             segment.spendRF(spent);
             remaining -= spent;
             if (remaining <= 0) break;
@@ -367,7 +344,7 @@ public final class RocketFlightPathCalculator {
             state.velocityY = 0;
             state.addSample(PathPhase.COAST, state.currentTarget, action.id());
             if (!sustainable) {
-                var rf = state.segments.values().stream().mapToDouble(segment -> segment.rf).sum();
+                var rf = state.segments.values().stream().mapToDouble(segment -> segment.rf()).sum();
                 var remaining = StationServiceRules.beamRemainingRF(rf, reserve, solar - services, beamOutput, duration * 20);
                 StationServiceRules.forecast(state, duration * 20, state.mass(), true);
                 if (beamOutput > 0) StationServiceRules.limitRF(state, remaining);
@@ -398,7 +375,7 @@ public final class RocketFlightPathCalculator {
             state.time += duration;
             state.addSample(PathPhase.COAST, state.currentTarget, action.id());
         }
-        var storedRF = state.segments.values().stream().mapToDouble(segment -> segment.rf).sum();
+        var storedRF = state.segments.values().stream().mapToDouble(segment -> segment.rf()).sum();
         var beamRemaining = StationServiceRules.beamRemainingRF(storedRF, reserve, -serviceRF, beamOutput, duration * 20);
         state.segments.values().forEach(segment -> {
             if (segment.hardware.chemical() > 0)
@@ -415,14 +392,8 @@ public final class RocketFlightPathCalculator {
     static boolean finishStage(SpaceSimulation.FlightPlanAction navigation, Craft state,
                                Context context) {
 
-        var canAdvance = state.currentStage < context.stageCount;
-        if (!state.stageFinished(context) && !(canAdvance && state.activeSegments(context).isEmpty())) return false;
         var finishedStage = state.currentStage;
-        var detachedBoosters = state.boostersEndingCurrentStage(context);
-        for (var booster : detachedBoosters) disconnectBooster(navigation, booster, state, context, finishedStage);
-        if (!canAdvance) return !detachedBoosters.isEmpty();
-        state.currentStage++;
-        return true;
+        return state.finishStage(context, booster -> disconnectBooster(navigation, booster, state, context, finishedStage));
     }
 
     /**
@@ -470,7 +441,6 @@ public final class RocketFlightPathCalculator {
         // Copy before removing: the detached craft inherits velocity, stage and any anchored asteroid.
         var detached = state.copyFor(Set.of(booster));
         state.removeSegment(booster);
-        if (booster.equals(state.asteroidAnchor)) state.clearAsteroidAttachment();
 
         UUID eventId = boosterEventId(navigation.id(), booster);
         var child = context.branchesByParent.get(eventId);
@@ -544,8 +514,7 @@ public final class RocketFlightPathCalculator {
         }
         var cube = holder.physical.payloads.remove(action.payload());
         holder.physical.layout.put(action.payload(), Blocks.AIR.defaultBlockState());
-        holder.dryMass = Math.max(0, holder.dryMass - RocketLayout.mass(SpaceAgeBlocks.CUBE_SAT.get().defaultBlockState())
-                * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT);
+        holder.refreshLayout();
         state.addSample(PathPhase.COAST, state.currentTarget, action.id());
 
         var child = context.branchesByParent.get(action.id());
@@ -571,7 +540,7 @@ public final class RocketFlightPathCalculator {
     private static void assignChildJobs(Craft craft, UUID childId) {
 
         var previous = craft.craftId;
-        craft.segments.values().forEach(s -> s.crafters.values().forEach(c -> c.reassignOperator(previous, childId)));
+        craft.segments.values().forEach(s -> s.physical.crafters.values().forEach(c -> c.reassignOperator(previous, childId)));
         craft.craftId = childId;
     }
 

@@ -29,9 +29,9 @@ public final class SpaceAgeMenus {
             DeferredRegister.create(Registries.MENU, OritechSpaceAge.MOD_ID);
     public static final Supplier<MenuType<RobotMenu>> ROBOT =
             MENUS.register("robot_arm", () -> IMenuTypeExtension.create(RobotMenu::new));
+
     private SpaceAgeMenus() {
-    }    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
-            MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
+    }
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
@@ -43,11 +43,13 @@ public final class SpaceAgeMenus {
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
         event.register(VACUUM_CRAFTER.get(), VacuumCrafterScreen::new);
         event.register(MISSION_CONTROL.get(), MissionControlScreen::new);
-    }
+    }    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
+            MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
+
+
 
     public static final Supplier<MenuType<MissionControlMenu>> MISSION_CONTROL =
             MENUS.register("mission_control", () -> IMenuTypeExtension.create(MissionControlMenu::new));
-
 
 
     public static final Supplier<MenuType<VacuumCrafterMenu>> VACUUM_CRAFTER =

@@ -34,6 +34,16 @@ public record RocketHardware(int chemical, int ion, int scanners, int antennas) 
         return chemical == 0 ? 0 : resources.fuel() / fuelCost(1);
     }
 
+    public double chemicalThrust() {
+
+        return chemical * SpaceBalance.CHEMICAL_THRUST_NEWTONS;
+    }
+
+    public double ionThrust() {
+
+        return ion * SpaceBalance.ION_THRUST_NEWTONS;
+    }
+
     public double ionSeconds(DynamicRocketSegment resources) {
 
         return ion == 0 ? 0 : resources.rf() / rfCost(1);

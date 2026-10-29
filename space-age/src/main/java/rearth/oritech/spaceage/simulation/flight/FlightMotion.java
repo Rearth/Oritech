@@ -28,6 +28,7 @@ public record FlightMotion(PathSample start, PathSample end) {
     public static State sample(List<PathSample> samples, double time) {
 
         var index = endIndex(samples, time);
+        while (index + 1 < samples.size() && samples.get(index + 1).timeSeconds() <= time) index++;
         var end = samples.get(index);
         if (time > end.timeSeconds()) {
             var seconds = time - end.timeSeconds();
@@ -41,7 +42,10 @@ public record FlightMotion(PathSample start, PathSample end) {
     public static MissionState.Position position(List<PathSample> samples, double time, MissionState.Position previous) {
 
         var index = FlightMotion.endIndex(samples, time);
-        var sample = samples.get(index);
+        // Motion/rates belong to the ending sample; attachment and stage changes happen at their timestamp.
+        var stateIndex = samples.get(index).timeSeconds() > time ? Math.max(0, index - 1) : index;
+        while (stateIndex + 1 < samples.size() && samples.get(stateIndex + 1).timeSeconds() <= time) stateIndex++;
+        var sample = samples.get(stateIndex);
         var motion = FlightMotion.sample(samples, time);
         var hx = motion.vx();
         var hy = motion.vy();

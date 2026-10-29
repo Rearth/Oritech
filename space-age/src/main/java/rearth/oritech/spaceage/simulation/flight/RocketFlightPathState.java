@@ -1,6 +1,5 @@
 package rearth.oritech.spaceage.simulation.flight;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -20,8 +19,8 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.Stat
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.TerminalState;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
-import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.service.StationServiceRules;
@@ -37,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
  * Mutable state used while one flight-plan preview is being compiled.
@@ -97,70 +97,121 @@ public final class RocketFlightPathState {
      */
     public static final class Segment {
 
-        public final Map<BlockPos, RocketControllerState> crafters = new HashMap<>();
-        public final RocketHardware hardware;
-        final double chemicalThrust;
-        final double ionThrust;
-        public double wetMass;
-        public double fuelMass;
+        public final StaticRocketSegment structure;
+        public final DynamicRocketSegment physical;
+        public final double initialRF;
+        public final double initialFuelTicks;
+        public RocketHardware hardware;
         public double dryMass;
         public double payloadEnergy;
-        public double fuelTicks;
-        public StaticRocketSegment structure;
-        public DynamicRocketSegment physical;
-        public double chemicalSeconds;
-        public double ionSeconds;
-        public double rf;
-        public double initialRF;
-        public double initialFuelTicks;
+        double chemicalThrust;
+        double ionThrust;
         int parachutes;
+        private StaticRocketSegment currentStructure;
+
+        public Segment(StaticRocketSegment structure, DynamicRocketSegment resources) {
+
+            this.structure = structure;
+            this.physical = resources.copy();
+            this.initialRF = structure.initialRF();
+            this.initialFuelTicks = structure.initialFuel();
+            refreshLayout();
+        }
 
         public Segment(double mass, double chemicalThrust, double ionThrust, double chemicalSeconds, double ionSeconds,
                        RocketHardware hardware) {
 
-            this.wetMass = mass;
+            this.dryMass = mass;
             this.chemicalThrust = chemicalThrust;
             this.ionThrust = ionThrust;
-            this.chemicalSeconds = chemicalSeconds;
-            this.ionSeconds = ionSeconds;
             this.hardware = hardware;
+            this.structure = null;
+            this.physical = new DynamicRocketSegment((long) Math.ceil(hardware.fuelCost(chemicalSeconds)),
+                    (long) Math.ceil(hardware.rfCost(ionSeconds)), 0, Set.of());
+            this.physical.setResources(hardware.fuelCost(chemicalSeconds), hardware.rfCost(ionSeconds));
+            this.initialRF = physical.rf();
+            this.initialFuelTicks = physical.fuel();
+        }
+
+        private Segment(Segment source, boolean resourcesOnly) {
+
+            structure = source.structure;
+            currentStructure = source.currentStructure;
+            physical = resourcesOnly ? source.physical.copyResources() : source.physical.copy();
+            hardware = source.hardware;
+            chemicalThrust = source.chemicalThrust;
+            ionThrust = source.ionThrust;
+            dryMass = source.dryMass;
+            payloadEnergy = source.payloadEnergy;
+            parachutes = source.parachutes;
+            initialRF = source.initialRF;
+            initialFuelTicks = source.initialFuelTicks;
+        }
+
+        public StaticRocketSegment currentStructure() {
+
+            return currentStructure;
+        }
+
+        public void refreshLayout() {
+
+            var current = RocketLayout.current(structure, physical);
+            currentStructure = current;
+            hardware = RocketHardware.of(current);
+            chemicalThrust = hardware.chemicalThrust();
+            ionThrust = hardware.ionThrust();
+            dryMass = current.staticWeight() * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
+            payloadEnergy = current.payloadEnergyJoules();
+            parachutes = ParachuteLanding.count(current);
+        }
+
+        public double mass() {
+
+            return dryMass + fuelMass();
+        }
+
+        public double fuelMass() {
+
+            return physical.currentFuelWeight * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
+        }
+
+        public double chemicalSeconds() {
+
+            return hardware.chemicalSeconds(physical);
+        }
+
+        public double ionSeconds() {
+
+            return hardware.ionSeconds(physical);
+        }
+
+        public double rf() {
+
+            return physical.rf();
         }
 
         double seconds() {
 
-            return Math.min(chemicalSeconds > BURN_TOLERANCE ? chemicalSeconds : Double.POSITIVE_INFINITY,
-                    ionSeconds > BURN_TOLERANCE ? ionSeconds : Double.POSITIVE_INFINITY);
-        }
-
-        double burnSeconds(double fuelFactor) {
-
-            var seconds = seconds() / fuelFactor;
-            if (ionSeconds <= BURN_TOLERANCE) return seconds;
-            var drain = hardware.rfCost(fuelFactor) + StationServiceRules.antennaRF(hardware, 20);
-            return Math.min(seconds, rf / drain);
+            var chemical = chemicalSeconds();
+            var ion = ionSeconds();
+            return Math.min(chemical > BURN_TOLERANCE ? chemical : Double.POSITIVE_INFINITY,
+                    ion > BURN_TOLERANCE ? ion : Double.POSITIVE_INFINITY);
         }
 
         public double thrust(boolean atmosphere) {
 
-            return (chemicalSeconds > BURN_TOLERANCE ? chemicalThrust : 0)
-                    + (ionSeconds > BURN_TOLERANCE ? ionThrust * (atmosphere ? SpaceBalance.ION_ATMOSPHERE : 1) : 0);
+            return (chemicalSeconds() > BURN_TOLERANCE ? chemicalThrust : 0)
+                    + (ionSeconds() > BURN_TOLERANCE ? ionThrust * (atmosphere ? SpaceBalance.ION_ATMOSPHERE : 1) : 0);
         }
 
         void consumeFuel(double seconds) {
 
-            var previous = chemicalSeconds;
-            chemicalSeconds = Math.max(0, previous - seconds);
-            if (previous > 0) {
-                fuelMass *= chemicalSeconds / previous;
-                fuelTicks *= chemicalSeconds / previous;
-            }
+            physical.consumeFuel(hardware.fuelCost(seconds));
         }
 
         public void consume(double seconds) {
 
-            consumeFuel(seconds);
-            rf = Math.max(0, rf - hardware.rfCost(Math.min(ionSeconds, seconds)));
-            ionSeconds = Math.max(0, ionSeconds - seconds);
+            hardware.burn(physical, seconds);
         }
 
         /**
@@ -168,31 +219,14 @@ public final class RocketFlightPathState {
          */
         public double rfCapacity() {
 
-            return physical == null ? initialRF : physical.rfCapacity;
+            return physical.rfCapacity;
         }
 
         public void spendRF(double amount) {
 
-            rf = Math.max(0, rf - amount);
-            if (hardware.ion() > 0) ionSeconds = Math.min(ionSeconds, rf / hardware.rfCost(1));
+            physical.spendRF(amount);
         }
 
-        Segment copy() {
-
-            var copy = new Segment(wetMass, chemicalThrust, ionThrust, chemicalSeconds, ionSeconds, hardware);
-            copy.structure = structure;
-            copy.physical = physical == null ? null : physical.copy();
-            copy.rf = rf;
-            copy.fuelMass = fuelMass;
-            copy.dryMass = dryMass;
-            copy.payloadEnergy = payloadEnergy;
-            copy.fuelTicks = fuelTicks;
-            copy.parachutes = parachutes;
-            crafters.forEach((pos, cargo) -> copy.crafters.put(pos, cargo.copy()));
-            copy.initialRF = initialRF;
-            copy.initialFuelTicks = initialFuelTicks;
-            return copy;
-        }
     }
 
     /**
@@ -261,13 +295,13 @@ public final class RocketFlightPathState {
         double explosiveEnergy() {
 
             return segments.values().stream().mapToDouble(s -> s.payloadEnergy
-                    + s.fuelTicks * SpaceBalance.FUEL_ENERGY_PER_BURN_TICK).sum();
+                    + s.physical.fuel() * SpaceBalance.FUEL_ENERGY_PER_BURN_TICK).sum();
         }
 
         double rocketMass() {
 
             var mass = 0d;
-            for (var segment : segments.values()) mass += segment.wetMass;
+            for (var segment : segments.values()) mass += segment.mass();
             return mass;
         }
 
@@ -336,6 +370,16 @@ public final class RocketFlightPathState {
             return anyEnding ? endingEmpty : anyBooster && allEmpty;
         }
 
+        boolean finishStage(Context context, Consumer<SpaceSimulation.SegmentRef> detach) {
+
+            var canAdvance = currentStage < context.stageCount;
+            if (!stageFinished(context) && !(canAdvance && activeSegments(context).isEmpty())) return false;
+            var boosters = boostersEndingCurrentStage(context);
+            boosters.forEach(detach);
+            if (canAdvance) currentStage++;
+            return canAdvance || !boosters.isEmpty();
+        }
+
         List<SpaceSimulation.SegmentRef> boostersEndingCurrentStage(Context context) {
 
             return segments.keySet().stream().filter(ref -> {
@@ -358,26 +402,19 @@ public final class RocketFlightPathState {
         RocketBurnProfile burnProfile(Context context) {
 
             // Vacuum rating and a geometry estimate; navigation budgets resources in EventTransfer.
-            var copy = copyFor(Set.copyOf(segments.keySet()));
+            var copy = copyForFlight();
             copy.atmosphere = false;
             var intervals = new ArrayList<RocketBurnProfile.Interval>();
             while (true) {
-                var active = copy.activeSegments(context);
-                if (copy.currentStage < context.stageCount && (copy.stageFinished(context) || active.isEmpty())) {
-                    for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
-                    copy.currentStage++;
-                    continue;
+                while (copy.finishStage(context, copy::removeSegment)) {
                 }
+                var active = copy.activeSegments(context);
                 if (active.isEmpty()) break;
                 var rate = copy.deltaVPerSecond(active);
                 var seconds = active.stream().map(copy.segments::get).mapToDouble(Segment::seconds).min().orElse(0);
                 if (rate <= 0 || seconds <= 0) break;
                 copy.consumeBurnTime(active, seconds);
                 intervals.add(new RocketBurnProfile.Interval(rate, seconds));
-                if (copy.stageFinished(context)) {
-                    for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
-                    copy.currentStage = Math.min(context.stageCount, copy.currentStage + 1);
-                }
             }
             return new RocketBurnProfile(intervals);
         }
@@ -390,6 +427,7 @@ public final class RocketFlightPathState {
         void removeSegment(SpaceSimulation.SegmentRef ref) {
 
             segments.remove(ref);
+            if (ref.equals(asteroidAnchor)) clearAsteroidAttachment();
             for (var neighbour : connections.getOrDefault(ref, Set.of())) {
                 var neighbourConnections = connections.get(neighbour);
                 if (neighbourConnections != null) neighbourConnections.remove(ref);
@@ -413,10 +451,21 @@ public final class RocketFlightPathState {
 
         Craft copyFor(Set<SpaceSimulation.SegmentRef> component) {
 
+            return copyFor(component, false);
+        }
+
+        Craft copyForFlight() {
+
+            return copyFor(segments.keySet(), true);
+        }
+
+        private Craft copyFor(Set<SpaceSimulation.SegmentRef> component, boolean resourcesOnly) {
+
             var copiedSegments = new LinkedHashMap<SpaceSimulation.SegmentRef, Segment>();
             var copiedConnections = new HashMap<SpaceSimulation.SegmentRef, Set<SpaceSimulation.SegmentRef>>();
             for (var ref : component) {
-                copiedSegments.put(ref, segments.get(ref).copy());
+                copiedSegments.put(ref, new Segment(segments.get(ref), resourcesOnly));
+                if (resourcesOnly) continue;
                 var neighbours = new LinkedHashSet<>(connections.getOrDefault(ref, Set.of()));
                 neighbours.retainAll(component);
                 copiedConnections.put(ref, neighbours);

@@ -105,22 +105,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             var selected = menu.fleet.stream().filter(entry -> entry.id().equals(menu.selected)).findFirst().orElse(null);
             if (selected != null) {
                 var telemetry = selected.telemetry();
-                var current = telemetry.plan().currentAction();
-                var currentAction = current == null ? null : current.id();
-                var missionStructureChanged = menu.selectedTelemetry == null
-                        || !Objects.equals(menu.currentAction, currentAction)
-                        || !menu.completed.equals(telemetry.completed())
-                        || menu.connected != selected.connected()
-                        || menu.acceptedPlan != null && !menu.acceptedPlan.equals(telemetry.plan())
-                        || !menu.selectedTelemetry.rocket().getStaticSegments().keySet()
-                        .equals(telemetry.rocket().getStaticSegments().keySet());
-                menu.selectedTelemetry = telemetry;
-                menu.completed = telemetry.completed();
-                menu.currentAction = currentAction;
-                menu.missionStatus = telemetry.status();
-                menu.acceptedPlan = telemetry.plan();
-                menu.knownPosition = telemetry.position();
-                menu.connected = selected.connected();
+                var missionStructureChanged = menu.updateMission(telemetry, selected.connected());
                 if (Minecraft.getInstance().screen instanceof RocketFlightPlannerScreen planner) {
                     planner.receiveLiveMission(new SpaceSimulation.FlightPlannerSnapshot(payload.system(),
                                     telemetry.rocket().getRocketId(), payload.objects(), telemetry.plan(), payload.stations()),

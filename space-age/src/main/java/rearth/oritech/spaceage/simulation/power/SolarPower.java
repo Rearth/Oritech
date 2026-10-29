@@ -16,7 +16,6 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
-import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.util.Geometry;
 
@@ -104,7 +103,7 @@ public final class SolarPower {
     public static List<StaticRocketSegment> structures(RocketFlightPathState.Craft craft) {
 
         return craft.segments.values().stream().filter(segment -> segment.structure != null)
-                .map(segment -> segment.physical == null ? segment.structure : RocketLayout.current(segment.structure, segment.physical)).toList();
+                .map(RocketFlightPathState.Segment::currentStructure).toList();
     }
 
     public static double output(RocketFlightPathState.Craft craft) {

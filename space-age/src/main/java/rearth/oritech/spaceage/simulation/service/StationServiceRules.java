@@ -51,7 +51,7 @@ public final class StationServiceRules {
     public static List<Budget> budgets(RocketFlightPathState.Craft craft) {
 
         return craft.segments.values().stream().map(segment -> new Budget(segment.hardware,
-                segment.chemicalSeconds * segment.hardware.fuelCost(1), segment.rf,
+                segment.physical.fuel(), segment.rf(),
                 segment.initialFuelTicks, segment.initialRF)).toList();
     }
 
@@ -145,9 +145,9 @@ public final class StationServiceRules {
 
     public static void limitRF(RocketFlightPathState.Craft craft, double remaining) {
 
-        var spent = Math.max(0, craft.segments.values().stream().mapToDouble(segment -> segment.rf).sum() - remaining);
+        var spent = Math.max(0, craft.segments.values().stream().mapToDouble(segment -> segment.rf()).sum() - remaining);
         for (var segment : craft.segments.values()) {
-            var debit = Math.min(segment.rf, spent);
+            var debit = Math.min(segment.rf(), spent);
             segment.spendRF(debit);
             spent -= debit;
         }
@@ -225,17 +225,16 @@ public final class StationServiceRules {
         if (ticks <= 0) return true;
         var solar = SolarPower.output(craft);
         if (solar > 0) {
-            var rf = craft.segments.values().stream().mapToDouble(s -> s.rf).sum();
+            var rf = craft.segments.values().stream().mapToDouble(s -> s.rf()).sum();
             var required = craft.segments.values().stream().mapToDouble(s -> antennaRF(s.hardware, ticks)).sum();
             if (rf + (generate ? solar * ticks : 0) < required) return false;
             var remaining = (generate ? solar * ticks : 0) - required;
             for (var segment : craft.segments.values()) {
                 if (remaining >= 0) {
-                    var accepted = Math.min(remaining, Math.max(0, segment.rfCapacity() - segment.rf));
-                    segment.rf += accepted;
+                    var accepted = segment.physical.receiveRF(remaining);
                     remaining -= accepted;
                 } else {
-                    var spent = Math.min(segment.rf, -remaining);
+                    var spent = Math.min(segment.rf(), -remaining);
                     segment.spendRF(spent);
                     remaining += spent;
                 }
@@ -245,14 +244,14 @@ public final class StationServiceRules {
         var thrust = craft.segments.values().stream().mapToDouble(s -> s.thrust(false)).sum();
         if (thrust <= 0) return false;
         var seconds = burnSeconds(thrust, mass, ticks);
-        var available = craft.segments.values().stream().mapToDouble(s -> Math.max(s.chemicalSeconds, s.ionSeconds)).max().orElse(0);
+        var available = craft.segments.values().stream().mapToDouble(s -> Math.max(s.chemicalSeconds(), s.ionSeconds())).max().orElse(0);
         if (available < seconds) return false;
         for (var segment : craft.segments.values()) {
             segment.consume(seconds);
             segment.spendRF(antennaRF(segment.hardware, ticks));
         }
         return craft.segments.values().stream().noneMatch(s -> s.hardware.antennas() > 0)
-                || craft.segments.values().stream().anyMatch(s -> s.hardware.antennas() > 0 && s.rf >= SpaceBalance.ANTENNA_RF);
+                || craft.segments.values().stream().anyMatch(s -> s.hardware.antennas() > 0 && s.rf() >= SpaceBalance.ANTENNA_RF);
     }
 
     public static boolean available(MissionState state) {

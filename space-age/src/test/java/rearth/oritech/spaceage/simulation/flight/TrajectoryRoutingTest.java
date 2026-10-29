@@ -178,8 +178,7 @@ class TrajectoryRoutingTest {
                                 poweredRadio ? 0 : 11590 / acceleration, poweredRadio ? 11590 / acceleration : 0, hardware);
                         if (poweredRadio) {
                             // Keep propulsion and a long coast's radio bill funded independently of ion balance.
-                            segment.rf = hardware.rfCost(segment.ionSeconds) + 2_000_000;
-                            segment.ionSeconds = segment.rf / hardware.rfCost(1);
+                            segment.physical.setResources(0, segment.rf() + 2_000_000);
                         }
                         craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
                         var action = action(mars.id(), 803).withOrbit(OrbitBand.HIGH);
@@ -210,14 +209,14 @@ class TrajectoryRoutingTest {
                     craft.velocityX = 500;
                     var hardware = new RocketHardware(1, 1, 0, antennas);
                     var segment = new RocketFlightPathState.Segment(1000, 1000, 1000, 10_000, ionSeconds, hardware);
-                    segment.rf = hardware.rfCost(segment.ionSeconds);
+
                     craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
                     var success = RocketFlightNavigation.navigate(action(mars.id(), 804).withOrbit(OrbitBand.HIGH)
                             .withMaxSpeed(speedCap), craft, context(earth, mars));
                     assertTrue(success, "ion=" + ionSeconds + " cap=" + speedCap + " antennas=" + antennas
                             + " status=" + craft.blockedState + " speed=" + Math.hypot(craft.velocityX, craft.velocityY));
                     assertEquals(0, Math.hypot(craft.velocityX, craft.velocityY), 1e-6);
-                    assertTrue(segment.chemicalSeconds > 0, "The spare chemical budget remains available after arrival");
+                    assertTrue(segment.chemicalSeconds() > 0, "The spare chemical budget remains available after arrival");
                     assertEquals(mars.id(), craft.currentTarget);
                 }
             }
@@ -239,11 +238,11 @@ class TrajectoryRoutingTest {
         var craft = craft(0, 0);
         var hardware = new RocketHardware(0, 1, 0, 1);
         var segment = new RocketFlightPathState.Segment(1000, 0, 1_000_000, 0, 11.59, hardware);
-        segment.rf = hardware.rfCost(segment.ionSeconds);
+
         craft.segments.put(new SegmentRef(BlockPos.ZERO), segment);
         assertFalse(RocketFlightNavigation.navigate(action(target.id(), 805).withOrbit(OrbitBand.HIGH), craft, context(target)));
         assertEquals(0, craft.time);
-        assertEquals(hardware.rfCost(11.59), segment.rf, 1e-6);
+        assertEquals(hardware.rfCost(11.59), segment.rf(), 1e-6);
         assertNotNull(craft.navigationFailure);
         assertEquals("radio_budget", craft.navigationFailure.reason());
         assertEquals(1, craft.samples.size(), "An impossible power schedule must not draw a completed transfer");
@@ -333,7 +332,7 @@ class TrajectoryRoutingTest {
         assertEquals(0, craft.velocityX, 1e-5);
         assertTrue(craft.samples.stream().noneMatch(sample -> sample.phase() == PathPhase.PARACHUTE));
         assertTrue(context.arrivalPredictions.getLast().parachutes().deltaVReduction() > 0);
-        assertTrue(segment.chemicalSeconds > powered.segments.values().iterator().next().chemicalSeconds,
+        assertTrue(segment.chemicalSeconds() > powered.segments.values().iterator().next().chemicalSeconds(),
                 "parachutes must reduce landing fuel consumption");
     }
 
@@ -610,7 +609,7 @@ class TrajectoryRoutingTest {
 
         var craft = craft(100_000, 0);
         craft.velocityX = -100;
-        craft.segments.values().forEach(s -> s.chemicalSeconds = 0);
+        craft.segments.values().forEach(s -> s.physical.consumeFuel(s.physical.fuel()));
         craft.samples.clear();
         craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
         assertTrue(RocketFlightNavigation.navigate(action(SpaceObjects.EARTH_ID, 8)

@@ -14,6 +14,7 @@ import org.joml.Vector2i;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 
@@ -36,9 +37,9 @@ public final class RocketSimulationController {
     /**
      * @param launchSpeed starting velocity, e.g. from a particle launch ramp. A fast start shortens the visible ascent.
      */
-    public static void launchMissionVisual(ServerLevel level, ActiveRocketData rocket, BlockPos launchPosition, double launchSpeed) {
+    public static void launchMissionVisual(ServerLevel level, ActiveRocketData rocket, FlightPlan plan, BlockPos launchPosition, double launchSpeed) {
 
-        var performance = RocketPerformanceCalculator.calculate(rocket);
+        var performance = RocketPerformanceCalculator.calculate(rocket, plan, 1);
         var ascent = RocketAscent.launch(performance, launchSpeed);
         var ascentSeconds = ascent.secondsTo(ORBIT_HEIGHT_BLOCKS);
         var flight = new RocketFlight(true, null, level.dimension(), performance, launchPosition,

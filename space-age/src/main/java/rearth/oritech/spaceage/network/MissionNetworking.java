@@ -253,7 +253,7 @@ public final class MissionNetworking {
             }
             PacketDistributor.sendToPlayer(player, new RocketNetworking.FlightPlannerPayload(menu.blockPos,
                     new SpaceSimulation.FlightPlannerSnapshot(system.id(), menu.getRocket().getRocketId(), system.createObjectData(), plan,
-                            RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()))));
+                            RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID())), true));
         }
     }
 

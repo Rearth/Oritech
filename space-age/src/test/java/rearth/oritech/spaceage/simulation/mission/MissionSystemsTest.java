@@ -86,6 +86,55 @@ class MissionSystemsTest {
     }
 
     @Test
+    void movingAsteroidCaptureUsesTheSameRelativeSpeedAsThePreview() {
+
+        var system = new SpaceSimulation();
+        var asteroid = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID).findFirst().orElseThrow();
+        system.releaseAsteroid(asteroid.id(), asteroid.x(), asteroid.y(), 100, 0, null);
+        var targetId = asteroid.id();
+        asteroid = system.truth().stream().filter(o -> o.id().equals(targetId)).findFirst().orElseThrow();
+        var knowledge = new SurveyKnowledge();
+        knowledge.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), 1);
+        var craft = rocket(false, 1000, 0);
+        var anchor = SegmentRef.of(craft.getStaticSegments().values().iterator().next());
+        var capture = FlightPlanAction.create(ActionType.CONNECT_ASTEROID).withTarget(asteroid.id()).withSegments(List.of(anchor));
+        for (var speed : new double[]{0, 100}) {
+            var position = new MissionState.Position(asteroid.x() + asteroid.radius(), asteroid.y(), speed, 0,
+                    asteroid.id(), OrbitBand.SURFACE, -1, 1, FlightPlanAction.NO_TARGET, anchor);
+            var mission = new MissionState(OWNER, craft, plan(capture), position, knowledge.copy(), BlockPos.ZERO);
+            var preview = RocketFlightPathCalculator.calculateFrom(craft, system.knownObjects(knowledge), mission.plan, position);
+            assertEquals(speed == 100 ? RocketFlightPathCalculator.TerminalState.READY
+                    : RocketFlightPathCalculator.TerminalState.UNSAFE_ASTEROID_APPROACH, preview.paths().getFirst().terminalState());
+            MissionController.step(null, new MissionSavedData(), mission, system, 0);
+            assertEquals(speed == 100 ? asteroid.id() : FlightPlanAction.NO_TARGET, mission.position.asteroid());
+        }
+    }
+
+    @Test
+    void captureCannotReplaceAnAttachmentOrUseAMissingSegment() {
+
+        var system = new SpaceSimulation();
+        var asteroid = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID).findFirst().orElseThrow();
+        var knowledge = new SurveyKnowledge();
+        knowledge.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), 1);
+        var craft = rocket(false, 1000, 0);
+        var anchor = SegmentRef.of(craft.getStaticSegments().values().iterator().next());
+        var capture = FlightPlanAction.create(ActionType.CONNECT_ASTEROID).withTarget(asteroid.id()).withSegments(List.of(anchor));
+        var position = new MissionState.Position(asteroid.x() + asteroid.radius(), asteroid.y(), 0, 0,
+                asteroid.id(), OrbitBand.SURFACE, -1, 1, FlightPlanAction.NO_TARGET, anchor);
+        var attached = new UUID(789, 1);
+        var mission = new MissionState(OWNER, craft, plan(capture), position.withAttachment(attached, anchor), knowledge.copy(), BlockPos.ZERO);
+        MissionController.step(null, new MissionSavedData(), mission, system, 0);
+        assertEquals(attached, mission.position.asteroid());
+        assertEquals(capture, mission.action());
+        mission = new MissionState(OWNER, craft, plan(capture.withSegments(List.of(new SegmentRef(BlockPos.ZERO.above(999))))),
+                position, knowledge.copy(), BlockPos.ZERO);
+        MissionController.step(null, new MissionSavedData(), mission, system, 0);
+        assertEquals(FlightPlanAction.NO_TARGET, mission.position.asteroid());
+        assertNotNull(mission.action());
+    }
+
+    @Test
     void fixedBodyCollisionMatchesForecastAfterReloadAndProducesTuggableAsteroids() {
 
         var system = new SpaceSimulation();

@@ -17,6 +17,8 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentConfiguration;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathPhase;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.TerminalState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -37,11 +39,72 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class EventTransferTest {
 
     private Map<?, ?> previousSolar;
+
+    @Test
+    void transfersUseTheCurrentSolarLayoutAndBatteryCapacity() {
+
+        var ref = new SegmentRef(BlockPos.ZERO);
+        for (var installed : new boolean[]{true, false}) {
+            var structure = new StaticRocketSegment(new UUID(781, 1), Set.of(
+                    new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()),
+                    new StaticRocketSegment.BlockData(BlockPos.ZERO.above(),
+                            (installed ? Blocks.AIR : Blocks.DAYLIGHT_DETECTOR).defaultBlockState())), Map.of(), 10, 1, 1000, 0);
+            var resources = new DynamicRocketSegment(0, 0, 0, Set.of());
+            resources.rfCapacity = 100;
+            resources.layout.put(BlockPos.ZERO.above(), (installed ? Blocks.DAYLIGHT_DETECTOR : Blocks.AIR).defaultBlockState());
+            var segment = new RocketFlightPathState.Segment(structure, resources);
+            var x = SpaceBalance.SOLAR_REFERENCE_DISTANCE;
+            var craft = new RocketFlightPathState.Craft(new HashMap<>(Map.of(ref, segment)), new HashMap<>(), x, 0, 0);
+            var context = new RocketFlightPathState.Context(Map.of(), Map.of(), Map.of(), 1);
+            var curve = FlightCurve.between(x, 0, x + 10_000, 0, 1, 0, 1, 0, 3000);
+            var events = new EventTransfer(craft, context, curve, 0, 0, 1, 0).solve(Double.POSITIVE_INFINITY, true);
+            if (!installed) {
+                assertNull(events, "A removed panel cannot power an empty ion craft");
+                continue;
+            }
+            assertNotNull(events, "A newly installed panel can power an empty ion craft");
+            assertEquals(0, segment.rf(), "Solver trials do not charge the original craft");
+            var battery = 0d;
+            for (var event : events) {
+                battery -= event.rates().get(ref).rf() * event.seconds();
+                assertTrue(battery <= 100 + 1e-6, "The solver must use current capacity, not launch RF");
+                EventTransfer.apply(craft, event.rates(), event.seconds());
+                assertEquals(battery, segment.rf(), 1e-6);
+            }
+        }
+    }
+
+    @Test
+    void droppingAnAsteroidAnchorRemovesItsMassFromSubsequentEvents() {
+
+        var boosterRef = new SegmentRef(BlockPos.ZERO);
+        var coreRef = new SegmentRef(BlockPos.ZERO.above());
+        var hardware = new RocketHardware(1, 0, 0, 0);
+        var booster = new RocketFlightPathState.Segment(1000, 500_000, 0, 1, 0, hardware);
+        var core = new RocketFlightPathState.Segment(1000, 500_000, 0, 1000, 0, hardware);
+        var craft = new RocketFlightPathState.Craft(new LinkedHashMap<>(Map.of(boosterRef, booster, coreRef, core)),
+                new HashMap<>(), 0, 0, 0);
+        craft.attachedAsteroid = new SpaceObjectData(new UUID(720, 1), SpaceObjects.ObjectType.ASTEROID,
+                0, 0, 0, 0, 10, 0, 100, SpaceObjects.DetectionState.PRECISE, "Attached", List.of());
+        craft.asteroidAnchor = boosterRef;
+        var context = new RocketFlightPathState.Context(Map.of(), Map.of(), Map.of(
+                boosterRef, new SegmentConfiguration(boosterRef, "", true, List.of(1)),
+                coreRef, new SegmentConfiguration(coreRef, "", false, List.of(2))), 2);
+        var curve = FlightCurve.between(0, 0, 10_000, 0, 1, 0, 1, 0, 3000);
+        var events = new EventTransfer(craft, context, curve, 0, 0, 1, 0).solve(Double.POSITIVE_INFINITY, true);
+        assertNotNull(events);
+        var secondStage = events.stream().filter(event -> event.firing().contains(coreRef)).findFirst().orElseThrow();
+        assertEquals(500, (secondStage.endSpeed() - secondStage.initialSpeed()) / secondStage.seconds(), 1e-6);
+        assertEquals(2000 + 100 * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS, craft.mass(),
+                "Solving must leave the source craft and its attachment untouched");
+    }
 
     @BeforeEach
     void solarData() {
@@ -83,7 +146,7 @@ class EventTransferTest {
                 5_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
         var hardware = new RocketHardware(0, 1, 0, 1);
         var segment = new RocketFlightPathState.Segment(1000, 0, 100, 0, 120_900, hardware);
-        segment.rf = hardware.rfCost(segment.ionSeconds);
+
         var craft = new RocketFlightPathState.Craft(new LinkedHashMap<>(Map.of(new SegmentRef(BlockPos.ZERO), segment)),
                 new HashMap<>(), -3_120_000, 0, 0);
         craft.branchId = new UUID(1, 1);

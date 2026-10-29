@@ -58,9 +58,11 @@ final class MissionNavigation {
         var before = state.actionTicks() / 20.0;
         var after = Math.min(path.durationSeconds(), before + 0.05);
         var samples = path.samples();
-        for (int index = 1; index < samples.size(); index++) {
+        splitBoosters(data, state, before, tick);
+        for (int index = Math.max(1, FlightMotion.endIndex(samples, before)); index < samples.size(); index++) {
             var previous = samples.get(index - 1);
             var next = samples.get(index);
+            if (previous.timeSeconds() >= after) break;
             var duration = Math.max(0, Math.min(after, next.timeSeconds()) - Math.max(before, previous.timeSeconds()));
             if (duration <= 0) continue;
             var insufficient = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
@@ -78,15 +80,27 @@ final class MissionNavigation {
                 var rate = next.resourceRates().get(SegmentRef.of(segment));
                 if (rate != null) rate.apply(state.rocket.getDynamicSegments().get(id), duration);
             });
+            var time = Math.min(after, next.timeSeconds());
+            state.position = FlightMotion.position(samples, time, state.position);
+            splitBoosters(data, state, time, tick);
         }
         state.position = FlightMotion.position(samples, after, state.position);
         state.advanceAction();
         state.status = MissionState.STATUS_IN_FLIGHT;
-        for (var event : state.transfer.path.boosterEvents()) {
-            if (!event.branchId().equals(state.plan.root().id()) || event.timeSeconds() > after) continue;
-            var id = state.rocket.getStaticSegments().entrySet().stream().filter(e -> SegmentRef.of(e.getValue()).equals(event.segment())).map(Map.Entry::getKey).findFirst().orElse(null);
-            if (id != null) MissionController.split(data, state, Set.of(id), event.id(), tick);
-        }
         MissionArrival.tick(server, data, state, system, action, path, after);
+    }
+
+    private static void splitBoosters(MissionSavedData data, MissionState state, double time, long tick) {
+
+        for (var event : state.transfer.path.boosterEvents()) {
+            if (!event.branchId().equals(state.plan.root().id()) || event.timeSeconds() > time) continue;
+            var id = state.rocket.getStaticSegments().entrySet().stream().filter(e -> SegmentRef.of(e.getValue()).equals(event.segment())).map(Map.Entry::getKey).findFirst().orElse(null);
+            if (id != null) {
+                var child = MissionController.split(data, state, Set.of(id), event.id(), tick);
+                var p = child.position;
+                child.position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), p.slot(),
+                        event.stage(), p.asteroid(), p.anchor(), p.headingX(), p.headingY());
+            }
+        }
     }
 }

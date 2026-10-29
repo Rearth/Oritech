@@ -49,7 +49,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Edits mission intent while the analytical calculator supplies paths and automatic booster events.
@@ -113,8 +112,6 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private int speedWindowRevision = -1;
     private int recipeRevision = -1;
     private boolean pendingMissionRefresh;
-    // Unsent edits kept while the radio link is down, restored once commands are available again.
-    private SpaceSimulation.FlightPlan disconnectedDraft;
 
     public RocketFlightPlannerScreen(RocketAssemblerMenu menu, Inventory inventory, Component title) {
 
@@ -183,25 +180,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     void refreshCurrentMission(SpaceSimulation.FlightPlannerSnapshot snapshot, boolean commandsAvailable) {
 
-        var edited = hasMissionChanges();
-        if (!commandsAvailable) {
-            if (!isReadOnly() && edited) disconnectedDraft = draftPlan;
-            closeEditorState();
-            draftPlan = snapshot.plan();
-        } else if (disconnectedDraft != null) {
-            draftPlan = disconnectedDraft;
-            disconnectedDraft = null;
-        } else if (!edited) {
-            draftPlan = snapshot.plan();
-        } else if (menu instanceof MissionControlMenu control) {
-            var completed = control.completed.stream().map(SpaceSimulation.FlightPlanAction::id)
-                    .collect(Collectors.toSet());
-            draftPlan = RocketFlightPlanRules.normalize(draftPlan.withBranches(draftPlan.branches().stream()
-                    .map(branch -> branch.withActions(branch.actions().stream()
-                            .filter(action -> !completed.contains(action.id())).toList()))
-                    .toList()));
-        }
-        menu.setDraftFlightPlan(draftPlan);
+        if (!commandsAvailable) closeEditorState();
         menu.setFlightPlannerSnapshot(snapshot);
     }
 
@@ -357,21 +336,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     private boolean hasMissionChanges() {
 
-        if (!(menu instanceof MissionControlMenu control) || control.acceptedPlan == null)
-            return false;
-        return !editableProgram(draftPlan).equals(editableProgram(control.acceptedPlan));
-    }
-
-    private SpaceSimulation.FlightPlan editableProgram(SpaceSimulation.FlightPlan plan) {
-
-        // Derived empty booster branches and already detached segment settings are not user edits.
-        var normalized = RocketFlightPlanRules.normalize(plan);
-        var branches = normalized.branches().stream().map(branch -> branch.withActions(branch.actions().stream()
-                        .filter(action -> !action.isGenerated()).toList()))
-                .filter(branch -> branch.isRoot() || !branch.actions().isEmpty()).toList();
-        var segments = RocketPayloads.planView(flightPlanRocket).getStaticSegments().values().stream().map(SpaceSimulation.SegmentRef::of).toList();
-        return new SpaceSimulation.FlightPlan(branches, plan.segmentConfigurations().stream()
-                .filter(configuration -> segments.contains(configuration.segment())).toList(), plan.name(), plan.category());
+        return menu instanceof MissionControlMenu control && control.hasMissionChanges(draftPlan);
     }
 
     private void updateSendButton() {
@@ -545,7 +510,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         }
 
         if (draftSourceRevision != menu.getFlightPlannerRevision()) {
-            var sharedDraft = menu.getDraftFlightPlan();
+            var sharedDraft = menu instanceof MissionControlMenu control ? control.displayedPlan() : menu.getDraftFlightPlan();
             draftPlan = RocketFlightPlanRules.normalize(sharedDraft == null ? snapshot.plan() : sharedDraft);
             draftSourceRevision = menu.getFlightPlannerRevision();
         }
@@ -646,7 +611,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                 draftPlan, calculatedFlight.boosterEvents());
         if (!synchronizedPlan.equals(draftPlan)) {
             draftPlan = synchronizedPlan;
-            menu.setDraftFlightPlan(draftPlan);
+            if (!isReadOnly()) menu.setDraftFlightPlan(draftPlan);
             calculatedFlight = calculateDraft(snapshot);
         }
         updateValidation();
@@ -691,6 +656,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private void addFlightPlanEditor(ActiveRocketData rocket) {
 
         currentActionLabels.clear();
+        powerTooltipCards.clear();
         flightPlanActionScroll = new FlightPlannerCards(this).build(rocket, editorY, panelWidth, editorHeight,
                 flightPlanActionScrollX, flightPlanActionScrollY);
         addComponent(flightPlanActionScroll);
@@ -946,7 +912,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var refsById = new HashMap<UUID, SpaceSimulation.SegmentRef>();
         view.getStaticSegments().forEach((id, segment) -> refsById.put(id, SpaceSimulation.SegmentRef.of(segment)));
         var pairs = new ArrayList<List<SpaceSimulation.SegmentRef>>();
-        view.getStaticSegments().forEach((id, segment) -> segment.getConnectedSegments().forEach(connected -> {
+        view.getDynamicSegments().forEach((id, segment) -> segment.getConnectedSegments().forEach(connected -> {
             var first = refsById.get(id);
             var second = refsById.get(connected);
             if (first != null && second != null) pairs.add(List.of(first, second));

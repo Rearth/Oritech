@@ -6,14 +6,17 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentConfiguration;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.FlightPath;
 import rearth.oritech.spaceage.simulation.mission.MissionState.Telemetry;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * A transfer's frozen inputs and clock survive reloads; compiled guidance is rebuilt lazily.
@@ -55,7 +58,11 @@ public final class ActiveTransfer {
     MissionForecast.Navigation forecast(FlightPlan plan, Collection<RecipeHolder<VacuumRecipe>> recipes) {
 
         if (!plan.equals(forecastPlan) || forecastRecipes != recipes) {
-            var flight = RocketFlightPathCalculator.calculateFrom(start.rocket(), objects, plan, start.position(), recipes, stations);
+            // Detached stages still existed at the transfer start and must retain their original firing rules.
+            var configurations = new ArrayList<>(plan.segmentConfigurations());
+            var configured = configurations.stream().map(SegmentConfiguration::segment).collect(Collectors.toSet());
+            start.plan().segmentConfigurations().stream().filter(c -> !configured.contains(c.segment())).forEach(configurations::add);
+            var flight = RocketFlightPathCalculator.calculateFrom(start.rocket(), objects, plan.withSegmentConfigurations(configurations), start.position(), recipes, stations);
             forecast = MissionForecast.Navigation.forClient(flight);
             forecastPlan = plan;
             forecastRecipes = recipes;

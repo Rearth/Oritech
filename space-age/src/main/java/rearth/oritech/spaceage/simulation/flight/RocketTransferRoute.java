@@ -159,7 +159,7 @@ public final class RocketTransferRoute {
                 craft.navigationFailure = new NavigationFailure("radio_budget",
                         craft.segments.values().stream().mapToDouble(segment -> segment.hardware.antennas() * SpaceBalance.ANTENNA_RF * 20).sum()
                                 * 2 * Math.sqrt(curve.length() / Math.max(.001, strongest)),
-                        craft.segments.values().stream().mapToDouble(segment -> segment.rf).sum());
+                        craft.segments.values().stream().mapToDouble(segment -> segment.rf()).sum());
             return null;
         }
         var factor = events.stream().filter(event -> event.direction() < 0).mapToDouble(EventTransfer.Event::fuelFactor).findFirst().orElse(1);

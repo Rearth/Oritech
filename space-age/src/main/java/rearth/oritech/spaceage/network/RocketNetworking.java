@@ -15,7 +15,6 @@ import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
-import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerClientController;
@@ -162,7 +161,7 @@ public final class RocketNetworking {
 
     private static void receiveFlightPlanner(FlightPlannerPayload payload, IPayloadContext context) {
 
-        context.enqueueWork(() -> RocketAssemblerClientController.receiveFlightPlanner(payload.position(), payload.snapshot()));
+        context.enqueueWork(() -> RocketAssemblerClientController.receiveFlightPlanner(payload.position(), payload.snapshot(), payload.replaceDraft()));
     }
 
     private static void requestFlightPlanner(RequestFlightPlannerPayload payload, IPayloadContext context) {
@@ -357,9 +356,15 @@ public final class RocketNetworking {
     }
 
     public record FlightPlannerPayload(BlockPos position,
-                                       SpaceSimulation.FlightPlannerSnapshot snapshot) implements CustomPacketPayload {
+                                       SpaceSimulation.FlightPlannerSnapshot snapshot,
+                                       boolean replaceDraft) implements CustomPacketPayload {
 
         public static final Type<FlightPlannerPayload> TYPE = new Type<>(OritechSpaceAge.id("flight_planner"));
+
+        public FlightPlannerPayload(BlockPos position, SpaceSimulation.FlightPlannerSnapshot snapshot) {
+
+            this(position, snapshot, false);
+        }
 
         @Override
         public Type<? extends CustomPacketPayload> type() {

@@ -2,11 +2,11 @@ package rearth.oritech.spaceage.simulation.service;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState.Context;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState.Craft;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState.Segment;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -145,7 +145,7 @@ public final class RocketServiceForecast {
             return processIssue(action, context, "requires_zero_g");
         if (!upkeep(craft, context, elapsed)) return processIssue(action, context, "station_keeping_exhausted");
         context.processingEstimates.add(new RocketFlightPathCalculator.ProcessingEstimate(action.id(), List.copyOf(products), elapsed, totalRF,
-                (long) target.segments.values().stream().mapToDouble(seg -> seg.rf).sum(), timedOut ? "processing_timed_out" : "", target != craft, assignments, skipped));
+                (long) target.segments.values().stream().mapToDouble(seg -> seg.rf()).sum(), timedOut ? "processing_timed_out" : "", target != craft, assignments, skipped));
         craft.x += craft.velocityX * elapsed / 20;
         craft.y += craft.velocityY * elapsed / 20;
         craft.time += elapsed / 20.0;
@@ -160,10 +160,6 @@ public final class RocketServiceForecast {
         var resources = new HashMap<UUID, DynamicRocketSegment>();
         craft.segments.values().forEach(segment -> {
             var r = segment.physical.copy();
-            r.setResources(segment.fuelTicks, segment.rf);
-            r.currentFuelWeight = segment.fuelMass / SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
-            r.crafters.clear();
-            segment.crafters.forEach((pos, c) -> r.crafters.put(pos, c.copy()));
             structures.put(segment.structure.segmentId(), segment.structure);
             resources.put(segment.structure.segmentId(), r);
         });
@@ -173,21 +169,10 @@ public final class RocketServiceForecast {
     private static void apply(Craft craft, ActiveRocketData rocket) {
 
         // Products change mass and explosives as well as resources for the following navigation card.
-        craft.segments.forEach((ref, segment) -> {
+        craft.segments.replaceAll((ref, segment) -> {
             var id = RocketLayout.segmentId(rocket, ref);
             var r = rocket.getDynamicSegments().get(id);
-            segment.physical = r.copy();
-            segment.crafters.clear();
-            r.crafters.forEach((pos, c) -> segment.crafters.put(pos, c.copy()));
-            segment.rf = r.rf();
-            segment.fuelTicks = r.fuel();
-            segment.fuelMass = r.currentFuelWeight * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
-            segment.chemicalSeconds = segment.hardware.chemicalSeconds(r);
-            segment.ionSeconds = segment.hardware.ionSeconds(r);
-            var current = rocket.getStaticSegments().get(id);
-            segment.dryMass = current.staticWeight() * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
-            segment.payloadEnergy = current.payloadEnergyJoules();
-            segment.wetMass = segment.dryMass + segment.fuelMass;
+            return new Segment(segment.structure, r);
         });
     }
 
@@ -230,7 +215,7 @@ public final class RocketServiceForecast {
         if (craft.dockedHost.equals(FlightPlanAction.NO_TARGET)) return false;
         var host = context.stationCraft.get(craft.dockedHost);
         if (host == null) return false;
-        if (host.segments.values().stream().flatMap(seg -> seg.crafters.values().stream()).anyMatch(m -> m.job != null && m.job.source().rocket().equals(craft.craftId)))
+        if (host.segments.values().stream().flatMap(seg -> seg.physical.crafters.values().stream()).anyMatch(m -> m.job != null && m.job.source().rocket().equals(craft.craftId)))
             return false;
         exchange(action, craft, host);
         var claimed = context.claimedPorts.get(craft.dockedHost);

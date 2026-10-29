@@ -30,8 +30,8 @@ final class MissionArrival {
     static void tick(MinecraftServer server, MissionSavedData data, MissionState state, SpaceSimulation system,
                      FlightPlanAction action, CraftPath path, double after) {
 
-        var earthLanding = action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == OrbitBand.SURFACE
-                && state.transfer.path.navigationAborts().stream().noneMatch(abort -> abort.actionId().equals(action.id()));
+        var aborted = state.transfer.path.navigationAborts().stream().anyMatch(abort -> abort.actionId().equals(action.id()));
+        var earthLanding = action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == OrbitBand.SURFACE && !aborted;
         if (earthLanding && server != null && state.transfer.landing == null && path.durationSeconds() - after <= 10) {
             var level = server.overworld();
             if (level.hasChunkAt(new BlockPos(action.landingX(), 0, action.landingZ()))) {
@@ -46,6 +46,12 @@ final class MissionArrival {
         var completed = !path.actionMoments().isEmpty() && path.actionMoments().getLast().completed();
         if (!completed) {
             state.status = MissionState.STATUS_TRANSFER_BLOCKED;
+            return;
+        }
+        if (aborted) {
+            // Completing a condition ends guidance where it stopped, without claiming the destination.
+            state.complete();
+            state.status = MissionState.STATUS_READY;
             return;
         }
         var p = state.position;
@@ -94,7 +100,7 @@ final class MissionArrival {
             if (path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED || Math.hypot(p.vx(), p.vy()) > 12) {
                 var level = server.overworld();
                 var pos = state.transfer.landing;
-                var energy = state.transfer.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID))
+                var energy = state.transfer.path.arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id()))
                         .mapToDouble(a -> a.impact().totalEnergyJoules()).findFirst().orElse(
                                 .5 * RocketPerformanceCalculator.calculate(state.rocket).wetMassKilograms() * (p.vx() * p.vx() + p.vy() * p.vy())
                                         + RocketExplosives.remaining(state.rocket));
@@ -115,6 +121,7 @@ final class MissionArrival {
             state.status = MissionState.STATUS_DESTROYED;
             UUID debrisRegion = null;
             for (var arrival : state.transfer.path.arrivalPredictions()) {
+                if (!arrival.actionId().equals(action.id())) continue;
                 var created = system.applyAsteroidImpact(arrival.targetId(), arrival.impact());
                 if (created != null) debrisRegion = created;
             }
@@ -124,7 +131,7 @@ final class MissionArrival {
             }
         }
         if (earthLanding && state.ended && !p.asteroid().equals(FlightPlanAction.NO_TARGET)) {
-            state.transfer.path.arrivalPredictions().stream().filter(a -> a.targetId().equals(SpaceObjects.EARTH_ID)).findFirst()
+            state.transfer.path.arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id())).findFirst()
                     .ifPresent(arrival -> system.recoverAsteroid(server.overworld(), p.asteroid(), arrival.impact(),
                             state.status.equals(MissionState.STATUS_RECOVERED)
                                     ? RocketRecovery.highestBlockY(state.rocket, state.transfer.landing) : null));

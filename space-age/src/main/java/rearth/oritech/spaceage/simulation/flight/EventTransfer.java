@@ -50,7 +50,7 @@ final class EventTransfer {
         this.efficiency = efficiency;
         this.credit = credit;
         source.segments.forEach((ref, segment) -> solar.put(ref,
-                segment.structure == null ? 0 : SolarPower.rating(List.of(segment.structure)) * 20));
+                segment.structure == null ? 0 : SolarPower.rating(List.of(segment.currentStructure())) * 20));
         this.environment = FlightEnvironment.along(curve, context, source.time, solar.values().stream().anyMatch(value -> value > 0));
     }
 
@@ -59,12 +59,7 @@ final class EventTransfer {
         rates.forEach((ref, rate) -> {
             var segment = craft.segments.get(ref);
             if (segment == null) return;
-            var previousFuelMass = segment.fuelMass;
-            if (segment.hardware.chemical() > 0)
-                segment.consumeFuel(rate.fuel() * seconds / segment.hardware.fuelCost(1));
-            segment.wetMass -= previousFuelMass - segment.fuelMass;
-            segment.rf = Math.max(0, segment.rf - rate.rf() * seconds);
-            segment.ionSeconds = segment.hardware.ion() == 0 ? 0 : segment.rf / segment.hardware.rfCost(1);
+            rate.apply(segment.physical, seconds);
         });
     }
 
@@ -133,7 +128,7 @@ final class EventTransfer {
 
     private Trial trial(double peak, double brakeAt, boolean freeArrival, boolean recording) {
 
-        var craft = source.copyFor(source.segments.keySet());
+        var craft = source.copyForFlight();
         var events = recording ? new ArrayList<Event>() : null;
         var fuelRates = new double[refs.length];
         var rfRates = new double[refs.length];
@@ -149,7 +144,8 @@ final class EventTransfer {
             while (cellIndex + 1 < environment.size() && s >= environment.get(cellIndex).end() - 1e-7) cellIndex++;
             var cell = environment.get(cellIndex);
             if (checkStage) {
-                advanceStage(craft);
+                while (craft.finishStage(context, craft::removeSegment)) {
+                }
                 checkStage = false;
             }
             craft.atmosphere = cell.atmosphere();
@@ -167,13 +163,13 @@ final class EventTransfer {
                 var active = configurations[i].usesEnginesDuring(craft.currentStage);
                 var generation = cell.atmosphere() ? 0 : solar.getOrDefault(ref, 0d) * cell.solar();
                 var radio = StationServiceRules.antennaRF(segment.hardware, 20);
-                var ion = segment.hardware.ion() > 0 && active && direction != 0 && (segment.rf > 1e-7
+                var ion = segment.hardware.ion() > 0 && active && direction != 0 && (segment.rf() > 1e-7
                         || generation >= radio + segment.hardware.rfCost(fuelFactor));
-                var chemical = active && direction != 0 && segment.chemicalSeconds > 1e-8;
+                var chemical = active && direction != 0 && segment.chemicalSeconds() > 1e-8;
                 var fuelRate = chemical ? segment.hardware.fuelCost(fuelFactor) : 0;
                 var rfRate = radio + (ion ? segment.hardware.rfCost(fuelFactor) : 0) - generation;
-                var capacity = Math.max(segment.rfCapacity(), segment.initialRF);
-                if (rfRate > 0 && segment.rf <= 1e-7 || rfRate < 0 && segment.rf >= capacity - 1e-7) rfRate = 0;
+                var capacity = segment.rfCapacity();
+                if (rfRate > 0 && segment.rf() <= 1e-7 || rfRate < 0 && segment.rf() >= capacity - 1e-7) rfRate = 0;
                 if (ion || chemical) {
                     thrust += (chemical ? segment.chemicalThrust : 0)
                             + (ion ? segment.ionThrust * (cell.atmosphere() ? SpaceBalance.ION_ATMOSPHERE : 1) : 0);
@@ -183,14 +179,14 @@ final class EventTransfer {
                 rfRates[i] = rfRate;
                 charging |= rfRate < 0;
                 if (chemical) {
-                    boundarySeconds = Math.min(boundarySeconds, segment.chemicalSeconds / fuelFactor);
+                    boundarySeconds = Math.min(boundarySeconds, segment.chemicalSeconds() / fuelFactor);
                     // Re-evaluate acceleration after appreciable propellant mass changes.
-                    if (segment.fuelMass > mass * .02)
-                        boundarySeconds = Math.min(boundarySeconds, segment.chemicalSeconds / fuelFactor * mass * .02 / segment.fuelMass);
+                    if (segment.fuelMass() > mass * .02)
+                        boundarySeconds = Math.min(boundarySeconds, segment.chemicalSeconds() / fuelFactor * mass * .02 / segment.fuelMass());
                 }
-                if (rfRate > 0) boundarySeconds = Math.min(boundarySeconds, segment.rf / rfRate);
+                if (rfRate > 0) boundarySeconds = Math.min(boundarySeconds, segment.rf() / rfRate);
                 else if (rfRate < 0)
-                    boundarySeconds = Math.min(boundarySeconds, Math.max(0, capacity - segment.rf) / -rfRate);
+                    boundarySeconds = Math.min(boundarySeconds, Math.max(0, capacity - segment.rf()) / -rfRate);
             }
             var engineAcceleration = thrust / mass * efficiency;
             if (engineAcceleration <= 1e-10) direction = 0;
@@ -228,11 +224,7 @@ final class EventTransfer {
                 var segment = craft.segments.get(refs[i]);
                 if (segment == null) continue;
                 var hadThrust = segment.thrust(false) > 0;
-                var previousFuelMass = segment.fuelMass;
-                if (fuelRates[i] > 0) segment.consumeFuel(fuelRates[i] * seconds / segment.hardware.fuelCost(1));
-                segment.wetMass -= previousFuelMass - segment.fuelMass;
-                segment.rf = Math.max(0, segment.rf - rfRates[i] * seconds);
-                segment.ionSeconds = segment.hardware.ion() == 0 ? 0 : segment.rf / segment.hardware.rfCost(1);
+                new FlightResourceRate(fuelRates[i], rfRates[i]).apply(segment.physical, seconds);
                 checkStage |= hadThrust && segment.thrust(false) == 0;
             }
             elapsed += seconds;
@@ -264,15 +256,6 @@ final class EventTransfer {
 
         if (eventLimitReached)
             source.navigationFailure = new NavigationFailure("calculation_limit", MAX_EVENTS, MAX_EVENTS);
-    }
-
-    private void advanceStage(Craft craft) {
-
-        while (craft.stageFinished(context) || craft.currentStage < context.stageCount && craft.activeSegments(context).isEmpty()) {
-            for (var ref : craft.boostersEndingCurrentStage(context)) craft.removeSegment(ref);
-            if (craft.currentStage >= context.stageCount) break;
-            craft.currentStage++;
-        }
     }
 
     record Event(double seconds, double start, double end, double initialSpeed, double endSpeed,

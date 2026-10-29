@@ -1,7 +1,10 @@
 package rearth.oritech.spaceage.simulation.rocket;
 
 import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+
+import java.util.function.Predicate;
 
 /**
  * Calculates the shared performance values used by launch checks and flight previews.
@@ -11,9 +14,18 @@ public final class RocketPerformanceCalculator {
     private RocketPerformanceCalculator() {
     }
 
-    // The overview calls this for the complete rocket, while the path calculator calls it once per segment so
-    // resources cannot move between stages. Supporting both keeps the underlying engine rules identical.
+    // A static rating for the overview and liftoff checks. The flight solver accounts for staging and charging.
     public static RocketPerformance calculate(ActiveRocketData rocket) {
+
+        return calculate(rocket, segment -> true);
+    }
+
+    public static RocketPerformance calculate(ActiveRocketData rocket, FlightPlan plan, int stage) {
+
+        return calculate(rocket, segment -> plan.configurationFor(SegmentRef.of(segment)).usesEnginesDuring(stage));
+    }
+
+    private static RocketPerformance calculate(ActiveRocketData rocket, Predicate<StaticRocketSegment> active) {
 
         double dryMass = 0;
         double fuelMass = 0;
@@ -28,12 +40,13 @@ public final class RocketPerformanceCalculator {
             var hardware = RocketHardware.of(segment);
             var dry = segment.staticWeight() * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
             var fuel = resources.currentFuelWeight * SpaceBalance.KILOGRAMS_PER_WEIGHT_UNIT;
-            var chemicalTime = hardware.chemicalSeconds(resources);
-            var ionTime = hardware.ionSeconds(resources);
-            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS : 0;
-            var ionThrust = ionTime > 0 ? hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS : 0;
             dryMass += dry;
             fuelMass += fuel;
+            if (!active.test(segment)) continue;
+            var chemicalTime = hardware.chemicalSeconds(resources);
+            var ionTime = hardware.ionSeconds(resources);
+            var chemicalThrust = chemicalTime > 0 ? hardware.chemicalThrust() : 0;
+            var ionThrust = ionTime > 0 ? hardware.ionThrust() : 0;
             thrust += chemicalThrust + ionThrust;
             launchThrust += chemicalThrust + ionThrust * SpaceBalance.ION_ATMOSPHERE;
             engines += hardware.chemical() + hardware.ion();
@@ -45,29 +58,9 @@ public final class RocketPerformanceCalculator {
                 mass > 0 ? deltaV / mass : 0, mass > 0 ? launchThrust / mass : 0);
     }
 
-    public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket, SpaceSimulation.FlightPlan plan) {
+    public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket, FlightPlan plan) {
 
-        var all = calculate(rocket);
-        double thrust = 0;
-        double burnSeconds = 0;
-        double deltaV = 0;
-        var engines = 0;
-        for (var entry : rocket.getStaticSegments().entrySet()) {
-            if (!plan.configurationFor(SpaceSimulation.SegmentRef.of(entry.getValue())).usesEnginesDuring(1)) continue;
-            var resources = rocket.getDynamicSegments().get(entry.getKey());
-            var hardware = RocketHardware.of(entry.getValue());
-            var chemicalTime = hardware.chemicalSeconds(resources);
-            var ionTime = hardware.ionSeconds(resources);
-            var chemicalThrust = chemicalTime > 0 ? hardware.chemical() * SpaceBalance.CHEMICAL_THRUST_NEWTONS : 0;
-            var ionThrust = ionTime > 0 ? hardware.ion() * SpaceBalance.ION_THRUST_NEWTONS * SpaceBalance.ION_ATMOSPHERE : 0;
-            engines += hardware.chemical() + hardware.ion();
-            thrust += chemicalThrust + ionThrust;
-            burnSeconds = Math.max(burnSeconds, Math.max(chemicalTime, ionTime));
-            deltaV += chemicalThrust * chemicalTime + ionThrust * ionTime;
-        }
-        var mass = Math.max(1, all.wetMassKilograms());
-        return getLaunchReadiness(new RocketPerformance(all.dryMassKilograms(), all.fuelMassKilograms(), all.wetMassKilograms(),
-                engines, thrust, burnSeconds, deltaV / mass, thrust / mass));
+        return getLaunchReadiness(calculate(rocket, plan, 1));
     }
 
     public static LaunchReadiness getLaunchReadiness(ActiveRocketData rocket) {
@@ -83,13 +76,7 @@ public final class RocketPerformanceCalculator {
             return LaunchReadiness.INSUFFICIENT_THRUST;
         }
 
-        var netAcceleration = performance.liftoffAccelerationMetersPerSecondSquared() - SpaceBalance.STANDARD_GRAVITY;
-        var ascentSeconds = Math.sqrt(2 * SpaceBalance.LAUNCH_ORBIT_HEIGHT_BLOCKS / netAcceleration);
-        var requiredDeltaV = performance.liftoffAccelerationMetersPerSecondSquared() * ascentSeconds;
-        if (performance.availableBurnSeconds() < ascentSeconds
-                || performance.availableDeltaVMetersPerSecond() < requiredDeltaV) {
-            return LaunchReadiness.INSUFFICIENT_FUEL;
-        }
+        // This only checks liftoff. The shared flight compiler validates fuel, staging and arrival.
         return LaunchReadiness.READY;
     }
 
@@ -98,8 +85,7 @@ public final class RocketPerformanceCalculator {
         READY(null),
         NO_ENGINES("Rocket has no engines"),
         NO_MASS("Rocket has no measurable mass"),
-        INSUFFICIENT_THRUST("Rocket does not have enough thrust to lift off"),
-        INSUFFICIENT_FUEL("Rocket does not have enough fuel to reach orbit");
+        INSUFFICIENT_THRUST("Rocket does not have enough thrust to lift off");
 
         private final String failureReason;
 

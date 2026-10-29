@@ -116,6 +116,16 @@ public class DynamicRocketSegment {
                 payloads);
     }
 
+    public DynamicRocketSegment copyResources() {
+
+        // Transfer trials need local resource pools, not layouts, payloads or processing jobs.
+        var copy = new DynamicRocketSegment(0, 0, currentFuelWeight, Set.of());
+        copy.fuelCapacity = fuelCapacity;
+        copy.rfCapacity = rfCapacity;
+        copy.setResources(fuel(), rf());
+        return copy;
+    }
+
     /**
      * Mixed fuels use the same remaining fraction for mass and chemical blast energy.
      */

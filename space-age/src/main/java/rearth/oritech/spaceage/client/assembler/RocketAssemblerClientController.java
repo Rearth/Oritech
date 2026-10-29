@@ -23,13 +23,12 @@ public final class RocketAssemblerClientController {
         }
     }
 
-    public static void receiveFlightPlanner(BlockPos position, SpaceSimulation.FlightPlannerSnapshot snapshot) {
+    public static void receiveFlightPlanner(BlockPos position, SpaceSimulation.FlightPlannerSnapshot snapshot, boolean replaceDraft) {
 
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof RocketAssemblerMenu menu
                 && menu.blockPos.equals(position)) {
-            menu.markDraftFlightPlanSaved();
-            menu.setFlightPlannerSnapshot(snapshot);
+            menu.setFlightPlannerSnapshot(snapshot, replaceDraft);
         }
     }
 

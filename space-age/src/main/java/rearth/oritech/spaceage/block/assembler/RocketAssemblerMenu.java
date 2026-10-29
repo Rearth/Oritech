@@ -101,11 +101,18 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
 
     public void setFlightPlannerSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
 
+        setFlightPlannerSnapshot(snapshot, false);
+    }
+
+    public void setFlightPlannerSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot, boolean replaceDraft) {
+
+        if (rocket == null || !rocket.getRocketId().equals(snapshot.rocketId())) return;
         this.flightPlannerSnapshot = snapshot;
-        if (draftFlightPlan == null || !snapshot.rocketId().equals(draftRocketId) || !draftFlightPlanDirty) {
+        if (replaceDraft || draftFlightPlan == null || !snapshot.rocketId().equals(draftRocketId) || !draftFlightPlanDirty) {
             draftFlightPlan = snapshot.plan();
             draftRocketId = snapshot.rocketId();
-            draftFlightPlanDirty = false;
+            // An explicit card load replaces the draft and must still be saved to this assembler.
+            draftFlightPlanDirty = replaceDraft;
         }
         this.flightPlannerRevision++;
     }

@@ -163,12 +163,12 @@ class TransferFeasibilityTest {
             for (int heading = 0; heading < 8; heading++) {
                 var segment = new Segment(100, 2_000, 1_000, chemicalEndsFirst ? 10 : 20_000,
                         chemicalEndsFirst ? 20_000 : 10, new RocketHardware(1, 1, 0, 0));
-                segment.rf = segment.ionSeconds * 20 * SpaceBalance.ION_RF;
+
                 var craft = craft(0, 0, 1_500, heading * Math.PI / 4, segment);
                 arrives(craft, context(target), action(target, ArrivalVelocityMode.ZERO, 0, 0), target,
                         "engine exhaustion chemicalFirst=" + chemicalEndsFirst + " heading=" + heading);
-                assertEquals(0, chemicalEndsFirst ? segment.chemicalSeconds : segment.ionSeconds, 1e-6);
-                assertTrue(chemicalEndsFirst ? segment.ionSeconds > 0 : segment.chemicalSeconds > 0);
+                assertEquals(0, chemicalEndsFirst ? segment.chemicalSeconds() : segment.ionSeconds(), 1e-6);
+                assertTrue(chemicalEndsFirst ? segment.ionSeconds() > 0 : segment.chemicalSeconds() > 0);
             }
         }
     }

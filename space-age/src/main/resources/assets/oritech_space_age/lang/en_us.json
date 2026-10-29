@@ -780,7 +780,7 @@
   "tooltip.oritech_space_age.cube_sat.mass": "Mass: %s t folded, %s t unfolded",
   "tooltip.oritech_space_age.cube_sat.delta_v": "Delta-V: %s m/s",
   "tooltip.oritech_space_age.cube_sat.thrust_to_weight": "Thrust-to-weight on Earth: %s",
-  "tooltip.oritech_space_age.cube_sat.self_launch": "Can launch on its own",
+  "tooltip.oritech_space_age.cube_sat.self_launch": "Enough thrust for liftoff; check the flight plan for range",
   "tooltip.oritech_space_age.cube_sat.needs_launcher": "Can't launch on its own: build it into a rocket or use a particle launch ramp",
   "tooltip.oritech_space_age.cube_sat.capabilities": "Hardware: %s",
   "tooltip.oritech_space_age.cube_sat.capability.radio": "radio",

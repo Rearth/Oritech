@@ -51,9 +51,7 @@ class RocketResourceAccountingTest {
         var continuous = new DynamicRocketSegment(1_000, 10_000_000, 50, Set.of());
         var live = continuous.copy();
         var preview = new Segment(100, 20, 30, hardware.chemicalSeconds(live), hardware.ionSeconds(live), hardware);
-        preview.fuelMass = 50;
-        preview.fuelTicks = live.fuel();
-        preview.rf = live.rf();
+        preview.physical.currentFuelWeight = live.currentFuelWeight;
         var seconds = .000037;
         for (int i = 0; i < 10_000; i++) {
             hardware.burn(live, seconds);
@@ -65,9 +63,9 @@ class RocketResourceAccountingTest {
         assertEquals(continuous.fuel(), live.fuel(), 1e-7);
         assertEquals(continuous.rf(), live.rf(), 1e-4);
         assertEquals(continuous.currentFuelWeight, live.currentFuelWeight, 1e-7);
-        assertEquals(preview.fuelTicks, live.fuel(), 1e-7);
-        assertEquals(preview.rf, live.rf(), 1e-4);
-        assertEquals(preview.fuelMass, live.currentFuelWeight, 1e-7);
+        assertEquals(preview.physical.fuel(), live.fuel(), 1e-7);
+        assertEquals(preview.rf(), live.rf(), 1e-4);
+        assertEquals(preview.physical.currentFuelWeight, live.currentFuelWeight, 1e-7);
         assertEquals(live.fuel(), live.copy().fuel());
         assertEquals(live.rf(), live.copy().rf());
         assertTrue(live.fuel() < 1_000, "sub-tick burns must still consume fuel");

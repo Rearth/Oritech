@@ -224,7 +224,7 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
         var data = MissionSavedData.get(level.getServer());
         data.craft.put(rocket.getRocketId(), mission);
         data.setDirty();
-        RocketSimulationController.launchMissionVisual(level, rocket, launchPosition(), velocity);
+        RocketSimulationController.launchMissionVisual(level, rocket, mission.plan, launchPosition(), velocity);
         return Outcome.ORBIT;
     }
 

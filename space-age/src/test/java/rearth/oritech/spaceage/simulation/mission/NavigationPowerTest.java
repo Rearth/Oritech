@@ -85,7 +85,7 @@ class NavigationPowerTest {
             }
         } finally {
             if (previous == null) maps.remove(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS);
-            else maps.put(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS, (Map) previous);
+            else maps.put(SpaceAgeDataMaps.SPACE_SOLAR_GENERATORS, previous);
         }
     }
 }

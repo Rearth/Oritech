@@ -9,6 +9,7 @@ import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
+import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.AsteroidDeliveries;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -30,6 +31,7 @@ import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
@@ -83,7 +85,7 @@ public final class MissionController {
         var data = MissionSavedData.get(level.getServer());
         data.craft.put(rocket.getRocketId(), state);
         data.setDirty();
-        RocketSimulationController.launchMissionVisual(level, rocket, launch, speed);
+        RocketSimulationController.launchMissionVisual(level, rocket, plan, launch, speed);
     }
 
     public static MissionState.Position launchPosition(double x, double y, BlockPos launch, double speed) {
@@ -299,7 +301,7 @@ public final class MissionController {
                 .findFirst().orElse(null);
         var alreadyAttached = data.craft.values().stream().anyMatch(other -> other != state && !other.ended
                 && other.owner.equals(state.owner) && other.position.asteroid().equals(action.targetId()));
-        if (alreadyAttached) {
+        if (alreadyAttached || !state.position.asteroid().equals(FlightPlanAction.NO_TARGET)) {
             state.status = MissionState.STATUS_ASTEROID_ATTACHED;
             return;
         }
@@ -307,9 +309,11 @@ public final class MissionController {
             state.status = MissionState.STATUS_PRECISE_REQUIRED;
             return;
         }
-        if (!state.position.target().equals(target.id()) || Math.hypot(state.position.vx(), state.position.vy()) > 12
+        var relativeSpeed = Math.hypot(state.position.vx() - target.velocityX(), state.position.vy() - target.velocityY());
+        if (!state.position.target().equals(target.id()) || !AsteroidImpactRules.canConnectAsteroid(relativeSpeed)
+                || state.position.orbit() != OrbitBand.SURFACE && state.position.orbit() != OrbitBand.TIGHT
                 || Math.hypot(state.position.x() - target.x(), state.position.y() - target.y()) > target.radius() + 1_010
-                || action.segments().isEmpty()) {
+                || action.segments().size() != 1 || RocketLayout.segmentId(state.rocket, action.segments().getFirst()) == null) {
             state.status = MissionState.STATUS_SLOW_APPROACH;
             return;
         }
@@ -405,7 +409,7 @@ public final class MissionController {
         return addon != null && StationServiceRules.conditionReached(StationServiceRules.budgets(state.rocket), addon, 0, state.actionTicks() / 20d);
     }
 
-    static void split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
+    static MissionState split(MissionSavedData data, MissionState state, Set<UUID> detached, UUID action, long tick) {
 
         var childStatic = new HashMap<UUID, StaticRocketSegment>();
         var childDynamic = new HashMap<UUID, DynamicRocketSegment>();
@@ -434,6 +438,7 @@ public final class MissionController {
         state.rocket = parent;
         var parentRefs = planRefs(parent);
         state.plan = state.plan.withSegmentConfigurations(state.plan.segmentConfigurations().stream().filter(c -> parentRefs.contains(c.segment())).toList());
+        return mission;
     }
 
     /**
@@ -576,8 +581,15 @@ public final class MissionController {
         var current = state.action();
         var unchangedCurrent = current != null && !validated.root().actions().isEmpty()
                 && current.equals(validated.root().actions().getFirst());
+        var unchangedGuidance = state.transfer == null || state.plan.root().id().equals(validated.root().id())
+                && state.rocket.getStaticSegments().values().stream().allMatch(segment -> {
+            var ref = SegmentRef.of(segment);
+            var previous = state.plan.configurationFor(ref);
+            var next = validated.configurationFor(ref);
+            return previous.booster() == next.booster() && previous.engineStages().equals(next.engineStages());
+        });
         state.plan = validated;
-        if (!unchangedCurrent || state.navigationBlocked()) state.resetAction();
+        if (!unchangedCurrent || !unchangedGuidance || state.navigationBlocked()) state.resetAction();
         state.status = MissionState.STATUS_UPDATE_ACCEPTED;
         return true;
     }
