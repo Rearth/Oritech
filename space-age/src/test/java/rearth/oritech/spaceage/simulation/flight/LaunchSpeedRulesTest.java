@@ -27,6 +27,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class LaunchSpeedRulesTest {
 
     @Test
+    void windowKeepsLaterWorkingRanges() {
+
+        var window = LaunchSpeedRules.window(30_000, speed -> speed >= 4_000 && speed <= 5_000 || speed >= 12_000);
+        assertEquals(List.of(new LaunchSpeedRules.Range(4_000, 5_000), new LaunchSpeedRules.Range(12_000, Long.MAX_VALUE)), window.ranges());
+        assertEquals(4_000, window.min());
+    }
+
+    @Test
     void laterNavigationCannotChangeTheLaunchWindowOrFirstLeg() {
 
         var id = UUID.randomUUID();

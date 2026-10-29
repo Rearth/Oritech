@@ -75,6 +75,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private RocketFlightPathCalculator.FlightPath calculatedFlight =
             new RocketFlightPathCalculator.FlightPath(List.of(), List.of(), 0);
     private List<RocketFlightPlanRules.Issue> validationIssues = List.of();
+    private SpaceSimulation.FlightPlan calculatedPlan;
+    private int calculatedPreviewRevision = -1;
+    private int calculatedSnapshotRevision = -1;
+    private int calculatedRecipeRevision = -1;
+    private MissionState.Position calculatedPosition;
     // Map widget whose view is retained across component rebuilds.
     private RocketStarMapWidget flightPlanMap;
     // Assembly used to validate and calculate the current draft.
@@ -622,6 +627,13 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private void recalculateAndSynchronize() {
 
         var snapshot = currentDraftSnapshot();
+        var position = menu.launchPosition(snapshot.objects());
+        // Component rebuilds and selection changes do not change a ramp/assembler forecast.
+        if (!(menu instanceof MissionControlMenu) && draftPlan.equals(calculatedPlan)
+                && calculatedPreviewRevision == menu.getPreviewRevision()
+                && calculatedSnapshotRevision == menu.getFlightPlannerRevision()
+                && calculatedRecipeRevision == SpaceAgeClientRecipes.revision
+                && Objects.equals(position, calculatedPosition)) return;
         calculatedFlight = calculateDraft(snapshot);
         var synchronizedPlan = RocketFlightPlanRules.synchronizeBoosterEvents(
                 draftPlan, calculatedFlight.boosterEvents());
@@ -631,6 +643,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             calculatedFlight = calculateDraft(snapshot);
         }
         updateValidation();
+        calculatedPlan = draftPlan;
+        calculatedPreviewRevision = menu.getPreviewRevision();
+        calculatedSnapshotRevision = menu.getFlightPlannerRevision();
+        calculatedRecipeRevision = SpaceAgeClientRecipes.revision;
+        calculatedPosition = position;
     }
 
     private void updateValidation() {
@@ -774,13 +791,18 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     private void refreshFlightPlanner() {
 
+        refreshFlightPlanner(true);
+    }
+
+    private void refreshFlightPlanner(boolean recalculate) {
+
         if (flightPlanRocket == null) return;
         if (flightPlanActionScroll != null) {
             flightPlanActionScrollX = flightPlanActionScroll.getScrollX();
             flightPlanActionScrollY = flightPlanActionScroll.getScrollY();
             removeComponent(flightPlanActionScroll);
         }
-        recalculateAndSynchronize();
+        if (recalculate) recalculateAndSynchronize();
         ensureActiveBranch();
         if (flightPlanMap != null) {
             flightPlanMap.updateFlightPath(currentDraftSnapshot(), calculatedFlight, activeBranchId);
@@ -794,7 +816,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     void selectBranch(UUID branchId) {
 
         activeBranchId = branchId;
-        refreshFlightPlanner();
+        refreshFlightPlanner(false);
     }
 
     @Override

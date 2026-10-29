@@ -18,7 +18,6 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.Proc
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ScanEstimate;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.StationKeepingEstimate;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.TerminalState;
-import rearth.oritech.spaceage.simulation.flight.RocketTransferRoute.Burn;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
@@ -265,7 +264,9 @@ public final class RocketFlightPathState {
 
         double rocketMass() {
 
-            return segments.values().stream().mapToDouble(segment -> segment.wetMass).sum();
+            var mass = 0d;
+            for (var segment : segments.values()) mass += segment.wetMass;
+            return mass;
         }
 
         List<SpaceSimulation.SegmentRef> activeSegments(Context context) {
@@ -315,14 +316,22 @@ public final class RocketFlightPathState {
 
         boolean stageFinished(Context context) {
 
-            var firingBoosters = segments.keySet().stream().filter(ref -> {
-                var configuration = context.configuration(ref);
-                return configuration.booster() && configuration.usesEnginesDuring(currentStage);
-            }).toList();
-            var endingBoosters = firingBoosters.stream()
-                    .filter(ref -> context.configuration(ref).lastEngineStage() == currentStage).toList();
-            if (!endingBoosters.isEmpty()) return endingBoosters.stream().allMatch(this::isEmpty);
-            return !firingBoosters.isEmpty() && firingBoosters.stream().allMatch(this::isEmpty);
+            var anyBooster = false;
+            var anyEnding = false;
+            var allEmpty = true;
+            var endingEmpty = true;
+            for (var entry : segments.entrySet()) {
+                var configuration = context.configuration(entry.getKey());
+                if (!configuration.booster() || !configuration.usesEnginesDuring(currentStage)) continue;
+                anyBooster = true;
+                var empty = entry.getValue().thrust(false) == 0;
+                allEmpty &= empty;
+                if (configuration.lastEngineStage() == currentStage) {
+                    anyEnding = true;
+                    endingEmpty &= empty;
+                }
+            }
+            return anyEnding ? endingEmpty : anyBooster && allEmpty;
         }
 
         List<SpaceSimulation.SegmentRef> boostersEndingCurrentStage(Context context) {
@@ -346,34 +355,11 @@ public final class RocketFlightPathState {
 
         RocketBurnProfile burnProfile(Context context) {
 
-            return burnProfile(context, List.of(), false);
-        }
-
-        RocketBurnProfile navigationBurnProfile(Context context, List<Burn> schedule) {
-
-            return burnProfile(context, schedule, true);
-        }
-
-        private RocketBurnProfile burnProfile(Context context, List<Burn> schedule, boolean radio) {
-
-            // Plan braking against a copy so looking ahead never consumes the real craft.
+            // Vacuum rating and a geometry estimate; navigation budgets resources in EventTransfer.
             var copy = copyFor(Set.copyOf(segments.keySet()));
+            copy.atmosphere = false;
             var intervals = new ArrayList<RocketBurnProfile.Interval>();
-            var phase = 0;
-            var remaining = schedule.isEmpty() ? Double.POSITIVE_INFINITY : schedule.getFirst().seconds();
             while (true) {
-                if (remaining <= BURN_TOLERANCE) {
-                    phase++;
-                    remaining = phase < schedule.size() ? schedule.get(phase).seconds() : Double.POSITIVE_INFINITY;
-                    continue;
-                }
-                var burn = phase < schedule.size() ? schedule.get(phase)
-                        : new Burn(Double.POSITIVE_INFINITY, 1, schedule.isEmpty() ? 1 : schedule.getLast().fuelFactor(), atmosphere);
-                if (!burn.firing()) {
-                    if (radio) copy.spendRadio(remaining);
-                    remaining = 0;
-                    continue;
-                }
                 var active = copy.activeSegments(context);
                 if (copy.currentStage < context.stageCount && (copy.stageFinished(context) || active.isEmpty())) {
                     for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
@@ -382,15 +368,10 @@ public final class RocketFlightPathState {
                 }
                 if (active.isEmpty()) break;
                 var rate = copy.deltaVPerSecond(active);
-                if (rate <= 0) break;
-                var factor = Math.max(1e-9, burn.fuelFactor());
-                var seconds = Math.min(remaining, active.stream().map(copy.segments::get)
-                        .mapToDouble(segment -> radio ? segment.burnSeconds(factor) : segment.seconds() / factor).min().orElse(0));
-                if (seconds <= 0) break;
-                copy.consumeBurnTime(active, seconds * factor);
-                if (radio) copy.spendRadio(seconds);
-                intervals.add(new RocketBurnProfile.Interval(rate, seconds * factor));
-                remaining -= seconds;
+                var seconds = active.stream().map(copy.segments::get).mapToDouble(Segment::seconds).min().orElse(0);
+                if (rate <= 0 || seconds <= 0) break;
+                copy.consumeBurnTime(active, seconds);
+                intervals.add(new RocketBurnProfile.Interval(rate, seconds));
                 if (copy.stageFinished(context)) {
                     for (var ref : copy.boostersEndingCurrentStage(context)) copy.removeSegment(ref);
                     copy.currentStage = Math.min(context.stageCount, copy.currentStage + 1);

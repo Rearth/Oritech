@@ -12,6 +12,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.LongPredicate;
@@ -86,7 +87,7 @@ public final class LaunchSpeedRules {
     }
 
     /**
-     * The lowest sampled range for which the first leg flies. Narrow ranges between samples may be missed.
+     * All sampled ranges for which the first leg flies. Narrow ranges between samples may be missed.
      */
     public static Window window(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket, List<SpaceSimulation.SpaceObjectData> objects,
                                 Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
@@ -98,38 +99,48 @@ public final class LaunchSpeedRules {
 
         var samples = new boolean[WINDOW_SAMPLES + 1];
         for (int i = 0; i <= WINDOW_SAMPLES; i++) samples[i] = valid.test(cap * i / WINDOW_SAMPLES);
-        var first = -1;
-        for (int i = 0; i <= WINDOW_SAMPLES && first < 0; i++) if (samples[i]) first = i;
-        if (first < 0) return null;
-        var last = first;
-        while (last < WINDOW_SAMPLES && samples[last + 1]) last++;
-
-        var min = cap * first / WINDOW_SAMPLES;
-        if (first > 0) {
-            var low = cap * (first - 1) / WINDOW_SAMPLES;
-            for (int i = 0; i < WINDOW_REFINEMENTS && min - low > 1; i++) {
-                var middle = (low + min) / 2;
-                if (valid.test(middle)) min = middle;
-                else low = middle;
+        var ranges = new ArrayList<Range>();
+        for (int first = 0; first <= WINDOW_SAMPLES; first++) {
+            if (!samples[first]) continue;
+            var last = first;
+            while (last < WINDOW_SAMPLES && samples[last + 1]) last++;
+            var min = cap * first / WINDOW_SAMPLES;
+            if (first > 0) {
+                var low = cap * (first - 1) / WINDOW_SAMPLES;
+                for (int i = 0; i < WINDOW_REFINEMENTS && min - low > 1; i++) {
+                    var middle = (low + min) / 2;
+                    if (valid.test(middle)) min = middle;
+                    else low = middle;
+                }
             }
-        }
-        var max = Long.MAX_VALUE;
-        if (last < WINDOW_SAMPLES) {
-            max = cap * last / WINDOW_SAMPLES;
-            var high = cap * (last + 1) / WINDOW_SAMPLES;
-            for (int i = 0; i < WINDOW_REFINEMENTS && high - max > 1; i++) {
-                var middle = (max + high) / 2;
-                if (valid.test(middle)) max = middle;
-                else high = middle;
+            var max = Long.MAX_VALUE;
+            if (last < WINDOW_SAMPLES) {
+                max = cap * last / WINDOW_SAMPLES;
+                var high = cap * (last + 1) / WINDOW_SAMPLES;
+                for (int i = 0; i < WINDOW_REFINEMENTS && high - max > 1; i++) {
+                    var middle = (max + high) / 2;
+                    if (valid.test(middle)) max = middle;
+                    else high = middle;
+                }
             }
+            ranges.add(new Range(min, max));
+            first = last;
         }
-        return new Window(min, max);
+        return ranges.isEmpty() ? null : new Window(ranges.getFirst().min(), ranges.getFirst().max(), List.copyOf(ranges));
     }
 
     /**
      * @param max Long.MAX_VALUE when the first leg still works at the velocity cap
      */
-    public record Window(long min, long max) {
+    public record Window(long min, long max, List<Range> ranges) {
 
+        public Window(long min, long max) {
+
+            this(min, max, List.of(new Range(min, max)));
+        }
+
+    }
+
+    public record Range(long min, long max) {
     }
 }

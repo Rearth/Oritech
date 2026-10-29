@@ -48,7 +48,7 @@ public final class RocketFlightPathTest {
 
     private static void ready(RocketFlightPathCalculator.CraftPath path) {
 
-        require(!path.terminalState().isFailure(), "route failed: " + path.terminalState());
+        require(!path.terminalState().isFailure(), "route failed: " + path.terminalState() + " " + path.failure());
     }
 
     private static void require(boolean condition, String message) {
@@ -456,8 +456,8 @@ public final class RocketFlightPathTest {
                 new SpaceSimulation.SegmentConfiguration(SpaceSimulation.SegmentRef.of(booster), "Booster", true, List.of(1))));
         // This regression exercises vacuum braking across a booster burnout, independently of ascent.
         var angle = Math.atan2(1_500_000, 8_000_000);
-        var start = new MissionState.Position(-3_000_000 + Math.cos(angle) * 70_000, Math.sin(angle) * 70_000,
-                0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.LOW, 0, 1,
+        var start = new MissionState.Position(-3_000_000 + Math.cos(angle) * 120_000, Math.sin(angle) * 120_000,
+                0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.HIGH, 0, 1,
                 SpaceSimulation.FlightPlanAction.NO_TARGET, new SpaceSimulation.SegmentRef(BlockPos.ZERO));
         var result = RocketFlightPathCalculator.calculateFrom(rocket, objects, plan, start);
         var path = result.paths().getFirst();

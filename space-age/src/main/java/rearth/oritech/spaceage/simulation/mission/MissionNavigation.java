@@ -8,8 +8,6 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.flight.FlightMotion;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
-import rearth.oritech.spaceage.simulation.flight.RocketFlightPathState;
-import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,26 +61,20 @@ final class MissionNavigation {
             var next = samples.get(index);
             var duration = Math.max(0, Math.min(after, next.timeSeconds()) - Math.max(before, previous.timeSeconds()));
             if (duration <= 0) continue;
-            var brakingFuelFactor = next.phase() == RocketFlightPathCalculator.PathPhase.BRAKE
-                    ? state.transfer.path.arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id()))
-                            .mapToDouble(a -> a.parachutes().brakingFuelFactor()).findFirst().orElse(1) : 1;
-            var burnSeconds = duration * brakingFuelFactor;
-            var depleted = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
-                var h = RocketHardware.of(entry.getValue());
-                var r = state.rocket.getDynamicSegments().get(entry.getKey());
-                // Mixed segments keep firing their chemical engines after the planned ion burnout.
-                return next.firingSegments().contains(SegmentRef.of(entry.getValue())) && h.ion() > 0
-                        && h.chemicalSeconds(r) <= RocketFlightPathState.BURN_TOLERANCE && r.rf() + 1e-7 < h.rfCost(burnSeconds)
-                        && state.transfer.start.rocket().getDynamicSegments().get(entry.getKey()).rf() > 0;
+            var insufficient = state.rocket.getStaticSegments().entrySet().stream().anyMatch(entry -> {
+                var rate = next.resourceRates().get(SegmentRef.of(entry.getValue()));
+                var resources = state.rocket.getDynamicSegments().get(entry.getKey());
+                return rate != null && (resources.fuel() + 1e-6 < rate.fuel() * duration
+                        || resources.rf() + 1e-6 < rate.rf() * duration);
             });
-            if (depleted) {
+            if (insufficient) {
                 state.resetAction();
                 state.status = MissionState.STATUS_REPLANNING;
                 return;
             }
             state.rocket.getStaticSegments().forEach((id, segment) -> {
-                if (next.firingSegments().contains(SegmentRef.of(segment)))
-                    RocketHardware.of(segment).burn(state.rocket.getDynamicSegments().get(id), burnSeconds);
+                var rate = next.resourceRates().get(SegmentRef.of(segment));
+                if (rate != null) rate.apply(state.rocket.getDynamicSegments().get(id), duration);
             });
         }
         state.position = FlightMotion.position(samples, after, state.position);

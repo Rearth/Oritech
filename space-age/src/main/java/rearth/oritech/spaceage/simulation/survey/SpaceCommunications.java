@@ -32,7 +32,8 @@ public final class SpaceCommunications {
         var installed = craft.rocket.hardware().values().stream().mapToInt(RocketHardware::antennas).sum();
         var stored = craft.rocket.getDynamicSegments().values().stream().mapToDouble(DynamicRocketSegment::rf).sum();
         var available = (int) Math.min(installed, stored / SpaceBalance.ANTENNA_RF);
-        if (consume) SolarPower.spend(craft.rocket, available * SpaceBalance.ANTENNA_RF);
+        if (consume && (craft.action() == null || craft.action().type() != SpaceSimulation.ActionType.NAVIGATE_TO))
+            SolarPower.spend(craft.rocket, available * SpaceBalance.ANTENNA_RF);
         return available;
     }
 

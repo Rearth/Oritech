@@ -119,7 +119,7 @@ class TrajectoryRoutingTest {
         assertNotNull(route);
         assertNull(craft.navigationFailure);
         assertTrue(route.duration() < SpaceBalance.MAX_TRANSFER_SECONDS);
-        assertEquals(0, route.gravity(), 1e-12, "Both endpoints are outside the celestial gravity fields");
+        assertEquals(0, RocketTransferRoute.gravityForLeg(context, route.curve(), 0), 1e-12, "Both endpoints are outside the celestial gravity fields");
     }
 
     @Test
@@ -146,12 +146,12 @@ class TrajectoryRoutingTest {
         var arrival = action(sun.id(), 802).withOrbit(OrbitBand.SOLAR);
         var route = RocketTransferRoute.solve(craft, context, arrival, sun, -500_000, 0);
         assertNotNull(route, "Even a 0.001 m/s² craft can stop at the collector ring with enough propulsion/time");
-        assertEquals(0, route.gravity(), 1e-12);
+        assertEquals(0, RocketTransferRoute.gravityForLeg(context, route.curve(), 0), 1e-12);
         assertNull(craft.navigationFailure);
         craft.x = -500_000;
         var departure = RocketTransferRoute.solve(craft, context, arrival, sun, -1_000_000, 0);
         assertNotNull(departure, "Departures and rendezvous routes also use the same zero-Sun-gravity region");
-        assertEquals(0, departure.gravity(), 1e-12);
+        assertEquals(0, RocketTransferRoute.gravityForLeg(context, departure.curve(), 0), 1e-12);
         assertNull(RocketTransferRoute.solve(craft, context, arrival.withOrbit(OrbitBand.SURFACE), sun, -250_000, 0),
                 "The collector ring exemption does not make a low-thrust Sun-surface landing safe");
         assertEquals("braking_thrust", craft.navigationFailure.reason());
@@ -385,7 +385,7 @@ class TrajectoryRoutingTest {
         var vacuumStoppingDistance = arrivalSpeed * arrivalSpeed / (2 * 12 * landing.efficiency());
         assertTrue(landing.curve().length() < vacuumStoppingDistance * 1.5,
                 "a long loop must not pay surface gravity over its entire braking distance");
-        assertTrue(landing.gravity() < 1,
+        assertTrue(RocketTransferRoute.gravityForLeg(context, landing.curve(), 0) < 1,
                 "gravity work is bounded by the difference in endpoint potential");
         assertTrue(RocketFlightNavigation.navigate(action(earth.id(), 153), craft, context));
         assertEquals(0, Math.hypot(craft.velocityX, craft.velocityY), 1e-5);
@@ -477,8 +477,9 @@ class TrajectoryRoutingTest {
         var action = action(earth.id(), 30).withOrbit(OrbitBand.LOW);
         var route = RocketTransferRoute.solve(craft, context, action, earth, 160_000, 0);
         assertNotNull(route);
-        assertEquals(-2.943, route.gravity(), .001);
-        assertTrue(route.burns().getFirst().seconds() > route.burns().getLast().seconds() * 1.5,
+        assertEquals(-2.943, RocketTransferRoute.gravityForLeg(context, route.curve(), 0), .001);
+        assertTrue(route.events().stream().filter(event -> event.direction() > 0).mapToDouble(EventTransfer.Event::seconds).sum()
+                > route.events().stream().filter(event -> event.direction() < 0).mapToDouble(EventTransfer.Event::seconds).sum() * 1.5,
                 "gravity must lengthen outward acceleration and assist final braking");
 
         var weakProfile = new RocketBurnProfile(List.of(new RocketBurnProfile.Interval(9, 10_000)));
@@ -560,6 +561,7 @@ class TrajectoryRoutingTest {
         craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
         craft.advance(false, 0, 0, 0, List.of(), 5);
         craft.addSample(PathPhase.COAST, FlightPlanAction.NO_TARGET, FlightPlanAction.NO_TARGET);
+        craft.samples.set(1, craft.samples.get(1).withResourceRates(Map.of(new SegmentRef(BlockPos.ZERO), new FlightResourceRate(2.5, -10.25))));
         var path = craft.toPath(TerminalState.READY, context);
         var asteroid = new AsteroidPath(new UUID(9, 9), List.of(new MotionSample(5, 50, 0, 10), new MotionSample(10, 100, 0, 10)), null, 0);
         var estimate = new ProcessingEstimate(new UUID(8, 8), List.of(Identifier.parse("minecraft:gold_ingot")), 100, 400000, 1200000, "", true);

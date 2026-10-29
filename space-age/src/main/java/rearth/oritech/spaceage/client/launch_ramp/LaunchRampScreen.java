@@ -106,6 +106,9 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         var window = menu.speedWindow;
         if (!menu.speedWindowKnown) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.computing");
         if (window == null) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.unreachable").withStyle(ChatFormatting.DARK_RED);
+        if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
+                String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
+                        ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
         if (window.min() == 0 && window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.free");
         if (window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.chip.open", number(window.min()));
         return Component.translatable("screen.oritech_space_age.launch_ramp.chip.window", number(window.min()), number(window.max()));
@@ -220,6 +223,9 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         var window = menu.speedWindow;
         if (menu.pattern().isEmpty() || !menu.speedWindowKnown) return windowSummary(menu);
         if (window == null) return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.maxUsefulSpeed()));
+        if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
+                String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
+                        ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
         if (window.min() == 0 && window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.window_free");
         if (window.max() == Long.MAX_VALUE) return Component.translatable("screen.oritech_space_age.launch_ramp.window_open", number(window.min()));
         return Component.translatable("screen.oritech_space_age.launch_ramp.window", number(window.min()), number(window.max()));

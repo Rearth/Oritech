@@ -28,6 +28,8 @@ public final class SpaceBalance {
     public static final long ION_RF = 20;
     /** Fraction of ion vacuum thrust available on atmospheric legs, with unchanged RF use. */
     public static final double ION_ATMOSPHERE = 0.1;
+    /** Height of Earth's atmosphere in map metres, independent of orbit destinations. */
+    public static final double ATMOSPHERE_HEIGHT = 10_000;
     /** Braking delta-v credit in m/s per parachute at the reference mass; reduces landing fuel/RF use. */
     public static final double PARACHUTE_DELTA_V = 200;
     /** Reference rocket mass in kg for parachute credit; credit scales inversely with actual mass. */

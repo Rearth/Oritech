@@ -654,7 +654,23 @@ public final class RocketFlightPathCalculator {
     public record PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
                              double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
                              int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
-                             Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
+                             Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId,
+                             Map<SpaceSimulation.SegmentRef, FlightResourceRate> resourceRates) {
+
+        public PathSample(double timeSeconds, double x, double y, double speedMetersPerSecond,
+                          double velocityX, double velocityY, PathPhase phase, UUID targetId, UUID actionId,
+                          int stage, Set<SpaceSimulation.SegmentRef> connectedSegments,
+                          Set<SpaceSimulation.SegmentRef> firingSegments, UUID attachedAsteroidId) {
+
+            this(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase, targetId, actionId,
+                    stage, connectedSegments, firingSegments, attachedAsteroidId, Map.of());
+        }
+
+        public PathSample withResourceRates(Map<SpaceSimulation.SegmentRef, FlightResourceRate> rates) {
+
+            return new PathSample(timeSeconds, x, y, speedMetersPerSecond, velocityX, velocityY, phase,
+                    targetId, actionId, stage, connectedSegments, firingSegments, attachedAsteroidId, rates);
+        }
 
         public static final Codec<PathSample> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.DOUBLE.fieldOf("timeSeconds").forGetter(PathSample::timeSeconds),
@@ -669,7 +685,8 @@ public final class RocketFlightPathCalculator {
                 Codec.INT.fieldOf("stage").forGetter(PathSample::stage),
                 SEGMENT_SET_CODEC.fieldOf("connectedSegments").forGetter(PathSample::connectedSegments),
                 SEGMENT_SET_CODEC.fieldOf("firingSegments").forGetter(PathSample::firingSegments),
-                UUIDUtil.STRING_CODEC.fieldOf("attachedAsteroidId").forGetter(PathSample::attachedAsteroidId)
+                UUIDUtil.STRING_CODEC.fieldOf("attachedAsteroidId").forGetter(PathSample::attachedAsteroidId),
+                FlightResourceRate.MAP_CODEC.fieldOf("resourceRates").forGetter(PathSample::resourceRates)
         ).apply(i, PathSample::new));
 
     }
