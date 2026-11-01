@@ -99,8 +99,7 @@ final class RocketFlightNavigation {
             // Empty stages are valid when a saved plan is reused on a smaller rocket.
         }
 
-        var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target),
-                action.orbit(), destinationAngle);
+        var destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
         var startTime = craft.time;
         var approachX = destination.x - craft.x;
         var approachY = destination.y - craft.y;
@@ -127,7 +126,7 @@ final class RocketFlightNavigation {
         targetVelocityY = target.velocityY() + end.vy();
         samples.add(craft.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
         for (var event : route.events()) {
-            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
+            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
             var abort = navigationAbort(action, craft, destination, transferPlan, context);
             if (abort != null) {
                 appendSamples(craft, samples);
@@ -155,7 +154,7 @@ final class RocketFlightNavigation {
             craft.headingY = heading.vy();
             var phase = event.direction() > 0 ? PathPhase.ACCELERATE : event.direction() < 0 ? PathPhase.BRAKE : PathPhase.COAST;
             samples.add(craft.createSample(phase, action.targetId(), action.id(), event.firing()).withResourceRates(event.rates()));
-            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
+            destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
             if (seconds < event.seconds()) {
                 appendSamples(craft, samples);
                 var stopped = navigationAbort(action, craft, destination, transferPlan, context);
@@ -172,7 +171,7 @@ final class RocketFlightNavigation {
             }
         }
         craft.atmosphere = false;
-        destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.navigationRadius(target), action.orbit(), destinationAngle);
+        destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
         if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, route))
             return true;
         return fail(craft, samples, TerminalState.NO_FEASIBLE_TRANSFER);
@@ -315,9 +314,8 @@ final class RocketFlightNavigation {
         return (new Random(seed).nextDouble() * 2 - 1) * SpaceBalance.TARGET_ANGLE_SPREAD;
     }
 
-    private static Point targetPoint(double x, double y, double radius, SpaceSimulation.OrbitBand orbit, double angle) {
+    private static Point targetPoint(double x, double y, double orbitRadius, double angle) {
 
-        var orbitRadius = radius + orbit.altitude();
         return new Point(x + Math.cos(angle) * orbitRadius, y + Math.sin(angle) * orbitRadius);
     }
 

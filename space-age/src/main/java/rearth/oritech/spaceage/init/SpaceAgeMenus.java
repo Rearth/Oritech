@@ -43,7 +43,9 @@ public final class SpaceAgeMenus {
         event.register(ROCKET_ASSEMBLER.get(), RocketAssemblerScreen::new);
         event.register(VACUUM_CRAFTER.get(), VacuumCrafterScreen::new);
         event.register(MISSION_CONTROL.get(), MissionControlScreen::new);
-    }    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
+    }
+
+    public static final Supplier<MenuType<RocketAssemblerMenu>> ROCKET_ASSEMBLER =
             MENUS.register("rocket_assembler", () -> IMenuTypeExtension.create(RocketAssemblerMenu::new));
 
 

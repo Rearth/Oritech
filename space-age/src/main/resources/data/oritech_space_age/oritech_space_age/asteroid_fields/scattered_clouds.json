@@ -1,0 +1,77 @@
+{
+  "layout": {
+    "type": "scattered_clouds",
+    "center": {
+      "x": 0,
+      "y": 0
+    },
+    "radius": 150000,
+    "region_count": 10,
+    "distance": {
+      "min": 3500000,
+      "max": 9500000
+    }
+  },
+  "asteroids_per_region": {
+    "min": 6,
+    "max": 6
+  },
+  "asteroid_types": [
+    {
+      "type": "oritech_space_age:ferrous",
+      "weight": 20
+    },
+    {
+      "type": "oritech_space_age:copper_rich",
+      "weight": 12
+    },
+    {
+      "type": "oritech_space_age:carbonaceous",
+      "weight": 8
+    },
+    {
+      "type": "oritech_space_age:gold_rich",
+      "weight": 8
+    },
+    {
+      "type": "oritech_space_age:redstone_rich",
+      "weight": 8
+    },
+    {
+      "type": "oritech_space_age:lapis_rich",
+      "weight": 8
+    },
+    {
+      "type": "oritech_space_age:gemstone",
+      "weight": 7
+    },
+    {
+      "type": "oritech_space_age:quartz_rich",
+      "weight": 7
+    },
+    {
+      "type": "oritech_space_age:metallic",
+      "weight": 10
+    },
+    {
+      "type": "oritech_space_age:radioactive",
+      "weight": 6
+    },
+    {
+      "type": "oritech_space_age:exotic",
+      "weight": 3
+    },
+    {
+      "type": "oritech_space_age:arcane",
+      "weight": 3
+    }
+  ],
+  "grouping": {
+    "groups_per_region": {
+      "min": 2,
+      "max": 3
+    },
+    "spread": 50000,
+    "type_selection": "per_group"
+  }
+}

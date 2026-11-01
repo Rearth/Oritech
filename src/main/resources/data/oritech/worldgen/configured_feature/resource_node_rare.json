@@ -20,28 +20,6 @@
       },
       {
         "block": "oritech:platinum_resource_node"
-      },
-      {
-        "block": "oritech:iridium_resource_node",
-        "required": false,
-        "requiresAny": [
-          "alltheores:deepslate_iridium_ore",
-          "ftbmaterials:iridium_deepslate_ore"
-        ]
-      },
-      {
-        "block": "oritech:tungsten_resource_node",
-        "required": false,
-        "requiresAny": [
-          "ftbmaterials:tungsten_deepslate_ore"
-        ]
-      },
-      {
-        "block": "oritech:titanium_resource_node",
-        "required": false,
-        "requiresAny": [
-          "ftbmaterials:titanium_deepslate_ore"
-        ]
       }
     ],
     "boulderOres": [
@@ -60,22 +38,6 @@
       },
       {
         "block": "oritech:deepslate_uranium_ore"
-      },
-      {
-        "block": "alltheores:deepslate_iridium_ore",
-        "required": false
-      },
-      {
-        "block": "ftbmaterials:iridium_deepslate_ore",
-        "required": false
-      },
-      {
-        "block": "ftbmaterials:tungsten_deepslate_ore",
-        "required": false
-      },
-      {
-        "block": "ftbmaterials:titanium_deepslate_ore",
-        "required": false
       },
       {
         "block": "minecraft:deepslate",

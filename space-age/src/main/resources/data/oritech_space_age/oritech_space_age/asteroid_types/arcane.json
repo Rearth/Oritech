@@ -1,0 +1,25 @@
+{
+  "volume": {
+    "min": 50000,
+    "max": 250000
+  },
+  "materials": [
+    {
+      "block": "oritech_space_age:superdense_quartz_ore",
+      "weight": 25
+    },
+    {
+      "block": "minecraft:amethyst_block",
+      "weight": 30
+    },
+    {
+      "block": "minecraft:prismarine",
+      "weight": 25
+    },
+    {
+      "block": "minecraft:deepslate",
+      "weight": 20
+    }
+  ],
+  "surface_gravity": 0
+}

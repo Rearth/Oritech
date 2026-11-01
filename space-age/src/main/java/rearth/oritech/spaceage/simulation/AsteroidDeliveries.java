@@ -56,7 +56,7 @@ public final class AsteroidDeliveries extends SavedData {
         // This query is deliberately after the explosion. Controlled deliveries instead clear the restored rocket.
         y = landingBottom(level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), rocketTop);
         if (impact.recoverableMaterials().isEmpty()) return;
-        jobs.add(new Job(new BlockPos(x, y, z), level.getRandom().nextLong(), impact.recoverableMaterials(),
+        jobs.add(new Job(new BlockPos(x, y, z), AsteroidShape.volume(impact.recoverableMaterials()), impact.recoverableMaterials(),
                 impact.recoverableMaterials(), 0, 0, 0, Math.max(1, level.getMaxY() - y + 1)));
         setDirty();
     }

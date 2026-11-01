@@ -41,9 +41,11 @@ class SpaceSimulationPersistenceTest {
         var simulation = new SpaceSimulation();
         for (var asteroid : simulation.truth()) {
             if (asteroid.type() != SpaceObjects.ObjectType.ASTEROID) continue;
-            var ore = asteroid.materials().stream().filter(material -> material.block().getPath().endsWith("_ore"))
+            var total = asteroid.materials().stream().mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
+            var filler = asteroid.materials().stream().filter(material -> List.of("stone", "deepslate").contains(material.block().getPath()))
                     .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
-            assertTrue(ore >= 10_000 && ore <= 50_000);
+            assertTrue(total >= 50_000 && total <= 250_000);
+            assertEquals(.8, (double) (total - filler) / total, .0001);
             assertEquals(DenseOres.mass(asteroid.materials()), asteroid.mass());
             assertTrue(asteroid.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS >= 50_000_000);
         }

@@ -70,14 +70,18 @@ public class SpaceObjects {
                         .forGetter(object -> object instanceof MovableSimulatedObject movable ? movable.velocity.y : 0F),
                 AsteroidMaterial.CODEC.listOf().optionalFieldOf("materials", List.of())
                         .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of()),
-                SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null))
-        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing) -> {
+                SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null)),
+                Codec.FLOAT.optionalFieldOf("survey_half_angle", 0F).forGetter(object -> object.surveyHalfAngle),
+                Identifier.CODEC.optionalFieldOf("source_field").forGetter(object -> Optional.ofNullable(object.sourceField))
+        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing, surveyHalfAngle, sourceField) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
             object.radius = radius;
             object.surfaceGravity = gravity;
             object.currentState = detection;
             object.name = name;
+            object.surveyHalfAngle = surveyHalfAngle;
+            object.sourceField = sourceField.orElse(null);
             if (object instanceof MovableSimulatedObject movable) {
                 movable.weight = weight;
                 movable.velocity = new Vector2f(velocityX, velocityY);
@@ -93,6 +97,9 @@ public class SpaceObjects {
         public final ObjectType type;
         public Vector2f currentPosition;
         public float radius;
+        // Positive for an annular survey sector; zero keeps the ordinary circular cloud.
+        public float surveyHalfAngle;
+        public Identifier sourceField;
         public float surfaceGravity;
         public String name = "";
         public DetectionState currentState = DetectionState.HIDDEN;
@@ -132,7 +139,7 @@ public class SpaceObjects {
             this(UUID.randomUUID());
         }
 
-        private Asteroid(UUID id) {
+        public Asteroid(UUID id) {
 
             super(id, ObjectType.ASTEROID);
         }

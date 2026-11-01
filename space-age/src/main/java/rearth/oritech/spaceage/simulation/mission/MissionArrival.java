@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.Level;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
@@ -79,8 +80,8 @@ final class MissionArrival {
         if (slot >= 0) {
             var angle = Math.PI + slot * Math.PI * 2 / SpaceBalance.slots(action.targetId(), action.orbit());
             var body = system.truth().stream().filter(o -> o.id().equals(action.targetId())).findFirst().orElseThrow();
-            px = body.x() + Math.cos(angle) * (body.radius() + action.orbit().altitude());
-            py = body.y() + Math.sin(angle) * (body.radius() + action.orbit().altitude());
+            px = body.x() + Math.cos(angle) * SurveyRules.orbitRadius(body, action.orbit());
+            py = body.y() + Math.sin(angle) * SurveyRules.orbitRadius(body, action.orbit());
         }
         state.position = p.placed(px, py, p.vx(), p.vy(), action.targetId(), action.orbit(), slot);
         if (earthLanding) {

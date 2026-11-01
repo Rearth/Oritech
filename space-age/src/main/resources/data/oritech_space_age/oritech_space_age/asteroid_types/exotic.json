@@ -1,0 +1,25 @@
+{
+  "volume": {
+    "min": 50000,
+    "max": 250000
+  },
+  "materials": [
+    {
+      "block": "oritech_space_age:superdense_ancient_debris_ore",
+      "weight": 25
+    },
+    {
+      "block": "minecraft:crying_obsidian",
+      "weight": 25
+    },
+    {
+      "block": "minecraft:glowstone",
+      "weight": 30
+    },
+    {
+      "block": "minecraft:stone",
+      "weight": 20
+    }
+  ],
+  "surface_gravity": 0
+}

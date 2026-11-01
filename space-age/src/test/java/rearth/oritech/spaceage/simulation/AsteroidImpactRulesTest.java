@@ -109,7 +109,7 @@ class AsteroidImpactRulesTest {
         assertTrue(chipped.fragmentCount() >= 2 && chipped.fragmentCount() <= 4);
         assertTrue(chipped.remainingTargetMass() > asteroid.mass() * 0.75f);
 
-        var breakup = AsteroidImpactRules.predictArrival(20_000, asteroid, 1_000, null, action);
+        var breakup = AsteroidImpactRules.predictArrival(20_000, asteroid, 3_000, null, action);
         assertEquals(AsteroidImpactRules.FragmentationMode.CATASTROPHIC, breakup.fragmentationMode());
         assertTrue(breakup.fragmentCount() >= 4 && breakup.fragmentCount() <= 8);
         assertEquals(0, breakup.remainingTargetMass());

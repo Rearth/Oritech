@@ -185,6 +185,7 @@ public final class RocketNetworking {
 
     public static void sendFlightPlanner(ServerPlayer player, RocketAssemblerMenu menu) {
 
+        FleetCategoryNetworking.send(player);
         var rocket = menu.getRocket();
         if (rocket == null) return;
         var snapshot = SpaceSimulationSavedData.getForPlayer(player)

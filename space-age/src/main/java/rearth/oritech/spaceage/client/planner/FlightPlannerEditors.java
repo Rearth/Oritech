@@ -586,8 +586,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
 
         var action = findAction(actionId);
         if (action == null || !action.addons().isEmpty()) return;
-        var addon = SpaceSimulation.ActionAddon.create(action.type().stationKeeping()
-                ? SpaceSimulation.ActionAddonType.LOW_RF
+        var addon = SpaceSimulation.ActionAddon.create(action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION ? SpaceSimulation.ActionAddonType.DURATION
+                : action.type().stationKeeping() ? SpaceSimulation.ActionAddonType.LOW_RF
                 : SpaceSimulation.ActionAddonType.DISTANCE_FROM_TARGET);
         replaceAction(branchId, actionId, action.withAddons(List.of(addon)), rocket);
         addonAction = actionId;

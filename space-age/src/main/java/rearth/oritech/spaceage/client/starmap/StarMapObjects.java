@@ -154,6 +154,12 @@ final class StarMapObjects {
         return intersects(viewport, center.x(), center.y(), radiusX, radiusX * StarMapCamera.PLANE_TILT);
     }
 
+    // Icon enlargement never changes physical size; orbit stand-off is defined separately in SurveyRules.
+    static double displayRadius(SpaceSimulation.SpaceObjectData object) {
+
+        return SurveyRules.boundingRadius(object) * (object.type() == SpaceObjects.ObjectType.ASTEROID ? 80 : 1);
+    }
+
     private static float iconSize(Entry object, StarMapCamera camera) {
 
         var diameterScale = switch (object.data.type()) {
@@ -161,7 +167,7 @@ final class StarMapObjects {
             case ASTEROID -> 1.3;
             default -> 2;
         };
-        return (float) (object.data.radius() * camera.zoom() * diameterScale);
+        return (float) (displayRadius(object.data) * camera.zoom() * diameterScale);
     }
 
     void setFleetMarkers(Set<UUID> craftIds) {
@@ -202,7 +208,7 @@ final class StarMapObjects {
     private void connectFog() {
 
         fogBridges.clear();
-        var regions = objects.stream().map(Entry::data).filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION).toList();
+        var regions = objects.stream().map(Entry::data).filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION && !SurveyRules.beltSegment(o)).toList();
         for (int a = 0; a < regions.size(); a++)
             for (int b = a + 1; b < regions.size(); b++) {
                 var first = regions.get(a);
@@ -255,6 +261,17 @@ final class StarMapObjects {
         }
         for (var object : objects) {
             if (isPlanet(object.data.type())) continue;
+            if (SurveyRules.beltSegment(object.data)) {
+                var radius = object.data.radius() * camera.zoom();
+                if (radius < 2) continue;
+                for (var point : SurveyRules.fogCenters(object.data)) {
+                    var center = project(camera, viewport, point.x(), point.y());
+                    if (intersects(viewport, center.x(), center.y(), radius, radius * StarMapCamera.PLANE_TILT))
+                        discs.add(new StarMapObjectRenderer.Disc(center.x(), center.y(), radius, radius * StarMapCamera.PLANE_TILT,
+                                0x487F858D, 0x007F858D, circleSegments(radius)));
+                }
+                continue;
+            }
             if (object.data.radius() * camera.zoom() < 2) continue;
             var center = project(camera, viewport, x(object), y(object));
             var color = switch (object.data.type()) {
@@ -307,7 +324,16 @@ final class StarMapObjects {
                 var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id())
                         && selectedTarget.orbit() == SpaceSimulation.OrbitBand.SURFACE;
                 if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION && !selected) continue;
-                addCircle(lines, camera, viewport, objectX, objectY, SurveyRules.navigationRadius(object.data),
+                if (SurveyRules.beltSegment(object.data)) {
+                    var outline = SurveyRules.outline(object.data);
+                    for (var i = 0; i < outline.size(); i++) {
+                        var a = outline.get(i);
+                        var b = outline.get((i + 1) % outline.size());
+                        var from = project(camera, viewport, a.x(), a.y());
+                        var to = project(camera, viewport, b.x(), b.y());
+                        lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), 0xDDF6C65B, 1.25f));
+                    }
+                } else addCircle(lines, camera, viewport, objectX, objectY, SurveyRules.navigationRadius(object.data),
                         selected ? 0xDDF6C65B : 0x997C93A6, selected ? 1.25f : 0.8f);
             }
         }
@@ -319,7 +345,7 @@ final class StarMapObjects {
             var objectY = y(object);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
                 if (band == SpaceSimulation.OrbitBand.SURFACE) continue;
-                var radius = object.data.radius() + band.altitude();
+                var radius = SurveyRules.orbitRadius(object.data, band);
                 if (radius * camera.zoom() < 18) continue;
                 var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id()) && selectedTarget.orbit() == band;
                 addCircle(lines, camera, viewport, objectX, objectY, radius,
@@ -405,6 +431,12 @@ final class StarMapObjects {
                 continue;
             }
             if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
+                if (SurveyRules.beltSegment(object.data)) {
+                    var world = camera.unproject(mouseX, mouseY, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+                    if (pointerInViewport && hovered == null && SurveyRules.surveyDistance(object.data, world.x(), world.y()) <= 3 / camera.zoom())
+                        hovered = object;
+                    continue;
+                }
                 var radiusX = Math.max(5, object.data.radius() * camera.zoom());
                 var dx = (mouseX - position.x()) / radiusX;
                 var dy = (mouseY - position.y()) / (radiusX * StarMapCamera.PLANE_TILT);
@@ -465,7 +497,7 @@ final class StarMapObjects {
             var angle = Math.atan2(offsetY, offsetX);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
                 if (band == SpaceSimulation.OrbitBand.SURFACE) continue;
-                var radius = object.data.radius() + band.altitude();
+                var radius = SurveyRules.orbitRadius(object.data, band);
                 if (radius * camera.zoom() < 18) continue;
                 if (!circleIntersects(viewport, camera, x(object), y(object), radius)) continue;
                 var ring = project(camera, viewport, x(object) + Math.cos(angle) * radius, y(object) + Math.sin(angle) * radius);
@@ -495,7 +527,9 @@ final class StarMapObjects {
 
         var object = byId(selection.objectId());
         if (object == null) return List.of();
-        var radius = SurveyRules.navigationRadius(object.data) + selection.orbit().altitude();
+        if (SurveyRules.beltSegment(object.data))
+            return SurveyRules.outline(object.data).stream().map(point -> new StarMapCamera.Point(point.x(), point.y())).toList();
+        var radius = Math.max(displayRadius(object.data), SurveyRules.orbitRadius(object.data, selection.orbit()));
         var centerX = x(object);
         var centerY = y(object);
         return List.of(new StarMapCamera.Point(centerX - radius, centerY),

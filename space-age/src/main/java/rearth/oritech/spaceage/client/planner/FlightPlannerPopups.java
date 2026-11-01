@@ -14,7 +14,7 @@ import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
-import rearth.oritech.spaceage.client.mission_control.FleetCategories;
+import rearth.oritech.spaceage.simulation.FleetCategories;
 import rearth.oritech.spaceage.client.planner.FlightPlannerEditors.NumberKind;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -142,7 +142,8 @@ final class FlightPlannerPopups {
             case SCAN -> 2;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
-            case MAINTAIN_POSITION, DISCARD_CRAFT -> 1;
+            case MAINTAIN_POSITION -> action.addons().isEmpty() ? 2 : 3;
+            case DISCARD_CRAFT -> 1;
             case BEAM_POWER -> action.targetId().equals(SpaceObjects.EARTH_ID) ? 4 : 3;
             case PROCESS -> 7;
             case DOCK -> 9;
@@ -152,7 +153,13 @@ final class FlightPlannerPopups {
         var popupWidth = Math.min(380, editors.panelWidth() - 12);
         var beamStats = action.type() == SpaceSimulation.ActionType.BEAM_POWER
                 ? FlightPlannerLabels.beamPreview(action, editors.hardwareFor(action), editors.currentDraftSnapshot(), editors.calculatedFlight()) : List.<Component>of();
-        var statsHeight = beamStats.stream().mapToInt(line -> font.split(line, popupWidth - 20).size() * font.lineHeight + 4).sum();
+        var stats = new ArrayList<>(beamStats);
+        if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+            stats.addAll(FlightPlannerLabels.stationKeepingDetails(FlightPlannerLabels.stationKeepingEstimate(editors.calculatedFlight(), action.id())));
+            stats.add(FlightPlannerLabels.stationKeepingContinuation(action,
+                    branch.actions().stream().skip(branch.actions().indexOf(action) + 1L).anyMatch(next -> !next.isGenerated())));
+        }
+        var statsHeight = stats.stream().mapToInt(line -> font.split(line, popupWidth - 20).size() * font.lineHeight + 4).sum();
         var rowSpacing = Math.clamp((editors.panelHeight() - 68 - statsHeight) / Math.max(1, settingCount), 18, 25);
         var popupHeight = 56 + settingCount * rowSpacing + statsHeight;
         var px = (editors.panelWidth() - popupWidth) / 2;
@@ -174,6 +181,43 @@ final class FlightPlannerPopups {
                 .withTooltip(FlightPlannerLabels.actionTooltip(action.type())).withZIndex(CONTROL_Z));
         rowY += rowSpacing;
 
+        if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+            for (var line : stats) {
+                var height = font.split(line, popupWidth - 20).size() * font.lineHeight;
+                editors.addPopupComponent(new LabelWidget(px + 10, rowY, popupWidth - 20, height, line)
+                        .withBrightColor().withWrap(true)
+                        .withTooltip(Component.translatable("screen.oritech_space_age.action.hold_rates_help")).withZIndex(CONTROL_Z));
+                rowY += height + 4;
+            }
+            var width = (popupWidth - 24) / 2;
+            var hold = SpaceAgeButtons.panel(px + 10, rowY - 4, width, 18,
+                    Component.translatable("screen.oritech_space_age.action.hold_indefinitely"), ignored -> {
+                        editors.removeNavigationAddon(branch.id(), action.id(), editors.flightPlanRocket());
+                        editors.openActionEditor(action.id());
+                    });
+            selectListButton(hold, action.addons().isEmpty());
+            editors.addPopupComponent(hold.withZIndex(CONTROL_Z));
+            var resume = SpaceAgeButtons.panel(px + 14 + width, rowY - 4, width, 18,
+                    Component.translatable("screen.oritech_space_age.action.continue_when"), ignored -> {
+                        if (action.addons().isEmpty()) editors.addNavigationAddon(branch.id(), action.id(), editors.flightPlanRocket());
+                        else editors.openAddonEditor(action.id());
+                    });
+            var hardware = editors.hardwareFor(action);
+            var computer = NavigationComputerRules.computers(hardware, NavigationComputerRules.allSegments(hardware)) > 0;
+            selectListButton(resume, !action.addons().isEmpty());
+            if (!computer) {
+                resume.setActive(false);
+                resume.withTooltip(Component.translatable("screen.oritech_space_age.validation.computer_required"));
+            }
+            editors.addPopupComponent(resume.withZIndex(CONTROL_Z));
+            rowY += rowSpacing;
+            if (!action.addons().isEmpty()) {
+                editors.addPopupComponent(SpaceAgeButtons.panel(px + 10, rowY - 4, popupWidth - 20, 18,
+                        FlightPlannerLabels.stationKeepingMode(action), ignored -> editors.openAddonEditor(action.id()))
+                        .withZIndex(CONTROL_Z));
+                rowY += rowSpacing;
+            }
+        }
         if (action.type() == SpaceSimulation.ActionType.BEAM_POWER) {
             for (var line : beamStats) {
                 var lineHeight = font.split(line, popupWidth - 20).size() * font.lineHeight;

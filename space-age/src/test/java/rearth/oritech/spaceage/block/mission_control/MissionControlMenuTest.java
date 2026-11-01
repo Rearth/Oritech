@@ -1,6 +1,11 @@
 package rearth.oritech.spaceage.block.mission_control;
 
 import net.minecraft.core.BlockPos;
+import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.survey.SpaceCommunications.NetworkStatus;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
@@ -32,6 +37,24 @@ class MissionControlMenuTest {
 
         menu.updateMission(new MissionState.Telemetry(rocket, program, MissionState.Position.surface(), 0,
                 MissionState.STATUS_READY, List.of(completed), 0), connected);
+    }
+
+    @Test
+    void firstEmptyFleetSnapshotCreatesTheMapWithoutPoweredAntennas() {
+
+        var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                SpaceObjects.EARTH_X, 0, SpaceObjects.EARTH_RADIUS, 9.81F, SpaceObjects.DetectionState.PRECISE);
+        var payload = new MissionNetworking.FleetPayload(List.of(), UUID.randomUUID(), List.of(earth),
+                0, 1, new NetworkStatus(0, 0, 0, 0), List.of(), List.of());
+        menu.receiveFleet(payload, 0);
+        assertEquals(1, menu.fleetRevision, "Initial system data must rebuild the screen even when fleet/network counts stay zero");
+        assertEquals(List.of(earth), menu.fleetSnapshot.objects());
+        assertEquals(payload.system(), menu.fleetSnapshot.simulationId());
+        menu.receiveFleet(payload, 20);
+        assertEquals(1, menu.fleetRevision, "Unchanged polls do not repeatedly rebuild the map");
+        menu.receiveFleet(new MissionNetworking.FleetPayload(List.of(), UUID.randomUUID(), List.of(earth),
+                0, 1, payload.network(), List.of(), List.of()), 40);
+        assertEquals(2, menu.fleetRevision, "A different world/simulation also rebuilds the map");
     }
 
     @Test

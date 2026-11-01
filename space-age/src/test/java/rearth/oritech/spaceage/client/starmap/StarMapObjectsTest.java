@@ -2,6 +2,10 @@ package rearth.oritech.spaceage.client.starmap;
 
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.item.Items;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import rearth.oritech.spaceage.simulation.DenseOres;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -18,6 +22,48 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class StarMapObjectsTest {
+
+    @Test
+    void asteroidMapEnlargementDoesNotChangePhysicalRadiusOrSizeTooltip() {
+
+        var asteroid = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
+                0, 0, 0, 0, 4_000, 0, 1, SpaceObjects.DetectionState.PRECISE, "Asteroid", List.of(
+                new SpaceObjects.AsteroidMaterial(DenseOres.Family.IRON.id(), 50_000)));
+        var physicalRadius = asteroid.radius();
+        assertTrue(StarMapObjects.displayRadius(asteroid) > physicalRadius * 10);
+        assertEquals(physicalRadius, asteroid.radius());
+        var lines = StarMapTooltip.build(null, asteroid, null, null, null, SpaceSimulation.FlightPlan.empty(),
+                Map.of(), Map.of(), ignored -> null);
+        var keys = lines.stream().map(line -> line.getContents()).filter(TranslatableContents.class::isInstance)
+                .map(TranslatableContents.class::cast).map(TranslatableContents::getKey).toList();
+        assertTrue(keys.contains("screen.oritech_space_age.object.physical_size"));
+        assertFalse(keys.contains("screen.oritech_space_age.object.radius"));
+    }
+
+    @Test
+    void physicalAsteroidHasVisibleSelectableTightOrbitOutsideItsIcon() {
+
+        var asteroid = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
+                0, 0, 0, 0, 4_000, 0, 1, SpaceObjects.DetectionState.PRECISE, "Asteroid", List.of(
+                new SpaceObjects.AsteroidMaterial(DenseOres.Family.IRON.id(), 50_000)));
+        Items.FIREWORK_ROCKET.builtInRegistryHolder().bindComponents(DataComponentMap.EMPTY);
+        Items.ENDER_EYE.builtInRegistryHolder().bindComponents(DataComponentMap.EMPTY);
+        var objects = new StarMapObjects();
+        objects.setSnapshot(new SpaceSimulation.FlightPlannerSnapshot(UUID.randomUUID(), UUID.randomUUID(),
+                List.of(asteroid), SpaceSimulation.FlightPlan.empty()));
+        var viewport = new StarMapObjects.Viewport(0, 0, 320, 200);
+        var camera = new StarMapCamera();
+        var selection = new RocketStarMapWidget.NavigationSelection(asteroid.id(), OrbitBand.TIGHT);
+        camera.fit(objects.focusPoints(selection), 0, 0, viewport.width(), viewport.height());
+        var radius = SurveyRules.orbitRadius(asteroid, OrbitBand.TIGHT);
+        assertTrue(radius > StarMapObjects.displayRadius(asteroid));
+        assertEquals(asteroid.radius(), SurveyRules.orbitRadius(asteroid, OrbitBand.SURFACE));
+        var lines = new ArrayList<StarMapLineRenderer.Line>();
+        objects.addReferenceLines(lines, camera, viewport, selection, objects.visibleIcons(camera, viewport, Set.of()));
+        assertFalse(lines.isEmpty());
+        var ring = camera.project(radius, 0, 0, 0, viewport.width(), viewport.height());
+        assertEquals(selection, objects.findHoveredOrbit(ring.x(), ring.y(), camera, viewport, null));
+    }
 
     @Test
     void offscreenSunStillHasVisibleAndSelectableCollectorOrbit() {

@@ -6,6 +6,8 @@ import net.minecraft.network.chat.Component;
 import rearth.oritech.spaceage.simulation.SpaceGravity;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.AsteroidShape;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 
 import java.util.ArrayList;
@@ -93,7 +95,15 @@ final class StarMapTooltip {
             lines.add(Component.translatable("screen.oritech_space_age.object.arrival_position",
                     String.format(Locale.ROOT, "%.2f", arrival.timeSeconds() / 1_200), format(object.x()), format(object.y())));
         }
-        lines.add(Component.translatable("screen.oritech_space_age.object.radius", format(object.radius())));
+        if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
+            if (AsteroidShape.volume(object.materials()) > 0) {
+                var size = AsteroidShape.size(object.materials());
+                lines.add(Component.translatable("screen.oritech_space_age.object.physical_size", size.width(), size.height(), size.depth()));
+            }
+        } else if (SurveyRules.beltSegment(object)) {
+            lines.add(Component.translatable("screen.oritech_space_age.object.survey_strip",
+                    format(Math.hypot(object.x(), object.y()) * object.surveyHalfAngle() * 2), format(object.radius() * 2)));
+        } else lines.add(Component.translatable("screen.oritech_space_age.object.radius", format(object.radius())));
         if (object.type() == SpaceObjects.ObjectType.SURVEY_REGION) {
             lines.add(Component.translatable("screen.oritech_space_age.object.unsurveyed_help"));
         }
@@ -137,7 +147,7 @@ final class StarMapTooltip {
 
     private static double gravityAtOrbit(SpaceSimulation.SpaceObjectData object, SpaceSimulation.OrbitBand orbit) {
 
-        var distance = object.radius() + orbit.altitude();
+        var distance = SurveyRules.orbitRadius(object, orbit);
         if (distance <= 0) return 0;
         return SpaceGravity.acceleration(object, distance);
     }

@@ -1,5 +1,10 @@
 package rearth.oritech.spaceage.simulation;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import rearth.oritech.spaceage.simulation.SpaceObjects.AsteroidMaterial;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -9,7 +14,47 @@ import java.util.List;
  */
 public final class AsteroidShape {
 
+    private static final LoadingCache<Integer, Size> SIZES = CacheBuilder.newBuilder().maximumSize(4096)
+            .build(new CacheLoader<>() {
+                @Override
+                public Size load(Integer volume) {
+
+                    return measure(columns(volume, volume));
+                }
+            });
+
     private AsteroidShape() {
+    }
+
+    public static int volume(List<AsteroidMaterial> materials) {
+
+        return materials.stream().mapToInt(material -> Math.max(0, material.amount())).sum();
+    }
+
+    /** Volume also seeds the shape, so forecasts, tooltips and normal delivery agree without extra saved fields. */
+    public static Size size(List<AsteroidMaterial> materials) {
+
+        return SIZES.getUnchecked(volume(materials));
+    }
+
+    public static Size measure(List<Column> columns) {
+
+        if (columns.isEmpty()) return new Size(0, 0, 0, 0);
+        var minX = columns.stream().mapToInt(Column::x).min().orElseThrow();
+        var maxX = columns.stream().mapToInt(Column::x).max().orElseThrow();
+        var minZ = columns.stream().mapToInt(Column::z).min().orElseThrow();
+        var maxZ = columns.stream().mapToInt(Column::z).max().orElseThrow();
+        var height = columns.stream().mapToInt(column -> column.bottom + column.height).max().orElseThrow();
+        var centerX = (minX + maxX) / 2.0;
+        var centerZ = (minZ + maxZ) / 2.0;
+        double radiusSquared = 0;
+        for (var column : columns) {
+            var dx = Math.abs(column.x - centerX) + .5;
+            var dz = Math.abs(column.z - centerZ) + .5;
+            var dy = Math.max(Math.abs(column.bottom - height / 2.0), Math.abs(column.bottom + column.height - height / 2.0));
+            radiusSquared = Math.max(radiusSquared, dx * dx + dy * dy + dz * dz);
+        }
+        return new Size(maxX - minX + 1, height, maxZ - minZ + 1, (float) Math.sqrt(radiusSquared));
     }
 
     public static List<Column> columns(int volume, long seed) {
@@ -84,6 +129,9 @@ public final class AsteroidShape {
     }
 
     public record Column(int x, int z, int bottom, int height) {
+    }
+
+    public record Size(int width, int height, int depth, float radius) {
     }
 
     private record Weight(int x, int z, double value) {

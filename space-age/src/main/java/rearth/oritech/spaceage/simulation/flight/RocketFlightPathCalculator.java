@@ -339,7 +339,10 @@ public final class RocketFlightPathCalculator {
                     : StationServiceRules.solarEstimate(StationServiceRules.budgets(state), solar, services, addon);
             var duration = estimate.seconds();
             var sustainable = estimate.end() == StationKeepingEnd.SUSTAINABLE;
-            context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, estimate.end()));
+            var endurance = beamOutput > 0 ? StationServiceRules.beamEstimate(StationServiceRules.budgets(state), solar, services, beamOutput, reserve, null)
+                    : StationServiceRules.solarEstimate(StationServiceRules.budgets(state), solar, services, null);
+            context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, estimate.end(),
+                    endurance.seconds(), endurance.end(), solar, services, 0, 0));
             state.velocityX = 0;
             state.velocityY = 0;
             state.addSample(PathPhase.COAST, state.currentTarget, action.id());
@@ -367,7 +370,17 @@ public final class RocketFlightPathCalculator {
         var duration = estimate.seconds();
         var end = estimate.end();
         var conditionReached = estimate.conditionReached();
-        context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, end));
+        var endurance = StationServiceRules.estimate(StationServiceRules.budgets(state), correctionBurnSecondsPerSecond, null);
+        if (beamOutput > 0) {
+            var beamEndurance = StationServiceRules.beamEstimate(StationServiceRules.budgets(state), 0, serviceRF, beamOutput, reserve, null);
+            if (beamEndurance.end() != StationKeepingEnd.SUSTAINABLE && beamEndurance.seconds() <= endurance.seconds())
+                endurance = beamEndurance;
+        }
+        var antennaRF = state.segments.values().stream().mapToDouble(s -> StationServiceRules.antennaRF(s.hardware, 1)).sum();
+        var fuelRate = state.segments.values().stream().mapToDouble(s -> s.hardware.fuelCost(correctionBurnSecondsPerSecond)).sum();
+        var fuelCapacity = state.segments.values().stream().filter(s -> s.hardware.chemical() > 0).mapToDouble(s -> s.physical.fuelCapacity).sum();
+        context.stationKeepingEstimates.add(new StationKeepingEstimate(action.id(), duration, end, endurance.seconds(), endurance.end(),
+                0, antennaRF, serviceRF - antennaRF, fuelCapacity > 0 ? fuelRate * 6000 / fuelCapacity : 0));
         state.velocityX = 0;
         state.velocityY = 0;
         state.addSample(PathPhase.COAST, state.currentTarget, action.id());
@@ -824,7 +837,10 @@ public final class RocketFlightPathCalculator {
 
     }
 
-    public record StationKeepingEstimate(UUID actionId, double durationSeconds, StationKeepingEnd end) {
+    public record StationKeepingEstimate(UUID actionId, double durationSeconds, StationKeepingEnd end,
+                                         double enduranceSeconds, StationKeepingEnd resourceLimit,
+                                         double solarRFPerTick, double antennaRFPerTick, double correctionRFPerTick,
+                                         double fuelPercentPerMinute) {
 
     }
 

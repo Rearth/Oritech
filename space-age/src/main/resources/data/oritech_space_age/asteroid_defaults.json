@@ -1,0 +1,26 @@
+{
+  "types": [
+    "oritech_space_age:ferrous",
+    "oritech_space_age:copper_rich",
+    "oritech_space_age:carbonaceous",
+    "oritech_space_age:gold_rich",
+    "oritech_space_age:redstone_rich",
+    "oritech_space_age:lapis_rich",
+    "oritech_space_age:gemstone",
+    "oritech_space_age:quartz_rich",
+    "oritech_space_age:metallic",
+    "oritech_space_age:radioactive",
+    "oritech_space_age:exotic",
+    "oritech_space_age:arcane"
+  ],
+  "fields": [
+    "oritech_space_age:earth_nearby",
+    "oritech_space_age:earth_east",
+    "oritech_space_age:earth_south",
+    "oritech_space_age:earth_northwest",
+    "oritech_space_age:earth_outbound",
+    "oritech_space_age:earth_distant",
+    "oritech_space_age:outer_belt",
+    "oritech_space_age:scattered_clouds"
+  ]
+}

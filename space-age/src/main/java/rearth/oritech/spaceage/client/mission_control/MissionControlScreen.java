@@ -1,5 +1,6 @@
 package rearth.oritech.spaceage.client.mission_control;
 
+import rearth.oritech.spaceage.simulation.FleetCategories;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -24,7 +25,7 @@ import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
-import rearth.oritech.spaceage.client.mission_control.FleetCategories.Category;
+import rearth.oritech.spaceage.simulation.FleetCategories.Category;
 import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -90,18 +91,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
 
         var player = Minecraft.getInstance().player;
         if (player != null && player.containerMenu instanceof MissionControlMenu menu) {
-            var fleetStructureChanged = !sameFleetStructure(menu.fleet, payload.fleet())
-                    || !menu.network.equals(payload.network());
-            menu.fleet = payload.fleet();
-            menu.telemetryRevision++;
-            if (fleetStructureChanged) menu.fleetRevision++;
-            menu.network = payload.network();
-            menu.networkNodes = payload.nodes();
-            menu.simulationTick = payload.simulationTick();
-            menu.debugSpeed = payload.debugSpeed();
-            menu.receivedWorldTick = Minecraft.getInstance().level.getGameTime();
-            menu.fleetSnapshot = new SpaceSimulation.FlightPlannerSnapshot(payload.system(), new UUID(0, 0), payload.objects(),
-                    SpaceSimulation.FlightPlan.empty(), payload.stations());
+            menu.receiveFleet(payload, Minecraft.getInstance().level.getGameTime());
             var selected = menu.fleet.stream().filter(entry -> entry.id().equals(menu.selected)).findFirst().orElse(null);
             if (selected != null) {
                 var telemetry = selected.telemetry();
@@ -115,15 +105,6 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             if (selected == null && menu.selected != null) menu.selected = null;
             menu.connected = selected != null && selected.connected();
         }
-    }
-
-    private static boolean sameFleetStructure(List<MissionNetworking.FleetEntry> current,
-                                              List<MissionNetworking.FleetEntry> updated) {
-
-        if (current.size() != updated.size()) return false;
-        var dismissible = new HashMap<UUID, Boolean>();
-        current.forEach(entry -> dismissible.put(entry.id(), entry.dismissible()));
-        return updated.stream().allMatch(entry -> Objects.equals(dismissible.get(entry.id()), entry.dismissible()));
     }
 
     public static void select(MissionNetworking.SelectedPayload payload) {

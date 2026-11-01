@@ -1,0 +1,17 @@
+{
+  "volume": {
+    "min": 50000,
+    "max": 250000
+  },
+  "materials": [
+    {
+      "block": "oritech_space_age:superdense_redstone_ore",
+      "weight": 80
+    },
+    {
+      "block": "minecraft:deepslate",
+      "weight": 20
+    }
+  ],
+  "surface_gravity": 0
+}

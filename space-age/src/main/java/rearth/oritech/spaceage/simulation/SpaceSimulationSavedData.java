@@ -2,6 +2,9 @@ package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.Codec;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.RegistryAccess;
+import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator;
+import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator.Definitions;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,6 +31,9 @@ public class SpaceSimulationSavedData extends SavedData {
 
     private final Map<UUID, SpaceSimulation> simulations = new HashMap<>();
     private List<SpaceSimulation.SpaceObjectData> resourceBodies = List.of();
+    private Definitions generation = AsteroidGenerator.defaults();
+    private RegistryAccess generationRegistries;
+    private long worldSeed;
 
     public SpaceSimulationSavedData() {
     }
@@ -35,12 +41,19 @@ public class SpaceSimulationSavedData extends SavedData {
     private SpaceSimulationSavedData(Map<UUID, SpaceSimulation> simulations) {
 
         this.simulations.putAll(simulations);
+        this.simulations.values().forEach(simulation -> simulation.fleetCategories.onChange(saved -> setDirty()));
     }
 
     public static SpaceSimulationSavedData get(MinecraftServer server) {
 
         var data = server.overworld().getDataStorage().computeIfAbsent(TYPE);
         data.resourceBodies = ResourceBodies.objects(server.registryAccess());
+        if (data.generationRegistries != server.registryAccess()) {
+            data.generation = AsteroidGenerator.definitions(server.registryAccess());
+            data.generation.validateBlocks();
+            data.generationRegistries = server.registryAccess();
+            data.worldSeed = server.overworld().getSeed();
+        }
         return data;
     }
 
@@ -64,8 +77,9 @@ public class SpaceSimulationSavedData extends SavedData {
 
         var simulation = simulations.get(player);
         if (simulation == null) {
-            simulation = new SpaceSimulation();
+            simulation = new SpaceSimulation(AsteroidGenerator.seed(worldSeed, player), generation);
             simulations.put(player, simulation);
+            simulation.fleetCategories.onChange(saved -> setDirty());
             setDirty();
         }
         simulation.setResourceBodies(resourceBodies);

@@ -132,6 +132,12 @@ public final class MissionNetworking {
 
     public static void sendFleet(ServerPlayer player) {
 
+        FleetCategoryNetworking.send(player);
+        PacketDistributor.sendToPlayer(player, fleetPayload(player));
+    }
+
+    public static FleetPayload fleetPayload(ServerPlayer player) {
+
         var data = MissionSavedData.get(player.level().getServer());
         var tick = MissionController.missionTime(player.level().getServer());
         var system = SpaceSimulationSavedData.getForPlayer(player);
@@ -157,8 +163,8 @@ public final class MissionNetworking {
                         mission.canDismiss() && !RocketDocking.linked(data, mission.rocket.getRocketId()),
                         mission.route, mission.communication, mission.navigationForecast(recipes))).toList();
         var nodes = data.networkNodes.stream().filter(n -> n.owner().equals(player.getUUID())).toList();
-        PacketDistributor.sendToPlayer(player, new FleetPayload(entries, system.id(), system.createObjectData(), tick, data.debugSpeed,
-                SpaceCommunications.network(player.getUUID(), nodes), nodes, stations));
+        return new FleetPayload(entries, system.id(), system.createObjectData(), tick, data.debugSpeed,
+                SpaceCommunications.network(player.getUUID(), nodes), nodes, stations);
     }
 
     public static void sendSurveyResults(MinecraftServer server, UUID owner, int discovered, int updated) {

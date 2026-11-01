@@ -38,6 +38,7 @@ import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings.HardwareRef;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
 import rearth.oritech.spaceage.simulation.survey.SurveyKnowledge;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 
 import java.util.List;
 import java.util.Map;
@@ -302,7 +303,7 @@ class MissionSystemsTest {
         var region = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION)
                 .findFirst().orElseThrow();
         var asteroids = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID
-                && Math.hypot(o.x() - region.x(), o.y() - region.y()) <= region.radius()).toList();
+                && SurveyRules.contains(region, o.x(), o.y())).toList();
         assertFalse(asteroids.isEmpty());
         assertTrue(system.createObjectData().stream().anyMatch(o -> o.id().equals(region.id())));
 
@@ -324,7 +325,7 @@ class MissionSystemsTest {
                 .findFirst().orElseThrow();
         system.earthKnowledge.scan(List.of(asteroid), 0, asteroid.x(), asteroid.y(), SpaceBalance.SCAN_RANGE);
         var oldRegions = system.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.SURVEY_REGION
-                        && Math.hypot(object.x() - asteroid.x(), object.y() - asteroid.y()) <= object.radius())
+                        && SurveyRules.contains(object, asteroid.x(), asteroid.y()))
                 .map(SpaceObjectData::id).toList();
         var action = FlightPlanAction.create(ActionType.NAVIGATE_TO)
                 .withTarget(asteroid.id()).withOrbit(OrbitBand.SURFACE);
@@ -358,7 +359,7 @@ class MissionSystemsTest {
         var region = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.SURVEY_REGION)
                 .findFirst().orElseThrow();
         var asteroid = system.truth().stream().filter(o -> o.type() == SpaceObjects.ObjectType.ASTEROID
-                && Math.hypot(o.x() - region.x(), o.y() - region.y()) <= region.radius()).findFirst().orElseThrow();
+                && SurveyRules.contains(region, o.x(), o.y())).findFirst().orElseThrow();
         var id = UUID.randomUUID();
         var segment = new StaticRocketSegment(id, Set.of(
                 new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.SPACE_SCANNER.get().defaultBlockState()),

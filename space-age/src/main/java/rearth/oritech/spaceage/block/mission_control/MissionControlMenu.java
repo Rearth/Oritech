@@ -19,6 +19,7 @@ import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
 
 import java.util.List;
+import java.util.HashMap;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -53,6 +54,32 @@ public class MissionControlMenu extends RocketAssemblerMenu {
     public MissionControlMenu(int id, Inventory inventory, BlockPos pos) {
 
         super(SpaceAgeMenus.MISSION_CONTROL.get(), id, pos);
+    }
+
+    public void receiveFleet(MissionNetworking.FleetPayload payload, long worldTick) {
+
+        // An empty first fleet still contains the solar system, even without powered antennas.
+        var changed = fleetSnapshot == null || !fleetSnapshot.simulationId().equals(payload.system())
+                || !sameFleetStructure(fleet, payload.fleet()) || !network.equals(payload.network());
+        fleet = payload.fleet();
+        telemetryRevision++;
+        if (changed) fleetRevision++;
+        network = payload.network();
+        networkNodes = payload.nodes();
+        simulationTick = payload.simulationTick();
+        debugSpeed = payload.debugSpeed();
+        receivedWorldTick = worldTick;
+        fleetSnapshot = new SpaceSimulation.FlightPlannerSnapshot(payload.system(), new UUID(0, 0), payload.objects(),
+                FlightPlan.empty(), payload.stations());
+    }
+
+    private static boolean sameFleetStructure(List<MissionNetworking.FleetEntry> current,
+                                              List<MissionNetworking.FleetEntry> updated) {
+
+        if (current.size() != updated.size()) return false;
+        var dismissible = new HashMap<UUID, Boolean>();
+        current.forEach(entry -> dismissible.put(entry.id(), entry.dismissible()));
+        return updated.stream().allMatch(entry -> Objects.equals(dismissible.get(entry.id()), entry.dismissible()));
     }
 
     public boolean updateMission(MissionState.Telemetry telemetry, boolean commandsAvailable) {

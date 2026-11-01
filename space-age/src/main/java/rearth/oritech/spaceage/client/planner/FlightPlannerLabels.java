@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
+import rearth.oritech.spaceage.simulation.AsteroidShape;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -98,20 +99,58 @@ final class FlightPlannerLabels {
 
     static Component stationKeepingDuration(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
 
-        if (estimate != null && estimate.end() == RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE)
+        if (estimate != null && estimate.resourceLimit() == RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE)
             return Component.translatable("screen.oritech_space_age.power.sustainable");
-        if (estimate == null || !Double.isFinite(estimate.durationSeconds()))
+        if (estimate == null || !Double.isFinite(estimate.enduranceSeconds()))
             return Component.translatable("screen.oritech_space_age.action.station_keeping_unavailable");
-        return Component.translatable("screen.oritech_space_age.action.station_keeping_estimate",
-                String.format(Locale.ROOT, "%.2f", estimate.durationSeconds() / 1_200d));
+        return Component.translatable("screen.oritech_space_age.action.hold_endurance."
+                        + estimate.resourceLimit().name().toLowerCase(Locale.ROOT),
+                holdTime(estimate.enduranceSeconds()));
     }
 
     static Component stationKeepingEnd(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
 
         if (estimate == null) return Component.empty();
-        return Component.translatable("screen.oritech_space_age.action.station_keeping_ends",
+        if (estimate.end() == RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE)
+            return Component.translatable("screen.oritech_space_age.action.hold_no_end");
+        return Component.translatable("screen.oritech_space_age.action.hold_end",
+                holdTime(estimate.durationSeconds()),
                 Component.translatable("screen.oritech_space_age.action.station_keeping_end."
                         + estimate.end().name().toLowerCase(Locale.ROOT)));
+    }
+
+    private static Component holdTime(double seconds) {
+
+        var unit = seconds < 60 ? "seconds" : seconds < 1200 ? "minutes" : "days";
+        var value = seconds < 60 ? seconds : seconds < 1200 ? seconds / 60 : seconds / 1200;
+        return Component.translatable("screen.oritech_space_age.action.hold_time." + unit, String.format(Locale.ROOT, "%.1f", value));
+    }
+
+    static Component stationKeepingMode(SpaceSimulation.FlightPlanAction action) {
+
+        return action.addons().isEmpty() ? Component.translatable("screen.oritech_space_age.action.hold_indefinitely")
+                : Component.translatable("screen.oritech_space_age.action.continue_condition", addonSummary(action.addons().getFirst()));
+    }
+
+    static List<Component> stationKeepingDetails(RocketFlightPathCalculator.StationKeepingEstimate estimate) {
+
+        var lines = new ArrayList<Component>();
+        lines.add(stationKeepingDuration(estimate));
+        if (estimate == null) return lines;
+        lines.add(Component.translatable("screen.oritech_space_age.action.hold_power",
+                String.format(Locale.ROOT, "%.1f", estimate.solarRFPerTick()),
+                String.format(Locale.ROOT, "%.1f", estimate.antennaRFPerTick()),
+                String.format(Locale.ROOT, "%.1f", estimate.correctionRFPerTick())));
+        lines.add(Component.translatable("screen.oritech_space_age.action.hold_fuel",
+                String.format(Locale.ROOT, "%.3f", estimate.fuelPercentPerMinute())));
+        lines.add(stationKeepingEnd(estimate));
+        return lines;
+    }
+
+    static Component stationKeepingContinuation(SpaceSimulation.FlightPlanAction action, boolean followed) {
+
+        return Component.translatable(!action.addons().isEmpty() ? "screen.oritech_space_age.action.hold_condition_help"
+                : followed ? "screen.oritech_space_age.action.hold_following_warning" : "screen.oritech_space_age.action.hold_forever_help");
     }
 
     static Component scanEnergyLabel(RocketFlightPathCalculator.ScanEstimate estimate) {
@@ -263,8 +302,9 @@ final class FlightPlannerLabels {
                     + prediction.fragmentationMode().name().toLowerCase(Locale.ROOT), prediction.fragmentCount()));
             for (int index = 0; index < prediction.fragments().size(); index++) {
                 var fragment = prediction.fragments().get(index);
+                var size = AsteroidShape.size(fragment.materials());
                 lines.add(Component.translatable("screen.oritech_space_age.arrival_fragment", index + 1,
-                        String.format(Locale.ROOT, "%.0f", fragment.mass() * 1_000), String.format(Locale.ROOT, "%.0f", fragment.radius())));
+                        String.format(Locale.ROOT, "%.0f", fragment.mass() * 1_000), size.width(), size.height(), size.depth()));
             }
             if (prediction.remainingTargetMass() > 0) {
                 lines.add(Component.translatable("screen.oritech_space_age.arrival_remaining_asteroid",

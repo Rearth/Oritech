@@ -1,11 +1,10 @@
-package rearth.oritech.spaceage.client.mission_control;
+package rearth.oritech.spaceage.simulation;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import net.minecraft.nbt.NbtOps;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,18 +15,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FleetCategoriesTest {
 
-    @TempDir
-    Path directory;
-
     @Test
     void launchCategoriesApplyUntilManuallyOverriddenAndRespectAutomaticSunGrouping() {
 
-        var file = directory.resolve("categories.json");
-        var preferences = new FleetCategories(file);
+        var preferences = new FleetCategories();
         var launchCategory = preferences.create("Automated satellites");
         var craft = UUID.randomUUID();
         assertEquals(launchCategory, preferences.category(craft, false, launchCategory));
-        var loaded = new FleetCategories(file);
+        var loaded = copy(preferences);
         assertEquals(launchCategory, loaded.category(craft, false, launchCategory));
         assertEquals(FleetCategories.SUN, loaded.category(craft, true, launchCategory));
         loaded.assign(craft, FleetCategories.UNCATEGORIZED);
@@ -40,8 +35,7 @@ class FleetCategoriesTest {
     @Test
     void automaticSectionsAndManualOverridesSurviveRestart() {
 
-        var file = directory.resolve("categories.json");
-        var preferences = new FleetCategories(file);
+        var preferences = new FleetCategories();
         var solar = UUID.randomUUID();
         var relay = UUID.randomUUID();
         assertEquals(List.of(FleetCategories.UNCATEGORIZED, FleetCategories.SUN),
@@ -54,7 +48,7 @@ class FleetCategoriesTest {
         preferences.assign(solar, FleetCategories.UNCATEGORIZED);
         preferences.toggle(category);
         preferences.toggle(FleetCategories.SUN);
-        var loaded = new FleetCategories(file);
+        var loaded = copy(preferences);
         assertEquals(category, loaded.category(relay, false), "Manual assignments survive restart");
         assertEquals(FleetCategories.SUN, loaded.category(relay, true), "Sun orbit always groups automatically");
         assertEquals(FleetCategories.SUN, loaded.category(solar, true), "Manual Uncategorized cannot hide a Sun craft");
@@ -67,8 +61,7 @@ class FleetCategoriesTest {
     @Test
     void deletingCategoriesMovesMembersToUncategorizedIncludingAbsentCraft() {
 
-        var file = directory.resolve("categories.json");
-        var preferences = new FleetCategories(file);
+        var preferences = new FleetCategories();
         var active = UUID.randomUUID();
         var absent = UUID.randomUUID();
         var automatic = UUID.randomUUID();
@@ -77,21 +70,20 @@ class FleetCategoriesTest {
         preferences.assign(absent, category);
         preferences.delete(category, List.of(active));
         preferences.delete(FleetCategories.SUN, List.of(automatic));
-        var loaded = new FleetCategories(file);
+        var loaded = copy(preferences);
         for (var craft : List.of(active, absent, automatic, UUID.randomUUID()))
             assertEquals(FleetCategories.UNCATEGORIZED, loaded.category(craft, false));
         assertEquals(List.of(FleetCategories.UNCATEGORIZED, FleetCategories.SUN), loaded.categories().stream().map(FleetCategories.Category::id).toList());
         loaded.delete(FleetCategories.UNCATEGORIZED, List.of(active));
-        assertEquals(2, new FleetCategories(file).categories().size(), "Both automatic sections always exist");
+        assertEquals(2, copy(loaded).categories().size(), "Both automatic sections always exist");
         assertEquals(FleetCategories.SUN, loaded.category(automatic, true));
     }
 
     @Test
-    void missingSunSectionIsRestoredFromExistingPreferences() throws Exception {
+    void missingSunSectionIsRestoredFromSavedWorldData() {
 
-        var file = directory.resolve("categories.json");
-        Files.writeString(file, "{\"categories\":[],\"assignments\":{}}");
-        var preferences = new FleetCategories(file);
+        var preferences = new FleetCategories(new FleetCategories.Saved(
+                List.of(new FleetCategories.Category(FleetCategories.UNCATEGORIZED, "", false)), Map.of()));
         assertEquals(List.of(FleetCategories.UNCATEGORIZED, FleetCategories.SUN),
                 preferences.categories().stream().map(FleetCategories.Category::id).toList());
         preferences.delete(FleetCategories.SUN, List.of());
@@ -101,8 +93,7 @@ class FleetCategoriesTest {
     @Test
     void deletingOneSectionPreservesOtherSectionsAndTheirCollapsedStates() {
 
-        var file = directory.resolve("categories.json");
-        var preferences = new FleetCategories(file);
+        var preferences = new FleetCategories();
         var first = preferences.create("Stations");
         var second = preferences.create("Stations");
         assertNotEquals(first, second, "Names need not be unique; stable IDs own assignments");
@@ -111,7 +102,7 @@ class FleetCategoriesTest {
         preferences.toggle(second);
         preferences.toggle(FleetCategories.UNCATEGORIZED);
         preferences.delete(first, List.of());
-        var loaded = new FleetCategories(file);
+        var loaded = copy(preferences);
         assertEquals(second, loaded.category(craft, false));
         assertTrue(loaded.collapsed(second));
         assertTrue(loaded.collapsed(FleetCategories.UNCATEGORIZED));
@@ -119,4 +110,38 @@ class FleetCategoriesTest {
         loaded.assign(craft, "missing");
         assertEquals(second, loaded.category(craft, false));
     }
+
+    @Test
+    void worldsAndPlayersHaveSeparateSavedCategories() {
+
+        var owner = UUID.randomUUID();
+        var world = new SpaceSimulationSavedData();
+        var simulation = world.getOrCreate(owner);
+        world.setDirty(false);
+        var category = simulation.fleetCategories.create("Relays");
+        var craft = UUID.randomUUID();
+        simulation.fleetCategories.assign(craft, category);
+        simulation.fleetCategories.toggle(category);
+        assertTrue(world.isDirty(), "Category edits mark world data dirty");
+        assertEquals(2, new SpaceSimulationSavedData().getOrCreate(owner).fleetCategories.categories().size(),
+                "The same player in another world starts with automatic sections only");
+        assertEquals(2, world.getOrCreate(UUID.randomUUID()).fleetCategories.categories().size(),
+                "Another player's categories are independent");
+        var saved = SpaceSimulationSavedData.CODEC.encodeStart(NbtOps.INSTANCE, world).getOrThrow();
+        var loaded = SpaceSimulationSavedData.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow();
+        var restored = loaded.getOrCreate(owner).fleetCategories;
+        assertEquals(simulation.fleetCategories.saved(), restored.saved());
+        assertEquals(category, restored.category(craft, false));
+        assertTrue(restored.collapsed(category));
+        loaded.setDirty(false);
+        restored.toggle(category);
+        assertTrue(loaded.isDirty(), "Loaded categories retain their world save callback");
+    }
+
+    private static FleetCategories copy(FleetCategories categories) {
+
+        var saved = FleetCategories.Saved.CODEC.encodeStart(NbtOps.INSTANCE, categories.saved()).getOrThrow();
+        return new FleetCategories(FleetCategories.Saved.CODEC.parse(NbtOps.INSTANCE, saved).getOrThrow());
+    }
+
 }

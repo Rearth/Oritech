@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
@@ -26,6 +27,27 @@ import java.util.stream.IntStream;
  * Integration checks for the planner's stage/resource handling and editor branch rules.
  */
 public final class RocketFlightPathTest {
+
+    @Test
+    void holdForecastSeparatesResourceEnduranceFromTheChosenDuration() {
+
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(
+                new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState()),
+                new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState())),
+                Map.of(), 25, 1, 48_000, 20_000);
+        var earth = new SpaceSimulation().createObjectData().stream().filter(o -> o.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
+        var condition = SpaceSimulation.ActionAddon.create(SpaceSimulation.ActionAddonType.DURATION).withValue(1);
+        var timed = maintainForecast(id, segment, earth, 48_000, condition).stationKeepingEstimates().getFirst();
+        var indefinite = maintainEstimate(id, segment, earth, 48_000);
+        require(timed.end() == RocketFlightPathCalculator.StationKeepingEnd.DURATION, "the timed hold should continue after one second");
+        require(timed.durationSeconds() == 1, "condition duration must remain separate from resource endurance");
+        require(timed.enduranceSeconds() == indefinite.durationSeconds(), "the endurance must ignore the selected condition");
+        require(timed.enduranceSeconds() > timed.durationSeconds(), "supplies last beyond the timed hold");
+        require(timed.antennaRFPerTick() == SpaceBalance.ANTENNA_RF, "show actual antenna draw");
+        require(timed.solarRFPerTick() == 0 && timed.correctionRFPerTick() == 0, "chemical corrections do not use RF");
+        require(timed.fuelPercentPerMinute() > 0, "show correction fuel consumption");
+    }
 
     private static RocketFlightPathCalculator.StationKeepingEstimate maintainEstimate(
             UUID segmentId, StaticRocketSegment segment, SpaceSimulation.SpaceObjectData earth, long rf) {
@@ -347,6 +369,34 @@ public final class RocketFlightPathTest {
                 "a threshold after automatic fuel exhaustion must not replace the actual ending");
         require(withLateCondition.navigationAborts().isEmpty(),
                 "a threshold reached after station keeping ends must not trigger");
+    }
+
+    @Test
+    void asteroidArrivalUsesTheSameStandOffAsItsMapOrbit() {
+
+        var segmentId = UUID.randomUUID();
+        var segment = new StaticRocketSegment(segmentId,
+                Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.BASIC_BOOSTER_ROCKET.get().defaultBlockState())),
+                Map.of(), 25, 1);
+        var rocket = new ActiveRocketData(Map.of(segmentId, segment),
+                Map.of(segmentId, new DynamicRocketSegment(1_000_000, 0, 0, Set.of())));
+        var asteroid = new SpaceSimulation.SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
+                0, 0, 30, 0, SpaceObjects.DetectionState.PRECISE);
+        var action = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
+                .withTarget(asteroid.id()).withOrbit(SpaceSimulation.OrbitBand.TIGHT);
+        var base = SpaceSimulation.FlightPlan.empty();
+        var plan = base.withBranches(List.of(base.root().withActions(List.of(action))));
+        var start = new MissionState.Position(20_000, 0, 0, 0, SpaceSimulation.FlightPlanAction.NO_TARGET,
+                SpaceSimulation.OrbitBand.TIGHT, 0, 1, SpaceSimulation.FlightPlanAction.NO_TARGET,
+                new SpaceSimulation.SegmentRef(BlockPos.ZERO));
+        var earth = new SpaceSimulation.SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
+                -3_000_000, 0, 60_000, 0, SpaceObjects.DetectionState.PRECISE);
+        var path = RocketFlightPathCalculator.calculateFrom(rocket, List.of(earth, asteroid), plan, start).paths().getFirst();
+        ready(path);
+        var arrival = path.samples().getLast();
+        require(Math.abs(Math.hypot(arrival.x(), arrival.y())
+                - SurveyRules.orbitRadius(asteroid, SpaceSimulation.OrbitBand.TIGHT)) < .01,
+                "flight destination must match the visible tight orbit");
     }
 
     @Test

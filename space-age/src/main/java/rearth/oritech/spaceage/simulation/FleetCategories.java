@@ -1,53 +1,61 @@
-package rearth.oritech.spaceage.client.mission_control;
+package rearth.oritech.spaceage.simulation;
 
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParser;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
-import rearth.oritech.spaceage.OritechSpaceAge;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 /**
- * Local fleet organization; assignments are independent of missions and their changing locations.
+ * Per-player fleet organization saved with the world; the client edits a synchronized copy.
  */
 public final class FleetCategories {
 
     public static final String UNCATEGORIZED = "uncategorized";
     public static final String SUN = "sun";
-    private final Path file;
+    private Consumer<Saved> onChange = saved -> {};
     private final List<Category> categories = new ArrayList<>();
     private final Map<UUID, String> assignments = new HashMap<>();
 
-    FleetCategories(Path file) {
+    public FleetCategories() {
 
-        this.file = file;
-        if (Files.exists(file)) {
-            try {
-                var saved = Saved.CODEC.parse(JsonOps.INSTANCE, JsonParser.parseString(Files.readString(file))).getOrThrow();
-                categories.addAll(saved.categories());
-                assignments.putAll(saved.assignments());
-            } catch (IOException | RuntimeException exception) {
-                OritechSpaceAge.LOGGER.warn("Could not load fleet categories", exception);
-            }
-        }
+        this(Saved.EMPTY);
+    }
+
+    public FleetCategories(Saved saved) {
+
+        replace(saved);
+    }
+
+    public void onChange(Consumer<Saved> listener) {
+
+        onChange = listener;
+    }
+
+    public Saved saved() {
+
+        return new Saved(categories, assignments);
+    }
+
+    public void replace(Saved saved) {
+
+        categories.clear();
+        assignments.clear();
+        categories.addAll(saved.categories());
+        assignments.putAll(saved.assignments());
         if (categories.stream().noneMatch(category -> category.id().equals(SUN)))
             categories.add(new Category(SUN, "", true));
         if (categories.stream().noneMatch(category -> category.id().equals(UNCATEGORIZED)))
             categories.addFirst(new Category(UNCATEGORIZED, "", false));
     }
 
-    static boolean permanent(String id) {
+    public static boolean permanent(String id) {
 
         return id.equals(UNCATEGORIZED) || id.equals(SUN);
     }
@@ -57,12 +65,12 @@ public final class FleetCategories {
         return List.copyOf(categories);
     }
 
-    boolean collapsed(String id) {
+    public boolean collapsed(String id) {
 
         return categories.stream().anyMatch(category -> category.id().equals(id) && category.collapsed());
     }
 
-    String create(String name) {
+    public String create(String name) {
 
         var trimmed = name.strip();
         if (trimmed.isEmpty()) return null;
@@ -72,26 +80,26 @@ public final class FleetCategories {
         return id;
     }
 
-    void assign(UUID craft, String category) {
+    public void assign(UUID craft, String category) {
 
         if (!contains(category)) return;
         assignments.put(craft, category);
         save();
     }
 
-    void toggle(String id) {
+    public void toggle(String id) {
 
         categories.replaceAll(category -> category.id().equals(id)
                 ? new Category(id, category.name(), !category.collapsed()) : category);
         save();
     }
 
-    String category(UUID craft, boolean sunOrbit) {
+    public String category(UUID craft, boolean sunOrbit) {
 
         return category(craft, sunOrbit, "");
     }
 
-    String category(UUID craft, boolean sunOrbit, String launchCategory) {
+    public String category(UUID craft, boolean sunOrbit, String launchCategory) {
 
         if (sunOrbit) return SUN;
         var assigned = assignments.getOrDefault(craft, launchCategory);
@@ -99,7 +107,7 @@ public final class FleetCategories {
         return UNCATEGORIZED;
     }
 
-    void delete(String id, List<UUID> members) {
+    public void delete(String id, List<UUID> members) {
 
         if (permanent(id)) return;
         categories.removeIf(category -> category.id().equals(id));
@@ -123,13 +131,7 @@ public final class FleetCategories {
 
     private void save() {
 
-        try {
-            var json = Saved.CODEC.encodeStart(JsonOps.INSTANCE, new Saved(categories, assignments)).getOrThrow();
-            Files.createDirectories(file.getParent());
-            Files.writeString(file, new GsonBuilder().setPrettyPrinting().create().toJson(json));
-        } catch (IOException exception) {
-            OritechSpaceAge.LOGGER.warn("Could not save fleet categories", exception);
-        }
+        onChange.accept(saved());
     }
 
     public record Category(String id, String name, boolean collapsed) {
@@ -141,11 +143,19 @@ public final class FleetCategories {
         ).apply(instance, Category::new));
     }
 
-    private record Saved(List<Category> categories, Map<UUID, String> assignments) {
+    public record Saved(List<Category> categories, Map<UUID, String> assignments) {
 
-        private static final Codec<Saved> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        public static final Saved EMPTY = new Saved(List.of(), Map.of());
+
+        public static final Codec<Saved> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Category.CODEC.listOf().fieldOf("categories").forGetter(Saved::categories),
                 Codec.unboundedMap(UUIDUtil.STRING_CODEC, Codec.STRING).fieldOf("assignments").forGetter(Saved::assignments)
         ).apply(instance, Saved::new));
+
+        public Saved {
+
+            categories = List.copyOf(categories);
+            assignments = Map.copyOf(assignments);
+        }
     }
 }

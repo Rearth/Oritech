@@ -673,6 +673,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var actions = withoutGenerated(branch.actions());
         actions.add(action);
         updateBranchActions(branchId, actions, rocket);
+        if (type == SpaceSimulation.ActionType.MAINTAIN_POSITION) openActionEditor(action.id());
     }
 
     void removeAction(UUID branchId, int index, ActiveRocketData rocket) {

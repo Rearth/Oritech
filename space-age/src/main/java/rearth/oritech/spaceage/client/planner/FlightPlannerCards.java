@@ -262,7 +262,13 @@ final class FlightPlannerCards {
         screen.calculatedFlight().arrivalPredictions().stream().filter(a -> a.actionId().equals(action.id())).findFirst()
                 .ifPresent(a -> FlightPlannerLabels.parachuteTooltip(a.parachutes()).forEach(card::addTooltipLine));
         if (action.type().stationKeeping()) {
-            card.addTooltipLine(stationKeepingEstimate(action));
+            FlightPlannerLabels.stationKeepingDetails(FlightPlannerLabels.stationKeepingEstimate(screen.calculatedFlight(), action.id()))
+                    .forEach(card::addTooltipLine);
+            if (action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION) {
+                card.addTooltipLine(FlightPlannerLabels.stationKeepingMode(action));
+                card.addTooltipLine(FlightPlannerLabels.stationKeepingContinuation(action,
+                        branch.actions().stream().skip(index + 1L).anyMatch(next -> !next.isGenerated())));
+            }
         }
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE
                 && !action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
@@ -305,7 +311,8 @@ final class FlightPlannerCards {
         scroll.addChild(new LabelWidget(cursorX + 6, rowY + 7, NORMAL_CARD_WIDTH - 20,
                 Component.literal((index + 1 + (branch.isRoot() ? screen.completedActions().size() : 0)) + ". ").append(FlightPlannerLabels.actionName(action.type())))
                 .withColor(textColor).withShadow(true));
-        Component parameter = screen.actionParameter(action, rocket);
+        Component parameter = action.type() == SpaceSimulation.ActionType.MAINTAIN_POSITION
+                ? FlightPlannerLabels.stationKeepingMode(action) : screen.actionParameter(action, rocket);
         if (action.type() == SpaceSimulation.ActionType.DECOUPLE && action.segments().size() == 2
                 && action.targetId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET)) {
             parameter = Component.translatable("screen.oritech_space_age.action.decouple_connection",

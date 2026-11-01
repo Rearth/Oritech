@@ -1,0 +1,40 @@
+{
+  "layout": {
+    "type": "cloud",
+    "center": {
+      "x": -3080000,
+      "y": -290000
+    },
+    "radius": 65000
+  },
+  "asteroids_per_region": {
+    "min": 10,
+    "max": 10
+  },
+  "asteroid_types": [
+    {
+      "type": "oritech_space_age:ferrous",
+      "weight": 30
+    },
+    {
+      "type": "oritech_space_age:copper_rich",
+      "weight": 25
+    },
+    {
+      "type": "oritech_space_age:carbonaceous",
+      "weight": 15
+    },
+    {
+      "type": "oritech_space_age:redstone_rich",
+      "weight": 15
+    },
+    {
+      "type": "oritech_space_age:gold_rich",
+      "weight": 10
+    },
+    {
+      "type": "oritech_space_age:lapis_rich",
+      "weight": 5
+    }
+  ]
+}

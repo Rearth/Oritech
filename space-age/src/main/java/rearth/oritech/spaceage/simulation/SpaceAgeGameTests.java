@@ -1,6 +1,10 @@
 package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.JsonOps;
+import com.mojang.authlib.GameProfile;
+import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
+import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -92,9 +96,11 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
         FUNCTIONS.register("robot_tools", () -> RobotGameTests::toolsAndDoors);
         FUNCTIONS.register("robot_bonemeal", () -> RobotGameTests::bonemeal);
+        FUNCTIONS.register("asteroid_generation", () -> AsteroidGameTests::generation);
         FUNCTIONS.register("dense_mining", () -> AsteroidGameTests::denseMining);
         FUNCTIONS.register("asteroid_landing", () -> AsteroidGameTests::landingAndProtection);
         FUNCTIONS.register("large_asteroid_delivery", () -> AsteroidGameTests::largeDelivery);
+        FUNCTIONS.register("mission_control_initial", () -> SpaceAgeGameTests::missionControlInitial);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -114,7 +120,7 @@ public final class SpaceAgeGameTests {
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
         event.registerTest(OritechSpaceAge.id("robot_bonemeal"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_bonemeal")), info));
-        for (var name : List.of("dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
+        for (var name : List.of("mission_control_initial", "asteroid_generation", "dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
             var key = ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name));
             event.registerTest(key.identifier(), new FunctionGameTestInstance(key,
                     new TestData<>(environment, Identifier.parse("minecraft:empty"), 6000, 1, true)));
@@ -667,6 +673,46 @@ public final class SpaceAgeGameTests {
             var context = new DirectionalPlaceContext(level, pos, Direction.NORTH, item, facing);
             test.assertTrue(light.getStateForPlacement(context) == null, "Light cannot mount on floors or ceilings");
         }
+        test.succeed();
+    }
+
+    private static void missionControlInitial(GameTestHelper test) {
+
+        var level = test.getLevel();
+        var pos = test.absolutePos(new BlockPos(1, 2, 1));
+        level.setBlock(pos, SpaceAgeBlocks.MISSION_CONTROL.get().defaultBlockState(), 3);
+        var player = FakePlayerFactory.get(level, new GameProfile(UUID.randomUUID(), "FleetWorldTest"));
+        player.setPos(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5);
+        var menu = new MissionControlMenu(1, player.getInventory(), pos);
+        player.containerMenu = menu;
+        var fleet = MissionNetworking.fleetPayload(player);
+        test.assertTrue(fleet.fleet().isEmpty() && fleet.nodes().isEmpty(), "Fresh mission control has no fleet or powered antennas");
+        test.assertTrue(fleet.network().equals(menu.network), "The first packet need not change antenna counts");
+        menu.receiveFleet(fleet, level.getGameTime());
+        test.assertTrue(menu.fleetRevision == 1 && !menu.fleetSnapshot.objects().isEmpty(), "Initial unpowered station receives a map and triggers its creation");
+        var simulation = SpaceSimulationSavedData.getForPlayer(player);
+        var categories = new FleetCategories();
+        var id = categories.create("Relays");
+        var craft = UUID.randomUUID();
+        categories.assign(craft, id);
+        var update = new FleetCategoryNetworking.UpdateCategories(simulation.id(), categories.saved());
+        var buffer = new RegistryFriendlyByteBuf(Unpooled.buffer(), level.registryAccess(), ConnectionType.NEOFORGE);
+        try {
+            var codec = NetworkManager.getAutoCodec(FleetCategoryNetworking.UpdateCategories.class);
+            codec.encode(buffer, update);
+            update = (FleetCategoryNetworking.UpdateCategories) codec.decode(buffer);
+        } finally {
+            buffer.release();
+        }
+        test.assertTrue(FleetCategoryNetworking.update(player, update), "Valid menu saves categories to its player's world simulation");
+        test.assertTrue(simulation.fleetCategories.category(craft, false).equals(id), "Server retains category assignments");
+        test.assertTrue(!FleetCategoryNetworking.update(player,
+                new FleetCategoryNetworking.UpdateCategories(UUID.randomUUID(), FleetCategories.Saved.EMPTY)), "A stale or foreign simulation cannot overwrite categories");
+        test.assertTrue(SpaceSimulationSavedData.get(level.getServer()).getOrCreate(UUID.randomUUID()).fleetCategories.categories().size() == 2,
+                "Another player starts with only the automatic categories");
+        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+        test.assertTrue(!FleetCategoryNetworking.update(player, update), "A removed mission control cannot update categories");
+        player.containerMenu = player.inventoryMenu;
         test.succeed();
     }
 

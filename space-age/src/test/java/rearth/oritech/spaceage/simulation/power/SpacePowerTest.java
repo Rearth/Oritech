@@ -625,6 +625,27 @@ class SpacePowerTest {
     }
 
     @Test
+    void timedSolarHoldRemainsSustainableAndContinuesToTheNextCard() {
+
+        var mission = station(UUID.randomUUID(), -3_000_000);
+        var hold = mission.action().withAddons(List.of(ActionAddon.create(ActionAddonType.DURATION).withValue(60)));
+        var discard = FlightPlanAction.create(ActionType.DISCARD_CRAFT);
+        var plan = mission.plan.withBranches(List.of(mission.plan.root().withActions(List.of(hold, discard))));
+        var forecast = RocketFlightPathCalculator.calculateFrom(mission.rocket, new SpaceSimulation().createObjectData(), plan, mission.position);
+        var estimate = forecast.stationKeepingEstimates().getFirst();
+        assertEquals(RocketFlightPathCalculator.StationKeepingEnd.SUSTAINABLE, estimate.resourceLimit());
+        assertEquals(RocketFlightPathCalculator.StationKeepingEnd.DURATION, estimate.end());
+        assertEquals(60, estimate.durationSeconds());
+        assertTrue(estimate.solarRFPerTick() > 0);
+        assertEquals(0, estimate.fuelPercentPerMinute());
+        assertEquals(0, estimate.correctionRFPerTick());
+        assertEquals(RocketFlightPathCalculator.TerminalState.DISCARDED, forecast.paths().getFirst().terminalState());
+        var forever = RocketFlightPathCalculator.calculateFrom(mission.rocket, new SpaceSimulation().createObjectData(),
+                plan.withBranches(List.of(plan.root().withActions(List.of(hold.withAddons(List.of()), discard)))), mission.position);
+        assertEquals(1, forever.paths().getFirst().actionMoments().size(), "Sustainable indefinite holds do not reach later cards");
+    }
+
+    @Test
     void losingSolarReleasesSunSlotAndKeepsCraftAvailable() {
 
         var data = new MissionSavedData();

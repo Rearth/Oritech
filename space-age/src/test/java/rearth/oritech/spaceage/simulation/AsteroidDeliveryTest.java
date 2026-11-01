@@ -2,6 +2,11 @@ package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtOps;
+import com.mojang.serialization.JsonOps;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
+import rearth.oritech.spaceage.simulation.SpaceObjects.DetectionState;
+import java.util.UUID;
 import net.minecraft.resources.Identifier;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.simulation.AsteroidDeliveries.Job;
@@ -17,6 +22,29 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AsteroidDeliveryTest {
+
+    @Test
+    void physicalSizeAndRadiusMatchNormalDeliveryAndNormalizeOldSnapshots() {
+
+        for (var volume : List.of(890, 50_000, 250_000)) {
+            var materials = List.of(new AsteroidMaterial(DenseOres.Family.GOLD.id(), volume));
+            var size = AsteroidShape.size(materials);
+            var job = new Job(BlockPos.ZERO, volume, materials, materials, 0, 0, 0);
+            assertEquals(size, AsteroidShape.measure(job.columns()));
+            assertEquals(volume, job.columns().stream().mapToInt(AsteroidShape.Column::height).sum());
+            assertTrue(size.radius() >= Math.max(size.width(), Math.max(size.height(), size.depth())) / 2.0);
+            assertTrue(size.radius() < 100, "Physical radius is tens of blocks, never the old map-scale kilometres");
+            var object = new SpaceObjectData(UUID.randomUUID(), ObjectType.ASTEROID, 0, 0, 0, 0,
+                    4_098, 0, 74, DetectionState.PRECISE, "Test asteroid", materials);
+            assertEquals(size.radius(), object.radius());
+            assertEquals(DenseOres.mass(materials), object.mass());
+            var encoded = SpaceObjectData.CODEC.encodeStart(JsonOps.INSTANCE, object).getOrThrow().getAsJsonObject();
+            encoded.addProperty("radius", 4_098);
+            encoded.addProperty("mass", 74);
+            var loaded = SpaceObjectData.CODEC.parse(JsonOps.INSTANCE, encoded).getOrThrow();
+            assertEquals(object, loaded, "Old stored observations and transfer snapshots use the physical size on reload");
+        }
+    }
 
     @Test
     void shapesUseExactVolumeAndHaveIrregularElongatedProfiles() {

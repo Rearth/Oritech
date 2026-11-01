@@ -129,8 +129,9 @@ public final class AsteroidImpactRules {
         var fragments = new ArrayList<AsteroidFragment>();
         for (int index = 0; index < count; index++) {
             var mass = sourceMass == 0 ? (float) (target.mass() * fractions[index])
-                    : target.mass() * DenseOres.mass(materials.get(index)) / sourceMass;
-            var radius = (float) (target.radius() * Math.cbrt(fractions[index]));
+                    : DenseOres.mass(materials.get(index));
+            var radius = materials.get(index).isEmpty() ? (float) (target.radius() * Math.cbrt(fractions[index]))
+                    : AsteroidShape.size(materials.get(index)).radius();
             fragments.add(new AsteroidFragment(mass, radius, materials.get(index)));
         }
         fragments.sort(Comparator.comparingDouble(AsteroidFragment::mass).reversed());
@@ -161,13 +162,13 @@ public final class AsteroidImpactRules {
                 if (resources[resource] > 0) materials.add(new SpaceObjects.AsteroidMaterial(
                         target.materials().get(resource).block(), resources[resource]));
             }
-            fragments.add(new AsteroidFragment(DenseOres.mass(materials), (float) (40 * Math.cbrt(amount)), materials));
+            fragments.add(new AsteroidFragment(DenseOres.mass(materials), AsteroidShape.size(materials).radius(), materials));
         }
         fragments.sort(Comparator.comparingDouble(AsteroidFragment::mass).reversed());
         return List.copyOf(fragments);
     }
 
-    private static int[] partition(int amount, double[] weights) {
+    public static int[] partition(int amount, double[] weights) {
 
         var totalWeight = Arrays.stream(weights).sum();
         var amounts = new int[weights.length];

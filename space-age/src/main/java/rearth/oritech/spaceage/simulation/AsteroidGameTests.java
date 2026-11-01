@@ -1,6 +1,8 @@
 package rearth.oritech.spaceage.simulation;
 
 import net.minecraft.core.BlockPos;
+import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator;
+import java.util.UUID;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +23,7 @@ import rearth.oritech.spaceage.simulation.DenseOres.Family;
 import rearth.oritech.spaceage.simulation.SpaceObjects.AsteroidMaterial;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Arrays;
 
 /**
@@ -29,6 +32,25 @@ import java.util.Arrays;
 public final class AsteroidGameTests {
 
     private AsteroidGameTests() {
+    }
+
+    public static void generation(GameTestHelper test) {
+
+        var level = test.getLevel();
+        var server = level.getServer();
+        var definitions = AsteroidGenerator.definitions(level.registryAccess());
+        definitions.validateBlocks();
+        test.assertTrue(definitions.types().keySet().equals(AsteroidGenerator.defaults().types().keySet()), "Default asteroid type registry loads");
+        test.assertTrue(definitions.fields().keySet().equals(AsteroidGenerator.defaults().fields().keySet()), "Default asteroid fields load");
+        var owner = UUID.randomUUID();
+        var simulation = SpaceSimulationSavedData.get(server).getOrCreate(owner);
+        var expected = AsteroidGenerator.generate(AsteroidGenerator.seed(server.overworld().getSeed(), owner), definitions)
+                .stream().map(object -> object.id).collect(Collectors.toSet());
+        var actual = simulation.truth().stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
+                || object.type() == SpaceObjects.ObjectType.SURVEY_REGION).map(SpaceSimulation.SpaceObjectData::id)
+                .collect(Collectors.toSet());
+        test.assertTrue(expected.equals(actual), "Player systems use the server's registry definitions and world seed");
+        test.succeed();
     }
 
     public static void denseMining(GameTestHelper test) {
@@ -83,6 +105,8 @@ public final class AsteroidGameTests {
         var controlled = new AsteroidDeliveries();
         controlled.enqueue(level, impact, false, top + 20);
         test.assertTrue(controlled.jobs.getFirst().origin.getY() >= top + 23, "Controlled placement clears rocket top");
+        test.assertTrue(AsteroidShape.size(materials).equals(AsteroidShape.measure(controlled.jobs.getFirst().columns())),
+                "Displayed physical dimensions describe the actual normal landing shape");
 
         var blocked = job.position();
         level.getChunk(blocked.getX() >> 4, blocked.getZ() >> 4);

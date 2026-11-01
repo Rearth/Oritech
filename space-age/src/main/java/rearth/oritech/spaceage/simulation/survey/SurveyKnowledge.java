@@ -63,7 +63,7 @@ public final class SurveyKnowledge {
         if (distance > range) return;
         for (var target : truth) {
             if (target.type() != SpaceObjects.ObjectType.ASTEROID
-                    || Math.hypot(target.x() - region.x(), target.y() - region.y()) > region.radius()) continue;
+                    || !SurveyRules.contains(region, target.x(), target.y())) continue;
             measurements.put(target.id(), new Measurement(target, tick));
         }
     }

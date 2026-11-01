@@ -70,7 +70,7 @@ class TransferFeasibilityTest {
         assertTrue(RocketFlightNavigation.navigate(action, craft, context),
                 () -> scenario + ": " + craft.blockedState + " at " + craft.x + ", " + craft.y
                         + " velocity=" + craft.velocityX + ", " + craft.velocityY);
-        assertEquals(SurveyRules.navigationRadius(target) + action.orbit().altitude(),
+        assertEquals(SurveyRules.orbitRadius(target, action.orbit()),
                 Math.hypot(craft.x - target.xAt(craft.time), craft.y - target.yAt(craft.time)), .01, scenario);
         var arrivalSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
         if (action.velocityMode() != ArrivalVelocityMode.MAXIMUM)

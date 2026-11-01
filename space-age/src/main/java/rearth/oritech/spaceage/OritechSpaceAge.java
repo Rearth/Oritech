@@ -30,10 +30,13 @@ import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import rearth.oritech.spaceage.network.RobotNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceAgeGameTests;
 import rearth.oritech.spaceage.simulation.ResourceBodies;
+import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 
@@ -58,6 +61,9 @@ public final class OritechSpaceAge {
         modEventBus.addListener(this::addNetworkHandlers);
         modEventBus.addListener(SpaceAgeDataMaps::register);
         modEventBus.addListener(ResourceBodies::register);
+        modEventBus.addListener(AsteroidGenerator::register);
+        NeoForge.EVENT_BUS.addListener((ServerAboutToStartEvent event) ->
+                AsteroidGenerator.definitions(event.getServer().registryAccess()).validateBlocks());
         modEventBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(() -> {
             CubeSatSplicerBehavior.register();
             LaunchRampImpactBehavior.register();
@@ -94,6 +100,7 @@ public final class OritechSpaceAge {
 
         RocketNetworking.register(event.registrar("1"));
         MissionNetworking.register(event.registrar("1"));
+        FleetCategoryNetworking.register(event.registrar("1"));
         GroundBeamNetworking.register(event.registrar("1"));
         RobotNetworking.register(event.registrar("1"));
     }

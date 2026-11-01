@@ -8,6 +8,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.beam_aperture.GroundBeamRenderer;
@@ -51,6 +53,7 @@ public final class OritechSpaceAgeClient {
                 event.getToolTip().add(Component.translatable("tooltip.oritech_space_age.beam_aperture.operation"));
             }
         });
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> FleetViewPreferences.clearWorld());
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onExtractRenderState);
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::extract);

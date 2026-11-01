@@ -1,0 +1,21 @@
+{
+  "volume": {
+    "min": 50000,
+    "max": 250000
+  },
+  "materials": [
+    {
+      "block": "oritech_space_age:superdense_nickel_ore",
+      "weight": 50
+    },
+    {
+      "block": "oritech_space_age:superdense_platinum_ore",
+      "weight": 30
+    },
+    {
+      "block": "minecraft:deepslate",
+      "weight": 20
+    }
+  ],
+  "surface_gravity": 0
+}

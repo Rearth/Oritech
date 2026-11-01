@@ -1,6 +1,10 @@
 package rearth.oritech.spaceage.client.mission_control;
 
+import rearth.oritech.spaceage.simulation.FleetCategories;
 import net.neoforged.fml.loading.FMLPaths;
+import net.minecraft.client.Minecraft;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import rearth.oritech.spaceage.OritechSpaceAge;
 
 import java.io.IOException;
@@ -15,7 +19,10 @@ import java.util.UUID;
  */
 public final class FleetViewPreferences {
 
-    public static final FleetCategories CATEGORIES = new FleetCategories(FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-fleet-categories.json"));
+    public static final FleetCategories CATEGORIES = categories();
+    private static UUID categorySystem;
+    private static FleetCategories.Saved pendingCategories;
+    private static int pendingCategoryMenu = -1;
     private static final Path FILE = FMLPaths.CONFIGDIR.get().resolve("oritech-space-age-collapsed-craft.txt");
     private static final Set<UUID> COLLAPSED = load();
 
@@ -23,6 +30,40 @@ public final class FleetViewPreferences {
     private static boolean showSun = loadSun();
 
     private FleetViewPreferences() {
+    }
+
+    private static FleetCategories categories() {
+
+        var categories = new FleetCategories();
+        categories.onChange(saved -> {
+            if (categorySystem != null && Minecraft.getInstance().player != null) {
+                pendingCategories = saved;
+                pendingCategoryMenu = Minecraft.getInstance().player.containerMenu.containerId;
+                ClientPacketDistributor.sendToServer(new FleetCategoryNetworking.UpdateCategories(categorySystem, saved));
+            }
+        });
+        return categories;
+    }
+
+    public static boolean receiveCategories(UUID system, FleetCategories.Saved saved) {
+
+        var player = Minecraft.getInstance().player;
+        // Ignore older polls/acks while our latest edit is still travelling to the server.
+        if (system.equals(categorySystem) && pendingCategories != null && player != null
+                && player.containerMenu.containerId == pendingCategoryMenu && !pendingCategories.equals(saved)) return false;
+        pendingCategories = null;
+        var changed = !system.equals(categorySystem) || !CATEGORIES.saved().equals(saved);
+        categorySystem = system;
+        CATEGORIES.replace(saved);
+        return changed;
+    }
+
+    public static void clearWorld() {
+
+        categorySystem = null;
+        pendingCategories = null;
+        pendingCategoryMenu = -1;
+        CATEGORIES.replace(FleetCategories.Saved.EMPTY);
     }
 
     public static boolean showSun() {
