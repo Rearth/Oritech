@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/industrial_support_beam",
+  "textures": {
+    "0": "oritech:block/colored/industrial_support_beam_netherite"
+  }
+}

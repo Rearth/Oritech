@@ -14,10 +14,10 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.Oritech;
 import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.CollisionShapes;
 import rearth.oritech.util.MultiblockMachineController;
+import rearth.oritech.util.PaintableBlock;
 import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
@@ -46,41 +46,47 @@ public class ColorCartridgeItem extends Item {
         var targetBlock = CollisionShapes.getControllerPos(context.getLevel().getBlockState(context.getClickedPos()), context.getLevel(), context.getClickedPos());
         var targetEntity = context.getLevel().getBlockEntity(targetBlock);
 
-        if (targetEntity instanceof ColorableMachine colorableMachine) {
+        var targetState = context.getLevel().getBlockState(targetBlock);
+        var colorableMachine = targetEntity instanceof ColorableMachine machine ? machine : null;
 
-            if (colorableMachine.getCurrentColor().equals(variant)) return super.useOn(context);
-
-            if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
-
-            Oritech.LOGGER.info("assigning color {} to {}", variant, targetBlock);
-            colorableMachine.assignColor(variant);
-
-            var stack = context.getItemInHand();
-            stack.shrink(1);
-
-            context.getPlayer().setItemInHand(context.getHand(), stack);
-
-            context.getLevel().playSound(null, targetBlock, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
-
-            // create particles
-            var targetBlocks = new ArrayList<BlockPos>();
-            targetBlocks.add(targetBlock);
-
-            if (targetEntity instanceof MultiblockMachineController multiblockMachineController) {
-                targetBlocks.addAll(multiblockMachineController.getConnectedCores());
-            }
-
-            var level = context.getLevel();
-            if (context.getLevel() instanceof ServerLevel serverLevel) {
-                for (var pos : targetBlocks) {
-                    var at = pos.getCenter().add(level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1);
-                    ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, at.x, at.y, at.z, 1, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
-                }
-            }
-
-            return InteractionResult.SUCCESS;
+        if (colorableMachine != null) {
+            if (colorableMachine.getCurrentColor() == variant) return InteractionResult.PASS;
+        } else if (!targetState.hasProperty(PaintableBlock.COLOR) || targetState.getValue(PaintableBlock.COLOR) == variant) {
+            return InteractionResult.PASS;
         }
 
-        return super.useOn(context);
+        if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
+
+        if (colorableMachine != null) {
+            colorableMachine.assignColor(variant);
+        } else {
+            context.getLevel().setBlockAndUpdate(targetBlock, targetState.setValue(PaintableBlock.COLOR, variant));
+        }
+
+        var stack = context.getItemInHand();
+        stack.shrink(1);
+
+        if (context.getPlayer() != null)
+            context.getPlayer().setItemInHand(context.getHand(), stack);
+
+        context.getLevel().playSound(null, targetBlock, SoundEvents.AXOLOTL_SPLASH, SoundSource.PLAYERS, 1f, 0.6f);
+
+        // create particles
+        var targetBlocks = new ArrayList<BlockPos>();
+        targetBlocks.add(targetBlock);
+
+        if (targetEntity instanceof MultiblockMachineController multiblockMachineController) {
+            targetBlocks.addAll(multiblockMachineController.getConnectedCores());
+        }
+
+        var level = context.getLevel();
+        if (context.getLevel() instanceof ServerLevel serverLevel) {
+            for (var pos : targetBlocks) {
+                var at = pos.getCenter().add(level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1, level.getRandom().nextFloat() * 0.1);
+                ParticleContent.sendParticles(serverLevel, ParticleTypes.GUST, at.x, at.y, at.z, 1, level.getRandom().nextFloat(), level.getRandom().nextFloat(), level.getRandom().nextFloat(), 0.15f);
+            }
+        }
+
+        return InteractionResult.SUCCESS;
     }
 }

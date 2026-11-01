@@ -19,8 +19,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
+import rearth.oritech.util.PaintableBlock;
 
-public class IndustrialSupportBeamBlock extends Block {
+public class IndustrialSupportBeamBlock extends Block implements PaintableBlock {
 
     // 0 = foot, 1 = inner, 2 = head
     private static final IntegerProperty BEAM_STATE = IntegerProperty.create("beam", 0, 2);
@@ -29,7 +31,7 @@ public class IndustrialSupportBeamBlock extends Block {
 
     public IndustrialSupportBeamBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(BEAM_STATE, 0));
+        this.registerDefaultState(defaultBlockState().setValue(BEAM_STATE, 0).setValue(COLOR, ColorVariant.ORANGE));
     }
 
     @Override
@@ -39,7 +41,7 @@ public class IndustrialSupportBeamBlock extends Block {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(BEAM_STATE);
+        builder.add(BEAM_STATE, COLOR);
     }
 
     @Override
@@ -57,17 +59,15 @@ public class IndustrialSupportBeamBlock extends Block {
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         var level = ctx.getLevel();
         var pos = ctx.getClickedPos();
-        return getTargetState(level, pos);
+        return getTargetState(defaultBlockState(), level, pos);
     }
 
-    private BlockState getTargetState(LevelReader level, BlockPos pos) {
+    private BlockState getTargetState(BlockState state, LevelReader level, BlockPos pos) {
         var isFrameSupport = level.getBlockState(pos).is(TagContent.MACHINE_FRAME_SUPPORT);
         var blockBelow = level.getBlockState(pos.below()).getBlock();
         var beamBelow = blockBelow.equals(BlockContent.INDUSTRIAL_SUPPORT_BEAM.get()) || (isFrameSupport && blockBelow.equals(BlockContent.MACHINE_FRAME.get()));
         var blockAbove = level.getBlockState(pos.above()).getBlock();
         var beamAbove = blockAbove.equals(BlockContent.INDUSTRIAL_SUPPORT_BEAM.get()) || (isFrameSupport && blockAbove.equals(BlockContent.MACHINE_FRAME.get()));
-
-        var state = defaultBlockState();
 
         if (beamBelow && beamAbove)
             return state.setValue(BEAM_STATE, 1);
@@ -80,6 +80,6 @@ public class IndustrialSupportBeamBlock extends Block {
 
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
-        return getTargetState(level, pos);
+        return getTargetState(state, level, pos);
     }
 }

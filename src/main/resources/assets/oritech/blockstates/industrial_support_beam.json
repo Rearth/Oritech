@@ -1,13 +1,85 @@
 {
   "variants": {
-    "beam=0": {
+    "beam=0,color=orange": {
       "model": "oritech:block/industrial_support_beam"
     },
-    "beam=1": {
+    "beam=1,color=orange": {
       "model": "oritech:block/industrial_support_beam_inner"
     },
-    "beam=2": {
+    "beam=2,color=orange": {
       "model": "oritech:block/industrial_support_beam_head"
+    },
+    "beam=0,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_beam_diamond"
+    },
+    "beam=1,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_diamond"
+    },
+    "beam=2,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_beam_head_diamond"
+    },
+    "beam=0,color=camo": {
+      "model": "oritech:block/colored/industrial_support_beam_camo"
+    },
+    "beam=1,color=camo": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_camo"
+    },
+    "beam=2,color=camo": {
+      "model": "oritech:block/colored/industrial_support_beam_head_camo"
+    },
+    "beam=0,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_beam_fluxite"
+    },
+    "beam=1,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_fluxite"
+    },
+    "beam=2,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_beam_head_fluxite"
+    },
+    "beam=0,color=white": {
+      "model": "oritech:block/colored/industrial_support_beam_white"
+    },
+    "beam=1,color=white": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_white"
+    },
+    "beam=2,color=white": {
+      "model": "oritech:block/colored/industrial_support_beam_head_white"
+    },
+    "beam=0,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_beam_industrial"
+    },
+    "beam=1,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_industrial"
+    },
+    "beam=2,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_beam_head_industrial"
+    },
+    "beam=0,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_beam_netherite"
+    },
+    "beam=1,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_netherite"
+    },
+    "beam=2,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_beam_head_netherite"
+    },
+    "beam=0,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_beam_redstone"
+    },
+    "beam=1,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_redstone"
+    },
+    "beam=2,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_beam_head_redstone"
+    },
+    "beam=0,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_beam_sculk"
+    },
+    "beam=1,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_beam_inner_sculk"
+    },
+    "beam=2,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_beam_head_sculk"
     }
   }
 }

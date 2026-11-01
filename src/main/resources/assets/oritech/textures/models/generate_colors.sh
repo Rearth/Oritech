@@ -35,6 +35,10 @@ SOURCE_INDUSTRIAL_DOOR_PRIMARY=(
     "#ffdc89" # 5. Pale Edge Highlight
 )
 
+# Additional pink shades used by the support beam and girder.
+SOURCE_PINK=("#b53962" "#5e1736" "#a53f46" "#ffa7a4")
+PINK_TARGET_INDICES=(1 0 1 4)
+
 # --- 2. THE TARGET PALETTES (PRIMARY) ---
 
 # Variant: Diamond (Sci-Fi / Tech Blue)
@@ -344,6 +348,12 @@ for img in "${TARGET_FILES[@]}"; do
             tgt="${TGT_DOOR[$i]}"
             [ -z "$tgt" ] && continue
             args+=("-fill" "$tgt" "-opaque" "$src")
+        done
+
+        # Match pink shades to the existing warm palette; leave gray metal unchanged.
+        for (( i=0; i<${#SOURCE_PINK[@]}; i++ )); do
+            target_index=${PINK_TARGET_INDICES[$i]}
+            args+=("-fill" "${TGT_DOOR[$target_index]}" "-opaque" "${SOURCE_PINK[$i]}")
         done
 
         # C. Swap Accent Colors (Source Blue -> Fitting Contrast)

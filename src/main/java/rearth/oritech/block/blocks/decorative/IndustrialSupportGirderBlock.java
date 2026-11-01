@@ -18,8 +18,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
+import rearth.oritech.util.PaintableBlock;
 
-public class IndustrialSupportGirderBlock extends HorizontalDirectionalBlock {
+public class IndustrialSupportGirderBlock extends HorizontalDirectionalBlock implements PaintableBlock {
 
     public static final BooleanProperty HEADING = BooleanProperty.create("heading");
 
@@ -28,13 +30,13 @@ public class IndustrialSupportGirderBlock extends HorizontalDirectionalBlock {
 
     public IndustrialSupportGirderBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(HEADING, false));
+        this.registerDefaultState(defaultBlockState().setValue(HEADING, false).setValue(COLOR, ColorVariant.ORANGE));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(HEADING);
+        builder.add(HEADING, COLOR);
         builder.add(BlockStateProperties.HORIZONTAL_FACING);
     }
 

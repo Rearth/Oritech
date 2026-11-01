@@ -64,6 +64,8 @@ public class ModelGenerator extends ModelProvider {
             BlockContent.IRON_PLATING.get(),
             BlockContent.CARBON_PLATING.get(),
             BlockContent.NICKEL_PLATING.get(),
+            BlockContent.INDUSTRIAL_SUPPORT_BEAM.get(),
+            BlockContent.INDUSTRIAL_SUPPORT_GIRDER.get(),
             BlockContent.SMART_SPLITTER.get()
     );
 
@@ -308,8 +310,6 @@ public class ModelGenerator extends ModelProvider {
         //decorative
         generator.createTrivialCube(BlockContent.INDUSTRIAL_GLASS.get());
         generator.createTrivialCube(BlockContent.POWER_BANK_ADDON_EXTENDER.get());
-        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_SUPPORT_BEAM.get(), generator);
-        createNonTemplateModelBlock(BlockContent.INDUSTRIAL_SUPPORT_GIRDER.get(), generator);
 
         generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT.get()));
         generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT_HANGING.get()));

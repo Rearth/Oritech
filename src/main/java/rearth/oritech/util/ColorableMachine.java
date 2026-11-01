@@ -1,6 +1,7 @@
 package rearth.oritech.util;
 
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -8,7 +9,7 @@ import java.util.Locale;
 
 public interface ColorableMachine {
 
-    enum ColorVariant {
+    enum ColorVariant implements StringRepresentable {
         ORANGE,
         DIAMOND,
         CAMO,
@@ -17,8 +18,12 @@ public interface ColorableMachine {
         INDUSTRIAL,
         NETHERITE,
         REDSTONE,
-        SCULK
+        SCULK;
 
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
     }
 
     default boolean supportRecoloring() {

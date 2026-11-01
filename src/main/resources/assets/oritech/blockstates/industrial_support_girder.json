@@ -1,33 +1,265 @@
 {
   "variants": {
-    "heading=true,facing=north": {
+    "heading=true,facing=north,color=orange": {
       "model": "oritech:block/industrial_support_girder",
       "y": 90
     },
-    "heading=true,facing=east": {
+    "heading=true,facing=east,color=orange": {
       "model": "oritech:block/industrial_support_girder",
       "y": 180
     },
-    "heading=true,facing=south": {
+    "heading=true,facing=south,color=orange": {
       "model": "oritech:block/industrial_support_girder",
       "y": 270
     },
-    "heading=true,facing=west": {
+    "heading=true,facing=west,color=orange": {
       "model": "oritech:block/industrial_support_girder"
     },
-    "heading=false,facing=north": {
+    "heading=false,facing=north,color=orange": {
       "model": "oritech:block/industrial_support_girder_straight",
       "y": 90
     },
-    "heading=false,facing=east": {
+    "heading=false,facing=east,color=orange": {
       "model": "oritech:block/industrial_support_girder_straight"
     },
-    "heading=false,facing=south": {
+    "heading=false,facing=south,color=orange": {
       "model": "oritech:block/industrial_support_girder_straight",
       "y": 90
     },
-    "heading=false,facing=west": {
+    "heading=false,facing=west,color=orange": {
       "model": "oritech:block/industrial_support_girder_straight"
+    },
+    "heading=true,facing=north,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_diamond",
+      "y": 90
+    },
+    "heading=true,facing=east,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_diamond",
+      "y": 180
+    },
+    "heading=true,facing=south,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_diamond",
+      "y": 270
+    },
+    "heading=true,facing=west,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_diamond"
+    },
+    "heading=false,facing=north,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_diamond",
+      "y": 90
+    },
+    "heading=false,facing=east,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_diamond"
+    },
+    "heading=false,facing=south,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_diamond",
+      "y": 90
+    },
+    "heading=false,facing=west,color=diamond": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_diamond"
+    },
+    "heading=true,facing=north,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_camo",
+      "y": 90
+    },
+    "heading=true,facing=east,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_camo",
+      "y": 180
+    },
+    "heading=true,facing=south,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_camo",
+      "y": 270
+    },
+    "heading=true,facing=west,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_camo"
+    },
+    "heading=false,facing=north,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_camo",
+      "y": 90
+    },
+    "heading=false,facing=east,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_camo"
+    },
+    "heading=false,facing=south,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_camo",
+      "y": 90
+    },
+    "heading=false,facing=west,color=camo": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_camo"
+    },
+    "heading=true,facing=north,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_fluxite",
+      "y": 90
+    },
+    "heading=true,facing=east,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_fluxite",
+      "y": 180
+    },
+    "heading=true,facing=south,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_fluxite",
+      "y": 270
+    },
+    "heading=true,facing=west,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_fluxite"
+    },
+    "heading=false,facing=north,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_fluxite",
+      "y": 90
+    },
+    "heading=false,facing=east,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_fluxite"
+    },
+    "heading=false,facing=south,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_fluxite",
+      "y": 90
+    },
+    "heading=false,facing=west,color=fluxite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_fluxite"
+    },
+    "heading=true,facing=north,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_white",
+      "y": 90
+    },
+    "heading=true,facing=east,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_white",
+      "y": 180
+    },
+    "heading=true,facing=south,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_white",
+      "y": 270
+    },
+    "heading=true,facing=west,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_white"
+    },
+    "heading=false,facing=north,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_white",
+      "y": 90
+    },
+    "heading=false,facing=east,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_white"
+    },
+    "heading=false,facing=south,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_white",
+      "y": 90
+    },
+    "heading=false,facing=west,color=white": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_white"
+    },
+    "heading=true,facing=north,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_industrial",
+      "y": 90
+    },
+    "heading=true,facing=east,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_industrial",
+      "y": 180
+    },
+    "heading=true,facing=south,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_industrial",
+      "y": 270
+    },
+    "heading=true,facing=west,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_industrial"
+    },
+    "heading=false,facing=north,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_industrial",
+      "y": 90
+    },
+    "heading=false,facing=east,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_industrial"
+    },
+    "heading=false,facing=south,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_industrial",
+      "y": 90
+    },
+    "heading=false,facing=west,color=industrial": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_industrial"
+    },
+    "heading=true,facing=north,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_netherite",
+      "y": 90
+    },
+    "heading=true,facing=east,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_netherite",
+      "y": 180
+    },
+    "heading=true,facing=south,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_netherite",
+      "y": 270
+    },
+    "heading=true,facing=west,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_netherite"
+    },
+    "heading=false,facing=north,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_netherite",
+      "y": 90
+    },
+    "heading=false,facing=east,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_netherite"
+    },
+    "heading=false,facing=south,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_netherite",
+      "y": 90
+    },
+    "heading=false,facing=west,color=netherite": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_netherite"
+    },
+    "heading=true,facing=north,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_redstone",
+      "y": 90
+    },
+    "heading=true,facing=east,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_redstone",
+      "y": 180
+    },
+    "heading=true,facing=south,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_redstone",
+      "y": 270
+    },
+    "heading=true,facing=west,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_redstone"
+    },
+    "heading=false,facing=north,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_redstone",
+      "y": 90
+    },
+    "heading=false,facing=east,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_redstone"
+    },
+    "heading=false,facing=south,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_redstone",
+      "y": 90
+    },
+    "heading=false,facing=west,color=redstone": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_redstone"
+    },
+    "heading=true,facing=north,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_sculk",
+      "y": 90
+    },
+    "heading=true,facing=east,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_sculk",
+      "y": 180
+    },
+    "heading=true,facing=south,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_sculk",
+      "y": 270
+    },
+    "heading=true,facing=west,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_sculk"
+    },
+    "heading=false,facing=north,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_sculk",
+      "y": 90
+    },
+    "heading=false,facing=east,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_sculk"
+    },
+    "heading=false,facing=south,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_sculk",
+      "y": 90
+    },
+    "heading=false,facing=west,color=sculk": {
+      "model": "oritech:block/colored/industrial_support_girder_straight_sculk"
     }
   }
 }

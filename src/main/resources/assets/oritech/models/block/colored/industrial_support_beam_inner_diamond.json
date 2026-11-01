@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/industrial_support_beam_inner",
+  "textures": {
+    "1": "oritech:block/colored/industrial_support_beam_inner_diamond"
+  }
+}
