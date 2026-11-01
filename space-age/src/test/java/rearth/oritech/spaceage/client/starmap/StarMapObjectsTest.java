@@ -56,7 +56,8 @@ class StarMapObjectsTest {
         var selection = new RocketStarMapWidget.NavigationSelection(asteroid.id(), OrbitBand.TIGHT);
         camera.fit(objects.focusPoints(selection), 0, 0, viewport.width(), viewport.height());
         var radius = SurveyRules.orbitRadius(asteroid, OrbitBand.TIGHT);
-        assertTrue(radius > StarMapObjects.displayRadius(asteroid));
+        assertEquals(StarMapObjects.displayRadius(asteroid) * .75, radius, .001);
+        assertEquals(radius, StarMapObjects.surfaceDiscRadius(asteroid));
         assertEquals(asteroid.radius(), SurveyRules.orbitRadius(asteroid, OrbitBand.SURFACE));
         var lines = new ArrayList<StarMapLineRenderer.Line>();
         objects.addReferenceLines(lines, camera, viewport, selection, objects.visibleIcons(camera, viewport, Set.of()));

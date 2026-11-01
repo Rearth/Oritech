@@ -248,6 +248,12 @@ final class StarMapObjects {
         return objects.stream().map(object -> new StarMapCamera.Point(x(object), y(object))).toList();
     }
 
+    static double surfaceDiscRadius(SpaceSimulation.SpaceObjectData object) {
+
+        return object.type() == SpaceObjects.ObjectType.ASTEROID
+                ? SurveyRules.orbitRadius(object, SpaceSimulation.OrbitBand.TIGHT) : object.radius();
+    }
+
     void renderSurfaceDiscs(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport) {
 
         var discs = new ArrayList<StarMapObjectRenderer.Disc>();
@@ -272,17 +278,18 @@ final class StarMapObjects {
                 }
                 continue;
             }
-            if (object.data.radius() * camera.zoom() < 2) continue;
+            if (surfaceDiscRadius(object.data) * camera.zoom() < 2) continue;
             var center = project(camera, viewport, x(object), y(object));
             var color = switch (object.data.type()) {
                 case SUN -> 0x66D7A438;
                 case EARTH -> 0x665A91B8;
                 case MARS -> 0x66975D4C;
-                case ASTEROID, RESOURCE_BODY -> 0x666F675E;
+                case ASTEROID -> 0x306F7379;
+                case RESOURCE_BODY -> 0x666F675E;
                 case SURVEY_REGION -> 0x407F858D;
                 case CRAFT, WAYPOINT -> 0x6693D7C8;
             };
-            var radiusX = object.data.radius() * camera.zoom();
+            var radiusX = surfaceDiscRadius(object.data) * camera.zoom();
             var radiusY = radiusX * StarMapCamera.PLANE_TILT;
             if (!intersects(viewport, center.x(), center.y(), radiusX, radiusY)) continue;
             if (object.data.type() == SpaceObjects.ObjectType.SURVEY_REGION) {

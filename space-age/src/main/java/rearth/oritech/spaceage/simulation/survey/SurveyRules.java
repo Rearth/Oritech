@@ -21,9 +21,9 @@ public final class SurveyRules {
 
     public static double orbitRadius(SpaceSimulation.SpaceObjectData target, SpaceSimulation.OrbitBand orbit) {
 
-        // Asteroids need a navigable stand-off envelope despite their small physical size.
+        // Keep the approach ring close around the enlarged map model, independent of physical surface impacts.
         if (target.type() == SpaceObjects.ObjectType.ASTEROID && orbit == SpaceSimulation.OrbitBand.TIGHT)
-            return Math.max(5_000, target.radius() * 100 + orbit.altitude());
+            return target.radius() * 60.0;
         return navigationRadius(target) + orbit.altitude();
     }
 
