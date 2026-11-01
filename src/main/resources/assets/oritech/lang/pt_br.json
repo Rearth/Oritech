@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "Inválido: os componentes internos do reator precisam ser idênticos em todas as camadas Y e ter portas correspondentes no topo",
   "config.jade.plugin_oritech.machine_core_controller": "Visualização da conexão do controlador de Oritech",
   "text.oritech.shrink": "Compacto!",
-  "text.oritech.shrink_no_addon": "Complementos conectados ausentes.",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "Energia insuficiente.",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "Contagem de Varetas: %s",

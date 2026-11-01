@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "無効：原子炉の内部部品は全てが垂直方向に同一部品で構成され、その頂点に対応するポートが必要です。",
   "config.jade.plugin_oritech.machine_core_controller": "Oritechコントローラーのリンクビュー",
   "text.oritech.shrink": "圧縮！！",
-  "text.oritech.shrink_no_addon": "接続中のアドオンが見つかりません。",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "エネルギーが足りません。",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "燃料棒の数： %s",

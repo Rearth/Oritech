@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "无效：反应堆内部组件必须在所有竖直层内一致，并需要在顶部放置对应的端口",
   "config.jade.plugin_oritech.machine_core_controller": "Oritech控制器连接视图",
   "text.oritech.shrink": "压缩！",
-  "text.oritech.shrink_no_addon": "缺失连接插件。",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "能量不足。",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "棒数：%s",

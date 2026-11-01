@@ -1053,7 +1053,7 @@
   "message.oritech.reactor_interior_issues": "Недопустимо: Компоненти внутрішньої частини реактора повинні бути однаковими на всіх Y-шарах і мати відповідні отвори зверху",
   "config.jade.plugin_oritech.machine_core_controller": "Перегляд зв’язків контролера Oritech",
   "text.oritech.shrink": "Стиснути!",
-  "text.oritech.shrink_no_addon": "Не знайдено встановлених доповнювачів.",
+  "text.oritech.shrink_no_target": "Nothing to compact.",
   "text.oritech.shrink_no_energy": "Недостатньо енергії.",
   "text.oritech.shrink_ready": "",
   "text.oritech.reactor.rod_count": "Кількість стрижнів: %s",
