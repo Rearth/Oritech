@@ -13,11 +13,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.entity.MachineCoreEntity;
 import rearth.oritech.util.ColorableMachine;
+import rearth.oritech.util.CollisionShapes;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.client.init.ParticleContent;
 
@@ -44,20 +43,14 @@ public class ColorCartridgeItem extends Item {
     @Override
     public @NotNull InteractionResult useOn(UseOnContext context) {
 
-        if (context.getLevel().isClientSide())
-            return super.useOn(context);
-
-        var targetBlock = context.getClickedPos();
+        var targetBlock = CollisionShapes.getControllerPos(context.getLevel().getBlockState(context.getClickedPos()), context.getLevel(), context.getClickedPos());
         var targetEntity = context.getLevel().getBlockEntity(targetBlock);
-
-        if (targetEntity instanceof MachineCoreEntity machineCore && machineCore.getCachedController() != null) {
-            targetEntity = (BlockEntity) machineCore.getCachedController();
-            targetBlock = targetEntity.getBlockPos();
-        }
 
         if (targetEntity instanceof ColorableMachine colorableMachine) {
 
             if (colorableMachine.getCurrentColor().equals(variant)) return super.useOn(context);
+
+            if (context.getLevel().isClientSide()) return InteractionResult.SUCCESS;
 
             Oritech.LOGGER.info("assigning color {} to {}", variant, targetBlock);
             colorableMachine.assignColor(variant);
