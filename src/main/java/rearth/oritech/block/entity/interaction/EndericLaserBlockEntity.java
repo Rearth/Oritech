@@ -10,6 +10,7 @@ import com.geckolib.util.GeckoLibUtil;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
@@ -54,6 +55,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.util.PermissionHelpers;
 import rearth.oritech.api.networking.LevelPacketCodec;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
@@ -157,6 +159,9 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
     public float lastLaserRotX;
     public float lastLaserRotY;
     private Player laserPlayerEntity = null;
+    // player that placed the laser; the laser's fake player uses this id so protection mods can tell who owns it
+    @Nullable
+    private UUID ownerId = null;
 
     public EndericLaserBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.ENDERIC_LASER.get(), pos, state);
@@ -235,6 +240,12 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
     public void finishBlockBreaking(BlockPos targetPos, BlockState targetBlockState) {
         progress -= targetBlockEnergyNeeded;
 
+        // respect claim / protection mods (FTB Chunks etc.), same as the railgun and promethium tools
+        if (getLaserPlayerEntity() instanceof ServerPlayer laserPlayer && !PermissionHelpers.CanPlayerBreakBlock(level, targetPos, targetBlockState, laserPlayer)) {
+            findNextBlockBreakTarget();
+            return;
+        }
+
         var targetEntity = level.getBlockEntity(targetPos);
         List<ItemStack> dropped;
         // added getLaserPlayerEntity() to make ae2 certus quartz drop from certus
@@ -289,12 +300,18 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
         return candidate.orElse(null);
     }
 
+    public void setOwner(@Nullable UUID owner) {
+        this.ownerId = owner;
+        this.laserPlayerEntity = null;
+        this.setChanged();
+    }
+
     public Player getLaserPlayerEntity() {
         if (!(level instanceof ServerLevel serverLevel))
             return null;
 
         if (laserPlayerEntity == null) {
-            laserPlayerEntity = new LaserMachinePlayer(serverLevel, new GameProfile(UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
+            laserPlayerEntity = new LaserMachinePlayer(serverLevel, new GameProfile(ownerId != null ? ownerId : UUID.randomUUID(), LASER_PLAYER_NAME), inventory);
             laserPlayerEntity.setPos(Vec3.atLowerCornerOf(getBlockPos()));
         }
 
@@ -590,6 +607,7 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
         output.putBoolean("cropAddon", hasCropFilterAddon);
         output.putBoolean("silkAddon", hasSilkTouchAddon);
         output.putInt("hunterTargetMode", hunterTargetMode.value);
+        if (ownerId != null) output.store("owner", UUIDUtil.CODEC, ownerId);
 
         if (targetDirection != null && currentTarget != null) {
             output.store("target_position", BlockPos.CODEC, currentTarget);
@@ -622,6 +640,7 @@ public class EndericLaserBlockEntity extends NetworkedBlockEntity implements
         hunterTargetMode = HunterTargetMode.fromValue(input.getIntOr("hunterTargetMode", 0));
         hasCropFilterAddon = input.getBooleanOr("cropAddon", false);
         hasSilkTouchAddon = input.getBooleanOr("silkAddon", false);
+        ownerId = input.read("owner", UUIDUtil.CODEC).orElse(null);
 
         pendingArea = input.childrenListOrEmpty("pendingPositions").stream()
                 .map(posData -> posData.read("pos", BlockPos.CODEC))
