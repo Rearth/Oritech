@@ -10,6 +10,7 @@ import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
+import net.neoforged.neoforge.common.conditions.NotCondition;
 import rearth.oritech.Oritech;
 import rearth.oritech.compat.datagen.resolver.FTBMaterialResolver;
 import rearth.oritech.datagen.builders.BedrockExtractorRecipeBuilder;
@@ -29,7 +30,7 @@ public class FTBMaterialsCompatRecipeProvider extends RecipeProvider {
     public FTBMaterialsCompatRecipeProvider(RecipeOutput output, HolderLookup.Provider registries) {
         super(registries, output);
 
-        this.modLoadedOutput = output.withConditions(new ModLoadedCondition(FTBMaterials.MOD_ID));
+        this.modLoadedOutput = output.withConditions(new ModLoadedCondition(FTBMaterials.MOD_ID), new NotCondition(new ModLoadedCondition("jaopca")));
         this.resolver = new FTBMaterialResolver(this.items);
     }
 

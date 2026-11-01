@@ -17,6 +17,7 @@ import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
+import net.neoforged.neoforge.common.conditions.NotCondition;
 import rearth.oritech.Oritech;
 import rearth.oritech.compat.datagen.resolver.ATOMaterialResolver;
 import rearth.oritech.datagen.builders.BedrockExtractorRecipeBuilder;
@@ -33,7 +34,7 @@ public class ATOCompatRecipeProvider extends RecipeProvider {
     public ATOCompatRecipeProvider(RecipeOutput output, HolderLookup.Provider registries) {
         super(registries, output);
 
-        this.modLoadedOutput = output.withConditions(new ModLoadedCondition(ATO.MOD_ID));
+        this.modLoadedOutput = output.withConditions(new ModLoadedCondition(ATO.MOD_ID), new NotCondition(new ModLoadedCondition("jaopca")));
         this.resolver = new ATOMaterialResolver(this.items);
     }
 

@@ -82,7 +82,7 @@ public class RecipeGenerator extends RecipeProvider {
     private void addVanillaAdditions(RecipeOutput exporter) {
 
         // Efficient alternatives to vanilla crafting.
-        new AssemblerRecipeBuilder(this.registries).input(ItemTags.PLANKS).input(ItemTags.PLANKS).input(Items.BOOK).input(Items.BOOK).result(Items.BOOKSHELF, 2).timeMultiplier(0.4f).export(exporter, "bookshelf");
+        new AssemblerRecipeBuilder(this.registries).input(ItemTags.PLANKS).input(Items.BOOK).input(Items.BOOK).input(Items.BOOK).result(Items.BOOKSHELF).timeMultiplier(0.4f).export(exporter, "bookshelf");
         new AssemblerRecipeBuilder(this.registries).input(Items.FLINT).input(Items.STICK).input(Items.STICK).input(Items.FEATHER).result(Items.ARROW, 16).timeMultiplier(0.4f).export(exporter, "arrows");
 
         // Golden dandelions and dried ghasts use fewer ingredients than vanilla crafting.
@@ -487,9 +487,9 @@ public class RecipeGenerator extends RecipeProvider {
         // large solar
         offerGeneratorRecipe(exporter, BlockContent.BIG_SOLAR_PANEL.asItem(), of(BlockContent.BASIC_GENERATOR.asItem()), of(ItemContent.FLUX_GATE), of(ItemContent.ADVANCED_BATTERY), of(ItemContent.FLUXITE), "solar");
 
-        // equipmentCharger
-        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentcharger");
-        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipmentchargeralt");
+        // equipment charger
+        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(cItemTag("storage_blocks/redstone")), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipment_charger");
+        offerAtomicForgeRecipe(exporter, BlockContent.EQUIPMENT_CHARGER.asItem(), of(cItemTag("chests/wooden")), of(BlockContent.ENERGY_PIPE), of(ItemContent.PROCESSING_UNIT), of(Items.DISPENSER), of(TagContent.STEEL_INGOTS), "equipment_charger_alt");
 
         // small storage: nickel enclosure around the battery, silicon and coil alongside
         offerEarlyFurnaceRecipe(exporter, BlockContent.PORTABLE_ENERGY_STORAGE.asItem(), of(ItemContent.BASIC_BATTERY), of(ItemContent.MAGNETIC_COIL), of(TagContent.SILICON), of(TagContent.NICKEL_INGOTS), of(TagContent.NICKEL_INGOTS), "smallstorage", "f f", "mbs", " c ");
