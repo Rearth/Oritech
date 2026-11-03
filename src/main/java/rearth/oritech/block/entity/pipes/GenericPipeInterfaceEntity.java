@@ -20,6 +20,7 @@ import rearth.oritech.block.entity.interaction.PipeBoosterBlockEntity;
 import rearth.oritech.config.OritechConfig;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import static rearth.oritech.block.blocks.pipes.GenericPipeBlock.NO_CONNECTION;
 
@@ -150,7 +151,7 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         Oritech.LOGGER.debug("Nodes:    " + foundNetwork.size() + " | " + foundNetwork);
         Oritech.LOGGER.debug("Machines: " + foundMachines.size() + " | " + foundMachines.stream().map(elem -> elem.machinePos() + ":" + elem.insertedFrom()).toList());
 
-        var netID = foundNetwork.hashCode();
+        var netID = data.allocateNetworkId();
         data.pipeNetworks.put(netID, foundNetwork);
         data.pipeNetworkInterfaces.put(netID, foundMachines);
 
@@ -167,6 +168,8 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             data.pipeNetworkInterfaces.remove(i);
         });
 
+        // TODO(legacy-pipe-hash-recovery): Remove this cleanup when dropping old-save recovery.
+        data.nodesToRebuild.removeAll(foundNetwork);
         data.setDirty();
     }
 
@@ -184,7 +187,10 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         return res;
     }
 
-    public static Set<PipeNetworkTarget> findNetworkTargets(BlockPos from, PipeNetworkData data) {
+    public Set<PipeNetworkTarget> findNetworkTargets(BlockPos from, PipeNetworkData data) {
+        // TODO(legacy-pipe-hash-recovery): Remove the repair hook below and restore this method to static.
+        // Old hash collisions can leave several disconnected components sharing one saved ID.
+        if (data.nodesToRebuild.contains(from)) updateFromNode(level, from, data);
         return data.getNetworkTargets(from);
     }
 
@@ -318,6 +324,19 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
         public final HashMap<Integer, Set<PipeNetworkTarget>> pipeNetworkInterfaces = new HashMap<>(); // list of machines and insertion faces connected to the network
         public final HashMap<BlockPos, Set<Direction>> machinePipeNeighbors = new HashMap<>(); // List of neighboring pipes per machine, and the direction they are in. Missing direction means no connection
 
+        private int nextNetworkId;
+        // TODO(legacy-pipe-hash-recovery): Remove this field when dropping old-save recovery.
+        private final Set<BlockPos> nodesToRebuild = new HashSet<>();
+
+        private int allocateNetworkId() {
+            // Reserve IDs referenced by incomplete saved networks too; -1 means no network.
+            while (nextNetworkId == -1 || pipeNetworks.containsKey(nextNetworkId)
+                    || pipeNetworkInterfaces.containsKey(nextNetworkId) || pipeNetworkLinks.containsValue(nextNetworkId)) {
+                nextNetworkId++;
+            }
+            return nextNetworkId++;
+        }
+
         @Override
         public int hashCode() {
             int result = pipeNetworkLinks.hashCode();
@@ -416,6 +435,21 @@ public abstract class GenericPipeInterfaceEntity extends BlockEntity implements 
             data.pipeNetworks.putAll(networks);
             data.pipeNetworkInterfaces.putAll(networkInterfaces);
             data.machinePipeNeighbors.putAll(machineNeighbors);
+
+            data.nextNetworkId = Stream.of(links.values(), networks.keySet(), networkInterfaces.keySet())
+                    .flatMap(Collection::stream).mapToInt(Integer::intValue).max().orElse(-1) + 1;
+
+            // TODO(legacy-pipe-hash-recovery): Remove the detection block below when dropping old-save recovery.
+            // A collision overwrites one component's node set but leaves both components' links.
+            // Mark every node sharing that ID so each component can repair itself before transferring.
+            var invalidNetworks = new HashSet<Integer>();
+            links.forEach((pos, id) -> {
+                var nodes = networks.get(id);
+                if (nodes == null || !nodes.contains(pos) || !networkInterfaces.containsKey(id)) invalidNetworks.add(id);
+            });
+            links.forEach((pos, id) -> {
+                if (invalidNetworks.contains(id)) data.nodesToRebuild.add(pos);
+            });
 
             return data;
         }
