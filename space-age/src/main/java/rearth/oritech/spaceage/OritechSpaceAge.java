@@ -30,6 +30,7 @@ import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
+import rearth.oritech.spaceage.network.HoloNetworking;
 import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import rearth.oritech.spaceage.network.RobotNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
@@ -100,6 +101,7 @@ public final class OritechSpaceAge {
 
         RocketNetworking.register(event.registrar("1"));
         MissionNetworking.register(event.registrar("1"));
+        HoloNetworking.register(event.registrar("1"));
         FleetCategoryNetworking.register(event.registrar("1"));
         GroundBeamNetworking.register(event.registrar("1"));
         RobotNetworking.register(event.registrar("1"));

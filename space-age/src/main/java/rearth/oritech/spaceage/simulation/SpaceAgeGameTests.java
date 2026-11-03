@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.JsonOps;
 import com.mojang.authlib.GameProfile;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
+import rearth.oritech.spaceage.block.hologram.HoloGameTests;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import io.netty.buffer.Unpooled;
@@ -100,6 +101,7 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("dense_mining", () -> AsteroidGameTests::denseMining);
         FUNCTIONS.register("asteroid_landing", () -> AsteroidGameTests::landingAndProtection);
         FUNCTIONS.register("large_asteroid_delivery", () -> AsteroidGameTests::largeDelivery);
+        FUNCTIONS.register("holo_projector", () -> HoloGameTests::projector);
         FUNCTIONS.register("mission_control_initial", () -> SpaceAgeGameTests::missionControlInitial);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
@@ -120,7 +122,7 @@ public final class SpaceAgeGameTests {
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
         event.registerTest(OritechSpaceAge.id("robot_bonemeal"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_bonemeal")), info));
-        for (var name : List.of("mission_control_initial", "asteroid_generation", "dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
+        for (var name : List.of("holo_projector", "mission_control_initial", "asteroid_generation", "dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
             var key = ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name));
             event.registerTest(key.identifier(), new FunctionGameTestInstance(key,
                     new TestData<>(environment, Identifier.parse("minecraft:empty"), 6000, 1, true)));

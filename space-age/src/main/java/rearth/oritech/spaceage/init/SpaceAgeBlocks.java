@@ -9,6 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent.NoAutoDrop;
 import rearth.oritech.init.BlockContent.NoBlockItem;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.hologram.HoloControllerBlock;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlock;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
 import rearth.oritech.spaceage.block.basic.GalleryLightBlock;
@@ -29,6 +30,11 @@ import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlock;
 public final class SpaceAgeBlocks {
 
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(OritechSpaceAge.MOD_ID);
+
+    public static final DeferredBlock<Block> HOLO_SCREEN = BLOCKS.registerSimpleBlock("holo_screen",
+            () -> machineProperties().lightLevel(state -> 4));
+    public static final DeferredBlock<HoloControllerBlock> HOLO_CONTROLLER = BLOCKS.registerBlock("holo_controller",
+            HoloControllerBlock::new, () -> machineProperties().lightLevel(state -> 5));
 
     public static final DeferredBlock<RobotArmBlock> ROBOT_ARM = BLOCKS.registerBlock("robot_arm", RobotArmBlock::new, () -> machineProperties().noOcclusion());
 

@@ -87,6 +87,15 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                     .define('f', BlockContent.MACHINE_FRAME)
                     .unlockedBy("has_processor", has(ItemContent.PROCESSING_UNIT)).save(output);
         }
+        shaped(RecipeCategory.BUILDING_BLOCKS, SpaceAgeBlocks.HOLO_SCREEN, 8)
+                .pattern("ggg").pattern("rar").pattern("sss")
+                .define('g', Items.TINTED_GLASS).define('r', Items.REDSTONE).define('a', Items.AMETHYST_SHARD)
+                .define('s', ItemContent.STEEL_INGOT).unlockedBy("has_amethyst", has(Items.AMETHYST_SHARD)).save(output);
+        shaped(RecipeCategory.MISC, SpaceAgeBlocks.HOLO_CONTROLLER)
+                .pattern("aga").pattern("pcp").pattern("sfs")
+                .define('a', Items.AMETHYST_SHARD).define('g', Items.GLASS).define('p', ItemContent.PROCESSING_UNIT)
+                .define('c', Items.COMPARATOR).define('s', ItemContent.STEEL_INGOT).define('f', BlockContent.MACHINE_FRAME)
+                .unlockedBy("has_mission_control", has(SpaceAgeBlocks.MISSION_CONTROL)).save(output);
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.LAUNCH_RAMP)
                 .pattern("sms").pattern("rpr").pattern("sfs")
                 .define('s', ItemContent.STEEL_INGOT).define('m', BlockContent.ACCELERATOR_MOTOR)

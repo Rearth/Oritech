@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_mission_control": {
+      "conditions": {
+        "items": [
+          {
+            "items": "oritech_space_age:mission_control"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "oritech_space_age:holo_controller"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_mission_control"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "oritech_space_age:holo_controller"
+    ]
+  }
+}

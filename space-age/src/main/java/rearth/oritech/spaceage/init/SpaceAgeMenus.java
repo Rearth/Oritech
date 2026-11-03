@@ -6,6 +6,8 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.hologram.HoloControllerMenu;
+import rearth.oritech.spaceage.client.hologram.HoloControllerScreen;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
@@ -30,11 +32,15 @@ public final class SpaceAgeMenus {
     public static final Supplier<MenuType<RobotMenu>> ROBOT =
             MENUS.register("robot_arm", () -> IMenuTypeExtension.create(RobotMenu::new));
 
+    public static final Supplier<MenuType<HoloControllerMenu>> HOLO_CONTROLLER = MENUS.register("holo_controller",
+            () -> IMenuTypeExtension.create(HoloControllerMenu::new));
+
     private SpaceAgeMenus() {
     }
 
     public static void registerScreens(RegisterMenuScreensEvent event) {
 
+        event.register(HOLO_CONTROLLER.get(), HoloControllerScreen::new);
         event.register(LAUNCH_RAMP.get(), LaunchRampScreen::new);
 
         event.register(ROBOT.get(), RobotScreen::new);

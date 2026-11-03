@@ -1,0 +1,21 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech_space_age:block/holo_screen"
+    }
+  },
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "up": {
+      "center": "oritech_space_age:block/holo_screen/center",
+      "empty": "oritech_space_age:block/holo_screen/empty",
+      "horizontal": "oritech_space_age:block/holo_screen/horizontal",
+      "vertical": "oritech_space_age:block/holo_screen/vertical",
+      "particle": "oritech_space_age:block/holo_screen/particle"
+    },
+    "default": "oritech:block/carbon_plating/empty"
+  },
+  "connect_to": {
+    "type": "sameState"
+  }
+}

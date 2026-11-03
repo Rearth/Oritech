@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "a": "minecraft:amethyst_shard",
+    "c": "minecraft:comparator",
+    "f": "oritech:machine_frame",
+    "g": "minecraft:glass",
+    "p": "oritech:processing_unit",
+    "s": "oritech:steel_ingot"
+  },
+  "pattern": [
+    "aga",
+    "pcp",
+    "sfs"
+  ],
+  "result": {
+    "id": "oritech_space_age:holo_controller"
+  }
+}

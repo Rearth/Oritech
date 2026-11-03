@@ -112,6 +112,8 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.CUBE_SAT.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.LAUNCH_RAMP.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.HOLO_SCREEN.get(), blockModels);
+        createHorizontalModelBlock(SpaceAgeBlocks.HOLO_CONTROLLER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.ANTENNA.get(), blockModels);
         itemModels.itemModelOutput.accept(SpaceAgeItems.MISSION_CARD.get(),

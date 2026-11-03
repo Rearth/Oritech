@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech_space_age:block/holo_controller",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/holo_controller"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/holo_controller",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/holo_controller",
+      "y": 270
+    }
+  }
+}
