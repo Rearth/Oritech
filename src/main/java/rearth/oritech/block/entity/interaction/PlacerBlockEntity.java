@@ -25,6 +25,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.PaintableBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.lang.reflect.Field;
@@ -100,7 +101,7 @@ public class PlacerBlockEntity extends ItemEnergyFrameInteractionBlockEntity imp
 
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_PLACER_HEAD.get().defaultBlockState();
+        return BlockContent.BLOCK_PLACER_HEAD.get().defaultBlockState().setValue(PaintableBlock.COLOR, getBlockState().getValue(PaintableBlock.COLOR));
     }
 
     @Override

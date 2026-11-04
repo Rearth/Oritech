@@ -39,23 +39,26 @@ import rearth.oritech.init.ComponentContent;
 import rearth.oritech.util.ComparatorOutputProvider;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public class PortableEnergyStorageBlock extends Block implements EntityBlock, TooltipProvider {
+public class PortableEnergyStorageBlock extends Block implements PaintableBlock, EntityBlock, TooltipProvider {
 
     public static final EnumProperty<Direction> TARGET_DIR = BlockStateProperties.FACING;
 
     public PortableEnergyStorageBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(TARGET_DIR, Direction.NORTH));
+        this.registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE).setValue(TARGET_DIR, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         builder.add(TARGET_DIR);
     }
 

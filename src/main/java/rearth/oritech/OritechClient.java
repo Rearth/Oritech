@@ -1,6 +1,8 @@
 package rearth.oritech;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import earth.terrarium.athena.api.client.models.FactoryManager;
+import rearth.oritech.client.renderers.models.ColoredConnectedBlockModel;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
@@ -68,6 +70,8 @@ public final class OritechClient {
 
     public OritechClient(IEventBus modEventBus, ModContainer container) {
         Oritech.LOGGER.info("Oritech client initialization");
+
+        FactoryManager.register(Oritech.id("colored_ctm"), json -> () -> new ColoredConnectedBlockModel(json));
 
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
 

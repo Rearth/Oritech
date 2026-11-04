@@ -26,7 +26,7 @@ public final class SpaceAgeCreativeTabs {
                 SpaceAgeItems.ITEMS.getEntries().stream().filter(item -> item.get() != SpaceAgeBlocks.CUBE_SAT.get().asItem())
                         .forEach(item -> output.accept(item.get()));
                 var paintings = parameters.holders().lookupOrThrow(Registries.PAINTING_VARIANT);
-                for (var name : List.of("earth", "mars", "sun")) {
+                for (var name : List.of("earth", "mars", "sun", "earth_from_space", "satellite", "solar_horizon")) {
                     var painting = new ItemStack(Items.PAINTING);
                     painting.set(DataComponents.PAINTING_VARIANT,
                             paintings.getOrThrow(ResourceKey.create(Registries.PAINTING_VARIANT, OritechSpaceAge.id(name))));

@@ -32,6 +32,8 @@ import net.neoforged.fml.ModList;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.ItemFilterBlockEntity;
 import rearth.oritech.util.Geometry;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.function.Consumer;
 
@@ -40,17 +42,18 @@ import java.util.function.Consumer;
 // connects via pipes to other nearby inventories
 // has a GUI to configure filter options (n amount of slots available, and some buttons to filter based on metadata)
 // filter options: whitelist/blacklist, ignore damage, ignore nbt
-public class ItemFilterBlock extends Block implements EntityBlock, TooltipProvider {
+public class ItemFilterBlock extends Block implements PaintableBlock, EntityBlock, TooltipProvider {
 
     private static final VoxelShape[] BOUNDING_SHAPES;
 
     public ItemFilterBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(BlockStateProperties.FACING, Direction.NORTH));
+        this.registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE).setValue(BlockStateProperties.FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         builder.add(BlockStateProperties.FACING);
     }
 

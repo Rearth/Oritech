@@ -1,26 +1,210 @@
 {
   "variants": {
-    "facing=south": {
+    "facing=south,color=orange": {
       "model": "oritech:block/portable_energy_storage",
       "y": 180
     },
-    "facing=east": {
+    "facing=south,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond",
+      "y": 180
+    },
+    "facing=south,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo",
+      "y": 180
+    },
+    "facing=south,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite",
+      "y": 180
+    },
+    "facing=south,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white",
+      "y": 180
+    },
+    "facing=south,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial",
+      "y": 180
+    },
+    "facing=south,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite",
+      "y": 180
+    },
+    "facing=south,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone",
+      "y": 180
+    },
+    "facing=south,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk",
+      "y": 180
+    },
+    "facing=east,color=orange": {
       "model": "oritech:block/portable_energy_storage",
       "y": 90
     },
-    "facing=north": {
+    "facing=east,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond",
+      "y": 90
+    },
+    "facing=east,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo",
+      "y": 90
+    },
+    "facing=east,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite",
+      "y": 90
+    },
+    "facing=east,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white",
+      "y": 90
+    },
+    "facing=east,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial",
+      "y": 90
+    },
+    "facing=east,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite",
+      "y": 90
+    },
+    "facing=east,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone",
+      "y": 90
+    },
+    "facing=east,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk",
+      "y": 90
+    },
+    "facing=north,color=orange": {
       "model": "oritech:block/portable_energy_storage"
     },
-    "facing=west": {
+    "facing=north,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond"
+    },
+    "facing=north,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo"
+    },
+    "facing=north,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite"
+    },
+    "facing=north,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white"
+    },
+    "facing=north,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial"
+    },
+    "facing=north,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite"
+    },
+    "facing=north,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone"
+    },
+    "facing=north,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk"
+    },
+    "facing=west,color=orange": {
       "model": "oritech:block/portable_energy_storage",
       "y": 270
     },
-    "facing=up": {
+    "facing=west,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond",
+      "y": 270
+    },
+    "facing=west,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo",
+      "y": 270
+    },
+    "facing=west,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite",
+      "y": 270
+    },
+    "facing=west,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white",
+      "y": 270
+    },
+    "facing=west,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial",
+      "y": 270
+    },
+    "facing=west,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite",
+      "y": 270
+    },
+    "facing=west,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone",
+      "y": 270
+    },
+    "facing=west,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk",
+      "y": 270
+    },
+    "facing=up,color=orange": {
       "model": "oritech:block/portable_energy_storage",
       "x": -90
     },
-    "facing=down": {
+    "facing=up,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond",
+      "x": -90
+    },
+    "facing=up,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo",
+      "x": -90
+    },
+    "facing=up,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite",
+      "x": -90
+    },
+    "facing=up,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white",
+      "x": -90
+    },
+    "facing=up,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial",
+      "x": -90
+    },
+    "facing=up,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite",
+      "x": -90
+    },
+    "facing=up,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone",
+      "x": -90
+    },
+    "facing=up,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk",
+      "x": -90
+    },
+    "facing=down,color=orange": {
       "model": "oritech:block/portable_energy_storage",
+      "x": 90
+    },
+    "facing=down,color=diamond": {
+      "model": "oritech:block/colored/portable_energy_storage_diamond",
+      "x": 90
+    },
+    "facing=down,color=camo": {
+      "model": "oritech:block/colored/portable_energy_storage_camo",
+      "x": 90
+    },
+    "facing=down,color=fluxite": {
+      "model": "oritech:block/colored/portable_energy_storage_fluxite",
+      "x": 90
+    },
+    "facing=down,color=white": {
+      "model": "oritech:block/colored/portable_energy_storage_white",
+      "x": 90
+    },
+    "facing=down,color=industrial": {
+      "model": "oritech:block/colored/portable_energy_storage_industrial",
+      "x": 90
+    },
+    "facing=down,color=netherite": {
+      "model": "oritech:block/colored/portable_energy_storage_netherite",
+      "x": 90
+    },
+    "facing=down,color=redstone": {
+      "model": "oritech:block/colored/portable_energy_storage_redstone",
+      "x": 90
+    },
+    "facing=down,color=sculk": {
+      "model": "oritech:block/colored/portable_energy_storage_sculk",
       "x": 90
     }
   }

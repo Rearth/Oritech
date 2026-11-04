@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_capacitor_addon_on",
+  "textures": {
+    "0": "oritech:block/colored/machine_capacitor_addon_on_sculk"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_extender",
+  "textures": {
+    "all": "oritech:block/colored/machine_extender_camo"
+  }
+}

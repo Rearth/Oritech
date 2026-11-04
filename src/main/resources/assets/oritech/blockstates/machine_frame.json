@@ -1,13 +1,87 @@
 {
   "multipart": [
     {
+      "when": {
+        "color": "orange"
+      },
       "apply": {
         "model": "oritech:block/machine_frame_inner"
       }
     },
     {
       "when": {
-        "north": "true"
+        "color": "diamond"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_diamond"
+      }
+    },
+    {
+      "when": {
+        "color": "camo"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_camo"
+      }
+    },
+    {
+      "when": {
+        "color": "fluxite"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_fluxite"
+      }
+    },
+    {
+      "when": {
+        "color": "white"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_white"
+      }
+    },
+    {
+      "when": {
+        "color": "industrial"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_industrial"
+      }
+    },
+    {
+      "when": {
+        "color": "netherite"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_netherite"
+      }
+    },
+    {
+      "when": {
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_redstone"
+      }
+    },
+    {
+      "when": {
+        "color": "sculk"
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_inner_sculk"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
@@ -16,7 +90,142 @@
     },
     {
       "when": {
-        "south": "true"
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
@@ -25,7 +234,142 @@
     },
     {
       "when": {
-        "east": "true"
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
+        "y": 0
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
@@ -34,7 +378,142 @@
     },
     {
       "when": {
-        "west": "true"
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
@@ -43,7 +522,142 @@
     },
     {
       "when": {
-        "up": "true"
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
@@ -52,10 +666,273 @@
     },
     {
       "when": {
-        "down": "true"
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "orange"
+          }
+        ]
       },
       "apply": {
         "model": "oritech:block/machine_frame_outer",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_diamond",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_camo",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_fluxite",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_white",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_industrial",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_netherite",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_redstone",
+        "x": -90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "true"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/machine_frame_outer_sculk",
         "x": -90
       }
     }

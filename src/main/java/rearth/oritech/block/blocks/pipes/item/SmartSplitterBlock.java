@@ -29,11 +29,13 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.pipes.SmartSplitterBlockEntity;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-public class SmartSplitterBlock extends Block implements EntityBlock, TooltipProvider {
+public class SmartSplitterBlock extends Block implements PaintableBlock, EntityBlock, TooltipProvider {
 
     public static final EnumProperty<SideMode> NORTH = EnumProperty.create("north", SideMode.class);
     public static final EnumProperty<SideMode> EAST = EnumProperty.create("east", SideMode.class);
@@ -42,7 +44,7 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
 
     public SmartSplitterBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState()
+        registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE)
                 .setValue(NORTH, SideMode.CLOSED)
                 .setValue(EAST, SideMode.CLOSED)
                 .setValue(SOUTH, SideMode.CLOSED)
@@ -51,6 +53,7 @@ public class SmartSplitterBlock extends Block implements EntityBlock, TooltipPro
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         builder.add(NORTH, EAST, SOUTH, WEST);
     }
 

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/placer",
+  "textures": {
+    "1": "oritech:block/colored/placer_white"
+  }
+}

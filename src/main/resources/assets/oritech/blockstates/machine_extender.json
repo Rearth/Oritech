@@ -1,10 +1,58 @@
 {
   "variants": {
-    "addon_used=true": {
+    "addon_used=true,color=orange": {
       "model": "oritech:block/machine_extender"
     },
-    "addon_used=false": {
+    "addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/machine_extender_diamond"
+    },
+    "addon_used=true,color=camo": {
+      "model": "oritech:block/colored/machine_extender_camo"
+    },
+    "addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/machine_extender_fluxite"
+    },
+    "addon_used=true,color=white": {
+      "model": "oritech:block/colored/machine_extender_white"
+    },
+    "addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/machine_extender_industrial"
+    },
+    "addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/machine_extender_netherite"
+    },
+    "addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/machine_extender_redstone"
+    },
+    "addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/machine_extender_sculk"
+    },
+    "addon_used=false,color=orange": {
       "model": "oritech:block/machine_extender_off"
+    },
+    "addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/machine_extender_off_diamond"
+    },
+    "addon_used=false,color=camo": {
+      "model": "oritech:block/colored/machine_extender_off_camo"
+    },
+    "addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/machine_extender_off_fluxite"
+    },
+    "addon_used=false,color=white": {
+      "model": "oritech:block/colored/machine_extender_off_white"
+    },
+    "addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/machine_extender_off_industrial"
+    },
+    "addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/machine_extender_off_netherite"
+    },
+    "addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/machine_extender_off_redstone"
+    },
+    "addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/machine_extender_off_sculk"
     }
   }
 }

@@ -1,0 +1,31 @@
+{
+  "variants": {
+    "color=orange": {
+      "model": "oritech:block/block_destroyer_head"
+    },
+    "color=diamond": {
+      "model": "oritech:block/colored/block_destroyer_head_diamond"
+    },
+    "color=camo": {
+      "model": "oritech:block/colored/block_destroyer_head_camo"
+    },
+    "color=fluxite": {
+      "model": "oritech:block/colored/block_destroyer_head_fluxite"
+    },
+    "color=white": {
+      "model": "oritech:block/colored/block_destroyer_head_white"
+    },
+    "color=industrial": {
+      "model": "oritech:block/colored/block_destroyer_head_industrial"
+    },
+    "color=netherite": {
+      "model": "oritech:block/colored/block_destroyer_head_netherite"
+    },
+    "color=redstone": {
+      "model": "oritech:block/colored/block_destroyer_head_redstone"
+    },
+    "color=sculk": {
+      "model": "oritech:block/colored/block_destroyer_head_sculk"
+    }
+  }
+}

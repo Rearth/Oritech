@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/frame_gantry_arm",
+  "textures": {
+    "1": "oritech:block/colored/frame_gantry_arm_netherite",
+    "particle": "oritech:block/colored/frame_gantry_arm_netherite"
+  }
+}

@@ -1,0 +1,139 @@
+{
+  "variants": {
+    "facing=east,color=orange": {
+      "model": "oritech:block/placer",
+      "y": 90
+    },
+    "facing=east,color=diamond": {
+      "model": "oritech:block/colored/placer_diamond",
+      "y": 90
+    },
+    "facing=east,color=camo": {
+      "model": "oritech:block/colored/placer_camo",
+      "y": 90
+    },
+    "facing=east,color=fluxite": {
+      "model": "oritech:block/colored/placer_fluxite",
+      "y": 90
+    },
+    "facing=east,color=white": {
+      "model": "oritech:block/colored/placer_white",
+      "y": 90
+    },
+    "facing=east,color=industrial": {
+      "model": "oritech:block/colored/placer_industrial",
+      "y": 90
+    },
+    "facing=east,color=netherite": {
+      "model": "oritech:block/colored/placer_netherite",
+      "y": 90
+    },
+    "facing=east,color=redstone": {
+      "model": "oritech:block/colored/placer_redstone",
+      "y": 90
+    },
+    "facing=east,color=sculk": {
+      "model": "oritech:block/colored/placer_sculk",
+      "y": 90
+    },
+    "facing=north,color=orange": {
+      "model": "oritech:block/placer"
+    },
+    "facing=north,color=diamond": {
+      "model": "oritech:block/colored/placer_diamond"
+    },
+    "facing=north,color=camo": {
+      "model": "oritech:block/colored/placer_camo"
+    },
+    "facing=north,color=fluxite": {
+      "model": "oritech:block/colored/placer_fluxite"
+    },
+    "facing=north,color=white": {
+      "model": "oritech:block/colored/placer_white"
+    },
+    "facing=north,color=industrial": {
+      "model": "oritech:block/colored/placer_industrial"
+    },
+    "facing=north,color=netherite": {
+      "model": "oritech:block/colored/placer_netherite"
+    },
+    "facing=north,color=redstone": {
+      "model": "oritech:block/colored/placer_redstone"
+    },
+    "facing=north,color=sculk": {
+      "model": "oritech:block/colored/placer_sculk"
+    },
+    "facing=south,color=orange": {
+      "model": "oritech:block/placer",
+      "y": 180
+    },
+    "facing=south,color=diamond": {
+      "model": "oritech:block/colored/placer_diamond",
+      "y": 180
+    },
+    "facing=south,color=camo": {
+      "model": "oritech:block/colored/placer_camo",
+      "y": 180
+    },
+    "facing=south,color=fluxite": {
+      "model": "oritech:block/colored/placer_fluxite",
+      "y": 180
+    },
+    "facing=south,color=white": {
+      "model": "oritech:block/colored/placer_white",
+      "y": 180
+    },
+    "facing=south,color=industrial": {
+      "model": "oritech:block/colored/placer_industrial",
+      "y": 180
+    },
+    "facing=south,color=netherite": {
+      "model": "oritech:block/colored/placer_netherite",
+      "y": 180
+    },
+    "facing=south,color=redstone": {
+      "model": "oritech:block/colored/placer_redstone",
+      "y": 180
+    },
+    "facing=south,color=sculk": {
+      "model": "oritech:block/colored/placer_sculk",
+      "y": 180
+    },
+    "facing=west,color=orange": {
+      "model": "oritech:block/placer",
+      "y": 270
+    },
+    "facing=west,color=diamond": {
+      "model": "oritech:block/colored/placer_diamond",
+      "y": 270
+    },
+    "facing=west,color=camo": {
+      "model": "oritech:block/colored/placer_camo",
+      "y": 270
+    },
+    "facing=west,color=fluxite": {
+      "model": "oritech:block/colored/placer_fluxite",
+      "y": 270
+    },
+    "facing=west,color=white": {
+      "model": "oritech:block/colored/placer_white",
+      "y": 270
+    },
+    "facing=west,color=industrial": {
+      "model": "oritech:block/colored/placer_industrial",
+      "y": 270
+    },
+    "facing=west,color=netherite": {
+      "model": "oritech:block/colored/placer_netherite",
+      "y": 270
+    },
+    "facing=west,color=redstone": {
+      "model": "oritech:block/colored/placer_redstone",
+      "y": 270
+    },
+    "facing=west,color=sculk": {
+      "model": "oritech:block/colored/placer_sculk",
+      "y": 270
+    }
+  }
+}

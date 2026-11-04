@@ -37,22 +37,25 @@ import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
 import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
 
-public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
+public abstract class FrameInteractionBlock extends HorizontalDirectionalBlock implements PaintableBlock, EntityBlock, TooltipProvider {
 
     public static final BooleanProperty HAS_FRAME = BooleanProperty.create("has_frame");
 
     public FrameInteractionBlock(Properties settings) {
         super(settings);
-        registerDefaultState(defaultBlockState().setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(HAS_FRAME, false));
+        registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH).setValue(HAS_FRAME, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         builder.add(BlockStateProperties.HORIZONTAL_FACING, HAS_FRAME);
     }
 

@@ -26,11 +26,13 @@ import rearth.oritech.block.blocks.pipes.GenericPipeBlock;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
 import rearth.oritech.init.TagContent;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class MachineFrameBlock extends Block implements TooltipProvider {
+public class MachineFrameBlock extends Block implements PaintableBlock, TooltipProvider {
 
 
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
@@ -44,12 +46,13 @@ public class MachineFrameBlock extends Block implements TooltipProvider {
 
     public MachineFrameBlock(Properties settings) {
         super(settings);
-        this.registerDefaultState(defaultBlockState().setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false).setValue(UP, false).setValue(DOWN, false));
+        this.registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE).setValue(NORTH, false).setValue(EAST, false).setValue(SOUTH, false).setValue(WEST, false).setValue(UP, false).setValue(DOWN, false));
         boundingShapes = createShapes();
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         builder.add(NORTH, EAST, SOUTH, WEST, UP, DOWN);
     }
 

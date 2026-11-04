@@ -1,11 +1,34 @@
 {
   "variants": {
-    "": {
+    "color=orange": {
       "model": "oritech:block/power_bank_addon_extender"
+    },
+    "color=diamond": {
+      "model": "oritech:block/colored/power_bank_addon_extender_diamond"
+    },
+    "color=camo": {
+      "model": "oritech:block/colored/power_bank_addon_extender_camo"
+    },
+    "color=fluxite": {
+      "model": "oritech:block/colored/power_bank_addon_extender_fluxite"
+    },
+    "color=white": {
+      "model": "oritech:block/colored/power_bank_addon_extender_white"
+    },
+    "color=industrial": {
+      "model": "oritech:block/colored/power_bank_addon_extender_industrial"
+    },
+    "color=netherite": {
+      "model": "oritech:block/colored/power_bank_addon_extender_netherite"
+    },
+    "color=redstone": {
+      "model": "oritech:block/colored/power_bank_addon_extender_redstone"
+    },
+    "color=sculk": {
+      "model": "oritech:block/colored/power_bank_addon_extender_sculk"
     }
   },
-
-  "athena:loader": "athena:ctm",
+  "athena:loader": "oritech:colored_ctm",
   "ctm_textures": {
     "center": "oritech:block/capacitor_ctm/center",
     "empty": "oritech:block/capacitor_ctm/empty",

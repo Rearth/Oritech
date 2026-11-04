@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/block_placer_head",
+  "textures": {
+    "0": "oritech:block/colored/block_placer_head_diamond",
+    "particle": "oritech:block/colored/block_placer_head_diamond"
+  }
+}

@@ -30,6 +30,8 @@ import rearth.oritech.block.entity.interaction.EnergyTransmissionPoleEntity;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.TooltipHelper;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -37,15 +39,16 @@ import java.util.function.Consumer;
 import static rearth.oritech.block.base.block.MultiblockMachine.ASSEMBLED;
 
 
-public class EnergyTransmissionPoleBlock extends Block implements EntityBlock, TooltipProvider {
+public class EnergyTransmissionPoleBlock extends Block implements PaintableBlock, EntityBlock, TooltipProvider {
 
     public EnergyTransmissionPoleBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(ASSEMBLED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
+        registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE).setValue(ASSEMBLED, false).setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.@NotNull Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
         super.createBlockStateDefinition(builder);
         builder.add(ASSEMBLED, BlockStateProperties.HORIZONTAL_FACING);
     }

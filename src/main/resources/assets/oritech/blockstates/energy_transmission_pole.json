@@ -1,34 +1,274 @@
 {
   "variants": {
-    "machine_assembled=false,facing=south": {
+    "machine_assembled=false,facing=south,color=orange": {
       "model": "oritech:block/large_storage_packaged",
       "y": 270
     },
-    "machine_assembled=false,facing=east": {
+    "machine_assembled=false,facing=south,color=diamond": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=camo": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=fluxite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=white": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=industrial": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=netherite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=redstone": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=south,color=sculk": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 270
+    },
+    "machine_assembled=false,facing=east,color=orange": {
       "model": "oritech:block/large_storage_packaged",
       "y": 180
     },
-    "machine_assembled=false,facing=north": {
+    "machine_assembled=false,facing=east,color=diamond": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=camo": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=fluxite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=white": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=industrial": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=netherite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=redstone": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=east,color=sculk": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 180
+    },
+    "machine_assembled=false,facing=north,color=orange": {
       "model": "oritech:block/large_storage_packaged",
       "y": 90
     },
-    "machine_assembled=false,facing=west": {
+    "machine_assembled=false,facing=north,color=diamond": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=camo": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=fluxite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=white": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=industrial": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=netherite": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=redstone": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=north,color=sculk": {
+      "model": "oritech:block/large_storage_packaged",
+      "y": 90
+    },
+    "machine_assembled=false,facing=west,color=orange": {
       "model": "oritech:block/large_storage_packaged"
     },
-    "machine_assembled=true,facing=south": {
+    "machine_assembled=false,facing=west,color=diamond": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=camo": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=fluxite": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=white": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=industrial": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=netherite": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=redstone": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=false,facing=west,color=sculk": {
+      "model": "oritech:block/large_storage_packaged"
+    },
+    "machine_assembled=true,facing=south,color=orange": {
       "model": "oritech:block/energy_transmission_pole",
       "y": 270
     },
-    "machine_assembled=true,facing=east": {
+    "machine_assembled=true,facing=south,color=diamond": {
+      "model": "oritech:block/colored/energy_transmission_pole_diamond",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=camo": {
+      "model": "oritech:block/colored/energy_transmission_pole_camo",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=fluxite": {
+      "model": "oritech:block/colored/energy_transmission_pole_fluxite",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=white": {
+      "model": "oritech:block/colored/energy_transmission_pole_white",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=industrial": {
+      "model": "oritech:block/colored/energy_transmission_pole_industrial",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=netherite": {
+      "model": "oritech:block/colored/energy_transmission_pole_netherite",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=redstone": {
+      "model": "oritech:block/colored/energy_transmission_pole_redstone",
+      "y": 270
+    },
+    "machine_assembled=true,facing=south,color=sculk": {
+      "model": "oritech:block/colored/energy_transmission_pole_sculk",
+      "y": 270
+    },
+    "machine_assembled=true,facing=east,color=orange": {
       "model": "oritech:block/energy_transmission_pole",
       "y": 180
     },
-    "machine_assembled=true,facing=north": {
+    "machine_assembled=true,facing=east,color=diamond": {
+      "model": "oritech:block/colored/energy_transmission_pole_diamond",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=camo": {
+      "model": "oritech:block/colored/energy_transmission_pole_camo",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=fluxite": {
+      "model": "oritech:block/colored/energy_transmission_pole_fluxite",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=white": {
+      "model": "oritech:block/colored/energy_transmission_pole_white",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=industrial": {
+      "model": "oritech:block/colored/energy_transmission_pole_industrial",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=netherite": {
+      "model": "oritech:block/colored/energy_transmission_pole_netherite",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=redstone": {
+      "model": "oritech:block/colored/energy_transmission_pole_redstone",
+      "y": 180
+    },
+    "machine_assembled=true,facing=east,color=sculk": {
+      "model": "oritech:block/colored/energy_transmission_pole_sculk",
+      "y": 180
+    },
+    "machine_assembled=true,facing=north,color=orange": {
       "model": "oritech:block/energy_transmission_pole",
       "y": 90
     },
-    "machine_assembled=true,facing=west": {
+    "machine_assembled=true,facing=north,color=diamond": {
+      "model": "oritech:block/colored/energy_transmission_pole_diamond",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=camo": {
+      "model": "oritech:block/colored/energy_transmission_pole_camo",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=fluxite": {
+      "model": "oritech:block/colored/energy_transmission_pole_fluxite",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=white": {
+      "model": "oritech:block/colored/energy_transmission_pole_white",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=industrial": {
+      "model": "oritech:block/colored/energy_transmission_pole_industrial",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=netherite": {
+      "model": "oritech:block/colored/energy_transmission_pole_netherite",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=redstone": {
+      "model": "oritech:block/colored/energy_transmission_pole_redstone",
+      "y": 90
+    },
+    "machine_assembled=true,facing=north,color=sculk": {
+      "model": "oritech:block/colored/energy_transmission_pole_sculk",
+      "y": 90
+    },
+    "machine_assembled=true,facing=west,color=orange": {
       "model": "oritech:block/energy_transmission_pole"
+    },
+    "machine_assembled=true,facing=west,color=diamond": {
+      "model": "oritech:block/colored/energy_transmission_pole_diamond"
+    },
+    "machine_assembled=true,facing=west,color=camo": {
+      "model": "oritech:block/colored/energy_transmission_pole_camo"
+    },
+    "machine_assembled=true,facing=west,color=fluxite": {
+      "model": "oritech:block/colored/energy_transmission_pole_fluxite"
+    },
+    "machine_assembled=true,facing=west,color=white": {
+      "model": "oritech:block/colored/energy_transmission_pole_white"
+    },
+    "machine_assembled=true,facing=west,color=industrial": {
+      "model": "oritech:block/colored/energy_transmission_pole_industrial"
+    },
+    "machine_assembled=true,facing=west,color=netherite": {
+      "model": "oritech:block/colored/energy_transmission_pole_netherite"
+    },
+    "machine_assembled=true,facing=west,color=redstone": {
+      "model": "oritech:block/colored/energy_transmission_pole_redstone"
+    },
+    "machine_assembled=true,facing=west,color=sculk": {
+      "model": "oritech:block/colored/energy_transmission_pole_sculk"
     }
   }
 }

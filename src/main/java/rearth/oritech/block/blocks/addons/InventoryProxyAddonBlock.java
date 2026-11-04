@@ -11,7 +11,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.InventoryProxyAddonBlockEntity;
 
-public class InventoryProxyAddonBlock extends MachineAddonBlock {
+public class InventoryProxyAddonBlock extends PaintableMachineAddonBlock {
 
     public InventoryProxyAddonBlock(Properties settings, AddonSettings addonSettings) {
         super(settings, addonSettings);

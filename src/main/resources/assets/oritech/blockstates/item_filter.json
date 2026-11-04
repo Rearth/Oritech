@@ -1,29 +1,237 @@
 {
   "variants": {
-    "facing=south": {
+    "facing=south,color=orange": {
       "model": "oritech:block/item_filter",
       "x": 90
     },
-    "facing=west": {
+    "facing=south,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond",
+      "x": 90
+    },
+    "facing=south,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo",
+      "x": 90
+    },
+    "facing=south,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite",
+      "x": 90
+    },
+    "facing=south,color=white": {
+      "model": "oritech:block/colored/item_filter_white",
+      "x": 90
+    },
+    "facing=south,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial",
+      "x": 90
+    },
+    "facing=south,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite",
+      "x": 90
+    },
+    "facing=south,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone",
+      "x": 90
+    },
+    "facing=south,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk",
+      "x": 90
+    },
+    "facing=west,color=orange": {
       "model": "oritech:block/item_filter",
       "y": 90,
       "x": 90
     },
-    "facing=north": {
+    "facing=west,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=white": {
+      "model": "oritech:block/colored/item_filter_white",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone",
+      "y": 90,
+      "x": 90
+    },
+    "facing=west,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk",
+      "y": 90,
+      "x": 90
+    },
+    "facing=north,color=orange": {
       "model": "oritech:block/item_filter",
       "y": 180,
       "x": 90
     },
-    "facing=east": {
+    "facing=north,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=white": {
+      "model": "oritech:block/colored/item_filter_white",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone",
+      "y": 180,
+      "x": 90
+    },
+    "facing=north,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk",
+      "y": 180,
+      "x": 90
+    },
+    "facing=east,color=orange": {
       "model": "oritech:block/item_filter",
       "y": 270,
       "x": 90
     },
-    "facing=down": {
+    "facing=east,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=white": {
+      "model": "oritech:block/colored/item_filter_white",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone",
+      "y": 270,
+      "x": 90
+    },
+    "facing=east,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk",
+      "y": 270,
+      "x": 90
+    },
+    "facing=down,color=orange": {
       "model": "oritech:block/item_filter"
     },
-    "facing=up": {
+    "facing=down,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond"
+    },
+    "facing=down,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo"
+    },
+    "facing=down,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite"
+    },
+    "facing=down,color=white": {
+      "model": "oritech:block/colored/item_filter_white"
+    },
+    "facing=down,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial"
+    },
+    "facing=down,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite"
+    },
+    "facing=down,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone"
+    },
+    "facing=down,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk"
+    },
+    "facing=up,color=orange": {
       "model": "oritech:block/item_filter",
+      "x": 180
+    },
+    "facing=up,color=diamond": {
+      "model": "oritech:block/colored/item_filter_diamond",
+      "x": 180
+    },
+    "facing=up,color=camo": {
+      "model": "oritech:block/colored/item_filter_camo",
+      "x": 180
+    },
+    "facing=up,color=fluxite": {
+      "model": "oritech:block/colored/item_filter_fluxite",
+      "x": 180
+    },
+    "facing=up,color=white": {
+      "model": "oritech:block/colored/item_filter_white",
+      "x": 180
+    },
+    "facing=up,color=industrial": {
+      "model": "oritech:block/colored/item_filter_industrial",
+      "x": 180
+    },
+    "facing=up,color=netherite": {
+      "model": "oritech:block/colored/item_filter_netherite",
+      "x": 180
+    },
+    "facing=up,color=redstone": {
+      "model": "oritech:block/colored/item_filter_redstone",
+      "x": 180
+    },
+    "facing=up,color=sculk": {
+      "model": "oritech:block/colored/item_filter_sculk",
       "x": 180
     }
   }

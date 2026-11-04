@@ -21,17 +21,26 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
+import rearth.oritech.util.PaintableBlock;
+import rearth.oritech.util.ColorableMachine.ColorVariant;
 
 import java.util.function.Consumer;
 
-public class SpawnerControllerBlock extends HorizontalDirectionalBlock implements EntityBlock, TooltipProvider {
+public class SpawnerControllerBlock extends HorizontalDirectionalBlock implements PaintableBlock, EntityBlock, TooltipProvider {
 
     public SpawnerControllerBlock(Properties settings) {
         super(settings);
+        registerDefaultState(defaultBlockState().setValue(COLOR, ColorVariant.ORANGE));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(COLOR);
     }
 
     @Override

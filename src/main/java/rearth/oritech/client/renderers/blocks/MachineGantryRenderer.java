@@ -28,6 +28,7 @@ import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
 import rearth.oritech.client.renderers.util.BeamRenderer;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.PaintableBlock;
 import rearth.oritech.client.init.OritechClientConfig;
 
 public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteractionBlockEntity, MachineGantryRenderer.GantryRenderState> {
@@ -90,6 +91,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         entity.lastRenderedPosition = renderedPosition;
 
         gState.targetOffset = renderedPosition.subtract(Vec3.atLowerCornerOf(entity.getBlockPos())).add(movingOffset);
+        var color = state.getValue(PaintableBlock.COLOR);
         gState.machineHead = entity.getMachineHead();
 
         var mc = Minecraft.getInstance();
@@ -102,7 +104,7 @@ public class MachineGantryRenderer implements BlockEntityRenderer<FrameInteracti
         gState.armTarget = new Vec3(entity.getAreaMin().getX() - 0.5 + BEAM_DEPTH, renderedPosition.y, renderedPosition.z).subtract(Vec3.atLowerCornerOf(entity.getBlockPos()));
 
         // resolve the arm block model state
-        resolver.update(gState.armBlockState, renderedBeam, BlockDisplayContext.create());
+        resolver.update(gState.armBlockState, renderedBeam.setValue(PaintableBlock.COLOR, color), BlockDisplayContext.create());
 
         var renderedItem = entity.getToolheadAdditionalRender();
         if (renderedItem != null) {

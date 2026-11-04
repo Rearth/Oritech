@@ -1,7 +1,39 @@
 {
   "variants": {
-    "": {
+    "color=orange": {
       "model": "oritech:block/frame_gantry_arm",
+      "y": 90
+    },
+    "color=diamond": {
+      "model": "oritech:block/colored/frame_gantry_arm_diamond",
+      "y": 90
+    },
+    "color=camo": {
+      "model": "oritech:block/colored/frame_gantry_arm_camo",
+      "y": 90
+    },
+    "color=fluxite": {
+      "model": "oritech:block/colored/frame_gantry_arm_fluxite",
+      "y": 90
+    },
+    "color=white": {
+      "model": "oritech:block/colored/frame_gantry_arm_white",
+      "y": 90
+    },
+    "color=industrial": {
+      "model": "oritech:block/colored/frame_gantry_arm_industrial",
+      "y": 90
+    },
+    "color=netherite": {
+      "model": "oritech:block/colored/frame_gantry_arm_netherite",
+      "y": 90
+    },
+    "color=redstone": {
+      "model": "oritech:block/colored/frame_gantry_arm_redstone",
+      "y": 90
+    },
+    "color=sculk": {
+      "model": "oritech:block/colored/frame_gantry_arm_sculk",
       "y": 90
     }
   }

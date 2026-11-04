@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/fertilizer",
+  "textures": {
+    "2": "oritech:block/colored/fertilizer_camo"
+  }
+}

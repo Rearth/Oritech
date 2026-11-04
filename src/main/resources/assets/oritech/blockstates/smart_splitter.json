@@ -1,57 +1,1777 @@
 {
   "multipart": [
     {
+      "when": {
+        "color": "orange"
+      },
       "apply": {
         "model": "oritech:block/smart_splitter_base"
       }
     },
     {
-      "when": { "north": "closed" },
-      "apply": { "model": "oritech:block/smart_splitter_closed" }
+      "when": {
+        "color": "diamond"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_diamond"
+      }
     },
     {
-      "when": { "north": "input" },
-      "apply": { "model": "oritech:block/smart_splitter_input" }
+      "when": {
+        "color": "camo"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_camo"
+      }
     },
     {
-      "when": { "north": "output" },
-      "apply": { "model": "oritech:block/smart_splitter_output" }
+      "when": {
+        "color": "fluxite"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_fluxite"
+      }
     },
     {
-      "when": { "east": "closed" },
-      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 90 }
+      "when": {
+        "color": "white"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_white"
+      }
     },
     {
-      "when": { "east": "input" },
-      "apply": { "model": "oritech:block/smart_splitter_input", "y": 90 }
+      "when": {
+        "color": "industrial"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_industrial"
+      }
     },
     {
-      "when": { "east": "output" },
-      "apply": { "model": "oritech:block/smart_splitter_output", "y": 90 }
+      "when": {
+        "color": "netherite"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_netherite"
+      }
     },
     {
-      "when": { "south": "closed" },
-      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 180 }
+      "when": {
+        "color": "redstone"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_redstone"
+      }
     },
     {
-      "when": { "south": "input" },
-      "apply": { "model": "oritech:block/smart_splitter_input", "y": 180 }
+      "when": {
+        "color": "sculk"
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_base_sculk"
+      }
     },
     {
-      "when": { "south": "output" },
-      "apply": { "model": "oritech:block/smart_splitter_output", "y": 180 }
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_closed"
+      }
     },
     {
-      "when": { "west": "closed" },
-      "apply": { "model": "oritech:block/smart_splitter_closed", "y": 270 }
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_diamond"
+      }
     },
     {
-      "when": { "west": "input" },
-      "apply": { "model": "oritech:block/smart_splitter_input", "y": 270 }
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_camo"
+      }
     },
     {
-      "when": { "west": "output" },
-      "apply": { "model": "oritech:block/smart_splitter_output", "y": 270 }
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_fluxite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_white"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_industrial"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_netherite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_redstone"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "closed"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_sculk"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_input"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_diamond"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_camo"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_fluxite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_white"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_industrial"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_netherite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_redstone"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_sculk"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_output"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_diamond"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_camo"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_fluxite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_white"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_industrial"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_netherite"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_redstone"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_sculk"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_closed",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_diamond",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_camo",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_fluxite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_white",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_industrial",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_netherite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_redstone",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "closed"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_sculk",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_input",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_diamond",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_camo",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_fluxite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_white",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_industrial",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_netherite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_redstone",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_sculk",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_output",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_diamond",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_camo",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_fluxite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_white",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_industrial",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_netherite",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_redstone",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_sculk",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_closed",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_diamond",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_camo",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_fluxite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_white",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_industrial",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_netherite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_redstone",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "closed"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_sculk",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_input",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_diamond",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_camo",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_fluxite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_white",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_industrial",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_netherite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_redstone",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_sculk",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_output",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_diamond",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_camo",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_fluxite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_white",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_industrial",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_netherite",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_redstone",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_sculk",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_closed",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_diamond",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_camo",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_fluxite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_white",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_industrial",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_netherite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_redstone",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "closed"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_closed_sculk",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_input",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_diamond",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_camo",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_fluxite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_white",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_industrial",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_netherite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_redstone",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_input_sculk",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "orange"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/smart_splitter_output",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "diamond"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_diamond",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "camo"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_camo",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "fluxite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_fluxite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "white"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_white",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "industrial"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_industrial",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "netherite"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_netherite",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "redstone"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_redstone",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "color": "sculk"
+          }
+        ]
+      },
+      "apply": {
+        "model": "oritech:block/colored/smart_splitter_output_sculk",
+        "y": 270
+      }
     }
   ]
 }

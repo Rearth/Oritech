@@ -26,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 
 public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
@@ -63,10 +64,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
 
         Oritech.LOGGER.debug("searching machine frame");
 
-        var facing = getFacing();
-        var backRelative = new Vec3i(getFrameOffset(), 0, 0);
-        // Frame machines always anchor to the frame block directly behind the controller.
-        var searchStart = (BlockPos) Geometry.offsetToWorldPosition(facing, backRelative, worldPosition);
+        var searchStart = getFrameAnchor();
 
         var bounds = findFrameBounds(searchStart);
         if (bounds == null) {
@@ -90,6 +88,26 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
         sendUpdate(SyncType.INITIAL);
 
         return true;
+    }
+
+    private BlockPos getFrameAnchor() {
+        return (BlockPos) Geometry.offsetToWorldPosition(getFacing(), new Vec3i(getFrameOffset(), 0, 0), worldPosition);
+    }
+
+    // Painting also works before the frame is activated or while it is being built.
+    public Set<BlockPos> getConnectedFrame() {
+        var connected = new HashSet<BlockPos>();
+        var pending = new ArrayDeque<BlockPos>();
+        pending.add(getFrameAnchor());
+        while (!pending.isEmpty()) {
+            var pos = pending.removeFirst();
+            if (connected.contains(pos) || !level.hasChunkAt(pos) || !testForFrame(pos)) continue;
+            connected.add(pos);
+            for (var direction : Direction.Plane.HORIZONTAL) {
+                pending.add(pos.relative(direction));
+            }
+        }
+        return connected;
     }
 
     protected Direction getFacing() {

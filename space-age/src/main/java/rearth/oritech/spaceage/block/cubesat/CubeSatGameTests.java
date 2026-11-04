@@ -1,6 +1,9 @@
 package rearth.oritech.spaceage.block.cubesat;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import rearth.oritech.block.blocks.processing.MachineCoreBlock;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
@@ -124,8 +127,16 @@ public final class CubeSatGameTests {
         var level = test.getLevel();
         var missions = MissionSavedData.get(level.getServer());
         var rampPos = test.absolutePos(new BlockPos(2, 1, 2));
-        level.setBlockAndUpdate(rampPos, SpaceAgeBlocks.LAUNCH_RAMP.get().defaultBlockState());
+        level.setBlockAndUpdate(rampPos, SpaceAgeBlocks.LAUNCH_RAMP.get().defaultBlockState()
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST));
         var ramp = (LaunchRampBlockEntity) level.getBlockEntity(rampPos);
+        ramp.launch(cube(false), 10_000, new Vec3(1, 0, 0));
+        test.assertTrue(ramp.lastShot == -1, "An unassembled launcher cannot fire");
+        level.setBlockAndUpdate(rampPos.above(), BlockContent.MACHINE_CORE_1.get().defaultBlockState());
+        test.assertTrue(!ramp.initMultiblock(ramp.getBlockState()), "One core is insufficient");
+        level.setBlockAndUpdate(rampPos.above().east(), BlockContent.MACHINE_CORE_1.get().defaultBlockState());
+        test.assertTrue(ramp.initMultiblock(ramp.getBlockState()), "Above and above-forward cores assemble the launcher");
+        test.assertTrue(ramp.getConnectedCores().size() == 2, "Exactly two cores belong to the launcher");
         var pattern = cube(false);
         ramp.pattern.setItem(0, CubeSatBlock.createStack(pattern));
         var orbit = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.LOW);
@@ -163,6 +174,13 @@ public final class CubeSatGameTests {
             landed |= level.getBlockState(candidate).is(SpaceAgeBlocks.SPACE_SCANNER);
         test.assertTrue(landed && ramp.lastOutcome() == LaunchRampBlockEntity.Outcome.FELL_BACK, "A slow cube falls back next to the ramp as blocks");
 
+        test.assertTrue(ramp.lastShot == level.getGameTime(), "Launching synchronizes the firing time");
+        var brokenCore = rampPos.above().east();
+        var coreState = level.getBlockState(brokenCore);
+        coreState.getBlock().playerWillDestroy(level, brokenCore, coreState, FakePlayerFactory.getMinecraft(level));
+        level.destroyBlock(brokenCore, false);
+        test.assertTrue(!ramp.isAssembled(ramp.getBlockState()), "Breaking a core disassembles the launcher");
+        test.assertTrue(!level.getBlockState(rampPos.above()).getValue(MachineCoreBlock.USED), "The other core is released");
         launched.forEach(state -> missions.craft.remove(state.rocket.getRocketId()));
         coasting.forEach(state -> missions.craft.remove(state.rocket.getRocketId()));
         test.succeed();

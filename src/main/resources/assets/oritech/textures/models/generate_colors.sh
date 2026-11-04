@@ -35,9 +35,30 @@ SOURCE_INDUSTRIAL_DOOR_PRIMARY=(
     "#ffdc89" # 5. Pale Edge Highlight
 )
 
-# Additional pink shades used by the support beam and girder.
-SOURCE_PINK=("#b53962" "#5e1736" "#a53f46" "#ffa7a4")
-PINK_TARGET_INDICES=(1 0 1 4)
+# Additional warm body shades used by addons, extenders and capacitor CTM tiles.
+# Map these to the existing five-shade door ramp instead of adding target palettes.
+SOURCE_ADDON_BODY=(
+    "#c63c33" # Extender red-orange border
+    "#e09f67" # Extender pale orange edge
+    "#dc8b4e" # Extender orange highlight
+    "#d0844d" # Extender mid highlight
+    "#d36e3b" # Extender orange transition
+    "#cf6e38" # Extender orange transition
+    "#c75f33" # Acceptor main copper-orange body
+    "#d2844b" # Acceptor body highlight
+    "#ad1616" # Acceptor red trim
+    "#aa3f31" # Acceptor dark copper trim
+    "#9c1919" # Acceptor dark red trim
+    "#e0b165" # Acceptor pale highlight
+    "#ab413a" # Capacitor CTM red-orange border
+    "#fdcf8f" # Capacitor CTM pale edge
+)
+ADDON_BODY_TARGET_INDICES=(1 3 3 3 2 2 2 3 0 1 0 4 1 4)
+
+# Additional pink shades used by supports and the capacitor CTM border.
+# The final shade is the light trim on the power-bank extender's isolated tile.
+SOURCE_PINK=("#b53962" "#5e1736" "#a53f46" "#ffa7a4" "#dd508a")
+PINK_TARGET_INDICES=(1 0 1 4 2)
 
 # --- 2. THE TARGET PALETTES (PRIMARY) ---
 
@@ -241,6 +262,12 @@ for img in "${TARGET_FILES[@]}"; do
         continue
     fi
     
+    # Cardboard packaging stays unpainted, including explicit-file requests.
+    if [[ "$(basename "$img")" == "large_storage_packaged.png" ]]; then
+        echo "Skipping (Unpainted packaging): $img"
+        continue
+    fi
+
     # 2. Skip files with glowmask suffix
     if [[ "$img" == *"${EXCLUDE_SUFFIX}.png" ]]; then
         continue
@@ -350,11 +377,20 @@ for img in "${TARGET_FILES[@]}"; do
             args+=("-fill" "$tgt" "-opaque" "$src")
         done
 
-        # Match pink shades to the existing warm palette; leave gray metal unchanged.
-        for (( i=0; i<${#SOURCE_PINK[@]}; i++ )); do
-            target_index=${PINK_TARGET_INDICES[$i]}
-            args+=("-fill" "${TGT_DOOR[$target_index]}" "-opaque" "${SOURCE_PINK[$i]}")
+        # Paint addon body details without broadening the fuzz into status colors.
+        for (( i=0; i<${#SOURCE_ADDON_BODY[@]}; i++ )); do
+            target_index=${ADDON_BODY_TARGET_INDICES[$i]}
+            args+=("-fill" "${TGT_DOOR[$target_index]}" "-opaque" "${SOURCE_ADDON_BODY[$i]}")
         done
+
+        # Addons use pink for disconnected indicators. Keep those readable.
+        # Support-beam/girder and other machine pink details retain their mapping.
+        if [[ "$filename" != *"_addon"* && "$filename" != "machine_extender"* ]]; then
+            for (( i=0; i<${#SOURCE_PINK[@]}; i++ )); do
+                target_index=${PINK_TARGET_INDICES[$i]}
+                args+=("-fill" "${TGT_DOOR[$target_index]}" "-opaque" "${SOURCE_PINK[$i]}")
+            done
+        fi
 
         # C. Swap Accent Colors (Source Blue -> Fitting Contrast)
         count_acnt=${#SOURCE_ACCENTS[@]}

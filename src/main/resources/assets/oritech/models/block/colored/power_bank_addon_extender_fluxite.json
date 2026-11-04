@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/power_bank_addon_extender",
+  "textures": {
+    "all": "oritech:block/colored/capacitor_ctm/particle_fluxite"
+  }
+}

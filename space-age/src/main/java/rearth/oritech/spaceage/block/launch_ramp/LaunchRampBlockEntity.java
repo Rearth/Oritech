@@ -1,27 +1,42 @@
 package rearth.oritech.spaceage.block.launch_ramp;
 
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.animation.object.PlayState;
+import com.geckolib.animation.state.AnimationTest;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Containers;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.block.base.entity.MachineBlockEntity;
+import rearth.oritech.block.base.entity.MultiblockMachineEntity;
+import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.spaceage.block.cubesat.CubeSatBlock;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
+import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -36,8 +51,10 @@ import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
+import rearth.oritech.util.ContainerSlotAssignment;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -46,7 +63,15 @@ import java.util.UUID;
  * simulation of the last player who saved one, keyed by the ramp's position, and applies to every cube with the same
  * layout as the pattern it was made for.
  */
-public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
+public class LaunchRampBlockEntity extends MultiblockMachineEntity {
+
+    private static final RawAnimation SHOOT = RawAnimation.begin().thenPlay("shoot");
+    public static final double ELEVATION = Math.toRadians(40);
+    public static final int BEAM_DELAY = 10;
+    public static final int BEAM_TICKS = 60;
+
+    @SyncField({SyncType.INITIAL, SyncType.TICK})
+    public long lastShot = -1;
 
     // Distance in particle direction at which too slow cubes come down again.
     private static final int FALLBACK_DISTANCE = 4;
@@ -69,7 +94,118 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
 
     public LaunchRampBlockEntity(BlockPos pos, BlockState state) {
 
-        super(SpaceAgeBlockEntities.LAUNCH_RAMP.get(), pos, state);
+        super(SpaceAgeBlockEntities.LAUNCH_RAMP.get(), pos, state, 0);
+    }
+
+    private void fire() {
+
+        lastShot = level.getGameTime();
+        triggerAnim("machine", "shoot");
+        setChanged();
+        sendUpdate(SyncType.TICK);
+    }
+
+    @Override
+    public Direction getFacingForMultiblock() {
+
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
+    }
+
+    public Vec3 launchDirection() {
+
+        var facing = getFacingForMultiblock();
+        return new Vec3(facing.getStepX() * Math.cos(ELEVATION), Math.sin(ELEVATION), facing.getStepZ() * Math.cos(ELEVATION));
+    }
+
+    public Vec3 muzzleOffset() {
+
+        return muzzleOffset(getFacingForMultiblock());
+    }
+
+    public static Vec3 muzzleOffset(Direction facing) {
+
+        // Pivot [0, 6, 3], bore center Y=8, end of the two muzzle rails Z=39.
+        var forward = (3 + 36 * Math.cos(ELEVATION) - 2 * Math.sin(ELEVATION)) / 16;
+        var height = (6 + 36 * Math.sin(ELEVATION) + 2 * Math.cos(ELEVATION)) / 16;
+        return new Vec3(.5 + facing.getStepX() * forward, height, .5 + facing.getStepZ() * forward);
+    }
+
+    @Override
+    public void serverTick(ServerLevel level, BlockPos pos, BlockState state, NetworkedBlockEntity entity) {
+
+        // Accelerator impacts drive this machine; it has no ticking recipe.
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+        controllers.add(new AnimationController<>("machine", 0, this::onAnimationUpdate)
+                .triggerableAnim("shoot", SHOOT).receiveTriggeredAnimations());
+    }
+
+    @Override
+    public PlayState onAnimationUpdate(AnimationTest<MachineBlockEntity> state) {
+
+        var controller = state.controller();
+        state.setControllerSpeed(1);
+        if (!isAssembled(getBlockState())) {
+            controller.stopTriggeredAnimation();
+            return state.setAndContinue(PACKAGED);
+        }
+        if (state.isCurrentAnimation(SHOOT) && !controller.hasAnimationFinished()) return PlayState.CONTINUE;
+        if (controller.isPlayingTriggeredAnimation()) controller.stopTriggeredAnimation();
+        if (state.isCurrentAnimation(PACKAGED)) return state.setAndContinue(SETUP);
+        if (state.isCurrentAnimation(SETUP) && !controller.hasAnimationFinished()) return PlayState.CONTINUE;
+        return state.setAndContinue(IDLE);
+    }
+
+    @Override
+    public void triggerSetupAnimation() {
+
+        // Deployment follows the synced assembled state, like the robot arm.
+    }
+
+    @Override
+    public List<Vec3i> getCorePositions() {
+
+        // Oritech's relative forward axis is -X.
+        return List.of(new Vec3i(0, 1, 0), new Vec3i(-1, 1, 0));
+    }
+
+    @Override
+    public List<Vec3i> getAddonSlots() {
+
+        return List.of();
+    }
+
+    @Override
+    protected RecipeType<OritechRecipe> getOwnRecipeType() {
+
+        return null;
+    }
+
+    @Override
+    public ContainerSlotAssignment getSlotAssignments() {
+
+        return new ContainerSlotAssignment(0, 0, 0, 0);
+    }
+
+    @Override
+    public int getInventorySize() {
+
+        return 0;
+    }
+
+    @Override
+    public List<GuiSlot> getGuiSlots() {
+
+        return List.of();
+    }
+
+    @Override
+    public MenuType<?> getScreenHandlerType() {
+
+        return SpaceAgeMenus.LAUNCH_RAMP.get();
     }
 
     private static String name(CubeSatData cube, SpaceSimulation.FlightPlan plan) {
@@ -107,6 +243,8 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
      */
     public void absorb(long particleSpeed) {
 
+        if (!isAssembled(getBlockState())) return;
+        fire();
         record(particleSpeed, Outcome.LOST);
     }
 
@@ -164,7 +302,9 @@ public class LaunchRampBlockEntity extends BlockEntity implements MenuProvider {
      */
     public void launch(CubeSatData cube, long particleSpeed, Vec3 direction) {
 
-        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!(level instanceof ServerLevel serverLevel) || !isAssembled(getBlockState())) return;
+        fire();
+        direction = launchDirection();
         if (serverLevel.dimension() != Level.OVERWORLD) {
             Containers.dropItemStack(serverLevel, worldPosition.getX() + .5, worldPosition.getY() + 1, worldPosition.getZ() + .5, CubeSatBlock.createStack(cube));
             record(particleSpeed, Outcome.DROPPED);

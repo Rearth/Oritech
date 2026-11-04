@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/crop_filter_addon",
+  "textures": {
+    "0": "oritech:block/colored/crop_filter_addon_off_sculk"
+  }
+}

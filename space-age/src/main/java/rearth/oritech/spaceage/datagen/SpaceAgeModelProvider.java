@@ -110,7 +110,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
         blockModels.registerSimpleItemModel(aperture, apertureModel);
         createCustomModelBlock(SpaceAgeBlocks.CRYSTAL_GLASS.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.CUBE_SAT.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.LAUNCH_RAMP.get(), blockModels);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(SpaceAgeBlocks.LAUNCH_RAMP.get(),
+                        BlockModelGenerators.variant(new Variant(OritechSpaceAge.id("block/launch_ramp"))))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        itemModels.itemModelOutput.accept(SpaceAgeBlocks.LAUNCH_RAMP.asItem(),
+                ItemModelUtils.specialModel(OritechSpaceAge.id("item/launch_ramp"), new GeckolibItemSpecialRenderer.Unbaked()));
         createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.HOLO_SCREEN.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.HOLO_CONTROLLER.get(), blockModels);

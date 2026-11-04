@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_speed_addon_on",
+  "textures": {
+    "1": "oritech:block/colored/machine_speed_addon_on_camo"
+  }
+}

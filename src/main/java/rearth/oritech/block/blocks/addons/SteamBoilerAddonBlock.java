@@ -4,7 +4,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.NotNull;
 import rearth.oritech.block.entity.addons.SteamBoilerAddonBlockEntity;
 
-public class SteamBoilerAddonBlock extends MachineAddonBlock {
+public class SteamBoilerAddonBlock extends PaintableMachineAddonBlock {
 
     public SteamBoilerAddonBlock(Properties settings, AddonSettings addonSettings) {
         super(settings, addonSettings);

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/quarry_addon_on",
+  "textures": {
+    "2": "oritech:block/colored/quarry_addon_on_diamond"
+  }
+}

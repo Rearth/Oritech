@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/portable_energy_storage",
+  "textures": {
+    "1": "oritech:block/colored/portable_energy_storage_white"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/portable_tank",
+  "textures": {
+    "0": "oritech:block/colored/portable_tank_industrial"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/machine_frame_outer",
+  "textures": {
+    "0": "oritech:block/colored/machine_frame_camo",
+    "particle": "oritech:block/colored/machine_frame_camo"
+  }
+}

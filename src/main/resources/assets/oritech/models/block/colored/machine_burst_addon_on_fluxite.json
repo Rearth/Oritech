@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_burst_addon_on",
+  "textures": {
+    "0": "oritech:block/colored/machine_burst_addon_on_fluxite"
+  }
+}

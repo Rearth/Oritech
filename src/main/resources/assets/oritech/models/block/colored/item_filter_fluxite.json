@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/item_filter",
+  "textures": {
+    "1": "oritech:block/colored/item_filter_fluxite"
+  }
+}

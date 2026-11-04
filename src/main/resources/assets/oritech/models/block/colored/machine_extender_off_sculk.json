@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_extender_off",
+  "textures": {
+    "all": "oritech:block/colored/machine_extender_off_sculk"
+  }
+}

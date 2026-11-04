@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/block_fertilizer_head",
+  "textures": {
+    "0": "oritech:block/colored/block_fertilizer_head_redstone",
+    "particle": "oritech:block/colored/block_fertilizer_head_redstone"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_burst_addon",
+  "textures": {
+    "0": "oritech:block/colored/machine_burst_addon_off_industrial"
+  }
+}

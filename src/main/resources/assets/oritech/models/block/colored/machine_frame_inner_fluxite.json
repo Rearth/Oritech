@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/machine_frame_inner",
+  "textures": {
+    "0": "oritech:block/colored/machine_frame_fluxite",
+    "particle": "oritech:block/colored/machine_frame_fluxite"
+  }
+}

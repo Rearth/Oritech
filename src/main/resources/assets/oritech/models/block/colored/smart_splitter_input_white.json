@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/smart_splitter_input",
+  "textures": {
+    "2": "oritech:block/colored/smart_splitter_white"
+  }
+}

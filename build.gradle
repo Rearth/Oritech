@@ -224,7 +224,7 @@ dependencies {
     interfaceInjectionData "com.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}"
 
     // athena (CTM)
-    runtimeOnly "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
+    implementation "earth.terrarium.athena:athena-neoforge-26.1:4.7.3"
 
     // recipe viewer
     compileOnly "mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}"

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_acceptor_addon",
+  "textures": {
+    "0": "oritech:block/colored/machine_acceptor_addon_off_industrial"
+  }
+}

@@ -30,6 +30,7 @@ import rearth.oritech.block.base.entity.ItemEnergyFrameInteractionBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.PaintableBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
@@ -160,7 +161,7 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
 
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_FERTILIZER_HEAD.get().defaultBlockState();
+        return BlockContent.BLOCK_FERTILIZER_HEAD.get().defaultBlockState().setValue(PaintableBlock.COLOR, getBlockState().getValue(PaintableBlock.COLOR));
     }
 
     @Override

@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_silk_touch_addon",
+  "textures": {
+    "2": "oritech:block/colored/machine_silk_touch_addon_off_sculk"
+  }
+}

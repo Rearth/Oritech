@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/spawner_controller",
+  "textures": {
+    "1": "oritech:block/colored/spawner_controller_redstone"
+  }
+}

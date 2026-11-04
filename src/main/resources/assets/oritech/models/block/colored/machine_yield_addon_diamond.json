@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_yield_addon",
+  "textures": {
+    "0": "oritech:block/colored/machine_yield_addon_off_diamond"
+  }
+}

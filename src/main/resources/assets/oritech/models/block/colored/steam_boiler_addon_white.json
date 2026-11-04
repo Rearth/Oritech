@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/steam_boiler_addon",
+  "textures": {
+    "3": "oritech:block/colored/steam_boiler_addon_off_white"
+  }
+}

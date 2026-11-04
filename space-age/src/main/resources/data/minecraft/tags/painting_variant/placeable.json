@@ -3,6 +3,9 @@
   "values": [
     "oritech_space_age:earth",
     "oritech_space_age:mars",
-    "oritech_space_age:sun"
+    "oritech_space_age:sun",
+    "oritech_space_age:earth_from_space",
+    "oritech_space_age:satellite",
+    "oritech_space_age:solar_horizon"
   ]
 }

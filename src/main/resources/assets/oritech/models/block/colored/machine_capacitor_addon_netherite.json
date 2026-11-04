@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_capacitor_addon",
+  "textures": {
+    "0": "oritech:block/colored/machine_capacitor_addon_off_netherite"
+  }
+}

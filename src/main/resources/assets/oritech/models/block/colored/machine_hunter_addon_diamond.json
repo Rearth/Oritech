@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/machine_hunter_addon",
+  "textures": {
+    "2": "oritech:block/colored/machine_hunter_addon_off_diamond"
+  }
+}

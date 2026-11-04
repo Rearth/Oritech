@@ -1,112 +1,992 @@
 {
   "variants": {
-    "face=wall,facing=north,addon_used=true": {
+    "face=wall,facing=north,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 270,
       "y": 180
     },
-    "face=wall,facing=north,addon_used=false": {
+    "face=wall,facing=north,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 270,
       "y": 180
     },
-    "face=wall,facing=south,addon_used=true": {
+    "face=wall,facing=north,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=north,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 270,
+      "y": 180
+    },
+    "face=wall,facing=south,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 270,
       "y": 0
     },
-    "face=wall,facing=south,addon_used=false": {
+    "face=wall,facing=south,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 270,
       "y": 0
     },
-    "face=wall,facing=west,addon_used=true": {
+    "face=wall,facing=south,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=south,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 270,
+      "y": 0
+    },
+    "face=wall,facing=west,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 270,
       "y": 90
     },
-    "face=wall,facing=west,addon_used=false": {
+    "face=wall,facing=west,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 270,
       "y": 90
     },
-    "face=wall,facing=east,addon_used=true": {
+    "face=wall,facing=west,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=west,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 270,
+      "y": 90
+    },
+    "face=wall,facing=east,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 270,
       "y": 270
     },
-    "face=wall,facing=east,addon_used=false": {
+    "face=wall,facing=east,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 270,
       "y": 270
     },
-    "face=floor,facing=north,addon_used=true": {
+    "face=wall,facing=east,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 270,
+      "y": 270
+    },
+    "face=wall,facing=east,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 270,
+      "y": 270
+    },
+    "face=floor,facing=north,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "y": 0
     },
-    "face=floor,facing=north,addon_used=false": {
+    "face=floor,facing=north,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "y": 0
     },
-    "face=floor,facing=south,addon_used=true": {
+    "face=floor,facing=north,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "y": 0
+    },
+    "face=floor,facing=north,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "y": 0
+    },
+    "face=floor,facing=south,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "y": 180
     },
-    "face=floor,facing=south,addon_used=false": {
+    "face=floor,facing=south,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "y": 180
     },
-    "face=floor,facing=west,addon_used=true": {
+    "face=floor,facing=south,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "y": 180
+    },
+    "face=floor,facing=south,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "y": 180
+    },
+    "face=floor,facing=west,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "y": 270
     },
-    "face=floor,facing=west,addon_used=false": {
+    "face=floor,facing=west,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "y": 270
     },
-    "face=floor,facing=east,addon_used=true": {
+    "face=floor,facing=west,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "y": 270
+    },
+    "face=floor,facing=west,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "y": 270
+    },
+    "face=floor,facing=east,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "y": 90
     },
-    "face=floor,facing=east,addon_used=false": {
+    "face=floor,facing=east,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "y": 90
     },
-    "face=ceiling,facing=north,addon_used=true": {
+    "face=floor,facing=east,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "y": 90
+    },
+    "face=floor,facing=east,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "y": 90
+    },
+    "face=ceiling,facing=north,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 180
     },
-    "face=ceiling,facing=north,addon_used=false": {
+    "face=ceiling,facing=north,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 180
     },
-    "face=ceiling,facing=south,addon_used=true": {
+    "face=ceiling,facing=north,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 180
+    },
+    "face=ceiling,facing=north,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 180,
       "y": 180
     },
-    "face=ceiling,facing=south,addon_used=false": {
+    "face=ceiling,facing=south,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 180,
       "y": 180
     },
-    "face=ceiling,facing=west,addon_used=true": {
+    "face=ceiling,facing=south,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=west,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 180,
       "y": 270
     },
-    "face=ceiling,facing=west,addon_used=false": {
+    "face=ceiling,facing=west,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
       "x": 180,
       "y": 270
     },
-    "face=ceiling,facing=east,addon_used=true": {
+    "face=ceiling,facing=west,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=west,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=east,addon_used=true,color=orange": {
       "model": "oritech:block/synergy_matrix_addon_on",
       "x": 180,
       "y": 90
     },
-    "face=ceiling,facing=east,addon_used=false": {
+    "face=ceiling,facing=east,addon_used=true,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_diamond",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_camo",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_fluxite",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_white",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_industrial",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_netherite",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_redstone",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=true,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_on_sculk",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=orange": {
       "model": "oritech:block/synergy_matrix_addon",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=diamond": {
+      "model": "oritech:block/colored/synergy_matrix_addon_diamond",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=camo": {
+      "model": "oritech:block/colored/synergy_matrix_addon_camo",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=fluxite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_fluxite",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=white": {
+      "model": "oritech:block/colored/synergy_matrix_addon_white",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=industrial": {
+      "model": "oritech:block/colored/synergy_matrix_addon_industrial",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=netherite": {
+      "model": "oritech:block/colored/synergy_matrix_addon_netherite",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=redstone": {
+      "model": "oritech:block/colored/synergy_matrix_addon_redstone",
+      "x": 180,
+      "y": 90
+    },
+    "face=ceiling,facing=east,addon_used=false,color=sculk": {
+      "model": "oritech:block/colored/synergy_matrix_addon_sculk",
       "x": 180,
       "y": 90
     }

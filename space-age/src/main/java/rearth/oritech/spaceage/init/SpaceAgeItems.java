@@ -11,6 +11,7 @@ import rearth.oritech.spaceage.block.cubesat.CubeSatItem;
 import rearth.oritech.spaceage.block.robot_arm.ActionCardItem;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmItem;
 import rearth.oritech.spaceage.item.MissionCardItem;
+import rearth.oritech.spaceage.block.launch_ramp.ParticleLauncherItem;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 public final class SpaceAgeItems {
@@ -39,6 +40,9 @@ public final class SpaceAgeItems {
                         () -> new Item.Properties().stacksTo(1).useBlockDescriptionPrefix());
             else if (block == SpaceAgeBlocks.ROBOT_ARM)
                 ITEMS.registerItem(name, properties -> new RobotArmItem(block.get(), properties),
+                        () -> new Item.Properties().useBlockDescriptionPrefix());
+            else if (block == SpaceAgeBlocks.LAUNCH_RAMP)
+                ITEMS.registerItem(name, properties -> new ParticleLauncherItem(block.get(), properties),
                         () -> new Item.Properties().useBlockDescriptionPrefix());
             else ITEMS.registerSimpleBlockItem(name, block);
         });

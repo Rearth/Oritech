@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/synergy_matrix_addon",
+  "textures": {
+    "3": "oritech:block/colored/synergy_matrix_addon_off_camo"
+  }
+}

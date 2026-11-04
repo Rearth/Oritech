@@ -42,6 +42,22 @@ public class ModelGenerator extends ModelProvider {
     // Blocks whose blockstate + model JSONs are hand-authored under src/main/resources
     // (BlockBench-exported custom geometry) and therefore excluded from datagen validation.
     private static final Set<Block> HAND_AUTHORED_BLOCKS = Set.of(
+            BlockContent.MACHINE_EXTENDER.get(),
+            BlockContent.POWER_BANK_ADDON_EXTENDER.get(),
+            BlockContent.MACHINE_FRAME.get(),
+            BlockContent.PORTABLE_ENERGY_STORAGE.get(),
+            BlockContent.LARGE_STORAGE.get(),
+            BlockContent.PORTABLE_TANK.get(),
+            BlockContent.PLACER.get(),
+            BlockContent.DESTROYER.get(),
+            BlockContent.FERTILIZER.get(),
+            BlockContent.ENERGY_TRANSMISSION_POLE.get(),
+            BlockContent.ITEM_FILTER.get(),
+            BlockContent.SPAWNER_CONTROLLER.get(),
+            BlockContent.BLOCK_DESTROYER_HEAD.get(),
+            BlockContent.BLOCK_PLACER_HEAD.get(),
+            BlockContent.BLOCK_FERTILIZER_HEAD.get(),
+
             BlockContent.FRAME_GANTRY_ARM.get(),
             BlockContent.MACHINE_SPEED_ADDON.get(),
             BlockContent.MACHINE_EFFICIENCY_ADDON.get(),
@@ -127,7 +143,6 @@ public class ModelGenerator extends ModelProvider {
 
     private void generateBlockStateModels(BlockModelGenerators generator) {
 
-        createNonTemplateModelBlock(BlockContent.MACHINE_FRAME.get(), generator);
         createNonTemplateModelBlock(BlockContent.FLUID_PIPE.get(), generator);
         createNonTemplateModelBlock(BlockContent.ENERGY_PIPE.get(), generator);
         createNonTemplateModelBlock(BlockContent.SUPERCONDUCTOR.get(), generator);
@@ -158,30 +173,17 @@ public class ModelGenerator extends ModelProvider {
         generator.createTrivialCube(BlockContent.ENERGY_PIPE_DUCT.get());
         generator.createTrivialCube(BlockContent.SUPERCONDUCTOR_DUCT.get());
         generator.createTrivialCube(BlockContent.ITEM_PIPE_DUCT.get());
-        createNonTemplateModelBlock(BlockContent.ITEM_FILTER.get(), generator);
         createNonTemplateModelBlock(BlockContent.CYBERNETIC_RESEARCH_STATION.get(), generator);
         createNonTemplateModelBlock(BlockContent.QUANTUM_RESEARCH_STATION.get(), generator);
         createNonTemplateModelBlock(BlockContent.ARCANE_AUGMENT_STATION.get(), generator);
 
-        createNonTemplateModelBlock(BlockContent.PORTABLE_ENERGY_STORAGE.get(), generator);
-        createNonTemplateModelBlock(BlockContent.LARGE_STORAGE.get(), generator);
         createNonTemplateModelBlock(BlockContent.CREATIVE_STORAGE.get(), generator);
-        createNonTemplateModelBlock(BlockContent.PORTABLE_TANK.get(), generator);
         createNonTemplateModelBlock(BlockContent.CREATIVE_TANK.get(), generator);
-
-        createNonTemplateHorizontalBlock(BlockContent.PLACER.get(), generator);
-        createNonTemplateHorizontalBlock(BlockContent.DESTROYER.get(), generator);
-        createNonTemplateHorizontalBlock(BlockContent.FERTILIZER.get(), generator);
-
-        createNonTemplateHorizontalBlock(BlockContent.ENERGY_TRANSMISSION_POLE.get(), generator);
 
         createNonTemplateModelBlock(BlockContent.PUMP.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.EQUIPMENT_CHARGER.get(), generator);
 
         generator.createTrivialCube(BlockContent.ADDON_INDICATOR.get());
-        generator.createTrivialCube(BlockContent.BLOCK_DESTROYER_HEAD.get());
-        generator.createTrivialCube(BlockContent.BLOCK_PLACER_HEAD.get());
-        generator.createTrivialCube(BlockContent.BLOCK_FERTILIZER_HEAD.get());
         generator.createTrivialCube(BlockContent.PUMP_TRUNK.get());
         createNonTemplateModelBlock(BlockContent.QUARRY_BEAM_RING.get(), generator);
 
@@ -255,11 +257,8 @@ public class ModelGenerator extends ModelProvider {
         generator.createTrivialCube(BlockContent.MACHINE_CORE_7.get());
         createNonTemplateModelBlock(BlockContent.COMPLEX_PLATING.get(), Blocks.AIR, generator);   // never visible
 
-        generator.createTrivialCube(BlockContent.MACHINE_EXTENDER.get());
-
         //arcane
         createNonTemplateModelBlock(BlockContent.SPAWNER_CAGE.get(), generator);
-        createNonTemplateModelBlock(BlockContent.SPAWNER_CONTROLLER.get(), generator);
         generator.createCropBlock(BlockContent.SOUL_FLOWERS.get(), CropBlock.AGE, 0, 1, 1, 2, 3, 3, 4, 5);
         createNonTemplateModelBlock(BlockContent.STABILIZED_ENCHANTER.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
         createNonTemplateModelBlock(BlockContent.SCHRODINGERS_SAFE.get(), BlockContent.MACHINE_SPEED_ADDON.get(), generator);
@@ -309,7 +308,6 @@ public class ModelGenerator extends ModelProvider {
 
         //decorative
         generator.createTrivialCube(BlockContent.INDUSTRIAL_GLASS.get());
-        generator.createTrivialCube(BlockContent.POWER_BANK_ADDON_EXTENDER.get());
 
         generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT.get()));
         generator.blockStateOutput.accept(createWallMountedState(BlockContent.INDUSTRIAL_LIGHT_HANGING.get()));
@@ -356,6 +354,27 @@ public class ModelGenerator extends ModelProvider {
     }
 
     private void generateItemModels(ItemModelGenerators itemModelGenerator) {
+        // The colored world states retain ordinary orange block items.
+        for (var block : new Block[] {
+                BlockContent.MACHINE_EXTENDER.get(),
+                BlockContent.POWER_BANK_ADDON_EXTENDER.get(),
+                BlockContent.MACHINE_FRAME.get(),
+                BlockContent.LARGE_STORAGE.get(),
+                BlockContent.PLACER.get(),
+                BlockContent.DESTROYER.get(),
+                BlockContent.FERTILIZER.get(),
+                BlockContent.ENERGY_TRANSMISSION_POLE.get(),
+                BlockContent.ITEM_FILTER.get(),
+                BlockContent.SPAWNER_CONTROLLER.get(),
+                BlockContent.BLOCK_DESTROYER_HEAD.get(),
+                BlockContent.BLOCK_PLACER_HEAD.get(),
+                BlockContent.BLOCK_FERTILIZER_HEAD.get()
+        }) {
+            if (block.asItem() == net.minecraft.world.item.Items.AIR) continue;
+            itemModelGenerator.itemModelOutput.accept(block.asItem(),
+                    ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(block)));
+        }
+
         HAND_AUTHORED_ITEM_MODEL_BLOCKS.forEach(block -> itemModelGenerator.itemModelOutput.accept(
                 block.asItem(),
                 ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(block.asItem()))

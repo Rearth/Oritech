@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/auxiliary_processing_chamber_addon_on",
+  "textures": {
+    "0": "oritech:block/colored/auxiliary_processing_chamber_addon_on_industrial"
+  }
+}

@@ -190,7 +190,7 @@ public final class SpaceAgeBlocks {
             "cube_sat", CubeSatBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.GLASS).strength(1.5F, 6.0F).noOcclusion());
 
     public static final DeferredBlock<LaunchRampBlock> LAUNCH_RAMP = BLOCKS.registerBlock(
-            "launch_ramp", LaunchRampBlock::new, SpaceAgeBlocks::machineProperties);
+            "launch_ramp", LaunchRampBlock::new, () -> machineProperties().noOcclusion());
 
     private SpaceAgeBlocks() {
     }

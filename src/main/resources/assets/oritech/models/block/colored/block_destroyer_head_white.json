@@ -1,0 +1,7 @@
+{
+  "parent": "oritech:block/block_destroyer_head",
+  "textures": {
+    "0": "oritech:block/colored/block_destroyer_head_white",
+    "particle": "oritech:block/colored/block_destroyer_head_white"
+  }
+}

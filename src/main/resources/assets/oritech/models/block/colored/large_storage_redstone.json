@@ -1,0 +1,6 @@
+{
+  "parent": "oritech:block/large_storage",
+  "textures": {
+    "2": "oritech:block/colored/large_storage_redstone"
+  }
+}

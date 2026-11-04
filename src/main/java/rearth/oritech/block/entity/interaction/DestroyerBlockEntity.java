@@ -41,6 +41,7 @@ import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.client.ui.OritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockContent;
+import rearth.oritech.util.PaintableBlock;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.client.init.ParticleContent;
 
@@ -360,7 +361,7 @@ public class DestroyerBlockEntity extends MultiblockFrameInteractionEntity {
 
     @Override
     public BlockState getMachineHead() {
-        return BlockContent.BLOCK_DESTROYER_HEAD.get().defaultBlockState();
+        return BlockContent.BLOCK_DESTROYER_HEAD.get().defaultBlockState().setValue(PaintableBlock.COLOR, getBlockState().getValue(PaintableBlock.COLOR));
     }
 
     @Override
