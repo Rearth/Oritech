@@ -32,13 +32,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Ground modules draw from adjacent Oritech batteries; no duplicate power-storage implementation.
+ * Mission Control detects passive antennas; ground scanners draw RF from adjacent batteries.
  */
 public class GroundStationBlockEntity extends BlockEntity implements MenuProvider {
 
     private final List<BlockPos> antennas = new ArrayList<>();
     public UUID owner = new UUID(0, 0);
-    public int poweredAntennas;
+    public int connectedAntennas;
 
     public GroundStationBlockEntity(BlockPos pos, BlockState state) {
 
@@ -76,10 +76,9 @@ public class GroundStationBlockEntity extends BlockEntity implements MenuProvide
         }
         if (!getBlockState().is(SpaceAgeBlocks.MISSION_CONTROL)) return;
         if (level.getGameTime() % 20 == 0) findAntennas();
-        poweredAntennas = 0;
+        connectedAntennas = 0;
         for (var pos : antennas) {
-            if (level.hasChunkAt(pos) && level.getBlockState(pos).is(SpaceAgeBlocks.ANTENNA)
-                    && draw(pos, SpaceBalance.ANTENNA_RF)) poweredAntennas++;
+            if (level.hasChunkAt(pos) && level.getBlockState(pos).is(SpaceAgeBlocks.ANTENNA)) connectedAntennas++;
         }
         MissionSavedData.get(server.getServer()).stations.put(GlobalPos.of(level.dimension(), worldPosition), this);
     }

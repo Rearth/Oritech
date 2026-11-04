@@ -32,6 +32,7 @@ final class HoloPreview extends UIComponent {
     private final Supplier<HoloSnapshot> snapshot;
     private final Supplier<HoloSettings> settings;
     private final Consumer<Frame> pick;
+    private final HoloAsteroidGroups asteroids = new HoloAsteroidGroups();
     private Frame frame;
     private boolean dragging;
     private Component hovered;
@@ -64,14 +65,23 @@ final class HoloPreview extends UIComponent {
         for (int gx = x; gx < x + width; gx += 20) graphics.fill(gx, y, gx + 1, y + height, 0x203A97AC);
         for (int gy = y; gy < y + height; gy += 20) graphics.fill(x, gy, x + width, gy + 1, 0x203A97AC);
         hovered = null;
+        var hidden = asteroids.hidden(configured, frame, null);
         var lines = new ArrayList<Line>();
         for (var craft : data.craft()) {
             if (!s.shows(HoloSettings.PATHS) || !HoloView.selected(s, craft)) continue;
-            for (int i = 1; i < craft.path().size(); i++)
-                line(lines, craft.path().get(i - 1).x(), craft.path().get(i - 1).y(), craft.path().get(i).x(), craft.path().get(i).y(), 0xFF5CC9EF);
+            var route = new HoloPath(craft, configured, frame);
+            for (var leg : craft.journey()) {
+                var points = route.journey(leg);
+                for (int i = 1; i < points.size(); i++)
+                    line(lines, points.get(i - 1).x(), points.get(i - 1).y(), points.get(i).x(), points.get(i).y(), 0xAA739CAD);
+            }
+            var points = route.active();
+            for (int i = 1; i < points.size(); i++)
+                line(lines, points.get(i - 1).x(), points.get(i - 1).y(), points.get(i).x(), points.get(i).y(), craft.destroyed() ? 0x997F6565 : 0xFF5CC9EF);
         }
         for (var object : data.objects()) {
-            if (!s.shows(HoloSettings.ORBITS) || object.type() == ObjectType.SURVEY_REGION) continue;
+            if (hidden.contains(object.id())) continue;
+            if (!s.shows(HoloSettings.ORBITS) || object.type() == ObjectType.SURVEY_REGION || object.type() == ObjectType.ASTEROID) continue;
             for (var orbit : RocketFlightPlanRules.availableOrbits(object.type())) {
                 if (orbit == OrbitBand.SURFACE) continue;
                 var radius = SurveyRules.orbitRadius(object, orbit);
@@ -86,6 +96,7 @@ final class HoloPreview extends UIComponent {
         }
         StarMapLineRenderer.submitConnected(graphics, lines, x, y, width, height);
         for (var object : data.objects()) {
+            if (hidden.contains(object.id())) continue;
             if (object.type() == ObjectType.SURVEY_REGION && !s.shows(HoloSettings.SURVEYS)) continue;
             if (object.type() != ObjectType.SURVEY_REGION && !s.shows(HoloSettings.BODIES)) continue;
             var pos = project(object.x(), object.y());
@@ -111,8 +122,15 @@ final class HoloPreview extends UIComponent {
         }
         for (var craft : data.craft()) {
             if (!HoloView.selected(s, craft) && !s.shows(HoloSettings.OTHER_CRAFT)) continue;
-            var pos = project(craft.x(), craft.y());
-            graphics.fill((int) pos.x() - 2, (int) pos.y() - 2, (int) pos.x() + 2, (int) pos.y() + 2, 0xFF89F4FF);
+            var mapped = craft.destroyed() ? HoloView.surfacePosition(new Point(craft.x(), craft.y()), frame, configured)
+                    : new HoloPath(craft, configured, frame).position(craft.flightTime(), craft.x(), craft.y());
+            var pos = project(mapped.x(), mapped.y());
+            if (craft.destroyed()) {
+                for (int offset = -3; offset <= 3; offset++) {
+                    graphics.fill((int) pos.x() + offset, (int) pos.y() + offset, (int) pos.x() + offset + 1, (int) pos.y() + offset + 1, 0xFFDF7973);
+                    graphics.fill((int) pos.x() + offset, (int) pos.y() - offset, (int) pos.x() + offset + 1, (int) pos.y() - offset + 1, 0xFFDF7973);
+                }
+            } else graphics.fill((int) pos.x() - 2, (int) pos.y() - 2, (int) pos.x() + 2, (int) pos.y() + 2, 0xFF89F4FF);
             if (Math.hypot(mouseX - pos.x(), mouseY - pos.y()) < 8) hovered = Component.literal(craft.name());
         }
         graphics.disableScissor();

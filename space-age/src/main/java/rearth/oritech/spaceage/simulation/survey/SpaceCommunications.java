@@ -108,7 +108,7 @@ public final class SpaceCommunications {
             return level == null || !level.hasChunkAt(entry.getKey().pos()) || entry.getValue().isRemoved();
         });
         data.stations.forEach((pos, station) -> nodes.add(new Node(UUID.nameUUIDFromBytes(pos.toString().getBytes(StandardCharsets.UTF_8)),
-                station.owner, SpaceObjects.EARTH_SURFACE_X, 0, station.poweredAntennas, SpaceSimulation.OrbitBand.SURFACE, -1, true, true)));
+                station.owner, SpaceObjects.EARTH_SURFACE_X, 0, station.connectedAntennas, SpaceSimulation.OrbitBand.SURFACE, -1, true, true)));
         var networks = new HashMap<UUID, NetworkStatus>();
         for (var node : nodes) {
             if (node.ground) continue;

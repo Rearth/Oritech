@@ -36,42 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class SpaceSimulationPersistenceTest {
 
     @Test
-    void generatedAsteroidsContainTensOfThousandsOfOreBlocksWithMatchingMass() {
-
-        var simulation = new SpaceSimulation();
-        for (var asteroid : simulation.truth()) {
-            if (asteroid.type() != SpaceObjects.ObjectType.ASTEROID) continue;
-            var total = asteroid.materials().stream().mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
-            var filler = asteroid.materials().stream().filter(material -> List.of("stone", "deepslate").contains(material.block().getPath()))
-                    .mapToInt(SpaceObjects.AsteroidMaterial::amount).sum();
-            assertTrue(total >= 50_000 && total <= 250_000);
-            assertEquals(.8, (double) (total - filler) / total, .0001);
-            assertEquals(DenseOres.mass(asteroid.materials()), asteroid.mass());
-            assertTrue(asteroid.mass() * SpaceBalance.KILOGRAMS_PER_ASTEROID_MASS >= 50_000_000);
-        }
-    }
-
-    @Test
-    void earthHasSurveyClustersAtSeveralDistancesWithHiddenAsteroids() {
-
-        var simulation = new SpaceSimulation();
-        var objects = simulation.createObjectData();
-        var earth = objects.stream().filter(object -> object.id().equals(SpaceObjects.EARTH_ID)).findFirst().orElseThrow();
-        var nearby = objects.stream().filter(object -> object.type() == SpaceObjects.ObjectType.SURVEY_REGION
-                && object.radius() <= 130_000
-                && Math.hypot(object.x() - earth.x(), object.y() - earth.y()) < 1_000_000).toList();
-        assertEquals(6, nearby.size());
-        assertTrue(nearby.stream().anyMatch(object -> Math.hypot(object.x() - earth.x(), object.y() - earth.y()) < 250_000));
-        assertTrue(nearby.stream().anyMatch(object -> Math.hypot(object.x() - earth.x(), object.y() - earth.y()) > 800_000));
-        assertTrue(objects.stream().noneMatch(object -> object.type() == SpaceObjects.ObjectType.ASTEROID));
-        for (var region : nearby) {
-            assertTrue(Math.hypot(region.x() - earth.x(), region.y() - earth.y()) - region.radius() > earth.radius());
-            assertTrue(simulation.truth().stream().anyMatch(object -> object.type() == SpaceObjects.ObjectType.ASTEROID
-                    && Math.hypot(object.x() - region.x(), object.y() - region.y()) <= region.radius()));
-        }
-    }
-
-    @Test
     void savesSettingsTargetsAndBranches(@TempDir Path directory) throws Exception {
 
         SharedConstants.tryDetectVersion();

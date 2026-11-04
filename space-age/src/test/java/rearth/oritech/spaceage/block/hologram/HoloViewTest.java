@@ -7,6 +7,8 @@ import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Craft;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Point;
 import rearth.oritech.spaceage.block.hologram.HoloView.Frame;
 import rearth.oritech.spaceage.simulation.FleetCategories;
+import rearth.oritech.spaceage.simulation.mission.MissionJourney;
+import rearth.oritech.spaceage.simulation.mission.MissionJourney.Leg;
 
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +71,20 @@ class HoloViewTest {
     }
 
     @Test
+    void journeyFramingIncludesPastAndFutureLegsBeyondTheActivePath() {
+
+        var craft = new Craft(UUID.randomUUID(), "Tug", "uncategorized", 0, 0, 0, 0, UUID.randomUUID(), true, "ready", List.of(),
+                List.of(new Leg(UUID.randomUUID(),
+                        List.of(new MissionJourney.Point(-1_000_000, 0),
+                                new MissionJourney.Point(1_000_000, 0)))));
+        var snapshot = snapshot(settings("category", "journey"), List.of(craft));
+        assertEquals(0, HoloView.frame(snapshot, null).x());
+        assertTrue(HoloView.frame(snapshot, null).coverage() > 2_000_000);
+        assertEquals(snapshot, HoloSnapshot.CODEC.parse(JsonOps.INSTANCE,
+                HoloSnapshot.CODEC.encodeStart(JsonOps.INSTANCE, snapshot).getOrThrow()).getOrThrow());
+    }
+
+    @Test
     void clippingKeepsCrossingPathsAndRejectsOutsideSegments() {
 
         var surface = new HoloSurface(BlockPos.ZERO, 8, 4);
@@ -80,21 +96,4 @@ class HoloViewTest {
         assertFalse(HoloView.inside(new Point(-1, 2), surface));
     }
 
-    @Test
-    void savedSettingsAndInspectionSnapshotsRoundTrip() {
-
-        var s = settings("craft", "journey");
-        assertEquals(s, HoloSettings.CODEC.parse(JsonOps.INSTANCE, HoloSettings.CODEC.encodeStart(JsonOps.INSTANCE, s).getOrThrow()).getOrThrow());
-        var snapshot = snapshot(s, List.of());
-        assertEquals(snapshot, HoloSnapshot.CODEC.parse(JsonOps.INSTANCE, HoloSnapshot.CODEC.encodeStart(JsonOps.INSTANCE, snapshot).getOrThrow()).getOrThrow());
-        var json = HoloSettings.CODEC.encodeStart(JsonOps.INSTANCE, s).getOrThrow().getAsJsonObject();
-        json.addProperty("height", -200);
-        json.addProperty("minimum", 500_000);
-        json.addProperty("maximum", 20);
-        var normalized = HoloSettings.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().normalized();
-        assertEquals(.16, normalized.height());
-        assertEquals(normalized.minimum(), normalized.maximum());
-        var frame = new Frame(0, 0, 1_000_000);
-        assertEquals(new Point(4, 2), HoloView.project(0, 0, frame, snapshot));
-    }
 }

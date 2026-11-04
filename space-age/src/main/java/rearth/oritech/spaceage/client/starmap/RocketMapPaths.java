@@ -4,6 +4,8 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.FlightMotion;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.BoosterEvent;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.CraftPath;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.FlightPath;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +17,7 @@ import java.util.function.UnaryOperator;
 /**
  * Projects motion with optional visual surface endpoints; simulation samples remain unchanged.
  */
-final class RocketMapPaths {
+public final class RocketMapPaths {
 
     private final Map<UUID, RocketFlightPathCalculator.CraftPath> paths = new HashMap<>();
     private final Map<UUID, List<LegTransform>> transforms = new HashMap<>();
@@ -34,6 +36,11 @@ final class RocketMapPaths {
         var departures = new HashMap<UUID, BoosterEvent>();
         flight.boosterEvents().forEach(event -> departures.put(event.childBranchId(), event));
         flight.paths().forEach(path -> buildTransforms(path, departures));
+    }
+
+    public RocketMapPaths(CraftPath path, UnaryOperator<Point> surfacePosition) {
+
+        this(SpaceSimulation.FlightPlan.empty(), new FlightPath(List.of(path), List.of(), path.durationSeconds()), surfacePosition);
     }
 
     private static void subdivide(List<RenderedPathSegment> result, FlightMotion motion, Point a, Point b, Point c, Point d,
@@ -103,13 +110,13 @@ final class RocketMapPaths {
         return List.copyOf(result);
     }
 
-    List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
+    public List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path) {
 
         return renderedPathSegments(path, UnaryOperator.identity(), -Double.MAX_VALUE / 4, -Double.MAX_VALUE / 4,
                 Double.MAX_VALUE / 2, Double.MAX_VALUE / 2);
     }
 
-    List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path,
+    public List<RenderedPathSegment> renderedPathSegments(RocketFlightPathCalculator.CraftPath path,
                                                    UnaryOperator<Point> projection, double x, double y, double width, double height) {
 
         var result = new ArrayList<RenderedPathSegment>();
@@ -153,7 +160,7 @@ final class RocketMapPaths {
         return result;
     }
 
-    Point renderedWorldPosition(UUID branch, double time, double fallbackX, double fallbackY) {
+    public Point renderedWorldPosition(UUID branch, double time, double fallbackX, double fallbackY) {
 
         var path = paths.get(branch);
         if (path == null || path.samples().isEmpty()) return surfacePosition.apply(new Point(fallbackX, fallbackY));
@@ -190,7 +197,7 @@ final class RocketMapPaths {
         }
     }
 
-    record RenderedPathSegment(Point from, Point to, RocketFlightPathCalculator.PathSample firstSample,
+    public record RenderedPathSegment(Point from, Point to, RocketFlightPathCalculator.PathSample firstSample,
                                RocketFlightPathCalculator.PathSample secondSample, double sampleProgressFrom,
                                double sampleProgressTo) {
 
@@ -200,7 +207,7 @@ final class RocketMapPaths {
 
     }
 
-    record Point(double x, double y) {
+    public record Point(double x, double y) {
 
         Point lerp(Point other, double t) {
 

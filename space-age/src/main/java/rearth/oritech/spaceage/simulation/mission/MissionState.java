@@ -8,6 +8,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.mission.MissionJourney.Leg;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.FlightPath;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.power.SpacePowerService;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -72,7 +75,8 @@ public final class MissionState {
             BlockPos.CODEC.fieldOf("launch").forGetter(m -> m.launch),
             SpaceSimulation.FlightPlanAction.CODEC.listOf().fieldOf("completed").forGetter(m -> m.completed),
             Codec.LONG.fieldOf("position_revision").forGetter(m -> m.positionRevision),
-            Codec.INT.fieldOf("service_progress").forGetter(m -> m.serviceProgress)
+            Codec.INT.fieldOf("service_progress").forGetter(m -> m.serviceProgress),
+            Leg.CODEC.listOf().optionalFieldOf("journey_history", List.of()).forGetter(m -> m.journeyHistory)
     ).apply(i, MissionState::new));
     public final UUID owner;
     public final SurveyKnowledge knowledge;
@@ -95,11 +99,15 @@ public final class MissionState {
     public double powerReadyAt;
     public SpacePowerService.Report powerReport = SpacePowerService.Report.EMPTY;
     private long serviceTicks;
+    public final List<Leg> journeyHistory = new ArrayList<>();
+    private SpaceSimulation.FlightPlan journeyPlan;
+    private long journeyRevision = -1;
+    private FlightPath journeyPreview;
 
     private MissionState(UUID owner, ActiveRocketData rocket, SpaceSimulation.FlightPlan plan, Position position,
                          SurveyKnowledge knowledge, long ticks, String status,
                          Optional<ActiveTransfer> transfer, BlockPos launch, List<SpaceSimulation.FlightPlanAction> completed,
-                         long positionRevision, int serviceProgress) {
+                         long positionRevision, int serviceProgress, List<Leg> journeyHistory) {
 
         this.positionRevision = positionRevision;
         this.serviceProgress = serviceProgress;
@@ -111,6 +119,7 @@ public final class MissionState {
         this.serviceTicks = ticks;
         this.status = status;
         this.completed.addAll(completed);
+        this.journeyHistory.addAll(journeyHistory);
         this.transfer = transfer.orElse(null);
         this.launch = launch;
         rocket.setLaunchPosition(launch);
@@ -121,7 +130,7 @@ public final class MissionState {
                         Position position, SurveyKnowledge knowledge, BlockPos launch) {
 
         this(owner, rocket, plan, position, knowledge, 0, STATUS_READY,
-                Optional.empty(), launch, List.of(), 0, 0);
+                Optional.empty(), launch, List.of(), 0, 0, List.of());
     }
 
     public static boolean isRecovered(String status) {
@@ -153,6 +162,19 @@ public final class MissionState {
         return transfer == null || ended ? MissionForecast.Navigation.EMPTY : transfer.forecast(plan, recipes);
     }
 
+    public FlightPath projectedJourney(SpaceSimulation system, MissionSavedData missions, Collection<RecipeHolder<VacuumRecipe>> recipes) {
+
+        if (transfer != null) return navigationForecast(recipes).flight();
+        if (ended) return MissionForecast.Navigation.EMPTY.flight();
+        if (!plan.equals(journeyPlan) || journeyRevision != positionRevision) {
+            journeyPreview = RocketFlightPathCalculator.calculateFrom(rocket, system.knownObjects(knowledge), plan, position,
+                    recipes, RocketDocking.targets(missions, owner));
+            journeyPlan = plan;
+            journeyRevision = positionRevision;
+        }
+        return journeyPreview;
+    }
+
     public long actionTicks() {
 
         return transfer == null ? serviceTicks : transfer.ticks;
@@ -165,6 +187,7 @@ public final class MissionState {
 
     void resetAction() {
 
+        MissionJourney.remember(this);
         serviceTicks = 0;
         serviceProgress = 0;
         transfer = null;

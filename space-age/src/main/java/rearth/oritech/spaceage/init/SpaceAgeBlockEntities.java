@@ -35,7 +35,7 @@ public final class SpaceAgeBlockEntities {
     public static final Supplier<BlockEntityType<GroundStationBlockEntity>> GROUND_STATION =
             BLOCK_ENTITY_TYPES.register("ground_station", () -> new BlockEntityType<>(
                     GroundStationBlockEntity::new,
-                    SpaceAgeBlocks.MISSION_CONTROL.get(), SpaceAgeBlocks.SPACE_SCANNER.get(), SpaceAgeBlocks.ANTENNA.get()));
+                    SpaceAgeBlocks.MISSION_CONTROL.get(), SpaceAgeBlocks.SPACE_SCANNER.get()));
 
     public static final Supplier<BlockEntityType<VacuumCrafterBlockEntity>> VACUUM_CRAFTER =
             BLOCK_ENTITY_TYPES.register("vacuum_crafter", () -> new BlockEntityType<>(

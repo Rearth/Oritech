@@ -160,7 +160,6 @@ public final class RocketFlightPathTest {
         var edited = parent.withActions(RocketFlightPlanRules.preserveBoosterLinks(parent, List.of(action.withMaxSpeed(100))));
         var normalized = RocketFlightPlanRules.normalize(base.withBranches(List.of(edited, child)));
         require(normalized.branches().contains(child), "editing a navigation card preserves its booster program");
-        System.out.println("Flight path and branch regressions passed");
     }
 
     @Test

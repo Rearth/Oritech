@@ -135,7 +135,7 @@ public final class SpaceBalance {
      */
     public static final double ANTENNA_RANGE = 300_000;
     /**
-     * Earth altitude in metres covered by powered ground arrays without an orbital relay ring.
+     * Earth altitude in metres covered by connected ground antennas without an orbital relay ring.
      */
     public static final double GROUND_COMMAND_ALTITUDE = 10_000;
     /**

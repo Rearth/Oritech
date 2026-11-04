@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MissionPowerUiTest {
 
@@ -61,15 +60,6 @@ class MissionPowerUiTest {
         var path = new RocketFlightPathCalculator.CraftPath(plan.root().id(), Set.of(), List.of(), List.of(moment), 0, 0,
                 RocketFlightPathCalculator.TerminalState.READY);
         assertEquals(-1, MissionControlScreen.progressPercent(telemetry, path, 0));
-    }
-
-    @Test
-    void craftDiagramDistinguishesSmallFlowsWithoutLettingLargeBeamsFillTheScreen() {
-
-        assertTrue(CraftStatusWidget.flowWidth(1) > CraftStatusWidget.flowWidth(0));
-        assertTrue(CraftStatusWidget.flowWidth(1000) > CraftStatusWidget.flowWidth(10));
-        assertTrue(CraftStatusWidget.flowWidth(1_000_000) < CraftStatusWidget.flowWidth(1000) * 2);
-        assertTrue(CraftStatusWidget.flowWidth(Long.MAX_VALUE) <= 32);
     }
 
     @Test

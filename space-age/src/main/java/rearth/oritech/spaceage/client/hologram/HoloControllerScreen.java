@@ -24,7 +24,6 @@ import rearth.oritech.spaceage.network.HoloNetworking.Configure;
 import rearth.oritech.spaceage.simulation.FleetCategories;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -34,12 +33,11 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
 
     private HoloSettings settings;
     private HoloSnapshot received;
-    private final List<EditBox> fields = new ArrayList<>();
     private HoloPreview preview;
     private LabelWidget status;
     private ButtonWidget modeSelector;
-    private ButtonWidget categorySelector;
-    private ButtonWidget craftSelector;
+    private ButtonWidget framingSelector;
+    private boolean layoutDirty;
     private int page;
     private int ticks;
     private boolean dirty;
@@ -103,12 +101,11 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
     @Override
     protected void buildComponents() {
 
-        fields.clear();
+        layoutDirty = false;
         craftSearch = null;
         craftPopup = null;
         modeSelector = null;
-        categorySelector = null;
-        craftSelector = null;
+        framingSelector = null;
         var snapshot = HoloRenderer.snapshot(menu.pos);
         if (settings == null) {
             settings = snapshot.settings();
@@ -126,24 +123,20 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
         var previewWidth = panelWidth - 244;
         preview = new HoloPreview(8, 30, previewWidth, 202, () -> HoloRenderer.snapshot(menu.pos), () -> settings,
                 frame -> {
+                    layoutDirty |= !settings.mode().equals("area");
                     change("centerX", frame.x());
                     change("centerY", frame.y());
                     change("coverage", frame.coverage());
                     change("mode", "area");
                     change("framing", "fixed");
-                    if (page == 0 && fields.size() == 3) {
-                        fields.get(0).setValue(String.format(Locale.ROOT, "%.2f", settings.centerX()));
-                        fields.get(1).setValue(String.format(Locale.ROOT, "%.2f", settings.centerY()));
-                        fields.get(2).setValue(String.format(Locale.ROOT, "%.2f", settings.coverage()));
-                    }
                 });
         addComponent(preview);
         var x = panelWidth - 228;
         addComponent(new LabelWidget(10, 239, previewWidth, 28, text("preview_help")).withDarkColor().withWrap(true));
-        var tabs = List.of("display", "framing", "layers");
+        var tabs = List.of("display", "layers");
         for (int i = 0; i < tabs.size(); i++) {
             var tabIndex = i;
-            var tab = SpaceAgeButtons.panel(x + i * 73, 30, 72, 20, text(tabs.get(i)), ignored -> {
+            var tab = SpaceAgeButtons.panel(x + i * 109, 30, 109, 20, text(tabs.get(i)), ignored -> {
                 page = tabIndex;
                 rebuildComponents();
             });
@@ -161,53 +154,48 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
                 change("framing", mode.equals("category") ? "fit" : mode.equals("craft") ? "follow" : "fixed");
                 rebuildComponents();
             });
-            var categories = new FleetCategories(snapshot.categories());
-            categorySelector = valueButton(x, 79, "category", categories.label(settings.category()), () -> {
-                var all = categories.categories();
-                var current = 0;
-                for (int i = 0; i < all.size(); i++) if (all.get(i).id().equals(settings.category())) current = i;
-                change("category", all.get((current + 1) % all.size()).id());
+            var y = 79;
+            if (settings.mode().equals("category")) {
+                var categories = new FleetCategories(snapshot.categories());
+                valueButton(x, y, "category", categories.label(settings.category()), () -> {
+                    var all = categories.categories();
+                    var current = 0;
+                    for (int i = 0; i < all.size(); i++) if (all.get(i).id().equals(settings.category())) current = i;
+                    change("category", all.get((current + 1) % all.size()).id());
+                    rebuildComponents();
+                });
+                y += 24;
+            } else if (settings.mode().equals("craft")) {
+                var craft = snapshot.craft().stream().filter(c -> c.id().equals(settings.craft())).findFirst();
+                valueButton(x, y, "craft", craft.<Component>map(c -> Component.literal(c.name())).orElse(text("none")), () -> {
+                    choosingCraft = true;
+                    craftQuery = "";
+                    rebuildComponents();
+                    setFocused(craftSearch);
+                });
+                y += 24;
+            }
+            framingSelector = valueButton(x, y, "framing", text(settings.framing()), () -> {
+                var modes = List.of("fixed", "fit", "follow", "journey", "local");
+                change("framing", modes.get((modes.indexOf(settings.framing()) + 1) % modes.size()));
                 rebuildComponents();
             });
-            categorySelector.setActive(settings.mode().equals("category"));
-            var craft = snapshot.craft().stream().filter(c -> c.id().equals(settings.craft())).findFirst();
-            craftSelector = valueButton(x, 103, "craft", craft.<Component>map(c -> Component.literal(c.name())).orElse(text("none")), () -> {
-                choosingCraft = true;
-                craftQuery = "";
-                rebuildComponents();
-                setFocused(craftSearch);
-            });
-            craftSelector.setActive(settings.mode().equals("craft"));
-            numeric(x, 132, "centerX", settings.centerX());
-            numeric(x, 157, "centerY", settings.centerY());
-            numeric(x, 182, "coverage", settings.coverage());
-            button(x, 210, 105, "earth", () -> {
+            button(x, y + 30, 105, "earth", () -> {
                 change("mode", "area");
+                change("framing", "fixed");
                 change("centerX", (double) SpaceObjects.EARTH_X);
                 change("centerY", 0d);
                 change("coverage", 500_000d);
                 rebuildComponents();
             });
-            button(x + 109, 210, 109, "system", () -> {
+            button(x + 109, y + 30, 109, "system", () -> {
                 change("mode", "area");
+                change("framing", "fixed");
                 change("centerX", 0d);
                 change("centerY", 0d);
                 change("coverage", 20_000_000d);
                 rebuildComponents();
             });
-        } else if (page == 1) {
-            valueButton(x, 55, "framing", text(settings.framing()), () -> {
-                var modes = List.of("fixed", "fit", "follow", "journey", "local");
-                change("framing", modes.get((modes.indexOf(settings.framing()) + 1) % modes.size()));
-                rebuildComponents();
-            });
-            numeric(x, 82, "minimum", settings.minimum());
-            numeric(x, 104, "maximum", settings.maximum());
-            numeric(x, 126, "margin", settings.margin());
-            numeric(x, 148, "height", settings.height());
-            numeric(x, 170, "rotation", settings.rotation());
-            numeric(x, 192, "markerSize", settings.markerSize());
-            numeric(x, 214, "response", settings.response());
         } else {
             var names = List.of("bodies", "orbits", "paths", "surveys", "labels", "other_craft");
             for (int i = 0; i < names.size(); i++) {
@@ -239,22 +227,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
         button.withTooltip(text(key + ".help"), value);
         addComponent(button);
         return button;
-    }
-
-    private void numeric(int x, int y, String key, double value) {
-
-        addComponent(new LabelWidget(x, y + 5, 98, fit(text(key), 98)).withDarkColor().withTooltip(text(key)));
-        var field = addRenderableWidget(new EditBox(font, leftPos + x + 106, topPos + y, 110, 20, text(key)));
-        field.setMaxLength(24);
-        field.setValue(String.format(Locale.ROOT, "%.2f", value));
-        field.setResponder(input -> {
-            try {
-                change(key, Double.parseDouble(input));
-            } catch (NumberFormatException ignored) {
-                // A partially typed number remains editable.
-            }
-        });
-        fields.add(field);
     }
 
     private Component fit(Component value, int width) {
@@ -290,7 +262,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             craftQuery = query;
             populateCraftChoices(popupWidth - 32);
         });
-        for (var field : fields) field.setVisible(false);
         populateCraftChoices(popupWidth - 32);
     }
 
@@ -329,7 +300,9 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
 
         if (choosingCraft && craftPopup != null) return craftPopup.handleMouseScroll(mouseX - leftPos, mouseY - topPos, scrollY);
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        var handled = super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        if (layoutDirty) rebuildComponents();
+        return handled;
     }
 
     @Override
@@ -337,8 +310,7 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
 
         super.containerTick();
         if (modeSelector != null) modeSelector.setLabel(fit(text("setting", text("mode"), text(settings.mode())), 204));
-        if (categorySelector != null) categorySelector.setActive(settings.mode().equals("category"));
-        if (craftSelector != null) craftSelector.setActive(settings.mode().equals("craft"));
+        if (framingSelector != null) framingSelector.setLabel(fit(text("setting", text("framing"), text(settings.framing())), 204));
         if (dirty && ++ticks % 5 == 0) send(true);
         var snapshot = HoloRenderer.snapshot(menu.pos);
         if (status != null) status.setText(text(snapshot.status(), snapshot.surface().width(), snapshot.surface().depth()));
@@ -364,14 +336,17 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             return craftSearch.mouseClicked(event, doubleClick);
         }
         if (choosingCraft) return super.mouseClicked(event, doubleClick);
-        for (var field : fields) {
-            if (field.isMouseOver(event.x(), event.y())) {
-                setFocused(field);
-                return field.mouseClicked(event, doubleClick);
-            }
-        }
         setFocused(null);
         return super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+
+        var handled = super.mouseReleased(event);
+        // Rebuild after the drag finishes so preview panning keeps its interaction target.
+        if (layoutDirty) rebuildComponents();
+        return handled;
     }
 
     @Override
@@ -381,7 +356,7 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             closeCraftPopup();
             return true;
         }
-        if (!event.isEscape() && (fields.stream().anyMatch(EditBox::isFocused) || craftSearch != null && craftSearch.isFocused())) {
+        if (!event.isEscape() && craftSearch != null && craftSearch.isFocused()) {
             getFocused().keyPressed(event);
             return true;
         }

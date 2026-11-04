@@ -11,13 +11,13 @@ import java.util.UUID;
 /**
  * Reduce crowded map icons in screen space, independently for rockets and asteroids.
  */
-final class StarMapIconGroups {
+public final class StarMapIconGroups {
 
     private static final double GROUP_RADIUS = 10;
     private static final double RELEASE_RADIUS = 12;
     private Set<UUID> previousHidden = Set.of();
 
-    Set<UUID> hidden(List<Icon> icons) {
+    public Set<UUID> hidden(List<Icon> icons) {
 
         var ordered = icons.stream().sorted(Comparator.comparing(Icon::selected).reversed()
                 .thenComparing(Icon::id)).toList();
@@ -38,6 +38,6 @@ final class StarMapIconGroups {
         return hidden;
     }
 
-    record Icon(UUID id, ObjectType type, double x, double y, boolean selected) {
+    public record Icon(UUID id, ObjectType type, double x, double y, boolean selected) {
     }
 }

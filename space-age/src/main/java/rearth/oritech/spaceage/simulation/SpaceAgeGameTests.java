@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import com.mojang.serialization.JsonOps;
 import com.mojang.authlib.GameProfile;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
+import rearth.oritech.spaceage.block.mission_control.GroundStationBlockEntity;
 import rearth.oritech.spaceage.block.hologram.HoloGameTests;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.FleetCategoryNetworking;
@@ -712,10 +713,18 @@ public final class SpaceAgeGameTests {
                 new FleetCategoryNetworking.UpdateCategories(UUID.randomUUID(), FleetCategories.Saved.EMPTY)), "A stale or foreign simulation cannot overwrite categories");
         test.assertTrue(SpaceSimulationSavedData.get(level.getServer()).getOrCreate(UUID.randomUUID()).fleetCategories.categories().size() == 2,
                 "Another player starts with only the automatic categories");
-        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
-        test.assertTrue(!FleetCategoryNetworking.update(player, update), "A removed mission control cannot update categories");
-        player.containerMenu = player.inventoryMenu;
-        test.succeed();
+        level.setBlock(pos.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState(), 3);
+        test.assertTrue(level.getBlockEntity(pos.above()) == null, "Antenna is a passive block without storage or a menu");
+        test.assertTrue(level.getCapability(Capabilities.Energy.BLOCK, pos.above(), null) == null, "Antenna exposes no energy capability");
+        var station = (GroundStationBlockEntity) level.getBlockEntity(pos);
+        test.runAfterDelay(21, () -> {
+            test.assertTrue(station.connectedAntennas == 1, "An antenna on Mission Control works without any RF source");
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+            test.assertTrue(!FleetCategoryNetworking.update(player,
+                    new FleetCategoryNetworking.UpdateCategories(simulation.id(), categories.saved())), "A removed mission control cannot update categories");
+            player.containerMenu = player.inventoryMenu;
+            test.succeed();
+        });
     }
 
     private static void content(GameTestHelper test) {

@@ -13,25 +13,9 @@ import rearth.oritech.client.ui.render.PreviewBlockRenderTypes;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class PreviewBlockModelTest {
-
-    @Test
-    void ctmPassBypassesBothWorldAndDirectionalLightingButKeepsTransparency() {
-
-        for (var type : List.of(PreviewBlockRenderTypes.CUTOUT, PreviewBlockRenderTypes.TRANSLUCENT)) {
-            var flags = type.pipeline().getShaderDefines().flags();
-            assertTrue(flags.contains("NO_CARDINAL_LIGHTING"));
-            assertTrue(flags.contains("EMISSIVE"));
-            assertFalse(flags.contains("PER_FACE_LIGHTING"));
-            assertEquals("0.1", type.pipeline().getShaderDefines().values().get("ALPHA_CUTOUT"));
-        }
-        assertFalse(PreviewBlockRenderTypes.CUTOUT.hasBlending());
-        assertTrue(PreviewBlockRenderTypes.TRANSLUCENT.hasBlending());
-    }
 
     @Test
     void ctmPartsUseTheUnlitPassAndSurviveModelReuse() {

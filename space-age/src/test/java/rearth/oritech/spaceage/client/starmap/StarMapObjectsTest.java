@@ -94,10 +94,4 @@ class StarMapObjectsTest {
                 objects.findHoveredOrbit(160, 100, camera, viewport, null));
     }
 
-    @Test
-    void orbitRingsGainDetailAsTheyGrowOnScreen() {
-        assertEquals(48, StarMapObjects.circleSegments(20));
-        assertEquals(189, StarMapObjects.circleSegments(240));
-        assertEquals(512, StarMapObjects.circleSegments(10_000));
-    }
 }

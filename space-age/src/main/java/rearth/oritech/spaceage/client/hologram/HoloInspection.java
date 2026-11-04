@@ -14,7 +14,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-/** Concise inspection content, kept out of world labels so neighbouring objects cannot overlap it. */
+/** Concise content for the single world-space inspection callout. */
 final class HoloInspection {
 
     private HoloInspection() {

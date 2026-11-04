@@ -22,11 +22,17 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionJourney;
+import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Craft;
-import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Point;
-
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathSample;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public final class HoloControllerBlockEntity extends BlockEntity implements MenuProvider {
 
@@ -74,24 +80,42 @@ public final class HoloControllerBlockEntity extends BlockEntity implements Menu
             var id = mission.rocket.getRocketId();
             var category = system.fleetCategories.category(id, pos.target().equals(SpaceSimulation.SUN_ID)
                     && pos.orbit() == SpaceSimulation.OrbitBand.SOLAR, mission.plan.category());
-            var path = new ArrayList<Point>();
-            // Read already compiled guidance; displaying a projector must never solve a transfer.
+            var path = new ArrayList<PathSample>();
+            // Active guidance is authoritative; full-journey forecasts use the shared per-mission cache.
             if (mission.transfer != null && mission.transfer.path != null) {
                 var root = mission.transfer.path.paths().stream().filter(p -> p.branchId().equals(mission.plan.root().id())).findFirst();
                 if (root.isPresent()) {
                     var samples = root.get().samples();
-                    var step = Math.max(1, (samples.size() + 126) / 127);
-                    for (int i = 0; i < samples.size(); i += step) path.add(new Point(samples.get(i).x(), samples.get(i).y()));
-                    if (!samples.isEmpty()) path.add(new Point(samples.getLast().x(), samples.getLast().y()));
+                    // Preserve every Hermite knot; no rocket structure, inventory or resource accounting is transmitted.
+                    for (var sample : samples) path.add(new PathSample(sample.timeSeconds(), sample.x(), sample.y(), sample.speedMetersPerSecond(),
+                            sample.velocityX(), sample.velocityY(), sample.phase(), sample.targetId(), sample.actionId(), sample.stage(),
+                            Set.of(), Set.of(), FlightPlanAction.NO_TARGET));
                 }
             }
-            crafts.add(new Craft(id, mission.plan.name().isBlank() ? id.toString().substring(0, 8) : mission.plan.name(),
-                    category, pos.x(), pos.y(), pos.vx(), pos.vy(), pos.target(), mission.canUpdateMission(), mission.status, List.copyOf(path)));
+            var destination = destination(mission, path);
+            var craft = new Craft(id, mission.plan.name().isBlank() ? id.toString().substring(0, 8) : mission.plan.name(),
+                    category, pos.x(), pos.y(), pos.vx(), pos.vy(), destination, mission.canUpdateMission(), mission.status, List.copyOf(path));
+            var journey = new ArrayList<>(mission.journeyHistory);
+            if (HoloView.selected(settings, craft) && (settings.shows(HoloSettings.PATHS) || settings.framing().equals("journey"))) {
+                var forecast = mission.projectedJourney(system, missions, VacuumRecipe.all(server.getServer()));
+                forecast.paths().stream().filter(p -> p.branchId().equals(mission.plan.root().id())).findFirst()
+                        .ifPresent(p -> journey.addAll(MissionJourney.legs(p)));
+            }
+            crafts.add(new Craft(id, craft.name(), category, pos.x(), pos.y(), pos.vx(), pos.vy(), destination, craft.connected(), mission.status,
+                    List.copyOf(path), List.copyOf(journey), mission.actionTicks() / 20d));
         }
         var status = surface.width() == 0 ? "no_screen" : !settings.mode().equals("area")
                 && crafts.stream().noneMatch(c -> HoloView.selected(settings, c)) ? "empty" : "ready";
         return new HoloSnapshot(settings, surface, system.createObjectData(), List.copyOf(crafts), system.fleetCategories.saved(),
                 tick, missions.debugSpeed, facing, status);
+    }
+
+    static UUID destination(MissionState mission, List<PathSample> path) {
+
+        var action = mission.action();
+        if (action == null || action.type() != ActionType.NAVIGATE_TO) return mission.position.target();
+        if (!path.isEmpty() && !path.getLast().targetId().equals(FlightPlanAction.NO_TARGET)) return path.getLast().targetId();
+        return action.targetId().equals(FlightPlanAction.CLOSEST_ASTEROID) ? mission.position.target() : action.targetId();
     }
 
     @Override

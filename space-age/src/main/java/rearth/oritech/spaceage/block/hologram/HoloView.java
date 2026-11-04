@@ -44,7 +44,10 @@ public final class HoloView {
         var points = new ArrayList<Point>();
         for (var craft : crafts) {
             points.add(new Point(craft.x(), craft.y()));
-            if (s.framing().equals("journey")) points.addAll(craft.path());
+            if (s.framing().equals("journey")) {
+                craft.path().forEach(point -> points.add(new Point(point.x(), point.y())));
+                craft.journey().forEach(leg -> leg.points().forEach(point -> points.add(new Point(point.x(), point.y()))));
+            }
             if (s.framing().equals("journey") || s.framing().equals("fit"))
                 snapshot.objects().stream().filter(o -> o.id().equals(craft.target())).findFirst()
                         .ifPresent(o -> points.add(new Point(o.x(), o.y())));
@@ -88,6 +91,40 @@ public final class HoloView {
         var scale = Math.max(.1, Math.min(snapshot.surface().width(), snapshot.surface().depth()) - .5) / frame.coverage();
         return new Point(snapshot.surface().width() / 2d + (dx * Math.cos(angle) - dy * Math.sin(angle)) * scale,
                 snapshot.surface().depth() / 2d + (dx * Math.sin(angle) + dy * Math.cos(angle)) * scale);
+    }
+
+    public static Point unproject(Point point, Frame frame, HoloSnapshot snapshot) {
+
+        var angle = Math.toRadians(snapshot.settings().rotation() + snapshot.facing());
+        var scale = Math.max(.1, Math.min(snapshot.surface().width(), snapshot.surface().depth()) - .5) / frame.coverage();
+        var dx = (point.x() - snapshot.surface().width() / 2d) / scale;
+        var dy = (point.y() - snapshot.surface().depth() / 2d) / scale;
+        return new Point(frame.x() + dx * Math.cos(angle) + dy * Math.sin(angle),
+                frame.y() - dx * Math.sin(angle) + dy * Math.cos(angle));
+    }
+
+    public static Point surfacePosition(Point point, Frame frame, HoloSnapshot snapshot) {
+
+        if (!snapshot.settings().shows(HoloSettings.BODIES)) return point;
+        for (var body : snapshot.objects()) {
+            if (body.type() != ObjectType.EARTH && body.type() != ObjectType.MARS && body.type() != ObjectType.SUN
+                    && body.type() != ObjectType.RESOURCE_BODY) continue;
+            if (Math.abs(Math.hypot(point.x() - body.x(), point.y() - body.y()) - body.radius()) >= .1) continue;
+            var center = project(body.x(), body.y(), frame, snapshot);
+            if (!inside(center, snapshot.surface())) return point;
+            var projected = project(point.x(), point.y(), frame, snapshot);
+            var halfSize = modelDiameter(body, frame, snapshot) / 2;
+            var dx = projected.x() - center.x();
+            var dy = projected.y() - center.y();
+            var x = Math.clamp(dx, -halfSize, halfSize);
+            var y = Math.clamp(dy, -halfSize, halfSize);
+            if (Math.abs(dx) < halfSize && Math.abs(dy) < halfSize) {
+                if (Math.abs(dx) >= Math.abs(dy)) x = Math.copySign(halfSize, dx);
+                else y = Math.copySign(halfSize, dy);
+            }
+            return unproject(new Point(center.x() + x, center.y() + y), frame, snapshot);
+        }
+        return point;
     }
 
     public static boolean inside(Point point, HoloSurface surface) {

@@ -59,9 +59,9 @@ public final class OritechSpaceAgeClient {
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
         NeoForge.EVENT_BUS.addListener(HoloRenderer::extract);
         NeoForge.EVENT_BUS.addListener(HoloRenderer::submit);
+        NeoForge.EVENT_BUS.addListener(HoloRenderer::render);
         NeoForge.EVENT_BUS.addListener(HoloRenderer::clear);
         NeoForge.EVENT_BUS.addListener(HoloRenderer::interact);
-        NeoForge.EVENT_BUS.addListener(HoloRenderer::hud);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::extract);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::submit);
         NeoForge.EVENT_BUS.addListener(GroundBeamRenderer::clear);

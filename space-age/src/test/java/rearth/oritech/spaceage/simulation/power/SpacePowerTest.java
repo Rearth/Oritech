@@ -663,46 +663,16 @@ class SpacePowerTest {
     }
 
     @Test
-    void stationaryFleetBenchmark() {
+    void fleetSummaryOmitsTheBlockLayoutAndKeepsFullTelemetrySeparate() {
 
-        for (var count : new int[]{200, 500}) {
-            var data = new MissionSavedData();
-            var owner = UUID.randomUUID();
-            for (int i = 0; i < count; i++) {
-                var station = station(owner, 500_000);
-                var original = station.rocket.getOriginalSegments().values().iterator().next();
-                var blocks = new HashSet<>(original.blocks());
-                blocks.add(new StaticRocketSegment.BlockData(new BlockPos(0, 1, 0), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()));
-                for (int x = 1; x <= 20; x++)
-                    for (int z = 1; z <= 20; z++)
-                        blocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, z), Blocks.GLASS.defaultBlockState()));
-                var structure = new StaticRocketSegment(original.segmentId(), blocks, Map.of(), 1000, 0, 0, 0);
-                station.rocket = new ActiveRocketData(station.rocket.getRocketId(), Map.of(structure.segmentId(), structure), station.rocket.getDynamicSegments(), null);
-                data.craft.put(station.rocket.getRocketId(), station);
-            }
-            powerTick(data);
-            var system = new SpaceSimulation();
-            var start = System.nanoTime();
-            for (int tick = 0; tick < 100; tick++) {
-                powerTick(data);
-                RocketProcessingService.tickJobs(data, ignored -> system.truth());
-                for (var station : data.craft.values()) {
-                    SpaceCommunications.poweredAntennas(station, true);
-                    MissionController.step(null, data, station, system, tick);
-                }
-                data.power.update(null, data, data.extraTicks);
-                data.power.update(null, data, data.extraTicks);
-            }
-            var elapsed = (System.nanoTime() - start) / 1_000_000d / 100;
-            var full = data.craft.values().iterator().next();
-            var summary = full.summary(100);
-            var fullBytes = MissionState.Telemetry.CODEC.encodeStart(JsonOps.INSTANCE, full.telemetry(100)).getOrThrow().toString().length();
-            var summaryBytes = MissionState.Telemetry.CODEC.encodeStart(JsonOps.INSTANCE, summary).getOrThrow().toString().length();
-            assertTrue(summaryBytes < fullBytes / 4);
-            System.out.printf("Fleet entry full/summary: %d/%d JSON bytes%n", fullBytes, summaryBytes);
-            assertFalse(summary.fullLayout());
-            assertTrue(summary.rocket().getStaticSegments().values().stream().allMatch(s -> s.blocks().isEmpty()));
-            System.out.printf("Solar fleet %d: %.3f ms/station service tick%n", count, elapsed);
-        }
+        var mission = station(UUID.randomUUID(), 500_000);
+        var summary = mission.summary(100);
+        assertFalse(summary.fullLayout());
+        assertTrue(summary.rocket().getStaticSegments().values().stream().allMatch(segment -> segment.blocks().isEmpty()));
+        var full = mission.telemetry(100);
+        assertTrue(full.fullLayout());
+        assertTrue(full.rocket().getStaticSegments().values().stream().anyMatch(segment -> !segment.blocks().isEmpty()));
+        assertEquals(full.position(), summary.position());
+        assertEquals(full.status(), summary.status());
     }
 }

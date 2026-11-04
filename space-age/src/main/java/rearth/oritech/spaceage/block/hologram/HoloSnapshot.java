@@ -4,12 +4,16 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
 import rearth.oritech.spaceage.simulation.FleetCategories;
+import rearth.oritech.spaceage.simulation.mission.MissionJourney.Leg;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathSample;
 
 import java.util.List;
 import java.util.UUID;
 
-/** Compact inspection data: no inventories, rocket structures, or new forecasts. */
+/** Compact inspection geometry, without inventories or rocket structures. */
 public record HoloSnapshot(HoloSettings settings, HoloSurface surface, List<SpaceObjectData> objects,
                            List<Craft> craft, FleetCategories.Saved categories, long tick, int speed,
                            int facing, String status) {
@@ -36,7 +40,7 @@ public record HoloSnapshot(HoloSettings settings, HoloSurface surface, List<Spac
     }
 
     public record Craft(UUID id, String name, String category, double x, double y, double vx, double vy,
-                        UUID target, boolean connected, String status, List<Point> path) {
+                        UUID target, boolean connected, String status, List<PathSample> path, List<Leg> journey, double flightTime) {
 
         public static final Codec<Craft> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(Craft::id),
@@ -47,7 +51,26 @@ public record HoloSnapshot(HoloSettings settings, HoloSurface surface, List<Spac
                 UUIDUtil.STRING_CODEC.fieldOf("target").forGetter(Craft::target),
                 Codec.BOOL.fieldOf("connected").forGetter(Craft::connected),
                 Codec.STRING.fieldOf("status").forGetter(Craft::status),
-                Point.CODEC.listOf().fieldOf("path").forGetter(Craft::path)
+                PathSample.CODEC.listOf().fieldOf("path").forGetter(Craft::path),
+                Leg.CODEC.listOf().optionalFieldOf("journey", List.of()).forGetter(Craft::journey),
+                Codec.DOUBLE.fieldOf("flight_time").forGetter(Craft::flightTime)
         ).apply(i, Craft::new));
+
+        public boolean destroyed() {
+
+            return MissionState.STATUS_DESTROYED.equals(status);
+        }
+
+        public Craft(UUID id, String name, String category, double x, double y, double vx, double vy,
+                     UUID target, boolean connected, String status, List<PathSample> path, List<Leg> journey) {
+
+            this(id, name, category, x, y, vx, vy, target, connected, status, path, journey, 0);
+        }
+
+        public Craft(UUID id, String name, String category, double x, double y, double vx, double vy,
+                     UUID target, boolean connected, String status, List<PathSample> path) {
+
+            this(id, name, category, x, y, vx, vy, target, connected, status, path, List.of(), 0);
+        }
     }
 }
