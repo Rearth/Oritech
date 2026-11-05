@@ -261,6 +261,17 @@ public class SpaceSimulation {
         });
     }
 
+    private static double fragmentClearance(double firstRadius, double secondRadius) {
+
+        return Math.max(SpaceBalance.ASTEROID_FRAGMENT_MIN_SEPARATION,
+                (firstRadius + secondRadius) * SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING);
+    }
+
+    private static String fragmentName(String parent, boolean destroyed, int number) {
+
+        return destroyed ? "Fragment " + number + " of destroyed " + parent : parent + " impact fragment " + number;
+    }
+
     public UUID applyAsteroidImpact(UUID targetId, AsteroidImpactRules.ImpactPrediction impact) {
 
         var target = truth().stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
@@ -278,22 +289,36 @@ public class SpaceSimulation {
         var largest = impact.fragments().stream().mapToDouble(fragment -> Math.max(fragment.radius(), AsteroidShape.size(fragment.materials()).radius())).max().orElse(0);
         var clearance = Math.max(SpaceBalance.ASTEROID_FRAGMENT_MIN_SEPARATION,
                 largest * 2 * SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING);
+        // Resource bodies use planet models; their parent radius does not receive asteroid-icon enlargement.
         var offset = Math.max(SpaceBalance.ASTEROID_FRAGMENT_MIN_SEPARATION,
-                (target.radius() + largest) * SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING);
+                target.radius() * (infinite ? 1.25 : SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING)
+                        + largest * SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING);
         if (impact.fragments().size() > 1)
             offset = Math.max(offset, clearance / (2 * Math.sin(Math.PI / impact.fragments().size())));
+        var names = nonCelestialObjects.stream().map(object -> object.name).collect(Collectors.toSet());
         for (int index = 0; index < impact.fragments().size(); index++) {
             var fragment = impact.fragments().get(index);
             var child = new SpaceObjects.Asteroid();
             var angle = index * Math.PI * 2 / impact.fragments().size();
-            child.currentPosition = new Vector2f(targetPosition).add((float) (Math.cos(angle) * offset), (float) (Math.sin(angle) * offset));
+            var childRadius = Math.max(fragment.radius(), AsteroidShape.size(fragment.materials()).radius());
+            var childOffset = offset;
+            while (true) {
+                child.currentPosition = new Vector2f(targetPosition).add((float) (Math.cos(angle) * childOffset), (float) (Math.sin(angle) * childOffset));
+                var blocking = nonCelestialObjects.stream().filter(object -> object instanceof SpaceObjects.Asteroid)
+                        .filter(object -> child.currentPosition.distance(object.currentPosition) < fragmentClearance(childRadius, object.radius) - 1)
+                        .findFirst().orElse(null);
+                if (blocking == null) break;
+                childOffset += fragmentClearance(childRadius, blocking.radius);
+            }
             child.weight = fragment.mass();
             child.radius = fragment.radius();
             child.materials = fragment.materials();
             child.surfaceGravity = target.surfaceGravity() * child.radius / target.radius();
-            child.name = destroyed ? "Fragment " + (index + 1) + " of destroyed " + targetName
-                    : targetName + " impact fragment " + (index + 1);
-            debrisRadius = (float) Math.max(debrisRadius, offset + AsteroidShape.size(child.materials).radius() * 1.5f);
+            var number = index + 1;
+            child.name = fragmentName(targetName, destroyed, number);
+            while (names.contains(child.name)) child.name = fragmentName(targetName, destroyed, ++number);
+            names.add(child.name);
+            debrisRadius = (float) Math.max(debrisRadius, childOffset + childRadius * 1.5f);
             nonCelestialObjects.add(child);
         }
         var asteroid = nonCelestialObjects.stream().filter(object -> object.id.equals(targetId))

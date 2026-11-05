@@ -348,7 +348,7 @@ class MissionSystemsTest {
         assertTrue(fragments.stream().allMatch(fragment -> fragment.detectionState() == SpaceObjects.DetectionState.HIDDEN));
         assertEquals(asteroid.x(), debris.x());
         assertEquals(asteroid.y(), debris.y());
-        assertTrue(debris.radius() < 30_000);
+        assertTrue(debris.radius() < SpaceBalance.SCAN_RANGE);
         assertEquals("Debris field of destroyed " + asteroid.name(), debris.name());
         assertTrue(oldRegions.stream().noneMatch(regionId -> truth.stream().anyMatch(object -> object.id().equals(regionId))));
     }

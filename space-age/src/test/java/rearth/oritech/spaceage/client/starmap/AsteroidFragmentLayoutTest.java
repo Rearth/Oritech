@@ -1,6 +1,9 @@
 package rearth.oritech.spaceage.client.starmap;
 
 import org.junit.jupiter.api.Test;
+import net.minecraft.resources.Identifier;
+import rearth.oritech.spaceage.simulation.ResourceBodies;
+import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules.ArrivalOutcome;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules.AsteroidFragment;
@@ -8,7 +11,6 @@ import rearth.oritech.spaceage.simulation.AsteroidImpactRules.FragmentationMode;
 import rearth.oritech.spaceage.simulation.AsteroidShape;
 import rearth.oritech.spaceage.simulation.DenseOres;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
-import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceObjects.AsteroidMaterial;
 import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -28,7 +30,7 @@ class AsteroidFragmentLayoutTest {
 
         for (int count : new int[]{1, 2, 3, 6, 24}) {
             for (var destroyed : List.of(false, true)) {
-                var system = new SpaceSimulation();
+                var system = new SpaceSimulation(42, AsteroidGenerator.defaults());
                 var parent = system.truth().stream().filter(body -> body.type() == ObjectType.ASTEROID).findFirst().orElseThrow();
                 system.earthKnowledge.scan(List.of(parent), 0, parent.x(), parent.y(), 1);
                 var previous = system.truth().stream().map(SpaceObjectData::id).collect(Collectors.toSet());
@@ -72,4 +74,33 @@ class AsteroidFragmentLayoutTest {
             }
         }
     }
+
+    @Test
+    void repeatedMoonImpactsAvoidEarlierFragmentsAndKeepDistinctNames() {
+
+        var system = new SpaceSimulation(42, AsteroidGenerator.defaults());
+        var definition = new ResourceBodies.Definition("Test moon", "", -3_250_000, 300_000, 18_000,
+                Identifier.parse("oritech_space_age:luna"), List.of(new AsteroidMaterial(DenseOres.Family.IRON.id(), 1)));
+        var moon = definition.object(Identifier.parse("oritech_space_age:test_moon"));
+        system.setResourceBodies(List.of(moon));
+        var material = List.of(new AsteroidMaterial(DenseOres.Family.IRON.id(), 10_000));
+        var fragment = new AsteroidFragment(DenseOres.mass(material), AsteroidShape.size(material).radius(), material);
+        var impact = new AsteroidImpactRules.ImpactPrediction(ArrivalOutcome.ASTEROID_FRAGMENTATION, 1_000, 1, 1,
+                FragmentationMode.CHIPPING, List.of(fragment), 0, List.of(), 0, 0);
+        for (int repeat = 0; repeat < 8; repeat++) system.applyAsteroidImpact(moon.id(), impact);
+        var fragments = system.truth().stream().filter(body -> body.name().startsWith("Test moon impact fragment ")).toList();
+        assertEquals(8, fragments.size());
+        assertEquals(8, fragments.stream().map(SpaceObjectData::name).distinct().count());
+        for (var first : fragments) {
+            assertTrue(Math.hypot(first.x() - moon.x(), first.y() - moon.y()) < 200_000,
+                    "Fragments stay near the moon instead of scaling the planet radius as an enlarged asteroid icon");
+            for (var second : fragments) {
+                if (first.id().equals(second.id())) continue;
+                var clearance = Math.max(SpaceBalance.ASTEROID_FRAGMENT_MIN_SEPARATION,
+                        (first.radius() + second.radius()) * SpaceBalance.ASTEROID_FRAGMENT_RADIUS_SPACING);
+                assertTrue(Math.hypot(first.x() - second.x(), first.y() - second.y()) >= clearance - 1);
+            }
+        }
+    }
+
 }
