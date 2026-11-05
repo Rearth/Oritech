@@ -117,6 +117,7 @@ public class BlockOutlineRenderer {
             machinePos = blockPos;
 
         var placementState = block.getStateForPlacement(new BlockPlaceContext(player, player.swingingArm, itemStack, hitResult));
+        if (placementState == null) return;
         var entity = entityProvider.newBlockEntity(machinePos, placementState);
 
         if (!(entity instanceof MultiblockMachineController multiblockController)) return;

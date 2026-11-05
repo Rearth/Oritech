@@ -134,7 +134,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
 
     private RocketStructureScan.Result scan(ServerLevel level) {
 
-        var pad = worldPosition.relative(getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING));
+        var pad = worldPosition.relative(getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite());
         var result = RocketStructureScan.scan(level, pad, false);
         scanIssue = result.issue();
         return result;

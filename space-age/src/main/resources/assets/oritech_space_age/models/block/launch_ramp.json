@@ -1,5 +1,5 @@
 {
   "textures": {
-    "particle": "oritech_space_age:models/particle_launcher"
+    "particle": "oritech:block/machine_core_1"
   }
 }

@@ -1,0 +1,143 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"idle": {
+			"loop": true,
+			"animation_length": 10,
+			"bones": {
+				"exchange_station": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"frontpanel": {
+					"rotation": {
+						"vector": [-22.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -4.675]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"frontpanelface": {
+					"rotation": {
+						"vector": [-22.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"frontpanel2": {
+					"rotation": {
+						"vector": [90, 0, 0]
+					},
+					"position": {
+						"vector": [0, 1, 1]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"rightpanel": {
+					"rotation": {
+						"vector": [0, 0, 55]
+					},
+					"position": {
+						"vector": [-4, 3, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"rightpanelface": {
+					"rotation": {
+						"vector": [22.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 1.5]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"leftpanel": {
+					"rotation": {
+						"vector": [0, 0, -55]
+					},
+					"position": {
+						"vector": [4, 3, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"leftpanelface": {
+					"rotation": {
+						"vector": [22.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 1.5]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"backaddon": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 3]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"topaddon": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					},
+					"position": {
+						"vector": [0, 7, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"holo": {
+					"rotation": {
+						"vector": [0, "-query.anim_time*36", 0]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				},
+				"frontpanelface2": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					},
+					"scale": {
+						"vector": [1, 1, 1]
+					}
+				}
+			}
+		}
+	}
+}

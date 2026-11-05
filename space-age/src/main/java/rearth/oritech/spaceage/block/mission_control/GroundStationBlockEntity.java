@@ -1,5 +1,11 @@
 package rearth.oritech.spaceage.block.mission_control;
 
+import com.geckolib.animatable.GeoBlockEntity;
+import com.geckolib.animatable.instance.AnimatableInstanceCache;
+import com.geckolib.animatable.manager.AnimatableManager;
+import com.geckolib.animation.AnimationController;
+import com.geckolib.animation.RawAnimation;
+import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
@@ -34,8 +40,10 @@ import java.util.UUID;
 /**
  * Mission Control detects passive antennas; ground scanners draw RF from adjacent batteries.
  */
-public class GroundStationBlockEntity extends BlockEntity implements MenuProvider {
+public class GroundStationBlockEntity extends BlockEntity implements MenuProvider, GeoBlockEntity {
 
+    private static final RawAnimation IDLE = RawAnimation.begin().thenLoop("idle");
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
     private final List<BlockPos> antennas = new ArrayList<>();
     public UUID owner = new UUID(0, 0);
     public int connectedAntennas;
@@ -43,6 +51,19 @@ public class GroundStationBlockEntity extends BlockEntity implements MenuProvide
     public GroundStationBlockEntity(BlockPos pos, BlockState state) {
 
         super(SpaceAgeBlockEntities.GROUND_STATION.get(), pos, state);
+    }
+
+    @Override
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
+
+        if (getBlockState().is(SpaceAgeBlocks.MISSION_CONTROL))
+            controllers.add(new AnimationController<>("idle", 0, state -> state.setAndContinue(IDLE)));
+    }
+
+    @Override
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+
+        return cache;
     }
 
     @Override

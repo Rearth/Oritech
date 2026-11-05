@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "oritech_space_age:block/rocket_assembler_down",
+    "up": "oritech_space_age:block/rocket_assembler_up",
+    "north": "oritech_space_age:block/rocket_assembler_south",
+    "south": "oritech_space_age:block/rocket_assembler_north",
+    "east": "oritech_space_age:block/rocket_assembler_west",
+    "west": "oritech_space_age:block/rocket_assembler_east",
+    "particle": "oritech_space_age:block/rocket_assembler_particle"
+  }
+}

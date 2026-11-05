@@ -7,7 +7,6 @@ import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
-import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.renderer.block.dispatch.Variant;
 import com.geckolib.renderer.internal.GeckolibItemSpecialRenderer;
 import net.minecraft.core.Direction;
@@ -17,6 +16,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
+import rearth.oritech.spaceage.block.basic.GalleryLightBlock;
+import rearth.oritech.spaceage.block.basic.GalleryLightBlock.Connection;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
@@ -98,12 +99,21 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_EARTH.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_MARS.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.MINI_SUN.get(), blockModels);
-        createHorizontalModelBlock(SpaceAgeBlocks.GALLERY_LIGHT.get(), blockModels);
+        var light = SpaceAgeBlocks.GALLERY_LIGHT.get();
+        var lightModel = ModelLocationUtils.getModelLocation(light);
+        var lightVariants = PropertyDispatch.initial(GalleryLightBlock.CONNECTION);
+        for (var connection : Connection.values()) {
+            var model = connection == Connection.SINGLE ? lightModel : lightModel.withSuffix("_" + connection.getSerializedName());
+            lightVariants.select(connection, BlockModelGenerators.variant(new Variant(model)));
+        }
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(light).with(lightVariants)
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.registerSimpleItemModel(light, lightModel);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_1.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_2.get(), blockModels);
         createAsteroidBlock(SpaceAgeBlocks.ASTEROID_3.get(), blockModels);
-        blockModels.createHorizontallyRotatedBlock(SpaceAgeBlocks.ROCKET_ASSEMBLER.get(), TexturedModel.CUBE);
-        blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_PAD.get());
+        createHorizontalModelBlock(SpaceAgeBlocks.ROCKET_ASSEMBLER.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.ROCKET_PAD.get(), blockModels);
         blockModels.createTrivialCube(SpaceAgeBlocks.ROCKET_COUPLING.get());
         createCustomModelBlock(SpaceAgeBlocks.NAVIGATION_COMPUTER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.PARACHUTE.get(), blockModels);
@@ -121,7 +131,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
                 .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
         itemModels.itemModelOutput.accept(SpaceAgeBlocks.LAUNCH_RAMP.asItem(),
                 ItemModelUtils.specialModel(OritechSpaceAge.id("item/launch_ramp"), new GeckolibItemSpecialRenderer.Unbaked()));
-        createCustomModelBlock(SpaceAgeBlocks.MISSION_CONTROL.get(), blockModels);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(SpaceAgeBlocks.MISSION_CONTROL.get(),
+                        BlockModelGenerators.variant(new Variant(OritechSpaceAge.id("block/mission_control"))))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        itemModels.itemModelOutput.accept(SpaceAgeBlocks.MISSION_CONTROL.asItem(),
+                ItemModelUtils.specialModel(OritechSpaceAge.id("item/mission_control"), new GeckolibItemSpecialRenderer.Unbaked()));
         createCustomModelBlock(SpaceAgeBlocks.HOLO_SCREEN.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.HOLO_CONTROLLER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);

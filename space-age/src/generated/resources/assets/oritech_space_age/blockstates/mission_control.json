@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "oritech_space_age:block/mission_control",
+      "y": 90
+    },
+    "facing=north": {
       "model": "oritech_space_age:block/mission_control"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/mission_control",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/mission_control",
+      "y": 270
     }
   }
 }

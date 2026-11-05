@@ -4,6 +4,8 @@ import com.mojang.serialization.JsonOps;
 import com.mojang.authlib.GameProfile;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.block.mission_control.GroundStationBlockEntity;
+import rearth.oritech.spaceage.block.basic.GalleryLightBlock;
+import rearth.oritech.spaceage.block.basic.GalleryLightBlock.Connection;
 import rearth.oritech.spaceage.block.hologram.HoloGameTests;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.FleetCategoryNetworking;
@@ -499,7 +501,7 @@ public final class SpaceAgeGameTests {
         var level = test.getLevel();
         var assemblerPos = test.absolutePos(new BlockPos(2, 1, 1));
         level.setBlockAndUpdate(assemblerPos, SpaceAgeBlocks.ROCKET_ASSEMBLER.get().defaultBlockState()
-                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH));
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH));
         var pad = assemblerPos.south();
         for (int dx = -1; dx <= 2; dx++)
             level.setBlockAndUpdate(pad.offset(dx, 0, 0), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState());
@@ -563,7 +565,7 @@ public final class SpaceAgeGameTests {
         var level = test.getLevel();
         var assemblerPos = test.absolutePos(new BlockPos(1, 1, 1));
         level.setBlock(assemblerPos, SpaceAgeBlocks.ROCKET_ASSEMBLER.get().defaultBlockState()
-                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.SOUTH), 3);
+                .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.NORTH), 3);
         level.setBlock(assemblerPos.south(), SpaceAgeBlocks.ROCKET_PAD.get().defaultBlockState(), 3);
         for (int dx = -1; dx <= 1; dx++)
             for (int dz = 0; dz <= 2; dz++)
@@ -672,6 +674,23 @@ public final class SpaceAgeGameTests {
             test.assertTrue(state != null && state.getValue(BlockStateProperties.HORIZONTAL_FACING) == facing, "Light faces away from its wall");
             test.assertTrue(state.getLightEmission(level, pos) == 15, "Gallery light emits level 15");
             level.setBlock(pos, state, 3);
+            test.assertTrue(state.getValue(GalleryLightBlock.CONNECTION) == Connection.SINGLE, "An isolated light is single");
+            var left = pos.relative(facing.getClockWise());
+            var right = pos.relative(facing.getCounterClockWise());
+            level.setBlock(left.relative(facing.getOpposite()), Blocks.STONE.defaultBlockState(), 3);
+            level.setBlock(right.relative(facing.getOpposite()), Blocks.STONE.defaultBlockState(), 3);
+            level.setBlock(left, light.getStateForPlacement(new DirectionalPlaceContext(level, left, facing.getOpposite(), item, facing)), 3);
+            test.assertTrue(level.getBlockState(left).getValue(GalleryLightBlock.CONNECTION) == Connection.LEFT
+                    && level.getBlockState(pos).getValue(GalleryLightBlock.CONNECTION) == Connection.RIGHT, "A pair has left and right ends");
+            level.setBlock(right, light.getStateForPlacement(new DirectionalPlaceContext(level, right, facing.getOpposite(), item, facing)), 3);
+            test.assertTrue(level.getBlockState(pos).getValue(GalleryLightBlock.CONNECTION) == Connection.CENTER
+                    && level.getBlockState(right).getValue(GalleryLightBlock.CONNECTION) == Connection.RIGHT, "Three lights have a seamless center");
+            level.setBlock(left, Blocks.AIR.defaultBlockState(), 3);
+            test.assertTrue(level.getBlockState(pos).getValue(GalleryLightBlock.CONNECTION) == Connection.LEFT, "Removing an end updates its neighbor");
+            level.setBlock(right, Blocks.AIR.defaultBlockState(), 3);
+            test.assertTrue(level.getBlockState(pos).getValue(GalleryLightBlock.CONNECTION) == Connection.SINGLE, "Removing both neighbors restores single");
+            level.setBlock(left.relative(facing.getOpposite()), Blocks.AIR.defaultBlockState(), 3);
+            level.setBlock(right.relative(facing.getOpposite()), Blocks.AIR.defaultBlockState(), 3);
             level.setBlock(support, Blocks.AIR.defaultBlockState(), 3);
             test.assertTrue(level.getBlockState(pos).isAir(), "Light drops when its wall is removed");
             test.assertTrue(light.getStateForPlacement(context) == null, "Light needs wall support");

@@ -36,7 +36,7 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<Block> HOLO_SCREEN = BLOCKS.registerSimpleBlock("holo_screen",
             () -> machineProperties().lightLevel(state -> 4));
     public static final DeferredBlock<HoloControllerBlock> HOLO_CONTROLLER = BLOCKS.registerBlock("holo_controller",
-            HoloControllerBlock::new, () -> machineProperties().lightLevel(state -> 5));
+            HoloControllerBlock::new, () -> machineProperties().noOcclusion().lightLevel(state -> 5));
 
     @NoBlockItem
     public static final DeferredBlock<Block> SPACECRAFT_ICON = BLOCKS.registerSimpleBlock("spacecraft_icon",
@@ -175,7 +175,7 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<RocketEngineBlock> ION_BOOSTER_ROCKET = registerRocketEngine("ion_booster_rocket", RocketEngineBlock.Type.ION);
 
     public static final DeferredBlock<MissionControlBlock> MISSION_CONTROL =
-            BLOCKS.registerBlock("mission_control", MissionControlBlock::new, SpaceAgeBlocks::machineProperties);
+            BLOCKS.registerBlock("mission_control", MissionControlBlock::new, () -> machineProperties().noOcclusion());
     public static final DeferredBlock<SurveyModuleBlock> SPACE_SCANNER =
             BLOCKS.registerBlock("space_scanner", properties -> new SurveyModuleBlock(properties, SurveyModuleBlock.SCANNER_SHAPE), () -> machineProperties().noOcclusion());
     public static final DeferredBlock<AntennaBlock> ANTENNA =

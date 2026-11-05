@@ -10,6 +10,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
+import rearth.oritech.spaceage.client.mission_control.MissionControlRenderer;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.beam_aperture.GroundBeamRenderer;
@@ -78,6 +79,7 @@ public final class OritechSpaceAgeClient {
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.CUBE_SAT.get(), CubeSatRenderer::new));
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.LAUNCH_RAMP.get(), ParticleLauncherRenderer::new));
         modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.SPACE_TROPHY.get(), SpaceTrophyRenderer::new));
+        modEventBus.addListener((EntityRenderersEvent.RegisterRenderers event) -> event.registerBlockEntityRenderer(SpaceAgeBlockEntities.GROUND_STATION.get(), MissionControlRenderer::new));
         NeoForge.EVENT_BUS.addListener(RobotWorkArea::extract);
         NeoForge.EVENT_BUS.addListener(RobotWorkArea::submit);
         modEventBus.addListener(SpaceAgeDataGenerators::gatherData);

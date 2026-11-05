@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "oritech_space_age:block/rocket_pad_down",
+    "top": "oritech_space_age:block/rocket_pad_up",
+    "side": "oritech_space_age:block/rocket_pad_side"
+  }
+}

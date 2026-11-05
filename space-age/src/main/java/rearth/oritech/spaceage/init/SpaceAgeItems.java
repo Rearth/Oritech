@@ -8,6 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.trophy.SpaceTrophyItem;
+import rearth.oritech.spaceage.block.mission_control.MissionControlItem;
 import rearth.oritech.spaceage.block.cubesat.CubeSatItem;
 import rearth.oritech.spaceage.block.robot_arm.ActionCardItem;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmItem;
@@ -42,6 +43,9 @@ public final class SpaceAgeItems {
             else if (block == SpaceAgeBlocks.SPACE_TROPHY)
                 ITEMS.registerItem(name, properties -> new SpaceTrophyItem(block.get(), properties),
                         () -> new Item.Properties().stacksTo(1).useBlockDescriptionPrefix());
+            else if (block == SpaceAgeBlocks.MISSION_CONTROL)
+                ITEMS.registerItem(name, properties -> new MissionControlItem(block.get(), properties),
+                        () -> new Item.Properties().useBlockDescriptionPrefix());
             else if (block == SpaceAgeBlocks.ROBOT_ARM)
                 ITEMS.registerItem(name, properties -> new RobotArmItem(block.get(), properties),
                         () -> new Item.Properties().useBlockDescriptionPrefix());

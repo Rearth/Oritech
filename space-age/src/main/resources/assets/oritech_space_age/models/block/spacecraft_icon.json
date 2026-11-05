@@ -7,7 +7,7 @@
   ],
   "textures": {
     "0": "oritech_space_age:models/space_trophy",
-    "particle": "oritech_space_age:models/space_trophy"
+    "particle": "oritech:block/machine_core_1"
   },
   "elements": [
     {
