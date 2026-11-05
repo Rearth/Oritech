@@ -14,15 +14,17 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import org.jetbrains.annotations.NotNull;
-import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.block.base.entity.FrameInteractionBlockEntity;
+import rearth.oritech.block.blocks.addons.MachineAddonBlock;
+import rearth.oritech.client.init.ParticleContent;
+import rearth.oritech.util.ColorableMachine;
 import rearth.oritech.util.CollisionShapes;
+import rearth.oritech.util.MachineAddonController;
 import rearth.oritech.util.MultiblockMachineController;
 import rearth.oritech.util.PaintableBlock;
-import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.HashSet;
 import java.util.function.Consumer;
 
 public class ColorCartridgeItem extends Item {
@@ -51,12 +53,24 @@ public class ColorCartridgeItem extends Item {
         var targetState = context.getLevel().getBlockState(targetBlock);
         var colorableMachine = targetEntity instanceof ColorableMachine machine ? machine : null;
 
-        var frame = targetEntity instanceof FrameInteractionBlockEntity gantry ? gantry.getConnectedFrame() : Set.<BlockPos>of();
-        var frameNeedsColor = frame.stream().anyMatch(pos -> context.getLevel().getBlockState(pos).getValue(PaintableBlock.COLOR) != variant);
+        var connectedBlocks = new HashSet<BlockPos>();
+        if (targetEntity instanceof FrameInteractionBlockEntity gantry) {
+            connectedBlocks.addAll(gantry.getConnectedFrame());
+        }
+        if (targetEntity instanceof MachineAddonController controller) {
+            // The controller's list includes extenders and addons reached through them.
+            for (var pos : controller.getConnectedAddons()) {
+                var state = context.getLevel().getBlockState(pos);
+                if (state.getBlock() instanceof MachineAddonBlock && state.hasProperty(PaintableBlock.COLOR)) {
+                    connectedBlocks.add(pos);
+                }
+            }
+        }
+        var connectionsNeedColor = connectedBlocks.stream().anyMatch(pos -> context.getLevel().getBlockState(pos).getValue(PaintableBlock.COLOR) != variant);
 
         if (colorableMachine != null) {
-            if (colorableMachine.getCurrentColor() == variant) return InteractionResult.PASS;
-        } else if (!targetState.hasProperty(PaintableBlock.COLOR) || (targetState.getValue(PaintableBlock.COLOR) == variant && !frameNeedsColor)) {
+            if (colorableMachine.getCurrentColor() == variant && !connectionsNeedColor) return InteractionResult.PASS;
+        } else if (!targetState.hasProperty(PaintableBlock.COLOR) || (targetState.getValue(PaintableBlock.COLOR) == variant && !connectionsNeedColor)) {
             return InteractionResult.PASS;
         }
 
@@ -68,7 +82,7 @@ public class ColorCartridgeItem extends Item {
             context.getLevel().setBlockAndUpdate(targetBlock, targetState.setValue(PaintableBlock.COLOR, variant));
         }
 
-        for (var pos : frame) {
+        for (var pos : connectedBlocks) {
             var state = context.getLevel().getBlockState(pos);
             context.getLevel().setBlockAndUpdate(pos, state.setValue(PaintableBlock.COLOR, variant));
         }
@@ -84,7 +98,7 @@ public class ColorCartridgeItem extends Item {
         // create particles
         var targetBlocks = new ArrayList<BlockPos>();
         targetBlocks.add(targetBlock);
-        targetBlocks.addAll(frame);
+        targetBlocks.addAll(connectedBlocks);
 
         if (targetEntity instanceof MultiblockMachineController multiblockMachineController) {
             targetBlocks.addAll(multiblockMachineController.getConnectedCores());
