@@ -51,7 +51,8 @@ public class SpaceSimulation {
                     .forGetter(simulation -> simulation.flightPlans.entrySet().stream()
                             .map(entry -> new StoredFlightPlan(entry.getKey(), entry.getValue())).toList()),
             SurveyKnowledge.CODEC.optionalFieldOf("earth_knowledge").forGetter(simulation -> Optional.of(simulation.earthKnowledge)),
-            FleetCategories.Saved.CODEC.optionalFieldOf("fleet_categories", FleetCategories.Saved.EMPTY).forGetter(simulation -> simulation.fleetCategories.saved())
+            FleetCategories.Saved.CODEC.optionalFieldOf("fleet_categories", FleetCategories.Saved.EMPTY).forGetter(simulation -> simulation.fleetCategories.saved()),
+            OrbitBand.CODEC.optionalFieldOf("completed_orbit").forGetter(simulation -> simulation.completedOrbit)
     ).apply(instance, SpaceSimulation::new));
 
     private static final SpaceObjects.SimulatedObject EARTH = celestial(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,
@@ -63,14 +64,17 @@ public class SpaceSimulation {
 
     public final SurveyKnowledge earthKnowledge;
     public final FleetCategories fleetCategories;
+    public Optional<OrbitBand> completedOrbit = Optional.empty();
     private final Set<SpaceObjects.SimulatedObject> nonCelestialObjects = new HashSet<>();
     private final UUID simulationId;
     private final Map<GlobalPos, FlightPlan> flightPlans = new HashMap<>();
     private List<SpaceObjectData> resourceBodies = List.of();
+    private long simulationTime;
 
     private SpaceSimulation(UUID loadedSimulationId, List<SpaceObjects.SimulatedObject> loadedObjects,
-                            List<StoredFlightPlan> loadedPlans, Optional<SurveyKnowledge> knowledge, FleetCategories.Saved categories) {
+                            List<StoredFlightPlan> loadedPlans, Optional<SurveyKnowledge> knowledge, FleetCategories.Saved categories, Optional<OrbitBand> completedOrbit) {
 
+        this.completedOrbit = completedOrbit;
         earthKnowledge = knowledge.orElseGet(SurveyKnowledge::new);
         fleetCategories = new FleetCategories(categories);
         simulationId = loadedSimulationId;
@@ -168,7 +172,7 @@ public class SpaceSimulation {
         }).toList());
         var existingAsteroids = truth.stream().filter(object -> object.type() == SpaceObjects.ObjectType.ASTEROID)
                 .map(SpaceObjectData::id).collect(Collectors.toSet());
-        visible.addAll(knowledge.contacts().stream().filter(contact -> existingAsteroids.contains(contact.id())).toList());
+        visible.addAll(knowledge.contacts(simulationTime).stream().filter(contact -> existingAsteroids.contains(contact.id())).toList());
         visible.sort(Comparator.comparing(SpaceObjectData::type).thenComparing(SpaceObjectData::id));
         return List.copyOf(visible);
     }
@@ -188,17 +192,35 @@ public class SpaceSimulation {
         resourceBodies = List.copyOf(bodies);
     }
 
-    public void tickAsteroids(ServerLevel level) {
+    public void setSimulationTime(long tick) {
+
+        simulationTime = tick;
+    }
+
+    public void tickAsteroids(ServerLevel level, Set<UUID> attached) {
 
         var removed = new ArrayList<SpaceObjects.SimulatedObject>();
         for (var object : nonCelestialObjects) {
-            if (!(object instanceof SpaceObjects.Asteroid asteroid) || asteroid.velocity.lengthSquared() == 0) continue;
-            asteroid.currentPosition.add(asteroid.velocity.x / 20, asteroid.velocity.y / 20);
+            if (!(object instanceof SpaceObjects.Asteroid asteroid) || attached.contains(asteroid.id) || asteroid.velocity.lengthSquared() == 0) continue;
+            var previousX = asteroid.currentPosition.x;
+            var previousY = asteroid.currentPosition.y;
+            var speed = asteroid.velocity.length();
+            var distance = AsteroidMotion.distanceFactor(speed, 1d / SpaceBalance.TICKS_PER_SECOND);
+            // Retain sub-float movement at large map coordinates, especially as the asteroid slows down.
+            var dx = asteroid.velocity.x * distance + asteroid.driftRemainderX;
+            var dy = asteroid.velocity.y * distance + asteroid.driftRemainderY;
+            asteroid.currentPosition.add((float) dx, (float) dy);
+            asteroid.driftRemainderX = dx - (asteroid.currentPosition.x - previousX);
+            asteroid.driftRemainderY = dy - (asteroid.currentPosition.y - previousY);
+            var drag = AsteroidMotion.velocityFactor(speed, 1d / SpaceBalance.TICKS_PER_SECOND);
+            asteroid.velocity.mul((float) drag);
             if (SpaceObjects.earthAltitude(asteroid.currentPosition.x, asteroid.currentPosition.y) > 0) continue;
             var action = asteroid.landing == null ? FlightPlanAction.create(ActionType.NAVIGATE_TO) : asteroid.landing;
             var pos = new BlockPos(action.landingX() + action.landingOffsetX(), 0, action.landingZ() + action.landingOffsetZ());
             if (!level.hasChunkAt(pos)) {
-                asteroid.currentPosition.sub(asteroid.velocity.x / 20, asteroid.velocity.y / 20);
+                asteroid.currentPosition.set(previousX, previousY);
+                asteroid.driftRemainderX = 0;
+                asteroid.driftRemainderY = 0;
                 continue;
             }
             var impact = AsteroidImpactRules.predictArrival(0, toData(EARTH), asteroid.velocity.length(), toData(asteroid), action);
@@ -208,9 +230,22 @@ public class SpaceSimulation {
         nonCelestialObjects.removeAll(removed);
     }
 
-    public void moveAttached(UUID id, double x, double y) {
+    public Optional<SpaceObjectData> asteroidData(UUID id) {
 
-        nonCelestialObjects.stream().filter(o -> o.id.equals(id)).findFirst().ifPresent(o -> o.currentPosition.set((float) x, (float) y));
+        return nonCelestialObjects.stream().filter(o -> o.id.equals(id)).findFirst().map(SpaceSimulation::toData);
+    }
+
+    public Optional<SpaceObjectData> moveAttached(UUID id, double x, double y, double vx, double vy) {
+
+        nonCelestialObjects.stream().filter(o -> o.id.equals(id)).findFirst().ifPresent(o -> {
+            o.currentPosition.set((float) x, (float) y);
+            if (o instanceof SpaceObjects.Asteroid asteroid) {
+                asteroid.velocity.set((float) vx, (float) vy);
+                asteroid.driftRemainderX = 0;
+                asteroid.driftRemainderY = 0;
+            }
+        });
+        return asteroidData(id);
     }
 
     public void releaseAsteroid(UUID id, double x, double y, double vx, double vy, FlightPlanAction landing) {
@@ -427,7 +462,7 @@ public class SpaceSimulation {
                                   float velocityX, float velocityY, float radius,
                                   float surfaceGravity, float mass,
                                   SpaceObjects.DetectionState detectionState, String name,
-                                  List<SpaceObjects.AsteroidMaterial> materials, float surveyHalfAngle) {
+                                  List<SpaceObjects.AsteroidMaterial> materials, float surveyHalfAngle, long observedAt, UUID tugId) {
 
         public static final Codec<SpaceObjectData> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(SpaceObjectData::id),
@@ -439,8 +474,30 @@ public class SpaceSimulation {
                 SpaceObjects.DetectionState.CODEC.fieldOf("detection").forGetter(SpaceObjectData::detectionState),
                 Codec.STRING.fieldOf("name").forGetter(SpaceObjectData::name),
                 SpaceObjects.AsteroidMaterial.CODEC.listOf().fieldOf("materials").forGetter(SpaceObjectData::materials),
-                Codec.FLOAT.optionalFieldOf("survey_half_angle", 0F).forGetter(SpaceObjectData::surveyHalfAngle)
+                Codec.FLOAT.optionalFieldOf("survey_half_angle", 0F).forGetter(SpaceObjectData::surveyHalfAngle),
+                Codec.LONG.optionalFieldOf("observed_at", -1L).forGetter(SpaceObjectData::observedAt),
+                UUIDUtil.STRING_CODEC.optionalFieldOf("tug", FlightPlanAction.NO_TARGET).forGetter(SpaceObjectData::tugId)
         ).apply(i, SpaceObjectData::new));
+
+        public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y,
+                               float velocityX, float velocityY, float radius, float surfaceGravity, float mass,
+                               SpaceObjects.DetectionState detectionState, String name, List<SpaceObjects.AsteroidMaterial> materials, float surveyHalfAngle) {
+
+            this(id, type, x, y, velocityX, velocityY, radius, surfaceGravity, mass, detectionState, name, materials,
+                    surveyHalfAngle, -1, FlightPlanAction.NO_TARGET);
+        }
+
+        public SpaceObjectData withMotion(double x, double y, double vx, double vy) {
+
+            return new SpaceObjectData(id, type, (float) x, (float) y, (float) vx, (float) vy, radius, surfaceGravity, mass,
+                    detectionState, name, materials, surveyHalfAngle, observedAt, tugId);
+        }
+
+        public SpaceObjectData withObservation(long tick, UUID tug) {
+
+            return new SpaceObjectData(id, type, x, y, velocityX, velocityY, radius, surfaceGravity, mass,
+                    detectionState, name, materials, surveyHalfAngle, tick, tug);
+        }
 
         public SpaceObjectData(UUID id, SpaceObjects.ObjectType type, float x, float y,
                                float velocityX, float velocityY, float radius, float surfaceGravity, float mass,
@@ -466,12 +523,18 @@ public class SpaceSimulation {
 
         public double xAt(double seconds) {
 
-            return x + velocityX * seconds;
+            return x + velocityX * motionTime(seconds);
         }
 
         public double yAt(double seconds) {
 
-            return y + velocityY * seconds;
+            return y + velocityY * motionTime(seconds);
+        }
+
+        private double motionTime(double seconds) {
+
+            return type == SpaceObjects.ObjectType.ASTEROID && tugId.equals(FlightPlanAction.NO_TARGET)
+                    ? AsteroidMotion.distanceFactor(Math.hypot(velocityX, velocityY), seconds) : seconds;
         }
     }
 

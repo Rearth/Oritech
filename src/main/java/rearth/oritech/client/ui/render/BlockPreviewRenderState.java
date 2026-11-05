@@ -17,6 +17,7 @@ import java.util.List;
  */
 public record BlockPreviewRenderState(
         List<Entry> blocks,
+        List<PreviewEffect> effects,
         float rotationX,
         float rotationY,
         float centerX,
@@ -55,9 +56,15 @@ public record BlockPreviewRenderState(
                                    float partialTick, boolean cacheTexture,
                                    int x0, int y0, int x1, int y1, float scale,
                                    Matrix3x2f pose, @Nullable ScreenRectangle scissorArea) {
-        this(blocks, rotationX, rotationY, centerX, centerY, centerZ, partialTick, cacheTexture,
+        this(blocks, List.of(), rotationX, rotationY, centerX, centerY, centerZ, partialTick, cacheTexture,
                 x0, y0, x1, y1, scale, new Matrix3x2f(pose), scissorArea,
                 calculateBounds(x0, y0, x1, y1, pose, scissorArea));
+    }
+
+    public BlockPreviewRenderState withEffects(List<PreviewEffect> effects) {
+        if (effects.isEmpty() && this.effects.isEmpty()) return this;
+        return new BlockPreviewRenderState(blocks, List.copyOf(effects), rotationX, rotationY, centerX, centerY, centerZ,
+                partialTick, false, x0, y0, x1, y1, scale, pose, scissorArea, bounds);
     }
 
     private static @Nullable ScreenRectangle calculateBounds(

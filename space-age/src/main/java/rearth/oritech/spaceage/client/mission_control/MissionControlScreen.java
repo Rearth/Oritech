@@ -475,11 +475,17 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             categoryPopup.addChild(SpaceAgeButtons.panel(x + popupWidth / 2 + 5, y + popupHeight - 28,
                     popupWidth / 2 - 15, 20, Component.translatable("gui.cancel"), ignored -> closeCategoryPopup()));
         } else if (discardingCraft != null) {
+            var archived = menu.fleet.stream().filter(entry -> entry.id().equals(discardingCraft))
+                    .anyMatch(entry -> MissionState.isRecovered(entry.telemetry().status())
+                            || MissionState.STATUS_DESTROYED.equals(entry.telemetry().status()));
+            var discardLabel = Component.translatable("screen.oritech_space_age.fleet.discard");
+            if (!archived) discardLabel.withStyle(ChatFormatting.RED);
             categoryPopup.addChild(new LabelWidget(x + 10, y + 33, popupWidth - 20, 70,
-                    Component.translatable("screen.oritech_space_age.fleet.discard_warning"))
-                    .withColor(0xFFFF7777).withWrap(true));
+                    Component.translatable(archived ? "screen.oritech_space_age.fleet.discard_archived"
+                            : "screen.oritech_space_age.fleet.discard_warning"))
+                    .withColor(archived ? LabelWidget.BRIGHT_TEXT : 0xFFFF7777).withWrap(true));
             categoryPopup.addChild(SpaceAgeButtons.panel(x + 10, y + popupHeight - 28, popupWidth / 2 - 15, 20,
-                    Component.translatable("screen.oritech_space_age.fleet.discard").withStyle(ChatFormatting.RED), ignored -> {
+                    discardLabel, ignored -> {
                         ClientPacketDistributor.sendToServer(new MissionNetworking.DeleteCrafts(List.of(discardingCraft)));
                         closeCategoryPopup();
                     }));

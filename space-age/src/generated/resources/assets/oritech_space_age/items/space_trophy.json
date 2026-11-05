@@ -1,0 +1,9 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "oritech_space_age:item/space_trophy",
+    "model": {
+      "type": "geckolib:geckolib"
+    }
+  }
+}

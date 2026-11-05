@@ -61,7 +61,7 @@ public final class SpaceTrophyRenderer<R extends BlockEntityRenderState & GeoRen
         stack.scale(scale, -scale, scale);
         for (int row = 0; row < lines.length; row++)
             collector.submitText(stack, -font.width(lines[row]) / 2f, row * 12 - 10, lines[row].getVisualOrderText(),
-                    false, Font.DisplayMode.NORMAL, pass.renderState().lightCoords, 0xFF21180D, 0, 0);
+                    false, Font.DisplayMode.NORMAL, pass.renderState().lightCoords, 0xFFFFFFFF, 0, 0);
         stack.popPose();
     }
 

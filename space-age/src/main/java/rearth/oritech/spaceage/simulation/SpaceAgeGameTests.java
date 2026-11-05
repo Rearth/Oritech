@@ -37,6 +37,7 @@ import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
 import rearth.oritech.spaceage.block.cubesat.CubeSatGameTests;
+import rearth.oritech.spaceage.block.trophy.SpaceTrophyGameTests;
 import rearth.oritech.spaceage.block.robot_arm.RobotGameTests;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
@@ -114,6 +115,8 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("cube_sat_shrink", () -> CubeSatGameTests::shrink);
         FUNCTIONS.register("cube_sat_contents", () -> CubeSatGameTests::contents);
         FUNCTIONS.register("launch_ramp", () -> CubeSatGameTests::launchRamp);
+        FUNCTIONS.register("space_trophy", () -> SpaceTrophyGameTests::trophy);
+        FUNCTIONS.register("full_orbit", () -> SpaceTrophyGameTests::advancement);
     }
 
     public static void register(RegisterGameTestsEvent event) {
@@ -139,7 +142,7 @@ public final class SpaceAgeGameTests {
                 OritechSpaceAge.id("space_power")), info));
         event.registerTest(OritechSpaceAge.id("gallery_light"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
                 OritechSpaceAge.id("gallery_light")), info));
-        for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp"))
+        for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp", "space_trophy", "full_orbit"))
             event.registerTest(OritechSpaceAge.id(name), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name)), info));
     }
 

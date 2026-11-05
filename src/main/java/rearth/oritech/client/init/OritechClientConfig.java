@@ -39,6 +39,10 @@ public class OritechClientConfig {
         };
     }
 
+    public static final ModConfigSpec.BooleanValue rocketCameraShake = CLIENT
+            .comment("Shake the camera near Space Age launches, landings and rocket impacts")
+            .define("rocketCameraShake", true);
+
     public static final ModConfigSpec.BooleanValue showMachinePreview = OritechClientConfig.CLIENT
             .comment("Render multiblock placement preview")
             .define("showMachinePreview", true);

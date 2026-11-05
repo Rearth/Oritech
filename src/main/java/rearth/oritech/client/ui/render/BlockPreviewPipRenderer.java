@@ -111,6 +111,7 @@ public class BlockPreviewPipRenderer extends PictureInPictureRenderer<BlockPrevi
             poseStack.popPose();
         }
 
+        for (var effect : state.effects()) effect.submit(poseStack, submitNodes);
         featureDispatcher.renderAllFeatures();
         cachedState = state.cacheTexture() ? state : null;
         cachedModel = minecraft.getModelManager().getBlockModelSet();

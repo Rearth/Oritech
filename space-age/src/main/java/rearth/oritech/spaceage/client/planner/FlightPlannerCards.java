@@ -157,9 +157,11 @@ final class FlightPlannerCards {
             var branchPath = screen.calculatedFlight().paths().stream()
                     .filter(path -> path.branchId().equals(branch.id())).findFirst().orElse(null);
             if (branchPath != null && branchPath.terminalState().isFailure()) {
-                var reason = branchPath.failure().<Component>map(failure -> failure.description()).orElseGet(() -> FlightPlannerLabels.blockedTooltip(branchPath.terminalState()));
+                var reason = branchPath.failure().<Component>map(failure -> failure.description().withStyle(FlightPlannerLabels.terminalStyle(branchPath.terminalState())))
+                        .orElseGet(() -> FlightPlannerLabels.blockedTooltip(branchPath.terminalState()));
                 branchButton.withTooltip(reason);
-                scroll.addChild(blockedBorder(branchX, rowY + 5, BRANCH_CARD_WIDTH, 58, List.of(reason)));
+                scroll.addChild(cardBorder(branchX, rowY + 5, BRANCH_CARD_WIDTH, 58, List.of(reason),
+                        0xFF000000 | FlightPlannerLabels.terminalStyle(branchPath.terminalState()).getColor()));
             }
             screen.registerPowerTooltip(branchButton);
             var branchColor = selectedBranch ? LabelWidget.BRIGHT_TEXT : LabelWidget.DARK_TEXT;
@@ -304,8 +306,8 @@ final class FlightPlannerCards {
         if (blockedPath != null) {
             var reason = FlightPlannerLabels.blockedTooltip(screen.calculatedFlight(), action.id(), blockedPath.terminalState());
             card.addTooltipLine(reason);
-            scroll.addChild(blockedBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, action.type() == SpaceSimulation.ActionType.SCAN
-                    ? card.getTooltip() : List.of(reason)));
+            scroll.addChild(cardBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, action.type() == SpaceSimulation.ActionType.SCAN
+                    ? card.getTooltip() : List.of(reason), 0xFF000000 | FlightPlannerLabels.terminalStyle(blockedPath.terminalState()).getColor()));
         }
         var textColor = LabelWidget.BRIGHT_TEXT;
         scroll.addChild(new LabelWidget(cursorX + 6, rowY + 7, NORMAL_CARD_WIDTH - 20,

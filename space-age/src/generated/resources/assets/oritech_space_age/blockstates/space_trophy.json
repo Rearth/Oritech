@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "oritech_space_age:block/space_trophy",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/space_trophy"
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/space_trophy",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/space_trophy",
+      "y": 270
+    }
+  }
+}

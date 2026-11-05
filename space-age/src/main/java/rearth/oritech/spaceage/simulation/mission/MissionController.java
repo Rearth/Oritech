@@ -11,6 +11,7 @@ import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceAgeAdvancements;
 import rearth.oritech.spaceage.simulation.AsteroidDeliveries;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -112,8 +113,11 @@ public final class MissionController {
     private static void tickOnce(MinecraftServer server, MissionSavedData data, long tick, boolean physicalTick) {
 
         var systems = SpaceSimulationSavedData.get(server);
-        data.craft.values().stream().map(m -> m.owner).distinct().forEach(owner ->
-                systems.getOrCreate(owner).tickAsteroids(server.overworld()));
+        data.craft.values().stream().map(m -> m.owner).distinct().forEach(owner -> {
+            var attached = data.craft.values().stream().filter(craft -> craft.owner.equals(owner) && !craft.ended)
+                    .map(craft -> craft.position.asteroid()).collect(Collectors.toSet());
+            systems.getOrCreate(owner).tickAsteroids(server.overworld(), attached);
+        });
         RocketDocking.synchronize(data);
         if (physicalTick) {
             SurfaceBeamData.get(server.overworld()).tick(server.overworld());
@@ -127,7 +131,8 @@ public final class MissionController {
             var system = systems.getOrCreate(state.owner);
             step(server, data, state, system, tick);
             if (!state.ended && !state.position.asteroid().equals(FlightPlanAction.NO_TARGET))
-                system.moveAttached(state.position.asteroid(), state.position.x(), state.position.y());
+                system.moveAttached(state.position.asteroid(), state.position.x(), state.position.y(), state.position.vx(), state.position.vy())
+                        .ifPresent(contact -> observeTugging(state, system, contact, tick, state.rocket.getRocketId()));
         }
 
         // An idle host still pays for its visitors.
@@ -144,6 +149,7 @@ public final class MissionController {
             GroundBeamNetworking.sync(server, data.power);
         }
         shareFleetKnowledge(data, nodes);
+        SpaceAgeAdvancements.recordCompletedOrbits(data, systems);
         systems.setDirty();
         if (!data.craft.isEmpty()) data.setDirty();
     }
@@ -321,6 +327,12 @@ public final class MissionController {
         state.complete();
     }
 
+    private static void observeTugging(MissionState state, SpaceSimulation system, SpaceObjectData contact, long tick, UUID tug) {
+
+        state.knowledge.observe(contact, tick, tug);
+        if (state.connected) system.earthKnowledge.observe(contact, tick, tug);
+    }
+
     private static void decouple(MissionSavedData data, MissionState state, SpaceSimulation system,
                                  FlightPlanAction action, long tick) {
 
@@ -331,6 +343,7 @@ public final class MissionController {
                     && completed.targetId().equals(SpaceObjects.EARTH_ID)
                     && completed.orbit() == OrbitBand.SURFACE).findFirst().orElse(null);
             system.releaseAsteroid(position.asteroid(), position.x(), position.y(), position.vx(), position.vy(), landing);
+            system.asteroidData(position.asteroid()).ifPresent(contact -> observeTugging(state, system, contact, tick, FlightPlanAction.NO_TARGET));
             state.position = position.withAttachment(FlightPlanAction.NO_TARGET, position.anchor());
         } else if (action.segments().size() == 2) {
             var ids = new HashMap<SegmentRef, UUID>();
@@ -458,7 +471,7 @@ public final class MissionController {
         var rocket = cube.unfold(child.id(), action.payload());
         rocket.copyLaunchFrom(state.rocket);
         var cubeName = cube.name().isBlank() ? "Cube-Sat" : cube.name();
-        var name = state.plan.name().isBlank() ? cubeName : state.plan.name() + " · " + cubeName;
+        var name = state.plan.name().isBlank() ? cubeName : state.plan.name() + " ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â· " + cubeName;
         var p = state.position;
         var position = new MissionState.Position(p.x(), p.y(), p.vx(), p.vy(), p.target(), p.orbit(), p.slot(), 1,
                 FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO), p.headingX(), p.headingY());

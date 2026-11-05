@@ -2,6 +2,8 @@
   "values": [
     "oritech_space_age:holo_screen",
     "oritech_space_age:holo_controller",
+    "oritech_space_age:spacecraft_icon",
+    "oritech_space_age:space_trophy",
     "oritech_space_age:robot_arm",
     "oritech_space_age:earth",
     "oritech_space_age:sun",

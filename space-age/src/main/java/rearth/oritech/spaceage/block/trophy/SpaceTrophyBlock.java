@@ -9,6 +9,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -38,12 +40,21 @@ public final class SpaceTrophyBlock extends Block implements EntityBlock {
     @Override
     public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
 
-        // The trophy occupies three vertical blocks; don't overwrite an existing build.
-        for (int height = 1; height <= 2; height++) {
-            var pos = context.getClickedPos().above(height);
-            if (context.getLevel().isOutsideBuildHeight(pos) || !context.getLevel().getBlockState(pos).canBeReplaced(context)) return null;
-        }
+        var pos = context.getClickedPos().above();
+        if (context.getLevel().isOutsideBuildHeight(pos) || !context.getLevel().getBlockState(pos).canBeReplaced(context)) return null;
         return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
+    protected BlockState rotate(BlockState state, Rotation rotation) {
+
+        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+    }
+
+    @Override
+    protected BlockState mirror(BlockState state, Mirror mirror) {
+
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override

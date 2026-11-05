@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.block.entity.generators.BigSolarPanelEntity;
 import rearth.oritech.client.ui.render.BlockPreviewRenderState;
+import rearth.oritech.client.ui.render.PreviewEffect;
 import rearth.oritech.util.Geometry;
 import rearth.oritech.util.MultiblockMachineController;
 
@@ -241,7 +242,15 @@ public class BlockPreviewWidget extends UIComponent {
                 lastScale,
                 graphics.pose(),
                 graphics.peekScissorStack()
-        ));
+        ).withEffects(getEffects(delta)));
+    }
+
+    protected List<PreviewEffect> getEffects(float partialTick) {
+        return List.of();
+    }
+
+    protected float getEffectPadding() {
+        return 0;
     }
 
     /**
@@ -266,8 +275,8 @@ public class BlockPreviewWidget extends UIComponent {
             return 0f;
         }
 
-        float widthScale = availableWidth * 0.5f / maxHorizontalRadius;
-        float heightScale = availableHeight * 0.5f / maxVerticalRadius;
+        float widthScale = availableWidth * 0.5f / (maxHorizontalRadius + getEffectPadding());
+        float heightScale = availableHeight * 0.5f / (maxVerticalRadius + getEffectPadding());
         return Math.min(widthScale, heightScale) * SCALE_MARGIN;
     }
 

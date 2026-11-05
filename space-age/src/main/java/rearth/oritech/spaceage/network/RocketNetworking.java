@@ -6,6 +6,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -19,15 +20,18 @@ import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerClientController;
 import rearth.oritech.spaceage.client.rocket.RocketClientController;
+import rearth.oritech.spaceage.client.rocket.RocketEffects;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 
+import java.util.List;
 import java.util.UUID;
 
 public final class RocketNetworking {
@@ -92,7 +96,11 @@ public final class RocketNetworking {
 
     public static void sendRocket(ServerPlayer player, ActiveRocketData rocket) {
 
-        PacketDistributor.sendToPlayer(player, new SyncRocketPayload(rocket));
+        var mission = MissionSavedData.get(player.level().getServer()).craft.get(rocket.getRocketId());
+        var engines = rocket.getStaticSegments().values().stream()
+                .filter(segment -> mission == null || mission.plan.configurationFor(SegmentRef.of(segment)).usesEnginesDuring(mission.position.stage()))
+                .map(segment -> segment.segmentId()).toList();
+        PacketDistributor.sendToPlayer(player, new SyncRocketPayload(rocket, engines));
     }
 
     public static void unloadRocket(ServerPlayer player, UUID rocketId) {
@@ -123,7 +131,7 @@ public final class RocketNetworking {
 
     private static void receiveRocket(SyncRocketPayload payload, IPayloadContext context) {
 
-        context.enqueueWork(() -> RocketClientController.receiveRocket(payload.rocket()));
+        context.enqueueWork(() -> RocketClientController.receiveRocket(payload.rocket(), payload.engineSegments()));
     }
 
     private static void unloadRocket(UnloadRocketPayload payload, IPayloadContext context) {
@@ -138,6 +146,7 @@ public final class RocketNetworking {
 
         context.enqueueWork(() -> {
             RocketClientController.removeRocket(payload.rocketId());
+            RocketEffects.impact(Vec3.atCenterOf(payload.position()), Math.min(2.5f, .5f + payload.explosionStrength() * .15f));
             OritechSpaceAge.LOGGER.debug("Received rocket collision {} at {}: speed={}m/s, strength={}, nuclear={}",
                     payload.rocketId(), payload.position(), payload.speedMetersPerSecond(),
                     payload.explosionStrength(), payload.nuclearExplosion());
@@ -242,7 +251,7 @@ public final class RocketNetworking {
         }
     }
 
-    public record SyncRocketPayload(ActiveRocketData rocket) implements CustomPacketPayload {
+    public record SyncRocketPayload(ActiveRocketData rocket, List<UUID> engineSegments) implements CustomPacketPayload {
 
         private static final Type<SyncRocketPayload> TYPE = new Type<>(OritechSpaceAge.id("sync_rocket"));
 

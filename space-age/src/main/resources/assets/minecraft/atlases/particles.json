@@ -1,0 +1,7 @@
+{
+  "sources": [
+    { "type": "minecraft:single", "resource": "oritech_space_age:effect/thruster_smoke" },
+    { "type": "minecraft:single", "resource": "oritech_space_age:effect/thruster_spark" },
+    { "type": "minecraft:single", "resource": "oritech_space_age:effect/thruster_ion_spark" }
+  ]
+}

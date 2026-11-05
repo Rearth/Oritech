@@ -676,7 +676,7 @@ public final class RocketStarMapWidget extends UIComponent {
             return branch.isRoot() ? Component.translatable("screen.oritech_space_age.branch.root")
                     : Component.translatable("screen.oritech_space_age.branch.number", index + 1);
         }
-        return Component.literal("ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“");
+        return Component.literal("–");
     }
 
     @Override

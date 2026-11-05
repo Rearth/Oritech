@@ -273,7 +273,7 @@ public final class HoloRenderer {
                 } else if (inside) {
                     emitters.add(new HoloEmitters.Beam(pos, radius, selected ? 1 : .45, craft.id().hashCode()));
                     models.add(new Miniature(model(SpaceAgeBlocks.SPACECRAFT_ICON.get().defaultBlockState()), pos,
-                            (float) (radius * 2), selected ? 1f : .65f));
+                            (float) (radius * 32 / 44), selected ? 1f : .65f));
                 } else {
                     var direction = new Vec3(point.x() - surface.width() / 2d, 0, point.y() - surface.depth() / 2d).normalize();
                     var back = pos.subtract(direction.scale(radius * 2));

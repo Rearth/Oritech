@@ -16,6 +16,7 @@ import rearth.oritech.client.ui.render.BlockPreviewEntities;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
+import rearth.oritech.spaceage.client.rocket.RocketPreviewWidget;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -72,7 +73,7 @@ public class CraftStatusScreen extends OritechWidgetScreen<MissionControlMenu> {
                 () -> {
                 }, this::openEditor).forEach(this::addComponent);
         addCraftHeader(panelWidth);
-        preview = new BlockPreviewWidget(9, 52, (panelWidth - 27) / 3, panelHeight - 61);
+        preview = new RocketPreviewWidget(9, 52, (panelWidth - 27) / 3, panelHeight - 61, menu);
         preview.withSurface(OritechSurface.PANEL_INSET);
         preview.withRotationSpeed(.18f).withDragRotation().withViewState(view);
         previewBlocks = Map.of();

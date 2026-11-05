@@ -41,7 +41,6 @@ public final class SpaceTrophyItem extends BlockItem implements GeoItem {
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
-
     }
 
     @Override
@@ -54,16 +53,19 @@ public final class SpaceTrophyItem extends BlockItem implements GeoItem {
 
         @Override
         public Identifier getModelResource(GeoRenderState state) {
+
             return OritechSpaceAge.id("space_trophy");
         }
 
         @Override
         public Identifier getTextureResource(GeoRenderState state) {
+
             return OritechSpaceAge.id("textures/models/space_trophy.png");
         }
 
         @Override
         public Identifier getAnimationResource(SpaceTrophyItem item) {
+
             return OritechSpaceAge.id("space_trophy");
         }
     }

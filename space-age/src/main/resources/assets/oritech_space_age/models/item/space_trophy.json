@@ -9,13 +9,13 @@
       ],
       "translation": [
         0,
-        -2,
+        -5,
         0
       ],
       "scale": [
-        0.5,
-        0.5,
-        0.5
+        0.32,
+        0.32,
+        0.32
       ]
     },
     "ground": {
@@ -32,9 +32,9 @@
     },
     "fixed": {
       "scale": [
-        0.5,
-        0.5,
-        0.5
+        0.3,
+        0.3,
+        0.3
       ]
     },
     "thirdperson_righthand": {
@@ -53,16 +53,16 @@
     },
     "firstperson_righthand": {
       "scale": [
-        0.5,
-        0.5,
-        0.5
+        0.3,
+        0.3,
+        0.3
       ]
     },
     "firstperson_lefthand": {
       "scale": [
-        0.5,
-        0.5,
-        0.5
+        0.3,
+        0.3,
+        0.3
       ]
     }
   },

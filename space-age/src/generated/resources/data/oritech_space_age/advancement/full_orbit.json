@@ -1,0 +1,26 @@
+{
+  "criteria": {
+    "filled_orbit": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "display": {
+    "background": "minecraft:gui/advancements/backgrounds/end",
+    "description": {
+      "translate": "advancements.oritech_space_age.full_orbit.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "id": "oritech_space_age:space_trophy"
+    },
+    "title": {
+      "translate": "advancements.oritech_space_age.full_orbit"
+    }
+  },
+  "requirements": [
+    [
+      "filled_orbit"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

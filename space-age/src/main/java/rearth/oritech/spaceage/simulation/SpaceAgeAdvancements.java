@@ -15,6 +15,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionState;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class SpaceAgeAdvancements {
@@ -27,13 +28,24 @@ public final class SpaceAgeAdvancements {
 
     public static void tick(MinecraftServer server) {
 
+        server.getPlayerList().getPlayers().forEach(SpaceAgeAdvancements::checkPlayer);
+    }
+
+    public static void checkPlayer(ServerPlayer player) {
+
+        var server = player.level().getServer();
         var advancement = server.getAdvancements().get(FULL_ORBIT);
-        if (advancement == null) return;
-        var missions = MissionSavedData.get(server).craft.values();
-        for (var player : server.getPlayerList().getPlayers()) {
-            if (player.getAdvancements().getOrStartProgress(advancement).isDone()) continue;
-            var orbit = completedOrbit(player.getUUID(), missions);
-            if (orbit != null && player.getAdvancements().award(advancement, CRITERION)) giveTrophy(player, orbit);
+        if (advancement == null || player.getAdvancements().getOrStartProgress(advancement).isDone()) return;
+        var orbit = SpaceSimulationSavedData.getForPlayer(player).completedOrbit.orElse(null);
+        if (orbit != null && player.getAdvancements().award(advancement, CRITERION)) giveTrophy(player, orbit);
+    }
+
+    public static void recordCompletedOrbits(MissionSavedData missions, SpaceSimulationSavedData systems) {
+
+        for (var owner : missions.craft.values().stream().map(craft -> craft.owner).distinct().toList()) {
+            var system = systems.getOrCreate(owner);
+            if (system.completedOrbit.isPresent()) continue;
+            system.completedOrbit = Optional.ofNullable(completedOrbit(owner, missions.craft.values()));
         }
     }
 

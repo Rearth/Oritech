@@ -1,0 +1,8 @@
+{
+  "sources": [
+    {
+      "type": "minecraft:single",
+      "resource": "oritech_space_age:models/space_trophy"
+    }
+  ]
+}

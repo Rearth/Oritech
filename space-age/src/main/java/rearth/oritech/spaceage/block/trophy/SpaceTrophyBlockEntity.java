@@ -4,33 +4,32 @@ import com.geckolib.animatable.GeoBlockEntity;
 import com.geckolib.animatable.instance.AnimatableInstanceCache;
 import com.geckolib.animatable.manager.AnimatableManager;
 import com.geckolib.util.GeckoLibUtil;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.transfer.StacksResourceHandler;
-import net.neoforged.neoforge.transfer.item.ItemResource;
-import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
-import rearth.oritech.util.MultiblockMachineController;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.StacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
+import rearth.oritech.util.MultiblockMachineController;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The inscription travels with the trophy through item components and block entity saves.
@@ -121,7 +120,7 @@ public class SpaceTrophyBlockEntity extends BlockEntity implements GeoBlockEntit
     @Override
     public List<Vec3i> getCorePositions() {
 
-        return List.of(new Vec3i(0, 1, 0), new Vec3i(0, 2, 0));
+        return List.of(new Vec3i(0, 1, 0));
     }
 
     @Override

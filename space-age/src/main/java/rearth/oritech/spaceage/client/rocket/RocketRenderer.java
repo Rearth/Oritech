@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.client.rocket;
 
 import com.geckolib.constant.DataTickets;
 import com.geckolib.renderer.base.GeoRenderState;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -22,6 +23,8 @@ import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import org.jspecify.annotations.Nullable;
 import rearth.oritech.client.ui.render.BlockPreviewEntities;
+import rearth.oritech.client.ui.render.PreviewEffect;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
@@ -60,7 +63,7 @@ public final class RocketRenderer {
 
         for (var rocket : RocketClientController.getActiveRockets()) {
             var flight = rocket.getFlight();
-            if (flight == null || !flight.canReachOrbit() || !flight.dimension().equals(level.dimension()) || flight.isInSpace(gameTime))
+            if (!RocketThrusters.visible(flight, gameTime) || !flight.dimension().equals(level.dimension()))
                 continue;
 
             var position = RocketSimulationController.getRocketPosition(flight, gameTime);
@@ -88,7 +91,11 @@ public final class RocketRenderer {
                     }
             }
             var light = LevelRenderer.getLightCoords(level, BlockPos.containing(position));
-            rockets.add(new RenderedRocket(position, light, blocks));
+            var effects = OritechClientConfig.renderBeams() ? RocketEffects.nozzles(rocket).stream()
+                    .filter(nozzle -> RocketThrusters.firing(nozzle, flight, gameTime))
+                    .map(nozzle -> RocketThrusters.effect(nozzle, gameTime)).toList() : List.<PreviewEffect>of();
+            var tumble = RocketThrusters.crashing(flight, gameTime) ? (float) (Math.sin(gameTime * .22) * 7) : 0;
+            rockets.add(new RenderedRocket(position, light, blocks, effects, tumble));
         }
 
         VISUAL_ENTITIES.keySet().retainAll(visibleRockets);
@@ -110,7 +117,10 @@ public final class RocketRenderer {
         for (var rocket : data.rockets()) {
             var offset = rocket.position().subtract(data.cameraPosition());
             poseStack.pushPose();
-            poseStack.translate(offset.x - 0.5, offset.y, offset.z - 0.5);
+            poseStack.translate(offset.x, offset.y, offset.z);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(rocket.tumble()));
+            poseStack.mulPose(Axis.XP.rotationDegrees(rocket.tumble() * .6f));
+            poseStack.translate(-.5, 0, -.5);
 
             for (var block : rocket.blocks()) {
                 poseStack.pushPose();
@@ -122,6 +132,8 @@ public final class RocketRenderer {
                 poseStack.popPose();
             }
 
+            poseStack.translate(.5, .5, .5);
+            for (var effect : rocket.effects()) effect.submit(poseStack, collector);
             poseStack.popPose();
         }
     }
@@ -207,7 +219,7 @@ public final class RocketRenderer {
 
     }
 
-    private record RenderedRocket(Vec3 position, int light, List<RenderedBlock> blocks) {
+    private record RenderedRocket(Vec3 position, int light, List<RenderedBlock> blocks, List<PreviewEffect> effects, float tumble) {
 
     }
 

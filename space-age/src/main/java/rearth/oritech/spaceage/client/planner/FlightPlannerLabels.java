@@ -10,6 +10,7 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.ParachuteLanding;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.TerminalState;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.power.BeamAperture;
 import rearth.oritech.spaceage.simulation.power.SolarPower;
@@ -71,7 +72,12 @@ final class FlightPlannerLabels {
     static Component blockedTooltip(RocketFlightPathCalculator.TerminalState state) {
 
         return Component.translatable("screen.oritech_space_age.blocked." + state.name().toLowerCase(Locale.ROOT))
-                .withStyle(ChatFormatting.RED);
+                .withStyle(terminalStyle(state));
+    }
+
+    static ChatFormatting terminalStyle(TerminalState state) {
+
+        return state == TerminalState.DESTROYED ? ChatFormatting.GOLD : ChatFormatting.RED;
     }
 
     static Component blockedTooltip(RocketFlightPathCalculator.FlightPath flight, UUID actionId,
@@ -81,7 +87,7 @@ final class FlightPlannerLabels {
         if (processing != null && !processing.issue().isEmpty())
             return Component.translatable("status.oritech_space_age." + processing.issue()).withStyle(ChatFormatting.RED);
         return flight.paths().stream().filter(path -> path.actionMoments().stream().anyMatch(moment -> moment.actionId().equals(actionId)))
-                .flatMap(path -> path.failure().stream()).findFirst().<Component>map(failure -> failure.description().withStyle(ChatFormatting.RED))
+                .flatMap(path -> path.failure().stream()).findFirst().<Component>map(failure -> failure.description().withStyle(terminalStyle(state)))
                 .orElseGet(() -> blockedTooltip(state));
     }
 
