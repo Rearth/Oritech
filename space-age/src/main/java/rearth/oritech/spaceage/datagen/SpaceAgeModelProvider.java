@@ -79,6 +79,12 @@ public class SpaceAgeModelProvider extends ModelProvider {
         itemModels.itemModelOutput.accept(SpaceAgeBlocks.ROBOT_ARM.asItem(),
                 ItemModelUtils.specialModel(OritechSpaceAge.id("item/robot_arm"), new GeckolibItemSpecialRenderer.Unbaked()));
         itemModels.itemModelOutput.accept(SpaceAgeItems.ACTION_CARD.get(), ItemModelUtils.plainModel(OritechSpaceAge.id("item/action_card")));
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(SpaceAgeBlocks.SPACE_TROPHY.get(),
+                        BlockModelGenerators.variant(new Variant(OritechSpaceAge.id("block/space_trophy"))))
+                .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        itemModels.itemModelOutput.accept(SpaceAgeBlocks.SPACE_TROPHY.asItem(),
+                ItemModelUtils.specialModel(OritechSpaceAge.id("item/space_trophy"), new GeckolibItemSpecialRenderer.Unbaked()));
+        createCustomModelBlock(SpaceAgeBlocks.SPACECRAFT_ICON.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);

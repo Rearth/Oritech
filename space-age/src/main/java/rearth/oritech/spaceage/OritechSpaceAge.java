@@ -35,6 +35,7 @@ import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import rearth.oritech.spaceage.network.RobotNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceAgeGameTests;
+import rearth.oritech.spaceage.simulation.SpaceAgeAdvancements;
 import rearth.oritech.spaceage.simulation.ResourceBodies;
 import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
@@ -111,6 +112,7 @@ public final class OritechSpaceAge {
 
         RocketSimulationController.tick(event.getServer());
         MissionController.tick(event.getServer());
+        SpaceAgeAdvancements.tick(event.getServer());
     }
 
     private void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {

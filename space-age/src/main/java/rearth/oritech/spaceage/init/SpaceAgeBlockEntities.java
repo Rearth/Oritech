@@ -4,6 +4,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.trophy.SpaceTrophyBlockEntity;
 import rearth.oritech.spaceage.block.hologram.HoloControllerBlockEntity;
 import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlockEntity;
@@ -22,6 +23,9 @@ public final class SpaceAgeBlockEntities {
 
     public static final Supplier<BlockEntityType<HoloControllerBlockEntity>> HOLO_CONTROLLER = BLOCK_ENTITY_TYPES.register("holo_controller",
             () -> new BlockEntityType<>(HoloControllerBlockEntity::new, SpaceAgeBlocks.HOLO_CONTROLLER.get()));
+
+    public static final Supplier<BlockEntityType<SpaceTrophyBlockEntity>> SPACE_TROPHY = BLOCK_ENTITY_TYPES.register("space_trophy",
+            () -> new BlockEntityType<>(SpaceTrophyBlockEntity::new, SpaceAgeBlocks.SPACE_TROPHY.get()));
 
     private SpaceAgeBlockEntities() {
     }

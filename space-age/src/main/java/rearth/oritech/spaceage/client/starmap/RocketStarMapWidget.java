@@ -7,12 +7,9 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.blockentity.AbstractEndPortalRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
-import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.ToggleWidget;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
@@ -190,9 +187,7 @@ public final class RocketStarMapWidget extends UIComponent {
 
     private static BranchMarker rocketMarker(UUID branchId, double timeSeconds, double x, double y) {
 
-        var widget = new ItemWidget(0, 0, 12, new ItemStack(Items.FIREWORK_ROCKET));
-        widget.withShowOverlay(false).withTooltipFromStack(false);
-        return new BranchMarker(branchId, timeSeconds, x, y, widget);
+        return new BranchMarker(branchId, timeSeconds, x, y);
     }
 
     public void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
@@ -586,8 +581,7 @@ public final class RocketStarMapWidget extends UIComponent {
         var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
         if (!StarMapLineSimplifier.intersects(position.x, position.y, position.x, position.y,
                 viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) return;
-        marker.widget.setPosition((int) Math.round(position.x - 6), (int) Math.round(position.y - 6));
-        marker.widget.render(graphics, mouseX, mouseY, delta);
+        SpacecraftIcon.draw(graphics, (int) Math.round(position.x), (int) Math.round(position.y), 18);
         var label = craftLabels.get(marker.branchId);
         if (label != null && camera.zoom() >= StarMapObjects.CRAFT_NAME_ZOOM) {
             var font = Minecraft.getInstance().font;
@@ -682,7 +676,7 @@ public final class RocketStarMapWidget extends UIComponent {
             return branch.isRoot() ? Component.translatable("screen.oritech_space_age.branch.root")
                     : Component.translatable("screen.oritech_space_age.branch.number", index + 1);
         }
-        return Component.literal("–");
+        return Component.literal("ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“");
     }
 
     @Override
@@ -877,7 +871,7 @@ public final class RocketStarMapWidget extends UIComponent {
      * @param widget      Icon drawn at this position.
      */
     private record BranchMarker(UUID branchId, double timeSeconds,
-                                double worldX, double worldY, ItemWidget widget) {
+                                double worldX, double worldY) {
 
     }
 

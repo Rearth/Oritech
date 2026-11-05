@@ -54,6 +54,7 @@ public class SpaceAgeBlockLootProvider extends BlockLootSubProvider {
 
         var blocks = getAutoDropBlocks();
         blocks.add(SpaceAgeBlocks.CUBE_SAT.get());
+        blocks.add(SpaceAgeBlocks.SPACE_TROPHY.get());
         for (var family : Family.values()) blocks.add(family.block());
         return blocks;
     }
@@ -69,6 +70,10 @@ public class SpaceAgeBlockLootProvider extends BlockLootSubProvider {
                     .apply(SetItemCountFunction.setCount(UniformGenerator.between(30, 60)))
                     .apply(ApplyBonusCount.addOreBonusCount(fortune)))));
         }
+        var trophy = SpaceAgeBlocks.SPACE_TROPHY.get();
+        add(trophy, LootTable.lootTable().withPool(applyExplosionCondition(trophy, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
+                .add(LootItem.lootTableItem(trophy).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                        .include(SpaceAgeComponents.TROPHY_INSCRIPTION.get()))))));
         var cube = SpaceAgeBlocks.CUBE_SAT.get();
         add(cube, LootTable.lootTable().withPool(applyExplosionCondition(cube, LootPool.lootPool().setRolls(ConstantValue.exactly(1))
                 .add(LootItem.lootTableItem(cube).apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)

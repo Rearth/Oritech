@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.datagen;
 
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import rearth.oritech.spaceage.datagen.tags.SpaceAgeBlockTagProvider;
@@ -20,6 +21,7 @@ public final class SpaceAgeDataGenerators {
         var lookupProvider = event.getLookupProvider();
 
         event.createProvider(SpaceAgeModelProvider::new);
+        generator.addProvider(true, new AdvancementProvider(output, lookupProvider, List.of(new SpaceAgeAdvancementProvider())));
         generator.addProvider(true, new SpaceAgeRecipeProvider.Runner(output, lookupProvider));
         generator.addProvider(true, new SpaceAgeDataMapProvider(output, lookupProvider));
         generator.addProvider(true, new SpaceAgeBlockTagProvider(output, lookupProvider));

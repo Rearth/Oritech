@@ -48,7 +48,6 @@ final class StarMapObjects {
     private final List<FogPatch> fogBridges = new ArrayList<>();
     // Asteroids move only for the selected craft's completed navigation events.
     private final Map<UUID, StarMapTooltip.ArrivalPosition> displayedPositions = new HashMap<>();
-    private final ItemStack craftIcon = new ItemStack(Items.FIREWORK_ROCKET);
     private final ItemStack waypointIcon = new ItemStack(Items.ENDER_EYE);
     private Set<UUID> fleetMarkers = Set.of();
 
@@ -90,7 +89,7 @@ final class StarMapObjects {
                 yield definition == null ? SpaceAgeBlocks.ASTEROID_1.get().defaultBlockState()
                         : BuiltInRegistries.BLOCK.getValue(definition.modelBlock()).defaultBlockState();
             }
-            case CRAFT, WAYPOINT -> SpaceAgeBlocks.ROCKET_COUPLING.get().defaultBlockState();
+            case CRAFT, WAYPOINT -> SpaceAgeBlocks.SPACECRAFT_ICON.get().defaultBlockState();
         };
     }
 
@@ -427,8 +426,9 @@ final class StarMapObjects {
                 // Fleet markers already draw these craft; standalone docking targets use the same icon.
                 if (!intersects(viewport, position.x(), position.y(), 8, 8)) continue;
                 if (visibleIcons.contains(object.data.id())) {
-                    graphics.item(object.data.type() == SpaceObjects.ObjectType.WAYPOINT ? waypointIcon : craftIcon,
-                            (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
+                    if (object.data.type() == SpaceObjects.ObjectType.WAYPOINT)
+                        graphics.item(waypointIcon, (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
+                    else SpacecraftIcon.draw(graphics, (int) Math.round(position.x()), (int) Math.round(position.y()), 18);
                     if (camera.zoom() >= CRAFT_NAME_ZOOM)
                         graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                                 (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);

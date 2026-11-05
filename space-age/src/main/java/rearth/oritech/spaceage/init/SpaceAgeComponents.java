@@ -8,6 +8,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.block.trophy.TrophyInscription;
 import rearth.oritech.spaceage.block.robot_arm.RobotProgram;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
@@ -23,6 +24,9 @@ public final class SpaceAgeComponents {
     public static final Supplier<DataComponentType<CubeSatData>> CUBE_SAT = COMPONENTS.registerComponentType("cube_sat", b ->
             b.persistent(CubeSatData.CODEC).networkSynchronized(CubeSatData.STREAM_CODEC));
     public static final Supplier<DataComponentType<RobotProgram>> ROBOT_PROGRAM = COMPONENTS.registerComponentType("robot_program", b -> b.persistent(RobotProgram.CODEC).networkSynchronized(ByteBufCodecs.fromCodecWithRegistries(RobotProgram.CODEC)));
+
+    public static final Supplier<DataComponentType<TrophyInscription>> TROPHY_INSCRIPTION = COMPONENTS.registerComponentType("trophy_inscription", b ->
+            b.persistent(TrophyInscription.CODEC).networkSynchronized(ByteBufCodecs.fromCodec(TrophyInscription.CODEC)));
 
     private SpaceAgeComponents() {
     }
