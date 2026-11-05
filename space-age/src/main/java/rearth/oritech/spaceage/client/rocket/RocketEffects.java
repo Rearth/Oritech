@@ -179,6 +179,7 @@ public final class RocketEffects {
     private static void particle(ClientLevel level, Vec3 position, Vec3 velocity, float size, Kind kind) {
 
         var minecraft = Minecraft.getInstance();
+        if (kind == Kind.SMOKE && level.getRandom().nextInt(4) != 0) return;
         if (particleBudget <= 0 || !OritechClientConfig.spawnParticle(level.getRandom())) return;
         var setting = minecraft.options.particles().get();
         if (setting == ParticleStatus.MINIMAL || setting == ParticleStatus.DECREASED && level.getRandom().nextBoolean()) return;

@@ -32,8 +32,8 @@ class StarMapObjectsTest {
         var physicalRadius = asteroid.radius();
         assertTrue(StarMapObjects.displayRadius(asteroid) > physicalRadius * 10);
         assertEquals(physicalRadius, asteroid.radius());
-        var lines = StarMapTooltip.build(null, asteroid, null, null, null, SpaceSimulation.FlightPlan.empty(),
-                Map.of(), Map.of(), ignored -> null);
+        var lines = StarMapTooltip.build(null, asteroid, null, null, SpaceSimulation.FlightPlan.empty(),
+                Map.of(), Map.of(), ignored -> null, Map.of());
         var keys = lines.stream().map(line -> line.getContents()).filter(TranslatableContents.class::isInstance)
                 .map(TranslatableContents.class::cast).map(TranslatableContents::getKey).toList();
         assertTrue(keys.contains("screen.oritech_space_age.object.physical_size"));
@@ -92,6 +92,33 @@ class StarMapObjectsTest {
         assertFalse(clipped.isEmpty(), "The collector ring still crosses the viewport");
         assertEquals(new RocketStarMapWidget.NavigationSelection(sun.id(), OrbitBand.SOLAR),
                 objects.findHoveredOrbit(160, 100, camera, viewport, null));
+    }
+
+    @Test
+    void tugPlacementUsesCurrentMotionWithoutACommunicationOrObservationAgeGate() {
+
+        Items.ENDER_EYE.builtInRegistryHolder().bindComponents(DataComponentMap.EMPTY);
+        var tug = UUID.randomUUID();
+        var asteroid = new SpaceObjectData(UUID.randomUUID(), SpaceObjects.ObjectType.ASTEROID,
+                1_000, 2_000, 0, 0, 10, 0, 1, SpaceObjects.DetectionState.PRECISE, "Tugged asteroid", List.of()).withTug(tug);
+        var objects = new StarMapObjects();
+        objects.setSnapshot(new SpaceSimulation.FlightPlannerSnapshot(UUID.randomUUID(), UUID.randomUUID(), List.of(asteroid), SpaceSimulation.FlightPlan.empty()));
+        objects.setFleetMarkers(Set.of(tug));
+        var camera = new StarMapCamera();
+        camera.fit(List.of(new StarMapCamera.Point(0, 0), new StarMapCamera.Point(10_000, 10_000)), 0, 0, 320, 200);
+        objects.beginTugFrame();
+        objects.moveTug(tug, 3_000, 4_000, 3_500, 4_500, 24, 0, camera);
+        var entry = objects.byId(asteroid.id());
+        assertEquals(3_000, objects.displayedData(entry).x());
+        assertEquals(24, objects.displayedData(entry).velocityX());
+        assertEquals(4_500, objects.positions().getFirst().y());
+        assertTrue(objects.positions().getFirst().x() < 3_500, "The asteroid sits beside the craft on its displayed route");
+        var keys = StarMapTooltip.build(null, objects.displayedData(entry), null, null, SpaceSimulation.FlightPlan.empty(), Map.of(), Map.of(),
+                ignored -> null, Map.of()).stream().map(line -> line.getContents()).filter(TranslatableContents.class::isInstance)
+                .map(TranslatableContents.class::cast).map(TranslatableContents::getKey).toList();
+        assertTrue(keys.contains("screen.oritech_space_age.object.tugged"));
+        assertTrue(keys.contains("screen.oritech_space_age.object.velocity"));
+        assertFalse(keys.contains("screen.oritech_space_age.object.observation_age"));
     }
 
 }

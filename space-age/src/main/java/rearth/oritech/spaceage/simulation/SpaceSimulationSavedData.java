@@ -8,12 +8,17 @@ import rearth.oritech.spaceage.simulation.generation.AsteroidGenerator.Definitio
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
 import java.util.HashMap;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -84,6 +89,13 @@ public class SpaceSimulationSavedData extends SavedData {
         }
         simulation.setResourceBodies(resourceBodies);
         return simulation;
+    }
+
+    public void tickAsteroids(ServerLevel level, Collection<MissionState> craft) {
+
+        var attached = craft.stream().filter(state -> !state.ended).collect(Collectors.groupingBy(state -> state.owner,
+                Collectors.mapping(state -> state.position.asteroid(), Collectors.toSet())));
+        simulations.forEach((owner, system) -> system.tickAsteroids(level, attached.getOrDefault(owner, Set.of())));
     }
 
     void updateFlightPlan(UUID player, GlobalPos assembler, SpaceSimulation.FlightPlan plan, ActiveRocketData rocket) {

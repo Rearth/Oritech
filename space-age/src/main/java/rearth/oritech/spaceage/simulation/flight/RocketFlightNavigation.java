@@ -108,11 +108,11 @@ final class RocketFlightNavigation {
         approachY = approachLength < 1 ? 0 : approachY / approachLength;
         var targetSpeed = action.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM
                 ? action.targetVelocity() : 0;
-        var targetVelocityX = target.velocityX() + approachX * targetSpeed;
-        var targetVelocityY = target.velocityY() + approachY * targetSpeed;
+        var targetVelocityX = target.velocityXAt(craft.time) + approachX * targetSpeed;
+        var targetVelocityY = target.velocityYAt(craft.time) + approachY * targetSpeed;
         if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE && RocketTransferRoute.hasSurface(target)) {
-            targetVelocityX = target.velocityX() - Math.cos(destinationAngle) * targetSpeed;
-            targetVelocityY = target.velocityY() - Math.sin(destinationAngle) * targetSpeed;
+            targetVelocityX = target.velocityXAt(craft.time) - Math.cos(destinationAngle) * targetSpeed;
+            targetVelocityY = target.velocityYAt(craft.time) - Math.sin(destinationAngle) * targetSpeed;
         }
         var samples = new ArrayList<PathSample>();
         if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, null))
@@ -122,8 +122,8 @@ final class RocketFlightNavigation {
         if (route == null) return fail(craft, samples, TerminalState.NO_FEASIBLE_TRANSFER);
         var transferPlan = new TransferPlan(craft.time, route);
         var end = route.curve().atDistance(route.curve().length(), targetSpeed);
-        targetVelocityX = target.velocityX() + end.vx();
-        targetVelocityY = target.velocityY() + end.vy();
+        targetVelocityX = target.velocityXAt(startTime + route.duration()) + end.vx();
+        targetVelocityY = target.velocityYAt(startTime + route.duration()) + end.vy();
         samples.add(craft.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
         for (var event : route.events()) {
             destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
@@ -145,10 +145,10 @@ final class RocketFlightNavigation {
             var travelled = fraction >= 1 ? event.end() : event.start() + event.initialSpeed() * seconds + .5 * acceleration * seconds * seconds;
             var velocity = fraction >= 1 ? event.endSpeed() : Math.max(0, event.initialSpeed() + acceleration * seconds);
             var position = route.curve().atDistance(travelled, velocity);
-            craft.x = position.x() + target.velocityX() * (craft.time - startTime);
-            craft.y = position.y() + target.velocityY() * (craft.time - startTime);
-            craft.velocityX = position.vx() + target.velocityX();
-            craft.velocityY = position.vy() + target.velocityY();
+            craft.x = position.x() + target.xAt(craft.time) - target.xAt(startTime);
+            craft.y = position.y() + target.yAt(craft.time) - target.yAt(startTime);
+            craft.velocityX = position.vx() + target.velocityXAt(craft.time);
+            craft.velocityY = position.vy() + target.velocityYAt(craft.time);
             var heading = route.curve().atDistance(travelled, 1);
             craft.headingX = heading.vx();
             craft.headingY = heading.vy();
@@ -194,9 +194,10 @@ final class RocketFlightNavigation {
             var seconds = iteration == 0 ? high : (low + high) * .5;
             var travelled = event.start() + event.initialSpeed() * seconds + .5 * acceleration * seconds * seconds;
             var position = plan.transfer.curve().atDistance(travelled, 0);
-            var x = position.x() + target.velocityX() * (craft.time + seconds - plan.startTime);
-            var y = position.y() + target.velocityY() * (craft.time + seconds - plan.startTime);
-            var distance = Math.hypot(destination.x + target.velocityX() * seconds - x, destination.y + target.velocityY() * seconds - y);
+            var x = position.x() + target.xAt(craft.time + seconds) - target.xAt(plan.startTime);
+            var y = position.y() + target.yAt(craft.time + seconds) - target.yAt(plan.startTime);
+            var distance = Math.hypot(destination.x + target.xAt(craft.time + seconds) - target.xAt(craft.time) - x,
+                    destination.y + target.yAt(craft.time + seconds) - target.yAt(craft.time) - y);
             var value = addon.type() == SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY
                     ? AsteroidImpactRules.landingUncertaintyBlocks(distance) : distance;
             if (value <= addon.value()) {
@@ -252,7 +253,7 @@ final class RocketFlightNavigation {
         if (action.orbit() == SpaceSimulation.OrbitBand.SURFACE && target.type() != SpaceObjects.ObjectType.SURVEY_REGION
                 && target.type() != SpaceObjects.ObjectType.CRAFT && target.type() != SpaceObjects.ObjectType.WAYPOINT) {
             if (target.id().equals(SpaceObjects.EARTH_ID)) craft.lastEarthSurfaceAction = action;
-            var relativeSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
+            var relativeSpeed = Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time));
             var prediction = AsteroidImpactRules.predictArrival(craft.rocketMass(), target, relativeSpeed,
                     craft.attachedAsteroid, action, craft.explosiveEnergy(), craft.craftId);
             context.arrivalPredictions.add(new ArrivalPrediction(action.id(), craft.branchId,

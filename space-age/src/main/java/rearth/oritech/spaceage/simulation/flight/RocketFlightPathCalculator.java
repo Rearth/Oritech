@@ -417,7 +417,7 @@ public final class RocketFlightPathCalculator {
 
         var asteroid = context.objects.get(action.targetId());
         var relativeSpeed = asteroid == null ? Double.POSITIVE_INFINITY
-                : Math.hypot(state.velocityX - asteroid.velocityX(), state.velocityY - asteroid.velocityY());
+                : Math.hypot(state.velocityX - asteroid.velocityXAt(state.time), state.velocityY - asteroid.velocityYAt(state.time));
         if (asteroid == null || asteroid.type() != SpaceObjects.ObjectType.ASTEROID) {
             state.blockedState = TerminalState.TARGET_UNAVAILABLE;
             return false;

@@ -25,6 +25,8 @@ final class HoloAsteroidGroups {
             if (HoloView.selected(snapshot.settings(), craft) || snapshot.settings().shows(HoloSettings.OTHER_CRAFT))
                 important.add(craft.target());
         }
+        for (var object : snapshot.objects())
+            if (snapshot.craft().stream().anyMatch(craft -> craft.id().equals(object.tugId()))) important.add(object.id());
         // Group only overlapping small icons; keep nearby but distinct contacts visible.
         var scale = 10 / (.16 * snapshot.settings().markerSize());
         var icons = snapshot.objects().stream().filter(object -> object.type() == ObjectType.ASTEROID)

@@ -21,6 +21,7 @@ import rearth.oritech.spaceage.client.trophy.SpaceTrophyRenderer;
 import rearth.oritech.spaceage.client.robot_arm.RobotWorkArea;
 import rearth.oritech.spaceage.client.rocket.RocketRenderer;
 import rearth.oritech.spaceage.client.rocket.RocketEffects;
+import rearth.oritech.spaceage.client.rocket.ExhaustParticle;
 import rearth.oritech.spaceage.client.rocket.RocketClientController;
 import rearth.oritech.spaceage.datagen.SpaceAgeDataGenerators;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
@@ -63,6 +64,7 @@ public final class OritechSpaceAgeClient {
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
         NeoForge.EVENT_BUS.addListener(RocketEffects::tick);
         NeoForge.EVENT_BUS.addListener(RocketEffects::camera);
+        modEventBus.addListener(ExhaustParticle::registerPipelines);
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> RocketClientController.clearRockets());
         NeoForge.EVENT_BUS.addListener(HoloRenderer::extract);
         NeoForge.EVENT_BUS.addListener(HoloRenderer::submit);

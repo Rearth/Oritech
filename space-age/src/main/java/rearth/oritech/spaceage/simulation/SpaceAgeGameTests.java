@@ -99,6 +99,7 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("robot_playback", () -> RobotGameTests::playback);
         FUNCTIONS.register("robot_tools", () -> RobotGameTests::toolsAndDoors);
         FUNCTIONS.register("robot_bonemeal", () -> RobotGameTests::bonemeal);
+        FUNCTIONS.register("asteroid_motion", () -> AsteroidMotionGameTests::motion);
         FUNCTIONS.register("asteroid_generation", () -> AsteroidGameTests::generation);
         FUNCTIONS.register("dense_mining", () -> AsteroidGameTests::denseMining);
         FUNCTIONS.register("asteroid_landing", () -> AsteroidGameTests::landingAndProtection);
@@ -126,7 +127,7 @@ public final class SpaceAgeGameTests {
         event.registerTest(OritechSpaceAge.id("robot_playback"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_playback")), info));
         event.registerTest(OritechSpaceAge.id("robot_tools"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_tools")), info));
         event.registerTest(OritechSpaceAge.id("robot_bonemeal"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("robot_bonemeal")), info));
-        for (var name : List.of("holo_projector", "mission_control_initial", "asteroid_generation", "dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
+        for (var name : List.of("holo_projector", "mission_control_initial", "asteroid_motion", "asteroid_generation", "dense_mining", "asteroid_landing", "large_asteroid_delivery")) {
             var key = ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name));
             event.registerTest(key.identifier(), new FunctionGameTestInstance(key,
                     new TestData<>(environment, Identifier.parse("minecraft:empty"), 6000, 1, true)));

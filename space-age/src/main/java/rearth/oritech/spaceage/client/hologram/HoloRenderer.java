@@ -118,6 +118,20 @@ public final class HoloRenderer {
         event.setSwingHand(false);
     }
 
+    private static Point craftPosition(HoloSnapshot.Craft craft, Cached cached, double time) {
+
+        var data = cached.snapshot;
+        var route = new HoloPath(craft, data, cached.frame);
+        var previous = cached.previous.craft().stream().filter(c -> c.id().equals(craft.id())).findFirst().orElse(craft);
+        var progress = Math.clamp((time - cached.received) / 20, 0, 1);
+        var sameTransfer = !craft.path().isEmpty() && !previous.path().isEmpty()
+                && craft.path().getFirst().equals(previous.path().getFirst()) && craft.flightTime() >= previous.flightTime();
+        var flightTime = sameTransfer ? previous.flightTime() + (craft.flightTime() - previous.flightTime()) * progress : craft.flightTime();
+        return craft.destroyed() ? HoloView.surfacePosition(new Point(craft.x(), craft.y()), cached.frame, data)
+                : route.position(flightTime, previous.x() + (craft.x() - previous.x()) * progress,
+                        previous.y() + (craft.y() - previous.y()) * progress);
+    }
+
     private static List<BakedQuad> model(BlockState state) {
 
         var minecraft = Minecraft.getInstance();
@@ -199,7 +213,9 @@ public final class HoloRenderer {
             for (var object : data.objects()) {
                 if (hidden.contains(object.id())) continue;
                 if (object.type() == ObjectType.CRAFT || object.type() == ObjectType.WAYPOINT) continue;
-                var point = HoloView.project(object.x(), object.y(), cached.frame, data);
+                var tug = data.craft().stream().filter(c -> c.id().equals(object.tugId())).findFirst().orElse(null);
+                var mapped = tug == null ? new Point(object.x(), object.y()) : craftPosition(tug, cached, time);
+                var point = HoloView.project(mapped.x(), mapped.y(), cached.frame, data);
                 if (s.shows(HoloSettings.ORBITS) && object.type() != ObjectType.SURVEY_REGION && object.type() != ObjectType.ASTEROID)
                     for (var orbit : RocketFlightPlanRules.availableOrbits(object.type())) {
                         if (orbit.altitude() > 0) circle(lines, cached, object.x(), object.y(), SurveyRules.orbitRadius(object, orbit), 0x665889A1);
@@ -210,11 +226,12 @@ public final class HoloRenderer {
                 var edge = Math.min(Math.min(point.x(), surface.width() - point.x()), Math.min(point.y(), surface.depth() - point.y()));
                 var alpha = Math.clamp(edge / Math.max(.01, size * .6), 0, 1);
                 var planet = object.type() != ObjectType.ASTEROID;
-                var position = new Vec3(point.x(), HoloView.PLANE_HEIGHT, point.y());
+                var position = new Vec3(point.x() - (tug == null ? 0 : size / 2 + .10 * s.markerSize()), HoloView.PLANE_HEIGHT, point.y());
                 models.add(new Miniature(model(block(object)), position, (float) (planet ? size / 2 : size), (float) alpha));
                 emitters.add(new HoloEmitters.Beam(position, size / 2, alpha, object.id().hashCode()));
                 var name = RocketStarMapWidget.objectName(object);
-                var target = new Target(object.id(), position, size / 2 + .025, name, () -> HoloInspection.body(object, name));
+                var target = new Target(object.id(), position, size / 2 + .025, name,
+                        () -> HoloInspection.body(object, name, tug == null ? null : tug.name()));
                 targets.add(target);
                 var hit = AABB.ofSize(origin.add(position), size, size, size).clip(camera, camera.add(look.scale(aimDistance)));
                 if (hit.isPresent()) {
@@ -247,14 +264,7 @@ public final class HoloRenderer {
                         }
                     } else activePath(lines, cached, route.active(), time / 20);
                 }
-                var previous = cached.previous.craft().stream().filter(c -> c.id().equals(craft.id())).findFirst().orElse(craft);
-                var progress = Math.clamp((time - cached.received) / 20, 0, 1);
-                var sameTransfer = !craft.path().isEmpty() && !previous.path().isEmpty()
-                        && craft.path().getFirst().equals(previous.path().getFirst()) && craft.flightTime() >= previous.flightTime();
-                var flightTime = sameTransfer ? previous.flightTime() + (craft.flightTime() - previous.flightTime()) * progress : craft.flightTime();
-                var mapped = craft.destroyed() ? HoloView.surfacePosition(new Point(craft.x(), craft.y()), cached.frame, data)
-                        : route.position(flightTime, previous.x() + (craft.x() - previous.x()) * progress,
-                        previous.y() + (craft.y() - previous.y()) * progress);
+                var mapped = craftPosition(craft, cached, time);
                 var point = HoloView.project(mapped.x(), mapped.y(), cached.frame, data);
                 var inside = HoloView.inside(point, surface);
                 var px = Math.clamp(point.x(), .10, surface.width() - .10);

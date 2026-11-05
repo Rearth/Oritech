@@ -65,14 +65,14 @@ class TransferFeasibilityTest {
     private static void arrives(Craft craft, Context context, FlightPlanAction action, SpaceObjectData target, String scenario) {
 
         var before = craft.availableDeltaV(context);
-        var speed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
+        var speed = Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time));
         assertTrue(before > 4 * (speed + action.targetVelocity()), scenario + ": ample delta-v");
         assertTrue(RocketFlightNavigation.navigate(action, craft, context),
                 () -> scenario + ": " + craft.blockedState + " at " + craft.x + ", " + craft.y
                         + " velocity=" + craft.velocityX + ", " + craft.velocityY);
         assertEquals(SurveyRules.orbitRadius(target, action.orbit()),
                 Math.hypot(craft.x - target.xAt(craft.time), craft.y - target.yAt(craft.time)), .01, scenario);
-        var arrivalSpeed = Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY());
+        var arrivalSpeed = Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time));
         if (action.velocityMode() != ArrivalVelocityMode.MAXIMUM)
             assertEquals(action.targetVelocity(), arrivalSpeed, 1e-5, scenario);
         assertTrue(craft.availableDeltaV(context) > 0, scenario + ": fuel remains");
@@ -120,9 +120,9 @@ class TransferFeasibilityTest {
                     var action = action(target, mode, mode == ArrivalVelocityMode.CUSTOM ? 100 : 0, cap).withOrbit(OrbitBand.TIGHT);
                     arrives(craft, context(target), action, target, "moving cap=" + cap + " heading=" + heading + " mode=" + mode);
                     if (cap > 0)
-                        assertTrue(Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()) <= cap + 1e-5,
+                        assertTrue(Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time)) <= cap + 1e-5,
                                 "moving cap=" + cap + " heading=" + heading + " mode=" + mode
-                                        + " actual=" + Math.hypot(craft.velocityX - target.velocityX(), craft.velocityY - target.velocityY()));
+                                        + " actual=" + Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time)));
                     assertFalse(craft.destroyed);
                 }
             }

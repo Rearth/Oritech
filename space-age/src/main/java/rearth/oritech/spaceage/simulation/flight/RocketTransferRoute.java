@@ -45,8 +45,8 @@ public final class RocketTransferRoute {
         var distance = Math.max(1e-6, Math.hypot(dx, dy));
         var ex = dx / distance;
         var ey = dy / distance;
-        var vx = craft.velocityX - target.velocityX();
-        var vy = craft.velocityY - target.velocityY();
+        var vx = craft.velocityX - target.velocityXAt(craft.time);
+        var vy = craft.velocityY - target.velocityYAt(craft.time);
         var speed = Math.hypot(vx, vy);
         var sx = speed > .001 ? vx / speed : ex;
         var sy = speed > .001 ? vy / speed : ey;

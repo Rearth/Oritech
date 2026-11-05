@@ -8,6 +8,8 @@ import rearth.oritech.spaceage.simulation.AsteroidShape;
 import rearth.oritech.spaceage.simulation.FleetCategories;
 import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -20,7 +22,7 @@ final class HoloInspection {
     private HoloInspection() {
     }
 
-    static List<Component> body(SpaceObjectData object, Component name) {
+    static List<Component> body(SpaceObjectData object, Component name, @Nullable String tug) {
 
         var lines = new ArrayList<Component>();
         lines.add(name);
@@ -30,6 +32,11 @@ final class HoloInspection {
                 lines.add(Component.translatable("screen.oritech_space_age.object.physical_size", size.width(), size.height(), size.depth()));
             }
             lines.add(Component.translatable("screen.oritech_space_age.object.mass", number(object.mass() * 1_000)));
+            var speed = Math.hypot(object.velocityX(), object.velocityY());
+            if (!object.tugId().equals(FlightPlanAction.NO_TARGET))
+                lines.add(Component.translatable("screen.oritech_space_age.object.tugged", tug == null ? Component.translatable("screen.oritech_space_age.object.craft") : tug));
+            else lines.add(Component.translatable(speed > 0 ? "screen.oritech_space_age.object.drifting" : "screen.oritech_space_age.object.stationary"));
+            if (speed > 0) lines.add(Component.translatable("screen.oritech_space_age.object.velocity", String.format(Locale.ROOT, "%.1f", speed)));
         } else if (object.type() == ObjectType.RESOURCE_BODY)
             lines.add(Component.translatable("screen.oritech_space_age.object.infinite_deposit"));
         else lines.add(Component.translatable("screen.oritech_space_age.holo.surface_gravity", number(object.surfaceGravity())));

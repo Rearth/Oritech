@@ -18,7 +18,6 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.ResourceBodies;
 import rearth.oritech.spaceage.simulation.ResourceBodies.Definition;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
-import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 
@@ -46,10 +45,9 @@ final class StarMapObjects {
     // Each object keeps its 3D block widget so its familiar planet icon can be reused each frame.
     private final List<Entry> objects = new ArrayList<>();
     private final List<FogPatch> fogBridges = new ArrayList<>();
-    // Asteroids move only for the selected craft's completed navigation events.
-    private final Map<UUID, StarMapTooltip.ArrivalPosition> displayedPositions = new HashMap<>();
     private final ItemStack waypointIcon = new ItemStack(Items.ENDER_EYE);
     private Set<UUID> fleetMarkers = Set.of();
+    private final Map<UUID, TuggedObject> tuggedObjects = new HashMap<>();
 
     private static void addCircle(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
                                   double centerX, double centerY, double radius, int color, float width) {
@@ -222,26 +220,6 @@ final class StarMapObjects {
             }
     }
 
-    void updateArrivalPositions(RocketFlightPathCalculator.CraftPath selectedPath,
-                                Map<UUID, SpaceSimulation.FlightPlanAction> actionsById,
-                                SpaceSimulation.FlightPlannerSnapshot snapshot) {
-
-        displayedPositions.clear();
-        if (selectedPath == null) return;
-        for (var moment : selectedPath.actionMoments()) {
-            var action = actionsById.get(moment.actionId());
-            if (!moment.completed() || action == null || action.type() != SpaceSimulation.ActionType.NAVIGATE_TO)
-                continue;
-            var targetId = selectedPath.samples().stream().filter(sample -> sample.actionId().equals(action.id()))
-                    .map(sample -> sample.targetId()).findFirst().orElse(action.targetId());
-            var target = snapshot.mapObjects().stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
-            if (target != null && target.type() == SpaceObjects.ObjectType.ASTEROID) {
-                displayedPositions.put(target.id(), new StarMapTooltip.ArrivalPosition(
-                        target.xAt(moment.timeSeconds()), target.yAt(moment.timeSeconds()), moment.timeSeconds()));
-            }
-        }
-    }
-
     List<StarMapCamera.Point> positions() {
 
         return objects.stream().map(object -> new StarMapCamera.Point(x(object), y(object))).toList();
@@ -321,6 +299,7 @@ final class StarMapObjects {
             }
         }
         for (var object : objects) {
+            if (tuggedObjects.containsKey(object.data.id())) continue;
             if (!visibleIcons.contains(object.data.id()) && object.data.type() != SpaceObjects.ObjectType.SURVEY_REGION)
                 continue;
             if (isPlanet(object.data.type())) continue;
@@ -343,10 +322,9 @@ final class StarMapObjects {
                         selected ? 0xDDF6C65B : 0x997C93A6, selected ? 1.25f : 0.8f);
             }
         }
-        // Match the original draw order: solar orbits, surfaces, motion guides, then local orbits.
-        addMotionLines(lines, camera, viewport);
         // An offscreen body can still have an orbit crossing the viewport.
         for (var object : objects) {
+            if (tuggedObjects.containsKey(object.data.id())) continue;
             var objectX = x(object);
             var objectY = y(object);
             for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
@@ -360,17 +338,23 @@ final class StarMapObjects {
         }
     }
 
-    private void addMotionLines(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport) {
+    void addTugReferenceLines(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
+                              RocketStarMapWidget.NavigationSelection selectedTarget, Set<UUID> visibleIcons) {
 
         for (var object : objects) {
-            var position = displayedPositions.get(object.data.id());
-            if (position == null || Math.hypot(position.x() - object.data.x(), position.y() - object.data.y()) < 1)
-                continue;
-            var from = project(camera, viewport, object.data.x(), object.data.y());
-            var to = project(camera, viewport, position.x(), position.y());
-            if (!intersects(viewport, (from.x() + to.x()) * 0.5, (from.y() + to.y()) * 0.5,
-                    Math.abs(to.x() - from.x()) * 0.5, Math.abs(to.y() - from.y()) * 0.5)) continue;
-            lines.add(new StarMapLineRenderer.Line(from.x(), from.y(), to.x(), to.y(), 0x6685A7BC, 0.7f));
+            if (!tuggedObjects.containsKey(object.data.id())) continue;
+            var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id());
+            if (visibleIcons.contains(object.data.id()) && object.data.radius() * camera.zoom() >= 2)
+                addCircle(lines, camera, viewport, x(object), y(object), SurveyRules.navigationRadius(object.data),
+                        selected ? 0xDDF6C65B : 0x997C93A6, selected ? 1.25f : .8f);
+            for (var band : RocketFlightPlanRules.availableOrbits(object.data.type())) {
+                if (band == SpaceSimulation.OrbitBand.SURFACE) continue;
+                var radius = SurveyRules.orbitRadius(object.data, band);
+                if (radius * camera.zoom() < 18) continue;
+                var highlighted = selected && selectedTarget.orbit() == band;
+                addCircle(lines, camera, viewport, x(object), y(object), radius,
+                        highlighted ? 0xDDF6C65B : 0x77577A91, highlighted ? 1.2f : .65f);
+            }
         }
     }
 
@@ -545,21 +529,42 @@ final class StarMapObjects {
                 new StarMapCamera.Point(centerX, centerY + radius));
     }
 
-    StarMapTooltip.ArrivalPosition arrivalPosition(UUID objectId) {
+    void beginTugFrame() {
 
-        return displayedPositions.get(objectId);
+        tuggedObjects.clear();
+    }
+
+    void moveTug(UUID craft, double x, double y, double renderedX, double renderedY, double vx, double vy, StarMapCamera camera) {
+
+        if (!fleetMarkers.contains(craft)) return;
+        for (var object : objects) {
+            if (!object.data.tugId().equals(craft)) continue;
+            var offset = (iconSize(object, camera) / 2 + 14) / camera.zoom();
+            tuggedObjects.put(object.data.id(), new TuggedObject(object.data.withMotion(x, y, vx, vy), renderedX - offset, renderedY));
+        }
+    }
+
+    SpaceSimulation.SpaceObjectData displayedData(Entry object) {
+
+        var live = tuggedObjects.get(object.data.id());
+        return live == null ? object.data : live.data();
     }
 
     private double x(Entry object) {
 
-        var position = displayedPositions.get(object.data.id());
-        return position == null ? object.data.x() : position.x();
+        var live = tuggedObjects.get(object.data.id());
+        if (live != null) return live.x();
+        return object.data.x();
     }
 
     private double y(Entry object) {
 
-        var position = displayedPositions.get(object.data.id());
-        return position == null ? object.data.y() : position.y();
+        var live = tuggedObjects.get(object.data.id());
+        if (live != null) return live.y();
+        return object.data.y();
+    }
+
+    private record TuggedObject(SpaceSimulation.SpaceObjectData data, double x, double y) {
     }
 
     private record FogPatch(double x, double y, double radius) {

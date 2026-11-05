@@ -107,6 +107,7 @@ public final class RocketStarMapWidget extends UIComponent {
     private UIComponent hoveredMapControl;
     private boolean showSummary = true;
     private Map<UUID, Component> craftLabels = Map.of();
+    private Map<UUID, Component> tugNames = Map.of();
     private double commandAltitude = -2;
 
     public RocketStarMapWidget(int x, int y, int width, int height,
@@ -212,7 +213,6 @@ public final class RocketStarMapWidget extends UIComponent {
                 .forEach(action -> actionsById.put(action.id(), action)));
         flightPath.paths().forEach(path -> pathsByBranch.put(path.branchId(), path));
         updateRocketMarkers();
-        mapObjects.updateArrivalPositions(pathsByBranch.get(selectedBranch), actionsById, snapshot);
         updateSeparationMarkers();
     }
 
@@ -322,6 +322,14 @@ public final class RocketStarMapWidget extends UIComponent {
         graphics.fill(viewportX, viewportY, viewportX + viewportWidth, viewportY + viewportHeight, 0x99030810);
 
         var viewport = new StarMapObjects.Viewport(viewportX, viewportY, viewportWidth, viewportHeight);
+        mapObjects.beginTugFrame();
+        for (var marker : rocketMarkers) {
+            var path = pathsByBranch.get(marker.branchId);
+            if (path == null || path.samples().isEmpty()) continue;
+            var motion = FlightMotion.sample(path.samples(), marker.timeSeconds);
+            var position = mapPaths.renderedWorldPosition(marker.branchId, marker.timeSeconds, motion.x(), motion.y());
+            mapObjects.moveTug(marker.branchId, motion.x(), motion.y(), position.x(), position.y(), motion.vx(), motion.vy(), camera);
+        }
         mapObjects.renderSurfaceDiscs(graphics, camera, viewport);
 
         hoveredObject = null;
@@ -340,6 +348,9 @@ public final class RocketStarMapWidget extends UIComponent {
         var visibleIcons = mapObjects.visibleIcons(camera, viewport, hiddenIcons);
         prepareLines(viewport, visibleIcons);
         StarMapLineRenderer.submit(graphics, cachedLines, viewportX, viewportY, viewportWidth, viewportHeight);
+        var tugLines = new ArrayList<StarMapLineRenderer.Line>();
+        mapObjects.addTugReferenceLines(tugLines, camera, viewport, selectedTarget, visibleIcons);
+        StarMapLineRenderer.submit(graphics, tugLines, viewportX, viewportY, viewportWidth, viewportHeight);
         findHoveredPath(mouseX, mouseY);
         hoveredObject = mapObjects.renderIcons(graphics, camera, viewport, selectedTarget, mouseX, mouseY, delta,
                 isInsideViewport(mouseX, mouseY), visibleIcons);
@@ -431,6 +442,12 @@ public final class RocketStarMapWidget extends UIComponent {
     public void setShowSummary(boolean show) {
 
         showSummary = show;
+    }
+
+    public void setTugNames(Map<UUID, Component> craft) {
+
+        if (!tugNames.keySet().equals(craft.keySet())) cachedView = null;
+        tugNames = Map.copyOf(craft);
     }
 
     public void setFleetTimes(Map<UUID, Double> times) {
@@ -780,12 +797,12 @@ public final class RocketStarMapWidget extends UIComponent {
         StarMapObjects.Entry object = hoveredSelection == null ? hoveredObject : mapObjects.byId(hoveredSelection.objectId);
         var separation = hoveredSeparation == null ? null
                 : new StarMapTooltip.Separation(hoveredSeparation.stage, hoveredSeparation.timeSeconds, hoveredSeparation.segments);
-        return StarMapTooltip.build(separation, object == null ? null : object.data(), hoveredSelection,
-                object == null ? null : mapObjects.arrivalPosition(object.data().id()), hoveredPathPoint,
+        return StarMapTooltip.build(separation, object == null ? null : mapObjects.displayedData(object), hoveredSelection,
+                hoveredPathPoint,
                 snapshot.plan(), defaultSegmentNames, branchSegmentNames, id -> {
                     var found = mapObjects.byId(id);
                     return found == null ? null : found.data();
-                });
+                }, tugNames);
     }
 
     private boolean isInsideViewport(double mouseX, double mouseY) {

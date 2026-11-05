@@ -1,7 +1,7 @@
 package rearth.oritech.spaceage.simulation.flight;
 
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.AsteroidMotion;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.AsteroidPath;
@@ -50,9 +50,11 @@ final class ReleasedAsteroidPrediction {
             var previousTime = time;
             var previousVelocityX = velocityX;
             var previousVelocityY = velocityY;
-            var drag = Math.exp(-SpaceBalance.SPACE_DRAG_PER_SECOND * seconds);
-            x += velocityX * seconds;
-            y += velocityY * seconds;
+            var speed = Math.hypot(velocityX, velocityY);
+            var distance = AsteroidMotion.distanceFactor(speed, seconds);
+            var drag = AsteroidMotion.velocityFactor(speed, seconds);
+            x += velocityX * distance;
+            y += velocityY * distance;
             velocityX *= drag;
             velocityY *= drag;
             time += seconds;
@@ -61,8 +63,9 @@ final class ReleasedAsteroidPrediction {
             if (Double.isFinite(hitFraction)) {
                 x = previousX + (x - previousX) * hitFraction;
                 y = previousY + (y - previousY) * hitFraction;
-                time = previousTime + seconds * hitFraction;
-                var hitDrag = Math.exp(-SpaceBalance.SPACE_DRAG_PER_SECOND * seconds * hitFraction);
+                var hitTime = AsteroidMotion.timeAtFraction(speed, seconds, hitFraction);
+                time = previousTime + hitTime;
+                var hitDrag = AsteroidMotion.velocityFactor(speed, hitTime);
                 velocityX = previousVelocityX * hitDrag;
                 velocityY = previousVelocityY * hitDrag;
                 samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));
@@ -70,7 +73,7 @@ final class ReleasedAsteroidPrediction {
                 break;
             }
             samples.add(new MotionSample(time, x, y, Math.hypot(velocityX, velocityY)));
-            if (Math.hypot(velocityX, velocityY) < 0.01) break;
+            if (Math.hypot(velocityX, velocityY) == 0) break;
         }
         return new AsteroidPath(asteroid.id(), List.copyOf(samples), impact, uncertainty);
     }

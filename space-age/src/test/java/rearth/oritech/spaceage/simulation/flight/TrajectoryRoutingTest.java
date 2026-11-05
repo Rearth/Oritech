@@ -600,7 +600,7 @@ class TrajectoryRoutingTest {
         var craft = craft(0, 0);
         assertTrue(RocketFlightNavigation.navigate(action(target.id(), 7).withVelocity(ArrivalVelocityMode.CUSTOM, 10), craft, context(earth(0), target)),
                 () -> "Moving arrival failed: " + craft.blockedState);
-        assertEquals(10, Math.hypot(craft.velocityX - 10, craft.velocityY - 5), 1e-5);
+        assertEquals(10, Math.hypot(craft.velocityX - target.velocityXAt(craft.time), craft.velocityY - target.velocityYAt(craft.time)), 1e-5);
         assertEquals(2_000, Math.hypot(craft.x - target.xAt(craft.time), craft.y - target.yAt(craft.time)), .01);
     }
 

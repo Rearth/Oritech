@@ -274,8 +274,9 @@ class MissionSystemsTest {
 
         var received = system.createObjectData().stream().filter(o -> o.id().equals(target.id()))
                 .findFirst().orElseThrow();
-        system.moveAttached(target.id(), target.x() + 1_000_000, target.y());
-        assertEquals(received, system.createObjectData().stream().filter(o -> o.id().equals(target.id()))
+        var tug = UUID.randomUUID();
+        system.moveAttached(target.id(), target.x() + 1_000_000, target.y(), 24, 0, tug);
+        assertEquals(received.withMotion(target.x() + 1_000_000, target.y(), 24, 0).withTug(tug), system.createObjectData().stream().filter(o -> o.id().equals(target.id()))
                 .findFirst().orElseThrow());
     }
 

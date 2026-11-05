@@ -72,8 +72,10 @@ public class SpaceObjects {
                         .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.materials : List.of()),
                 SpaceSimulation.FlightPlanAction.CODEC.optionalFieldOf("landing").forGetter(object -> Optional.ofNullable(object instanceof Asteroid asteroid ? asteroid.landing : null)),
                 Codec.FLOAT.optionalFieldOf("survey_half_angle", 0F).forGetter(object -> object.surveyHalfAngle),
-                Identifier.CODEC.optionalFieldOf("source_field").forGetter(object -> Optional.ofNullable(object.sourceField))
-        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing, surveyHalfAngle, sourceField) -> {
+                Identifier.CODEC.optionalFieldOf("source_field").forGetter(object -> Optional.ofNullable(object.sourceField)),
+                UUIDUtil.STRING_CODEC.optionalFieldOf("tug", SpaceSimulation.FlightPlanAction.NO_TARGET)
+                        .forGetter(object -> object instanceof Asteroid asteroid ? asteroid.tugId : SpaceSimulation.FlightPlanAction.NO_TARGET)
+        ).apply(instance, (id, type, x, y, radius, gravity, detection, name, weight, velocityX, velocityY, materials, landing, surveyHalfAngle, sourceField, tug) -> {
             var object = type == ObjectType.ASTEROID ? new Asteroid(id) : new SimulatedObject(id, type);
             object.currentPosition = new Vector2f(x, y);
             object.radius = radius;
@@ -89,6 +91,7 @@ public class SpaceObjects {
             if (object instanceof Asteroid asteroid) {
                 asteroid.materials = List.copyOf(materials);
                 asteroid.landing = landing.orElse(null);
+                asteroid.tugId = tug;
             }
             return object;
         }));
@@ -117,7 +120,7 @@ public class SpaceObjects {
 
     }
 
-    // Things like asteroids. Movement itsn't applied per tick, instead events / future positions are calculated during each interaction / event
+    // Untouched asteroids stay stationary; tugs move attached bodies and free drift is integrated each simulation tick.
     public static class MovableSimulatedObject extends SimulatedObject {
 
         public float weight;
@@ -133,6 +136,9 @@ public class SpaceObjects {
 
         public List<AsteroidMaterial> materials = List.of();
         public SpaceSimulation.FlightPlanAction landing;
+        public UUID tugId = SpaceSimulation.FlightPlanAction.NO_TARGET;
+        public double driftRemainderX;
+        public double driftRemainderY;
 
         public Asteroid() {
 

@@ -36,8 +36,8 @@ class StarMapTooltipTest {
 
         var sample = new PathSample(10, 0, 0, 100, 100, 0, PathPhase.BRAKE,
                 SpaceObjects.EARTH_ID, action.id(), 1, Set.of(SEGMENT), Set.of(SEGMENT), FlightPlanAction.NO_TARGET);
-        return StarMapTooltip.build(null, null, null, null, new StarMapTooltip.PathPoint(branch, sample, 100),
-                plan, defaults, names, id -> id.equals(EARTH.id()) ? EARTH : null);
+        return StarMapTooltip.build(null, null, null, new StarMapTooltip.PathPoint(branch, sample, 100),
+                plan, defaults, names, id -> id.equals(EARTH.id()) ? EARTH : null, Map.of());
     }
 
     @Test

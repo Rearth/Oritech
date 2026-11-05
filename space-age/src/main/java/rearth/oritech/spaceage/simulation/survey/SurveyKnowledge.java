@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Precise asteroid contacts collected by a craft and merged only when their results are transmitted or recovered.
+ * Saved asteroid discoveries and composition. Discovered contacts use current world motion.
  */
 public final class SurveyKnowledge {
 
@@ -82,7 +82,8 @@ public final class SurveyKnowledge {
 
         var measured = measurements.get(truth.id());
         if (measured == null) return null;
-        return contact(measured);
+        var known = contact(measured);
+        return known.withMotion(truth.x(), truth.y(), truth.velocityX(), truth.velocityY()).withTug(truth.tugId());
     }
 
     private SpaceSimulation.SpaceObjectData contact(Measurement measured) {
@@ -90,13 +91,13 @@ public final class SurveyKnowledge {
         var truth = measured.data;
         return new SpaceSimulation.SpaceObjectData(truth.id(), truth.type(), truth.x(), truth.y(),
                 truth.velocityX(), truth.velocityY(), truth.radius(), truth.surfaceGravity(), truth.mass(),
-                SpaceObjects.DetectionState.PRECISE, truth.name(), truth.materials());
+                SpaceObjects.DetectionState.PRECISE, truth.name(), truth.materials(), truth.surveyHalfAngle(), truth.tugId());
     }
 
     public SpaceSimulation.SpaceObjectData contact(UUID target) {
 
         var measurement = measurements.get(target);
-        return measurement == null ? null : contact(measurement.data);
+        return measurement == null ? null : contact(measurement);
     }
 
     public record Measurement(SpaceSimulation.SpaceObjectData data, long tick) {

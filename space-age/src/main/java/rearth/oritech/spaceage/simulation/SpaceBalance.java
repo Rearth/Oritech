@@ -189,7 +189,19 @@ public final class SpaceBalance {
     /**
      * Exponential velocity damping coefficient per second for released asteroids.
      */
-    public static final double SPACE_DRAG_PER_SECOND = 0.000002;
+    public static final double SPACE_DRAG_PER_SECOND = Math.log(2) / 120;
+    /**
+     * Released asteroids settle once they drift more slowly than this many metres per second.
+     */
+    public static final double ASTEROID_STOP_SPEED = 0.05;
+    /**
+     * Minimum world-space distance between new impact fragments, for distinct map selection.
+     */
+    public static final double ASTEROID_FRAGMENT_MIN_SEPARATION = 2_500;
+    /**
+     * Clearance per combined physical radius, allowing for enlarged icons and the map's tilted plane.
+     */
+    public static final double ASTEROID_FRAGMENT_RADIUS_SPACING = 160;
     /**
      * Maximum relative arrival speed in m/s for connecting to an asteroid or an unladen safe landing.
      */

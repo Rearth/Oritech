@@ -28,11 +28,11 @@ final class StarMapTooltip {
     }
 
     static List<Component> build(Separation separation, SpaceSimulation.SpaceObjectData object,
-                                 RocketStarMapWidget.NavigationSelection selection, ArrivalPosition arrival,
+                                 RocketStarMapWidget.NavigationSelection selection,
                                  PathPoint pathPoint, SpaceSimulation.FlightPlan plan,
                                  Map<SpaceSimulation.SegmentRef, String> defaultSegmentNames,
                                  Map<UUID, Map<SpaceSimulation.SegmentRef, String>> branchSegmentNames,
-                                 Function<UUID, SpaceSimulation.SpaceObjectData> objectById) {
+                                 Function<UUID, SpaceSimulation.SpaceObjectData> objectById, Map<UUID, Component> craftNames) {
 
         if (separation != null) {
             var lines = new ArrayList<Component>();
@@ -41,7 +41,7 @@ final class StarMapTooltip {
             separation.segments().forEach(segment -> lines.add(Component.literal("• " + segmentName(plan, defaultSegmentNames, segment))));
             return lines;
         }
-        if (object != null) return objectTooltip(object, selection, arrival);
+        if (object != null) return objectTooltip(object, selection, craftNames);
         if (pathPoint == null) return List.of();
 
         var sample = pathPoint.sample();
@@ -74,7 +74,7 @@ final class StarMapTooltip {
 
     private static List<Component> objectTooltip(SpaceSimulation.SpaceObjectData object,
                                                  RocketStarMapWidget.NavigationSelection selection,
-                                                 ArrivalPosition arrival) {
+                                                 Map<UUID, Component> craftNames) {
 
         var lines = new ArrayList<Component>();
         lines.add(RocketStarMapWidget.objectName(object).copy().withStyle(ChatFormatting.BOLD));
@@ -88,13 +88,7 @@ final class StarMapTooltip {
             lines.add(Component.translatable("screen.oritech_space_age.orbit_gravity", String.format(Locale.ROOT, "%.2f", gravity),
                     String.format(Locale.ROOT, "%.0f", percentage)));
         }
-        var displayedX = arrival == null ? object.x() : arrival.x();
-        var displayedY = arrival == null ? object.y() : arrival.y();
-        lines.add(Component.translatable("screen.oritech_space_age.object.position", format(displayedX), format(displayedY)));
-        if (arrival != null && Math.hypot(arrival.x() - object.x(), arrival.y() - object.y()) >= 1) {
-            lines.add(Component.translatable("screen.oritech_space_age.object.arrival_position",
-                    String.format(Locale.ROOT, "%.2f", arrival.timeSeconds() / 1_200), format(object.x()), format(object.y())));
-        }
+        lines.add(Component.translatable("screen.oritech_space_age.object.position", format(object.x()), format(object.y())));
         if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
             if (AsteroidShape.volume(object.materials()) > 0) {
                 var size = AsteroidShape.size(object.materials());
@@ -119,8 +113,13 @@ final class StarMapTooltip {
         }
         if (object.type() == SpaceObjects.ObjectType.ASTEROID) {
             lines.add(Component.translatable("screen.oritech_space_age.object.mass", format(object.mass() * 1_000)));
-            lines.add(Component.translatable("screen.oritech_space_age.object.velocity",
-                    formatSpeed(Math.hypot(object.velocityX(), object.velocityY()))));
+            var speed = Math.hypot(object.velocityX(), object.velocityY());
+            if (!object.tugId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET))
+                lines.add(Component.translatable("screen.oritech_space_age.object.tugged",
+                        craftNames.getOrDefault(object.tugId(), Component.translatable("screen.oritech_space_age.object.craft"))));
+            else lines.add(Component.translatable(speed > 0 ? "screen.oritech_space_age.object.drifting" : "screen.oritech_space_age.object.stationary"));
+            if (speed > 0)
+                lines.add(Component.translatable("screen.oritech_space_age.object.velocity", formatSpeed(speed)));
             lines.add(Component.translatable("screen.oritech_space_age.object.materials"));
             object.materials().forEach(material -> lines.add(material.amount() > 0
                     ? Component.translatable("screen.oritech_space_age.object.material_known",
@@ -171,13 +170,6 @@ final class StarMapTooltip {
      * Stage, shared-clock release time and boosters grouped at this marker.
      */
     record Separation(int stage, double timeSeconds, List<SpaceSimulation.SegmentRef> segments) {
-
-    }
-
-    /**
-     * Displayed object position in world units, with its arrival time.
-     */
-    record ArrivalPosition(double x, double y, double timeSeconds) {
 
     }
 

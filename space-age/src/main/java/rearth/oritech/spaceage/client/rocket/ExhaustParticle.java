@@ -1,21 +1,38 @@
 package rearth.oritech.spaceage.client.rocket;
 
+import com.mojang.blaze3d.pipeline.DepthStencilState;
+import com.mojang.blaze3d.platform.CompareOp;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import rearth.oritech.client.renderers.util.RenderHelpers;
 import rearth.oritech.spaceage.OritechSpaceAge;
 
 /** Smoke expands and catches world light; hot embers shrink and remain emissive. */
-final class ExhaustParticle extends SingleQuadParticle {
+public final class ExhaustParticle extends SingleQuadParticle {
+
+    // Faint foreground puffs must not occlude the smoke behind them.
+    private static final Layer EXHAUST_LAYER = new Layer(true, TextureAtlas.LOCATION_PARTICLES,
+            RenderPipelines.TRANSLUCENT_PARTICLE.toBuilder()
+                    .withLocation(OritechSpaceAge.id("pipeline/exhaust_particle"))
+                    .withDepthStencilState(new DepthStencilState(CompareOp.LESS_THAN_OR_EQUAL, false))
+                    .build());
 
     enum Kind { SMOKE, EMBER, ION }
 
     private final Kind kind;
     private final float size;
+
+    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
+
+        event.registerPipeline(EXHAUST_LAYER.pipeline());
+    }
 
     ExhaustParticle(ClientLevel level, Vec3 position, Vec3 velocity, float size, Kind kind) {
 
@@ -70,6 +87,6 @@ final class ExhaustParticle extends SingleQuadParticle {
     @Override
     protected Layer getLayer() {
 
-        return Layer.TRANSLUCENT;
+        return EXHAUST_LAYER;
     }
 }

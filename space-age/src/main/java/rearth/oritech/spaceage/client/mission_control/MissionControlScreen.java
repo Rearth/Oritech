@@ -403,7 +403,9 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             map.setCoverage(nodes);
             map.setShowSummary(false);
             map.setCommandCoverage(network.groundAntennas() == 0 ? -2 : network.coverageAltitude());
-            map.setFleetTimes(presentation.times());
+            map.setTugNames(menu.fleet.stream().collect(Collectors.toMap(MissionNetworking.FleetEntry::id,
+                entry -> entry.telemetry().plan().name().isBlank() ? Component.translatable("screen.oritech_space_age.object.craft") : Component.literal(entry.telemetry().plan().name()))));
+        map.setFleetTimes(presentation.times());
             map.setCraftLabels(presentation.labels());
             map.setBranchSegmentNames(presentation.segmentNames());
             addComponent(map);
@@ -870,6 +872,8 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         map.updateFlightPath(presentation.snapshot(), presentation.flight(), null);
         map.setCoverage(menu.networkNodes);
         map.setCommandCoverage(menu.network.groundAntennas() == 0 ? -2 : menu.network.coverageAltitude());
+        map.setTugNames(menu.fleet.stream().collect(Collectors.toMap(MissionNetworking.FleetEntry::id,
+                entry -> entry.telemetry().plan().name().isBlank() ? Component.translatable("screen.oritech_space_age.object.craft") : Component.literal(entry.telemetry().plan().name()))));
         map.setFleetTimes(presentation.times());
         map.setCraftLabels(presentation.labels());
         map.setBranchSegmentNames(presentation.segmentNames());
