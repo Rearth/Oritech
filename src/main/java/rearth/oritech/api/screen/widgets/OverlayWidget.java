@@ -15,6 +15,7 @@ import java.util.List;
 public class OverlayWidget extends UIComponent {
 
     private final List<UIComponent> children = new ArrayList<>();
+    private UIComponent interactionChild;
     private Runnable onDismiss;
     private int bgColor = ColorHelper.argb(0f, 0f, 0f, 0.5f);
     private boolean consumeOutsideClicks = true;
@@ -55,10 +56,13 @@ public class OverlayWidget extends UIComponent {
 
     @Override
     public boolean handleClick(double mouseX, double mouseY, int button) {
+        interactionChild = null;
         // Dispatch to children first
         for (var child : children) {
-            if (child.isVisible() && child.isMouseOver(mouseX, mouseY) && child.handleClick(mouseX, mouseY, button))
+            if (child.isVisible() && child.isMouseOver(mouseX, mouseY) && child.handleClick(mouseX, mouseY, button)) {
+                interactionChild = child;
                 return true;
+            }
         }
         // Check if click was inside any child content area
         for (var child : children) {
@@ -68,6 +72,19 @@ public class OverlayWidget extends UIComponent {
         // Clicked outside content — dismiss
         if (onDismiss != null) onDismiss.run();
         return consumeOutsideClicks;
+    }
+
+    @Override
+    public boolean handleDrag(double mouseX, double mouseY, double deltaX, double deltaY, int button) {
+        return interactionChild != null && interactionChild.isVisible()
+                && interactionChild.handleDrag(mouseX, mouseY, deltaX, deltaY, button);
+    }
+
+    @Override
+    public boolean handleMouseRelease(double mouseX, double mouseY, int button) {
+        var child = interactionChild;
+        interactionChild = null;
+        return child != null && child.handleMouseRelease(mouseX, mouseY, button);
     }
 
     @Override

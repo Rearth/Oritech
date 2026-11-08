@@ -45,7 +45,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
     private static final int ICON_SIZE = 24;
     private static final int PANEL_PADDING = 8;
     private static final int GRAPH_LEFT_OFFSET = 20;
-    private static final int GRAPH_BG = ColorHelper.argb(0.11f, 0.13f, 0.17f, 0.95f);
     private static final int HIGHLIGHT_COLOR = ColorHelper.argb(0.7f, 0.7f, 0.7f, 0.9f);
     private static final int BLOCKER_COLOR = ColorHelper.argb(0.3f, 0.4f, 0.4f, 0.78f);
     private static final int LINE_COLOR = ColorHelper.argb(0.1f, 0.15f, 0.2f, 1f);
@@ -92,17 +91,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         mainPanel.withZIndex(-12);
         addComponent(mainPanel);
 
-        var graphInset = new SurfaceWidget(mainX + PANEL_PADDING, mainY + PANEL_PADDING,
-                mainWidth - PANEL_PADDING * 2, mainHeight - PANEL_PADDING * 2);
-        graphInset.withSurface(OritechSurface.PANEL_INSET);
-        graphInset.withZIndex(-11);
-        addComponent(graphInset);
-
-        var graphBackdrop = BoxWidget.filled(mainX + PANEL_PADDING + 3, mainY + PANEL_PADDING + 3,
-                mainWidth - (PANEL_PADDING + 3) * 2, mainHeight - (PANEL_PADDING + 3) * 2, GRAPH_BG);
-        graphBackdrop.withZIndex(-10);
-        addComponent(graphBackdrop);
-
         buildAugmentCanvas(mainX, mainY, mainWidth, mainHeight);
         buildResearchPanels(researchX, researchY, researchWidth);
         buildEnergyPanel(energyX, energyY);
@@ -115,12 +103,14 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         int viewportHeight = mainHeight - PANEL_PADDING * 2;
         int graphHeight = Math.max(140, viewportHeight - 10);
 
-        var augmentCanvas = new ScrollWidget(viewportX, viewportY, viewportWidth, viewportHeight)
+        // Widen the canvas past its surface so the 4px scroll margin meets the inset's 1px side borders.
+        var augmentCanvas = new ScrollWidget(viewportX - 3, viewportY, viewportWidth + 6, viewportHeight)
                 .withHorizontalScroll(true)
                 .withVerticalScroll(false)
                 .withScrollSpeed(16)
                 .withDragScrolling(true);
         augmentCanvas.setSurface(OritechSurface.PANEL_INSET);
+        augmentCanvas.setPadding(Insets.of(0, -3));
         addComponent(augmentCanvas);
 
         int maxY = 0;
