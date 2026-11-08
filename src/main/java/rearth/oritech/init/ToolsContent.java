@@ -192,7 +192,7 @@ public class ToolsContent {
     public static final DeferredItem<Item> PROMETHIUM_PICKAXE = EQUIPMENT.registerItem(
             "promethium_pickaxe",
             props -> new PromethiumPickaxeItem(
-                    props.pickaxe(PROMETHIUM_MATERIAL, 3f, -2.4f)
+                    props.tool(PROMETHIUM_MATERIAL, TagContent.DRILL_MINEABLE, 3f, -2.4f, 0)
                             .attributes(PromethiumPickaxeItem.getToolAttributesWithRange(PROMETHIUM_MATERIAL, 3f, -2.4f, 2, "pick"))
                             .rarity(Rarity.EPIC)
                             .component(DataComponents.UNBREAKABLE, Unit.INSTANCE))
