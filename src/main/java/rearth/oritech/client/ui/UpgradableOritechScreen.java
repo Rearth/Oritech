@@ -211,12 +211,13 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             int statsY = yOffset + 17;
             int statsX = 28;
 
-            var speed = (1 - settings.speedMultiplier()) * 100;
-            var efficiency = (1 - settings.efficiencyMultiplier()) * 100;
+            // Match addon tooltips: round float percentages instead of truncating values like 19.999998 to 19.
+            var speed = Math.round((1 - settings.speedMultiplier()) * 100);
+            var efficiency = Math.round((1 - settings.efficiencyMultiplier()) * 100);
 
             if (speed != 0) {
                 var label = new LabelWidget(statsX, statsY, 50, 10,
-                        Component.translatable("title.oritech.machine_speed", (int) speed));
+                        Component.translatable("title.oritech.machine_speed", speed));
                 label.withColor(SPEED_COLOR);
                 label.withTooltip(Component.translatable("tooltip.oritech.machine_speed"));
                 scroll.addChild(label);
@@ -224,7 +225,7 @@ public class UpgradableOritechScreen<T extends UpgradableOritechScreenHandler> e
             }
             if (efficiency != 0) {
                 var label = new LabelWidget(statsX, statsY, 50, 10,
-                        Component.translatable("title.oritech.machine_efficiency", (int) efficiency));
+                        Component.translatable("title.oritech.machine_efficiency", efficiency));
                 label.withColor(EFFICIENCY_COLOR);
                 label.withTooltip(Component.translatable("tooltip.oritech.machine_efficiency"));
                 scroll.addChild(label);
