@@ -71,6 +71,18 @@ public class DynamicStatisticEnergyStorage extends DynamicEnergyStorage {
         return extracted;
     }
 
+    // Item charging and the safe's automatic output bypass transfer limits, but still count as output.
+    @Override
+    public long internalExtract(long amount, TransactionContext transaction) {
+        var extracted = super.internalExtract(amount, transaction);
+        if (extracted > 0) {
+            // Roll back the statistics along with the energy if a simulated/nested transfer is aborted.
+            statisticsJournal.updateSnapshots(transaction);
+            extractedThisTick += extracted;
+        }
+        return extracted;
+    }
+
     public void tick(long worldTicks) {
         var index = (int) (worldTicks % 20);
         historicInsert[index] = insertedThisTick;

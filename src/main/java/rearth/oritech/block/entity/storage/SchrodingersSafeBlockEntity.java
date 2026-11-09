@@ -42,16 +42,17 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyHistory;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.blocks.storage.SchrodingersSafeBlock;
 import rearth.oritech.client.init.ModScreens;
+import rearth.oritech.client.init.ParticleContent;
 import rearth.oritech.client.ui.UpgradableOritechScreenHandler;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
 import rearth.oritech.init.ItemContent;
 import rearth.oritech.util.*;
-import rearth.oritech.client.init.ParticleContent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +76,9 @@ public class SchrodingersSafeBlockEntity extends NetworkedBlockEntity implements
 
     @SyncField({SyncType.SPARSE_TICK, SyncType.INITIAL})
     public ColorVariant currentColor = getDefaultColor();
+
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    public final EnergyHistory energyHistory = new EnergyHistory();
 
     private long age = 0;
     private boolean dropped = false;
@@ -114,6 +118,11 @@ public class SchrodingersSafeBlockEntity extends NetworkedBlockEntity implements
 
         if (energyStorage.energy > 0)
             outputEnergy();
+        // Sample the current amount after capacity adjustments/output, using the completed second's RF/t averages.
+        if (serverLevel.getGameTime() % EnergyHistory.SAMPLE_TICKS == 0) {
+            var stats = energyStorage.getCurrentStatistics(serverLevel.getGameTime());
+            energyHistory.record(serverLevel.getGameTime(), energyStorage.energy, stats.avgInsertSecond(), stats.avgExtractSecond());
+        }
     }
 
     private void adjustEnergyStorageSize() {

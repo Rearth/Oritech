@@ -2,7 +2,12 @@ package rearth.oritech.block.entity.storage;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
+import rearth.oritech.api.networking.NetworkedBlockEntity;
+import rearth.oritech.api.networking.SyncField;
+import rearth.oritech.api.networking.SyncType;
+import rearth.oritech.api.transfer.energy.EnergyHistory;
 import rearth.oritech.block.base.entity.ExpandableMultiblockEnergyStorageBlockEntity;
 import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.config.OritechConfig;
@@ -11,6 +16,19 @@ import rearth.oritech.init.BlockEntitiesContent;
 import java.util.List;
 
 public class LargeStorageBlockEntity extends ExpandableMultiblockEnergyStorageBlockEntity implements RedstoneAddonBlockEntity.RedstoneControllable {
+
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    public final EnergyHistory energyHistory = new EnergyHistory();
+
+    @Override
+    public void serverTick(ServerLevel level, BlockPos pos, BlockState state, NetworkedBlockEntity entity) {
+        super.serverTick(level, pos, state, entity);
+        // The base tick advances the 20-tick statistics first; keep recording independently of GUI sync.
+        if (level.getGameTime() % EnergyHistory.SAMPLE_TICKS == 0) {
+            var stats = energyStorage.getCurrentStatistics(level.getGameTime());
+            energyHistory.record(level.getGameTime(), energyStorage.energy, stats.avgInsertSecond(), stats.avgExtractSecond());
+        }
+    }
 
     public LargeStorageBlockEntity(BlockPos pos, BlockState state) {
         super(BlockEntitiesContent.LARGE_STORAGE.get(), pos, state);

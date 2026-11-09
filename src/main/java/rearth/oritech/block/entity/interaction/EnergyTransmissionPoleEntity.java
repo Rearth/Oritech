@@ -33,6 +33,7 @@ import net.neoforged.neoforge.transfer.StacksResourceHandler;
 import net.neoforged.neoforge.transfer.energy.DelegatingEnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.SnapshotJournal;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import org.jetbrains.annotations.NotNull;
@@ -43,6 +44,7 @@ import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
 import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.api.transfer.energy.DynamicStatisticEnergyStorage;
+import rearth.oritech.api.transfer.energy.EnergyHistory;
 import rearth.oritech.api.transfer.energy.EnergyProvider;
 import rearth.oritech.api.transfer.item.SimpleInventoryStorage;
 import rearth.oritech.block.base.entity.ExpandableEnergyStorageBlockEntity;
@@ -73,6 +75,10 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
     private final Set<ConnectionTarget> connections = new HashSet<>();
 
     private PoleNetworkData netDataRef = null;
+
+    // The server points this at the shared network; the client receives its snapshot and latest sample.
+    @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
+    public EnergyHistory energyHistory = new EnergyHistory();
 
     // storage
     @SyncField(SyncType.GUI_TICK)
@@ -119,6 +125,7 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
     public void preNetworkUpdate(SyncType type) {
         super.preNetworkUpdate(type);
         currentStats = energyStorage.getCurrentStatistics(level.getGameTime());
+        energyHistory = getNetwork().energyHistory;
     }
 
     private void outputEnergy() {
@@ -454,146 +461,6 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
         return ModScreens.ENERGY_TRANSMISSION_POLE_SCREEN.get();
     }
 
-    protected class EnergyTransmissionPoleEnergyStorage extends DynamicEnergyStorage {
-
-        private long clientShownEnergy;
-
-        public EnergyTransmissionPoleEnergyStorage() {
-            super(0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, EnergyTransmissionPoleEntity.this::setChanged, false);
-        }
-
-        private boolean isValid() {
-            return level != null && EnergyTransmissionPoleEntity.this.isConnected();
-        }
-
-        @Override
-        public int insert(int maxAmount, TransactionContext transaction) {
-            if (!isValid()) return 0;
-
-            var insertAmount = (int) Math.min(maxAmount, getCapacityAsLong() - getAmountAsLong());
-
-            if (insertAmount > 0) {
-                var newAmount = getAmountAsLong() + insertAmount;
-                set(newAmount);
-                getNetwork().inserted.add((long) insertAmount);
-            }
-
-            return insertAmount;
-        }
-
-        @Override
-        public int extract(int maxAmount, TransactionContext transaction) {
-            if (!isValid()) return 0;
-
-            var extractAmount = (int) Math.min(maxAmount, this.getAmountAsLong());
-
-            if (extractAmount > 0) {
-                var newAmount = getAmountAsLong() - extractAmount;
-                set(newAmount);
-                getNetwork().extracted.add((long) extractAmount);
-            }
-
-            return extractAmount;
-        }
-
-        @Override
-        public void set(long amount) {
-            if (!isValid()) return;
-
-            if (amount > getCapacityAsLong() || amount < 0) {
-                Oritech.LOGGER.error("tried setting invalid amount for pole network: " + amount);
-                return;
-            }
-
-            var network = EnergyTransmissionPoleEntity.this.getNetwork();
-            if (network == null) {
-                Oritech.LOGGER.error("Invalid set network state for power pole entity at: {}", worldPosition);
-                return;
-            }
-
-            network.storedEnergy = amount;
-
-        }
-
-        @Override
-        public long getAmountAsLong() {
-            if (level.isClientSide()) return clientShownEnergy;
-
-            if (!isValid()) return 0;
-
-            var network = EnergyTransmissionPoleEntity.this.getNetwork();
-            if (network == null) {
-                Oritech.LOGGER.error("Invalid get network state for power pole entity at: {}", worldPosition);
-                return 0;
-            }
-
-            return network.storedEnergy;
-        }
-
-        @Override
-        public long getCapacityAsLong() {
-            return OritechConfig.poleConfig.energyCapacity.get();
-        }
-
-        public void update() {
-            if (!isValid()) return;
-            EnergyTransmissionPoleEntity.this.setChanged(false);
-        }
-
-        public void tick(long worldTicks) {
-            var net = getNetwork();
-
-            if (worldTicks <= net.lastTickedAt) return;
-            var index = (int) (worldTicks % 20);
-            net.historicInsert[index] = net.inserted.stream().mapToLong(Long::longValue).sum();
-            net.historicExtract[index] = net.extracted.stream().mapToLong(Long::longValue).sum();
-            net.currentInsertSources = net.inserted.size();
-
-            net.inserted.clear();
-            net.extracted.clear();
-            net.lastTickedAt = worldTicks;
-        }
-
-        public DynamicStatisticEnergyStorage.EnergyStatistics getCurrentStatistics(long worldTicks) {
-            var index = (int) (worldTicks % 20);
-            var net = getNetwork();
-
-            return new DynamicStatisticEnergyStorage.EnergyStatistics(
-                    (float) Arrays.stream(net.historicInsert).mapToLong(Long::longValue).average().orElse(0),
-                    (float) Arrays.stream(net.historicExtract).mapToLong(Long::longValue).average().orElse(0),
-                    net.historicInsert[index],
-                    net.historicExtract[index],
-                    net.currentInsertSources,
-                    Arrays.stream(net.historicInsert).mapToLong(Long::longValue).max().orElse(0),
-                    Arrays.stream(net.historicExtract).mapToLong(Long::longValue).max().orElse(0)
-            );
-
-        }
-
-        @Override
-        public Long getDeltaData() {
-            return getAmountAsLong();
-        }
-
-        @Override
-        public EnergyTransmissionPoleEnergyStorage getFullData() {
-            return this;
-        }
-
-        @Override
-        public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
-            return ByteBufCodecs.VAR_LONG;
-        }
-
-        @Override
-        public void handleDeltaUpdate(Long updatedData) {
-            this.clientShownEnergy = updatedData;
-        }
-    }
-
-    public record ConnectionTarget(BlockPos pos, Direction facing) {
-    }
-
     // this is kept separate from the block entities (and fully decoupled) so it works well across unloaded areas,
     // even if some poles are in the middle of it
     public static class PoleNetworkData extends SavedData {
@@ -639,6 +506,9 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
 
         protected void mergeNetworks(PoleNetwork netA, PoleNetwork netB) {
 
+            if (netA == netB) return;
+            // Neither old history describes the combined network, so start a fresh timeline after merging.
+            netA.energyHistory.clear();
             // move all from netB to netA
             netA.storedEnergy = Math.min(OritechConfig.poleConfig.energyCapacity.get(), netA.storedEnergy + netB.storedEnergy);
 
@@ -719,6 +589,9 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
 
     }
 
+    public record ConnectionTarget(BlockPos pos, Direction facing) {
+    }
+
     // stores the energy in a network. Also includes a list of poles and their connection (only used for floodfill when splitting networks)
     public static class PoleNetwork {
 
@@ -750,6 +623,26 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
         private final Map<BlockPos, Set<BlockPos>> poles;
 
         public long storedEnergy = 0L;
+        // One buffer per network, shared by every pole and omitted from the SavedData codec.
+        public final EnergyHistory energyHistory = new EnergyHistory();
+        // All poles must roll back the same energy and transfer lists when a trial transfer is aborted.
+        // Restoring list sizes removes only entries added by that transaction, including nested transfers.
+        private final SnapshotJournal<NetworkEnergySnapshot> energyJournal = new SnapshotJournal<>() {
+            @Override
+            protected NetworkEnergySnapshot createSnapshot() {
+                return new NetworkEnergySnapshot(storedEnergy, inserted.size(), extracted.size());
+            }
+
+            @Override
+            protected void revertToSnapshot(NetworkEnergySnapshot snapshot) {
+                storedEnergy = snapshot.stored();
+                inserted.subList(snapshot.insertCount(), inserted.size()).clear();
+                extracted.subList(snapshot.extractCount(), extracted.size()).clear();
+            }
+        };
+
+        private record NetworkEnergySnapshot(long stored, int insertCount, int extractCount) {
+        }
 
         // network stats
         private final List<Long> inserted = new ArrayList<>();  // just for this tick
@@ -785,6 +678,150 @@ public class EnergyTransmissionPoleEntity extends NetworkedBlockEntity implement
         // adds or updates a pole in a network
         public void setPole(BlockPos pole, Set<ConnectionTarget> connections) {
             poles.put(pole, new HashSet<>(connections.stream().map(elem -> elem.pos()).toList()));
+        }
+    }
+
+    protected class EnergyTransmissionPoleEnergyStorage extends DynamicEnergyStorage {
+
+        private long clientShownEnergy;
+
+        public EnergyTransmissionPoleEnergyStorage() {
+            super(0, Integer.MAX_VALUE, Integer.MAX_VALUE, 0, EnergyTransmissionPoleEntity.this::setChanged, false);
+        }
+
+        private boolean isValid() {
+            return level != null && EnergyTransmissionPoleEntity.this.isConnected();
+        }
+
+        @Override
+        public int insert(int maxAmount, TransactionContext transaction) {
+            if (!isValid()) return 0;
+
+            var insertAmount = (int) Math.min(maxAmount, getCapacityAsLong() - getAmountAsLong());
+
+            if (insertAmount > 0) {
+                getNetwork().energyJournal.updateSnapshots(transaction);
+                var newAmount = getAmountAsLong() + insertAmount;
+                set(newAmount);
+                getNetwork().inserted.add((long) insertAmount);
+            }
+
+            return insertAmount;
+        }
+
+        @Override
+        public int extract(int maxAmount, TransactionContext transaction) {
+            if (!isValid()) return 0;
+
+            var extractAmount = (int) Math.min(maxAmount, this.getAmountAsLong());
+
+            if (extractAmount > 0) {
+                getNetwork().energyJournal.updateSnapshots(transaction);
+                var newAmount = getAmountAsLong() - extractAmount;
+                set(newAmount);
+                getNetwork().extracted.add((long) extractAmount);
+            }
+
+            return extractAmount;
+        }
+
+        @Override
+        public void set(long amount) {
+            if (!isValid()) return;
+
+            if (amount > getCapacityAsLong() || amount < 0) {
+                Oritech.LOGGER.error("tried setting invalid amount for pole network: " + amount);
+                return;
+            }
+
+            var network = EnergyTransmissionPoleEntity.this.getNetwork();
+            if (network == null) {
+                Oritech.LOGGER.error("Invalid set network state for power pole entity at: {}", worldPosition);
+                return;
+            }
+
+            network.storedEnergy = amount;
+
+        }
+
+        @Override
+        public long getAmountAsLong() {
+            if (level.isClientSide()) return clientShownEnergy;
+
+            if (!isValid()) return 0;
+
+            var network = EnergyTransmissionPoleEntity.this.getNetwork();
+            if (network == null) {
+                Oritech.LOGGER.error("Invalid get network state for power pole entity at: {}", worldPosition);
+                return 0;
+            }
+
+            return network.storedEnergy;
+        }
+
+        @Override
+        public long getCapacityAsLong() {
+            return OritechConfig.poleConfig.energyCapacity.get();
+        }
+
+        public void update() {
+            if (!isValid()) return;
+            EnergyTransmissionPoleEntity.this.setChanged(false);
+        }
+
+        public void tick(long worldTicks) {
+            var net = getNetwork();
+
+            // Every loaded pole ticks this shared object. Advance its statistics/history only once per tick.
+            if (worldTicks <= net.lastTickedAt) return;
+            var index = (int) (worldTicks % 20);
+            net.historicInsert[index] = net.inserted.stream().mapToLong(Long::longValue).sum();
+            net.historicExtract[index] = net.extracted.stream().mapToLong(Long::longValue).sum();
+            net.currentInsertSources = net.inserted.size();
+
+            net.inserted.clear();
+            net.extracted.clear();
+            net.lastTickedAt = worldTicks;
+            if (worldTicks % EnergyHistory.SAMPLE_TICKS == 0) {
+                var stats = getCurrentStatistics(worldTicks);
+                net.energyHistory.record(worldTicks, net.storedEnergy, stats.avgInsertSecond(), stats.avgExtractSecond());
+            }
+        }
+
+        public DynamicStatisticEnergyStorage.EnergyStatistics getCurrentStatistics(long worldTicks) {
+            var index = (int) (worldTicks % 20);
+            var net = getNetwork();
+
+            return new DynamicStatisticEnergyStorage.EnergyStatistics(
+                    (float) Arrays.stream(net.historicInsert).mapToLong(Long::longValue).average().orElse(0),
+                    (float) Arrays.stream(net.historicExtract).mapToLong(Long::longValue).average().orElse(0),
+                    net.historicInsert[index],
+                    net.historicExtract[index],
+                    net.currentInsertSources,
+                    Arrays.stream(net.historicInsert).mapToLong(Long::longValue).max().orElse(0),
+                    Arrays.stream(net.historicExtract).mapToLong(Long::longValue).max().orElse(0)
+            );
+
+        }
+
+        @Override
+        public Long getDeltaData() {
+            return getAmountAsLong();
+        }
+
+        @Override
+        public EnergyTransmissionPoleEnergyStorage getFullData() {
+            return this;
+        }
+
+        @Override
+        public StreamCodec<? extends ByteBuf, Long> getDeltaCodec() {
+            return ByteBufCodecs.VAR_LONG;
+        }
+
+        @Override
+        public void handleDeltaUpdate(Long updatedData) {
+            this.clientShownEnergy = updatedData;
         }
     }
 }
