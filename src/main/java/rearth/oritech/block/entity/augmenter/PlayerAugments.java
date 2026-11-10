@@ -97,7 +97,7 @@ public class PlayerAugments {
     }
 
     public enum AugmentApplicatorOperation {
-        RESEARCH, ADD, REMOVE, NONE, NEEDS_INIT
+        RESEARCH, ADD, REMOVE, NEEDS_INIT
     }
 
     public record AugmentInstallTriggerPacket(BlockPos position, Identifier id,

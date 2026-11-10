@@ -15,20 +15,15 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 4,
+      "count": 2,
       "ingredient": "oritech:motor"
     },
     {
-      "count": 8,
+      "count": 4,
       "ingredient": "oritech:biosteel_ingot"
-    },
-    {
-      "count": 32,
-      "ingredient": "minecraft:redstone"
     }
   ],
-  "rfCost": 15000000,
-  "time": 600,
+  "rfCost": 5000000,
   "toggleable": false,
   "uiX": 5,
   "uiY": 30

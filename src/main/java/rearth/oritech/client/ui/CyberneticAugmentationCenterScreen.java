@@ -51,7 +51,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
 
     private final Map<Identifier, AugmentNodeWidget> augmentNodes = new LinkedHashMap<>();
     private final List<DependencyLine> dependencyLines = new ArrayList<>();
-    private final List<LabelWidget> researchLabels = new ArrayList<>();
 
     private OverlayWidget dialogOverlay;
 
@@ -64,7 +63,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         setPanelSize(width, height);
         augmentNodes.clear();
         dependencyLines.clear();
-        researchLabels.clear();
         dialogOverlay = null;
 
         if (menu.blockEntity == null) {
@@ -148,12 +146,10 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
     }
 
     private void buildResearchPanels(int x, int y, int width) {
-        for (int i = 0; i < 3; i++) researchLabels.add(null);
-
         int offsetY = y;
         for (int index = 0; index < 3; index++) {
-            var researchState = menu.blockEntity.availableStations.getOrDefault(index, null);
-            if (researchState == null) continue;
+            var stationId = menu.blockEntity.availableStations.get(index);
+            if (stationId == null) continue;
 
             int panelHeight = 52;
             var panel = new SurfaceWidget(x, offsetY, width, panelHeight);
@@ -161,20 +157,19 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
             panel.withZIndex(-8);
             addComponent(panel);
 
-            var title = new LabelWidget(x + 6, offsetY + 7, width - 12, 10,
-                    researchState.type.getName().copy().withStyle(ChatFormatting.BOLD));
+            var title = new LabelWidget(x + 6, offsetY + 7, width - 12, 22,
+                    BuiltInRegistries.BLOCK.get(stationId).orElseThrow().value().getName().copy().withStyle(ChatFormatting.BOLD));
             title.withAlignment(LabelWidget.Alignment.CENTER);
             title.withDarkColor();
             title.withWrap(true);
             addComponent(title);
 
-            var status = new LabelWidget(x + 6, offsetY + 30, width - 12, 18, Component.literal(" "));
+            var status = new LabelWidget(x + 6, offsetY + 30, width - 12, 18, Component.translatable("oritech.text.augment_station_ready"));
             status.withAlignment(LabelWidget.Alignment.CENTER);
             status.withDarkColor();
             status.withWrap(true);
             addComponent(status);
 
-            researchLabels.set(index, status);
             offsetY += panelHeight + 10;
         }
     }
@@ -209,33 +204,7 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
 
         if (menu.blockEntity == null) return;
 
-        updateResearchPanels();
         updateAugmentNodes();
-    }
-
-    private void updateResearchPanels() {
-        var level = this.menu.blockEntity.getLevel();
-        if (level == null) return;
-
-        for (int i = 0; i < 3; i++) {
-            if (i >= researchLabels.size()) continue;
-            var panelData = researchLabels.get(i);
-            var researchData = this.menu.blockEntity.availableStations.get(i);
-            if (researchData == null || panelData == null) continue;
-
-            Component text;
-            var time = level.getGameTime();
-            if (!researchData.working) {
-                var ticks = time % 20 / 7;
-                text = Component.translatable("text.oritech.accelerator.ui.waiting." + ticks);
-            } else {
-                var remainingTicks = researchData.researchStartedAt + researchData.workTime - time;
-                var remainingSeconds = (int) (remainingTicks / 20f);
-                text = Component.translatable("text.oritech.augmenter_active", remainingSeconds);
-            }
-
-            panelData.setText(text);
-        }
     }
 
     private void updateAugmentNodes() {
@@ -246,12 +215,9 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
             if (augmentData == null) continue;
 
             var isResearched = this.menu.blockEntity.researchedAugments.contains(augmentId);
-            var isResearching = this.menu.blockEntity.availableStations.values().stream()
-                    .filter(Objects::nonNull)
-                    .anyMatch(station -> station.selectedResearch.equals(augmentId));
             var isApplied = this.menu.blockEntity.hasPlayerAugment(augmentId, this.menu.player);
 
-            var operation = resolveOperation(isApplied, isResearched, isResearching);
+            var operation = resolveOperation(isApplied, isResearched);
 
             var missingRequirements = new ArrayList<Component>();
             var hasRequirements = true;
@@ -266,7 +232,7 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
             var requiredStationBlock = getRequiredStationBlock(augmentData);
             var hasResearchStation = this.menu.blockEntity.availableStations.values().stream()
                     .filter(Objects::nonNull)
-                    .anyMatch(station -> station.type.equals(requiredStationBlock));
+                    .anyMatch(station -> station.equals(augmentData.requiredStation()));
 
             if (!hasResearchStation) {
                 hasRequirements = false;
@@ -296,8 +262,8 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         }
 
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
-            tooltip.add(Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20));
             tooltip.add(Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())));
+            addCostTooltip(tooltip, "oritech.text.augment_research_cost", augmentData.researchCost());
         }
 
         if (!missingRequirements.isEmpty()) {
@@ -308,10 +274,9 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         return tooltip;
     }
 
-    private PlayerAugments.AugmentApplicatorOperation resolveOperation(boolean isApplied, boolean isResearched, boolean isResearching) {
+    private PlayerAugments.AugmentApplicatorOperation resolveOperation(boolean isApplied, boolean isResearched) {
         if (isApplied) return PlayerAugments.AugmentApplicatorOperation.REMOVE;
         if (isResearched) return PlayerAugments.AugmentApplicatorOperation.ADD;
-        if (isResearching) return PlayerAugments.AugmentApplicatorOperation.NONE;
         return PlayerAugments.AugmentApplicatorOperation.RESEARCH;
     }
 
@@ -343,8 +308,8 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         boolean hasRequiredStation = false;
         for (int i = 0; i < 3; i++) {
             var station = this.menu.blockEntity.availableStations.getOrDefault(i, null);
-            if (station == null || station.working) continue;
-            if (requiredStationBlock.equals(station.type)) {
+            if (station == null) continue;
+            if (augmentData.requiredStation().equals(station)) {
                 hasRequiredStation = true;
                 break;
             }
@@ -387,8 +352,9 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         var dialogChildren = new ArrayList<UIComponent>();
 
         var title = new LabelWidget(panelX + 12, cursorY, contentWidth, 10,
-                Component.translatable(augmentKey(id)).withStyle(ChatFormatting.BOLD, ChatFormatting.BLACK));
+                Component.translatable(augmentKey(id)).withStyle(ChatFormatting.BOLD));
         title.withAlignment(LabelWidget.Alignment.CENTER);
+        title.withBrightColor();
         dialogChildren.add(title);
         cursorY += 20;
 
@@ -408,37 +374,19 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
 
         if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
             cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-                    Component.translatable("oritech.text.augment_research_time", augmentData.time() / 20), LabelWidget.Alignment.LEFT);
-            cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
                     Component.translatable("oritech.text.energy_cost", TooltipHelper.getEnergyText(augmentData.rfCost())), LabelWidget.Alignment.LEFT);
         }
 
+        if (operation == PlayerAugments.AugmentApplicatorOperation.RESEARCH) {
+            cursorY = addCostSection(dialogChildren, panelX + 12, cursorY, contentWidth,
+                    "oritech.text.augment_research_cost", augmentData.researchCost());
+        }
         if (operation != PlayerAugments.AugmentApplicatorOperation.REMOVE) {
-            cursorY += 4;
-            cursorY = addWrappedLabel(dialogChildren, panelX + 12, cursorY, contentWidth,
-                    Component.translatable("oritech.text.augment_resource_cost"), LabelWidget.Alignment.LEFT);
-
-            int itemX = panelX + 12;
-            int itemY = cursorY;
-            for (var input : shownCost) {
-                var shownStacks = getDisplayStacks(input);
-                if (shownStacks.isEmpty()) continue;
-
-                var shownStack = shownStacks.getFirst().copyWithCount(input.count());
-
-                var itemWidget = new ItemWidget(itemX, itemY, shownStack).withTooltipFromStack(false);
-                var tooltip = new ArrayList<Component>();
-                tooltip.add(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
-                shownStacks.stream().map(ItemStack::getHoverName).forEach(tooltip::add);
-                itemWidget.withTooltip(tooltip);
-                dialogChildren.add(itemWidget);
-                itemX += 20;
-            }
-            cursorY += 24;
+            cursorY = addCostSection(dialogChildren, panelX + 12, cursorY, contentWidth,
+                    "oritech.text.augment_installation_cost", augmentData.applyCost());
         }
 
         boolean confirmAllowed = switch (operation) {
-            case NONE -> false;
             case RESEARCH -> hasRequiredStation && hasResources && hasEnergy;
             case ADD -> hasResources;
             case REMOVE -> true;
@@ -448,29 +396,33 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         var confirmKey = switch (operation) {
             case ADD -> "text.oritech.install";
             case REMOVE -> "text.oritech.remove";
-            case NONE -> "text.oritech.noop";
             default -> "text.oritech.begin_research";
         };
 
         if ((!hasResources || !hasEnergy) && isCreative) {
-            confirmAllowed = operation != PlayerAugments.AugmentApplicatorOperation.NONE && (operation != PlayerAugments.AugmentApplicatorOperation.RESEARCH || hasRequiredStation);
+            confirmAllowed = (operation != PlayerAugments.AugmentApplicatorOperation.RESEARCH || hasRequiredStation);
         }
 
-        int buttonY = cursorY + 8;
-        int panelHeight = buttonY - panelY + 30;
+        int contentHeight = cursorY - panelY;
+        int panelHeight = contentHeight + 38;
+        int dialogY = (height - panelHeight) / 2;
+        int buttonY = dialogY + panelHeight - 24;
 
-        var panelBackground = new SurfaceWidget(panelX, panelY, panelWidth, panelHeight, OritechSurface.PANEL);
+        var panelBackground = new SurfaceWidget(panelX, dialogY, panelWidth, panelHeight, OritechSurface.PANEL);
         panelBackground.withZIndex(-10);
         overlay.addChild(panelBackground);
 
-        var panelInset = new SurfaceWidget(panelX + 5, panelY + 25, panelWidth - 10, cursorY - panelY - 23, OritechSurface.PANEL_INSET);
+        var panelInset = new SurfaceWidget(panelX + 5, dialogY + 5, panelWidth - 10,
+                panelHeight - 38, OritechSurface.PANEL_INSET);
         panelInset.withZIndex(-10);
         overlay.addChild(panelInset);
 
+        for (var child : dialogChildren) {
+            child.setY(child.getY() + dialogY - panelY);
+            overlay.addChild(child);
+        }
 
-        for (var child : dialogChildren) overlay.addChild(child);
-
-        var confirmLabel = (!hasResources || !hasEnergy) && isCreative && operation != PlayerAugments.AugmentApplicatorOperation.NONE
+        var confirmLabel = (!hasResources || !hasEnergy) && isCreative
                 ? Component.literal("[C] ").withColor(ColorHelper.argb(214 / 255f, 26 / 255f, 173 / 255f)).append(Component.translatable(confirmKey).withColor(ColorHelper.WHITE))
                 : Component.translatable(confirmKey);
 
@@ -496,6 +448,40 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         addComponent(overlay);
     }
 
+    private static void addCostTooltip(List<Component> tooltip, String label, List<SizedIngredient> costs) {
+        tooltip.add(Component.translatable(label).withStyle(ChatFormatting.BOLD));
+        for (var input : costs) {
+            var stacks = getDisplayStacks(input);
+            if (!stacks.isEmpty()) {
+                tooltip.add(Component.literal(input.count() + " × ").append(stacks.getFirst().getHoverName()));
+            }
+        }
+    }
+
+    private int addCostSection(List<UIComponent> children, int x, int y, int width,
+                               String label, List<SizedIngredient> costs) {
+        y = addWrappedLabel(children, x, y + 4, width,
+                Component.translatable(label), LabelWidget.Alignment.LEFT);
+        int itemX = x;
+        for (var input : costs) {
+            var stacks = getDisplayStacks(input);
+            if (stacks.isEmpty()) continue;
+            if (itemX + 18 > x + width) {
+                itemX = x;
+                y += 24;
+            }
+            var itemWidget = new ItemWidget(itemX, y, stacks.getFirst().copyWithCount(input.count()))
+                    .withTooltipFromStack(false);
+            var tooltip = new ArrayList<Component>();
+            tooltip.add(Component.translatable("oritech.text.augment_ingredient_tip").withStyle(ChatFormatting.BOLD, ChatFormatting.GRAY));
+            stacks.stream().map(ItemStack::getHoverName).forEach(tooltip::add);
+            itemWidget.withTooltip(tooltip);
+            children.add(itemWidget);
+            itemX += 20;
+        }
+        return y + 24;
+    }
+
     private int addWrappedLabel(List<UIComponent> children, int x, int y, int width, Component text, LabelWidget.Alignment alignment) {
         int height = Math.max(10, Minecraft.getInstance().font.split(text, width).size() * Minecraft.getInstance().font.lineHeight);
         var label = new LabelWidget(x, y, width, height, text);
@@ -517,7 +503,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
         return switch (operation) {
             case ADD -> "oritech.text.augment_op.apply";
             case REMOVE -> "oritech.text.augment_op.remove";
-            case NONE -> "oritech.text.augment_op.pending";
             default -> "oritech.text.augment_op.research";
         };
     }
@@ -647,7 +632,6 @@ public class CyberneticAugmentationCenterScreen extends OritechWidgetScreen<Cybe
             var backgroundTexture = switch (operation) {
                 case ADD -> Oritech.id("textures/gui/augment/background_completed.png");
                 case REMOVE -> Oritech.id("textures/gui/augment/background_installed.png");
-                case NONE -> Oritech.id("textures/gui/augment/background_pending.png");
                 default -> Oritech.id("textures/gui/augment/background_open.png");
             };
 

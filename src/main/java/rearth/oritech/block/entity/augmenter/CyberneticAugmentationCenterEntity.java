@@ -11,8 +11,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
@@ -23,7 +21,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.ValueInput;
@@ -78,9 +75,9 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
 
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
     public final Set<Identifier> researchedAugments = new HashSet<>();
-    // working state
+    // connected research station types
     @SyncField({SyncType.GUI_TICK, SyncType.GUI_OPEN})
-    public final HashMap<Integer, ResearchState> availableStations = new HashMap<>();
+    public final HashMap<Integer, Identifier> availableStations = new HashMap<>();
 
     public boolean screenInvOverride = false;
 
@@ -97,20 +94,6 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
     @Override
     public void serverTick(ServerLevel serverLevel, BlockPos pos, BlockState state, NetworkedBlockEntity blockEntity) {
         screenInvOverride = false;
-
-        // update research stations
-        for (int i = 0; i < 3; i++) {
-            var station = availableStations.getOrDefault(i, null);
-            if (station == null) continue;
-            if (station.working) {
-                var isDone = serverLevel.getGameTime() > station.researchStartedAt + station.workTime;
-                if (!isDone) continue;
-
-                researchedAugments.add(station.selectedResearch);
-                station.working = false;
-                this.setChanged();
-            }
-        }
     }
 
     // persist researched augments, inventory, energy
@@ -124,14 +107,6 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
         var list = output.childrenList("researched");
         for (var augment : researchedAugments) {
             list.addChild().store("id", Identifier.CODEC, augment);
-        }
-
-        // also put in pending researches to avoid having to separately store them
-        for (var station : availableStations.values()) {
-            if (station == null) continue;
-            if (station.working) {
-                list.addChild().store("id", Identifier.CODEC, station.selectedResearch);
-            }
         }
     }
 
@@ -166,6 +141,10 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
         var augmentData = getAugmentData(augment);
         if (augmentData == null) return;
 
+        loadAvailableStations(player);
+        if (!availableStations.containsValue(augmentData.requiredStation())) return;
+        if (!researchedAugments.containsAll(augmentData.requirements())) return;
+
         try (var transaction = Transaction.openRoot()) {
 
             var extracted = energyStorage.internalExtract(augmentData.rfCost(), transaction);
@@ -176,23 +155,7 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
             transaction.commit();
         }
 
-        // assign first idle station
-        for (int i = 0; i < 3; i++) {
-            var station = availableStations.getOrDefault(i, null);
-            if (station == null) continue;
-            if (station.working) continue;
-
-
-            if (!BuiltInRegistries.BLOCK.getKey(station.type).equals(augmentData.requiredStation())) continue;
-
-            station.selectedResearch = augment;
-            station.working = true;
-            station.researchStartedAt = currentLevel.getGameTime();
-            station.workTime = creative ? 5 : augmentData.time();
-
-            break;
-
-        }
+        researchedAugments.add(augment);
         this.setChanged();
     }
 
@@ -302,12 +265,7 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
                 continue;
             }
 
-            if (availableStations.containsKey(i) && availableStations.get(i) != null && availableStations.get(i).type.equals(candidateState.getBlock()))
-                continue;
-
-            var newState = new ResearchState(candidateState.getBlock(), false, Identifier.parse(""), -1, -1);
-
-            availableStations.put(i, newState);
+            availableStations.put(i, BuiltInRegistries.BLOCK.getKey(candidateState.getBlock()));
         }
 
     }
@@ -530,63 +488,6 @@ public class CyberneticAugmentationCenterEntity extends NetworkedBlockEntity imp
         }
 
         return true;
-    }
-
-    public static class ResearchState {
-
-        public Block type;
-        public boolean working;
-        public Identifier selectedResearch;
-        public int workTime;
-        public long researchStartedAt;
-
-        public static StreamCodec<RegistryFriendlyByteBuf, ResearchState> PACKET_CODEC = StreamCodec.composite(
-                Identifier.STREAM_CODEC.map(id -> BuiltInRegistries.BLOCK.get(id).orElseThrow().value(), BuiltInRegistries.BLOCK::getKey), ResearchState::getType,
-                ByteBufCodecs.BOOL, ResearchState::getWorking,
-                Identifier.STREAM_CODEC, ResearchState::getSelectedResearch,
-                ByteBufCodecs.INT, ResearchState::getWorkTime,
-                ByteBufCodecs.VAR_LONG, ResearchState::getResearchStartedAt,
-                ResearchState::new
-        );
-
-        public Block getType() {
-            return type;
-        }
-
-        public int getWorkTime() {
-            return workTime;
-        }
-
-        public Identifier getSelectedResearch() {
-            return selectedResearch;
-        }
-
-        public long getResearchStartedAt() {
-            return researchStartedAt;
-        }
-
-        public boolean getWorking() {
-            return working;
-        }
-
-        public ResearchState(Block type, boolean working, Identifier selectedResearch, int workTime, long researchStartedAt) {
-            this.type = type;
-            this.working = working;
-            this.selectedResearch = selectedResearch;
-            this.workTime = workTime;
-            this.researchStartedAt = researchStartedAt;
-        }
-
-        @Override
-        public String toString() {
-            return "ResearchState{" +
-                    "type=" + type +
-                    ", working=" + working +
-                    ", selectedResearch=" + selectedResearch +
-                    ", workTime=" + workTime +
-                    ", researchStartedAt=" + researchStartedAt +
-                    '}';
-        }
     }
 
 }

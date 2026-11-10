@@ -13,21 +13,20 @@
   },
   "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
-    "oritech:augment/superspeedboost"
+    "oritech:augment/speedboost"
   ],
   "researchCost": [
     {
-      "count": 32,
+      "count": 2,
       "ingredient": "oritech:motor"
     },
     {
-      "count": 64,
+      "count": 8,
       "ingredient": "#c:ingots/steel"
     }
   ],
-  "rfCost": 75000000,
-  "time": 800,
+  "rfCost": 10000000,
   "toggleable": true,
-  "uiX": 80,
-  "uiY": 50
+  "uiX": 30,
+  "uiY": 30
 }

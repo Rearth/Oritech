@@ -31,7 +31,6 @@ public class AugmentRecipeBuilder {
     private Identifier requiredStation;
     private int uiX;
     private int uiY;
-    private int time;
     private long rfCost;
     private final HolderLookup.Provider registryAccess;
 
@@ -152,11 +151,6 @@ public class AugmentRecipeBuilder {
         return this;
     }
 
-    public AugmentRecipeBuilder time(int time) {
-        this.time = time;
-        return this;
-    }
-
     public AugmentRecipeBuilder rfCost(long rfCost) {
         this.rfCost = rfCost;
         return this;
@@ -211,7 +205,6 @@ public class AugmentRecipeBuilder {
                 requiredStation,
                 uiX,
                 uiY,
-                time,
                 rfCost,
                 definition
         ));

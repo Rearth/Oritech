@@ -67,6 +67,8 @@ public class CyberneticAugmentationCenterScreenHandler extends AbstractContainer
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
+        // This menu has no inventory slots, so sync the player's inventory separately.
+        player.inventoryMenu.broadcastChanges();
         blockEntity.sendUpdate(SyncType.GUI_TICK);
     }
 }

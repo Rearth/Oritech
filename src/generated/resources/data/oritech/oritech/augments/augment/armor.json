@@ -2,7 +2,7 @@
   "applyCost": [
     {
       "count": 4,
-      "ingredient": "oritech:duratium_ingot"
+      "ingredient": "oritech:biosteel_ingot"
     },
     {
       "count": 32,
@@ -19,20 +19,15 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 64,
+      "count": 16,
       "ingredient": "#c:ingots/steel"
     },
     {
       "count": 8,
-      "ingredient": "oritech:duratium_ingot"
-    },
-    {
-      "count": 16,
-      "ingredient": "minecraft:diamond"
+      "ingredient": "oritech:biosteel_ingot"
     }
   ],
-  "rfCost": 80000000,
-  "time": 800,
+  "rfCost": 20000000,
   "toggleable": false,
   "uiX": 30,
   "uiY": 50

@@ -29,6 +29,10 @@ public class AugmentSelectionScreen extends Screen {
     private static final int EXIT_HOVER_COLOR = ColorHelper.argb(160 / 255f, 180 / 255f, 220 / 255f, 0.5f);
 
     private final List<SelectionEntry> augmentEntries = new ArrayList<>();
+    private final List<Identifier> passiveAugments = new ArrayList<>();
+    private ScreenRectangle installedBounds = ScreenRectangle.empty();
+    private int installedRows;
+    private int installedColumnWidth;
     private final Map<Identifier, Float> augmentSizes = new HashMap<>();
     private SelectionEntry centerEntry;
     private @Nullable SelectionEntry lastFocused;
@@ -45,6 +49,8 @@ public class AugmentSelectionScreen extends Screen {
 
     private void rebuildEntries() {
         augmentEntries.clear();
+        passiveAugments.clear();
+        installedBounds = ScreenRectangle.empty();
         augmentSizes.clear();
 
         var player = Objects.requireNonNull(this.minecraft).player;
@@ -52,9 +58,25 @@ public class AugmentSelectionScreen extends Screen {
 
         var available = new ArrayList<Augment>();
         for (var augment : PlayerAugments.getAllAugments(player.registryAccess()).values()) {
-            if (augment.isInstalled(player) && augment.toggleable) {
+            if (!augment.isInstalled(player)) continue;
+            if (augment.toggleable) {
                 available.add(augment);
+            } else {
+                passiveAugments.add(augment.id);
             }
+        }
+
+        passiveAugments.sort(Comparator.comparing(id ->
+                Component.translatable(CyberneticAugmentationCenterScreen.augmentKey(id)).getString()));
+        if (!passiveAugments.isEmpty()) {
+            installedRows = Math.min(passiveAugments.size(), Math.max(1, (height - 28) / 14));
+            installedColumnWidth = passiveAugments.stream().mapToInt(id ->
+                    font.width(Component.translatable(CyberneticAugmentationCenterScreen.augmentKey(id))) + 20)
+                    .max().orElse(0);
+            int columns = (passiveAugments.size() + installedRows - 1) / installedRows;
+            int listWidth = Math.max(installedColumnWidth * columns,
+                    font.width(Component.translatable("oritech.text.augment_installed")));
+            installedBounds = new ScreenRectangle(width - listWidth - 8, 5, listWidth, 17 + installedRows * 14);
         }
 
         float radius = Math.min(width, height) * 0.28f;
@@ -93,9 +115,14 @@ public class AugmentSelectionScreen extends Screen {
         submitGeometry(graphics, geometry);
         drawAugmentIcons(graphics, focused);
         drawLabels(graphics, focused);
+        drawInstalledAugments(graphics);
     }
 
     private SelectionEntry findFocused(int mouseX, int mouseY) {
+        if (mouseX >= installedBounds.left() && mouseX < installedBounds.right()
+                && mouseY >= installedBounds.top() && mouseY < installedBounds.bottom()) {
+            return centerEntry;
+        }
         SelectionEntry focused = centerEntry;
         int minDist = Integer.MAX_VALUE;
 
@@ -184,6 +211,22 @@ public class AugmentSelectionScreen extends Screen {
         graphics.text(minecraft.font, centerLabel, centerEntry.centerX() - labelWidth / 2, centerEntry.centerY() - 4, 0xFFE7EEF5, true);
         graphics.text(minecraft.font, Component.translatable("oritech.text.augment_toggle"), 12, height - 20, 0xFFE7EEF5, true);
         graphics.text(minecraft.font, Component.translatable("oritech.text.augment_toggle_title"), 5, 5, 0xFFE7EEF5, true);
+    }
+
+    private void drawInstalledAugments(GuiGraphicsExtractor graphics) {
+        if (passiveAugments.isEmpty()) return;
+
+        graphics.text(font, Component.translatable("oritech.text.augment_installed"),
+                installedBounds.left(), installedBounds.top(), 0xFFE7EEF5, true);
+        for (int i = 0; i < passiveAugments.size(); i++) {
+            var id = passiveAugments.get(i);
+            int x = installedBounds.left() + i / installedRows * installedColumnWidth;
+            int y = installedBounds.top() + 17 + i % installedRows * 14;
+            graphics.blit(RenderPipelines.GUI_TEXTURED, Oritech.id("textures/gui/" + id.getPath() + ".png"),
+                    x, y, 0f, 0f, 12, 12, 24, 24, 24, 24);
+            graphics.text(font, Component.translatable(CyberneticAugmentationCenterScreen.augmentKey(id)),
+                    x + 16, y + 2, 0xFFE7EEF5, true);
+        }
     }
 
     private static void drawPieSegmented(List<ColoredQuad> geometry, double centerAngle, double angleSize,

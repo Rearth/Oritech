@@ -11,25 +11,20 @@
   },
   "requiredStation": "oritech:cybernetic_research_station",
   "requirements": [
-    "oritech:augment/superminingspeed"
+    "oritech:augment/miningspeed"
   ],
   "researchCost": [
     {
-      "count": 32,
+      "count": 4,
       "ingredient": "oritech:magnetic_coil"
     },
     {
-      "count": 32,
-      "ingredient": "oritech:energite_ingot"
-    },
-    {
-      "count": 2,
-      "ingredient": "minecraft:lodestone"
+      "count": 8,
+      "ingredient": "#c:ingots/electrum"
     }
   ],
-  "rfCost": 300000000,
-  "time": 2400,
+  "rfCost": 15000000,
   "toggleable": true,
-  "uiX": 105,
+  "uiX": 55,
   "uiY": 10
 }

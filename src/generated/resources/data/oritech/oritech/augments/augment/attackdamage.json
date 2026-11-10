@@ -21,14 +21,9 @@
     {
       "count": 8,
       "ingredient": "minecraft:diamond"
-    },
-    {
-      "count": 64,
-      "ingredient": "oritech:fluxite"
     }
   ],
-  "rfCost": 150000000,
-  "time": 1600,
+  "rfCost": 50000000,
   "toggleable": false,
   "uiX": 5,
   "uiY": 10

@@ -15,7 +15,7 @@ import rearth.oritech.block.entity.augmenter.api.ModifierAugment;
 import java.util.List;
 
 public record AugmentData(boolean toggleable, List<SizedIngredient> researchCost, List<SizedIngredient> applyCost,
-                          List<Identifier> requirements, Identifier requiredStation, int uiX, int uiY, int time,
+                          List<Identifier> requirements, Identifier requiredStation, int uiX, int uiY,
                           long rfCost, AugmentDefinition definition) {
 
     public static final Codec<AugmentData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -26,7 +26,6 @@ public record AugmentData(boolean toggleable, List<SizedIngredient> researchCost
             Identifier.CODEC.fieldOf("requiredStation").forGetter(AugmentData::requiredStation),
             Codec.INT.fieldOf("uiX").forGetter(AugmentData::uiX),
             Codec.INT.fieldOf("uiY").forGetter(AugmentData::uiY),
-            Codec.INT.fieldOf("time").forGetter(AugmentData::time),
             Codec.LONG.fieldOf("rfCost").forGetter(AugmentData::rfCost),
             AugmentDefinition.CODEC.fieldOf("effect").forGetter(AugmentData::definition)
     ).apply(instance, AugmentData::new));

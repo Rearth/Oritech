@@ -15,20 +15,15 @@
   "requirements": [],
   "researchCost": [
     {
-      "count": 8,
+      "count": 2,
       "ingredient": "oritech:motor"
     },
     {
-      "count": 24,
+      "count": 8,
       "ingredient": "#c:ingots/steel"
-    },
-    {
-      "count": 4,
-      "ingredient": "minecraft:ender_pearl"
     }
   ],
-  "rfCost": 50000000,
-  "time": 900,
+  "rfCost": 15000000,
   "toggleable": false,
   "uiX": 115,
   "uiY": 90

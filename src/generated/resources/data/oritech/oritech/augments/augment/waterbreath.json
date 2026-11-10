@@ -18,16 +18,11 @@
       "ingredient": "minecraft:prismarine_crystals"
     },
     {
-      "count": 32,
+      "count": 8,
       "ingredient": "oritech:biosteel_ingot"
-    },
-    {
-      "count": 1,
-      "ingredient": "minecraft:heart_of_the_sea"
     }
   ],
-  "rfCost": 50000000,
-  "time": 800,
+  "rfCost": 15000000,
   "toggleable": false,
   "uiX": 5,
   "uiY": 90

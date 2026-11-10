@@ -30,16 +30,19 @@ stat boosts to entirely new abilities.
 # Research and Development
 
 To begin, walk into the assembled **Cybernetic Augmentation Center**. 
-This opens the research interface, where you can browse and start projects. 
-Each augmentation requires specific energy and resources, drawn from either your personal inventory or 
-the machine's internal storage (accessible via the interface).
+This opens the research interface, where you can browse and unlock augmentations.
+Research completes instantly when you confirm it, consuming the listed energy and research resources.
+Items are drawn from your personal inventory or the machine's internal storage (accessible via the interface).
+The research screen lists **Research Cost** and **Installation Cost** separately, so you can prepare both.
+Installation resources are only consumed when you install the augmentation.
 
 Many high-tier upgrades require earlier research, as shown in the tech tree.
 
 The center acts as a hub for **Research Stations**, constructed as multiblock add-ons. The main unit supports 
-up to **three stations**, allowing for parallel processing.
+up to **three stations**, so you can connect the basic, quantum, and arcane station types.
 *   Each station requires **3 Machine Cores**.
-*   A station handles one active research task at a time.
+*   Each augment requires its specified station type to be connected and assembled.
+*   There are no research timers or busy stations; duplicate stations do not speed up research.
 
 <center>
 <ModAsset location="oritech:area/cyborg_research_ui" width={700} />
@@ -47,14 +50,14 @@ up to **three stations**, allowing for parallel processing.
 
 <Callout variant="info">
     Researched Augments are stored locally within the machine's memory. If the center is
-    destroyed, all unapplied research progress and blueprints will be lost.
+    destroyed, all uninstalled research blueprints will be lost.
 </Callout>
 
 ---
 
 # Application and Control
 
-Once a research is complete, the augmentation becomes available for installation. The procedure requires a one-time resource cost
+Once an augment is researched, the augmentation becomes available for installation. The procedure requires a one-time resource cost
 to permanently fuse the technology with your player.
 
 If you have augmentations installed, you can load them into the machine using the **Import** 
@@ -85,6 +88,8 @@ Oritech augmentations are fully data-driven and configurable, allowing extensive
 mod for the underlying logic.
 
 Existing augments can be modified or disabled, and completely new ones can be defined via JSON.
+Augment definitions use `researchCost` for research items, `rfCost` for research energy, and `applyCost` for installation items.
+There is no research `time` field.
 *   **Example Definition**: [Attack Damage Augment (GitHub)](https://github.com/Rearth/Oritech/blob/1.21/fabric/src/main/generated/data/oritech/recipe/augment/attackdamage.json)
 *   **Texture Location**: `oritech/textures/gui/augment`
 

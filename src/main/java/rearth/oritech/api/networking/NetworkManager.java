@@ -35,7 +35,6 @@ import rearth.oritech.block.entity.addons.RedstoneAddonBlockEntity;
 import rearth.oritech.block.entity.arcane.StabilizedEnchanterBlockEntity;
 import rearth.oritech.block.entity.arcane.ArcaneCatalystBlockEntity;
 import rearth.oritech.block.entity.arcane.SpawnerControllerBlockEntity;
-import rearth.oritech.block.entity.augmenter.CyberneticAugmentationCenterEntity;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
 import rearth.oritech.block.entity.interaction.EndericLaserBlockEntity;
 import rearth.oritech.block.entity.interaction.DestroyerBlockEntity;
@@ -87,7 +86,6 @@ public class NetworkManager {
         registerCodec(ItemFilterBlockEntity.FilterData.PACKET_CODEC, ItemFilterBlockEntity.FilterData.class);
         registerCodec(Recipe.STREAM_CODEC.map(recipe -> (OritechRecipe) recipe, recipe -> recipe), OritechRecipe.class);
         registerCodec(EndericLaserBlockEntity.LASER_TARGET_PACKET_CODEC, LivingEntity.class);
-        registerCodec(CyberneticAugmentationCenterEntity.ResearchState.PACKET_CODEC, CyberneticAugmentationCenterEntity.ResearchState.class);
         registerCodec(SplicerPreview.STREAM_CODEC, SplicerPreview.class);
 
     }

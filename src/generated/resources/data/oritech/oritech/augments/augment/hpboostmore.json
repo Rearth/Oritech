@@ -17,20 +17,15 @@
   ],
   "researchCost": [
     {
-      "count": 32,
+      "count": 16,
       "ingredient": "#c:carbon_fibre"
     },
     {
-      "count": 16,
+      "count": 8,
       "ingredient": "oritech:biosteel_ingot"
-    },
-    {
-      "count": 4,
-      "ingredient": "minecraft:diamond"
     }
   ],
-  "rfCost": 50000000,
-  "time": 800,
+  "rfCost": 30000000,
   "toggleable": false,
   "uiX": 80,
   "uiY": 70
