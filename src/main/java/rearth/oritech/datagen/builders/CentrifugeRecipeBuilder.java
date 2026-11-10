@@ -8,7 +8,7 @@ public class CentrifugeRecipeBuilder extends OritechRecipeBuilder {
 
     public CentrifugeRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.CENTRIFUGE, "centrifuge", registryAccess);
-        this.time = 100;
+        this.time = 50;
     }
 
     @Override

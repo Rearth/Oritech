@@ -8,7 +8,7 @@ public class CentrifugeFluidRecipeBuilder extends OritechRecipeBuilder {
 
     public CentrifugeFluidRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.CENTRIFUGE_FLUID, "centrifuge/fluid", registryAccess);
-        this.time = 100;
+        this.time = 50;
     }
 
     @Override

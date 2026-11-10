@@ -10,7 +10,7 @@ public class PulverizerRecipeBuilder extends OritechRecipeBuilder {
 
     public PulverizerRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.PULVERIZER, "pulverizer", registryAccess);
-        this.time = 100;
+        this.time = 50;
     }
 
     @Override

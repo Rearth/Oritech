@@ -8,7 +8,7 @@ public class FragmentForgeRecipeBuilder extends OritechRecipeBuilder {
 
     public FragmentForgeRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.FRAGMENT_FORGE, "fragment_forge", registryAccess);
-        this.time = 40;
+        this.time = 30;
     }
 
     @Override

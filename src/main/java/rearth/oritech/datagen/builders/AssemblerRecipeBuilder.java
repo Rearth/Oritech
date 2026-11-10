@@ -8,7 +8,7 @@ public class AssemblerRecipeBuilder extends OritechRecipeBuilder {
 
     public AssemblerRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.ASSEMBLER, "assembler", registryAccess);
-        this.time = 120;
+        this.time = 60;
     }
 
     @Override

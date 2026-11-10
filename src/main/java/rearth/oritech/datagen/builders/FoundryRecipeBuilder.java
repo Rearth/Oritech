@@ -8,7 +8,7 @@ public class FoundryRecipeBuilder extends OritechRecipeBuilder {
 
     public FoundryRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.FOUNDRY, "foundry/alloy", registryAccess);
-        this.time = 80;
+        this.time = 50;
     }
 
     @Override

@@ -8,7 +8,7 @@ public class RefineryRecipeBuilder extends OritechRecipeBuilder {
 
     public RefineryRecipeBuilder(HolderLookup.Provider registryAccess) {
         super(RecipeContent.REFINERY, "refinery", registryAccess);
-        this.time = 80;
+        this.time = 50;
     }
 
     @Override
