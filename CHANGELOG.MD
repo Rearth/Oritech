@@ -1,0 +1,19 @@
+- Add colored variants for almost all oritech blocks (except pipes)
+- Connected addons and machine frames will now be auto-painted when painting the host.
+- Add energy graph to larger energy storages
+- Make most machines relevantly faster
+- Enable other mods to register operations for the addon splicer (without needing mixins)
+- Enable other mods to register behaviour for particle accelerator interactions
+- Remove research time from augment center
+- Make early augments slightly cheaper to research
+- Add list of installed, non-toggleable augments to augment toggle UI
+- Make enderic laser respect block break protections (@GnumoMuitoLoco)
+- Improve scrolling behaviour in UIs
+- Fix railgun not being enchantable in vanilla enchanting table
+- Fix hangar doors and industrial doors not being paintable
+- Fix equipment charger recipe path
+- Fix assembler bookshelf recipe duping
+- Fix material compat with JAOPCA
+- Fix potential pipe network hash collision issues
+- Fix exo armor charging entire stacks at once
+- Fix prom pickaxe not working properly as shovel
