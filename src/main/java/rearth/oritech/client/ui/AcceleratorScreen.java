@@ -40,16 +40,17 @@ public class AcceleratorScreen extends OritechMachineScreen<AcceleratorScreenHan
         addComponent(activeParticleRenderer);
         addComponent(new TextureWidget(3, 27, 24, 30, PARTICLE_OVERLAY, 24, 30));
 
-        titleLabel = new LabelWidget(34, 15, 126, 10, Component.literal("Waiting...").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
+        titleLabel = new LabelWidget(34, 8, 126, 10, Component.literal("Waiting...").withStyle(ChatFormatting.BLACK, ChatFormatting.BOLD));
         titleLabel.withAlignment(LabelWidget.Alignment.CENTER);
         titleLabel.withDarkColor();
 
-        speedValueLabel = new LabelWidget(37, 40, 133, 10, Component.literal(" "));
+        speedValueLabel = new LabelWidget(37, 22, 133, 10, Component.literal(" "));
         speedValueLabel.withDarkColor();
-        speedValueLabel.withAlignment(LabelWidget.Alignment.RIGHT);
+        speedValueLabel.withAlignment(LabelWidget.Alignment.LEFT);
 
-        statusLabel = new LabelWidget(37, 52, 133, 30, Component.literal(" "));
-        statusLabel.withAlignment(LabelWidget.Alignment.RIGHT);
+        // Leave five lines for wrapped coordinates and statistics above the inventory at y=84.
+        statusLabel = new LabelWidget(37, 35, 133, 45, Component.literal(" "));
+        statusLabel.withAlignment(LabelWidget.Alignment.LEFT);
         statusLabel.withWrap(true);
         statusLabel.withDarkColor();
 
