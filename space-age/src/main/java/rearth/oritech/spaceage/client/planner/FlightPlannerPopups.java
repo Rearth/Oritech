@@ -20,6 +20,7 @@ import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.flight.NavigationComputerRules;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
@@ -143,7 +144,7 @@ final class FlightPlannerPopups {
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
             case MAINTAIN_POSITION -> action.addons().isEmpty() ? 2 : 3;
-            case DISCARD_CRAFT -> 1;
+            case EXPLODE -> 1;
             case BEAM_POWER -> action.targetId().equals(SpaceObjects.EARTH_ID) ? 4 : 3;
             case PROCESS -> 7;
             case DOCK -> 9;
@@ -751,12 +752,14 @@ final class FlightPlannerPopups {
         var addon = action.addons().getFirst();
         var stationKeeping = action.type().stationKeeping();
         var types = Arrays.stream(SpaceSimulation.ActionAddonType.values())
-                .filter(type -> stationKeeping ? type.isStationaryCondition() : type.isNavigationCondition()).toList();
-        var columns = Math.min(3, types.size());
+                .filter(type -> stationKeeping ? type.isStationaryCondition() : type.isNavigationCondition())
+                .filter(type -> type != ActionAddonType.ALTITUDE_ABOVE).toList();
+        var columns = types.size() == 4 ? 2 : Math.min(3, types.size());
         var typeRows = (types.size() + columns - 1) / columns;
         var stationKeepingDetailsHeight = stationKeeping ? 40 : 0;
+        var altitudeDetailsHeight = addon.type().isAltitude() ? 26 : 0;
         var popupWidth = Math.min(350, editors.panelWidth() - 12);
-        var popupHeight = 123 + typeRows * 32 + stationKeepingDetailsHeight;
+        var popupHeight = 123 + typeRows * 32 + stationKeepingDetailsHeight + altitudeDetailsHeight;
         var px = (editors.panelWidth() - popupWidth) / 2;
         var py = Math.max(4, (editors.panelHeight() - popupHeight) / 2);
         addEditorBackdrop(px, py, popupWidth, popupHeight);
@@ -784,12 +787,28 @@ final class FlightPlannerPopups {
             var button = SpaceAgeButtons.panel(px + 10 + column * (typeWidth + 4),
                     py + 38 + stationKeepingDetailsHeight + row * 32, typeWidth, 28,
                     FlightPlannerLabels.addonTypeName(type), ignored -> editors.selectAddonType(type));
-            button.setActive(type != addon.type());
-            editors.addPopupComponent(button.withTooltip(FlightPlannerLabels.addonTooltip(type)).withZIndex(CONTROL_Z));
+            button.setActive(type != addon.type() && !(type.isAltitude() && addon.type().isAltitude()));
+            editors.addPopupComponent(button.withTooltip(FlightPlannerLabels.addonTooltip(type.isAltitude() && addon.type().isAltitude()
+                    ? addon.type() : type)).withZIndex(CONTROL_Z));
         }
-        var valueY = py + 44 + stationKeepingDetailsHeight + typeRows * 32;
+        if (addon.type().isAltitude()) {
+            var comparisonY = py + 38 + stationKeepingDetailsHeight + typeRows * 32;
+            var comparisonWidth = (popupWidth - 24) / 2;
+            var below = SpaceAgeButtons.panel(px + 10, comparisonY, comparisonWidth, 20,
+                    Component.translatable("screen.oritech_space_age.action.altitude_below"),
+                    ignored -> editors.selectAddonType(ActionAddonType.ALTITUDE_BELOW));
+            below.setActive(addon.type() != ActionAddonType.ALTITUDE_BELOW);
+            editors.addPopupComponent(below.withZIndex(CONTROL_Z));
+            var above = SpaceAgeButtons.panel(px + 14 + comparisonWidth, comparisonY, comparisonWidth, 20,
+                    Component.translatable("screen.oritech_space_age.action.altitude_above"),
+                    ignored -> editors.selectAddonType(ActionAddonType.ALTITUDE_ABOVE));
+            above.setActive(addon.type() != ActionAddonType.ALTITUDE_ABOVE);
+            editors.addPopupComponent(above.withZIndex(CONTROL_Z));
+        }
+        var valueY = py + 44 + stationKeepingDetailsHeight + typeRows * 32 + altitudeDetailsHeight;
         editors.addPopupComponent(new LabelWidget(px + 10, valueY + 5, 72,
-                Component.translatable("screen.oritech_space_age.action.condition_value"))
+                Component.translatable(addon.type().isAltitude() ? "screen.oritech_space_age.action.condition.altitude"
+                        : "screen.oritech_space_age.action.condition_value"))
                 .withBrightColor().withZIndex(CONTROL_Z));
         editors.addonValueField = editors.addPopupField(new EditBox(font, leftPos + px + 82, topPos + valueY,
                 popupWidth - 172, 18, Component.translatable("screen.oritech_space_age.action.condition_value")));

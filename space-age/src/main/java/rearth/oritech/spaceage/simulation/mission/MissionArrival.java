@@ -13,6 +13,7 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.CraftPath;
 import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.rocket.RocketExplosives;
+import rearth.oritech.spaceage.simulation.rocket.RocketDetonation;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
@@ -105,6 +106,7 @@ final class MissionArrival {
                         .mapToDouble(a -> a.impact().totalEnergyJoules()).findFirst().orElse(
                                 .5 * RocketPerformanceCalculator.calculate(state.rocket).wetMassKilograms() * (p.vx() * p.vx() + p.vy() * p.vy())
                                         + RocketExplosives.remaining(state.rocket));
+                RocketDetonation.applyPayload(server, state.rocket, 0);
                 level.explode(null, pos.getX(), pos.getY(), pos.getZ(), RocketExplosives.worldStrength(energy), Level.ExplosionInteraction.BLOCK);
                 state.ended = true;
                 state.status = MissionState.STATUS_DESTROYED;

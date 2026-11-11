@@ -9,6 +9,7 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.Arri
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.AsteroidPath;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.BoosterEvent;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.CraftPath;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ExplosionPrediction;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.NavigationAbortMoment;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.NavigationFailure;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathPhase;
@@ -70,6 +71,7 @@ public final class RocketFlightPathState {
         final List<ArrivalPrediction> arrivalPredictions = new ArrayList<>();
         final List<AsteroidPath> asteroidPaths = new ArrayList<>();
         final List<NavigationAbortMoment> navigationAborts = new ArrayList<>();
+        final List<ExplosionPrediction> explosions = new ArrayList<>();
         final List<RocketFlightPathCalculator.ScanEstimate> scanEstimates = new ArrayList<>();
         final List<RocketFlightPathCalculator.StationKeepingEstimate> stationKeepingEstimates = new ArrayList<>();
         public Collection<RecipeHolder<VacuumRecipe>> recipes = List.of();
@@ -265,7 +267,7 @@ public final class RocketFlightPathState {
         // Terminal cards and unsafe arrivals stop this branch.
         boolean atmosphere;
         boolean maintainingPosition;
-        boolean discarded;
+        boolean exploded;
         boolean destroyed;
         // Attached asteroid and its anchor segment, if this craft carries one.
         SpaceSimulation.SpaceObjectData attachedAsteroid;

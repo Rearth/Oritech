@@ -1,4 +1,4 @@
-// 26.1.2	2026-11-05T18:04:01.4735336	Oritech: Space Age Recipes
+// 26.1.2	2026-11-11T21:38:15.488259	Oritech: Space Age Recipes
 5aa5a78e921f291d9061e4e3a4a5fdfbedd91f3c data/oritech_space_age/advancement/recipes/building_blocks/crystal_glass.json
 6e8d1b72fab312700d6b829738471d7b8791456e data/oritech_space_age/advancement/recipes/building_blocks/holo_screen.json
 5052b08574e211de45638d49068d4a12293d29b6 data/oritech_space_age/advancement/recipes/misc/action_card.json
@@ -39,6 +39,9 @@ dfbea3317839738bf55fc738f5f89b890e9c13fc data/oritech_space_age/recipe/mission_c
 a9005ea91a3da834ec1761cd8ebda0e73fcd0a81 data/oritech_space_age/recipe/rocket_assembler.json
 2bdc256ace832c8c85ef09de015ec28e1b619019 data/oritech_space_age/recipe/rocket_coupling.json
 8f978e46feae96382fd71d3609bcc6d1e59d46af data/oritech_space_age/recipe/rocket_pad.json
+96af3ffbb7b9fc7873913a583d1b962a4d07ac31 data/oritech_space_age/recipe/rocket_payload/clear.json
+57df543a58c96ba8d2711d5764a0d4736b033da9 data/oritech_space_age/recipe/rocket_payload/rain.json
+1cce4d6489b0a373215d0784f7407a8b3c72f41b data/oritech_space_age/recipe/rocket_payload/thunder.json
 7d825b5d956d8bf2f40cb465bd99979ab2627aac data/oritech_space_age/recipe/space_scanner.json
 b053cc6a47829067f13de7051047f8e27563513d data/oritech_space_age/recipe/vacuum/duratium.json
 94ed4cb7893c4ec42ec82fa0249100a18200012e data/oritech_space_age/recipe/vacuum/energite.json

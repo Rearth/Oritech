@@ -411,6 +411,7 @@ public final class RocketFlightPlanRules {
 
         return switch (type) {
             case DISTANCE_FROM_TARGET -> Math.clamp(value, 1, 10_000_000);
+            case ALTITUDE_BELOW, ALTITUDE_ABOVE -> Math.clamp(value, 0, 10_000_000);
             case TIME_BEFORE_ARRIVAL, DURATION -> Math.clamp(value, 1, 1_000_000);
             case DESIRED_UNCERTAINTY -> Math.clamp(value, 1, 100_000);
             case LOW_RF, LOW_FUEL -> Math.clamp(value, 1, 100);

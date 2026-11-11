@@ -45,7 +45,7 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
             SpaceSimulation.ActionType.NAVIGATE_TO, SpaceSimulation.ActionType.CONNECT_ASTEROID,
             SpaceSimulation.ActionType.DECOUPLE, SpaceSimulation.ActionType.DEPLOY_CUBESAT, SpaceSimulation.ActionType.MAINTAIN_POSITION,
             SpaceSimulation.ActionType.BEAM_POWER,
-            SpaceSimulation.ActionType.DISCARD_CRAFT, SpaceSimulation.ActionType.SCAN,
+            SpaceSimulation.ActionType.EXPLODE, SpaceSimulation.ActionType.SCAN,
             SpaceSimulation.ActionType.PROCESS, SpaceSimulation.ActionType.DOCK,
             SpaceSimulation.ActionType.UNDOCK, SpaceSimulation.ActionType.TRANSMIT_INFORMATION
     };
@@ -612,6 +612,8 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         var action = findAction(addonAction);
         if (action == null || action.addons().isEmpty()) return;
         var changed = action.addons().getFirst().withType(type);
+        if (type.isAltitude() && action.addons().getFirst().type().isAltitude())
+            changed = changed.withValue(action.addons().getFirst().value());
         var branch = findBranchContaining(action);
         if (branch == null) return;
         addonValueText = Integer.toString(changed.value());

@@ -221,7 +221,7 @@ public final class RocketStarMapWidget extends UIComponent {
         rocketMarkers.clear();
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()
-                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED
+                    || path.terminalState() == RocketFlightPathCalculator.TerminalState.EXPLODED
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED) continue;
             var last = path.samples().getLast();

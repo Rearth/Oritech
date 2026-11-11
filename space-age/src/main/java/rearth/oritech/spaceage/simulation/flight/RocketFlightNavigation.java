@@ -4,6 +4,7 @@ import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ArrivalPrediction;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.NavigationAbortMoment;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.NavigationFailure;
@@ -115,6 +116,15 @@ final class RocketFlightNavigation {
             targetVelocityY = target.velocityYAt(craft.time) - Math.sin(destinationAngle) * targetSpeed;
         }
         var samples = new ArrayList<PathSample>();
+        var altitude = altitude(target, craft.x, craft.y, craft.time);
+        var immediate = action.addons().stream().filter(addon -> addon.type().isAltitude()
+                && addon.type().altitudeReached(altitude, addon.value())).findFirst().orElse(null);
+        if (immediate != null) {
+            samples.add(craft.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
+            appendSamples(craft, samples);
+            abort(action, craft, context, new Abort(immediate, altitude), destination);
+            return true;
+        }
         if (completeArrival(action, craft, target, destination, targetVelocityX, targetVelocityY, samples, context, null))
             return true;
         var route = RocketTransferRoute.solve(craft, context, action, target, destination.x, destination.y);
@@ -130,10 +140,7 @@ final class RocketFlightNavigation {
             var abort = navigationAbort(action, craft, destination, transferPlan, context);
             if (abort != null) {
                 appendSamples(craft, samples);
-                if (action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
-                    craft.lastEarthSurfaceAction = action;
-                context.navigationAborts.add(new NavigationAbortMoment(action.id(), craft.branchId,
-                        abort.addon.id(), abort.actualValue, craft.time, craft.x, craft.y, destination.x, destination.y));
+                abort(action, craft, context, abort, destination);
                 return true;
             }
             var seconds = eventDuration(action, craft, target, destination, transferPlan, event);
@@ -155,16 +162,11 @@ final class RocketFlightNavigation {
             var phase = event.direction() > 0 ? PathPhase.ACCELERATE : event.direction() < 0 ? PathPhase.BRAKE : PathPhase.COAST;
             samples.add(craft.createSample(phase, action.targetId(), action.id(), event.firing()).withResourceRates(event.rates()));
             destination = targetPoint(target.xAt(craft.time), target.yAt(craft.time), SurveyRules.orbitRadius(target, action.orbit()), destinationAngle);
-            if (seconds < event.seconds()) {
+            var stopped = navigationAbort(action, craft, destination, transferPlan, context);
+            if (stopped != null) {
                 appendSamples(craft, samples);
-                var stopped = navigationAbort(action, craft, destination, transferPlan, context);
-                if (stopped != null) {
-                    if (action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
-                        craft.lastEarthSurfaceAction = action;
-                    context.navigationAborts.add(new NavigationAbortMoment(action.id(), craft.branchId,
-                            stopped.addon.id(), stopped.actualValue, craft.time, craft.x, craft.y, destination.x, destination.y));
-                    return true;
-                }
+                abort(action, craft, context, stopped, destination);
+                return true;
             }
             while (RocketFlightPathCalculator.finishStage(action, craft, context)) {
                 samples.add(craft.createSample(PathPhase.COAST, action.targetId(), action.id(), Set.of()));
@@ -184,8 +186,10 @@ final class RocketFlightNavigation {
         if (action.addons().isEmpty() || !action.addons().getFirst().type().isNavigationCondition())
             return event.seconds();
         var addon = action.addons().getFirst();
-        if (addon.type() == SpaceSimulation.ActionAddonType.TIME_BEFORE_ARRIVAL)
+        if (addon.type() == ActionAddonType.TIME_BEFORE_ARRIVAL)
             return Math.min(event.seconds(), Math.max(0, plan.transfer.duration() - (craft.time - plan.startTime) - addon.value()));
+        if (addon.type().isAltitude())
+            return altitudeDuration(craft, target, plan, event, addon);
         var low = 0d;
         var high = event.seconds();
         var acceleration = (event.endSpeed() - event.initialSpeed()) / event.seconds();
@@ -198,7 +202,7 @@ final class RocketFlightNavigation {
             var y = position.y() + target.yAt(craft.time + seconds) - target.yAt(plan.startTime);
             var distance = Math.hypot(destination.x + target.xAt(craft.time + seconds) - target.xAt(craft.time) - x,
                     destination.y + target.yAt(craft.time + seconds) - target.yAt(craft.time) - y);
-            var value = addon.type() == SpaceSimulation.ActionAddonType.DESIRED_UNCERTAINTY
+            var value = addon.type() == ActionAddonType.DESIRED_UNCERTAINTY
                     ? AsteroidImpactRules.landingUncertaintyBlocks(distance) : distance;
             if (value <= addon.value()) {
                 found = true;
@@ -209,6 +213,47 @@ final class RocketFlightNavigation {
             }
         }
         return high;
+    }
+
+    private static double altitudeDuration(Craft craft, SpaceSimulation.SpaceObjectData target,
+                                           TransferPlan plan, EventTransfer.Event event, SpaceSimulation.ActionAddon addon) {
+
+        var acceleration = (event.endSpeed() - event.initialSpeed()) / event.seconds();
+        // A curved leg can cross the threshold twice within one event. Find the first crossing.
+        for (int part = 1; part <= 32; part++) {
+            var low = event.seconds() * (part - 1) / 32;
+            var high = event.seconds() * part / 32;
+            if (!addon.type().altitudeReached(altitudeAt(craft, target, plan, event, acceleration, high), addon.value())) continue;
+            for (int iteration = 0; iteration < 40; iteration++) {
+                var seconds = (low + high) / 2;
+                if (addon.type().altitudeReached(altitudeAt(craft, target, plan, event, acceleration, seconds), addon.value())) high = seconds;
+                else low = seconds;
+            }
+            return high;
+        }
+        return event.seconds();
+    }
+
+    private static double altitudeAt(Craft craft, SpaceSimulation.SpaceObjectData target, TransferPlan plan,
+                                     EventTransfer.Event event, double acceleration, double seconds) {
+
+        var travelled = event.start() + event.initialSpeed() * seconds + .5 * acceleration * seconds * seconds;
+        var position = plan.transfer.curve().atDistance(travelled, 0);
+        return altitude(target, position.x() + target.xAt(craft.time + seconds) - target.xAt(plan.startTime),
+                position.y() + target.yAt(craft.time + seconds) - target.yAt(plan.startTime), craft.time + seconds);
+    }
+
+    private static double altitude(SpaceSimulation.SpaceObjectData target, double x, double y, double time) {
+
+        return Math.max(0, Math.hypot(x - target.xAt(time), y - target.yAt(time)) - target.radius());
+    }
+
+    private static void abort(SpaceSimulation.FlightPlanAction action, Craft craft, Context context, Abort abort, Point destination) {
+
+        if (action.targetId().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
+            craft.lastEarthSurfaceAction = action;
+        context.navigationAborts.add(new NavigationAbortMoment(action.id(), craft.branchId,
+                abort.addon.id(), abort.actualValue, craft.time, craft.x, craft.y, destination.x, destination.y));
     }
 
     private static Abort navigationAbort(SpaceSimulation.FlightPlanAction action, Craft craft,
@@ -223,9 +268,11 @@ final class RocketFlightNavigation {
             case TIME_BEFORE_ARRIVAL ->
                     Math.max(0, transferPlan.transfer.duration() - (craft.time - transferPlan.startTime));
             case DESIRED_UNCERTAINTY -> AsteroidImpactRules.landingUncertaintyBlocks(distance);
+            case ALTITUDE_BELOW, ALTITUDE_ABOVE -> altitude(context.objects.get(action.targetId()), craft.x, craft.y, craft.time);
             case LOW_RF, LOW_FUEL, DURATION -> Double.POSITIVE_INFINITY;
         };
-        return actual <= addon.value() + 1e-7 ? new Abort(addon, actual) : null;
+        var reached = addon.type().isAltitude() ? addon.type().altitudeReached(actual, addon.value()) : actual <= addon.value() + 1e-7;
+        return reached ? new Abort(addon, actual) : null;
     }
 
     private static boolean completeArrival(SpaceSimulation.FlightPlanAction action, Craft craft,

@@ -374,6 +374,8 @@ public class SpaceSimulation {
         DISTANCE_FROM_TARGET(50_000),
         TIME_BEFORE_ARRIVAL(120),
         DESIRED_UNCERTAINTY(256),
+        ALTITUDE_BELOW(5_000),
+        ALTITUDE_ABOVE(5_000),
         DURATION(1200),
         LOW_RF(10),
         LOW_FUEL(10);
@@ -393,7 +395,17 @@ public class SpaceSimulation {
 
         public boolean isNavigationCondition() {
 
-            return this == DISTANCE_FROM_TARGET || this == TIME_BEFORE_ARRIVAL || this == DESIRED_UNCERTAINTY;
+            return this == DISTANCE_FROM_TARGET || this == TIME_BEFORE_ARRIVAL || this == DESIRED_UNCERTAINTY || isAltitude();
+        }
+
+        public boolean isAltitude() {
+
+            return this == ALTITUDE_BELOW || this == ALTITUDE_ABOVE;
+        }
+
+        public boolean altitudeReached(double altitude, double threshold) {
+
+            return this == ALTITUDE_ABOVE ? altitude >= threshold - 1e-7 : altitude <= threshold + 1e-7;
         }
 
         public boolean isMaintainPositionCondition() {
@@ -423,7 +435,7 @@ public class SpaceSimulation {
         DISCONNECT_BOOSTER,
         MAINTAIN_POSITION,
         BEAM_POWER,
-        DISCARD_CRAFT,
+        EXPLODE,
         PROCESS,
         DOCK,
         UNDOCK,

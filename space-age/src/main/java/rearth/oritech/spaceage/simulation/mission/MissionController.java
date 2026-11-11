@@ -32,6 +32,7 @@ import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
+import rearth.oritech.spaceage.simulation.rocket.RocketDetonation;
 import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
@@ -194,7 +195,8 @@ public final class MissionController {
             action = resolved;
         }
         var linked = RocketDocking.linked(data, state.rocket.getRocketId());
-        if (!linked && (action == null || action.type() != ActionType.NAVIGATE_TO && action.type() != ActionType.MAINTAIN_POSITION)) {
+        if (!linked && (action == null || action.type() != ActionType.NAVIGATE_TO && action.type() != ActionType.MAINTAIN_POSITION
+                && action.type() != ActionType.EXPLODE)) {
             // Craft without active guidance drift with their current velocity.
             var p = state.position;
             if (Math.hypot(p.vx(), p.vy()) > .001) state.positionRevision++;
@@ -209,7 +211,7 @@ public final class MissionController {
         }
         if (linked && (action.type() == ActionType.NAVIGATE_TO || action.type() == ActionType.DOCK
                 || action.type() == ActionType.DECOUPLE && !RocketDocking.preservesPorts(data, state,
-                action) || action.type() == ActionType.DISCARD_CRAFT)) {
+                action) || action.type() == ActionType.EXPLODE)) {
             state.status = "status.oritech_space_age.undock_required";
             return;
         }
@@ -235,10 +237,7 @@ public final class MissionController {
             case DEPLOY_CUBESAT -> deploy(data, state, action);
             case BEAM_POWER -> SpacePowerService.step(data, state);
             case MAINTAIN_POSITION -> maintainPosition(data, state, system, action);
-            case DISCARD_CRAFT -> {
-                state.ended = true;
-                state.status = MissionState.STATUS_DISCARDED;
-            }
+            case EXPLODE -> RocketDetonation.explode(server, data, state, system);
             case DISCONNECT_BOOSTER -> state.complete();
         }
     }

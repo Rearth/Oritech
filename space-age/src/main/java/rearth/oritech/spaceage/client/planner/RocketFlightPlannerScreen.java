@@ -329,9 +329,11 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         capacityLabel.setTooltip(tooltip);
     }
 
-    boolean canAddStep() {
+    boolean canAddStep(UUID branchId) {
 
-        return flightPlanRocket != null && editableActionCount() < NavigationComputerRules.capacity(flightPlanRocket);
+        var branch = findBranch(branchId);
+        return branch != null && !FlightPlannerLabels.endsCraft(branch, calculatedFlight)
+                && flightPlanRocket != null && editableActionCount() < NavigationComputerRules.capacity(flightPlanRocket);
     }
 
     private boolean hasMissionChanges() {
@@ -666,7 +668,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     protected void addAction(UUID branchId, ActiveRocketData rocket, SpaceSimulation.ActionType type) {
 
         var branch = findBranch(branchId);
-        if (branch == null || !canAddStep()) return;
+        if (branch == null || !canAddStep(branchId)) return;
         var action = SpaceSimulation.FlightPlanAction.create(type);
         action = configureAction(action, type, branch, action.id());
         if (action == null) return;
@@ -824,6 +826,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     @Override
     protected Component actionParameter(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket) {
 
+        if (action.type() == SpaceSimulation.ActionType.EXPLODE)
+            return Component.translatable("screen.oritech_space_age.action.explode_summary");
         if (action.type() == SpaceSimulation.ActionType.PROCESS)
             return Component.translatable("screen.oritech_space_age.service.processing_summary", action.settings().processing().modules().size());
         if (action.type() == SpaceSimulation.ActionType.DOCK)

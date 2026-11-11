@@ -25,7 +25,7 @@ class MissionControlMenuTest {
     private final ActiveRocketData rocket = new ActiveRocketData(Map.of(), Map.of());
     private final MissionControlMenu menu = new MissionControlMenu(1, null, BlockPos.ZERO);
     private final FlightPlanAction first = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
-    private final FlightPlanAction second = FlightPlanAction.create(ActionType.DISCARD_CRAFT);
+    private final FlightPlanAction second = FlightPlanAction.create(ActionType.EXPLODE);
     private final FlightPlan plan = FlightPlan.empty();
 
     private FlightPlan program(FlightPlanAction... actions) {

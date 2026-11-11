@@ -1,0 +1,13 @@
+{
+  "type": "oritech_space_age:rocket_payload",
+  "duration": 12000,
+  "effect": "rain",
+  "ingredients": [
+    {
+      "block": "minecraft:packed_ice"
+    },
+    {
+      "block": "minecraft:calcite"
+    }
+  ]
+}

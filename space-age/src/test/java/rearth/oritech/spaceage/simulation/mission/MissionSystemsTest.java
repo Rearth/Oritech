@@ -400,7 +400,7 @@ class MissionSystemsTest {
                 MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO);
         mission.completed.add(completed);
         for (int i = 0; i < 400; i++) mission.advanceAction();
-        var replacement = plan(completed, current, FlightPlanAction.create(ActionType.DISCARD_CRAFT));
+        var replacement = plan(completed, current, FlightPlanAction.create(ActionType.EXPLODE));
 
         assertFalse(MissionController.replace(mission, replacement, system));
         mission.connected = true;
@@ -530,7 +530,7 @@ class MissionSystemsTest {
             if (type == ActionAddonType.LOW_FUEL) resources.availableFuelBurnTimeTicks = 500;
             var condition = new ActionAddon(UUID.randomUUID(), type, 50);
             var maintain = FlightPlanAction.create(ActionType.MAINTAIN_POSITION).withAddons(List.of(condition));
-            var discard = FlightPlanAction.create(ActionType.DISCARD_CRAFT);
+            var discard = FlightPlanAction.create(ActionType.EXPLODE);
             var mission = new MissionState(OWNER, craft, plan(maintain, discard),
                     MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO);
 
@@ -547,7 +547,7 @@ class MissionSystemsTest {
         var system = new SpaceSimulation();
         var data = new MissionSavedData();
         var maintain = FlightPlanAction.create(ActionType.MAINTAIN_POSITION);
-        var discard = FlightPlanAction.create(ActionType.DISCARD_CRAFT);
+        var discard = FlightPlanAction.create(ActionType.EXPLODE);
 
         var fuelLimited = new MissionState(OWNER, rocket(false, 0, 1_000), plan(maintain, discard),
                 MissionState.Position.surface(), new SurveyKnowledge(), BlockPos.ZERO);

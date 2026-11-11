@@ -45,7 +45,7 @@ public final class MissionState {
     public static final String STATUS_SLOW_APPROACH = "status.oritech_space_age.slow_approach_required";
     public static final String STATUS_STATION_KEEPING_EXHAUSTED = "status.oritech_space_age.station_keeping_exhausted";
     public static final String STATUS_MAINTAINING_POSITION = "status.oritech_space_age.maintaining_position";
-    public static final String STATUS_DISCARDED = "status.oritech_space_age.discarded";
+    public static final String STATUS_EXPLODED = "status.oritech_space_age.exploded";
     public static final String STATUS_TRANSFER = "status.oritech_space_age.transfer";
     public static final String STATUS_NO_FEASIBLE_TRANSFER = "status.oritech_space_age.no_feasible_transfer";
     public static final String STATUS_REPLANNING = "status.oritech_space_age.replanning";
@@ -123,7 +123,7 @@ public final class MissionState {
         this.transfer = transfer.orElse(null);
         this.launch = launch;
         rocket.setLaunchPosition(launch);
-        this.ended = isRecovered(status) || status.equals(STATUS_DESTROYED) || status.equals(STATUS_DISCARDED);
+        this.ended = isRecovered(status) || status.equals(STATUS_DESTROYED) || status.equals(STATUS_EXPLODED);
     }
 
     public MissionState(UUID owner, ActiveRocketData rocket, SpaceSimulation.FlightPlan plan,

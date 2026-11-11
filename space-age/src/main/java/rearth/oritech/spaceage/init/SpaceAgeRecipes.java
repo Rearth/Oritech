@@ -5,6 +5,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.spaceage.OritechSpaceAge;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 
 import java.util.function.Supplier;
@@ -22,6 +23,15 @@ public final class SpaceAgeRecipes {
         }
     });
     public static final Supplier<RecipeSerializer<VacuumRecipe>> VACUUM_SERIALIZER = SERIALIZERS.register("vacuum_crafting", VacuumRecipe::serializer);
+    public static final Supplier<RecipeType<RocketPayloadRecipe>> ROCKET_PAYLOAD = TYPES.register("rocket_payload", () -> new RecipeType<>() {
+
+        @Override
+        public String toString() {
+
+            return OritechSpaceAge.id("rocket_payload").toString();
+        }
+    });
+    public static final Supplier<RecipeSerializer<RocketPayloadRecipe>> ROCKET_PAYLOAD_SERIALIZER = SERIALIZERS.register("rocket_payload", RocketPayloadRecipe::serializer);
 
     private SpaceAgeRecipes() {
     }

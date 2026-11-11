@@ -55,6 +55,18 @@ in place; optional Dock/Undock exchanges supply or collect whole pairs, fuel and
 Ordinary blocks land freshly placed without NBT or contents. Current physical product blocks and controller names survive; energy/fluid storage resets.
 Dock/Undock can exchange whole Cargo pairs and finite fuel/RF pools instantly.
 
+Navigate To supports an Altitude abort with At or above / At or below options,
+measured from the selected target's surface. Reaching it ends navigation and runs
+the next card. Explode replaces Discard Craft and destroys the craft at that point.
+The planner shows matching explosion effects beside the final card and disables
+adding actions after destruction.
+
+Weather payloads need two blocks: packed ice + calcite for rain, packed ice + copper
+block for thunderstorms, or sponge + magma block for clear weather. Explode at
+5,000 m above Earth or lower for a one-time, global 10-minute weather change. TNT
+is optional. JEI's Rocket Payload Detonation category shows the reloadable recipes.
+Wiki follow-up: add these recipes and the Navigate To → Altitude → Explode workflow.
+
 ## Cube-sats and the particle launch ramp
 
 An addon splicer facing a rocket pad compacts the rocket standing on it into a cube-sat item. The rocket's

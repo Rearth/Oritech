@@ -1,0 +1,13 @@
+{
+  "type": "oritech_space_age:rocket_payload",
+  "duration": 12000,
+  "effect": "clear",
+  "ingredients": [
+    {
+      "block": "minecraft:sponge"
+    },
+    {
+      "block": "minecraft:magma_block"
+    }
+  ]
+}

@@ -17,7 +17,11 @@ import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.recipe.BlockIngredient;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe.Effect;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe.Requirement;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -64,6 +68,9 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .unlockedBy("has_steel", has(ItemContent.STEEL_INGOT)).save(output);
         blockRecipe("duratium", BlockContent.STEEL.get(), Blocks.DIAMOND_BLOCK, BlockContent.DURATIUM.get(), 1200);
         blockRecipe("energite", Blocks.REDSTONE_BLOCK, Blocks.END_STONE, BlockContent.ENERGITE.get(), 2400);
+        payloadRecipe("rain", Effect.RAIN, Blocks.PACKED_ICE, Blocks.CALCITE, 0);
+        payloadRecipe("thunder", Effect.THUNDER, Blocks.PACKED_ICE, Blocks.COPPER_BLOCK, 10);
+        payloadRecipe("clear", Effect.CLEAR, Blocks.SPONGE, Blocks.MAGMA_BLOCK, 0);
         shaped(RecipeCategory.MISC, SpaceAgeBlocks.NAVIGATION_COMPUTER)
                 .pattern("sss").pattern("pcp").pattern("sss")
                 .define('s', ItemContent.STEEL_INGOT).define('p', ItemContent.PROCESSING_UNIT)
@@ -158,6 +165,13 @@ public class SpaceAgeRecipeProvider extends RecipeProvider {
                 .define('t', SpaceAgeBlocks.BASIC_BOOSTER_ROCKET)
                 .unlockedBy("has_basic_booster_rocket", has(SpaceAgeBlocks.BASIC_BOOSTER_ROCKET))
                 .save(output);
+    }
+
+    private void payloadRecipe(String name, Effect effect, Block first, Block second, int priority) {
+
+        output.accept(ResourceKey.create(Registries.RECIPE, OritechSpaceAge.id("rocket_payload/" + name)),
+                new RocketPayloadRecipe(List.of(new Requirement(BlockIngredient.of(first), 1), new Requirement(BlockIngredient.of(second), 1)),
+                        effect, SpaceBalance.DAY / 2, SpaceBalance.ATMOSPHERE_HEIGHT / 2, priority), null);
     }
 
     private void blockRecipe(String name, Block first, Block second, Block result, int ticks) {

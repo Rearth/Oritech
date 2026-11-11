@@ -1,0 +1,14 @@
+{
+  "type": "oritech_space_age:rocket_payload",
+  "duration": 12000,
+  "effect": "thunder",
+  "ingredients": [
+    {
+      "block": "minecraft:packed_ice"
+    },
+    {
+      "block": "minecraft:copper_block"
+    }
+  ],
+  "priority": 10
+}

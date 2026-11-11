@@ -83,7 +83,7 @@ class SpaceSimulationPersistenceTest {
         var separate = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DECOUPLE)
                 .withSegments(List.of(coreRef, boosterRef));
         var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), separate.id(),
-                List.of(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DISCARD_CRAFT)));
+                List.of(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.EXPLODE)));
         var plan = new SpaceSimulation.FlightPlan(List.of(initial.plan().root().withActions(List.of(navigate, separate)), child),
                 List.of(new SpaceSimulation.SegmentConfiguration(coreRef, "Explorer", false, List.of(2)),
                         new SpaceSimulation.SegmentConfiguration(boosterRef, "Booster", true, List.of(1))), "Wayfinder");

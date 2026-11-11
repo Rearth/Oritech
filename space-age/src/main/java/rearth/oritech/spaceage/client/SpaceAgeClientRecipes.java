@@ -10,6 +10,7 @@ import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 
 import java.util.Collection;
@@ -43,5 +44,10 @@ public final class SpaceAgeClientRecipes {
     public static Collection<RecipeHolder<VacuumRecipe>> vacuum() {
 
         return recipes.byType(SpaceAgeRecipes.VACUUM_CRAFTING.get());
+    }
+
+    public static Collection<RecipeHolder<RocketPayloadRecipe>> payloads() {
+
+        return recipes.byType(SpaceAgeRecipes.ROCKET_PAYLOAD.get());
     }
 }

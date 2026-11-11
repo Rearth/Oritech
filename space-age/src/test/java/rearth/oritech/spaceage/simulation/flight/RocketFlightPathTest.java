@@ -156,7 +156,7 @@ public final class RocketFlightPathTest {
                 SpaceSimulation.SegmentRef.of(segment), action.id());
         var parent = base.root().withActions(List.of(action, link));
         var child = new SpaceSimulation.FlightPlanBranch(UUID.randomUUID(), link.id(),
-                List.of(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DISCARD_CRAFT)));
+                List.of(SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.EXPLODE)));
         var edited = parent.withActions(RocketFlightPlanRules.preserveBoosterLinks(parent, List.of(action.withMaxSpeed(100))));
         var normalized = RocketFlightPlanRules.normalize(base.withBranches(List.of(edited, child)));
         require(normalized.branches().contains(child), "editing a navigation card preserves its booster program");
@@ -230,7 +230,7 @@ public final class RocketFlightPathTest {
         var base = SpaceSimulation.FlightPlan.empty();
 
         for (var type : SpaceSimulation.ActionAddonType.values()) {
-            if (!type.isNavigationCondition()) continue;
+            if (!type.isNavigationCondition() || type.isAltitude()) continue;
             var threshold = switch (type) {
                 case DISTANCE_FROM_TARGET -> 500_000;
                 case TIME_BEFORE_ARRIVAL -> 120;
@@ -283,13 +283,13 @@ public final class RocketFlightPathTest {
             var condition = new SpaceSimulation.ActionAddon(UUID.randomUUID(), type, 50);
             var maintain = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.MAINTAIN_POSITION)
                     .withAddons(List.of(condition));
-            var discard = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.DISCARD_CRAFT);
+            var discard = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.EXPLODE);
             var empty = SpaceSimulation.FlightPlan.empty();
             var plan = empty.withBranches(List.of(empty.root().withActions(List.of(maintain, discard))));
 
             var result = RocketFlightPathCalculator.calculate(rocket, List.of(earth), plan);
             var path = result.paths().getFirst();
-            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.DISCARDED,
+            require(path.terminalState() == RocketFlightPathCalculator.TerminalState.EXPLODED,
                     type + " condition did not continue to the next card");
             require(path.actionMoments().size() == 2, type + " did not complete maintain position");
             require(result.navigationAborts().stream().anyMatch(moment -> moment.addonId().equals(condition.id())),

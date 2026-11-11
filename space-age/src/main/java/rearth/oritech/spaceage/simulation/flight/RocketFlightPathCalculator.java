@@ -3,12 +3,15 @@ package rearth.oritech.spaceage.simulation.flight;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Blocks;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe.Input;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -148,7 +151,7 @@ public final class RocketFlightPathCalculator {
         return new FlightPath(orderedPaths, List.copyOf(context.boosterEvents), lastCommand,
                 List.copyOf(context.arrivalPredictions), List.copyOf(context.asteroidPaths),
                 List.copyOf(context.navigationAborts), List.copyOf(context.scanEstimates),
-                List.copyOf(context.stationKeepingEstimates), List.copyOf(context.processingEstimates));
+                List.copyOf(context.stationKeepingEstimates), List.copyOf(context.processingEstimates), List.copyOf(context.explosions));
     }
 
     public static Craft createInitialCraft(ActiveRocketData rocket,
@@ -196,7 +199,7 @@ public final class RocketFlightPathCalculator {
             if (action.type() == SpaceSimulation.ActionType.DISCONNECT_BOOSTER) continue;
             var requiresUndocking = (!state.occupiedPortSegments.isEmpty() || !state.dockedHost.equals(SpaceSimulation.FlightPlanAction.NO_TARGET))
                     && (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.DOCK
-                    || action.type() == SpaceSimulation.ActionType.DISCARD_CRAFT);
+                    || action.type() == SpaceSimulation.ActionType.EXPLODE);
             completed = !requiresUndocking && switch (action.type()) {
                 case SCAN, TRANSMIT_INFORMATION -> service(action, state, context);
                 case NAVIGATE_TO ->
@@ -213,8 +216,8 @@ public final class RocketFlightPathCalculator {
                 case PROCESS -> RocketServiceForecast.process(action, state, context);
                 case DOCK -> RocketServiceForecast.dock(action, state, context);
                 case UNDOCK -> RocketServiceForecast.undock(action, state, context);
-                case DISCARD_CRAFT -> {
-                    state.discarded = true;
+                case EXPLODE -> {
+                    state.exploded = true;
                     yield true;
                 }
                 case DISCONNECT_BOOSTER -> true;
@@ -223,11 +226,18 @@ public final class RocketFlightPathCalculator {
                     state.x, state.y, completed, Set.copyOf(state.segments.keySet()),
                     state.attachedAsteroid == null ? SpaceSimulation.FlightPlanAction.NO_TARGET
                             : state.attachedAsteroid.id()));
-            if (!completed || state.maintainingPosition || state.discarded || state.destroyed) break;
+            if (state.exploded || state.destroyed) {
+                var blocks = new HashMap<Identifier, Integer>();
+                state.segments.values().stream().map(Segment::currentStructure).filter(Objects::nonNull)
+                        .flatMap(segment -> segment.blocks().stream()).filter(block -> !block.state().isAir())
+                        .forEach(block -> blocks.merge(BuiltInRegistries.BLOCK.getKey(block.state().getBlock()), 1, Integer::sum));
+                context.explosions.add(new ExplosionPrediction(action.id(), branch.id(), SpaceObjects.earthAltitude(state.x, state.y), Map.copyOf(blocks)));
+            }
+            if (!completed || state.maintainingPosition || state.exploded || state.destroyed) break;
         }
 
         var terminal = state.destroyed ? TerminalState.DESTROYED
-                : state.discarded ? TerminalState.DISCARDED
+                : state.exploded ? TerminalState.EXPLODED
                   : state.maintainingPosition ? TerminalState.SUSTAINABLE
                     : completed ? TerminalState.READY : state.blockedState;
         context.paths.put(branch.id(), state.toPath(terminal, context));
@@ -584,7 +594,7 @@ public final class RocketFlightPathCalculator {
         READY,
         SUSTAINABLE,
         STATION_KEEPING_EXHAUSTED,
-        DISCARDED,
+        EXPLODED,
         DESTROYED,
         PLAN_BLOCKED,
         TARGET_UNAVAILABLE,
@@ -608,7 +618,12 @@ public final class RocketFlightPathCalculator {
 
         public boolean isFailure() {
 
-            return this != READY && this != SUSTAINABLE && this != STATION_KEEPING_EXHAUSTED && this != DISCARDED;
+            return this != READY && this != SUSTAINABLE && this != STATION_KEEPING_EXHAUSTED && this != EXPLODED;
+        }
+
+        public boolean destroysCraft() {
+
+            return this == DESTROYED || this == EXPLODED;
         }
 
         /**
@@ -792,7 +807,16 @@ public final class RocketFlightPathCalculator {
                              List<AsteroidPath> asteroidPaths, List<NavigationAbortMoment> navigationAborts,
                              List<ScanEstimate> scanEstimates,
                              List<StationKeepingEstimate> stationKeepingEstimates,
-                             List<ProcessingEstimate> processingEstimates) {
+                             List<ProcessingEstimate> processingEstimates, List<ExplosionPrediction> explosions) {
+
+        public FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents, double lastCommandSeconds,
+                          List<ArrivalPrediction> arrivalPredictions, List<AsteroidPath> asteroidPaths,
+                          List<NavigationAbortMoment> navigationAborts, List<ScanEstimate> scanEstimates,
+                          List<StationKeepingEstimate> stationKeepingEstimates, List<ProcessingEstimate> processingEstimates) {
+
+            this(paths, boosterEvents, lastCommandSeconds, arrivalPredictions, asteroidPaths, navigationAborts,
+                    scanEstimates, stationKeepingEstimates, processingEstimates, List.of());
+        }
 
         public FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents, double lastCommandSeconds,
                           List<ArrivalPrediction> arrivalPredictions, List<AsteroidPath> asteroidPaths,
@@ -805,6 +829,17 @@ public final class RocketFlightPathCalculator {
         public FlightPath(List<CraftPath> paths, List<BoosterEvent> boosterEvents, double lastCommandSeconds) {
 
             this(paths, boosterEvents, lastCommandSeconds, List.of(), List.of(), List.of());
+        }
+    }
+
+    /**
+     * Only the craft's physical block counts, never an asteroid's hidden composition.
+     */
+    public record ExplosionPrediction(UUID actionId, UUID branchId, double earthAltitude, Map<Identifier, Integer> blocks) {
+
+        public Optional<RecipeHolder<RocketPayloadRecipe>> payload(Collection<RecipeHolder<RocketPayloadRecipe>> recipes) {
+
+            return RocketPayloadRecipe.select(recipes, Input.of(blocks), earthAltitude);
         }
     }
 

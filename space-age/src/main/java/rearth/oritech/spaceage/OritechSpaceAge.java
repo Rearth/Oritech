@@ -84,7 +84,7 @@ public final class OritechSpaceAge {
         SpaceAgeRecipes.TYPES.register(modEventBus);
         SpaceAgeRecipes.SERIALIZERS.register(modEventBus);
         NeoForge.EVENT_BUS.addListener((OnDatapackSyncEvent event) ->
-                event.sendRecipes(List.of(SpaceAgeRecipes.VACUUM_CRAFTING.get())));
+                event.sendRecipes(List.of(SpaceAgeRecipes.VACUUM_CRAFTING.get(), SpaceAgeRecipes.ROCKET_PAYLOAD.get())));
         SpaceAgeItems.addBlockItems();
         SpaceAgeBlocks.BLOCKS.register(modEventBus);
         SpaceAgeItems.ITEMS.register(modEventBus);

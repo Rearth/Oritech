@@ -8,6 +8,8 @@ import rearth.oritech.spaceage.simulation.AsteroidShape;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanBranch;
 import rearth.oritech.spaceage.simulation.flight.ParachuteLanding;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.TerminalState;
@@ -29,6 +31,12 @@ import java.util.UUID;
 final class FlightPlannerLabels {
 
     private FlightPlannerLabels() {
+    }
+
+    static boolean endsCraft(FlightPlanBranch branch, RocketFlightPathCalculator.FlightPath flight) {
+
+        return !branch.actions().isEmpty() && branch.actions().getLast().type() == ActionType.EXPLODE
+                || flight.paths().stream().anyMatch(path -> path.branchId().equals(branch.id()) && path.terminalState().destroysCraft());
     }
 
     static List<Component> beamPreview(SpaceSimulation.FlightPlanAction action, ActiveRocketData rocket,
@@ -203,6 +211,7 @@ final class FlightPlannerLabels {
 
     static Component addonTypeName(SpaceSimulation.ActionAddonType type) {
 
+        if (type.isAltitude()) return Component.translatable("screen.oritech_space_age.action.condition.altitude");
         return Component.translatable("screen.oritech_space_age.action.condition." + type.name().toLowerCase(Locale.ROOT));
     }
 
@@ -227,7 +236,7 @@ final class FlightPlannerLabels {
     static String formatAddonValue(SpaceSimulation.ActionAddonType type, double value) {
 
         return switch (type) {
-            case DISTANCE_FROM_TARGET -> String.format(Locale.ROOT, "%.0f m", value);
+            case DISTANCE_FROM_TARGET, ALTITUDE_BELOW, ALTITUDE_ABOVE -> String.format(Locale.ROOT, "%.0f m", value);
             case TIME_BEFORE_ARRIVAL, DURATION -> String.format(Locale.ROOT, "%.0f s", value);
             case DESIRED_UNCERTAINTY -> String.format(Locale.ROOT, "±%.0f blocks", value);
             case LOW_RF, LOW_FUEL -> String.format(Locale.ROOT, "%.0f%%", value);
@@ -272,7 +281,7 @@ final class FlightPlannerLabels {
 
         try {
             var result = Integer.parseInt(value.strip());
-            return result > 0 && RocketFlightPlanRules.clampAddonValue(type, result) == result
+            return (result > 0 || result == 0 && type.isAltitude()) && RocketFlightPlanRules.clampAddonValue(type, result) == result
                     ? result : null;
         } catch (NumberFormatException ignored) {
             return null;

@@ -8,10 +8,12 @@ import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
+import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.client.starmap.StarMapLineRenderer;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -194,16 +196,22 @@ final class FlightPlannerCards {
                     cursorX += NORMAL_CARD_WIDTH;
                 }
             }
+            var explosion = screen.calculatedFlight().explosions().stream()
+                    .filter(prediction -> prediction.branchId().equals(branch.id())).findFirst().orElse(null);
+            var payload = explosion == null ? null : explosion.payload(SpaceAgeClientRecipes.payloads()).orElse(null);
             if (!screen.isReadOnly()) {
                 var addActionX = cursorX + 2;
-                var addButton = SpaceAgeButtons.orangePanel(addActionX, rowY + 27, 64, 32,
+                var addButton = SpaceAgeButtons.orangePanel(addActionX, rowY + (payload == null ? 27 : 65),
+                        payload == null ? 64 : 176, payload == null ? 32 : 18,
                         Component.translatable("screen.oritech_space_age.action.add"),
                         ignored -> screen.openAddActionMenu(branch.id(), addActionX, rowY + 61));
-                addButton.setActive(screen.canAddStep());
-                addButton.withTooltip(screen.capacityText());
+                addButton.setActive(screen.canAddStep(branch.id()));
+                addButton.withTooltip(FlightPlannerLabels.endsCraft(branch, screen.calculatedFlight())
+                        ? Component.translatable("screen.oritech_space_age.action.branch_ends") : screen.capacityText());
                 scroll.addChild(addButton);
             }
-            contentWidth = Math.max(contentWidth, cursorX + 74);
+            if (payload != null) addExplosionEffect(scroll, cursorX + 2, rowY + 4, payload.value(), explosion.earthAltitude());
+            contentWidth = Math.max(contentWidth, cursorX + (payload == null ? 74 : 182));
         }
 
         scroll.setContentDimensions(contentWidth,
@@ -221,6 +229,20 @@ final class FlightPlannerCards {
         if (segments.isEmpty()) return Component.translatable("screen.oritech_space_age.branch.no_segments");
         var names = segments.stream().map(segment -> screen.segmentName(segment, rocket)).sorted().toList();
         return Component.translatable("screen.oritech_space_age.branch.segments", String.join(", ", names));
+    }
+
+    private void addExplosionEffect(ScrollWidget scroll, int x, int y, RocketPayloadRecipe recipe, double altitude) {
+
+        var tooltip = List.<Component>of(Component.translatable("screen.oritech_space_age.payload.effect_help", (int) Math.round(altitude),
+                        (int) recipe.maxAltitude()),
+                Component.translatable("jei.oritech_space_age.payload_instructions"));
+        scroll.addChild(new SurfaceWidget(x, y, 176, 54, OritechSurface.PANEL_DARK).withTooltip(tooltip));
+        scroll.addChild(new LabelWidget(x + 7, y + 6, 162,
+                Component.translatable("screen.oritech_space_age.payload.effect_title")).withColor(0xFFE7AC58));
+        scroll.addChild(new LabelWidget(x + 7, y + 21, 162, 20,
+                Component.translatable("jei.oritech_space_age.payload_result",
+                        Component.translatable("jei.oritech_space_age.payload_effect." + recipe.effect().getSerializedName()), recipe.durationTicks() / 20))
+                .withColor(0xFF8CE1D7).withWrap(true));
     }
 
     private void addCompletedCard(ScrollWidget scroll, SpaceSimulation.FlightPlanAction action, int number,

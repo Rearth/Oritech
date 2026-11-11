@@ -72,6 +72,7 @@ import rearth.oritech.spaceage.simulation.rocket.RocketAscent;
 import rearth.oritech.spaceage.simulation.rocket.RocketFlight;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloadGameTests;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
@@ -120,6 +121,7 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("launch_ramp", () -> CubeSatGameTests::launchRamp);
         FUNCTIONS.register("space_trophy", () -> SpaceTrophyGameTests::trophy);
         FUNCTIONS.register("full_orbit", () -> SpaceTrophyGameTests::advancement);
+        FUNCTIONS.register("rocket_payloads", () -> RocketPayloadGameTests::weather);
     }
 
     public static void register(RegisterGameTestsEvent event) {
@@ -145,7 +147,7 @@ public final class SpaceAgeGameTests {
                 OritechSpaceAge.id("space_power")), info));
         event.registerTest(OritechSpaceAge.id("gallery_light"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
                 OritechSpaceAge.id("gallery_light")), info));
-        for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp", "space_trophy", "full_orbit"))
+        for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp", "space_trophy", "full_orbit", "rocket_payloads"))
             event.registerTest(OritechSpaceAge.id(name), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name)), info));
     }
 

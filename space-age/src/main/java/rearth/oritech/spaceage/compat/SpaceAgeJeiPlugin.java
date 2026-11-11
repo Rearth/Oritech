@@ -20,6 +20,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.recipe.RocketPayloadRecipe;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 
 import java.util.List;
@@ -31,8 +32,10 @@ import java.util.List;
 public final class SpaceAgeJeiPlugin implements IModPlugin {
 
     public static final IRecipeHolderType<VacuumRecipe> TYPE = IRecipeHolderType.create(OritechSpaceAge.id("vacuum_crafting"));
+    public static final IRecipeHolderType<RocketPayloadRecipe> PAYLOAD_TYPE = IRecipeHolderType.create(OritechSpaceAge.id("rocket_payload"));
     private IJeiRuntime runtime;
     private List<RecipeHolder<VacuumRecipe>> shown = List.of();
+    private List<RecipeHolder<RocketPayloadRecipe>> shownPayloads = List.of();
 
     public SpaceAgeJeiPlugin() {
 
@@ -42,6 +45,10 @@ public final class SpaceAgeJeiPlugin implements IModPlugin {
             shown = List.copyOf(SpaceAgeClientRecipes.vacuum());
             runtime.getRecipeManager().addRecipes(TYPE, shown);
             runtime.getRecipeManager().unhideRecipes(TYPE, shown);
+            runtime.getRecipeManager().hideRecipes(PAYLOAD_TYPE, shownPayloads);
+            shownPayloads = List.copyOf(SpaceAgeClientRecipes.payloads());
+            runtime.getRecipeManager().addRecipes(PAYLOAD_TYPE, shownPayloads);
+            runtime.getRecipeManager().unhideRecipes(PAYLOAD_TYPE, shownPayloads);
         });
     }
 
@@ -54,7 +61,8 @@ public final class SpaceAgeJeiPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
 
-        registration.addRecipeCategories(new Category(registration.getJeiHelpers().getGuiHelper()));
+        var gui = registration.getJeiHelpers().getGuiHelper();
+        registration.addRecipeCategories(new Category(gui), new PayloadCategory(gui));
     }
 
     @Override
@@ -62,12 +70,16 @@ public final class SpaceAgeJeiPlugin implements IModPlugin {
 
         shown = List.copyOf(SpaceAgeClientRecipes.vacuum());
         registration.addRecipes(TYPE, shown);
+        shownPayloads = List.copyOf(SpaceAgeClientRecipes.payloads());
+        registration.addRecipes(PAYLOAD_TYPE, shownPayloads);
     }
 
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
 
         registration.addCraftingStation(TYPE, SpaceAgeBlocks.VACUUM_CRAFTER.get());
+        registration.addCraftingStation(PAYLOAD_TYPE, SpaceAgeBlocks.ROCKET_ASSEMBLER.get());
+        registration.addCraftingStation(PAYLOAD_TYPE, SpaceAgeBlocks.LAUNCH_RAMP.get());
     }
 
     @Override
@@ -81,6 +93,39 @@ public final class SpaceAgeJeiPlugin implements IModPlugin {
 
         runtime = null;
         shown = List.of();
+        shownPayloads = List.of();
+    }
+
+    private static final class PayloadCategory extends AbstractRecipeCategory<RecipeHolder<RocketPayloadRecipe>> {
+
+        PayloadCategory(IGuiHelper gui) {
+
+            super(PAYLOAD_TYPE, Component.translatable("jei.oritech_space_age.rocket_payload"),
+                    gui.createDrawableItemLike(SpaceAgeBlocks.ROCKET_ASSEMBLER), 180, 145);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<RocketPayloadRecipe> holder, IFocusGroup focuses) {
+
+            var ingredients = holder.value().ingredients();
+            for (int index = 0; index < ingredients.size(); index++)
+                builder.addInputSlot(10 + index % 6 * 28, 20 + index / 6 * 22)
+                        .addItemStacks(ingredients.get(index).display()).setStandardSlotBackground();
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<RocketPayloadRecipe> holder, IFocusGroup focuses) {
+
+            var recipe = holder.value();
+            var detailsY = 24 + ((recipe.ingredients().size() + 5) / 6) * 22;
+            builder.addText(Component.translatable("jei.oritech_space_age.payload_result",
+                    Component.translatable("jei.oritech_space_age.payload_effect." + recipe.effect().getSerializedName()),
+                    recipe.durationTicks() / 20), 180, 12).setPosition(0, 0);
+            builder.addText(Component.translatable("jei.oritech_space_age.payload_altitude", (int) recipe.maxAltitude()),
+                    180, 30).setPosition(0, detailsY);
+            builder.addText(Component.translatable("jei.oritech_space_age.payload_instructions"),
+                    180, 48).setPosition(0, detailsY + 32);
+        }
     }
 
     private static final class Category extends AbstractRecipeCategory<RecipeHolder<VacuumRecipe>> {

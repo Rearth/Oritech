@@ -117,6 +117,10 @@ public final class RocketSimulationController {
                 var seconds = Math.max(0, (flight.takeoffCollisionTick() - flight.launchTick()) / 20.0);
                 var speed = flight.ascent().speed(seconds);
                 var strength = RocketExplosives.worldStrength(.5 * flight.performance().wetMassKilograms() * speed * speed + RocketExplosives.remaining(rocket));
+                if (level.dimension().equals(Level.OVERWORLD))
+                    RocketDetonation.applyPayload(server, rocket, Math.max(0,
+                            flight.takeoffCollisionPosition().getY() - flight.launchPosition().getY())
+                            * SpaceBalance.ATMOSPHERE_HEIGHT / ORBIT_HEIGHT_BLOCKS);
                 sendTakeoffCollisionDataToClients(level, rocket, flight.takeoffCollisionPosition(), speed, strength);
                 explodeOnTakeoffCollision(level, flight.takeoffCollisionPosition(), strength);
                 var mission = MissionSavedData.get(server).craft.get(rocket.getRocketId());

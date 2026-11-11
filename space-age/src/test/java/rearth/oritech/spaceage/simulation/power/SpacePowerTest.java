@@ -629,7 +629,7 @@ class SpacePowerTest {
 
         var mission = station(UUID.randomUUID(), -3_000_000);
         var hold = mission.action().withAddons(List.of(ActionAddon.create(ActionAddonType.DURATION).withValue(60)));
-        var discard = FlightPlanAction.create(ActionType.DISCARD_CRAFT);
+        var discard = FlightPlanAction.create(ActionType.EXPLODE);
         var plan = mission.plan.withBranches(List.of(mission.plan.root().withActions(List.of(hold, discard))));
         var forecast = RocketFlightPathCalculator.calculateFrom(mission.rocket, new SpaceSimulation().createObjectData(), plan, mission.position);
         var estimate = forecast.stationKeepingEstimates().getFirst();
@@ -639,7 +639,7 @@ class SpacePowerTest {
         assertTrue(estimate.solarRFPerTick() > 0);
         assertEquals(0, estimate.fuelPercentPerMinute());
         assertEquals(0, estimate.correctionRFPerTick());
-        assertEquals(RocketFlightPathCalculator.TerminalState.DISCARDED, forecast.paths().getFirst().terminalState());
+        assertEquals(RocketFlightPathCalculator.TerminalState.EXPLODED, forecast.paths().getFirst().terminalState());
         var forever = RocketFlightPathCalculator.calculateFrom(mission.rocket, new SpaceSimulation().createObjectData(),
                 plan.withBranches(List.of(plan.root().withActions(List.of(hold.withAddons(List.of()), discard)))), mission.position);
         assertEquals(1, forever.paths().getFirst().actionMoments().size(), "Sustainable indefinite holds do not reach later cards");

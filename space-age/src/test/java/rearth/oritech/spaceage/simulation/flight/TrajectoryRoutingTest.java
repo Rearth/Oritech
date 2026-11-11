@@ -25,6 +25,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.AsteroidPath;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.CraftPath;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.FlightPath;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ExplosionPrediction;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.MotionSample;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathPhase;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ProcessingEstimate;
@@ -566,7 +567,10 @@ class TrajectoryRoutingTest {
         var path = craft.toPath(TerminalState.READY, context);
         var asteroid = new AsteroidPath(new UUID(9, 9), List.of(new MotionSample(5, 50, 0, 10), new MotionSample(10, 100, 0, 10)), null, 0);
         var estimate = new ProcessingEstimate(new UUID(8, 8), List.of(Identifier.parse("minecraft:gold_ingot")), 100, 400000, 1200000, "", true);
-        var flight = new FlightPath(List.of(path), List.of(), 5, List.of(), List.of(asteroid), List.of(), List.of(), List.of(), List.of(estimate));
+        var explosion = new ExplosionPrediction(new UUID(7, 7), BRANCH, 4_000,
+                Map.of(Identifier.parse("minecraft:packed_ice"), 1, Identifier.parse("minecraft:calcite"), 1));
+        var flight = new FlightPath(List.of(path), List.of(), 5, List.of(), List.of(asteroid), List.of(), List.of(), List.of(), List.of(estimate), List.of(explosion));
+        assertEquals(List.of(explosion), MissionForecast.Navigation.forClient(flight).flight().explosions());
         NetworkManager.loadDefaultCodecs();
         MissionNetworking.registerForecastCodecs();
         var codec = ReflectiveCodecBuilder.create(MissionForecast.Navigation.class);
