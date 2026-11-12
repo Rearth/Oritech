@@ -39,8 +39,8 @@ final class OritechJeiLaserRecipe extends AbstractRecipeCategory<RecipeHolder<Or
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OritechRecipe> recipe,
                                    IFocusGroup focuses) {
-        builder.addDrawable(laserBackground, 10, 5);
-        builder.addAnimatedRecipeArrow(40).setPosition(105, 15);
+        builder.addDrawableWidget(laserBackground).setPosition(10, 5);
+        builder.addAnimatedRecipeArrowWidget(40).setPosition(105, 15);
     }
 
     @Override
