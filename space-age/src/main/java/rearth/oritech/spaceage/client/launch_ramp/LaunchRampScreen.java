@@ -130,7 +130,8 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
     public static @Nullable Component speedAdvice(LaunchRampMenu menu) {
 
         var window = menu.speedWindow;
-        if (!menu.speedWindowKnown || window == null || window.contains(menu.previewSpeed())) return null;
+        if (!menu.speedWindowKnown || window == null || menu.previewSpeed() > LaunchSpeedRules.sampleLimit()
+                || window.contains(menu.previewSpeed())) return null;
         return Component.translatable("screen.oritech_space_age.launch_ramp.speed_advice", number(menu.previewSpeed()),
                 number(window.nearest(menu.previewSpeed()))).withStyle(ChatFormatting.RED);
     }
@@ -141,7 +142,8 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
     public static List<Component> speedRules() {
 
         return List.of(Component.translatable("screen.oritech_space_age.launch_ramp.conversion",
-                        number(1000), number(Math.round(1000 * SpaceAgeConfig.launchSpeedFactor())), number(SpaceAgeConfig.launchSpeedCap())),
+                        number(1000), number(Math.round(1000 * SpaceAgeConfig.launchSpeedFactor()))),
+                Component.translatable("screen.oritech_space_age.launch_ramp.sample_limit", number(LaunchSpeedRules.sampleLimit())),
                 Component.translatable("screen.oritech_space_age.launch_ramp.orbit",
                         number(LaunchSpeedRules.orbitParticleSpeed()), number(Math.round(LaunchSpeedRules.orbitVelocity()))));
     }
@@ -274,7 +276,7 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
         if (menu.getRocket() == null || !menu.speedWindowKnown
                 || menu.getDraftFlightPlan() != null && menu.getDraftFlightPlan().root().actions().isEmpty()) return windowSummary(menu);
         if (window == null)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.maxUsefulSpeed()));
+            return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.sampleLimit()));
         if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
                 String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
                         ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));

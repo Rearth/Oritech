@@ -393,6 +393,25 @@ class TrajectoryRoutingTest {
     }
 
     @Test
+    void stoppedOrbitalApproachesRoundTheBrakingTurnWithoutAHairpin() {
+
+        var curve = FlightCurve.between(0, 0, -114, 11_970, .585, .811, -.0095, .99995, 40_000, true);
+        var previous = curve.atDistance(0, 1);
+        var turn = 0d;
+        for (var index = 1; index <= 1_000; index++) {
+            var point = curve.atDistance(curve.length() * index / 1_000, 1);
+            var angle = Math.abs(Math.atan2(previous.vx() * point.vy() - previous.vy() * point.vx(),
+                    previous.vx() * point.vx() + previous.vy() * point.vy()));
+            assertTrue(angle < .1, "A braking arc must turn smoothly instead of reversing at a cusp");
+            turn += angle;
+            previous = point;
+        }
+        assertTrue(turn < Math.PI * 1.5, "A stopped arrival needs no extra turn to match the chord heading");
+        assertEquals(-114, previous.x(), 1e-7);
+        assertEquals(11_970, previous.y(), 1e-7);
+    }
+
+    @Test
     void longLandingTurnsStayRoundedAndApproachAlongTheSurfaceNormal() {
 
         var earth = new SpaceObjectData(SpaceObjects.EARTH_ID, SpaceObjects.ObjectType.EARTH,

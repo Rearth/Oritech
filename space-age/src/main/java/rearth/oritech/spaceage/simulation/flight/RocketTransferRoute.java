@@ -85,11 +85,13 @@ public final class RocketTransferRoute {
         var parachuteCount = ParachuteLanding.eligible(action)
                 ? craft.segments.values().stream().mapToInt(segment -> segment.parachutes).sum() : 0;
         var brakingCredit = ParachuteLanding.deltaVReduction(craft.mass(), parachuteCount);
+        var stoppedArrival = !freeArrival && arrival == 0
+                && !(action.orbit() == SpaceSimulation.OrbitBand.SURFACE && hasSurface(target));
         FlightCurve curve = null;
         var efficiency = 1d;
         var gravity = 0d;
         for (int attempt = 0; attempt < 16; attempt++) {
-            curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle);
+            curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle, stoppedArrival);
             efficiency = steeringEfficiency(curve);
             gravity = gravityForLeg(context, curve, craft.time);
             var brakingArrival = freeArrival ? cap : arrival;
@@ -105,7 +107,7 @@ public final class RocketTransferRoute {
                     var high = startHandle;
                     for (int refinement = 0; refinement < 32; refinement++) {
                         var middle = (low + high) * .5;
-                        var candidate = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, middle);
+                        var candidate = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, middle, stoppedArrival);
                         var candidateEfficiency = steeringEfficiency(candidate);
                         var needed = CurveTransfer.brakingDistance(speed, brakingArrival, burnProfile,
                                 candidateEfficiency, gravityForLeg(context, candidate, craft.time), brakingCredit);
@@ -136,7 +138,7 @@ public final class RocketTransferRoute {
         // Grow enough to escape a too-short stopping curve; tiny extensions leave artificial launch-speed gaps.
         for (int approach = 0; events == null && speed > arrival && !freeArrival && approach < 4; approach++) {
             startHandle *= 2;
-            curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle);
+            curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle, stoppedArrival);
             efficiency = steeringEfficiency(curve);
             events = new EventTransfer(craft, context, curve, speed, arrival, efficiency, brakingCredit).solve(Math.min(cap, speed), false);
         }

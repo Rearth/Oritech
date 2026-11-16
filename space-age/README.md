@@ -79,9 +79,10 @@ Deploy Cube-Sat card releases it like a decouple, on its own branch. A host land
 cube brings the cube back intact.
 
 A particle launch ramp hit by an accelerator particle launches cube-sats straight up with the particle's
-speed as starting velocity (by default a tenth of the particle speed in m/s, see `launchSpeedFactor` and
-`launchSpeedCap`). Cubes then slow down against Earth's gravity like any coasting craft; at least
+speed as starting velocity (by default a tenth of the particle speed in m/s, see `launchSpeedFactor`).
+There is no launch-speed cap. Cubes then slow down against Earth's gravity like any coasting craft; at least
 `orbitVelocity` is needed to coast up to low Earth orbit. The pattern slot on the ramp's first tab holds the cube its plan is made for; the plan applies to every cube with the same layout and belongs to the last player
-who saved it. The planner shows the particle speed range in which the plan works. Cubes without a matching
+who saved it. The planner suggests sampled working particle speeds; its sampling horizon does not limit the speeds
+you can preview or launch. Cubes without a matching
 plan, or which can't fly the first leg, stay in low Earth orbit if fast enough and otherwise fall back next
 to the ramp.

@@ -35,16 +35,16 @@ public final class LaunchSpeedRules {
      */
     public static double velocity(long particleSpeed) {
 
-        return Math.min(particleSpeed * SpaceAgeConfig.launchSpeedFactor(), SpaceAgeConfig.launchSpeedCap());
+        return particleSpeed * SpaceAgeConfig.launchSpeedFactor();
     }
 
     /**
-     * The lowest particle speed reaching the velocity cap; faster particles don't launch any faster.
+     * Finite advisory search horizon. Higher speeds remain available for preview and launch.
      */
-    public static long maxUsefulSpeed() {
+    public static long sampleLimit() {
 
         var factor = SpaceAgeConfig.launchSpeedFactor();
-        return factor <= 0 ? 0 : (long) Math.ceil(SpaceAgeConfig.launchSpeedCap() / factor);
+        return factor <= 0 ? 0 : (long) Math.ceil(1500 / factor);
     }
 
     /**
@@ -100,31 +100,31 @@ public final class LaunchSpeedRules {
     public static Window window(SpaceSimulation.FlightPlan plan, ActiveRocketData rocket, List<SpaceSimulation.SpaceObjectData> objects,
                                 Collection<RecipeHolder<VacuumRecipe>> recipes, List<DockingTarget> stations) {
 
-        return window(maxUsefulSpeed(), speed -> valid(plan, rocket, objects, speed, recipes, stations));
+        return window(sampleLimit(), speed -> valid(plan, rocket, objects, speed, recipes, stations));
     }
 
-    static Window window(long cap, LongPredicate valid) {
+    static Window window(long sampleLimit, LongPredicate valid) {
 
         var samples = new boolean[WINDOW_SAMPLES + 1];
-        for (int i = 0; i <= WINDOW_SAMPLES; i++) samples[i] = valid.test(cap * i / WINDOW_SAMPLES);
+        for (int i = 0; i <= WINDOW_SAMPLES; i++) samples[i] = valid.test(sampleLimit * i / WINDOW_SAMPLES);
         var ranges = new ArrayList<Range>();
         for (int first = 0; first <= WINDOW_SAMPLES; first++) {
             if (!samples[first]) continue;
             var last = first;
             while (last < WINDOW_SAMPLES && samples[last + 1]) last++;
-            var min = cap * first / WINDOW_SAMPLES;
+            var min = sampleLimit * first / WINDOW_SAMPLES;
             if (first > 0) {
-                var low = cap * (first - 1) / WINDOW_SAMPLES;
+                var low = sampleLimit * (first - 1) / WINDOW_SAMPLES;
                 for (int i = 0; i < WINDOW_REFINEMENTS && min - low > 1; i++) {
                     var middle = (low + min) / 2;
                     if (valid.test(middle)) min = middle;
                     else low = middle;
                 }
             }
-            var max = Long.MAX_VALUE;
+            var max = sampleLimit;
             if (last < WINDOW_SAMPLES) {
-                max = cap * last / WINDOW_SAMPLES;
-                var high = cap * (last + 1) / WINDOW_SAMPLES;
+                max = sampleLimit * last / WINDOW_SAMPLES;
+                var high = sampleLimit * (last + 1) / WINDOW_SAMPLES;
                 for (int i = 0; i < WINDOW_REFINEMENTS && high - max > 1; i++) {
                     var middle = (max + high) / 2;
                     if (valid.test(middle)) max = middle;
@@ -138,7 +138,7 @@ public final class LaunchSpeedRules {
     }
 
     /**
-     * @param max Long.MAX_VALUE when the first leg still works at the velocity cap
+     * @param max highest sampled working particle speed; not a launch-speed limit
      */
     public record Window(long min, long max, List<Range> ranges) {
 

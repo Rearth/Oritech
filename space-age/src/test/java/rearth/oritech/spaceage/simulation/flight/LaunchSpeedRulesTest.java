@@ -30,7 +30,7 @@ class LaunchSpeedRulesTest {
     void windowKeepsLaterWorkingRanges() {
 
         var window = LaunchSpeedRules.window(30_000, speed -> speed >= 4_000 && speed <= 5_000 || speed >= 12_000);
-        assertEquals(List.of(new LaunchSpeedRules.Range(4_000, 5_000), new LaunchSpeedRules.Range(12_000, Long.MAX_VALUE)), window.ranges());
+        assertEquals(List.of(new LaunchSpeedRules.Range(4_000, 5_000), new LaunchSpeedRules.Range(12_000, 30_000)), window.ranges());
         assertEquals(4_000, window.min());
     }
 
@@ -51,6 +51,8 @@ class LaunchSpeedRulesTest {
         var extended = single.withBranches(List.of(single.root().withActions(List.of(first, later))));
 
         assertTrue(LaunchSpeedRules.valid(single, rocket, objects, 10_000, List.of(), List.of()));
+        assertTrue(LaunchSpeedRules.valid(single, rocket, objects, 20_000, List.of(), List.of()),
+                "Launches above the former velocity cap must use their actual speed");
         assertTrue(LaunchSpeedRules.valid(extended, rocket, objects, 10_000, List.of(), List.of()));
         assertEquals(LaunchSpeedRules.window(single, rocket, objects, List.of(), List.of()),
                 LaunchSpeedRules.window(extended, rocket, objects, List.of(), List.of()));
@@ -90,19 +92,20 @@ class LaunchSpeedRulesTest {
 
         var free = LaunchSpeedRules.window(30_000, speed -> true);
         assertEquals(0, free.min());
-        assertEquals(Long.MAX_VALUE, free.max());
+        assertEquals(30_000, free.max());
         assertNull(LaunchSpeedRules.window(30_000, speed -> false));
         var open = LaunchSpeedRules.window(30_000, speed -> speed >= 9_000);
-        assertEquals(Long.MAX_VALUE, open.max());
+        assertEquals(30_000, open.max());
     }
 
     @Test
-    void launchVelocityIsCappedAndOrbitNeedsAReachableSpeed() {
+    void launchVelocityKeepsIncreasingAboveTheFormerCap() {
 
-        assertEquals(SpaceAgeConfig.launchSpeedCap(), LaunchSpeedRules.velocity(Long.MAX_VALUE / 2));
+        assertEquals(2_000, LaunchSpeedRules.velocity(20_000));
+        assertEquals(4_000, LaunchSpeedRules.velocity(40_000));
+        assertEquals((Long.MAX_VALUE / 2) * SpaceAgeConfig.launchSpeedFactor(), LaunchSpeedRules.velocity(Long.MAX_VALUE / 2));
         assertTrue(LaunchSpeedRules.orbitVelocity() > 0);
         assertTrue(LaunchSpeedRules.velocity(LaunchSpeedRules.orbitParticleSpeed()) >= LaunchSpeedRules.orbitVelocity());
-        assertTrue(LaunchSpeedRules.orbitParticleSpeed() <= LaunchSpeedRules.maxUsefulSpeed(), "the default cap reaches orbit");
     }
 
     @Test

@@ -43,9 +43,26 @@ final class FlightCurve {
     static FlightCurve between(double startX, double startY, double endX, double endY,
                                double sx, double sy, double ex, double ey, double startHandle) {
 
+        return between(startX, startY, endX, endY, sx, sy, ex, ey, startHandle, false);
+    }
+
+    static FlightCurve between(double startX, double startY, double endX, double endY,
+                               double sx, double sy, double ex, double ey, double startHandle, boolean stoppedArrival) {
+
         var dx = endX - startX;
         var dy = endY - startY;
         var distance = Math.max(1e-6, Math.hypot(dx, dy));
+        if (stoppedArrival) {
+            // A stopped waypoint has no required arrival heading. Approach from the departure
+            // control point so a long braking arc does not hook back to an arbitrary chord tangent.
+            var arrivalX = dx - sx * startHandle;
+            var arrivalY = dy - sy * startHandle;
+            var arrivalLength = Math.hypot(arrivalX, arrivalY);
+            if (arrivalLength > 1e-6) {
+                ex = arrivalX / arrivalLength;
+                ey = arrivalY / arrivalLength;
+            }
+        }
         var endHandle = Math.max(distance / 3, startHandle / 4);
         var collinear = Math.abs(sx * dy - sy * dx) < distance * .01
                 && Math.abs(ex * dy - ey * dx) < distance * .01;
@@ -53,9 +70,10 @@ final class FlightCurve {
         // Long braking approaches need width and an arrival handle proportional to their extent.
         var bow = Math.max(0, startHandle - distance) * SpaceBalance.REVERSAL_STEERING_RATIO;
         if (collinear && turnsBack) bow = Math.max(bow, distance * SpaceBalance.REVERSAL_STEERING_RATIO);
-        // Stay on the control polygon's side so the bow reinforces its curvature.
+        // Open the inside of a stopped return arc so its turn stays rounded.
+        // Constrained arrivals keep the bow on the control polygon's side.
         var side = (sx * dy - sy * dx) * startHandle - (ex * dy - ey * dx) * endHandle;
-        if (side > 0) bow = -bow;
+        if (stoppedArrival ? side < 0 : side > 0) bow = -bow;
         return new FlightCurve(startX, startY, startX + sx * startHandle, startY + sy * startHandle,
                 endX - ex * endHandle, endY - ey * endHandle, endX, endY, -dy / distance * bow, dx / distance * bow);
     }
