@@ -20,6 +20,6 @@ public class AcceleratorBlockImpactBehavior implements ParticleImpactBehavior {
     @Override
     public Optional<ParticleImpactResult> onImpact(ParticleImpactContext context) {
         var used = context.accelerator().handleParticleBlockCollision(context.hitPos(), context.speed(), context.hitState());
-        return Optional.of(new ParticleImpactResult((long) Math.ceil(used), false));
+        return Optional.of(new ParticleImpactResult((long) Math.ceil(used), false, false));
     }
 }

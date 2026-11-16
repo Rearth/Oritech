@@ -157,7 +157,8 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                                       RocketFlightPathCalculator.CraftPath path, long extraTicks) {
 
         var action = telemetry.plan().currentAction();
-        if (action == null) return -1;
+        if (action == null || telemetry.status().equals(MissionState.STATUS_TRANSFER_BLOCKED)
+                || telemetry.status().equals(MissionState.STATUS_NO_FEASIBLE_TRANSFER)) return -1;
         var totalTicks = telemetry.actionDurationTicks();
         if (totalTicks <= 0 && path != null
                 && action.type() != SpaceSimulation.ActionType.TRANSMIT_INFORMATION

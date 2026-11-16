@@ -1,5 +1,12 @@
 package rearth.oritech.spaceage.simulation;
 
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ServiceSettings;
+
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -259,6 +266,26 @@ public final class SpaceBalance {
         var slot = 0;
         while (occupied.contains(slot)) slot++;
         return slot;
+    }
+
+    /** Current placements and promised destinations share the same slot allocation in previews and launches. */
+    public record OrbitSlot(UUID body, OrbitBand orbit, int slot) {
+    }
+
+    public static FlightPlan resolveOrbitSlots(FlightPlan plan, List<OrbitSlot> occupied) {
+
+        var used = new HashSet<>(occupied);
+        return plan.withBranches(plan.branches().stream().map(branch -> branch.withActions(branch.actions().stream().map(action -> {
+            if (action.type() != ActionType.NAVIGATE_TO || !hasSlots(action.targetId(), action.orbit())) return action;
+            var ring = new HashSet<Integer>();
+            used.stream().filter(slot -> slot.body().equals(action.targetId()) && slot.orbit() == action.orbit())
+                    .forEach(slot -> ring.add(slot.slot()));
+            var slot = freeSlot(action.service().slot(), ring);
+            if (slot >= slots(action.targetId(), action.orbit())) slot = -1;
+            else used.add(new OrbitSlot(action.targetId(), action.orbit(), slot));
+            var settings = action.service();
+            return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
+        }).toList())).toList());
     }
 
     public static boolean hasSlots(UUID body, SpaceSimulation.OrbitBand orbit) {

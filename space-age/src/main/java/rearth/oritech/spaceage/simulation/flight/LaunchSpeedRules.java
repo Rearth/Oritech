@@ -147,6 +147,21 @@ public final class LaunchSpeedRules {
             this(min, max, List.of(new Range(min, max)));
         }
 
+        public boolean contains(long speed) {
+
+            return ranges.stream().anyMatch(range -> speed >= range.min() && speed <= range.max());
+        }
+
+        public long nearest(long speed) {
+
+            var nearest = min;
+            for (var range : ranges) {
+                var candidate = Math.clamp(speed, range.min(), range.max());
+                if (Math.abs(candidate - speed) < Math.abs(nearest - speed)) nearest = candidate;
+            }
+            return nearest;
+        }
+
     }
 
     public record Range(long min, long max) {

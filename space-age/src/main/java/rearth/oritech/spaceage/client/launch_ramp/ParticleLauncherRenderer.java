@@ -44,7 +44,7 @@ public final class ParticleLauncherRenderer<R extends BlockEntityRenderState & G
     public void addRenderData(LaunchRampBlockEntity launcher, Void related, R state, float partialTick) {
 
         var age = launcher.lastShot < 0 || launcher.getLevel() == null || !launcher.isAssembled(launcher.getBlockState())
-                ? -1d : launcher.getLevel().getGameTime() + partialTick - launcher.lastShot - LaunchRampBlockEntity.BEAM_DELAY;
+                ? -1d : launcher.getLevel().getGameTime() + partialTick - launcher.lastShot;
         state.addGeckolibData(SHOT_AGE, age);
     }
 
@@ -52,7 +52,7 @@ public final class ParticleLauncherRenderer<R extends BlockEntityRenderState & G
     public AABB getRenderBoundingBox(LaunchRampBlockEntity launcher) {
 
         var start = Vec3.atLowerCornerOf(launcher.getBlockPos()).add(launcher.muzzleOffset());
-        var end = start.add(launcher.launchDirection().scale(36));
+        var end = start.add(launcher.launchDirection().scale(LaunchRampBlockEntity.BEAM_LENGTH));
         return new AABB(start, end).inflate(2).minmax(new AABB(launcher.getBlockPos()).inflate(2));
     }
 
@@ -70,17 +70,20 @@ public final class ParticleLauncherRenderer<R extends BlockEntityRenderState & G
             if (age == null || age < 0 || age > LaunchRampBlockEntity.BEAM_TICKS) return;
             var direction = new Vec3(0, Math.sin(LaunchRampBlockEntity.ELEVATION), Math.cos(LaunchRampBlockEntity.ELEVATION));
             var muzzle = LaunchRampBlockEntity.muzzleOffset(Direction.SOUTH).subtract(.5, 0, .5);
-            // A short pulse grows out of the muzzle, then travels away at twelve blocks/second.
-            var head = age * .6;
-            var tail = Math.max(0, head - 5);
-            var start = muzzle.add(direction.scale(tail));
-            var delta = direction.scale(head - tail);
-            var alpha = (int) (255 * Math.min(1, (LaunchRampBlockEntity.BEAM_TICKS - age) / 10));
             collector.submitCustomGeometry(pass.poseStack(), RenderTypes.eyes(BEAM), (pose, consumer) -> {
-                BeamRenderer.renderStraightBeam(pose, consumer, start, delta, .035f, RenderHelpers.FULL_BRIGHT,
-                        alpha << 24 | 0xD8FAFF, alpha << 24 | 0xFFFFFF);
-                BeamRenderer.renderOuterBeam(pose, consumer, start, delta, .12f, RenderHelpers.FULL_BRIGHT,
-                        (alpha / 3) << 24 | 0x38BDFF, (alpha / 3) << 24 | 0x67DEFF);
+                // A complete flash becomes irregular fragments as the breakup front climbs away from the muzzle.
+                for (var distance = 0d; distance < LaunchRampBlockEntity.BEAM_LENGTH; distance += 2) {
+                    var dissolve = ParticleLauncherEffects.dissolve(distance, age);
+                    if (dissolve >= 1) continue;
+                    var sideways = Math.sin(distance * 4.7) * dissolve * .35;
+                    var start = muzzle.add(direction.scale(distance + dissolve * .6)).add(sideways, 0, 0);
+                    var delta = direction.scale(2 * (1 - dissolve * .8));
+                    var alpha = (int) (255 * (1 - dissolve) * (1 - dissolve));
+                    BeamRenderer.renderStraightBeam(pose, consumer, start, delta, .025f, RenderHelpers.FULL_BRIGHT,
+                            alpha << 24 | 0xD8FAFF, alpha << 24 | 0xFFFFFF);
+                    BeamRenderer.renderOuterBeam(pose, consumer, start, delta, .075f, RenderHelpers.FULL_BRIGHT,
+                            (alpha / 4) << 24 | 0x38BDFF, (alpha / 4) << 24 | 0x67DEFF);
+                }
             });
         }
     }

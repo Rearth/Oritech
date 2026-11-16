@@ -12,7 +12,6 @@ import com.geckolib.util.GeckoLibUtil;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.level.block.Block;
-import rearth.oritech.block.base.entity.MachineBlockEntity;
 import rearth.oritech.spaceage.OritechSpaceAge;
 
 import java.util.function.Consumer;
@@ -44,7 +43,7 @@ public final class ParticleLauncherItem extends BlockItem implements GeoItem {
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controllers) {
 
-        controllers.add(new AnimationController<>("machine", 0, state -> state.setAndContinue(MachineBlockEntity.PACKAGED)));
+        controllers.add(new AnimationController<>("machine", 0, state -> state.setAndContinue(LaunchRampBlockEntity.PACKAGED)));
     }
 
     @Override

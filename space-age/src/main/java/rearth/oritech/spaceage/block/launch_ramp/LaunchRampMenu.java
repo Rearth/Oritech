@@ -17,9 +17,13 @@ import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlockEntity.Outcome;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.network.RocketNetworking;
-import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
+import rearth.oritech.spaceage.simulation.SpaceBalance.OrbitSlot;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlannerSnapshot;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.flight.LaunchSpeedRules;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,7 +44,7 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     private final @Nullable LaunchRampBlockEntity ramp;
     private final Player player;
     // Client state: synced ramp status, the expected particle speed (-1 uses the lowest working speed) and the speed window.
-    public Status status = new Status(0, Outcome.NONE.ordinal(), "", false);
+    public Status status = new Status(0, Outcome.NONE.ordinal(), "", false, false, "", "", false);
     public int statusRevision;
     public long expectedSpeed = -1;
     // Only the ramp tab shows the slots; the full-screen rocket and plan tabs hide them.
@@ -48,11 +52,15 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     public @Nullable LaunchSpeedRules.Window speedWindow;
     public boolean speedWindowKnown;
     public int speedWindowRevision;
-    public @Nullable SpaceSimulation.FlightPlan speedWindowPlan;
+    public @Nullable FlightPlan speedWindowPlan;
     public @Nullable CompletableFuture<LaunchSpeedRules.Window> speedWindowSearch;
     public int speedWindowDelay;
     public int speedWindowPreviewRevision = -1;
-    private long sentPattern = -1;
+    private @Nullable CubeSatData sentPattern;
+    private @Nullable FlightPlan sentPlan;
+    private boolean viewingSaved;
+    private boolean sentSaved;
+    private List<OrbitSlot> sentSlots = List.of();
     private @Nullable Status sentStatus;
 
     public LaunchRampMenu(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
@@ -105,7 +113,7 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     }
 
     @Override
-    public @Nullable MissionState.Position launchPosition(List<SpaceSimulation.SpaceObjectData> objects) {
+    public @Nullable MissionState.Position launchPosition(List<SpaceObjectData> objects) {
 
         var rocket = getRocket();
         return rocket == null ? null : LaunchSpeedRules.position(objects, rocket.getLaunchPosition(), previewSpeed());
@@ -119,19 +127,41 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
 
         super.broadcastChanges();
         if (ramp == null || !(player instanceof ServerPlayer serverPlayer)) return;
-        var data = CubeSatBlock.data(pattern());
-        var fingerprint = data == null ? 0 : data.fingerprint();
-        if (fingerprint != sentPattern) {
-            sentPattern = fingerprint;
-            setPreview(ramp.createPreview());
+        var data = ramp.previewPattern(viewingSaved);
+        if (!isPreviewLoaded() || !Objects.equals(data, sentPattern) || sentSaved != viewingSaved || !ramp.savedPlan().equals(sentPlan)) {
+            sentPattern = data;
+            sentSaved = viewingSaved;
+            sentPlan = ramp.savedPlan();
+            setPreview(ramp.createPreview(viewingSaved));
             RocketNetworking.sendAssemblerPreview(serverPlayer, blockPos, getRocket());
-            if (getRocket() != null) RocketNetworking.sendFlightPlanner(serverPlayer, this);
+            if (getRocket() != null) {
+                sentSlots = ramp.orbitSlots(serverPlayer, getRocket().getRocketId());
+                RocketNetworking.sendFlightPlanner(serverPlayer, this);
+            }
         }
-        var current = new Status(ramp.lastSpeed(), ramp.lastOutcome().ordinal(), ramp.ownerName(), ramp.planForPattern());
+        if (getRocket() != null) {
+            var occupied = ramp.orbitSlots(serverPlayer, getRocket().getRocketId());
+            if (!occupied.equals(sentSlots)) {
+                sentSlots = occupied;
+                RocketNetworking.sendFlightPlanner(serverPlayer, this);
+            }
+        }
+        var saved = ramp.savedPattern();
+        var current = new Status(ramp.lastSpeed(), ramp.lastOutcome().ordinal(), ramp.ownerName(), ramp.planForPattern(),
+                saved != null, ramp.savedPlan().name(), saved == null ? "" : saved.name(), viewingSaved || pattern().isEmpty() && saved != null);
         if (!current.equals(sentStatus)) {
             sentStatus = current;
             PacketDistributor.sendToPlayer(serverPlayer, new RocketNetworking.RampStatusPayload(containerId, current));
         }
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int button) {
+
+        if (ramp == null || !stillValid(player) || button < 0 || button > 1) return false;
+        viewingSaved = button == 1 && ramp.savedPattern() != null;
+        broadcastChanges();
+        return true;
     }
 
     public void receiveStatus(Status status) {
@@ -160,10 +190,18 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     }
 
     @Override
-    public void saveFlightPlan(ServerPlayer player, SpaceSimulation.FlightPlan plan) {
+    public void saveFlightPlan(ServerPlayer player, FlightPlan plan) {
 
         var rocket = getRocket();
-        if (ramp != null && rocket != null) ramp.savePlan(player, rocket.getRocketId(), plan);
+        if (ramp == null || rocket == null) return;
+        var current = ramp.createPreview(viewingSaved);
+        if (current != null && current.getRocketId().equals(rocket.getRocketId())) ramp.savePlan(player, rocket.getRocketId(), plan);
+    }
+
+    @Override
+    public FlightPlannerSnapshot createFlightPlannerSnapshot(ServerPlayer player) {
+
+        return ramp == null ? super.createFlightPlannerSnapshot(player) : ramp.createFlightPlannerSnapshot(player, getRocket().getRocketId());
     }
 
     @Override
@@ -176,9 +214,14 @@ public class LaunchRampMenu extends RocketAssemblerMenu {
     /**
      * @param outcome     ordinal of {@link Outcome}
      * @param owner       name of the player who saved the plan, empty without one
-     * @param planMatches whether the saved plan was made for the current pattern
+     * @param planMatches whether the saved plan was made for the inserted pattern
+     * @param hasPlan whether this block owns a stored program, independently of its physical slot
+     * @param planName stored program name
+     * @param patternName stored design name
+     * @param viewingSaved whether the editor uses the stored design instead of the inserted item
      */
-    public record Status(long lastSpeed, int outcome, String owner, boolean planMatches) {
+    public record Status(long lastSpeed, int outcome, String owner, boolean planMatches, boolean hasPlan,
+                         String planName, String patternName, boolean viewingSaved) {
 
     }
 

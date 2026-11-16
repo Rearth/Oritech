@@ -16,6 +16,9 @@ import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 
 import java.util.List;
@@ -163,6 +166,15 @@ public class RocketAssemblerMenu extends AbstractContainerMenu {
     public boolean savesOnClose() {
 
         return true;
+    }
+
+    /** The source owns which saved plan and simulation are shown in its editor. */
+    public SpaceSimulation.FlightPlannerSnapshot createFlightPlannerSnapshot(ServerPlayer player) {
+
+        return SpaceSimulationSavedData.getForPlayer(player)
+                .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), blockPos), rocket.getRocketId())
+                .withStations(RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()))
+                .withOrbitSlots(MissionController.orbitSlots(MissionSavedData.get(player.level().getServer()), player.getUUID(), rocket.getRocketId()));
     }
 
     public boolean canLaunch() {

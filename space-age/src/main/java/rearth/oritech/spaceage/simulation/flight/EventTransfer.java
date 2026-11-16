@@ -36,6 +36,7 @@ final class EventTransfer {
     private final double credit;
     private final Map<SegmentRef, Double> solar = new HashMap<>();
     private boolean eventLimitReached;
+    private double immediateArrivalSpeed = Double.NaN;
 
     EventTransfer(Craft source, Context context, FlightCurve curve, double initial, double arrival, double efficiency, double credit) {
 
@@ -70,6 +71,7 @@ final class EventTransfer {
 
     List<Event> solve(double cap, boolean freeArrival) {
 
+        source.navigationFailure = null;
         if (!freeArrival && arrival > cap) return null;
         var acceleration = Math.max(.001, source.deltaVPerSecond(source.activeSegments(context)));
         if (solar.values().stream().anyMatch(value -> value > 0))
@@ -96,6 +98,7 @@ final class EventTransfer {
             }
         }
         if (best == null) {
+            if (initial > arrival) trial(initial, 0, false, false);
             reportLimit();
             return null;
         }
@@ -242,6 +245,7 @@ final class EventTransfer {
                     }
                     return new Trial(0, elapsed, peak, brakeAt, true, events);
                 }
+                if (brakeAt == 0 && speed > arrival + SPEED_TOLERANCE) immediateArrivalSpeed = speed;
                 return new Trial(speed > arrival ? length : -length, elapsed, peak, brakeAt, false, null);
             }
             if (braking && speed <= arrival + 1e-7) return new Trial(s - length, elapsed, peak, brakeAt, false, null);
@@ -256,6 +260,8 @@ final class EventTransfer {
 
         if (eventLimitReached)
             source.navigationFailure = new NavigationFailure("calculation_limit", MAX_EVENTS, MAX_EVENTS);
+        else if (Double.isFinite(immediateArrivalSpeed))
+            source.navigationFailure = new NavigationFailure("arrival_braking", immediateArrivalSpeed, arrival);
     }
 
     record Event(double seconds, double start, double end, double initialSpeed, double endSpeed,

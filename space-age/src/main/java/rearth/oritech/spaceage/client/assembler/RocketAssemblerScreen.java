@@ -112,7 +112,10 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         if (menu instanceof LaunchRampMenu ramp) {
             ramp.slotsVisible = false;
-            SpaceAgeButtons.rampTabs(1, () -> Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle)), () -> {
+            SpaceAgeButtons.rampTabs(1, () -> {
+                RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
+                Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle));
+            }, () -> {
             }, this::openFlightPlanner).forEach(this::addComponent);
         } else SpaceAgeButtons.assemblerTabs(0, () -> {
         }, this::openFlightPlanner).forEach(this::addComponent);

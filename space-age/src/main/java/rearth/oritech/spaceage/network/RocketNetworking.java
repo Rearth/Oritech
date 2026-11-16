@@ -1,7 +1,6 @@
 package rearth.oritech.spaceage.network;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -23,11 +22,10 @@ import rearth.oritech.spaceage.client.rocket.RocketClientController;
 import rearth.oritech.spaceage.client.rocket.RocketEffects;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.SpaceBalance.OrbitSlot;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
-import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
-import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 
@@ -59,6 +57,7 @@ public final class RocketNetworking {
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanAction.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlanBranch.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlan.class);
+        NetworkManager.getAutoCodec(OrbitSlot.class);
         NetworkManager.getAutoCodec(SpaceSimulation.FlightPlannerSnapshot.class);
 
         NetworkManager.getAutoCodec(LaunchRampMenu.Status.class);
@@ -197,9 +196,7 @@ public final class RocketNetworking {
         FleetCategoryNetworking.send(player);
         var rocket = menu.getRocket();
         if (rocket == null) return;
-        var snapshot = SpaceSimulationSavedData.getForPlayer(player)
-                .createFlightPlannerSnapshot(GlobalPos.of(player.level().dimension(), menu.blockPos), rocket.getRocketId())
-                .withStations(RocketDocking.targets(MissionSavedData.get(player.level().getServer()), player.getUUID()));
+        var snapshot = menu.createFlightPlannerSnapshot(player);
         PacketDistributor.sendToPlayer(player, new FlightPlannerPayload(menu.blockPos, snapshot));
     }
 

@@ -11,6 +11,7 @@ import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.AsteroidTarget;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
+import rearth.oritech.spaceage.simulation.SpaceBalance.OrbitSlot;
 import rearth.oritech.spaceage.simulation.SpaceAgeAdvancements;
 import rearth.oritech.spaceage.simulation.AsteroidDeliveries;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
@@ -515,28 +516,22 @@ public final class MissionController {
 
     public static FlightPlan resolveOrbitSlots(FlightPlan plan, MissionSavedData data, UUID owner, UUID self) {
 
-        record Ring(UUID body, OrbitBand orbit) {
-        }
+        return SpaceBalance.resolveOrbitSlots(plan, orbitSlots(data, owner, self));
+    }
 
-        var occupied = new HashMap<Ring, Set<Integer>>();
+    public static List<OrbitSlot> orbitSlots(MissionSavedData data, UUID owner, UUID self) {
+
+        var occupied = new HashSet<OrbitSlot>();
         for (var craft : data.craft.values()) {
             if (!craft.owner.equals(owner) || craft.ended || craft.rocket.getRocketId().equals(self)) continue;
-            occupied.computeIfAbsent(new Ring(craft.position.target(), craft.position.orbit()), ignored -> new HashSet<>()).add(craft.position.slot());
-            craft.plan.branches().stream().flatMap(b -> b.actions().stream()).filter(a -> a.type() == ActionType.NAVIGATE_TO
-                    && SpaceBalance.hasSlots(a.targetId(), a.orbit()) && a.service().slot() >= 0).forEach(a ->
-                    occupied.computeIfAbsent(new Ring(a.targetId(), a.orbit()), ignored -> new HashSet<>()).add(a.service().slot()));
+            if (craft.position.slot() >= 0)
+                occupied.add(new OrbitSlot(craft.position.target(), craft.position.orbit(), craft.position.slot()));
+            craft.plan.branches().stream().flatMap(branch -> branch.actions().stream())
+                    .filter(action -> action.type() == ActionType.NAVIGATE_TO
+                            && SpaceBalance.hasSlots(action.targetId(), action.orbit()) && action.service().slot() >= 0)
+                    .forEach(action -> occupied.add(new OrbitSlot(action.targetId(), action.orbit(), action.service().slot())));
         }
-        return plan.withBranches(plan.branches().stream().map(branch -> branch.withActions(branch.actions().stream().map(action -> {
-            if (action.type() != ActionType.NAVIGATE_TO || !SpaceBalance.hasSlots(action.targetId(), action.orbit()))
-                return action;
-            var used = occupied.computeIfAbsent(new Ring(action.targetId(), action.orbit()), ignored -> new HashSet<>());
-            var slot = SpaceBalance.freeSlot(action.service().slot(), used);
-            // A full ring retains an unassigned destination; arrival waits with an explicit full-ring status.
-            if (slot >= SpaceBalance.slots(action.targetId(), action.orbit())) slot = -1;
-            else used.add(slot);
-            var settings = action.service();
-            return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
-        }).toList())).toList());
+        return List.copyOf(occupied);
     }
 
     public static boolean redirectBeam(MissionState state, UUID target, int x, int z, SpaceSimulation system,

@@ -191,7 +191,14 @@ public class AcceleratorParticleLogic {
         var distance = Math.max(Math.sqrt(particle.velocity), 0.4) * 0.9;
         var exitTo = exitFrom.add(direction.normalize().scale(distance));
 
-        entity.onParticleExited(exitFrom, exitTo, particle.lastGate, direction, reason);
+        entity.onParticleExited(reason);
+
+        // Resolve interactions before sending the trail so absorbed particles never draw past the hit.
+        exitTo = traceParticleExit(particle, direction, reason, distance, exitTo);
+        entity.sendParticleTrail(List.of(exitFrom, exitTo));
+    }
+
+    private Vec3 traceParticleExit(ActiveParticle particle, Vec3 direction, ParticleAcceleratorBlockEntity.ParticleEvent reason, double distance, Vec3 exitTo) {
 
         var searchDist = (int) distance;
         var searchDirection = new Vec3i((int) Math.round(direction.x), 0, (int) Math.round(direction.z));
@@ -210,7 +217,7 @@ public class AcceleratorParticleLogic {
                 var usedMomentum = entity.handleParticleEntityCollision(checkPos, particle, remainingMomentum, mob);
                 remainingMomentum -= usedMomentum;
 
-                if (remainingMomentum <= 0.1f) return;
+                if (remainingMomentum <= 0.1f) return checkPos.getCenter();
             }
 
             var block = level.getBlockState(checkPos);
@@ -225,11 +232,12 @@ public class AcceleratorParticleLogic {
                     entity.activeItemParticle = ItemStack.EMPTY;
                 }
 
-                if (remainingMomentum <= 0.1f) return;
+                if (result.get().consumeParticle() || remainingMomentum <= 0.1f) return checkPos.getCenter();
             }
 
         }
 
+        return exitTo;
     }
 
     private Optional<Pair<ActiveParticle, ParticleAcceleratorBlockEntity>> updateParticleCollision(BlockPos blockPos, List<BlockPos> collisionPositions) {

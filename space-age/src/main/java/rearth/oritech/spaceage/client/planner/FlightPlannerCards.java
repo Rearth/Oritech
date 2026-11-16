@@ -310,8 +310,11 @@ final class FlightPlannerCards {
                 && (issue.actionId().equals(action.id()) || issue.actionId().equals(SpaceSimulation.FlightPlanAction.NO_TARGET))).toList();
         issues.forEach(issue -> card.addTooltipLine(issue.description()));
         scroll.addChild(card);
-        if (!issues.isEmpty()) scroll.addChild(blockedBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
-                issues.stream().map(RocketFlightPlanRules.Issue::description).toList()));
+        if (!issues.isEmpty()) {
+            var tooltip = new ArrayList<Component>(issues.stream().map(RocketFlightPlanRules.Issue::description).toList());
+            tooltip.addAll(screen.navigationContext(action.id()));
+            scroll.addChild(blockedBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, tooltip));
+        }
         if (screen.isCurrentAction(action.id())) {
             scroll.addChild(cardBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT,
                     currentActionTooltip(card.getTooltip(), screen.currentActionLabel()), 0xFF5AD6EB));
@@ -326,10 +329,10 @@ final class FlightPlannerCards {
                         && (!moment.completed() || path.actionMoments().getLast().equals(moment))))
                 .findFirst().orElse(null);
         if (blockedPath != null) {
-            var reason = FlightPlannerLabels.blockedTooltip(screen.calculatedFlight(), action.id(), blockedPath.terminalState());
-            card.addTooltipLine(reason);
+            var reason = screen.navigationProblem(action.id(), blockedPath.terminalState());
+            reason.forEach(card::addTooltipLine);
             scroll.addChild(cardBorder(cursorX, rowY, NORMAL_CARD_WIDTH - 8, CARD_HEIGHT, action.type() == SpaceSimulation.ActionType.SCAN
-                    ? card.getTooltip() : List.of(reason), 0xFF000000 | FlightPlannerLabels.terminalStyle(blockedPath.terminalState()).getColor()));
+                    ? card.getTooltip() : reason, 0xFF000000 | FlightPlannerLabels.terminalStyle(blockedPath.terminalState()).getColor()));
         }
         var textColor = LabelWidget.BRIGHT_TEXT;
         scroll.addChild(new LabelWidget(cursorX + 6, rowY + 7, NORMAL_CARD_WIDTH - 20,

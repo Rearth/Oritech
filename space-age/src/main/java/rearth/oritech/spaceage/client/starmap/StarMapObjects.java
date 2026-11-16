@@ -4,8 +4,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import rearth.oritech.api.screen.widgets.BlockWidget;
@@ -45,7 +43,6 @@ final class StarMapObjects {
     // Each object keeps its 3D block widget so its familiar planet icon can be reused each frame.
     private final List<Entry> objects = new ArrayList<>();
     private final List<FogPatch> fogBridges = new ArrayList<>();
-    private final ItemStack waypointIcon = new ItemStack(Items.ENDER_EYE);
     private Set<UUID> fleetMarkers = Set.of();
     private final Map<UUID, TuggedObject> tuggedObjects = new HashMap<>();
 
@@ -410,9 +407,13 @@ final class StarMapObjects {
                 // Fleet markers already draw these craft; standalone docking targets use the same icon.
                 if (!intersects(viewport, position.x(), position.y(), 8, 8)) continue;
                 if (visibleIcons.contains(object.data.id())) {
-                    if (object.data.type() == SpaceObjects.ObjectType.WAYPOINT)
-                        graphics.item(waypointIcon, (int) Math.round(position.x() - 8), (int) Math.round(position.y() - 8));
-                    else SpacecraftIcon.draw(graphics, (int) Math.round(position.x()), (int) Math.round(position.y()), 18);
+                    if (object.data.type() == SpaceObjects.ObjectType.WAYPOINT) {
+                        var x = (int) Math.round(position.x());
+                        var y = (int) Math.round(position.y());
+                        var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id());
+                        graphics.fill(x - 3, y - 3, x + 3, y + 3, selected ? 0xFFFFD45C : 0xFFE2E8F0);
+                        graphics.fill(x - 2, y - 2, x + 2, y + 2, 0xFF080D18);
+                    } else SpacecraftIcon.draw(graphics, (int) Math.round(position.x()), (int) Math.round(position.y()), 18);
                     if (camera.zoom() >= CRAFT_NAME_ZOOM)
                         graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                                 (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);

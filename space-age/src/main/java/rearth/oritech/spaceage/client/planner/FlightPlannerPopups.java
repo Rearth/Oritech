@@ -759,7 +759,7 @@ final class FlightPlannerPopups {
         var stationKeepingDetailsHeight = stationKeeping ? 40 : 0;
         var altitudeDetailsHeight = addon.type().isAltitude() ? 26 : 0;
         var popupWidth = Math.min(350, editors.panelWidth() - 12);
-        var popupHeight = 123 + typeRows * 32 + stationKeepingDetailsHeight + altitudeDetailsHeight;
+        var popupHeight = 135 + typeRows * 32 + stationKeepingDetailsHeight + altitudeDetailsHeight;
         var px = (editors.panelWidth() - popupWidth) / 2;
         var py = Math.max(4, (editors.panelHeight() - popupHeight) / 2);
         addEditorBackdrop(px, py, popupWidth, popupHeight);
@@ -791,8 +791,17 @@ final class FlightPlannerPopups {
             editors.addPopupComponent(button.withTooltip(FlightPlannerLabels.addonTooltip(type.isAltitude() && addon.type().isAltitude()
                     ? addon.type() : type)).withZIndex(CONTROL_Z));
         }
+        var settingsY = py + 50 + stationKeepingDetailsHeight + typeRows * 32;
+        editors.addPopupComponent(new UIComponent(px + 10, settingsY - 8, popupWidth - 20, 1) {
+
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                graphics.fill(x, y, x + width, y + height, 0xFF62676B);
+            }
+        }.withZIndex(CONTROL_Z));
         if (addon.type().isAltitude()) {
-            var comparisonY = py + 38 + stationKeepingDetailsHeight + typeRows * 32;
+            var comparisonY = settingsY;
             var comparisonWidth = (popupWidth - 24) / 2;
             var below = SpaceAgeButtons.panel(px + 10, comparisonY, comparisonWidth, 20,
                     Component.translatable("screen.oritech_space_age.action.altitude_below"),
@@ -805,7 +814,7 @@ final class FlightPlannerPopups {
             above.setActive(addon.type() != ActionAddonType.ALTITUDE_ABOVE);
             editors.addPopupComponent(above.withZIndex(CONTROL_Z));
         }
-        var valueY = py + 44 + stationKeepingDetailsHeight + typeRows * 32 + altitudeDetailsHeight;
+        var valueY = settingsY + 6 + altitudeDetailsHeight;
         editors.addPopupComponent(new LabelWidget(px + 10, valueY + 5, 72,
                 Component.translatable(addon.type().isAltitude() ? "screen.oritech_space_age.action.condition.altitude"
                         : "screen.oritech_space_age.action.condition_value"))

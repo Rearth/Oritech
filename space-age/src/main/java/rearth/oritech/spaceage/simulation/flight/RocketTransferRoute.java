@@ -133,9 +133,9 @@ public final class RocketTransferRoute {
         }
         var events = new EventTransfer(craft, context, curve, speed, arrival, efficiency, brakingCredit).solve(cap, freeArrival);
         // The vacuum stopping estimate can miss an atmospheric crossing on a long reversal.
-        // Give the actual event simulation room to brake, keeping inherited speed as the cruise ceiling.
+        // Grow enough to escape a too-short stopping curve; tiny extensions leave artificial launch-speed gaps.
         for (int approach = 0; events == null && speed > arrival && !freeArrival && approach < 4; approach++) {
-            startHandle *= 1.1;
+            startHandle *= 2;
             curve = FlightCurve.between(craft.x, craft.y, endX, endY, sx, sy, ex, ey, startHandle);
             efficiency = steeringEfficiency(curve);
             events = new EventTransfer(craft, context, curve, speed, arrival, efficiency, brakingCredit).solve(Math.min(cap, speed), false);
@@ -155,11 +155,8 @@ public final class RocketTransferRoute {
                 craft.navigationFailure = new NavigationFailure("arrival_cap", arrival, cap);
             else if (speed > arrival && !freeArrival && burnProfile.deltaV() * efficiency < speed - arrival)
                 craft.navigationFailure = new NavigationFailure("braking_budget", burnProfile.deltaV() * efficiency, speed - arrival);
-            if (craft.navigationFailure == null && craft.segments.values().stream().anyMatch(segment -> segment.hardware.ion() > 0 && segment.hardware.antennas() > 0))
-                craft.navigationFailure = new NavigationFailure("radio_budget",
-                        craft.segments.values().stream().mapToDouble(segment -> segment.hardware.antennas() * SpaceBalance.ANTENNA_RF * 20).sum()
-                                * 2 * Math.sqrt(curve.length() / Math.max(.001, strongest)),
-                        craft.segments.values().stream().mapToDouble(segment -> segment.rf()).sum());
+            if (craft.navigationFailure == null)
+                craft.navigationFailure = new NavigationFailure("approach_search", speed, arrival);
             return null;
         }
         var factor = events.stream().filter(event -> event.direction() < 0).mapToDouble(EventTransfer.Event::fuelFactor).findFirst().orElse(1);

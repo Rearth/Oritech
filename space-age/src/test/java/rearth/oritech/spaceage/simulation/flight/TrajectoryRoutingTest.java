@@ -232,7 +232,7 @@ class TrajectoryRoutingTest {
     }
 
     @Test
-    void insufficientRfForPropulsionAndRadioRejectsBeforeDrawingAFlight() {
+    void aFailedIonTransferDoesNotInventARadioBudgetDiagnosis() {
 
         var target = new SpaceObjectData(SpaceSimulation.MARS_ID, SpaceObjects.ObjectType.MARS,
                 8_000_000, 1_500_000, 45_000, 3.71f, SpaceObjects.DetectionState.PRECISE);
@@ -245,7 +245,7 @@ class TrajectoryRoutingTest {
         assertEquals(0, craft.time);
         assertEquals(hardware.rfCost(11.59), segment.rf(), 1e-6);
         assertNotNull(craft.navigationFailure);
-        assertEquals("radio_budget", craft.navigationFailure.reason());
+        assertEquals("approach_search", craft.navigationFailure.reason());
         assertEquals(1, craft.samples.size(), "An impossible power schedule must not draw a completed transfer");
     }
 

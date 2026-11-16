@@ -72,6 +72,20 @@ class LaunchSpeedRulesTest {
     }
 
     @Test
+    void disjointSpeedWindowsSuggestTheNearestWorkingSpeed() {
+
+        var window = new LaunchSpeedRules.Window(3511, Long.MAX_VALUE,
+                List.of(new LaunchSpeedRules.Range(3511, 4625), new LaunchSpeedRules.Range(7858, Long.MAX_VALUE)));
+        assertTrue(!window.contains(7799));
+        assertEquals(7858, window.nearest(7799));
+        assertEquals(4625, window.nearest(5000));
+        assertEquals(3511, window.nearest(0));
+        assertTrue(window.contains(7858));
+        assertTrue(window.contains(Long.MAX_VALUE));
+        assertEquals(Long.MAX_VALUE, window.nearest(Long.MAX_VALUE));
+    }
+
+    @Test
     void windowReportsPlansWithoutSpeedAndUnreachablePlans() {
 
         var free = LaunchSpeedRules.window(30_000, speed -> true);

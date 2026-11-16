@@ -14,8 +14,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -25,9 +23,7 @@ import net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent;
 import org.joml.Quaternionf;
 import rearth.oritech.block.base.block.MultiblockMachine;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
-import rearth.oritech.block.blocks.processing.RefineryChamberModuleBlock;
 import rearth.oritech.block.blocks.storage.LargeStorageBlock;
-import rearth.oritech.block.blocks.storage.PortableEnergyStorageBlock;
 import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.init.BlockContent;
 import rearth.oritech.init.ItemContent;
@@ -129,14 +125,12 @@ public class BlockOutlineRenderer {
         }
 
         var coreOffsets = multiblockController.getCorePositions();
-        var machineFacing = getFacingFromState(placementState);
+        var machineFacing = multiblockController.getFacingForMultiblock();
 
         if (block instanceof LargeStorageBlock) {    // the large block is weird
             machineFacing = player.getDirection().getOpposite();
         } else if (block instanceof AugmentResearchStationBlock) {
             machineFacing = player.getNearestViewDirection();
-        } else if (!(block instanceof MultiblockMachine || block instanceof RefineryChamberModuleBlock)) {
-            machineFacing = machineFacing.getOpposite();
         }
 
         var fullList = new ArrayList<>(coreOffsets);
@@ -150,18 +144,6 @@ public class BlockOutlineRenderer {
         }
 
         targetOutlines.add(new OutlineData(machinePos, shape));
-    }
-
-    private static Direction getFacingFromState(BlockState state) {
-        if (state.hasProperty(BlockStateProperties.HORIZONTAL_FACING)) {
-            return state.getValue(BlockStateProperties.HORIZONTAL_FACING);
-        } else if (state.hasProperty(BlockStateProperties.FACING)) {
-            return state.getValue(BlockStateProperties.FACING);
-        } else if (state.hasProperty(PortableEnergyStorageBlock.TARGET_DIR)) {
-            return state.getValue(PortableEnergyStorageBlock.TARGET_DIR);
-        }
-
-        return Direction.NORTH;
     }
 
     private static void addPromethiumPickaxeOutline(ClientLevel level, LocalPlayer player, ItemStack itemStack, BlockPos blockPos, BlockHitResult hitResult, HashSet<OutlineData> targetOutlines) {

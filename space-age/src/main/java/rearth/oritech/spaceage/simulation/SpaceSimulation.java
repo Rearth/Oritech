@@ -9,6 +9,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import org.joml.Vector2f;
+import rearth.oritech.spaceage.simulation.SpaceBalance.OrbitSlot;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.mission.DockingTarget;
@@ -599,22 +600,39 @@ public class SpaceSimulation {
     }
 
     public record FlightPlannerSnapshot(UUID simulationId, UUID rocketId,
-                                        List<SpaceObjectData> objects, FlightPlan plan, List<DockingTarget> stations) {
+                                        List<SpaceObjectData> objects, FlightPlan plan, List<DockingTarget> stations, List<OrbitSlot> occupiedSlots) {
 
         public FlightPlannerSnapshot(UUID simulationId, UUID rocketId, List<SpaceObjectData> objects, FlightPlan plan) {
 
             this(simulationId, rocketId, objects, plan, List.of());
         }
 
+        public FlightPlannerSnapshot(UUID simulationId, UUID rocketId, List<SpaceObjectData> objects, FlightPlan plan,
+                                     List<DockingTarget> stations) {
+
+            this(simulationId, rocketId, objects, plan, stations, List.of());
+        }
+
         public FlightPlannerSnapshot {
 
             objects = List.copyOf(objects);
             stations = List.copyOf(stations);
+            occupiedSlots = List.copyOf(occupiedSlots);
         }
 
         public FlightPlannerSnapshot withStations(List<DockingTarget> stations) {
 
-            return new FlightPlannerSnapshot(simulationId, rocketId, objects, plan, stations);
+            return new FlightPlannerSnapshot(simulationId, rocketId, objects, plan, stations, occupiedSlots);
+        }
+
+        public FlightPlannerSnapshot withOrbitSlots(List<OrbitSlot> occupiedSlots) {
+
+            return new FlightPlannerSnapshot(simulationId, rocketId, objects, plan, stations, occupiedSlots);
+        }
+
+        public FlightPlan resolvedPlan(FlightPlan draft) {
+
+            return SpaceBalance.resolveOrbitSlots(draft, occupiedSlots);
         }
 
         public List<SpaceObjectData> mapObjects() {

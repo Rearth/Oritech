@@ -63,6 +63,23 @@ class MissionPowerUiTest {
     }
 
     @Test
+    void blockedNavigationNeverPretendsToBeNinetyNinePercentComplete() {
+
+        var id = UUID.randomUUID();
+        var segment = new StaticRocketSegment(id, Set.of(new StaticRocketSegment.BlockData(BlockPos.ZERO,
+                Blocks.GLASS.defaultBlockState())), Map.of(), 1, 0);
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, new DynamicRocketSegment(0, 0, 0, Set.of())));
+        var plan = SpaceSimulation.FlightPlan.empty();
+        plan = plan.withBranches(List.of(plan.root().withActions(List.of(
+                SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)))));
+        for (var status : List.of(MissionState.STATUS_TRANSFER_BLOCKED, MissionState.STATUS_NO_FEASIBLE_TRANSFER)) {
+            var telemetry = new MissionState.Telemetry(rocket, plan, MissionState.Position.surface(), 100,
+                    status, List.of(), 100, 100, 0);
+            assertEquals(-1, MissionControlScreen.progressPercent(telemetry, null, 0));
+        }
+    }
+
+    @Test
     void engineDemandUsesLiveFiringSegmentsAndIgnoresCoastingAndDepletedEngines() {
 
         var id = UUID.randomUUID();

@@ -140,7 +140,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         this.activeItemParticle = ItemStack.EMPTY;
     }
 
-    public void onParticleExited(Vec3 from, Vec3 to, BlockPos lastGate, Vec3 exitDirection, ParticleEvent reason) {
+    public void onParticleExited(ParticleEvent reason) {
 
         var eventPosition = BlockPos.containing(particle.position);
         PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new LastEventPacket(worldPosition, reason, particle.velocity, eventPosition, AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
@@ -148,10 +148,12 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
         this.lastParticle = particle;
         this.particle = null;
 
-        var renderedTrail = List.of(from, to);
-        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new ParticleRenderTrail(worldPosition, renderedTrail));
-
         this.setChanged();
+    }
+
+    public void sendParticleTrail(List<Vec3> positions) {
+
+        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new ParticleRenderTrail(worldPosition, positions));
     }
 
     public void onParticleCollided(long relativeSpeed, Vec3 collision, ParticleAcceleratorBlockEntity secondControllerEntity) {
@@ -330,7 +332,7 @@ public class ParticleAcceleratorBlockEntity extends BlockEntity implements Block
             resultList.add(position);
         }
 
-        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new ParticleRenderTrail(worldPosition, resultList));
+        sendParticleTrail(resultList);
         PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, ChunkPos.containing(worldPosition), new LastEventPacket(worldPosition, ParticleEvent.ACCELERATING, particle.velocity, BlockPos.containing(particle.position), AcceleratorParticleLogic.getParticleBendDist(particle.lastBendDistance, particle.lastBendDistance2), activeItemParticle));
 
     }

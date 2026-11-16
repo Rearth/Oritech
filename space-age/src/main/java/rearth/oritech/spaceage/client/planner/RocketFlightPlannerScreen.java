@@ -139,6 +139,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
 
     private static Component speedSummary(LaunchRampMenu ramp) {
 
+        var advice = LaunchRampScreen.speedAdvice(ramp);
+        if (advice != null) return advice;
         return LaunchRampScreen.windowSummary(ramp).append(Component.translatable("screen.oritech_space_age.launch_ramp.chip.preview",
                 LaunchRampScreen.number(ramp.previewSpeed())));
     }
@@ -163,6 +165,9 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (!(menu instanceof MissionControlMenu control)
                 || control.selectedTelemetry == null)
             return Component.translatable("screen.oritech_space_age.mission.now");
+        if (control.selectedTelemetry.status().equals(MissionState.STATUS_TRANSFER_BLOCKED)
+                || control.selectedTelemetry.status().equals(MissionState.STATUS_NO_FEASIBLE_TRANSFER))
+            return Component.translatable("screen.oritech_space_age.mission.blocked");
         var progress = MissionControlScreen.progressPercent(control.selectedTelemetry, branchPath(draftPlan.root().id()), extraTicks);
         return progress < 0 ? Component.translatable("screen.oritech_space_age.mission.now")
                 : Component.translatable("screen.oritech_space_age.mission.percent", progress);
@@ -447,7 +452,10 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
                     }).forEach(this::addComponent);
         } else if (menu instanceof LaunchRampMenu ramp) {
             ramp.slotsVisible = false;
-            SpaceAgeButtons.rampTabs(2, () -> Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle)),
+            SpaceAgeButtons.rampTabs(2, () -> {
+                RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
+                Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle));
+            },
                     this::switchToRocketScreen, () -> {
                     }).forEach(this::addComponent);
         } else {
@@ -527,8 +535,12 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         addComponent(capacityLabel);
         if (menu instanceof LaunchRampMenu ramp) {
             speedWindowRevision = ramp.speedWindowRevision;
-            speedLabel = new LabelWidget(12, panelHeight - 17, panelWidth - 100, speedSummary(ramp)).withDarkColor();
+            var advice = LaunchRampScreen.speedAdvice(ramp);
+            speedLabel = new LabelWidget(12, panelHeight - 17, panelWidth - 100, speedSummary(ramp))
+                    .withColor(advice == null ? LabelWidget.DARK_TEXT : 0xFFB53525);
             var tooltip = new ArrayList<>(LaunchRampScreen.speedRules());
+            tooltip.add(LaunchRampScreen.windowSummary(ramp));
+            if (advice != null) tooltip.add(advice);
             tooltip.add(Component.translatable("screen.oritech_space_age.launch_ramp.footer_help"));
             speedLabel.withTooltip(tooltip);
             addComponent(speedLabel);
@@ -575,7 +587,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
             return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), forecastPlan, control.knownPosition,
                     SpaceAgeClientRecipes.vacuum(), snapshot.stations());
         }
-        return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), draftPlan, menu.launchPosition(snapshot.objects()),
+        return RocketFlightPathCalculator.calculateFrom(flightPlanRocket, snapshot.objects(), snapshot.resolvedPlan(draftPlan), menu.launchPosition(snapshot.objects()),
                 SpaceAgeClientRecipes.vacuum(), snapshot.stations());
     }
 
@@ -588,7 +600,30 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (speedWindowRevision == ramp.speedWindowRevision) return;
         speedWindowRevision = ramp.speedWindowRevision;
         if (speedLabel != null) speedLabel.setText(speedSummary(ramp));
-        if (ramp.expectedSpeed < 0 && !hasOpenPopup()) refreshFlightPlanner();
+        if (!hasOpenPopup()) rebuildComponents();
+    }
+
+    List<Component> navigationProblem(UUID actionId, RocketFlightPathCalculator.TerminalState state) {
+
+        var result = new ArrayList<Component>();
+        result.add(FlightPlannerLabels.blockedTooltip(calculatedFlight, actionId, state));
+        result.addAll(navigationContext(actionId));
+        return result;
+    }
+
+    List<Component> navigationContext(UUID actionId) {
+
+        var result = new ArrayList<Component>();
+        if (menu instanceof LaunchRampMenu ramp && draftPlan.currentAction() != null
+                && draftPlan.currentAction().type() == SpaceSimulation.ActionType.NAVIGATE_TO && draftPlan.currentAction().id().equals(actionId)) {
+            var advice = LaunchRampScreen.speedAdvice(ramp);
+            if (advice != null) result.add(advice);
+            var resolved = currentDraftSnapshot().resolvedPlan(draftPlan).currentAction();
+            if (resolved != null && resolved.service().slot() >= 0)
+                result.add(Component.translatable("screen.oritech_space_age.launch_ramp.resolved_slot", resolved.service().slot() + 1));
+            result.add(Component.translatable("screen.oritech_space_age.launch_ramp.preview_only"));
+        }
+        return result;
     }
 
     private void card(boolean save) {
@@ -820,7 +855,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var source = menu.getFlightPlannerSnapshot();
         if (source == null) throw new IllegalStateException("Flight planner snapshot is not loaded");
         return new SpaceSimulation.FlightPlannerSnapshot(
-                source.simulationId(), source.rocketId(), source.objects(), draftPlan, source.stations());
+                source.simulationId(), source.rocketId(), source.objects(), draftPlan, source.stations(), source.occupiedSlots());
     }
 
     @Override

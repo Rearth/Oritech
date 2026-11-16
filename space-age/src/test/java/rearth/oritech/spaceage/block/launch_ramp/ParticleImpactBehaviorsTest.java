@@ -10,6 +10,7 @@ import rearth.oritech.api.accelerator.ParticleImpactResult;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -31,22 +32,34 @@ class ParticleImpactBehaviorsTest {
     @Test
     void higherPriorityBehaviorsHandleImpactsFirst() {
 
-        ParticleImpactBehaviors.register(FALLBACK, 100, context -> Optional.of(new ParticleImpactResult(1, false)));
+        ParticleImpactBehaviors.register(FALLBACK, 100, context -> Optional.of(new ParticleImpactResult(1, false, false)));
         assertEquals(1, ParticleImpactBehaviors.onImpact(CONTEXT).orElseThrow().usedMomentum());
         ParticleImpactBehaviors.register(CUSTOM, 200, context -> Optional.of(ParticleImpactResult.absorbed(context, true)));
         var result = ParticleImpactBehaviors.onImpact(CONTEXT).orElseThrow();
         assertEquals(500, result.usedMomentum());
         assertTrue(result.consumedItem());
+        assertTrue(result.consumeParticle());
     }
 
     @Test
     void emptyResultsFallThroughAndReRegisteringReplaces() {
 
-        ParticleImpactBehaviors.register(FALLBACK, 100, context -> Optional.of(new ParticleImpactResult(1, false)));
+        ParticleImpactBehaviors.register(FALLBACK, 100, context -> Optional.of(new ParticleImpactResult(1, false, false)));
         ParticleImpactBehaviors.register(CUSTOM, 200, context -> Optional.empty());
         assertEquals(1, ParticleImpactBehaviors.onImpact(CONTEXT).orElseThrow().usedMomentum());
-        ParticleImpactBehaviors.register(CUSTOM, 200, context -> Optional.of(new ParticleImpactResult(7, false)));
+        ParticleImpactBehaviors.register(CUSTOM, 200, context -> Optional.of(new ParticleImpactResult(7, false, false)));
         assertEquals(7, ParticleImpactBehaviors.onImpact(CONTEXT).orElseThrow().usedMomentum());
         assertEquals(1, ParticleImpactBehaviors.getBehaviors().stream().filter(entry -> entry.id().equals(CUSTOM)).count());
+    }
+
+    @Test
+    void particleConsumptionIsIndependentOfItemAndMomentum() {
+
+        ParticleImpactBehaviors.register(CUSTOM, 200, context -> Optional.of(new ParticleImpactResult(0, false, true)));
+        var result = ParticleImpactBehaviors.onImpact(CONTEXT).orElseThrow();
+        assertEquals(0, result.usedMomentum());
+        assertFalse(result.consumedItem());
+        assertTrue(result.consumeParticle());
+        assertFalse(new ParticleImpactResult(1, true, false).consumeParticle());
     }
 }

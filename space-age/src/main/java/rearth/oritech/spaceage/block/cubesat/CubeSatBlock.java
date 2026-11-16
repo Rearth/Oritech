@@ -3,7 +3,9 @@ package rearth.oritech.spaceage.block.cubesat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -46,5 +48,13 @@ public class CubeSatBlock extends Block implements EntityBlock {
     public @Nullable BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 
         return new CubeSatBlockEntity(pos, state);
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+
+        if (level.getBlockEntity(pos) instanceof CubeSatBlockEntity cube && cube.data() != null)
+            return createStack(cube.data());
+        return new ItemStack(this);
     }
 }

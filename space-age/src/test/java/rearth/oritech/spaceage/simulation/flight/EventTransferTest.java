@@ -30,6 +30,10 @@ import java.util.HashMap;
 
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.mission.MissionController;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ServiceSettings;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -78,6 +82,43 @@ class EventTransferTest {
                 EventTransfer.apply(craft, event.rates(), event.seconds());
                 assertEquals(battery, segment.rf(), 1e-6);
             }
+        }
+    }
+
+    @Test
+    void atmosphericIonRampApproachesFindEnoughRoomToBrakeAtPreviouslyRejectedSpeeds() {
+
+        var id = new UUID(817, 1);
+        var blocks = new HashSet<StaticRocketSegment.BlockData>();
+        for (var x = 0; x < 4; x++) blocks.add(new StaticRocketSegment.BlockData(new BlockPos(x, 0, 0),
+                SpaceAgeBlocks.ION_BOOSTER_ROCKET.get().defaultBlockState()));
+        blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(), SpaceAgeBlocks.ANTENNA.get().defaultBlockState()));
+        blocks.add(new StaticRocketSegment.BlockData(BlockPos.ZERO.above(2), Blocks.DAYLIGHT_DETECTOR.defaultBlockState()));
+        var structure = new StaticRocketSegment(id, blocks, Map.of(), 109, 4, 1_079_200, 0);
+        var resources = new DynamicRocketSegment(0, 1_079_200, 0, Set.of());
+        resources.rfCapacity = 1_100_000;
+        var source = new ActiveRocketData(Map.of(id, structure), Map.of(id, resources));
+        source.setLaunchPosition(new BlockPos(1030, 74, 3271));
+        var system = new SpaceSimulation();
+        var navigate = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.LOW)
+                .withService(new ServiceSettings(0, 0, 4));
+        var plan = FlightPlan.empty();
+        plan = plan.withBranches(List.of(plan.root().withActions(List.of(navigate))));
+        for (var speed : new long[]{4_625, 7_799, 7_858, 8_000}) {
+            var rocket = MissionState.copyRocket(source);
+            var start = LaunchSpeedRules.position(system.createObjectData(), source.getLaunchPosition(), speed);
+            var forecast = RocketFlightPathCalculator.calculateFrom(rocket, system.createObjectData(), plan, start).paths().getFirst();
+            assertEquals(TerminalState.READY, forecast.terminalState(), "The approach search must allow actual atmospheric stopping distance at " + speed);
+            var state = new MissionState(new UUID(818, 1), rocket, plan, start, system.earthKnowledge.copy(), source.getLaunchPosition());
+            var missions = new MissionSavedData();
+            missions.craft.put(rocket.getRocketId(), state);
+            for (var tick = 0; tick < Math.ceil(forecast.durationSeconds() * 20) + 10 && state.action() != null; tick++) {
+                MissionController.step(null, missions, state, system, tick);
+                assertTrue(!state.navigationBlocked(), "Accepted atmospheric guidance must finish in the live runner at " + speed);
+            }
+            assertNull(state.action());
+            assertEquals(4, state.position.slot());
+            assertTrue(resources.rf() == 1_079_200, "Forecasts and live copies leave the saved pattern untouched");
         }
     }
 
