@@ -26,13 +26,13 @@ public class TooltipHelper {
         if (amount < 1000) {
             return String.valueOf(amount);
         } else if (amount < 1_000_000) {
-            return getFormatted(amount / 1_000.0) + I18n.get("tooltip.oritech.thousand_abbrev");
+            return getFormatted(amount / 1_000.0) + Component.translatable("tooltip.oritech.thousand_abbrev").getString();
         } else if (amount < 1_000_000_000) {
-            return getFormatted(amount / 1_000_000.0) + I18n.get("tooltip.oritech.million_abbrev");
+            return getFormatted(amount / 1_000_000.0) + Component.translatable("tooltip.oritech.million_abbrev").getString();
         } else if (amount < 1_000_000_000_000L) {
-            return getFormatted(amount / 1_000_000_000.0) + I18n.get("tooltip.oritech.billion_abbrev");
+            return getFormatted(amount / 1_000_000_000.0) + Component.translatable("tooltip.oritech.billion_abbrev").getString();
         } else {
-            return getFormatted(amount / 1_000_000_000_000.0) + I18n.get("tooltip.oritech.trillion_abbrev");
+            return getFormatted(amount / 1_000_000_000_000.0) + Component.translatable("tooltip.oritech.trillion_abbrev").getString();
         }
     }
 
