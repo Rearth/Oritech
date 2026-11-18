@@ -1,9 +1,0 @@
-- Add precision mining augment
-- Add ant augment (1/8th scale)
-- Change schroedings safe default capacity to 50M RF
-- Fix accelerator text overflows in some cases
-- Fix small enderic laser animation issue
-- Fix crash when placing tainted refinery in creative
-- Fix machine cores being broken by water
-- Fix guel generator output using the wrong receiver sides (@GammaQQ)
-- Fix dedicated server crash in splicer block (@GnomoMuitoLoco)
