@@ -313,7 +313,7 @@ public class OritechConfig {
     public static final ModConfigSpec.LongValue schrodingersSafeBaseCapacity = COMMON
             .comment("Unstable container base RF storage capacity")
             .worldRestart()
-            .defineInRange("schrodingersSafeBaseCapacity", 20_000_000L, 0L, Long.MAX_VALUE);
+            .defineInRange("schrodingersSafeBaseCapacity", 50_000_000L, 0L, Long.MAX_VALUE);
 
     static {
         COMMON.pop();
