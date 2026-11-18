@@ -36,10 +36,12 @@ import java.util.concurrent.CompletableFuture;
 public class LaunchRampMenu extends RocketAssemblerMenu {
 
     // Slot positions in panel coordinates of the ramp tab.
-    public static final int PATTERN_X = 21;
-    public static final int PATTERN_Y = 62;
-    public static final int INVENTORY_X = 21;
-    public static final int INVENTORY_Y = 112;
+    public static final int PANEL_WIDTH = 320;
+    public static final int DESIGN_PANEL_TOP = -9;
+    public static final int PATTERN_X = 12;
+    public static final int PATTERN_Y = DESIGN_PANEL_TOP + 33;
+    public static final int INVENTORY_X = (PANEL_WIDTH - 9 * 18) / 2 + 1;
+    public static final int INVENTORY_Y = 132;
 
     private final @Nullable LaunchRampBlockEntity ramp;
     private final Player player;

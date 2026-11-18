@@ -38,6 +38,12 @@ public final class LaunchSpeedRules {
         return particleSpeed * SpaceAgeConfig.launchSpeedFactor();
     }
 
+    public static long particleSpeedForVelocity(double metersPerSecond) {
+
+        var factor = SpaceAgeConfig.launchSpeedFactor();
+        return factor > 0 ? Math.round(metersPerSecond / factor) : 0;
+    }
+
     /**
      * Finite advisory search horizon. Higher speeds remain available for preview and launch.
      */

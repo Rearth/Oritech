@@ -112,11 +112,12 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         if (menu instanceof LaunchRampMenu ramp) {
             ramp.slotsVisible = false;
-            SpaceAgeButtons.rampTabs(1, () -> {
+            addComponent(SpaceAgeButtons.launcherBack(() -> {
                 RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
                 Minecraft.getInstance().setScreen(new LaunchRampScreen(ramp, screenInventory, screenTitle));
-            }, () -> {
-            }, this::openFlightPlanner).forEach(this::addComponent);
+            }));
+            addComponent(SpaceAgeButtons.panel(92, 9, 92, 20, Component.translatable("screen.oritech_space_age.flight_plan"),
+                    ignored -> openFlightPlanner()));
         } else SpaceAgeButtons.assemblerTabs(0, () -> {
         }, this::openFlightPlanner).forEach(this::addComponent);
 
@@ -138,7 +139,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
             return;
         }
 
-        var nameX = menu instanceof LaunchRampMenu ? 228 : 205;
+        var nameX = 205;
         var nameWidth = Math.max(60, Math.min(220, panelWidth - nameX - 12));
         rocketNameField = addRenderableWidget(new EditBox(font, leftPos + nameX, topPos + 10,
                 nameWidth, 18, Component.translatable("screen.oritech_space_age.rocket_name")));

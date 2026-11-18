@@ -6,24 +6,32 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.fml.ModList;
+import rearth.oracle.OracleClient;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.OverlayWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
+import rearth.oritech.client.init.OritechClientConfig;
 import rearth.oritech.util.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
 
@@ -305,11 +313,34 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         return -27;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    protected void addOracleButton(int x, int y, String book, Block block, Optional<String> wikiLink) {
+        if (!OritechClientConfig.enableHelpButton.get()) return;
+
+        var installed = ModList.get().isLoaded("oracle_index");
+        var target = installed ? wikiLink.map(page -> OracleClient.getPage(book, page))
+                .orElseGet(() -> OracleClient.CONTENT_ID_MAP.get(BuiltInRegistries.ITEM.getKey(block.asItem()).toString())) : null;
+        if (installed && target == null) return;
+
+        var button = ButtonWidget.darkPanel(x, y, 14, 14, Component.literal("?"), ignored -> {
+                    if (target != null) OracleClient.openScreen(book, target, this);
+                    else Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
+                })
+                .withTextColor(ColorHelper.argb(0.9f, 0.9f, 0.9f))
+                .withSurfacePadding(new Insets(2, 1, 3, 1));
+        button.withTooltip(Component.translatable(installed ? "tooltip.oritech.oracle_available" : "tooltip.oritech.oracle_missing"));
+        addComponent(button);
+    }
+
     protected void addTitle() {
         addTitle(imageWidth);
     }
 
     protected void addTitle(int panelWidth) {
+        addTitle(panelWidth, false);
+    }
+
+    protected void addTitle(int panelWidth, boolean centered) {
         var blockTitle = getTitleText();
         var icon = getTitleIcon();
 
@@ -331,6 +362,7 @@ public abstract class OritechWidgetScreen<T extends AbstractContainerMenu> exten
         int titleX = (panelWidth - combinedWidth) * 65 / 100;
         if (blockTitle.getString().length() > 15)
             titleX = panelWidth - combinedWidth;
+        if (centered) titleX = (panelWidth - combinedWidth - 8) / 2;
         int titleY = getTitleY();
 
         iconWidget.setPosition(titleX, titleY);

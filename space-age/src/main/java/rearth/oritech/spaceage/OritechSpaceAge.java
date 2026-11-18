@@ -28,6 +28,7 @@ import rearth.oritech.spaceage.init.SpaceAgeDataMaps;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.init.SpaceAgeMenus;
 import rearth.oritech.spaceage.init.SpaceAgeRecipes;
+import rearth.oritech.spaceage.init.SpaceAgeSounds;
 import rearth.oritech.spaceage.network.GroundBeamNetworking;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.HoloNetworking;
@@ -91,6 +92,7 @@ public final class OritechSpaceAge {
         SpaceAgeBlockEntities.BLOCK_ENTITY_TYPES.register(modEventBus);
         SpaceAgeMenus.MENUS.register(modEventBus);
         SpaceAgeCreativeTabs.TABS.register(modEventBus);
+        SpaceAgeSounds.SOUND_EVENTS.register(modEventBus);
     }
 
     public static Identifier id(String path) {

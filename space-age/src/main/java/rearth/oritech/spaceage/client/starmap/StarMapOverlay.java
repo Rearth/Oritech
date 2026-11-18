@@ -22,6 +22,19 @@ final class StarMapOverlay {
     private StarMapOverlay() {
     }
 
+    static Component flightSummary(Component selectedBranch, RocketFlightPathCalculator.CraftPath selectedPath) {
+
+        var deltaV = selectedPath == null ? "–" : String.format(Locale.ROOT, "%.0f", selectedPath.remainingDeltaV());
+        var status = selectedPath == null ? Component.literal("–") : Component.translatable(
+                "screen.oritech_space_age.terminal." + selectedPath.terminalState().name().toLowerCase(Locale.ROOT));
+        var duration = selectedPath == null ? "–"
+                : String.format(Locale.ROOT, "%.2f", selectedPath.durationSeconds() / 1_200d);
+        if (selectedPath != null && selectedPath.failure().filter(failure -> failure.reason().equals("time_limit")).isPresent())
+            duration = "~" + String.format(Locale.ROOT, "%.2f", (selectedPath.durationSeconds() + selectedPath.failure().orElseThrow().actual()) / 1_200d);
+        return Component.translatable("screen.oritech_space_age.flight_stats_compact",
+                selectedBranch, duration, deltaV, status);
+    }
+
     static void render(GuiGraphicsExtractor graphics, int x, int y, int width, int height,
                        Component selectedTarget, Component selectedBranch,
                        RocketFlightPathCalculator.CraftPath selectedPath, boolean legendExpanded, boolean showSummary,
@@ -36,16 +49,7 @@ final class StarMapOverlay {
             var statsRight = x + width - 9;
             var statsX = Math.max(x + 195, statsRight - 470);
             OritechSurface.PANEL_DARK.render(graphics, statsX, y - 30, statsRight - statsX, 20);
-            var deltaV = selectedPath == null ? "–" : String.format(Locale.ROOT, "%.0f", selectedPath.remainingDeltaV());
-            var status = selectedPath == null ? Component.literal("–") : Component.translatable(
-                    "screen.oritech_space_age.terminal." + selectedPath.terminalState().name().toLowerCase(Locale.ROOT));
-            var duration = selectedPath == null ? "–"
-                    : String.format(Locale.ROOT, "%.2f", selectedPath.durationSeconds() / 1_200d);
-            if (selectedPath != null && selectedPath.failure().filter(failure -> failure.reason().equals("time_limit")).isPresent())
-                duration = "~" + String.format(Locale.ROOT, "%.2f", (selectedPath.durationSeconds() + selectedPath.failure().orElseThrow().actual()) / 1_200d);
-            var summary = Component.translatable("screen.oritech_space_age.flight_stats_compact",
-                    selectedBranch, duration, deltaV, status);
-            graphics.text(font, summary, statsX + 8, y - 24,
+            graphics.text(font, flightSummary(selectedBranch, selectedPath), statsX + 8, y - 24,
                     selectedPath != null && selectedPath.terminalState().isFailure() ? 0xFFFF9999 : 0xFFCAD8E5, false);
         }
 

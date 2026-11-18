@@ -15,7 +15,6 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -40,6 +39,7 @@ import rearth.oritech.api.transfer.energy.DynamicEnergyStorage;
 import rearth.oritech.spaceage.block.cubesat.CubeSatBlock;
 import rearth.oritech.spaceage.client.launch_ramp.ParticleLauncherEffects;
 import rearth.oritech.spaceage.init.SpaceAgeBlockEntities;
+import rearth.oritech.spaceage.init.SpaceAgeSounds;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceBalance.OrbitSlot;
@@ -120,7 +120,7 @@ public class LaunchRampBlockEntity extends NetworkedBlockEntity implements GeoBl
     private void fire() {
 
         lastShot = level.getGameTime();
-        level.playSound(null, worldPosition, SoundEvents.DRAGON_FIREBALL_EXPLODE, SoundSource.BLOCKS, 1.5f, .8f);
+        level.playSound(null, worldPosition, SpaceAgeSounds.PARTICLE_SPACE_LAUNCH.value(), SoundSource.BLOCKS, 1.25f, 1.0f);
         setChanged();
         sendUpdate(SyncType.TICK);
     }

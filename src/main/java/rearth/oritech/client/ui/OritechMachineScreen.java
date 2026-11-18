@@ -2,16 +2,13 @@ package rearth.oritech.client.ui;
 
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RedstoneTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import rearth.oracle.OracleClient;
 import rearth.oritech.Oritech;
 import rearth.oritech.api.screen.Insets;
 import rearth.oritech.api.screen.OritechSurface;
@@ -19,14 +16,11 @@ import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.data.*;
 import rearth.oritech.api.screen.widgets.*;
 import rearth.oritech.block.base.entity.MachineBlockEntity;
-import rearth.oritech.client.init.OritechClientConfig;
-import rearth.oritech.util.ColorHelper;
 import rearth.oritech.util.InventoryInputMode;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 public class OritechMachineScreen<T extends OritechScreenHandler> extends OritechWidgetScreen<T> {
 
@@ -68,7 +62,7 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         if (menu.armorSlots != null)
             buildEquipmentPanel();
 
-        buildOracleButton();
+        addOracleButton(-10, imageHeight - 13, Oritech.MOD_ID, menu.machineBlock.getBlock(), menu.screenData.getWikiLink());
         addExtraComponents();
     }
 
@@ -231,46 +225,6 @@ public class OritechMachineScreen<T extends OritechScreenHandler> extends Oritec
         equipBg.withSurface(OritechSurface.PANEL);
         equipBg.withZIndex(-10);
         addComponent(equipBg);
-    }
-
-    private void buildOracleButton() {
-        if (!OritechClientConfig.enableHelpButton.get()) return;
-
-        var hasOracleLib = ModList.get().isLoaded("oracle_index");
-        Optional<Identifier> linkTarget = hasOracleLib ? getHelpBookLink() : Optional.empty();
-        if (hasOracleLib && linkTarget.isEmpty()) return;
-
-        var button = ButtonWidget.darkPanel(-10, imageHeight - 13, 14, 14,
-                Component.literal("?"),
-                btn -> onOracleButtonClick(hasOracleLib, linkTarget))
-                .withTextColor(ColorHelper.argb(0.9f, 0.9f, 0.9f))
-                .withSurfacePadding(new Insets(2, 1, 3, 1));
-
-        button.withTooltip(hasOracleLib
-                ? Component.translatable("tooltip.oritech.oracle_available")
-                : Component.translatable("tooltip.oritech.oracle_missing"));
-        addComponent(button);
-    }
-
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    private void onOracleButtonClick(boolean enabled, Optional<Identifier> target) {
-        if (!enabled || target.isEmpty()) {
-            Oritech.LOGGER.info("Oracle Index mod is missing. Install it here: https://www.curseforge.com/minecraft/mc-mods/oracle-index (or from modrinth)");
-            return;
-        }
-        OracleClient.openScreen(Oritech.MOD_ID, target.get(), this);
-    }
-
-    private Optional<Identifier> getHelpBookLink() {
-        var wikiLink = menu.screenData.getWikiLink();
-        if (wikiLink.isPresent()) {
-            var page = OracleClient.getPage(Oritech.MOD_ID, wikiLink.get());
-            if (page != null) return Optional.of(page);
-        }
-
-        var blockItem = menu.machineBlock.getBlock().asItem();
-        var itemId = BuiltInRegistries.ITEM.getKey(blockItem);
-        return Optional.ofNullable(OracleClient.CONTENT_ID_MAP.get(itemId.toString()));
     }
 
     @Override

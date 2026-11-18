@@ -1,344 +1,347 @@
 package rearth.oritech.spaceage.client.launch_ramp;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.Util;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.BoxWidget;
+import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemSlotWidget;
+import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
-import rearth.oritech.spaceage.SpaceAgeConfig;
+import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.cubesat.CubeSatBlock;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlockEntity.Outcome;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
-import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerClientController;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerScreen;
 import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
+import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
-import rearth.oritech.spaceage.simulation.flight.LaunchSpeedRules;
-import rearth.oritech.spaceage.simulation.mission.MissionState;
-import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlannerSnapshot;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.util.Optional;
 
-/**
- * First tab of the launch ramp: the pattern slot, the saved plan, the particle speeds the plan needs and the last launch.
- */
-public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
+public final class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
 
-    private static final int WINDOW_PADDING = 6;
-    private static final int INFO_X = 206;
+    private static final int WIDTH = LaunchRampMenu.PANEL_WIDTH;
+    private static final int HEIGHT = 213;
+    private static final int SIDE_WIDTH = 96;
+    private static final int PLAN_WIDTH = 112;
+    private static final int PLAN_TOP = -20;
+    private static final int PLAN_BOTTOM = 106;
+    private static final int PANEL_CENTER = (PLAN_TOP + PLAN_BOTTOM) / 2;
+    private static final int DESIGN_TOP = LaunchRampMenu.DESIGN_PANEL_TOP;
+    private static final int DESIGN_BOTTOM = 2 * PANEL_CENTER - DESIGN_TOP;
+    private static final int LAUNCH_TOP = PANEL_CENTER - 42;
+    private static final int LAUNCH_BOTTOM = PANEL_CENTER + 42;
+    private static final int DESIGN_X = 0;
+    private static final int PLAN_X = 104;
+    private static final int LAUNCH_X = 224;
+    private static final int PANEL_PADDING = 6;
+    private static final int TEXT_PADDING = 9;
+    private static final int SIDE_TEXT_WIDTH = SIDE_WIDTH - TEXT_PADDING * 2;
+    private static final int INVENTORY_WIDTH = 176;
+    private static final int INVENTORY_X = (WIDTH - INVENTORY_WIDTH) / 2;
+    private static final int INVENTORY_TOP = 110;
+    private static final int DETAIL_TEXT = 0xFF5E6064;
+    private static final int ROUTE_COLOR = 0xFF466A7D;
+    private static final int MATCH_BACKGROUND = 0xFFB6CAB8;
+    private static final int MATCH_TEXT = 0xFF335541;
     private final Inventory screenInventory;
-    private final Component screenTitle;
-    private int panelWidth;
-    private int panelHeight;
-    private int statusRevision = -1;
-    private int windowRevision = -1;
-    private int previewRevision = -1;
-    private int planRevision = -1;
-    private EditBox speedField;
-    private LabelWidget speedAdviceLabel;
-    private String speedText;
+    private int statusRevision;
+    private int previewRevision;
+    private int planRevision;
+    private ItemStack displayedPattern = ItemStack.EMPTY;
 
     public LaunchRampScreen(LaunchRampMenu menu, Inventory inventory, Component title) {
 
-        super(menu, inventory, title, 0, 0);
+        super(menu, inventory, title, WIDTH, HEIGHT);
         screenInventory = inventory;
-        screenTitle = title;
-        speedText = menu.expectedSpeed < 0 ? "" : Long.toString(menu.expectedSpeed);
-    }
-
-    public static String number(long value) {
-
-        return String.format(Locale.ROOT, "%,d", value);
-    }
-
-    /**
-     * Searching the window runs many previews, so it waits for plan edits to settle and runs off the render thread.
-     * Every ramp tab ticks it, so the result is shared through the menu.
-     */
-    public static void tickSpeedWindow(LaunchRampMenu menu) {
-
-        var rocket = menu.getRocket();
-        var snapshot = menu.getFlightPlannerSnapshot();
-        if (rocket == null || snapshot == null || !snapshot.rocketId().equals(rocket.getRocketId())) return;
-        var plan = LaunchSpeedRules.firstLeg(snapshot.resolvedPlan(menu.getDraftFlightPlan() == null ? snapshot.plan() : menu.getDraftFlightPlan()));
-        var changed = !plan.equals(menu.speedWindowPlan) || menu.speedWindowPreviewRevision != menu.getPreviewRevision();
-        if (changed) {
-            menu.speedWindowKnown = false;
-            menu.speedWindow = null;
-            if (menu.speedWindowSearch != null) menu.speedWindowSearch.cancel(false);
-            menu.speedWindowSearch = null;
-            menu.speedWindowPlan = plan;
-            menu.speedWindowPreviewRevision = menu.getPreviewRevision();
-            menu.speedWindowDelay = 10;
-            menu.speedWindowRevision++;
-        }
-        if (menu.speedWindowDelay > 0 && --menu.speedWindowDelay == 0) {
-            var copy = MissionState.copyRocket(rocket);
-            var recipes = List.copyOf(SpaceAgeClientRecipes.vacuum());
-            menu.speedWindowSearch = CompletableFuture.supplyAsync(() -> LaunchSpeedRules.window(plan, copy, snapshot.objects(), recipes,
-                    snapshot.stations()), Util.backgroundExecutor()).exceptionally(error -> null);
-        }
-        if (menu.speedWindowSearch == null || !menu.speedWindowSearch.isDone()) return;
-        menu.speedWindow = menu.speedWindowSearch.join();
-        menu.speedWindowKnown = true;
-        menu.speedWindowSearch = null;
-        menu.speedWindowRevision++;
-    }
-
-    /**
-     * Short summary of the working particle speeds for the planner footer.
-     */
-    public static MutableComponent windowSummary(LaunchRampMenu menu) {
-
-        var window = menu.speedWindow;
-        if (menu.getRocket() == null) return Component.translatable("screen.oritech_space_age.launch_ramp.speed_no_design");
-        var plan = menu.getDraftFlightPlan();
-        if (plan != null && plan.root().actions().isEmpty())
-            return Component.translatable("screen.oritech_space_age.launch_ramp.speed_no_route");
-        if (!menu.speedWindowKnown)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.computing");
-        if (window == null)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.unreachable").withStyle(ChatFormatting.DARK_RED);
-        if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
-                String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
-                        ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
-        if (window.min() == 0 && window.max() == Long.MAX_VALUE)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.free");
-        if (window.max() == Long.MAX_VALUE)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.chip.open", number(window.min()));
-        return Component.translatable("screen.oritech_space_age.launch_ramp.chip.window", number(window.min()), number(window.max()));
-    }
-
-    public static @Nullable Component speedAdvice(LaunchRampMenu menu) {
-
-        var window = menu.speedWindow;
-        if (!menu.speedWindowKnown || window == null || menu.previewSpeed() > LaunchSpeedRules.sampleLimit()
-                || window.contains(menu.previewSpeed())) return null;
-        return Component.translatable("screen.oritech_space_age.launch_ramp.speed_advice", number(menu.previewSpeed()),
-                number(window.nearest(menu.previewSpeed()))).withStyle(ChatFormatting.RED);
-    }
-
-    /**
-     * How particle speed becomes launch speed, and what happens to cube-sats without a plan.
-     */
-    public static List<Component> speedRules() {
-
-        return List.of(Component.translatable("screen.oritech_space_age.launch_ramp.conversion",
-                        number(1000), number(Math.round(1000 * SpaceAgeConfig.launchSpeedFactor()))),
-                Component.translatable("screen.oritech_space_age.launch_ramp.sample_limit", number(LaunchSpeedRules.sampleLimit())),
-                Component.translatable("screen.oritech_space_age.launch_ramp.orbit",
-                        number(LaunchSpeedRules.orbitParticleSpeed()), number(Math.round(LaunchSpeedRules.orbitVelocity()))));
-    }
-
-    private static MutableComponent title(String key) {
-
-        return Component.translatable("screen.oritech_space_age.launch_ramp." + key).withStyle(ChatFormatting.BOLD);
     }
 
     @Override
     protected void buildComponents() {
 
+        topPos = panelTop();
         menu.slotsVisible = true;
-        speedField = null;
-        speedAdviceLabel = null;
-        panelWidth = width - WINDOW_PADDING * 2;
-        panelHeight = height - WINDOW_PADDING * 2;
-        setPanelSize(panelWidth, panelHeight);
         statusRevision = menu.statusRevision;
-        windowRevision = menu.speedWindowRevision;
         previewRevision = menu.getPreviewRevision();
         planRevision = menu.getFlightPlannerRevision();
-        addComponent(new SurfaceWidget(0, 0, panelWidth, panelHeight, OritechSurface.PANEL));
-        SpaceAgeButtons.rampTabs(0, () -> {
-        }, this::openRocket, this::openPlanner).forEach(this::addComponent);
+        displayedPattern = menu.pattern().copy();
 
-        addComponent(new SurfaceWidget(12, 39, 186, 160, OritechSurface.PANEL_INSET));
-        addComponent(new LabelWidget(21, 47, 170, title("pattern")));
-        menu.slots.forEach(slot -> addComponent(new ItemSlotWidget(slot.x, slot.y)));
-        addComponent(new LabelWidget(LaunchRampMenu.PATTERN_X + 22, LaunchRampMenu.PATTERN_Y - 4, 150, 40, patternText()).withWrap(true));
-        addComponent(new LabelWidget(21, LaunchRampMenu.INVENTORY_Y - 12, 170, Component.translatable("container.inventory")));
-
-        var infoWidth = panelWidth - INFO_X - 12;
-        addComponent(new SurfaceWidget(INFO_X, 39, infoWidth, panelHeight - 51, OritechSurface.PANEL_INSET));
-        var x = INFO_X + 10;
-        var width = infoWidth - 20;
-        var planLines = new ArrayList<Component>();
-        if (menu.status.hasPlan()) planLines.add(Component.translatable("screen.oritech_space_age.launch_ramp.saved_summary",
-                menu.status.planName().isBlank() ? Component.translatable("screen.oritech_space_age.launch_ramp.unnamed_plan") : menu.status.planName(),
-                menu.status.patternName().isBlank() ? SpaceAgeBlocks.CUBE_SAT.get().getName() : menu.status.patternName(),
-                menu.status.owner()).withStyle(ChatFormatting.DARK_GREEN));
-        planLines.add(planText());
-        var y = addSection(x, 47, width, "plan", planLines);
-        if (menu.getRocket() != null) {
-            addComponent(SpaceAgeButtons.panel(x, y - 4, 124, 18,
-                    Component.translatable("screen.oritech_space_age.launch_ramp.open_plan"), ignored -> openPlanner()));
-            if (menu.status.hasPlan() && !menu.pattern().isEmpty() && !menu.status.planMatches()) {
-                var saved = !menu.status.viewingSaved();
-                addComponent(SpaceAgeButtons.panel(x + 130, y - 4, 124, 18,
-                        Component.translatable("screen.oritech_space_age.launch_ramp." + (saved ? "view_saved" : "edit_inserted")), ignored -> {
-                            RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
-                            Minecraft.getInstance().gameMode.handleInventoryButtonClick(menu.containerId, saved ? 1 : 0);
-                        }));
-            }
-            y += 24;
-        }
-        var speeds = new ArrayList<Component>();
-        speeds.add(windowText());
-        speeds.addAll(speedRules());
-        y = addSection(x, y, width, "speed", speeds);
-        y = addSection(x, y, width, "expected", List.of(Component.translatable("screen.oritech_space_age.launch_ramp.expected_help")));
-        speedField = addRenderableWidget(new EditBox(font, leftPos + x, topPos + y - 4, 90, 18, title("expected")));
-        speedField.setHint(Component.literal(number(menu.previewSpeed())));
-        speedField.setValue(speedText);
-        speedField.setResponder(this::setExpectedSpeed);
-        var lowest = SpaceAgeButtons.panel(x + 96, y - 4, 110, 18, Component.translatable("screen.oritech_space_age.launch_ramp.use_lowest"), ignored -> {
-            speedText = "";
-            setExpectedSpeed("");
-            rebuildComponents();
-        });
-        addComponent(lowest);
-        if (menu.status.lastSpeed() > 0) addComponent(SpaceAgeButtons.panel(x + 210, y - 4, 110, 18,
-                Component.translatable("screen.oritech_space_age.launch_ramp.use_last"), ignored -> {
-                    speedText = Long.toString(menu.status.lastSpeed());
-                    setExpectedSpeed(speedText);
-                    rebuildComponents();
-                }));
-        var advice = speedAdvice(menu);
-        speedAdviceLabel = new LabelWidget(x, y + 20, width, 20, advice == null ? Component.empty() : advice).withWrap(true);
-        addComponent(speedAdviceLabel);
-        addSection(x, y + 48, width, "last", List.of(lastLaunchText()));
-    }
-
-    private int addSection(int x, int y, int width, String key, List<Component> lines) {
-
-        addComponent(new LabelWidget(x, y, width, title(key)));
-        y += 13;
-        for (var line : lines) {
-            var height = font.split(line, width).size() * font.lineHeight;
-            addComponent(new LabelWidget(x, y, width, height, line).withWrap(true));
-            y += height + 2;
-        }
-        return y + 8;
-    }
-
-    private void setExpectedSpeed(String text) {
-
-        speedText = text;
-        try {
-            menu.expectedSpeed = text.isBlank() ? -1 : Math.max(0, Long.parseLong(text.strip().replace(",", "")));
-        } catch (NumberFormatException ignored) {
-            menu.expectedSpeed = -1;
-        }
-        if (speedAdviceLabel != null) {
-            var advice = speedAdvice(menu);
-            speedAdviceLabel.setText(advice == null ? Component.empty() : advice);
-        }
-    }
-
-    private Component patternText() {
-
-        var data = CubeSatBlock.data(menu.pattern());
-        if (data == null) return Component.translatable("screen.oritech_space_age.launch_ramp.pattern_empty");
-        var performance = RocketPerformanceCalculator.calculate(data.unfold(UUID.randomUUID(), null));
-        return Component.translatable("screen.oritech_space_age.launch_ramp.pattern_summary", menu.pattern().getHoverName(),
-                data.blockCount(), number(Math.round(performance.availableDeltaVMetersPerSecond())));
-    }
-
-    private Component planText() {
+        addComponent(new SurfaceWidget(INVENTORY_X, INVENTORY_TOP, INVENTORY_WIDTH, HEIGHT - INVENTORY_TOP, OritechSurface.PANEL));
+        addConnectors(SIDE_WIDTH, PLAN_X);
+        addConnectors(PLAN_X + PLAN_WIDTH, LAUNCH_X);
+        addPanel(DESIGN_X, DESIGN_TOP, DESIGN_BOTTOM, SIDE_WIDTH, DESIGN_TOP, "pattern");
+        addPanel(PLAN_X, PLAN_TOP, PLAN_BOTTOM, PLAN_WIDTH, planContentOffset(), "plan");
+        addPanel(LAUNCH_X, LAUNCH_TOP, LAUNCH_BOTTOM, SIDE_WIDTH, LAUNCH_TOP, "last");
 
         var status = menu.status;
-        var key = !status.hasPlan() ? (menu.pattern().isEmpty() ? "plan_no_pattern" : "plan_none")
-                : status.viewingSaved() ? "plan_stored" : status.planMatches() ? "plan_saved" : "plan_other";
-        return Component.translatable("screen.oritech_space_age.launch_ramp." + key);
+        var hasSavedPlan = status.hasPlan() && (status.viewingSaved() || status.planMatches());
+        var canInspect = menu.getRocket() != null;
+        buildDesign(canInspect);
+        buildPlan(hasSavedPlan, canInspect);
+        buildLastLaunch();
+
+        addComponent(new LabelWidget(LaunchRampMenu.INVENTORY_X, 119, 162,
+                Component.translatable("container.inventory")).withDarkColor());
+        for (var slot : menu.slots) {
+            if (slot == menu.slots.getFirst()) {
+                var frame = BoxWidget.outline(slot.x - 1, slot.y - 1, 18, 18, 0xFF85888B);
+                if (!slot.hasItem()) frame.withTooltip(text("template_help"));
+                addComponent(frame);
+            } else addComponent(new ItemSlotWidget(slot.x, slot.y));
+        }
+
+        addOracleButton(INVENTORY_X - 10, Math.min(HEIGHT - 13, height - topPos - 17),
+                OritechSpaceAge.MOD_ID, getTitleState().getBlock(), Optional.empty());
     }
 
-    private Component windowText() {
+    private void addConnectors(int left, int right) {
 
-        var window = menu.speedWindow;
-        if (menu.getRocket() == null || !menu.speedWindowKnown
-                || menu.getDraftFlightPlan() != null && menu.getDraftFlightPlan().root().actions().isEmpty()) return windowSummary(menu);
-        if (window == null)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.window_unreachable", number(LaunchSpeedRules.sampleLimit()));
-        if (window.ranges().size() > 1) return Component.translatable("screen.oritech_space_age.launch_ramp.ranges",
-                String.join(", ", window.ranges().stream().map(range -> range.max() == Long.MAX_VALUE
-                        ? number(range.min()) + "+" : number(range.min()) + "-" + number(range.max())).toList()));
-        if (window.min() == 0 && window.max() == Long.MAX_VALUE)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.window_free");
-        if (window.max() == Long.MAX_VALUE)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.window_open", number(window.min()));
-        return Component.translatable("screen.oritech_space_age.launch_ramp.window", number(window.min()), number(window.max()));
+        var width = right - left + 8;
+        addComponent(new SurfaceWidget(left - 4, PANEL_CENTER - 19, width, 12, OritechSurface.PANEL_DARK));
+        addComponent(new SurfaceWidget(left - 4, PANEL_CENTER + 7, width, 12, OritechSurface.PANEL_DARK));
     }
 
-    private Component lastLaunchText() {
+    private void addPanel(int x, int top, int bottom, int panelWidth, int contentOffset, String key) {
+
+        addComponent(new SurfaceWidget(x, top, panelWidth, bottom - top, OritechSurface.PANEL));
+        var heading = new LabelWidget(x + PANEL_PADDING, 9 + contentOffset, panelWidth - PANEL_PADDING * 2, text(key))
+                .withAlignment(LabelWidget.Alignment.CENTER).withDarkColor();
+        if (x == DESIGN_X) heading.withTooltip(text("template_help"));
+        if (x == LAUNCH_X) heading.withTooltip(text("automatic"));
+        addComponent(heading);
+        addComponent(BoxWidget.filled(x + TEXT_PADDING, 23 + contentOffset, panelWidth - TEXT_PADDING * 2, 1, 0xFF96989B));
+    }
+
+    private void buildDesign(boolean canInspect) {
+
+        var status = menu.status;
+        var pattern = CubeSatBlock.data(menu.pattern());
+        var showSaved = status.hasPlan() && status.viewingSaved();
+        var hasChoice = status.hasPlan() && pattern != null && !status.planMatches();
+        var nameX = LaunchRampMenu.PATTERN_X + 21;
+        var nameWidth = SIDE_WIDTH - TEXT_PADDING - nameX;
+
+        if (pattern != null) {
+            addLine(nameX, DESIGN_TOP + 32, nameWidth, menu.pattern().getHoverName(), LabelWidget.DARK_TEXT);
+            addLine(nameX, DESIGN_TOP + 44, nameWidth, text("blocks", pattern.blockCount()), DETAIL_TEXT);
+        } else {
+            var label = new LabelWidget(nameX, DESIGN_TOP + (showSaved ? 37 : 32), nameWidth, 22,
+                    text(showSaved ? "slot_empty" : "insert_template")).withColor(DETAIL_TEXT).withWrap(true);
+            addComponent(label);
+        }
+
+        if (hasChoice) {
+            var toggle = SpaceAgeButtons.darkPanel(TEXT_PADDING, DESIGN_TOP + 61, SIDE_TEXT_WIDTH, 14,
+                    text(showSaved ? "edit_inserted" : "view_saved"), ignored -> {
+                        RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
+                        Minecraft.getInstance().gameMode.handleInventoryButtonClick(menu.containerId, showSaved ? 0 : 1);
+                    });
+            toggle.withTooltip(text(showSaved ? "showing_saved" : "plan_other"));
+            addComponent(toggle);
+        } else if (showSaved) {
+            var ghost = new ItemWidget(LaunchRampMenu.PATTERN_X + 2, DESIGN_TOP + 55, 12, new ItemStack(SpaceAgeBlocks.CUBE_SAT.get()))
+                    .withGhost(true).withTooltipFromStack(false);
+            ghost.withTooltip(text("plan_stored"));
+            addComponent(ghost);
+            var name = designName(status.patternName());
+            var saved = addLine(nameX, DESIGN_TOP + 57, nameWidth, name, LabelWidget.DARK_TEXT);
+            saved.withTooltip(name, text("plan_stored"));
+        } else if (status.planMatches()) {
+            addLine(TEXT_PADDING, DESIGN_TOP + 63, SIDE_TEXT_WIDTH, text("matches"), DETAIL_TEXT);
+        }
+
+        addComponent(panelAction(DESIGN_X, DESIGN_BOTTOM, SIDE_WIDTH, "inspect", canInspect, () ->
+                Minecraft.getInstance().setScreen(new RocketAssemblerScreen(menu, screenInventory, title))));
+    }
+
+    private void buildPlan(boolean hasSavedPlan, boolean canInspect) {
+
+        var offset = planContentOffset();
+        var status = menu.status;
+        var snapshot = menu.getFlightPlannerSnapshot();
+        var x = PLAN_X + TEXT_PADDING;
+        var contentWidth = PLAN_WIDTH - TEXT_PADDING * 2;
+        if (hasSavedPlan) {
+            var name = status.planName().isBlank() ? text("unnamed_plan") : Component.literal(status.planName());
+            var nameLabel = addLine(x, 31 + offset, contentWidth, name, LabelWidget.DARK_TEXT);
+            if (!status.owner().isBlank()) nameLabel.withTooltip(name, text("saved_by", status.owner()));
+            if (snapshot != null) {
+                var actions = snapshot.plan().root().actions().stream().filter(action -> !action.isGenerated()).toList();
+                var destinations = actions.stream().filter(action -> action.type() == ActionType.NAVIGATE_TO).toList();
+                if (!destinations.isEmpty()) buildRoute(x, 47 + offset, contentWidth, snapshot, destinations);
+                else if (!actions.isEmpty()) addLine(x, 51 + offset, contentWidth, firstStep(snapshot, actions.getFirst()), DETAIL_TEXT);
+                else addLine(x, 51 + offset, contentWidth, text("no_route"), DETAIL_TEXT);
+            }
+        } else {
+            var label = new LabelWidget(x, 32 + offset, contentWidth, 24,
+                    text(canInspect ? "no_plan" : "template_required")).withColor(DETAIL_TEXT).withWrap(true);
+            if (status.hasPlan()) label.withTooltip(text("plan_other"));
+            addComponent(label);
+        }
+        addComponent(panelAction(PLAN_X, PLAN_BOTTOM, PLAN_WIDTH, hasSavedPlan ? "open_plan" : "create_plan", canInspect, this::openPlanner));
+    }
+
+    private void buildRoute(int x, int y, int width, FlightPlannerSnapshot snapshot, List<FlightPlanAction> stops) {
+
+        var rows = Math.min(y <= 35 ? 4 : 3, stops.size() + 1);
+        var rowHeight = 12;
+        addComponent(BoxWidget.filled(x + 2, y + 3, 1, (rows - 1) * rowHeight, ROUTE_COLOR));
+        addComponent(BoxWidget.filled(x, y + 1, 5, 5, ROUTE_COLOR));
+        addLine(x + 10, y, width - 10, text("route_start"), DETAIL_TEXT);
+        for (var row = 1; row < rows; row++) {
+            var stopY = y + row * rowHeight;
+            if (row == rows - 1 && stops.size() >= rows) {
+                addComponent(BoxWidget.outline(x, stopY + 1, 5, 5, ROUTE_COLOR));
+                var more = addLine(x + 10, stopY, width - 10, text("route_more", stops.size() - row + 1), DETAIL_TEXT);
+                more.withTooltip(stops.stream().skip(row - 1L).limit(5).map(stop -> firstStep(snapshot, stop)).toList());
+            } else {
+                var stop = stops.get(row - 1);
+                addComponent(BoxWidget.outline(x, stopY + 1, 5, 5, ROUTE_COLOR));
+                var destination = firstStep(snapshot, stop);
+                var orbit = snapshot.objects().stream().anyMatch(object -> object.id().equals(stop.targetId()));
+                var detail = orbit ? Component.translatable("screen.oritech_space_age.selected_target",
+                        destination, RocketStarMapWidget.orbitName(stop.orbit())) : destination;
+                addLine(x + 10, stopY, width - 10, detail, DETAIL_TEXT);
+            }
+        }
+    }
+
+    private Component firstStep(FlightPlannerSnapshot snapshot, FlightPlanAction action) {
+
+        if (action.type() == ActionType.NAVIGATE_TO) {
+            var target = snapshot.objects().stream().filter(object -> object.id().equals(action.targetId())).findFirst();
+            if (target.isPresent()) return RocketStarMapWidget.objectName(target.get());
+            var station = snapshot.stations().stream().filter(candidate -> candidate.id().equals(action.targetId())).findFirst();
+            if (station.isPresent()) return Component.literal(station.get().name());
+            if (action.targetId().equals(FlightPlanAction.CLOSEST_ASTEROID))
+                return Component.translatable("screen.oritech_space_age.action.closest_asteroid");
+        }
+        return Component.translatable("screen.oritech_space_age.action." + action.type().name().toLowerCase(Locale.ROOT));
+    }
+
+    private void buildLastLaunch() {
 
         var status = menu.status;
         var outcome = Outcome.values()[status.outcome()];
-        if (outcome == Outcome.NONE) return Component.translatable("screen.oritech_space_age.launch_ramp.last_none");
-        var result = Component.translatable("screen.oritech_space_age.launch_ramp.outcome." + outcome.name().toLowerCase(Locale.ROOT));
-        if (outcome == Outcome.LOST)
-            return Component.translatable("screen.oritech_space_age.launch_ramp.last_lost", number(status.lastSpeed()), result);
-        return Component.translatable("screen.oritech_space_age.launch_ramp.last_launch", number(status.lastSpeed()),
-                number(Math.round(LaunchSpeedRules.velocity(status.lastSpeed()))), result);
+        var x = LAUNCH_X + TEXT_PADDING;
+        if (outcome == Outcome.NONE) {
+            addLine(x, LAUNCH_TOP + 32, SIDE_TEXT_WIDTH, text("last_none"), DETAIL_TEXT);
+        } else {
+            var key = outcome.name().toLowerCase(Locale.ROOT);
+            var result = text("result." + key);
+            var detail = text("outcome." + key);
+            if (outcome == Outcome.PLAN) {
+                addComponent(BoxWidget.filled(LAUNCH_X + PANEL_PADDING, LAUNCH_TOP + 29, SIDE_WIDTH - PANEL_PADDING * 2, 15, MATCH_BACKGROUND));
+                var badge = new LabelWidget(x, LAUNCH_TOP + 33, SIDE_TEXT_WIDTH, fit(result, SIDE_TEXT_WIDTH))
+                        .withAlignment(LabelWidget.Alignment.CENTER).withColor(MATCH_TEXT);
+                badge.withTooltip(detail);
+                addComponent(badge);
+            } else {
+                addLine(x, LAUNCH_TOP + 33, SIDE_TEXT_WIDTH, result, LabelWidget.DARK_TEXT).withTooltip(detail);
+            }
+            var particle = text("particle_reading", LaunchRampPreviewSpeed.number(status.lastSpeed()));
+            if (outcome == Outcome.LOST) {
+                addLine(x, LAUNCH_TOP + 55, SIDE_TEXT_WIDTH, particle, LabelWidget.DARK_TEXT).withTooltip(particle);
+            } else {
+                addLaunchVelocity(x, text("speed_value", LaunchRampPreviewSpeed.metersPerSecond(status.lastSpeed())));
+                addLine(x, LAUNCH_TOP + 67, SIDE_TEXT_WIDTH, particle, DETAIL_TEXT).withTooltip(particle);
+            }
+        }
     }
 
-    private void openRocket() {
+    private void addLaunchVelocity(int x, Component velocity) {
 
-        Minecraft.getInstance().setScreen(new RocketAssemblerScreen(menu, screenInventory, screenTitle));
+        var scale = 1.25f;
+        var display = fit(velocity, (int) (SIDE_TEXT_WIDTH / scale));
+        var label = new UIComponent(x, LAUNCH_TOP + 51, SIDE_TEXT_WIDTH, 12) {
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                var pose = graphics.pose();
+                pose.pushMatrix();
+                pose.translate(contentX(), contentY());
+                pose.scale(scale);
+                graphics.text(font, display, 0, 0, LabelWidget.DARK_TEXT, false);
+                pose.popMatrix();
+            }
+        };
+        label.withTooltip(velocity);
+        addComponent(label);
+    }
+
+    private ButtonWidget panelAction(int x, int bottom, int panelWidth, String key, boolean active, Runnable action) {
+
+        var label = text(key);
+        var width = panelWidth - PANEL_PADDING * 2;
+        var button = SpaceAgeButtons.darkPanel(x + PANEL_PADDING, bottom - 25, width, 17, fit(label, width - 8), ignored -> action.run());
+        if (font.width(label) > width - 8) button.withTooltip(label);
+        button.setActive(active);
+        return button;
+    }
+
+    @Override
+    public boolean mouseReleased(MouseButtonEvent event) {
+
+        var template = isHovering(LaunchRampMenu.PATTERN_X, LaunchRampMenu.PATTERN_Y, 16, 16, event.x(), event.y());
+        var handled = super.mouseReleased(event);
+        // The slot uses Minecraft's normal transfer. Clear any drag preview once it has consumed the cursor stack.
+        if (template && !menu.pattern().isEmpty() && menu.getCarried().isEmpty()) clearDraggingState();
+        return handled;
+    }
+
+    private LabelWidget addLine(int x, int y, int width, Component value, int color) {
+
+        var label = new LabelWidget(x, y, width, fit(value, width)).withColor(color);
+        if (font.width(value) > width) label.withTooltip(value);
+        addComponent(label);
+        return label;
+    }
+
+    private Component fit(Component value, int width) {
+
+        if (font.width(value) <= width) return value;
+        return Component.literal(font.plainSubstrByWidth(value.getString(), width - font.width("…")) + "…");
+    }
+
+    private static Component designName(String name) {
+
+        return name.isBlank() ? SpaceAgeBlocks.CUBE_SAT.get().getName() : Component.literal(name);
+    }
+
+    private static MutableComponent text(String key, Object... args) {
+
+        return Component.translatable("screen.oritech_space_age.launch_ramp." + key, args);
     }
 
     private void openPlanner() {
 
-        Minecraft.getInstance().setScreen(new RocketFlightPlannerScreen(menu, screenInventory, screenTitle));
-    }
-
-    @Override
-    public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-
-        if (speedField != null && speedField.isMouseOver(event.x(), event.y())) {
-            setFocused(speedField);
-            return speedField.mouseClicked(event, doubleClick);
-        }
-        setFocused(null);
-        return super.mouseClicked(event, doubleClick);
-    }
-
-    @Override
-    public boolean keyPressed(KeyEvent event) {
-
-        if (!event.isEscape() && speedField != null && speedField.isFocused()) {
-            // Container screens normally interpret E as the inventory shortcut before charTyped reaches a field.
-            speedField.keyPressed(event);
-            return true;
-        }
-        return super.keyPressed(event);
+        Minecraft.getInstance().setScreen(new RocketFlightPlannerScreen(menu, screenInventory, title));
     }
 
     @Override
     protected void containerTick() {
 
         super.containerTick();
-        components.forEach(UIComponent::tick);
-        tickSpeedWindow(menu);
-        if (statusRevision != menu.statusRevision || windowRevision != menu.speedWindowRevision
-                || previewRevision != menu.getPreviewRevision() || planRevision != menu.getFlightPlannerRevision()) rebuildComponents();
+        if (statusRevision != menu.statusRevision || previewRevision != menu.getPreviewRevision()
+                || planRevision != menu.getFlightPlannerRevision()
+                || !ItemStack.matches(displayedPattern, menu.pattern())) rebuildComponents();
     }
 
     @Override
@@ -349,9 +352,33 @@ public class LaunchRampScreen extends OritechWidgetScreen<LaunchRampMenu> {
     }
 
     @Override
-    public boolean shouldCreateTitle() {
+    protected void addTitle() {
 
-        return false;
+        addTitle(WIDTH, true);
+    }
+
+    @Override
+    public int getTitleY() {
+
+        return Math.max(-45, 2 - panelTop());
+    }
+
+    private int panelTop() {
+
+        var freeHeight = height - HEIGHT;
+        return Math.min(freeHeight - 3, (freeHeight + 45) / 2);
+    }
+
+    private int planContentOffset() {
+
+        // Keep the heading below the raised title even at the largest GUI scale.
+        return -Math.clamp(-getTitleY() - 19, 3, 16);
+    }
+
+    @Override
+    public Component getTitleText() {
+
+        return text("title");
     }
 
     @Override

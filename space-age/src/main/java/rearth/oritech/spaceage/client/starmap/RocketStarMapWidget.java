@@ -444,6 +444,11 @@ public final class RocketStarMapWidget extends UIComponent {
         showSummary = show;
     }
 
+    public Component flightSummary() {
+
+        return StarMapOverlay.flightSummary(selectedBranchLabel(), pathsByBranch.get(selectedBranch));
+    }
+
     public void setTugNames(Map<UUID, Component> craft) {
 
         if (!tugNames.keySet().equals(craft.keySet())) cachedView = null;
