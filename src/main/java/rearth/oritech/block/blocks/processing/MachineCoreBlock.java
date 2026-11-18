@@ -53,7 +53,8 @@ public class MachineCoreBlock extends Block implements EntityBlock, TooltipProvi
     public MachineCoreBlock(Properties settings, IntSupplier coreLevel) {
         // A used core's shape depends on its controller, not just its own block state.
         // Disable vanilla's state-only shape cache so different machines can share the same core block.
-        super(settings.dynamicShape());
+        // Without a cached shape, vanilla needs an explicit solidity flag to keep fluids from replacing the core.
+        super(settings.dynamicShape().forceSolidOn());
         this.registerDefaultState(defaultBlockState().setValue(USED, false));
         this.coreLevel = coreLevel;
     }
