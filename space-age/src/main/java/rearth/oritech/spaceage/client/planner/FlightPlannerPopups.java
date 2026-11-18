@@ -552,28 +552,29 @@ final class FlightPlannerPopups {
         typeList.withSurface(OritechSurface.NONE);
         typeList.setZIndex(CONTROL_Z);
         var hasAperture = craft.powerHardware().throughput() > 0;
+        var hasCubeSat = !RocketPayloads.all(craft).isEmpty();
+        Predicate<SpaceSimulation.ActionType> available = type -> switch (type) {
+            case CONNECT_ASTEROID -> canConnectAsteroid
+                    || editedAction != null && editedAction.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID;
+            case SCAN -> hasScanner;
+            case DOCK -> canDock;
+            case TRANSMIT_INFORMATION -> hasAntenna;
+            case DEPLOY_CUBESAT -> hasCubeSat;
+            default -> true;
+        };
         var types = Arrays.stream(FlightPlannerEditors.EDITABLE_ACTION_TYPES)
-                .filter(type -> type != SpaceSimulation.ActionType.BEAM_POWER || hasAperture).toList();
+                .filter(type -> type != SpaceSimulation.ActionType.BEAM_POWER || hasAperture)
+                .sorted(Comparator.comparing(type -> !available.test(type)))
+                .toList();
         for (int index = 0; index < types.size(); index++) {
             var type = types.get(index);
             var button = SpaceAgeButtons.panel(4, 4 + index * 22, popupWidth - 30, 18,
                     FlightPlannerLabels.actionName(type), ignored -> editors.selectActionType(type));
             button.withTooltip(FlightPlannerLabels.actionTooltip(type));
-            var available = type != SpaceSimulation.ActionType.CONNECT_ASTEROID
-                    || editedAction != null && editedAction.type() == SpaceSimulation.ActionType.CONNECT_ASTEROID
-                    || canConnectAsteroid;
-            if (type == SpaceSimulation.ActionType.SCAN) available &= hasScanner;
-            if (type == SpaceSimulation.ActionType.DOCK) {
-                available &= canDock;
-                if (!canDock)
-                    button.withTooltip(Component.translatable("screen.oritech_space_age.action.dock_requires_arrival"));
-            }
-            if (type == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
-                available &= hasAntenna;
-            if (type == SpaceSimulation.ActionType.DEPLOY_CUBESAT)
-                available &= !RocketPayloads.all(craft).isEmpty();
+            if (type == SpaceSimulation.ActionType.DOCK && !canDock)
+                button.withTooltip(Component.translatable("screen.oritech_space_age.action.dock_requires_arrival"));
             if (editedAction != null && type == editedAction.type()) selectListButton(button, true);
-            else button.setActive(available);
+            else button.setActive(available.test(type));
             typeList.addChild(button);
         }
         typeList.setContentDimensions(popupWidth - 22, 8 + types.size() * 22);
