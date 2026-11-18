@@ -1,0 +1,30 @@
+{
+  "applyCost": [
+    {
+      "count": 2,
+      "ingredient": "oritech:processing_unit"
+    }
+  ],
+  "effect": {
+    "type": "custom",
+    "customAugmentId": "oritech:augment/precision_mining"
+  },
+  "requiredStation": "oritech:quantum_research_station",
+  "requirements": [
+    "oritech:augment/superminingspeed"
+  ],
+  "researchCost": [
+    {
+      "count": 8,
+      "ingredient": "oritech:processing_unit"
+    },
+    {
+      "count": 4,
+      "ingredient": "oritech:duratium_ingot"
+    }
+  ],
+  "rfCost": 75000000,
+  "toggleable": true,
+  "uiX": 105,
+  "uiY": 10
+}

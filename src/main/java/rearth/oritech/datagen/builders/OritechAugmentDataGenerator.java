@@ -162,6 +162,17 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .export(exporter, "dwarf");
 
         new AugmentRecipeBuilder(registries)
+                .researchCost(ItemContent.PROCESSING_UNIT, 16)
+                .researchCost(ItemContent.HEISENBERG_COMPENSATOR, 4)
+                .applyCost(ItemContent.HEISENBERG_COMPENSATOR, 1)
+                .requirement(Oritech.id("augment/dwarf"))
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
+                .uiX(55).uiY(70).rfCost(100_000_000)
+                .modifierDefinition(Attributes.SCALE, -0.875f, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
+                .toggleable()
+                .export(exporter, "ant_size");
+
+        new AugmentRecipeBuilder(registries)
                 .researchCost(ItemContent.RAW_BIOPOLYMER, 32)
                 .researchCost(TagContent.URANIUM_DUSTS, 4)
                 .applyCost(ItemContent.RAW_BIOPOLYMER, 8)
@@ -260,6 +271,17 @@ public class OritechAugmentDataGenerator implements DataProvider {
                 .modifierDefinition(Attributes.BLOCK_BREAK_SPEED, 1, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)
                 .toggleable()
                 .export(exporter, "superminingspeed");
+
+        new AugmentRecipeBuilder(registries)
+                .researchCost(ItemContent.PROCESSING_UNIT, 8)
+                .researchCost(ItemContent.DURATIUM_INGOT, 4)
+                .applyCost(ItemContent.PROCESSING_UNIT, 2)
+                .requirement(Oritech.id("augment/superminingspeed"))
+                .requiredStation(QUANTUM_RESEARCH_STATION_ID)
+                .uiX(105).uiY(10).rfCost(75_000_000)
+                .customAugmentDefinition(CustomAugmentsCollection.precisionMining.id)
+                .toggleable()
+                .export(exporter, "precision_mining");
 
         new AugmentRecipeBuilder(registries)
                 .researchCost(TagContent.STEEL_INGOTS, 32)

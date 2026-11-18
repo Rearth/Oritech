@@ -209,11 +209,32 @@ public class CustomAugmentsCollection {
         }
     };
 
+    // relevant code is in the mixin
+    public static final Augment precisionMining = new Augment(Oritech.id("augment/precision_mining"), true) {
+        @Override
+        public void activate(Player player) {
+        }
+
+        @Override
+        public void deactivate(Player player) {
+        }
+
+        @Override
+        public void refreshServer(Player player) {
+        }
+
+        @Override
+        public int refreshInterval() {
+            return Integer.MAX_VALUE;
+        }
+    };
+
     static {
         CUSTOM_AUGMENTS.put(feeder.id, feeder);
         CUSTOM_AUGMENTS.put(magnet.id, magnet);
         CUSTOM_AUGMENTS.put(oreFinder.id, oreFinder);
         CUSTOM_AUGMENTS.put(portal.id, portal);
+        CUSTOM_AUGMENTS.put(precisionMining.id, precisionMining);
     }
 
 }

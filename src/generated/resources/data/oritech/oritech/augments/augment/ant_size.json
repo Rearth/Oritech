@@ -1,0 +1,32 @@
+{
+  "applyCost": [
+    {
+      "count": 1,
+      "ingredient": "oritech:heisenberg_compensator"
+    }
+  ],
+  "effect": {
+    "type": "modifier",
+    "amount": -0.875,
+    "attributeOperationType": 2,
+    "entityAttributeId": "minecraft:scale"
+  },
+  "requiredStation": "oritech:quantum_research_station",
+  "requirements": [
+    "oritech:augment/dwarf"
+  ],
+  "researchCost": [
+    {
+      "count": 16,
+      "ingredient": "oritech:processing_unit"
+    },
+    {
+      "count": 4,
+      "ingredient": "oritech:heisenberg_compensator"
+    }
+  ],
+  "rfCost": 100000000,
+  "toggleable": true,
+  "uiX": 55,
+  "uiY": 70
+}

@@ -8,7 +8,8 @@
   "client": [
     "client.AvatarRenderStateMixin",
     "client.AvatarRendererMixin",
-    "client.HumanoidModelMixin"
+    "client.HumanoidModelMixin",
+    "client.MultiPlayerGameModeMixin"
   ],
   "injectors": {
     "defaultRequire": 1

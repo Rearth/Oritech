@@ -88,7 +88,7 @@ public class SchrodingersSafeBlockEntity extends NetworkedBlockEntity implements
 
     //own storage
     @SyncField({SyncType.GUI_OPEN, SyncType.GUI_TICK})
-    protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(20_000_000L, 20_000_000L, 20_000_000L, this::setChanged);
+    protected final DynamicStatisticEnergyStorage energyStorage = new DynamicStatisticEnergyStorage(BASE_CAPACITY, BASE_CAPACITY, BASE_CAPACITY, this::setChanged);
 
     private final EnergyHandler outputStorage = new DelegatingEnergyHandler(energyStorage) {
         @Override
