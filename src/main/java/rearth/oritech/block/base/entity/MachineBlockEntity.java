@@ -54,7 +54,6 @@ import rearth.oritech.util.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public abstract class MachineBlockEntity extends NetworkedBlockEntity
         implements GeoBlockEntity, ScreenProvider, MenuProvider, RedstoneAddonBlockEntity.RedstoneControllable, ColorableMachine, EnergyProvider, ItemProvider {
@@ -404,7 +403,7 @@ public abstract class MachineBlockEntity extends NetworkedBlockEntity
     }
 
     protected Direction getFacing() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override
