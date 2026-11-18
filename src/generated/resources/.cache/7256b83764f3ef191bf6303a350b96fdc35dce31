@@ -1,4 +1,5 @@
-// 26.1.2	2026-11-10T22:15:34.3983428	Oritech augment data
+// 26.1.2	2026-11-18T21:42:00.9697842	Oritech augment data
+8dd38a83ff791db0c214e804149b3d5cfba1ac6c data/oritech/oritech/augments/augment/ant_size.json
 fd0d688be122276721f66d2a5d76f9ed3dbb1c0c data/oritech/oritech/augments/augment/armor.json
 3378ae3fcfe47e28d47197199dbab954f28c6217 data/oritech/oritech/augments/augment/attackdamage.json
 02eb419f112cb2199a829b97d441ae185603a233 data/oritech/oritech/augments/augment/autofeeder.json
@@ -20,6 +21,7 @@ f81ccaea6c32f3674a7b5a8a9fae2a01a198bcd5 data/oritech/oritech/augments/augment/m
 fb0dcf7a0ab53c4b17819270896b39a4d6c8b434 data/oritech/oritech/augments/augment/nightvision.json
 fbae9231e5d96bc0b2a1e55a6529544071f2f191 data/oritech/oritech/augments/augment/orefinder.json
 11ccc8d912ac9609648e5f2acc000fefa5eec1c4 data/oritech/oritech/augments/augment/portal.json
+3ded287e99f7e01428028d2b2d53e7e8f846a5ca data/oritech/oritech/augments/augment/precision_mining.json
 388a58c3f08f17d8d18a1ce2d8a6e8e30c7f3789 data/oritech/oritech/augments/augment/speedboost.json
 b94e90a9cc7b63e693a0c402b20f3c29f4465e7a data/oritech/oritech/augments/augment/stepassist.json
 2e512069415c7e9abc9231d14ea1ce4822378b0a data/oritech/oritech/augments/augment/superattackdamage.json
