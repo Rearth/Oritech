@@ -2,6 +2,7 @@ package rearth.oritech.spaceage.block.mission_control;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.PipeBlock;
@@ -17,8 +18,33 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
+
+import java.util.Map;
 
 public class MissionControlBlock extends SurveyModuleBlock {
+
+    // Approximate the tilted screens in the idle model with boxes inside the block footprint.
+    private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Shapes.or(
+            Block.box(4, 0, 4, 12, 13, 12),
+            Block.box(6, 13, 5.75, 10, 17, 9.75),
+            Block.box(6, 3, 11.75, 10, 12, 14.75),
+            Block.box(3, 13.5, 3.5, 13, 14.5, 12.5),
+            Block.box(3, 10, 0, 13, 12.5, 2),
+            Block.box(3, 12.5, 1, 13, 14.5, 3.5),
+            Block.box(7, 7, 0, 9, 10.5, 4.75),
+            Block.box(0, 9.5, 3, 2.5, 13, 13),
+            Block.box(1.5, 13, 3, 4, 15.5, 13),
+            Block.box(3, 15.5, 3, 5.5, 18, 13),
+            Block.box(13.5, 9.5, 3, 16, 13, 13),
+            Block.box(12, 13, 3, 14.5, 15.5, 13),
+            Block.box(10.5, 15.5, 3, 13, 18, 13)));
+
+    private static final Map<Direction, VoxelShape> CONNECTION_SHAPES = Shapes.rotateHorizontal(Shapes.or(
+            Block.box(7, 3, 2, 9, 5, 4),
+            Block.box(6, 3, 0, 10, 5, 2)));
 
     public MissionControlBlock(Properties properties) {
 
@@ -33,6 +59,17 @@ public class MissionControlBlock extends SurveyModuleBlock {
 
         builder.add(BlockStateProperties.HORIZONTAL_FACING, BlockStateProperties.NORTH, BlockStateProperties.EAST,
                 BlockStateProperties.SOUTH, BlockStateProperties.WEST);
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+
+        var shape = SHAPES.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
+        for (var direction : Direction.Plane.HORIZONTAL) {
+            if (state.getValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction)))
+                shape = Shapes.or(shape, CONNECTION_SHAPES.get(direction));
+        }
+        return shape;
     }
 
     @Override

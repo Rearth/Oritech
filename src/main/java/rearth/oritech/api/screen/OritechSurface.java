@@ -18,7 +18,11 @@ public enum OritechSurface {
     PANEL_HOVER(ninePatch("textures/gui/bedrock_panel_hover.png")),
     PANEL_DARK_HOVER(ninePatch("textures/gui/bedrock_panel_dark_hover.png")),
     PANEL_ORANGE_HOVER(ninePatch("textures/gui/bedrock_panel_orange_hover.png")),
-    PANEL_PRESSED(ninePatch("textures/gui/bedrock_panel_pressed.png"));
+    PANEL_PRESSED(ninePatch("textures/gui/bedrock_panel_pressed.png")),
+    PANEL_DISABLED((graphics, x, y, w, h) -> {
+        graphics.fill(x, y, x + w, y + h, 0xFF373737);
+        graphics.fill(x + 1, y + 1, x + w - 1, y + h - 1, 0xFF555555);
+    });
 
     @FunctionalInterface
     public interface SurfaceRenderer {

@@ -77,6 +77,7 @@ public final class SpaceAgeButtons {
 
     private static ButtonWidget colors(ButtonWidget button) {
 
-        return button.withDisabledTextColor(0xFFBBBBBB).withPressedTextColor(LabelWidget.BRIGHT_TEXT);
+        return button.withDisabledSurface(OritechSurface.PANEL_DISABLED)
+                .withDisabledTextColor(0xFFBBBBBB).withPressedTextColor(LabelWidget.BRIGHT_TEXT);
     }
 }

@@ -79,9 +79,11 @@ final class FlightPlannerPopups {
 
     private static void selectListButton(ButtonWidget button, boolean selected) {
 
-        button.withDisabledSurface(OritechSurface.PANEL_PRESSED)
-                .withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(selected);
-        button.setActive(!selected);
+        if (selected) {
+            button.withDisabledSurface(OritechSurface.PANEL_PRESSED)
+                    .withDisabledTextColor(LabelWidget.BRIGHT_TEXT).withTextShadow(true);
+            button.setActive(false);
+        }
     }
 
     void build() {
@@ -205,8 +207,9 @@ final class FlightPlannerPopups {
                     });
             var hardware = editors.hardwareFor(action);
             var computer = NavigationComputerRules.computers(hardware, NavigationComputerRules.allSegments(hardware)) > 0;
-            selectListButton(resume, !action.addons().isEmpty());
-            if (!computer) {
+            if (computer) {
+                selectListButton(resume, !action.addons().isEmpty());
+            } else {
                 resume.setActive(false);
                 resume.withTooltip(Component.translatable("screen.oritech_space_age.validation.computer_required"));
             }

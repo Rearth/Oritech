@@ -1,7 +1,30 @@
 {
   "variants": {
-    "": {
+    "facing=down": {
+      "model": "oritech_space_age:block/antenna",
+      "x": 180
+    },
+    "facing=east": {
+      "model": "oritech_space_age:block/antenna",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north": {
+      "model": "oritech_space_age:block/antenna",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "oritech_space_age:block/antenna",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up": {
       "model": "oritech_space_age:block/antenna"
+    },
+    "facing=west": {
+      "model": "oritech_space_age:block/antenna",
+      "x": 90,
+      "y": 270
     }
   }
 }

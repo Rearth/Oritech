@@ -139,7 +139,11 @@ public class SpaceAgeModelProvider extends ModelProvider {
         createCustomModelBlock(SpaceAgeBlocks.HOLO_SCREEN.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.HOLO_CONTROLLER.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.ANTENNA.get(), blockModels);
+        var antenna = SpaceAgeBlocks.ANTENNA.get();
+        var antennaModel = ModelLocationUtils.getModelLocation(antenna);
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(antenna, BlockModelGenerators.variant(new Variant(antennaModel)))
+                .with(BlockModelGenerators.ROTATIONS_COLUMN_WITH_FACING));
+        blockModels.registerSimpleItemModel(antenna, antennaModel);
         itemModels.itemModelOutput.accept(SpaceAgeItems.MISSION_CARD.get(),
                 ItemModelUtils.plainModel(OritechSpaceAge.id("item/mission_card")));
         createCustomModelBlock(SpaceAgeBlocks.ASTEROID_ANCHOR.get(), blockModels);
