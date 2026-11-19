@@ -1,8 +1,10 @@
 package rearth.oritech.spaceage.simulation.mission;
 
+import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
@@ -88,6 +90,43 @@ class RampGuidanceTest {
             assertEquals(MissionController.resolveOrbitSlots(plan, data, owner, rocket.getRocketId()), resolved);
             assertEquals(requested, plan.currentAction().service().slot(), "Preview resolution leaves the editable Auto setting intact");
         }
+    }
+
+    @Test
+    void passThroughFinishesAtAGapInAFullEarthRing() {
+
+        var owner = UUID.randomUUID();
+        var system = new SpaceSimulation();
+        var rocket = ionSatellite();
+        var data = new MissionSavedData();
+        var count = SpaceBalance.slots(OrbitBand.LOW);
+        for (var slot = 0; slot < count; slot++) {
+            var satellite = ionSatellite();
+            var position = MissionState.Position.surface().placed(SpaceObjects.EARTH_X, 0, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW, slot);
+            data.craft.put(UUID.randomUUID(), new MissionState(owner, satellite, FlightPlan.empty(), position,
+                    system.earthKnowledge.copy(), BlockPos.ZERO));
+        }
+        var action = navigation(0);
+        var settings = action.service().withMainOccupant(false);
+        var saved = ServiceSettings.CODEC.encodeStart(JsonOps.INSTANCE, settings).getOrThrow();
+        assertEquals(settings, ServiceSettings.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow());
+        var plan = MissionController.resolveOrbitSlots(program(action.withService(settings)), data, owner, rocket.getRocketId());
+        assertEquals(-1, plan.currentAction().service().slot());
+
+        // Start at a gap so only the arrival rule matters in this test.
+        var radius = SpaceObjects.EARTH_RADIUS + OrbitBand.LOW.altitude();
+        var angle = Math.PI + Math.PI / count;
+        var x = SpaceObjects.EARTH_X + Math.cos(angle) * radius;
+        var y = Math.sin(angle) * radius;
+        var start = MissionState.Position.surface().placed(x, y, 0, 0, SpaceObjects.EARTH_ID, OrbitBand.LOW, -1);
+        var state = new MissionState(owner, rocket, plan, start, system.earthKnowledge.copy(), BlockPos.ZERO);
+        data.craft.put(rocket.getRocketId(), state);
+        MissionController.step(null, data, state, system, 1);
+        assertNull(state.action(), state.status);
+        assertEquals(-1, state.position.slot());
+        assertEquals(x, state.position.x(), .01);
+        assertEquals(y, state.position.y(), .01);
+        assertEquals(count, MissionController.orbitSlots(data, owner, UUID.randomUUID()).size());
     }
 
     @Test

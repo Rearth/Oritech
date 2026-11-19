@@ -3,7 +3,7 @@ package rearth.oritech.spaceage.simulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlan;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
-import rearth.oritech.spaceage.simulation.SpaceSimulation.ServiceSettings;
+import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 
 import java.util.HashSet;
 import java.util.List;
@@ -133,6 +133,10 @@ public final class SpaceBalance {
      * RF spent once per instant survey sweep, independent of installed scanner count.
      */
     public static final long SCAN_RF = 600_000;
+
+    // Keep a low-orbit Earth scan near the original survey cost.
+    public static final double EARTH_SCAN_METRES_PER_BLOCK = 20;
+    public static final long EARTH_SCAN_RF_PER_BLOCK = 1_200;
     /**
      * RF per simulation tick per powered spacecraft antenna.
      */
@@ -277,20 +281,25 @@ public final class SpaceBalance {
         var used = new HashSet<>(occupied);
         return plan.withBranches(plan.branches().stream().map(branch -> branch.withActions(branch.actions().stream().map(action -> {
             if (action.type() != ActionType.NAVIGATE_TO || !hasSlots(action.targetId(), action.orbit())) return action;
+            if (passesThroughOrbit(action)) return action.withService(action.service().withSlot(-1));
             var ring = new HashSet<Integer>();
             used.stream().filter(slot -> slot.body().equals(action.targetId()) && slot.orbit() == action.orbit())
                     .forEach(slot -> ring.add(slot.slot()));
             var slot = freeSlot(action.service().slot(), ring);
             if (slot >= slots(action.targetId(), action.orbit())) slot = -1;
             else used.add(new OrbitSlot(action.targetId(), action.orbit(), slot));
-            var settings = action.service();
-            return action.withService(new ServiceSettings(settings.durationTicks(), settings.timeoutTicks(), slot));
+            return action.withService(action.service().withSlot(slot));
         }).toList())).toList());
     }
 
     public static boolean hasSlots(UUID body, SpaceSimulation.OrbitBand orbit) {
 
         return slots(body, orbit) > 0;
+    }
+
+    public static boolean passesThroughOrbit(FlightPlanAction action) {
+
+        return hasSlots(action.targetId(), action.orbit()) && !action.service().mainOccupant();
     }
 
     public static boolean hasSlots(SpaceSimulation.OrbitBand orbit) {

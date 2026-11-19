@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.simulation;
 
 import com.mojang.serialization.JsonOps;
+import com.google.gson.JsonPrimitive;
 import com.mojang.authlib.GameProfile;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.block.mission_control.GroundStationBlockEntity;
@@ -12,6 +13,7 @@ import rearth.oritech.spaceage.network.FleetCategoryNetworking;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
@@ -20,11 +22,16 @@ import net.minecraft.gametest.framework.TestData;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.common.util.FakePlayerFactory;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -78,6 +85,9 @@ import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.service.VacuumProcessing;
 import rearth.oritech.spaceage.simulation.survey.SurveyKnowledge;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
+import rearth.oritech.spaceage.simulation.survey.EarthScan.Report;
+import rearth.oritech.spaceage.simulation.survey.EarthScan.Target;
 
 import java.util.HashSet;
 import java.util.List;
@@ -109,6 +119,8 @@ public final class SpaceAgeGameTests {
         FUNCTIONS.register("large_asteroid_delivery", () -> AsteroidGameTests::largeDelivery);
         FUNCTIONS.register("holo_projector", () -> HoloGameTests::projector);
         FUNCTIONS.register("mission_control_initial", () -> SpaceAgeGameTests::missionControlInitial);
+        FUNCTIONS.register("earth_scan", () -> SpaceAgeGameTests::earthScan);
+        FUNCTIONS.register("space_scanner_mount", () -> SpaceAgeGameTests::spaceScannerMount);
         FUNCTIONS.register("recovery", () -> SpaceAgeGameTests::recovery);
         FUNCTIONS.register("content", () -> SpaceAgeGameTests::content);
         FUNCTIONS.register("assembly", () -> SpaceAgeGameTests::assembly);
@@ -138,6 +150,10 @@ public final class SpaceAgeGameTests {
         }
         event.registerTest(RECOVERY.identifier(), new FunctionGameTestInstance(RECOVERY, info));
         event.registerTest(CONTENT.identifier(), new FunctionGameTestInstance(CONTENT, info));
+        event.registerTest(OritechSpaceAge.id("earth_scan"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
+                OritechSpaceAge.id("earth_scan")), info));
+        event.registerTest(OritechSpaceAge.id("space_scanner_mount"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
+                OritechSpaceAge.id("space_scanner_mount")), info));
         event.registerTest(OritechSpaceAge.id("assembly"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id("assembly")), info));
         event.registerTest(OritechSpaceAge.id("assembly_identity"), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION,
                 OritechSpaceAge.id("assembly_identity")), info));
@@ -149,6 +165,95 @@ public final class SpaceAgeGameTests {
                 OritechSpaceAge.id("gallery_light")), info));
         for (var name : List.of("cube_sat_shrink", "cube_sat_contents", "launch_ramp", "space_trophy", "full_orbit", "rocket_payloads"))
             event.registerTest(OritechSpaceAge.id(name), new FunctionGameTestInstance(ResourceKey.create(Registries.TEST_FUNCTION, OritechSpaceAge.id(name)), info));
+    }
+
+    private static void earthScan(GameTestHelper test) {
+
+        var level = test.getLevel();
+        var server = level.getServer();
+        var center = test.absolutePos(BlockPos.ZERO);
+        test.assertTrue(EarthScan.biomeIds(level).contains(Target.PLAINS.id()), "The picker gets plains from the flat world's biome source");
+        test.assertTrue(Target.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("plains")).getOrThrow().equals(Target.PLAINS)
+                        && Target.CODEC.parse(JsonOps.INSTANCE, new JsonPrimitive("village")).getOrThrow().equals(Target.VILLAGE),
+                "Existing biome and structure presets still load");
+        var customBiome = new Target(OritechSpaceAge.id("test_biome"), true);
+        var encodedBiome = Target.CODEC.encodeStart(JsonOps.INSTANCE, customBiome).getOrThrow();
+        test.assertTrue(Target.CODEC.parse(JsonOps.INSTANCE, encodedBiome).getOrThrow().equals(customBiome),
+                "Scan targets keep the biome's full registry ID");
+        var biome = new EarthScan(center.getX(), center.getZ(), 64, EarthScan.Target.PLAINS);
+        var survey = FlightPlanAction.create(ActionType.SCAN);
+        survey = survey.withSettings(survey.settings().withEarthScan(Optional.of(biome)));
+        var plan = FlightPlan.empty();
+        plan = plan.withBranches(List.of(plan.root().withActions(List.of(survey, FlightPlanAction.create(ActionType.TRANSMIT_INFORMATION)))));
+        var id = UUID.randomUUID();
+        var scanner = new StaticRocketSegment.BlockData(BlockPos.ZERO, SpaceAgeBlocks.SPACE_SCANNER.get().defaultBlockState());
+        var waypointCost = 704_400;
+        var segment = new StaticRocketSegment(id, Set.of(scanner), Map.of(), 1, 0, waypointCost, 0);
+        var energy = new DynamicRocketSegment(0, waypointCost, 0, Set.of());
+        var rocket = new ActiveRocketData(Map.of(id, segment), Map.of(id, energy));
+        var position = new MissionState.Position(-2_943_966, 44_794, 0, 0, UUID.randomUUID(),
+                OrbitBand.SURFACE, -1, 1, FlightPlanAction.NO_TARGET, new SegmentRef(BlockPos.ZERO));
+        var state = new MissionState(UUID.randomUUID(), rocket, plan, position, new SurveyKnowledge(), center);
+        var system = new SpaceSimulation();
+        var missions = new MissionSavedData();
+        MissionController.step(server, missions, state, system, 1);
+        test.assertTrue(energy.rf() == 0 && state.knowledge.earthReports().size() == 1, "The scan costs RF and saves a report onboard");
+        test.assertTrue(system.earthKnowledge.earthReports().isEmpty(), "The report stays onboard until transmission");
+        state.connected = true;
+        MissionController.step(server, missions, state, system, 2);
+        var report = system.earthKnowledge.earthReports().getFirst();
+        test.assertTrue(state.knowledge.earthReports().isEmpty(), "Transmission delivers the stored report once");
+        test.assertTrue(report.scan().radius() == 587, "The report uses the waypoint's actual altitude");
+        test.assertTrue(report.position().filter(p -> p.getX() == center.getX() && p.getZ() == center.getZ()).isPresent(),
+                "The flat test world has plains at the scan center");
+        var saved = SurveyKnowledge.CODEC.encodeStart(JsonOps.INSTANCE, system.earthKnowledge).getOrThrow();
+        test.assertTrue(SurveyKnowledge.CODEC.parse(JsonOps.INSTANCE, saved).getOrThrow().earthReports().equals(List.of(report)),
+                "Delivered Earth reports survive a save round trip");
+        var map = report.createMap(level);
+        test.assertTrue(map.is(Items.FILLED_MAP) && map.has(DataComponents.MAP_DECORATIONS), "The exported map carries the survey marker");
+        test.assertTrue(OritechSpaceAge.id("earth_survey_map").equals(map.get(DataComponents.ITEM_MODEL)),
+                "The survey map uses the digital icon and keeps vanilla map behavior");
+
+        var structure = new EarthScan(center.getX(), center.getZ(), 64, EarthScan.Target.VILLAGE).run(level, 3);
+        test.assertTrue(structure.position().filter(p -> Math.hypot(p.getX() - center.getX(), p.getZ() - center.getZ()) > 64).isEmpty(),
+                "Structure reports never point outside the search radius");
+        test.succeed();
+    }
+
+    private static void spaceScannerMount(GameTestHelper test) {
+
+        var level = test.getLevel();
+        var pos = test.absolutePos(BlockPos.ZERO).above(3);
+        var scanner = SpaceAgeBlocks.SPACE_SCANNER.get();
+        var stack = new ItemStack(scanner);
+        for (var support : Direction.values()) {
+            var supportPos = pos.relative(support);
+            level.setBlockAndUpdate(supportPos, Blocks.STONE.defaultBlockState());
+            var state = scanner.getStateForPlacement(new DirectionalPlaceContext(level, pos, support, stack, support.getOpposite()));
+            var face = support == Direction.DOWN ? AttachFace.FLOOR : support == Direction.UP ? AttachFace.CEILING : AttachFace.WALL;
+            test.assertTrue(state != null && state.getValue(BlockStateProperties.ATTACH_FACE) == face, "Scanner mounts against " + support);
+            if (face == AttachFace.WALL)
+                test.assertTrue(state.getValue(BlockStateProperties.HORIZONTAL_FACING) == support.getOpposite(), "Scanner faces away from the wall");
+            level.setBlockAndUpdate(pos, state);
+            var shape = state.getShape(level, pos);
+            test.assertTrue(scannerBaseAt(shape, support) && !scannerBaseAt(shape, support.getOpposite()),
+                    "The scanner shape has its base against the support");
+            test.assertTrue(level.getBlockEntity(pos) instanceof GroundStationBlockEntity, "The scanner still has its station block entity");
+            level.removeBlock(supportPos, false);
+            test.assertTrue(level.getBlockState(pos).isAir(), "Removing the support detaches the scanner");
+        }
+        test.succeed();
+    }
+
+    private static boolean scannerBaseAt(VoxelShape shape, Direction support) {
+
+        // Sample away from the mast and side posts so only the base touches the probe.
+        var inset = support.getAxisDirection() == Direction.AxisDirection.POSITIVE ? .94 : .06;
+        var x = support.getAxis() == Direction.Axis.X ? inset : .25;
+        var y = support.getAxis() == Direction.Axis.Y ? inset : .25;
+        var z = support.getAxis() == Direction.Axis.Z ? inset : .25;
+        var probe = Shapes.box(x - .01, y - .01, z - .01, x + .01, y + .01, z + .01);
+        return Shapes.joinIsNotEmpty(shape, probe, BooleanOp.AND);
     }
 
     private static MissionState beamStation(UUID owner, double x, long rf) {

@@ -59,6 +59,7 @@ final class MissionArrival {
         var p = state.position;
         var slot = -1;
         if (SpaceBalance.hasSlots(action.targetId(), action.orbit())
+                && !SpaceBalance.passesThroughOrbit(action)
                 && Math.hypot(p.vx(), p.vy()) <= 12) {
             var occupied = new HashSet<Integer>();
             data.craft.values().stream().filter(c -> c != state && !c.ended && c.owner.equals(state.owner)

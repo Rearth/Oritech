@@ -23,7 +23,7 @@ import rearth.oritech.spaceage.block.beam_aperture.BeamApertureBlock;
 import rearth.oritech.spaceage.block.cubesat.CubeSatBlock;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlock;
 import rearth.oritech.spaceage.block.mission_control.MissionControlBlock;
-import rearth.oritech.spaceage.block.mission_control.SurveyModuleBlock;
+import rearth.oritech.spaceage.block.mission_control.SpaceScannerBlock;
 import rearth.oritech.spaceage.block.mission_control.AntennaBlock;
 import rearth.oritech.spaceage.block.robot_arm.RobotArmBlock;
 import rearth.oritech.spaceage.block.vacuum_crafter.BlockPairController;
@@ -176,8 +176,8 @@ public final class SpaceAgeBlocks {
 
     public static final DeferredBlock<MissionControlBlock> MISSION_CONTROL =
             BLOCKS.registerBlock("mission_control", MissionControlBlock::new, () -> machineProperties().noOcclusion());
-    public static final DeferredBlock<SurveyModuleBlock> SPACE_SCANNER =
-            BLOCKS.registerBlock("space_scanner", properties -> new SurveyModuleBlock(properties, SurveyModuleBlock.SCANNER_SHAPE), () -> machineProperties().noOcclusion());
+    public static final DeferredBlock<SpaceScannerBlock> SPACE_SCANNER =
+            BLOCKS.registerBlock("space_scanner", SpaceScannerBlock::new, () -> machineProperties().noOcclusion());
     public static final DeferredBlock<AntennaBlock> ANTENNA =
             BLOCKS.registerBlock("antenna", AntennaBlock::new, () -> machineProperties().noOcclusion());
 

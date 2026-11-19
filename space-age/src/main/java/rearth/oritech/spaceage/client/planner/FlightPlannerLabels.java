@@ -5,7 +5,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.spaceage.simulation.AsteroidImpactRules;
 import rearth.oritech.spaceage.simulation.AsteroidShape;
-import rearth.oritech.spaceage.simulation.SpaceBalance;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionType;
@@ -169,10 +168,10 @@ final class FlightPlannerLabels {
 
     static Component scanEnergyLabel(RocketFlightPathCalculator.ScanEstimate estimate) {
 
-        return estimate == null
+        return estimate == null || estimate.requiredRF() == 0
                 ? Component.translatable("screen.oritech_space_age.scan.energy_unknown")
                 : Component.translatable("screen.oritech_space_age.scan.energy_estimate",
-                TooltipHelper.getEnergyText(SpaceBalance.SCAN_RF));
+                TooltipHelper.getEnergyText(estimate.requiredRF()));
     }
 
     static List<Component> scanEnergyTooltip(RocketFlightPathCalculator.ScanEstimate estimate) {
@@ -180,8 +179,8 @@ final class FlightPlannerLabels {
         var lines = new ArrayList<Component>();
         lines.add(scanEnergyLabel(estimate));
         if (estimate != null) {
-            lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
-                    String.format(Locale.ROOT, "%,d", SpaceBalance.SCAN_RF)));
+            if (estimate.requiredRF() > 0) lines.add(Component.translatable("screen.oritech_space_age.scan.energy_exact",
+                    String.format(Locale.ROOT, "%,d", estimate.requiredRF())));
             lines.add(Component.translatable("screen.oritech_space_age.scan.energy_available", String.format(Locale.ROOT, "%,d", estimate.availableRF())));
             lines.add(Component.translatable("screen.oritech_space_age.scan.scanners", estimate.scanners()));
         }

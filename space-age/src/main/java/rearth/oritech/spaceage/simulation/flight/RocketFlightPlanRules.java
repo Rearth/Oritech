@@ -256,11 +256,8 @@ public final class RocketFlightPlanRules {
                     validatedAction = action.withService(SpaceSimulation.ServiceSettings.DEFAULT);
                 }
                 if (validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
-                        && !SpaceBalance.hasSlots(validatedAction.targetId(), validatedAction.orbit())) {
-                    var settings = validatedAction.service();
-                    validatedAction = validatedAction.withService(new SpaceSimulation.ServiceSettings(settings.durationTicks(),
-                            settings.timeoutTicks(), -1));
-                }
+                        && (!SpaceBalance.hasSlots(validatedAction.targetId(), validatedAction.orbit()) || SpaceBalance.passesThroughOrbit(validatedAction)))
+                    validatedAction = validatedAction.withService(validatedAction.service().withSlot(-1));
                 var addons = validAddons(validatedAction);
                 var targetVelocity = validatedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO
                         && validatedAction.velocityMode() == SpaceSimulation.ArrivalVelocityMode.CUSTOM

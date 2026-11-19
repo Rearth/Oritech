@@ -605,6 +605,38 @@ class SpacePowerTest {
     }
 
     @Test
+    void solarPassThroughStaysUnslottedAfterArrival() {
+
+        var owner = UUID.randomUUID();
+        var data = new MissionSavedData();
+        var system = new SpaceSimulation();
+        var count = SpaceBalance.slots(SpaceSimulation.SUN_ID, OrbitBand.SOLAR);
+        for (var slot = 0; slot < count; slot++) {
+            var occupant = station(owner, SpaceBalance.SOLAR_MIN_DISTANCE);
+            occupant.position = occupant.position.placed(occupant.position.x(), 0, 0, 0, SpaceSimulation.SUN_ID, OrbitBand.SOLAR, slot);
+            data.craft.put(occupant.rocket.getRocketId(), occupant);
+        }
+        var craft = station(owner, SpaceBalance.SOLAR_MIN_DISTANCE);
+        var arrival = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceSimulation.SUN_ID).withOrbit(OrbitBand.SOLAR);
+        arrival = arrival.withService(arrival.service().withMainOccupant(false));
+        var plan = craft.plan.withBranches(List.of(craft.plan.root().withActions(List.of(arrival))));
+        craft.plan = MissionController.resolveOrbitSlots(plan, data, owner, craft.rocket.getRocketId());
+        var angle = Math.PI + Math.PI / count;
+        var x = Math.cos(angle) * SpaceBalance.SOLAR_MIN_DISTANCE;
+        var y = Math.sin(angle) * SpaceBalance.SOLAR_MIN_DISTANCE;
+        craft.position = craft.position.placed(x, y, 0, 0, SpaceSimulation.SUN_ID, OrbitBand.SOLAR, -1);
+        data.craft.put(craft.rocket.getRocketId(), craft);
+
+        MissionController.step(null, data, craft, system, 1);
+        assertNull(craft.action(), craft.status);
+        SunOrbitRules.validate(data);
+        assertEquals(SpaceSimulation.SUN_ID, craft.position.target());
+        assertEquals(-1, craft.position.slot());
+        assertEquals(x, craft.position.x(), .01);
+        assertEquals(y, craft.position.y(), .01);
+    }
+
+    @Test
     void sunEntryAndSustainablePreviewUseActualHardware() {
 
         var mission = station(UUID.randomUUID(), -3_000_000);

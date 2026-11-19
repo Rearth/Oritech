@@ -7,30 +7,60 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Saved asteroid discoveries and composition. Discovered contacts use current world motion.
+ * Saved asteroid discoveries and Earth survey reports.
  */
 public final class SurveyKnowledge {
 
-    public static final Codec<SurveyKnowledge> CODEC = Measurement.CODEC.listOf().fieldOf("measurements")
-            .xmap(SurveyKnowledge::new, knowledge -> List.copyOf(knowledge.measurements.values())).codec();
+    private static final int REPORT_LIMIT = 24;
+    public static final Codec<SurveyKnowledge> CODEC = RecordCodecBuilder.create(i -> i.group(
+            Measurement.CODEC.listOf().fieldOf("measurements").forGetter(knowledge -> List.copyOf(knowledge.measurements.values())),
+            EarthScan.Report.CODEC.listOf().optionalFieldOf("earth_reports", List.of()).forGetter(SurveyKnowledge::earthReports)
+    ).apply(i, SurveyKnowledge::new));
     private final Map<UUID, Measurement> measurements = new HashMap<>();
+    private final List<EarthScan.Report> earthReports = new ArrayList<>();
 
     public SurveyKnowledge() {
     }
 
-    private SurveyKnowledge(List<Measurement> measurements) {
+    private SurveyKnowledge(List<Measurement> measurements, List<EarthScan.Report> reports) {
 
         measurements.forEach(m -> this.measurements.put(m.data.id(), m));
+        earthReports.addAll(reports);
     }
 
     public SurveyKnowledge copy() {
 
-        return new SurveyKnowledge(List.copyOf(measurements.values()));
+        // The original craft keeps its reports. New craft only inherit the shared star chart.
+        return new SurveyKnowledge(List.copyOf(measurements.values()), List.of());
+    }
+
+    public List<EarthScan.Report> earthReports() {
+
+        return List.copyOf(earthReports);
+    }
+
+    public void addEarthReport(EarthScan.Report report) {
+
+        earthReports.addFirst(report);
+        if (earthReports.size() > REPORT_LIMIT) earthReports.removeLast();
+    }
+
+    public void addEarthReports(List<EarthScan.Report> reports) {
+
+        for (var report : reports.reversed()) addEarthReport(report);
+    }
+
+    public List<EarthScan.Report> takeEarthReports() {
+
+        var reports = earthReports();
+        earthReports.clear();
+        return reports;
     }
 
     public void forget(UUID target) {

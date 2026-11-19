@@ -33,6 +33,7 @@ public final class MissionSavedData extends SavedData {
     public final SpacePowerService power = new SpacePowerService();
     public List<SpaceCommunications.Node> networkNodes = List.of();
     public long extraTicks;
+    long lastEarthScanTick = Long.MIN_VALUE;
     public int debugSpeed = 1;
 
     public MissionSavedData() {

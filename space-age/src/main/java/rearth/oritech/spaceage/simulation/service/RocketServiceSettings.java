@@ -8,6 +8,7 @@ import net.minecraft.resources.Identifier;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +18,14 @@ import java.util.UUID;
  * Typed parameters for explicit rocket services. A reference always belongs to its containing segment.
  */
 public record RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam,
-                                    Optional<NavigationWaypoint> waypoint) {
+                                    Optional<NavigationWaypoint> waypoint, Optional<EarthScan> earthScan) {
 
     public static final RocketServiceSettings DEFAULT = new RocketServiceSettings(Processing.DEFAULT, Docking.DEFAULT, Exchange.DEFAULT);
     public static final Codec<RocketServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
             Processing.CODEC.fieldOf("processing").forGetter(RocketServiceSettings::processing), Docking.CODEC.fieldOf("docking").forGetter(RocketServiceSettings::docking),
             Exchange.CODEC.fieldOf("exchange").forGetter(RocketServiceSettings::exchange), Beam.CODEC.optionalFieldOf("beam", Beam.DEFAULT).forGetter(RocketServiceSettings::beam),
-            NavigationWaypoint.CODEC.optionalFieldOf("waypoint").forGetter(RocketServiceSettings::waypoint)
+            NavigationWaypoint.CODEC.optionalFieldOf("waypoint").forGetter(RocketServiceSettings::waypoint),
+            EarthScan.CODEC.optionalFieldOf("earth_scan").forGetter(RocketServiceSettings::earthScan)
     ).apply(i, RocketServiceSettings::new));
 
     public RocketServiceSettings(Processing processing, Docking docking, Exchange exchange) {
@@ -33,32 +35,37 @@ public record RocketServiceSettings(Processing processing, Docking docking, Exch
 
     public RocketServiceSettings(Processing processing, Docking docking, Exchange exchange, Beam beam) {
 
-        this(processing, docking, exchange, beam, Optional.empty());
+        this(processing, docking, exchange, beam, Optional.empty(), Optional.empty());
     }
 
     public RocketServiceSettings withWaypoint(Optional<NavigationWaypoint> value) {
 
-        return new RocketServiceSettings(processing, docking, exchange, beam, value);
+        return new RocketServiceSettings(processing, docking, exchange, beam, value, earthScan);
     }
 
     public RocketServiceSettings withBeam(Beam value) {
 
-        return new RocketServiceSettings(processing, docking, exchange, value, waypoint);
+        return new RocketServiceSettings(processing, docking, exchange, value, waypoint, earthScan);
     }
 
     public RocketServiceSettings withProcessing(Processing value) {
 
-        return new RocketServiceSettings(value, docking, exchange, beam, waypoint);
+        return new RocketServiceSettings(value, docking, exchange, beam, waypoint, earthScan);
     }
 
     public RocketServiceSettings withDocking(Docking value) {
 
-        return new RocketServiceSettings(processing, value, exchange, beam, waypoint);
+        return new RocketServiceSettings(processing, value, exchange, beam, waypoint, earthScan);
     }
 
     public RocketServiceSettings withExchange(Exchange value) {
 
-        return new RocketServiceSettings(processing, docking, value, beam, waypoint);
+        return new RocketServiceSettings(processing, docking, value, beam, waypoint, earthScan);
+    }
+
+    public RocketServiceSettings withEarthScan(Optional<EarthScan> value) {
+
+        return new RocketServiceSettings(processing, docking, exchange, beam, waypoint, value);
     }
 
     public enum SourceScope {

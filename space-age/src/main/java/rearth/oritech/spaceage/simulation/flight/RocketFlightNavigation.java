@@ -346,10 +346,15 @@ final class RocketFlightNavigation {
         if (target.id().equals(SpaceObjects.EARTH_ID) && action.orbit() == SpaceSimulation.OrbitBand.SURFACE)
             return SpaceBalance.surfaceAngle((double) action.landingX() + action.landingOffsetX(),
                     (double) action.landingZ() + action.landingOffsetZ());
+        var nearestAngle = Math.atan2(craft.y - target.yAt(craft.time), craft.x - target.xAt(craft.time));
+        if (SpaceBalance.passesThroughOrbit(action)) {
+            // Aim midway between stations so a full ring still has safe arrival points.
+            var spacing = Math.TAU / SpaceBalance.slots(target.id(), action.orbit());
+            return Math.PI + (Math.floor((nearestAngle - Math.PI) / spacing) + .5) * spacing;
+        }
         if (SpaceBalance.hasSlots(target.id(), action.orbit())
                 && action.service().slot() >= 0)
             return Math.PI + Math.PI * 2 * action.service().slot() / SpaceBalance.slots(target.id(), action.orbit());
-        var nearestAngle = Math.atan2(craft.y - target.yAt(craft.time), craft.x - target.xAt(craft.time));
         return nearestAngle + targetPointOffset(action);
     }
 

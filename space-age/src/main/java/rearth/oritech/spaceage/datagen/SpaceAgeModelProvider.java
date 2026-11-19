@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.basic.AsteroidBlock;
@@ -57,6 +58,30 @@ public class SpaceAgeModelProvider extends ModelProvider {
         var model = ModelLocationUtils.getModelLocation(block);
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.variant(new Variant(model)))
                 .with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.registerSimpleItemModel(block, model);
+    }
+
+    private static void createFaceAttachedModelBlock(Block block, BlockModelGenerators blockModels) {
+
+        var model = ModelLocationUtils.getModelLocation(block);
+        // The scanner model is upright by default, so tilt it before turning it toward the wall.
+        var rotations = PropertyDispatch.modify(BlockStateProperties.ATTACH_FACE, BlockStateProperties.HORIZONTAL_FACING)
+                .generate((face, facing) -> {
+                    var tilt = switch (face) {
+                        case FLOOR -> BlockModelGenerators.NOP;
+                        case WALL -> BlockModelGenerators.X_ROT_90;
+                        case CEILING -> BlockModelGenerators.X_ROT_180;
+                    };
+                    var direction = face == AttachFace.CEILING ? facing.getOpposite() : facing;
+                    var turn = switch (direction) {
+                        case EAST -> BlockModelGenerators.Y_ROT_90;
+                        case SOUTH -> BlockModelGenerators.Y_ROT_180;
+                        case WEST -> BlockModelGenerators.Y_ROT_270;
+                        default -> BlockModelGenerators.NOP;
+                    };
+                    return tilt.then(turn);
+                });
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.variant(new Variant(model))).with(rotations));
         blockModels.registerSimpleItemModel(block, model);
     }
 
@@ -138,7 +163,7 @@ public class SpaceAgeModelProvider extends ModelProvider {
                 ItemModelUtils.specialModel(OritechSpaceAge.id("item/mission_control"), new GeckolibItemSpecialRenderer.Unbaked()));
         createCustomModelBlock(SpaceAgeBlocks.HOLO_SCREEN.get(), blockModels);
         createHorizontalModelBlock(SpaceAgeBlocks.HOLO_CONTROLLER.get(), blockModels);
-        createCustomModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
+        createFaceAttachedModelBlock(SpaceAgeBlocks.SPACE_SCANNER.get(), blockModels);
         var antenna = SpaceAgeBlocks.ANTENNA.get();
         var antennaModel = ModelLocationUtils.getModelLocation(antenna);
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(antenna, BlockModelGenerators.variant(new Variant(antennaModel)))

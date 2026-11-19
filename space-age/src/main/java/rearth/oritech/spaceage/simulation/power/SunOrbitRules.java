@@ -34,7 +34,8 @@ final class SunOrbitRules {
                 data.dockingLinks.removeIf(link -> link.host().equals(state.rocket.getRocketId()) || link.visitor().equals(state.rocket.getRocketId()));
                 continue;
             }
-            if (RocketDocking.visitorLink(data, state.rocket.getRocketId()) != null) continue;
+            // Solar power is still required for pass-through craft, but they never enter the slot roster.
+            if (state.position.slot() < 0 || RocketDocking.visitorLink(data, state.rocket.getRocketId()) != null) continue;
             var used = occupied.computeIfAbsent(state.owner, ignored -> new HashSet<>());
             var slot = SpaceBalance.freeSlot(state.position.slot(), used);
             if (slot != state.position.slot()) {

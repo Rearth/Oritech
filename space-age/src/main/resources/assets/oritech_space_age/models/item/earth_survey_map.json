@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "oritech_space_age:item/earth_survey_map"
+  }
+}

@@ -290,24 +290,36 @@ public final class RocketFlightPathCalculator {
         var scanners = state.segments.values().stream().mapToInt(segment -> segment.hardware.scanners()).sum();
         var available = state.segments.values().stream().filter(segment -> segment.hardware.scanners() > 0)
                 .mapToDouble(segment -> segment.rf()).sum();
-        context.scanEstimates.add(new ScanEstimate(action.id(), (long) Math.floor(available), scanners));
+        var earthScan = action.settings().earthScan().orElse(null);
+        var scanArea = earthScan == null ? null : earthScan.atPosition(state.x, state.y).orElse(null);
+        var radius = scanArea == null ? 0 : scanArea.radius();
+        var requiredRF = earthScan == null ? SpaceBalance.SCAN_RF : scanArea == null ? 0 : scanArea.energyCost();
+        context.scanEstimates.add(new ScanEstimate(action.id(), (long) Math.floor(available), scanners, requiredRF, radius));
         if (scanners == 0) {
             state.blockedState = TerminalState.NO_SCANNER;
             return false;
         }
-        if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
-            state.blockedState = TerminalState.NO_SCAN_TARGET;
-            return false;
+        // The planner checks flight and power but leaves the world search to the running mission.
+        if (earthScan != null) {
+            if (scanArea == null) {
+                state.blockedState = TerminalState.EARTH_SCAN_OUT_OF_RANGE;
+                return false;
+            }
+        } else {
+            if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION) {
+                state.blockedState = TerminalState.NO_SCAN_TARGET;
+                return false;
+            }
+            if (SurveyRules.surveyDistance(target, state.x, state.y) > SpaceBalance.SCAN_RANGE) {
+                state.blockedState = TerminalState.SCAN_OUT_OF_RANGE;
+                return false;
+            }
         }
-        if (SurveyRules.surveyDistance(target, state.x, state.y) > SpaceBalance.SCAN_RANGE) {
-            state.blockedState = TerminalState.SCAN_OUT_OF_RANGE;
-            return false;
-        }
-        if (available < SpaceBalance.SCAN_RF) {
+        if (available < requiredRF) {
             state.blockedState = TerminalState.NOT_ENOUGH_SERVICE_RF;
             return false;
         }
-        double remaining = SpaceBalance.SCAN_RF;
+        double remaining = requiredRF;
         for (var segment : state.segments.values()) {
             if (segment.hardware.scanners() == 0) continue;
             var spent = Math.min(remaining, segment.rf());
@@ -605,6 +617,7 @@ public final class RocketFlightPathCalculator {
         NO_COUPLING,
         NO_PAYLOAD,
         NO_SCAN_TARGET,
+        EARTH_SCAN_OUT_OF_RANGE,
         SCAN_OUT_OF_RANGE,
         NO_SCANNER,
         NO_ANTENNA,
@@ -868,7 +881,7 @@ public final class RocketFlightPathCalculator {
         }
     }
 
-    public record ScanEstimate(UUID actionId, long availableRF, int scanners) {
+    public record ScanEstimate(UUID actionId, long availableRF, int scanners, long requiredRF, int radius) {
 
     }
 

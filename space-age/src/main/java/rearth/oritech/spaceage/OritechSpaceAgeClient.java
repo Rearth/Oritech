@@ -11,6 +11,7 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import rearth.oritech.spaceage.client.mission_control.MissionControlRenderer;
+import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import rearth.oritech.spaceage.client.beam_aperture.GroundBeamRenderer;
@@ -35,6 +36,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.Locale;
+import java.util.List;
 
 @Mod(value = OritechSpaceAge.MOD_ID, dist = Dist.CLIENT)
 public final class OritechSpaceAgeClient {
@@ -61,6 +63,7 @@ public final class OritechSpaceAgeClient {
             }
         });
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> FleetViewPreferences.clearWorld());
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> RocketFlightPlannerScreen.receiveEarthBiomes(List.of()));
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onExtractRenderState);
         NeoForge.EVENT_BUS.addListener(RocketRenderer::onSubmitGeometry);
         NeoForge.EVENT_BUS.addListener(RocketEffects::tick);

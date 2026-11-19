@@ -1,10 +1,12 @@
 package rearth.oritech.spaceage.network;
 
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -16,6 +18,7 @@ import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.mission_control.MissionControlMenu;
 import rearth.oritech.spaceage.client.MissionNotifications;
 import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
+import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
 import rearth.oritech.spaceage.init.SpaceAgeComponents;
 import rearth.oritech.spaceage.init.SpaceAgeItems;
 import rearth.oritech.spaceage.recipe.VacuumRecipe;
@@ -36,9 +39,11 @@ import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -64,6 +69,14 @@ public final class MissionNetworking {
                 MissionControlScreen.select(payload)));
         registrar.playToClient(SurveyResultsPayload.TYPE, NetworkManager.getAutoCodec(SurveyResultsPayload.class), (payload, context) -> context.enqueueWork(() ->
                 MissionNotifications.showSurveyResults(payload.discovered(), payload.updated())));
+        NetworkManager.registerCodec(ByteBufCodecs.fromCodecWithRegistries(EarthScan.Report.CODEC), EarthScan.Report.class);
+        registrar.playToClient(EarthReports.TYPE, NetworkManager.getAutoCodec(EarthReports.class), (payload, context) ->
+                context.enqueueWork(() -> MissionControlScreen.receiveEarthReports(payload)));
+        registrar.playToClient(SurveyNotice.TYPE, NetworkManager.getAutoCodec(SurveyNotice.class), (payload, context) ->
+                context.enqueueWork(() -> MissionNotifications.showSurveyNotice(payload.kind())));
+        registrar.playToClient(EarthBiomes.TYPE, NetworkManager.getAutoCodec(EarthBiomes.class), (payload, context) ->
+                context.enqueueWork(() -> RocketFlightPlannerScreen.receiveEarthBiomes(payload.biomes())));
+        registrar.playToServer(EarthReportRequest.TYPE, EarthReportRequest.STREAM_CODEC, MissionNetworking::earthReport);
         registrar.playToServer(FleetRequest.TYPE, NetworkManager.getAutoCodec(FleetRequest.class), MissionNetworking::request);
         registrar.playToServer(DebugSpeed.TYPE, NetworkManager.getAutoCodec(DebugSpeed.class), (payload, context) -> {
             if (!(context.player() instanceof ServerPlayer player) || !player.isCreative()
@@ -172,6 +185,101 @@ public final class MissionNetworking {
         var player = server.getPlayerList().getPlayer(owner);
         if (player != null && discovered + updated > 0)
             PacketDistributor.sendToPlayer(player, new SurveyResultsPayload(discovered, updated));
+    }
+
+    public static void sendEarthReports(MinecraftServer server, UUID owner) {
+
+        var player = server.getPlayerList().getPlayer(owner);
+        if (player == null) return;
+        PacketDistributor.sendToPlayer(player, new SurveyNotice(SurveyNotice.Kind.EARTH_RECEIVED));
+        if (player.containerMenu instanceof MissionControlMenu menu && menu.stillValid(player)) sendEarthReports(player, menu);
+    }
+
+    private static void sendEarthReports(ServerPlayer player, MissionControlMenu menu) {
+
+        var reports = SpaceSimulationSavedData.getForPlayer(player).earthKnowledge.earthReports();
+        PacketDistributor.sendToPlayer(player, new EarthReports(menu.containerId, reports));
+    }
+
+    private static void earthReport(EarthReportRequest request, IPayloadContext context) {
+
+        if (!(context.player() instanceof ServerPlayer player) || !(player.containerMenu instanceof MissionControlMenu menu)
+                || menu.containerId != request.menuId() || !menu.stillValid(player)) return;
+        if (request.export().isEmpty()) {
+            sendEarthReports(player, menu);
+            return;
+        }
+        // Only export reports that this player has actually received from a mission.
+        var reports = SpaceSimulationSavedData.getForPlayer(player).earthKnowledge.earthReports();
+        for (var report : reports) {
+            if (!report.id().equals(request.export().get()) || report.position().isEmpty()) continue;
+            // Each exported map has its own ID, so it needs an empty slot.
+            if (player.getInventory().getFreeSlot() < 0) {
+                PacketDistributor.sendToPlayer(player, new SurveyNotice(SurveyNotice.Kind.INVENTORY_FULL));
+                return;
+            }
+            player.getInventory().placeItemBackInInventory(report.createMap(player.level().getServer().overworld()));
+            player.closeContainer();
+            PacketDistributor.sendToPlayer(player, new SurveyNotice(SurveyNotice.Kind.MAP_EXPORTED));
+            return;
+        }
+    }
+
+    public record EarthReports(int menuId, List<EarthScan.Report> reports) implements CustomPacketPayload {
+
+        public static final Type<EarthReports> TYPE = new Type<>(OritechSpaceAge.id("earth_reports"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+    }
+
+    public record SurveyNotice(Kind kind) implements CustomPacketPayload {
+
+        public static final Type<SurveyNotice> TYPE = new Type<>(OritechSpaceAge.id("survey_notice"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+
+        public enum Kind {
+
+            EARTH_RECEIVED, MAP_EXPORTED, INVENTORY_FULL
+        }
+    }
+
+    public static void sendEarthBiomes(ServerPlayer player) {
+
+        PacketDistributor.sendToPlayer(player, new EarthBiomes(EarthScan.biomeIds(player.level().getServer().overworld())));
+    }
+
+    public record EarthBiomes(List<Identifier> biomes) implements CustomPacketPayload {
+
+        public static final Type<EarthBiomes> TYPE = new Type<>(OritechSpaceAge.id("earth_biomes"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
+    }
+
+    public record EarthReportRequest(int menuId, Optional<UUID> export) implements CustomPacketPayload {
+
+        public static final Type<EarthReportRequest> TYPE = new Type<>(OritechSpaceAge.id("earth_report_request"));
+        public static final StreamCodec<RegistryFriendlyByteBuf, EarthReportRequest> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.VAR_INT, EarthReportRequest::menuId,
+                ByteBufCodecs.optional(UUIDUtil.STREAM_CODEC), EarthReportRequest::export, EarthReportRequest::new);
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
     }
 
     private static void request(FleetRequest payload, IPayloadContext context) {

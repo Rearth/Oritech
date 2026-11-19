@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.client.planner;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -29,10 +30,13 @@ import rearth.oritech.spaceage.simulation.service.RocketProcessingService;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings.Docking;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings.HardwareRef;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
+import rearth.oritech.spaceage.simulation.survey.EarthScan.Target;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -287,6 +291,11 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         return addRenderableWidget(field);
     }
 
+    BlockPos earthScanCenter() {
+
+        return menu instanceof MissionControlMenu control ? control.earthScanCenter : null;
+    }
+
     void focusPopup(EditBox field) {
 
         setFocused(field);
@@ -530,6 +539,15 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
         closeNestedEditorState();
         replaceAction(branch.id(), action.id(), changed, flightPlanRocket());
         rebuildComponents();
+    }
+
+    void selectEarthScanTarget(Target target) {
+
+        var action = findAction(targetAction);
+        if (action == null || action.settings().earthScan().isEmpty()) return;
+        var scan = action.settings().earthScan().get();
+        closeNestedEditorState();
+        changeServiceSettings(action, action.settings().withEarthScan(Optional.of(new EarthScan(scan.x(), scan.z(), target))));
     }
 
     protected void openDestinationMenuFromEditor(UUID actionId, int panelX, int panelY) {

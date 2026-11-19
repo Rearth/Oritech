@@ -6,6 +6,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -62,6 +63,18 @@ import java.util.UUID;
  * Edits mission intent while the analytical calculator supplies paths and automatic booster events.
  */
 public class RocketFlightPlannerScreen extends FlightPlannerEditors {
+
+    private static List<Identifier> earthBiomes = List.of();
+
+    public static void receiveEarthBiomes(List<Identifier> biomes) {
+
+        earthBiomes = List.copyOf(biomes);
+    }
+
+    static List<Identifier> earthBiomes() {
+
+        return earthBiomes;
+    }
 
     // Keep a small border around the resizable screen panel.
     private static final int WINDOW_PADDING = 6;
@@ -824,7 +837,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var actions = withoutGenerated(branch.actions());
         actions.add(action);
         updateBranchActions(branchId, actions, rocket);
-        if (type == SpaceSimulation.ActionType.MAINTAIN_POSITION) openActionEditor(action.id());
+        if (type == SpaceSimulation.ActionType.MAINTAIN_POSITION || type == SpaceSimulation.ActionType.SCAN) openActionEditor(action.id());
     }
 
     void removeAction(UUID branchId, int index, ActiveRocketData rocket) {
@@ -989,8 +1002,14 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         }
         if (action.type() == SpaceSimulation.ActionType.UNDOCK)
             return Component.translatable("screen.oritech_space_age.service.undock_help");
-        if (action.type() == SpaceSimulation.ActionType.SCAN)
-            return Component.translatable("screen.oritech_space_age.action.scan_instant");
+        if (action.type() == SpaceSimulation.ActionType.SCAN) {
+            var scan = action.settings().earthScan().orElse(null);
+            if (scan == null) return Component.translatable("screen.oritech_space_age.action.scan_instant");
+            var target = scan.target().label();
+            var estimate = FlightPlannerLabels.scanEstimate(calculatedFlight, action.id());
+            return estimate == null || estimate.radius() == 0 ? target
+                    : Component.translatable("screen.oritech_space_age.earth_survey.card", target, estimate.radius());
+        }
         if (action.type() == SpaceSimulation.ActionType.TRANSMIT_INFORMATION)
             return Component.translatable("screen.oritech_space_age.action.upload_survey_data");
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO || action.type() == SpaceSimulation.ActionType.BEAM_POWER) {

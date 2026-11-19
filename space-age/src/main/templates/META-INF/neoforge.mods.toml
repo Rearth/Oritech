@@ -9,6 +9,9 @@ description = '''
 A deeply integrated space-age expansion for Oritech.
 '''
 
+[[mixins]]
+config = "oritech_space_age.mixins.json"
+
 [[dependencies.${ space_age_mod_id }]]
 modId = "neoforge"
 type = "required"

@@ -23,6 +23,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.Map;
+import java.util.function.Function;
 
 public class MissionControlBlock extends SurveyModuleBlock {
 
@@ -46,6 +47,8 @@ public class MissionControlBlock extends SurveyModuleBlock {
             Block.box(7, 3, 2, 9, 5, 4),
             Block.box(6, 3, 0, 10, 5, 2)));
 
+    private final Function<BlockState, VoxelShape> shapesByState = getShapeForEachState(MissionControlBlock::buildShape);
+
     public MissionControlBlock(Properties properties) {
 
         super(properties);
@@ -63,6 +66,11 @@ public class MissionControlBlock extends SurveyModuleBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+
+        return shapesByState.apply(state);
+    }
+
+    private static VoxelShape buildShape(BlockState state) {
 
         var shape = SHAPES.get(state.getValue(BlockStateProperties.HORIZONTAL_FACING));
         for (var direction : Direction.Plane.HORIZONTAL) {

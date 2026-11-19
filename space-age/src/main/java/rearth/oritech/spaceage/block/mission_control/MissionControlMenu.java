@@ -17,6 +17,7 @@ import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
 
 import java.util.List;
 import java.util.HashMap;
@@ -45,6 +46,8 @@ public class MissionControlMenu extends RocketAssemblerMenu {
     public String missionStatus = "";
     public SpaceSimulation.FlightPlan acceptedPlan;
     public SpaceSimulation.FlightPlannerSnapshot fleetSnapshot;
+    public List<EarthScan.Report> earthReports;
+    public BlockPos earthScanCenter;
 
     public MissionControlMenu(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
 

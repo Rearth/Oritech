@@ -22,16 +22,20 @@ import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.ActionAddonType;
 import rearth.oritech.spaceage.simulation.flight.NavigationComputerRules;
+import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.ScanEstimate;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.RocketHardware;
 import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
+import rearth.oritech.spaceage.simulation.survey.EarthScan.Target;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -139,10 +143,12 @@ final class FlightPlannerPopups {
         var craft = target != null && target.type() == SpaceObjects.ObjectType.CRAFT;
         var waypoint = action.settings().waypoint().isPresent();
         var deployment = SpaceBalance.hasSlots(action.targetId(), action.orbit());
+        var reservesSlot = deployment && !SpaceBalance.passesThroughOrbit(action);
         var settingCount = switch (action.type()) {
             case NAVIGATE_TO ->
-                    4 + (survey || craft || waypoint ? 0 : 1) + (deployment ? 1 : 0) + (action.asteroidTarget().closest() ? 2 : 0);
-            case SCAN -> 2;
+                    4 + (survey || craft || waypoint ? 0 : 1) + (deployment ? 1 : 0) + (reservesSlot ? 1 : 0)
+                            + (action.asteroidTarget().closest() ? 2 : 0);
+            case SCAN -> action.settings().earthScan().isPresent() ? 7 : 3;
             case TRANSMIT_INFORMATION -> 2;
             case CONNECT_ASTEROID, DECOUPLE, DEPLOY_CUBESAT -> 2;
             case MAINTAIN_POSITION -> action.addons().isEmpty() ? 2 : 3;
@@ -275,6 +281,7 @@ final class FlightPlannerPopups {
                     FlightPlannerLabels.scanEnergyLabel(estimate)).withBrightColor()
                     .withTooltip(FlightPlannerLabels.scanEnergyTooltip(estimate)).withZIndex(CONTROL_Z));
             rowY += rowSpacing;
+            rowY = buildScanSettings(action, px, rowY, buttonX, buttonWidth, rowSpacing, estimate);
         }
         if (action.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
             addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.target");
@@ -324,14 +331,22 @@ final class FlightPlannerPopups {
             rowY += rowSpacing;
 
             if (deployment) {
+                editors.addPopupComponent(new ToggleWidget(buttonX, rowY - 3, buttonWidth,
+                        Component.translatable("screen.oritech_space_age.action.main_slot_occupant"), action.service().mainOccupant(),
+                        (toggle, value) -> editors.changeService(action, action.service().withMainOccupant(value)))
+                        .withTextColor(LabelWidget.BRIGHT_TEXT)
+                        .withTooltip(Component.translatable("screen.oritech_space_age.action.main_slot_occupant_help")).withZIndex(CONTROL_Z));
+                rowY += rowSpacing;
+            }
+            if (reservesSlot) {
                 var settings = action.service();
                 editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
                                 Component.translatable("screen.oritech_space_age.action.deployment_slot",
                                         settings.slot() < 0 ? Component.translatable("screen.oritech_space_age.action.slot_auto") : settings.slot()),
                                 ignored -> editors.changeService(action,
-                                        new SpaceSimulation.ServiceSettings(settings.durationTicks(), settings.timeoutTicks(),
-                                                settings.slot() + 1 >= SpaceBalance.slots(action.targetId(), action.orbit()) ? -1 : settings.slot() + 1)))
-                        .withTooltip(Component.translatable("screen.oritech_space_age.action.slot_tooltip")).withZIndex(CONTROL_Z));
+                                        settings.withSlot(settings.slot() + 1 >= SpaceBalance.slots(action.targetId(), action.orbit()) ? -1 : settings.slot() + 1)))
+                        .withTooltip(Component.translatable(action.targetId().equals(SpaceObjects.EARTH_ID)
+                                ? "screen.oritech_space_age.action.slot_tooltip" : "screen.oritech_space_age.action.solar_slot_tooltip")).withZIndex(CONTROL_Z));
                 rowY += rowSpacing;
             }
             addSettingLabel(px, rowY, "screen.oritech_space_age.action.setting.cruise");
@@ -386,6 +401,94 @@ final class FlightPlannerPopups {
         if (coordinate == null || branch == null) return;
         editors.replaceAction(branch.id(), current.id(), current.withLanding(x ? coordinate : current.landingX(),
                 x ? current.landingZ() : coordinate, 0, 0), editors.flightPlanRocket());
+    }
+
+    private int buildScanSettings(SpaceSimulation.FlightPlanAction action, int px, int rowY,
+                                  int buttonX, int buttonWidth, int rowSpacing, ScanEstimate estimate) {
+
+        var scan = action.settings().earthScan().orElse(null);
+        var start = editors.flightPlanRocket().getLaunchPadCenter();
+        addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.mode");
+        editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                surveyText(scan == null ? "space" : "earth"), ignored -> {
+                    var value = scan == null ? Optional.of(new EarthScan(start.getX(), start.getZ(), Target.VILLAGE))
+                            : Optional.<EarthScan>empty();
+                    editors.changeServiceSettings(action, action.settings().withEarthScan(value));
+                }).withTooltip(surveyText("mode_help")).withZIndex(CONTROL_Z));
+        rowY += rowSpacing;
+        if (scan == null) return rowY;
+
+        addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.center");
+        var fieldWidth = (buttonWidth - 4) / 3;
+        editors.landingXField = scanField(buttonX, rowY, fieldWidth, "X", scan.x(), value -> editScanCoordinate(action, value, true));
+        editors.landingZField = scanField(buttonX + fieldWidth + 2, rowY, fieldWidth, "Z", scan.z(),
+                value -> editScanCoordinate(action, value, false));
+        var marker = editors.earthScanCenter();
+        if (marker != null) {
+            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX + (fieldWidth + 2) * 2, rowY - 4, fieldWidth, 18,
+                    surveyText("use_marker"), ignored -> {
+                        var current = editors.findAction(action.id());
+                        var selected = current.settings().earthScan().orElseThrow();
+                        editors.changeServiceSettings(current, current.settings().withEarthScan(Optional.of(
+                                new EarthScan(marker.getX(), marker.getZ(), selected.target()))));
+                    }).withTooltip(surveyText("use_marker_help")).withZIndex(CONTROL_Z));
+        }
+        rowY += rowSpacing;
+
+        addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.radius");
+        var radius = estimate == null || estimate.radius() == 0 ? surveyText("radius_unknown") : surveyText("radius_value", estimate.radius());
+        editors.addPopupComponent(new LabelWidget(buttonX, rowY, buttonWidth, radius)
+                .withBrightColor().withTooltip(surveyText("radius_help")).withZIndex(CONTROL_Z));
+        rowY += rowSpacing;
+
+        addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.kind");
+        editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                surveyText(scan.target().biome() ? "biome" : "structure"), ignored ->
+                        editScanTarget(action, scan.target().biome() ? Target.VILLAGE : defaultBiomeTarget()))
+                .withTooltip(surveyText("kind_help")).withZIndex(CONTROL_Z));
+        rowY += rowSpacing;
+
+        addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.destination");
+        var targetMenuY = rowY + 16;
+        editors.addPopupComponent(SpaceAgeButtons.panel(buttonX, rowY - 4, buttonWidth, 18,
+                scan.target().label(), ignored ->
+                        editors.openTargetMenuFromEditor(action.id(), buttonX, targetMenuY))
+                .withTooltip(surveyText("target_help")).withZIndex(CONTROL_Z));
+        return rowY + rowSpacing;
+    }
+
+    private EditBox scanField(int x, int y, int width, String label, int initial, Consumer<String> responder) {
+
+        var field = editors.addPopupField(new EditBox(font, leftPos + x, topPos + y - 4, width, 18, Component.literal(label)));
+        field.setMaxLength(10);
+        field.setValue(Integer.toString(initial));
+        field.setResponder(responder);
+        return field;
+    }
+
+    private void editScanCoordinate(SpaceSimulation.FlightPlanAction action, String text, boolean x) {
+
+        var value = FlightPlannerLabels.parseInteger(text);
+        var current = editors.findAction(action.id());
+        var branch = editors.findBranchContaining(current);
+        if (value == null || branch == null) return;
+        var scan = current.settings().earthScan().orElseThrow();
+        var updated = new EarthScan(x ? value : scan.x(), x ? scan.z() : value, scan.target());
+        editors.replaceAction(branch.id(), current.id(), current.withSettings(current.settings().withEarthScan(Optional.of(updated))),
+                editors.flightPlanRocket());
+    }
+
+    private void editScanTarget(SpaceSimulation.FlightPlanAction action, Target target) {
+
+        var current = editors.findAction(action.id());
+        var scan = current.settings().earthScan().orElseThrow();
+        editors.changeServiceSettings(current, current.settings().withEarthScan(
+                Optional.of(new EarthScan(scan.x(), scan.z(), target))));
+    }
+
+    private static Component surveyText(String key, Object... args) {
+
+        return Component.translatable("screen.oritech_space_age.earth_survey." + key, args);
     }
 
     private void buildDecoupleEditor() {
@@ -590,19 +693,64 @@ final class FlightPlannerPopups {
         var popupHeight = Math.min(250, editors.panelHeight() - 12);
         var px = Math.clamp(editors.dropdownX, 6, Math.max(6, editors.panelWidth() - popupWidth - 6));
         var py = Math.clamp(editors.dropdownY, 6, Math.max(6, editors.panelHeight() - popupHeight - 6));
-        addDropdown(px, py, popupWidth, popupHeight, "screen.oritech_space_age.action.choose_target", true);
+        var editedAction = editors.findAction(editors.targetAction);
+        var scan = editedAction == null ? null : editedAction.settings().earthScan().orElse(null);
+        addDropdown(px, py, popupWidth, popupHeight, scan == null ? "screen.oritech_space_age.action.choose_target"
+                : "screen.oritech_space_age.earth_survey.choose_target", true);
+        var searchLabel = Component.translatable("screen.oritech_space_age.action.search_targets");
         editors.targetSearchField = editors.addPopupField(new EditBox(font, leftPos + px + 10, topPos + py + 27,
-                popupWidth - 20, 18, Component.translatable("screen.oritech_space_age.action.search_targets")));
+                popupWidth - 20, 18, searchLabel));
         editors.targetSearchField.setMaxLength(40);
         editors.targetSearchField.setValue(editors.targetSearch);
-        editors.addPopupComponent(new ToggleWidget(px + 10, py + 49, popupWidth - 20,
-                Component.translatable("screen.oritech_space_age.sun_filter"), FleetViewPreferences.showSun(), (toggle, value) ->
-                editors.toggleSunStations()).withTextColor(LabelWidget.BRIGHT_TEXT).withZIndex(CONTROL_Z));
-        editors.targetList = new ScrollWidget(px + 10, py + 71, popupWidth - 20, popupHeight - 81)
-                .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20);
+        editors.targetSearchField.setHint(searchLabel);
+        if (scan == null) {
+            editors.addPopupComponent(new ToggleWidget(px + 10, py + 49, popupWidth - 20,
+                    Component.translatable("screen.oritech_space_age.sun_filter"), FleetViewPreferences.showSun(), (toggle, value) ->
+                    editors.toggleSunStations()).withTextColor(LabelWidget.BRIGHT_TEXT).withZIndex(CONTROL_Z));
+        }
+        var listTop = scan == null ? 71 : 49;
+        // Both pickers share search, scrolling, and Escape handling.
+        editors.targetList = new ScrollWidget(px + 10, py + listTop, popupWidth - 20, popupHeight - listTop - 10)
+                .withVerticalScroll(true).withHorizontalScroll(false).withScrollSpeed(20).withRenderCulling(4);
         editors.targetList.setZIndex(CONTROL_Z);
         editors.targetOptions.clear();
-        var editedAction = editors.findAction(editors.targetAction);
+        if (scan == null) addNavigationTargets(editedAction, popupWidth);
+        else addEarthTargets(scan.target(), popupWidth);
+        filterTargetOptions();
+        editors.addPopupComponent(editors.targetList);
+        editors.targetSearchField.setResponder(value -> {
+            editors.targetSearch = value;
+            editors.targetList.setScrollPosition(0, 0);
+            filterTargetOptions();
+        });
+        editors.focusPopup(editors.targetSearchField);
+    }
+
+    private void addEarthTargets(Target current, int popupWidth) {
+
+        var choices = current.biome() ? RocketFlightPlannerScreen.earthBiomes().stream().map(id -> new Target(id, true)).toList()
+                : Target.STRUCTURES;
+        var targets = choices.stream().sorted(Comparator.comparing(target -> target.label().getString(),
+                String.CASE_INSENSITIVE_ORDER)).toList();
+        for (var target : targets) {
+            var label = target.label();
+            var button = SpaceAgeButtons.panel(4, 0, popupWidth - 36, 18, label, ignored -> editors.selectEarthScanTarget(target));
+            button.withTooltip(Component.literal(target.id().toString()));
+            selectListButton(button, target.equals(current));
+            editors.targetList.addChild(button);
+            var searchable = label.getString().toLowerCase(Locale.ROOT) + " " + target.id();
+            editors.targetOptions.add(new FlightPlannerEditors.TargetOption(button, searchable));
+        }
+    }
+
+    private static Target defaultBiomeTarget() {
+
+        var biomes = RocketFlightPlannerScreen.earthBiomes();
+        return biomes.isEmpty() || biomes.contains(Target.PLAINS.id()) ? Target.PLAINS : new Target(biomes.getFirst(), true);
+    }
+
+    private void addNavigationTargets(SpaceSimulation.FlightPlanAction editedAction, int popupWidth) {
+
         if (editedAction != null && editedAction.type() == SpaceSimulation.ActionType.NAVIGATE_TO) {
             var label = Component.translatable("screen.oritech_space_age.action.closest_asteroid");
             var button = SpaceAgeButtons.panel(4, 0, popupWidth - 36, 18, label, ignored -> editors.selectClosestAsteroid());
@@ -632,13 +780,6 @@ final class FlightPlannerPopups {
             editors.targetOptions.add(new FlightPlannerEditors.TargetOption(button,
                     RocketStarMapWidget.objectName(object).getString().toLowerCase(Locale.ROOT)));
         }
-        filterTargetOptions();
-        editors.addPopupComponent(editors.targetList);
-        editors.targetSearchField.setResponder(value -> {
-            editors.targetSearch = value;
-            filterTargetOptions();
-        });
-        editors.focusPopup(editors.targetSearchField);
     }
 
     private void filterTargetOptions() {

@@ -38,6 +38,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionForecast;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
+import rearth.oritech.spaceage.simulation.survey.EarthScan;
 import rearth.oritech.util.TooltipHelper;
 
 import java.util.ArrayList;
@@ -46,6 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -68,6 +70,8 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
     private float fleetScrollY;
     private ButtonWidget speedButton;
     private OverlayWidget categoryPopup;
+    private boolean earthSurveyOpen;
+    private int earthSurveyIndex;
     private EditBox categoryNameField;
     private UUID categoryCraft;
     private String deletingCategory;
@@ -105,6 +109,15 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             if (selected == null && menu.selected != null) menu.selected = null;
             menu.connected = selected != null && selected.connected();
         }
+    }
+
+    public static void receiveEarthReports(MissionNetworking.EarthReports payload) {
+
+        var client = Minecraft.getInstance();
+        if (client.player == null || !(client.player.containerMenu instanceof MissionControlMenu menu)
+                || menu.containerId != payload.menuId()) return;
+        menu.earthReports = payload.reports();
+        if (client.screen instanceof MissionControlScreen screen && screen.earthSurveyOpen) screen.rebuildComponents();
     }
 
     public static void select(MissionNetworking.SelectedPayload payload) {
@@ -330,7 +343,13 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         addComponent(speedButton);
         addNetworkIndicators(w, menu.network);
         var listWidth = Math.min(235, w / 3);
-        var list = new ScrollWidget(8, 30, listWidth, h - 40) {
+        addComponent(SpaceAgeButtons.panel(8, 30, listWidth, 18, surveyText("reports"), ignored -> {
+            earthSurveyOpen = true;
+            earthSurveyIndex = 0;
+            ClientPacketDistributor.sendToServer(new MissionNetworking.EarthReportRequest(menu.containerId, Optional.empty()));
+            rebuildComponents();
+        }));
+        var list = new ScrollWidget(8, 52, listWidth, h - 62) {
 
             @Override
             protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
@@ -388,7 +407,7 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
                     rebuildComponents();
                 }));
         y += 32;
-        list.setContentDimensions(listWidth - 8, Math.max(h - 48, y));
+        list.setContentDimensions(listWidth - 8, Math.max(h - 70, y));
         list.setScrollPosition(0, fleetScrollY);
         addComponent(list);
         if (presentation != null) {
@@ -411,7 +430,8 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             map.setBranchSegmentNames(presentation.segmentNames());
             addComponent(map);
         }
-        buildCategoryPopup(w, h);
+        if (earthSurveyOpen) buildEarthSurveyPopup(w, h);
+        else buildCategoryPopup(w, h);
     }
 
     private Component fit(Component label, int width) {
@@ -428,8 +448,82 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         redirectingCategory = null;
         confirmDeleteCraft = false;
         creatingCategory = false;
+        earthSurveyOpen = false;
         setFocused(null);
         rebuildComponents();
+    }
+
+    private void buildEarthSurveyPopup(int width, int height) {
+
+        var panelWidth = Math.min(330, width - 24);
+        var panelHeight = Math.min(204, height - 16);
+        var x = (width - panelWidth) / 2;
+        var y = (height - panelHeight) / 2;
+        categoryPopup = new OverlayWidget(width, height).withDismissHandler(this::closeCategoryPopup);
+        categoryPopup.addChild(new SurfaceWidget(x, y, panelWidth, panelHeight, OritechSurface.PANEL_DARK));
+        categoryPopup.addChild(new LabelWidget(x + 10, y + 10, panelWidth - 20, surveyText("reports")).withBrightColor());
+        categoryPopup.addChild(SpaceAgeButtons.panel(x + panelWidth - 78, y + panelHeight - 26, 68, 18,
+                Component.translatable("gui.done"), ignored -> closeCategoryPopup()));
+        var reports = menu.earthReports;
+        if (reports == null || reports.isEmpty()) {
+            categoryPopup.addChild(new LabelWidget(x + 10, y + 38, panelWidth - 20, 36,
+                    surveyText(reports == null ? "loading" : "empty")).withBrightColor().withWrap(true));
+            addComponent(categoryPopup);
+            return;
+        }
+
+        earthSurveyIndex = Math.clamp(earthSurveyIndex, 0, reports.size() - 1);
+        var report = reports.get(earthSurveyIndex);
+        var scan = report.scan();
+        var mapSize = Math.min(Math.min(144, panelWidth / 2 - 12), panelHeight - 64);
+        var detailsX = x + mapSize + 20;
+        var detailsWidth = x + panelWidth - detailsX - 10;
+        categoryPopup.addChild(new EarthSurveyMapWidget(x + 10, y + 28, mapSize, report)
+                .withTooltip(surveyText("preview_help")));
+        categoryPopup.addChild(new LabelWidget(detailsX, y + 30, detailsWidth, 20,
+                scan.target().label()).withBrightColor().withWrap(true));
+        categoryPopup.addChild(new LabelWidget(detailsX, y + 50, detailsWidth, 28,
+                surveyText("area", scan.x(), scan.z(), scan.radius())).withBrightColor().withWrap(true));
+        var hit = report.position().orElse(null);
+        var result = surveyText(report.limited() ? "limited" : "no_match");
+        if (hit != null) {
+            var distance = Math.round(Math.hypot(hit.getX() - scan.x(), hit.getZ() - scan.z()));
+            result = scan.target().biome() ? surveyText("found_biome", hit.getX(), hit.getY(), hit.getZ(), distance)
+                    : surveyText("found_structure", hit.getX(), hit.getZ(), distance);
+        }
+        categoryPopup.addChild(new LabelWidget(detailsX, y + 80, detailsWidth, 34, result).withBrightColor().withWrap(true));
+        if (hit != null) {
+            categoryPopup.addChild(SpaceAgeButtons.panel(detailsX, y + panelHeight - 68, detailsWidth, 18,
+                    surveyText("export"), ignored -> ClientPacketDistributor.sendToServer(
+                            new MissionNetworking.EarthReportRequest(menu.containerId, Optional.of(report.id())))));
+            categoryPopup.addChild(SpaceAgeButtons.panel(detailsX, y + panelHeight - 47, detailsWidth, 18,
+                    surveyText(hit.equals(menu.earthScanCenter) ? "center_set" : "set_center"), ignored -> {
+                        menu.earthScanCenter = hit;
+                        rebuildComponents();
+                    }).withTooltip(surveyText("set_center_help")));
+        }
+
+        var footer = y + panelHeight - 26;
+        var previous = SpaceAgeButtons.panel(x + 10, footer, 20, 18, Component.literal("‹"), ignored -> {
+            earthSurveyIndex--;
+            rebuildComponents();
+        });
+        previous.setActive(earthSurveyIndex > 0);
+        categoryPopup.addChild(previous);
+        categoryPopup.addChild(new LabelWidget(x + 35, footer + 5, 47,
+                Component.literal((earthSurveyIndex + 1) + " / " + reports.size())).withBrightColor());
+        var next = SpaceAgeButtons.panel(x + 85, footer, 20, 18, Component.literal("›"), ignored -> {
+            earthSurveyIndex++;
+            rebuildComponents();
+        });
+        next.setActive(earthSurveyIndex + 1 < reports.size());
+        categoryPopup.addChild(next);
+        addComponent(categoryPopup);
+    }
+
+    private static Component surveyText(String key, Object... args) {
+
+        return Component.translatable("screen.oritech_space_age.earth_survey." + key, args);
     }
 
     private void buildCategoryPopup(int width, int height) {

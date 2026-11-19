@@ -1000,14 +1000,30 @@ public class SpaceSimulation {
         }
     }
 
-    public record ServiceSettings(int durationTicks, int timeoutTicks, int slot) {
+    public record ServiceSettings(int durationTicks, int timeoutTicks, int slot, boolean mainOccupant) {
 
         public static final ServiceSettings DEFAULT = new ServiceSettings(SpaceBalance.DAY, 0, -1);
         public static final Codec<ServiceSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Codec.INT.fieldOf("duration").forGetter(ServiceSettings::durationTicks),
                 Codec.INT.fieldOf("timeout").forGetter(ServiceSettings::timeoutTicks),
-                Codec.INT.fieldOf("slot").forGetter(ServiceSettings::slot)
+                Codec.INT.fieldOf("slot").forGetter(ServiceSettings::slot),
+                Codec.BOOL.optionalFieldOf("main_occupant", true).forGetter(ServiceSettings::mainOccupant)
         ).apply(i, ServiceSettings::new));
+
+        public ServiceSettings(int durationTicks, int timeoutTicks, int slot) {
+
+            this(durationTicks, timeoutTicks, slot, true);
+        }
+
+        public ServiceSettings withSlot(int value) {
+
+            return new ServiceSettings(durationTicks, timeoutTicks, value, mainOccupant);
+        }
+
+        public ServiceSettings withMainOccupant(boolean value) {
+
+            return new ServiceSettings(durationTicks, timeoutTicks, value ? slot : -1, value);
+        }
     }
 
     public record ActionAddon(UUID id, ActionAddonType type, int value) {

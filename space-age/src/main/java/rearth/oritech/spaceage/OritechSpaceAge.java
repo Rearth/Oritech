@@ -121,6 +121,7 @@ public final class OritechSpaceAge {
 
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
             RocketSimulationController.syncActiveRocketsToPlayer(serverPlayer);
+            MissionNetworking.sendEarthBiomes(serverPlayer);
         }
     }
 

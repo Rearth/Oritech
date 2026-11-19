@@ -230,7 +230,7 @@ public final class MissionController {
             }
             case DOCK -> RocketDocking.connect(data, state, action.settings().docking());
             case UNDOCK -> RocketDocking.undock(data, state);
-            case SCAN -> scan(state, system, action, tick);
+            case SCAN -> scan(server, data, state, system, action, tick);
             case TRANSMIT_INFORMATION -> transmit(server, state, system, action);
             case NAVIGATE_TO -> MissionNavigation.tick(server, data, state, system, action, tick);
             case CONNECT_ASTEROID -> connectAsteroid(data, state, system, action);
@@ -243,16 +243,30 @@ public final class MissionController {
         }
     }
 
-    private static void scan(MissionState state, SpaceSimulation system, FlightPlanAction action, long tick) {
+    private static void scan(MinecraftServer server, MissionSavedData data, MissionState state,
+                             SpaceSimulation system, FlightPlanAction action, long tick) {
 
-        var objects = system.truth();
-        var targetId = action.targetId().equals(FlightPlanAction.NO_TARGET)
-                ? state.position.target() : action.targetId();
-        var target = objects.stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
-        if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION
-                || SurveyRules.surveyDistance(target, state.position.x(), state.position.y()) > SpaceBalance.SCAN_RANGE) {
-            state.status = MissionState.STATUS_SCAN_WAITING;
-            return;
+        var earthScan = action.settings().earthScan().orElse(null);
+        var requiredRF = SpaceBalance.SCAN_RF;
+        SpaceObjectData target = null;
+        List<SpaceObjectData> objects = List.of();
+        if (earthScan != null) {
+            earthScan = earthScan.atPosition(state.position.x(), state.position.y()).orElse(null);
+            if (server == null || earthScan == null) {
+                state.status = "status.oritech_space_age.earth_scan_out_of_range";
+                return;
+            }
+            requiredRF = earthScan.energyCost();
+        } else {
+            objects = system.truth();
+            var targetId = action.targetId().equals(FlightPlanAction.NO_TARGET)
+                    ? state.position.target() : action.targetId();
+            target = objects.stream().filter(object -> object.id().equals(targetId)).findFirst().orElse(null);
+            if (target == null || target.type() != SpaceObjects.ObjectType.SURVEY_REGION
+                    || SurveyRules.surveyDistance(target, state.position.x(), state.position.y()) > SpaceBalance.SCAN_RANGE) {
+                state.status = MissionState.STATUS_SCAN_WAITING;
+                return;
+            }
         }
         long available = 0;
         var scannerInstalled = false;
@@ -262,11 +276,20 @@ public final class MissionController {
             scannerInstalled = true;
             available += (long) state.rocket.getDynamicSegments().get(entry.getKey()).rf();
         }
-        if (!scannerInstalled || available < SpaceBalance.SCAN_RF) {
+        if (!scannerInstalled || available < requiredRF) {
             state.status = MissionState.STATUS_SCAN_WAITING;
             return;
         }
-        var remaining = SpaceBalance.SCAN_RF;
+        if (earthScan != null) {
+            var worldTick = server.overworld().getGameTime();
+            // Share the world scan budget across craft, even when the simulation runs faster in Creative.
+            if (data.lastEarthScanTick == worldTick) {
+                state.status = "status.oritech_space_age.earth_scan_queued";
+                return;
+            }
+            data.lastEarthScanTick = worldTick;
+        }
+        var remaining = requiredRF;
         for (var entry : state.rocket.getStaticSegments().entrySet()) {
             if (RocketHardware.of(entry.getValue()).scanners() == 0) continue;
             var resources = state.rocket.getDynamicSegments().get(entry.getKey());
@@ -275,7 +298,8 @@ public final class MissionController {
             remaining -= spent;
             if (remaining == 0) break;
         }
-        state.knowledge.scanRegion(objects, target, tick, state.position.x(), state.position.y(), SpaceBalance.SCAN_RANGE);
+        if (earthScan != null) state.knowledge.addEarthReport(earthScan.run(server.overworld(), tick));
+        else state.knowledge.scanRegion(objects, target, tick, state.position.x(), state.position.y(), SpaceBalance.SCAN_RANGE);
         state.status = MissionState.STATUS_SCANNING;
         state.complete();
     }
@@ -528,7 +552,8 @@ public final class MissionController {
                 occupied.add(new OrbitSlot(craft.position.target(), craft.position.orbit(), craft.position.slot()));
             craft.plan.branches().stream().flatMap(branch -> branch.actions().stream())
                     .filter(action -> action.type() == ActionType.NAVIGATE_TO
-                            && SpaceBalance.hasSlots(action.targetId(), action.orbit()) && action.service().slot() >= 0)
+                            && SpaceBalance.hasSlots(action.targetId(), action.orbit())
+                            && !SpaceBalance.passesThroughOrbit(action) && action.service().slot() >= 0)
                     .forEach(action -> occupied.add(new OrbitSlot(action.targetId(), action.orbit(), action.service().slot())));
         }
         return List.copyOf(occupied);
@@ -594,6 +619,8 @@ public final class MissionController {
         var before = new HashMap<UUID, SpaceObjectData>();
         system.earthKnowledge.contacts().forEach(contact -> before.put(contact.id(), contact));
         system.earthKnowledge.merge(state.knowledge);
+        var earthReports = state.knowledge.takeEarthReports();
+        system.earthKnowledge.addEarthReports(earthReports);
         var discovered = 0;
         var updated = 0;
         for (var contact : system.earthKnowledge.contacts()) {
@@ -601,6 +628,9 @@ public final class MissionController {
             if (previous == null) discovered++;
             else if (!previous.equals(contact)) updated++;
         }
-        if (server != null) MissionNetworking.sendSurveyResults(server, state.owner, discovered, updated);
+        if (server != null) {
+            MissionNetworking.sendSurveyResults(server, state.owner, discovered, updated);
+            if (!earthReports.isEmpty()) MissionNetworking.sendEarthReports(server, state.owner);
+        }
     }
 }
