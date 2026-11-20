@@ -25,7 +25,6 @@ import rearth.oritech.util.Geometry;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 
@@ -111,7 +110,7 @@ public abstract class FrameInteractionBlockEntity extends NetworkedBlockEntity {
     }
 
     protected Direction getFacing() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     private FrameBounds findFrameBounds(BlockPos searchStart) {

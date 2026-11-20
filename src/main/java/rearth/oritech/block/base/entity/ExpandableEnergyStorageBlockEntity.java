@@ -242,7 +242,7 @@ public abstract class ExpandableEnergyStorageBlockEntity extends NetworkedBlockE
 
     @Override
     public Direction getFacingForAddon() {
-        var facing = Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(PortableEnergyStorageBlock.TARGET_DIR);
+        var facing = getBlockState().getValue(PortableEnergyStorageBlock.TARGET_DIR);
 
         if (facing.equals(Direction.UP) || facing.equals(Direction.DOWN))
             return Direction.NORTH;

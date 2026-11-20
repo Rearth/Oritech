@@ -423,7 +423,7 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public Direction getFacingForMultiblock() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite();
     }
 
     @Override
@@ -505,7 +505,7 @@ public class DronePortEntity extends NetworkedBlockEntity
 
     @Override
     public Direction getFacingForAddon() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override
