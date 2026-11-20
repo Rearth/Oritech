@@ -58,6 +58,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
 import rearth.oritech.spaceage.simulation.rocket.RocketSimulationController;
@@ -109,6 +110,7 @@ public class LaunchRampBlockEntity extends NetworkedBlockEntity implements GeoBl
     private String ownerName = "";
     private @Nullable CubeSatData savedPattern;
     private FlightPlan savedPlan = FlightPlan.empty();
+    private SpacecraftModel modelChoice = SpacecraftModel.AUTO;
     private long lastSpeed;
     private Outcome lastOutcome = Outcome.NONE;
 
@@ -367,6 +369,7 @@ public class LaunchRampBlockEntity extends NetworkedBlockEntity implements GeoBl
     private ActiveRocketData unfold(CubeSatData data, UUID id) {
 
         var rocket = data.unfold(id, null);
+        rocket.setModelChoice(modelChoice);
         rocket.setLaunchPosition(launchPosition());
         rocket.setLaunchPadCenter(launchPosition());
         return rocket;
@@ -476,10 +479,17 @@ public class LaunchRampBlockEntity extends NetworkedBlockEntity implements GeoBl
         Containers.dropContents(level, pos, pattern);
     }
 
+    public void setModelChoice(SpacecraftModel choice) {
+
+        modelChoice = choice;
+        setChanged();
+    }
+
     @Override
     protected void saveAdditional(ValueOutput output) {
 
         super.saveAdditional(output);
+        if (modelChoice != SpacecraftModel.AUTO) output.store("spacecraft_model", SpacecraftModel.CODEC, modelChoice);
         serializeMultiblock(output);
         if (!pattern.isEmpty()) output.store("pattern", ItemStack.CODEC, pattern.getItem(0));
         if (owner != null) output.store("owner", UUIDUtil.CODEC, owner);
@@ -496,6 +506,7 @@ public class LaunchRampBlockEntity extends NetworkedBlockEntity implements GeoBl
     protected void loadAdditional(ValueInput input) {
 
         super.loadAdditional(input);
+        modelChoice = input.read("spacecraft_model", SpacecraftModel.CODEC).orElse(SpacecraftModel.AUTO);
         deserializeMultiblock(input);
         pattern.setItem(0, input.read("pattern", ItemStack.CODEC).orElse(ItemStack.EMPTY));
         owner = input.read("owner", UUIDUtil.CODEC).orElse(null);

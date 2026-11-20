@@ -243,6 +243,8 @@ public final class MissionState {
         });
         var summaryRocket = new ActiveRocketData(rocket.getRocketId(), structures, resources, null);
         summaryRocket.copyLaunchFrom(rocket);
+        // Fleet summaries omit the blocks used to choose the automatic model.
+        summaryRocket.setModelChoice(rocket.spacecraftModel());
         return new Telemetry(summaryRocket, plan, position, tick, status,
                 List.copyOf(completed), actionTicks(), actionDurationTicks(), serviceProgress, powerReport, false);
     }
@@ -287,6 +289,13 @@ public final class MissionState {
 
             return new Position(SpaceObjects.EARTH_SURFACE_X, 0, 0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.SURFACE,
                     -1, 1, SpaceSimulation.FlightPlanAction.NO_TARGET, new SpaceSimulation.SegmentRef(BlockPos.ZERO));
+        }
+
+        public double headingAngle() {
+
+            // Older craft may only have a velocity until the next guidance update.
+            return headingX != 0 || headingY != 0 ? Math.atan2(headingY, headingX)
+                    : vx != 0 || vy != 0 ? Math.atan2(vy, vx) : -Math.PI / 2;
         }
 
         /**

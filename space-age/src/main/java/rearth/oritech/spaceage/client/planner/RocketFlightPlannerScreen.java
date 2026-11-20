@@ -32,6 +32,7 @@ import rearth.oritech.spaceage.client.mission_control.CraftStatusScreen;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import rearth.oritech.spaceage.client.mission_control.MissionControlScreen;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.network.RocketNetworking;
@@ -234,7 +235,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         updateValidation();
         flightPlanMap.updateFlightPath(currentDraftSnapshot(), calculatedFlight, activeBranchId);
         if (menu instanceof MissionControlMenu) {
-            flightPlanMap.setFleetTimes(Map.of(draftPlan.root().id(), livePathTime()));
+            updateLiveMarker(livePathTime());
             flightPlanMap.setCraftLabels(Map.of(draftPlan.root().id(),
                     Component.translatable("screen.oritech_space_age.mission.current_position")));
         }
@@ -252,9 +253,8 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         var elapsedTicks = Math.max(0,
                 Minecraft.getInstance().level.getGameTime() - control.receivedWorldTick) * control.debugSpeed;
         var path = branchPath(draftPlan.root().id());
-        if (path != null) flightPlanMap.setFleetTimes(Map.of(draftPlan.root().id(),
-                // Cached navigation starts at the action's beginning, not the latest telemetry update.
-                Math.min(livePathTime() + elapsedTicks / 20.0, path.durationSeconds())));
+        // Cached navigation starts at the action's beginning, not the latest telemetry update.
+        if (path != null) updateLiveMarker(Math.min(livePathTime() + elapsedTicks / 20.0, path.durationSeconds()));
         var progress = currentActionLabel(elapsedTicks);
         currentActionLabels.forEach(label -> label.setText(progress));
     }
@@ -605,7 +605,7 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
         if (menu instanceof LaunchRampMenu) flightPlanMap.setShowSummary(false);
         if (menu instanceof MissionControlMenu) {
             flightPlanMap.setShowSummary(false);
-            flightPlanMap.setFleetTimes(Map.of(draftPlan.root().id(), livePathTime()));
+            updateLiveMarker(livePathTime());
             flightPlanMap.setCraftLabels(Map.of(draftPlan.root().id(),
                     Component.translatable("screen.oritech_space_age.mission.current_position")));
         }
@@ -691,6 +691,16 @@ public class RocketFlightPlannerScreen extends FlightPlannerEditors {
     private static Component speedText(String key) {
 
         return Component.translatable("screen.oritech_space_age.launch_ramp." + key);
+    }
+
+    private void updateLiveMarker(double time) {
+
+        if (!(menu instanceof MissionControlMenu control) || control.selectedTelemetry == null) return;
+        var telemetry = control.selectedTelemetry;
+        var branchId = draftPlan.root().id();
+        flightPlanMap.setFleetCraft(Map.of(branchId,
+                new SpacecraftIcon.Pose(telemetry.rocket().spacecraftModel(), telemetry.position().headingAngle())));
+        flightPlanMap.setFleetTimes(Map.of(branchId, time));
     }
 
     private double livePathTime() {

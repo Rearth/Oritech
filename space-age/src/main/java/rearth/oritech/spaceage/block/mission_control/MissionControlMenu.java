@@ -47,7 +47,6 @@ public class MissionControlMenu extends RocketAssemblerMenu {
     public SpaceSimulation.FlightPlan acceptedPlan;
     public SpaceSimulation.FlightPlannerSnapshot fleetSnapshot;
     public List<EarthScan.Report> earthReports;
-    public BlockPos earthScanCenter;
 
     public MissionControlMenu(int id, Inventory inventory, RegistryFriendlyByteBuf buffer) {
 

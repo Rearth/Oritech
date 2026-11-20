@@ -34,10 +34,12 @@ public class ActiveRocketData {
             DYNAMIC_SEGMENTS_CODEC.fieldOf("dynamic_segments").forGetter(ActiveRocketData::getDynamicSegments),
             BlockPos.CODEC.optionalFieldOf("launch_position", BlockPos.ZERO).forGetter(ActiveRocketData::getLaunchPosition),
             RocketFlight.CODEC.optionalFieldOf("flight").forGetter(rocket -> Optional.ofNullable(rocket.flight)),
-            BlockPos.CODEC.optionalFieldOf("launch_pad_center").forGetter(rocket -> Optional.ofNullable(rocket.launchPadCenter))
-    ).apply(instance, (rocketId, staticSegments, dynamicSegments, launch, flight, pad) -> {
+            BlockPos.CODEC.optionalFieldOf("launch_pad_center").forGetter(rocket -> Optional.ofNullable(rocket.launchPadCenter)),
+            SpacecraftModel.CODEC.optionalFieldOf("spacecraft_model", SpacecraftModel.AUTO).forGetter(ActiveRocketData::modelChoice)
+    ).apply(instance, (rocketId, staticSegments, dynamicSegments, launch, flight, pad, model) -> {
         var rocket = new ActiveRocketData(rocketId, staticSegments, dynamicSegments, flight.orElse(null));
         rocket.setLaunchPosition(launch);
+        rocket.setModelChoice(model);
         pad.ifPresent(rocket::setLaunchPadCenter);
         return rocket;
     }));
@@ -46,6 +48,7 @@ public class ActiveRocketData {
     private final Map<UUID, StaticRocketSegment> staticSegments = new HashMap<>();
     private final Map<UUID, DynamicRocketSegment> dynamicSegments = new HashMap<>();
     private RocketFlight flight;
+    private SpacecraftModel modelChoice = SpacecraftModel.AUTO;
     private SpacePowerHardware powerHardware;
     private Map<UUID, Map<BlockPos, BlockState>> powerLayouts = Map.of();
     private int apertureArmLimit;
@@ -137,10 +140,26 @@ public class ActiveRocketData {
         launchPadCenter = position.immutable();
     }
 
+    public SpacecraftModel modelChoice() {
+
+        return modelChoice;
+    }
+
+    public void setModelChoice(SpacecraftModel choice) {
+
+        modelChoice = choice;
+    }
+
+    public SpacecraftModel spacecraftModel() {
+
+        return modelChoice == SpacecraftModel.AUTO ? modelChoice.resolve(powerHardware().solar() > 0) : modelChoice;
+    }
+
     public void copyLaunchFrom(ActiveRocketData original) {
 
         setLaunchPosition(original.getLaunchPosition());
         setLaunchPadCenter(original.getLaunchPadCenter());
+        setModelChoice(original.modelChoice());
     }
 
     public UUID getRocketId() {

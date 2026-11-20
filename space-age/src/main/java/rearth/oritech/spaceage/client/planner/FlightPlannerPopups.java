@@ -419,20 +419,10 @@ final class FlightPlannerPopups {
         if (scan == null) return rowY;
 
         addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.center");
-        var fieldWidth = (buttonWidth - 4) / 3;
+        var fieldWidth = (buttonWidth - 4) / 2;
         editors.landingXField = scanField(buttonX, rowY, fieldWidth, "X", scan.x(), value -> editScanCoordinate(action, value, true));
-        editors.landingZField = scanField(buttonX + fieldWidth + 2, rowY, fieldWidth, "Z", scan.z(),
+        editors.landingZField = scanField(buttonX + fieldWidth + 4, rowY, fieldWidth, "Z", scan.z(),
                 value -> editScanCoordinate(action, value, false));
-        var marker = editors.earthScanCenter();
-        if (marker != null) {
-            editors.addPopupComponent(SpaceAgeButtons.panel(buttonX + (fieldWidth + 2) * 2, rowY - 4, fieldWidth, 18,
-                    surveyText("use_marker"), ignored -> {
-                        var current = editors.findAction(action.id());
-                        var selected = current.settings().earthScan().orElseThrow();
-                        editors.changeServiceSettings(current, current.settings().withEarthScan(Optional.of(
-                                new EarthScan(marker.getX(), marker.getZ(), selected.target()))));
-                    }).withTooltip(surveyText("use_marker_help")).withZIndex(CONTROL_Z));
-        }
         rowY += rowSpacing;
 
         addSettingLabel(px, rowY, "screen.oritech_space_age.earth_survey.radius");

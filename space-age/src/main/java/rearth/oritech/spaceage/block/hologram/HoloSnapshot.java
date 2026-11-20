@@ -9,6 +9,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionState;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator.PathSample;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,7 +41,8 @@ public record HoloSnapshot(HoloSettings settings, HoloSurface surface, List<Spac
     }
 
     public record Craft(UUID id, String name, String category, double x, double y, double vx, double vy,
-                        UUID target, boolean connected, String status, List<PathSample> path, List<Leg> journey, double flightTime) {
+                        UUID target, boolean connected, String status, List<PathSample> path, List<Leg> journey, double flightTime,
+                        SpacecraftModel model, double headingAngle) {
 
         public static final Codec<Craft> CODEC = RecordCodecBuilder.create(i -> i.group(
                 UUIDUtil.STRING_CODEC.fieldOf("id").forGetter(Craft::id),
@@ -53,12 +55,21 @@ public record HoloSnapshot(HoloSettings settings, HoloSurface surface, List<Spac
                 Codec.STRING.fieldOf("status").forGetter(Craft::status),
                 PathSample.CODEC.listOf().fieldOf("path").forGetter(Craft::path),
                 Leg.CODEC.listOf().optionalFieldOf("journey", List.of()).forGetter(Craft::journey),
-                Codec.DOUBLE.fieldOf("flight_time").forGetter(Craft::flightTime)
+                Codec.DOUBLE.fieldOf("flight_time").forGetter(Craft::flightTime),
+                SpacecraftModel.CODEC.fieldOf("model").forGetter(Craft::model),
+                Codec.DOUBLE.fieldOf("heading").forGetter(Craft::headingAngle)
         ).apply(i, Craft::new));
 
         public boolean destroyed() {
 
             return MissionState.STATUS_DESTROYED.equals(status);
+        }
+
+        public Craft(UUID id, String name, String category, double x, double y, double vx, double vy,
+                     UUID target, boolean connected, String status, List<PathSample> path, List<Leg> journey, double flightTime) {
+
+            this(id, name, category, x, y, vx, vy, target, connected, status, path, journey, flightTime,
+                    SpacecraftModel.ORIGINAL, -Math.PI / 2);
         }
 
         public Craft(UUID id, String name, String category, double x, double y, double vx, double vy,

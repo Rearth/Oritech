@@ -28,6 +28,7 @@ import rearth.oritech.spaceage.simulation.mission.MissionController;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.mission.RocketDocking;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.RocketStructureScan;
 
@@ -36,6 +37,7 @@ import java.util.UUID;
 
 public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvider {
 
+    private SpacecraftModel modelChoice = SpacecraftModel.AUTO;
     private String scanIssue = "";
     // The plan of a redstone launch comes from this player's simulation, as the last one to save or launch a plan here.
     private @Nullable UUID owner;
@@ -137,13 +139,21 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
         var pad = worldPosition.relative(getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite());
         var result = RocketStructureScan.scan(level, pad, false);
         scanIssue = result.issue();
+        if (result.rocket() != null) result.rocket().setModelChoice(modelChoice);
         return result;
+    }
+
+    public void setModelChoice(SpacecraftModel choice) {
+
+        modelChoice = choice;
+        setChanged();
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
 
         super.saveAdditional(output);
+        if (modelChoice != SpacecraftModel.AUTO) output.store("spacecraft_model", SpacecraftModel.CODEC, modelChoice);
         if (owner != null) output.store("owner", UUIDUtil.CODEC, owner);
         output.putBoolean("powered", powered);
     }
@@ -152,6 +162,7 @@ public class RocketAssemblerBlockEntity extends BlockEntity implements MenuProvi
     protected void loadAdditional(ValueInput input) {
 
         super.loadAdditional(input);
+        modelChoice = input.read("spacecraft_model", SpacecraftModel.CODEC).orElse(SpacecraftModel.AUTO);
         owner = input.read("owner", UUIDUtil.CODEC).orElse(null);
         powered = input.getBooleanOr("powered", false);
     }

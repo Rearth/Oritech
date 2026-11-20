@@ -21,6 +21,10 @@ import rearth.oritech.spaceage.simulation.flight.FlightMotion;
 import rearth.oritech.spaceage.simulation.flight.NavigationWaypoint;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPathCalculator;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.RocketPayloads;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
+import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.survey.SpaceCommunications;
 
 import java.util.ArrayList;
@@ -45,6 +49,8 @@ public final class RocketStarMapWidget extends UIComponent {
     private final StarMapIconGroups iconGroups = new StarMapIconGroups();
     // One rocket icon at the end of each surviving branch.
     private final List<BranchMarker> rocketMarkers = new ArrayList<>();
+    private final ActiveRocketData rocket;
+    private Map<UUID, SpacecraftIcon.Pose> fleetCraft = Map.of();
     // Group boosters released together into one map marker.
     private final List<SeparationMarker> separationMarkers = new ArrayList<>();
     // Find a branch preview for selection and statistics.
@@ -120,6 +126,7 @@ public final class RocketStarMapWidget extends UIComponent {
 
         super(x, y, width, height);
         surface = OritechSurface.NONE;
+        this.rocket = rocket;
         this.selectionListener = selectionListener;
         this.contextMenuListener = contextMenuListener;
         this.selectedTarget = selectedTarget;
@@ -186,15 +193,11 @@ public final class RocketStarMapWidget extends UIComponent {
         return Component.translatable("screen.oritech_space_age.orbit." + orbit.name().toLowerCase(Locale.ROOT));
     }
 
-    private static BranchMarker rocketMarker(UUID branchId, double timeSeconds, double x, double y) {
-
-        return new BranchMarker(branchId, timeSeconds, x, y);
-    }
-
     public void updateFlightPath(SpaceSimulation.FlightPlannerSnapshot snapshot,
                                  RocketFlightPathCalculator.FlightPath flightPath,
                                  UUID selectedBranch) {
 
+        mapObjects.setStationCraft(snapshot.stations());
         if (flightPath.equals(this.flightPath) && Objects.equals(selectedBranch, this.selectedBranch)
                 && this.snapshot != null && snapshot.objects().equals(this.snapshot.objects())
                 && snapshot.plan().equals(this.snapshot.plan())) return;
@@ -219,14 +222,33 @@ public final class RocketStarMapWidget extends UIComponent {
     private void updateRocketMarkers() {
 
         rocketMarkers.clear();
+        var choice = rocket.modelChoice();
+        var structures = choice == SpacecraftModel.AUTO ? RocketPayloads.planView(rocket).getStaticSegments().values() : List.<StaticRocketSegment>of();
         for (var path : flightPath.paths()) {
             if (path.samples().isEmpty()
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.EXPLODED
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.STATION_KEEPING_EXHAUSTED
                     || path.terminalState() == RocketFlightPathCalculator.TerminalState.DESTROYED) continue;
             var last = path.samples().getLast();
-            rocketMarkers.add(rocketMarker(path.branchId(), last.timeSeconds(), last.x(), last.y()));
+            var model = choice;
+            if (choice == SpacecraftModel.AUTO) {
+                // Count only the panels on this branch, including hardware from a deployed cube-sat.
+                var branchStructures = structures.stream()
+                        .filter(segment -> last.connectedSegments().contains(SpaceSimulation.SegmentRef.of(segment))).toList();
+                model = choice.resolve(SolarPower.rating(branchStructures) > 0);
+            }
+            rocketMarkers.add(new BranchMarker(path.branchId(), last.timeSeconds(), last.x(), last.y(),
+                    new SpacecraftIcon.Pose(model, finalHeading(path))));
         }
+    }
+
+    private static double finalHeading(RocketFlightPathCalculator.CraftPath path) {
+
+        // A stopped arrival keeps facing the direction it was travelling before it stopped.
+        for (var sample : path.samples().reversed()) {
+            if (sample.speedMetersPerSecond() > .001) return Math.atan2(sample.velocityY(), sample.velocityX());
+        }
+        return -Math.PI / 2;
     }
 
     private void updateSeparationMarkers() {
@@ -455,15 +477,21 @@ public final class RocketStarMapWidget extends UIComponent {
         tugNames = Map.copyOf(craft);
     }
 
+    public void setFleetCraft(Map<UUID, SpacecraftIcon.Pose> craft) {
+
+        fleetCraft = Map.copyOf(craft);
+    }
+
     public void setFleetTimes(Map<UUID, Double> times) {
 
         rocketMarkers.clear();
         mapObjects.setFleetMarkers(times.keySet());
         times.forEach((id, time) -> {
             var path = pathsByBranch.get(id);
-            if (path == null || path.samples().isEmpty()) return;
+            var craft = fleetCraft.get(id);
+            if (path == null || path.samples().isEmpty() || craft == null) return;
             var position = FlightMotion.sample(path.samples(), time);
-            rocketMarkers.add(rocketMarker(id, time, position.x(), position.y()));
+            rocketMarkers.add(new BranchMarker(id, time, position.x(), position.y(), craft));
         });
     }
 
@@ -603,7 +631,7 @@ public final class RocketStarMapWidget extends UIComponent {
         var position = renderedPosition(marker.branchId, marker.timeSeconds, marker.worldX, marker.worldY);
         if (!StarMapLineSimplifier.intersects(position.x, position.y, position.x, position.y,
                 viewportX(), viewportY(), viewportWidth(), viewportHeight(), 8)) return;
-        SpacecraftIcon.draw(graphics, (int) Math.round(position.x), (int) Math.round(position.y), 18);
+        SpacecraftIcon.draw(graphics, position.x, position.y, marker.craft, StarMapCamera.PLANE_TILT);
         var label = craftLabels.get(marker.branchId);
         if (label != null && camera.zoom() >= StarMapObjects.CRAFT_NAME_ZOOM) {
             var font = Minecraft.getInstance().font;
@@ -893,7 +921,7 @@ public final class RocketStarMapWidget extends UIComponent {
      * @param widget      Icon drawn at this position.
      */
     private record BranchMarker(UUID branchId, double timeSeconds,
-                                double worldX, double worldY) {
+                                double worldX, double worldY, SpacecraftIcon.Pose craft) {
 
     }
 

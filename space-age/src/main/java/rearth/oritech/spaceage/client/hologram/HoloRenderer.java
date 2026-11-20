@@ -1,6 +1,7 @@
 package rearth.oritech.spaceage.client.hologram;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.geom.builders.UVPair;
@@ -27,6 +28,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.InteractionHand;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -45,6 +47,7 @@ import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
 import rearth.oritech.spaceage.simulation.survey.SurveyRules;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -227,7 +230,7 @@ public final class HoloRenderer {
                 var alpha = Math.clamp(edge / Math.max(.01, size * .6), 0, 1);
                 var planet = object.type() != ObjectType.ASTEROID;
                 var position = new Vec3(point.x() - (tug == null ? 0 : size / 2 + .10 * s.markerSize()), HoloView.PLANE_HEIGHT, point.y());
-                models.add(new Miniature(model(block(object)), position, (float) (planet ? size / 2 : size), (float) alpha));
+                models.add(new Miniature(model(block(object)), position, (float) (planet ? size / 2 : size), (float) alpha, 0, 0));
                 emitters.add(new HoloEmitters.Beam(position, size / 2, alpha, object.id().hashCode()));
                 var name = RocketStarMapWidget.objectName(object);
                 var target = new Target(object.id(), position, size / 2 + .025, name,
@@ -282,8 +285,12 @@ public final class HoloRenderer {
                     lines.add(new Line(pos.subtract(second), pos.add(second), color, 2.25f));
                 } else if (inside) {
                     emitters.add(new HoloEmitters.Beam(pos, radius, selected ? 1 : .45, craft.id().hashCode()));
-                    models.add(new Miniature(model(SpaceAgeBlocks.SPACECRAFT_ICON.get().defaultBlockState()), pos,
-                            (float) (radius * 32 / 44), selected ? 1f : .65f));
+                    // The original model points along +Z. Lay the alternate model on the same plane first.
+                    var alternate = craft.model() == SpacecraftModel.ALTERNATE;
+                    var yaw = Math.PI / 2 - craft.headingAngle() - Math.toRadians(s.rotation() + data.facing());
+                    models.add(new Miniature(model(SpacecraftIcon.block(craft.model())), pos,
+                            (float) (radius * 32 / (alternate ? 20 : 44)), selected ? 1f : .65f,
+                            (float) yaw, alternate ? (float) (Math.PI / 2) : 0));
                 } else {
                     var direction = new Vec3(point.x() - surface.width() / 2d, 0, point.y() - surface.depth() / 2d).normalize();
                     var back = pos.subtract(direction.scale(radius * 2));
@@ -486,6 +493,8 @@ public final class HoloRenderer {
             for (var model : display.models) {
                 stack.pushPose();
                 stack.translate(model.pos.x, model.pos.y, model.pos.z);
+                if (model.yaw != 0) stack.mulPose(Axis.YP.rotation(model.yaw));
+                if (model.pitch != 0) stack.mulPose(Axis.XP.rotation(model.pitch));
                 stack.scale(model.scale, model.scale, model.scale);
                 stack.translate(-.5, -.5, -.5);
                 collector.submitCustomGeometry(stack, RenderTypes.entityTranslucentEmissive(TextureAtlas.LOCATION_BLOCKS), (pose, consumer) -> {
@@ -590,7 +599,7 @@ public final class HoloRenderer {
         }
     }
 
-    private record Miniature(List<BakedQuad> quads, Vec3 pos, float scale, float alpha) {
+    private record Miniature(List<BakedQuad> quads, Vec3 pos, float scale, float alpha, float yaw, float pitch) {
     }
 
     private record Label(Vec3 pos, Component text) {

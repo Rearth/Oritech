@@ -18,6 +18,7 @@ import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.BlockPreviewWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.OverlayWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.client.ui.render.BlockPreviewEntities;
@@ -29,6 +30,7 @@ import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
 import rearth.oritech.spaceage.client.launch_ramp.LaunchRampScreen;
 import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.RocketNetworking;
 import rearth.oritech.spaceage.simulation.SpaceSimulation;
@@ -39,6 +41,7 @@ import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
 import rearth.oritech.spaceage.simulation.rocket.RocketLayout;
 import rearth.oritech.spaceage.simulation.rocket.RocketPerformanceCalculator;
 import rearth.oritech.spaceage.simulation.rocket.StaticRocketSegment;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.service.PhysicalCrafting;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 
@@ -51,6 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -74,6 +78,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     private boolean segmentStagesExpanded;
     private EditBox rocketNameField;
     private EditBox segmentNameField;
+    private OverlayWidget modelPicker;
     private RocketPreviewWidget rocketPreview;
     private BlockPreviewWidget.ViewState previewViewState;
 
@@ -99,6 +104,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
 
         segmentNameField = null;
         rocketNameField = null;
+        modelPicker = null;
         panelWidth = width - WINDOW_PADDING * 2;
         panelHeight = height - WINDOW_PADDING * 2;
         setPanelSize(panelWidth, panelHeight);
@@ -140,13 +146,20 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         }
 
         var nameX = 205;
-        var nameWidth = Math.max(60, Math.min(220, panelWidth - nameX - 12));
+        var headerControlSize = 18;
+        var nameWidth = Math.clamp(panelWidth - nameX - headerControlSize - 16, 1, 220);
         rocketNameField = addRenderableWidget(new EditBox(font, leftPos + nameX, topPos + 10,
-                nameWidth, 18, Component.translatable("screen.oritech_space_age.rocket_name")));
+                nameWidth, headerControlSize, Component.translatable("screen.oritech_space_age.rocket_name")));
         rocketNameField.setMaxLength(RocketFlightPlanRules.MAX_ROCKET_NAME_LENGTH);
         rocketNameField.setHint(Component.translatable("screen.oritech_space_age.rocket_name"));
         rocketNameField.setValue(currentPlan().name());
         rocketNameField.setResponder(name -> menu.setDraftFlightPlan(currentPlan().withName(name)));
+
+        var modelX = nameX + nameWidth + 4;
+        addComponent(SpaceAgeButtons.darkPanel(modelX, 10, headerControlSize, headerControlSize, Component.empty(),
+                ignored -> openModelPicker(rocket, modelX + headerControlSize))
+                .withTooltip(Component.translatable("screen.oritech_space_age.spacecraft_model.tooltip")));
+        addComponent(modelIcon(modelX + headerControlSize / 2, 10 + headerControlSize / 2, 16, rocket::spacecraftModel));
 
         var contentTop = 39;
         var contentHeight = panelHeight - contentTop - 12;
@@ -365,6 +378,53 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
         return draft == null ? SpaceSimulation.FlightPlan.empty() : draft;
     }
 
+    private void openModelPicker(ActiveRocketData rocket, int right) {
+
+        var pickerWidth = 142;
+        var pickerX = right - pickerWidth;
+        var pickerY = 31;
+        var rowHeight = 22;
+        var choices = SpacecraftModel.values();
+        modelPicker = new OverlayWidget(panelWidth, panelHeight).withBackgroundColor(0)
+                .withDismissHandler(this::closeModelPicker);
+        modelPicker.addChild(new SurfaceWidget(pickerX, pickerY, pickerWidth, rowHeight * choices.length + 8, OritechSurface.PANEL_DARK));
+        // Auto previews the hardware's recommendation even while a manual override is selected.
+        var solar = rocket.powerHardware().solar() > 0;
+        for (var choice : choices) {
+            var model = choice.resolve(solar);
+            var label = Component.translatable("screen.oritech_space_age.spacecraft_model." + model.getSerializedName());
+            if (choice == SpacecraftModel.AUTO) label = Component.translatable("screen.oritech_space_age.spacecraft_model.auto", label);
+            if (choice == rocket.modelChoice()) label.withStyle(ChatFormatting.BOLD);
+            var y = pickerY + 4 + choice.ordinal() * rowHeight;
+            modelPicker.addChild(SpaceAgeButtons.panel(pickerX + 4, y, pickerWidth - 8, 20, label, ignored -> {
+                if (choice != rocket.modelChoice()) {
+                    rocket.setModelChoice(choice);
+                    ClientPacketDistributor.sendToServer(new RocketNetworking.SelectSpacecraftModel(menu.blockPos, rocket.getRocketId(), choice));
+                }
+                closeModelPicker();
+            }));
+            modelPicker.addChild(modelIcon(pickerX + 17, y + 10, 19, () -> model));
+        }
+        addComponent(modelPicker);
+    }
+
+    private void closeModelPicker() {
+
+        removeComponent(modelPicker);
+        modelPicker = null;
+    }
+
+    private static UIComponent modelIcon(int centerX, int centerY, int size, Supplier<SpacecraftModel> model) {
+
+        return new UIComponent(centerX - size / 2, centerY - size / 2, size, size) {
+            @Override
+            protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
+
+                SpacecraftIcon.drawPreview(graphics, centerX, centerY, model.get(), size);
+            }
+        };
+    }
+
     private void launch() {
 
         RocketAssemblerClientController.submitFlightPlanIfDirty(menu);
@@ -456,6 +516,7 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
 
+        if (modelPicker != null) return super.mouseClicked(event, doubleClick);
         for (var field : new EditBox[]{rocketNameField, segmentNameField}) {
             if (field != null && field.isMouseOver(event.x(), event.y())) {
                 setFocused(field);
@@ -469,6 +530,10 @@ public class RocketAssemblerScreen extends OritechWidgetScreen<RocketAssemblerMe
     @Override
     public boolean keyPressed(KeyEvent event) {
 
+        if (modelPicker != null && event.isEscape()) {
+            closeModelPicker();
+            return true;
+        }
         if (selectedSegment != null && event.isEscape()) {
             closeSegmentConfiguration();
             return true;

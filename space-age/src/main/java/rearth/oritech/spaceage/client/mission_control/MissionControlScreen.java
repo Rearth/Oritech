@@ -15,9 +15,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import rearth.oritech.api.screen.OritechSurface;
 import rearth.oritech.api.screen.UIComponent;
+import rearth.oritech.api.screen.widgets.BoxWidget;
 import rearth.oritech.api.screen.widgets.ButtonWidget;
 import rearth.oritech.api.screen.widgets.ItemWidget;
 import rearth.oritech.api.screen.widgets.LabelWidget;
+import rearth.oritech.api.screen.widgets.LabelWidget.Alignment;
 import rearth.oritech.api.screen.widgets.OverlayWidget;
 import rearth.oritech.api.screen.widgets.ScrollWidget;
 import rearth.oritech.api.screen.widgets.SurfaceWidget;
@@ -28,6 +30,7 @@ import rearth.oritech.spaceage.client.SpaceAgeClientRecipes;
 import rearth.oritech.spaceage.simulation.FleetCategories.Category;
 import rearth.oritech.spaceage.client.planner.RocketFlightPlannerScreen;
 import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.MissionNetworking;
 import rearth.oritech.spaceage.simulation.SpaceBalance;
@@ -424,8 +427,9 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             map.setShowSummary(false);
             map.setCommandCoverage(network.groundAntennas() == 0 ? -2 : network.coverageAltitude());
             map.setTugNames(menu.fleet.stream().collect(Collectors.toMap(MissionNetworking.FleetEntry::id,
-                entry -> entry.telemetry().plan().name().isBlank() ? Component.translatable("screen.oritech_space_age.object.craft") : Component.literal(entry.telemetry().plan().name()))));
-        map.setFleetTimes(presentation.times());
+                    entry -> entry.telemetry().plan().name().isBlank() ? Component.translatable("screen.oritech_space_age.object.craft") : Component.literal(entry.telemetry().plan().name()))));
+            map.setFleetCraft(fleetCraft());
+            map.setFleetTimes(presentation.times());
             map.setCraftLabels(presentation.labels());
             map.setBranchSegmentNames(presentation.segmentNames());
             addComponent(map);
@@ -476,14 +480,30 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         var report = reports.get(earthSurveyIndex);
         var scan = report.scan();
         var mapSize = Math.min(Math.min(144, panelWidth / 2 - 12), panelHeight - 64);
-        var detailsX = x + mapSize + 20;
+        var mapX = x + 10;
+        var contentY = y + 28;
+        var dividerX = mapX + mapSize + 7;
+        var detailsX = dividerX + 8;
         var detailsWidth = x + panelWidth - detailsX - 10;
-        categoryPopup.addChild(new EarthSurveyMapWidget(x + 10, y + 28, mapSize, report)
+        var dividerColor = 0xFF62666A;
+        categoryPopup.addChild(new SurfaceWidget(mapX, contentY, mapSize, mapSize, OritechSurface.PANEL_INSET));
+        categoryPopup.addChild(new EarthSurveyMapWidget(mapX + 4, contentY + 4, mapSize - 8, report)
                 .withTooltip(surveyText("preview_help")));
-        categoryPopup.addChild(new LabelWidget(detailsX, y + 30, detailsWidth, 20,
-                scan.target().label()).withBrightColor().withWrap(true));
-        categoryPopup.addChild(new LabelWidget(detailsX, y + 50, detailsWidth, 28,
-                surveyText("area", scan.x(), scan.z(), scan.radius())).withBrightColor().withWrap(true));
+        categoryPopup.addChild(BoxWidget.filled(dividerX, contentY, 1, mapSize, dividerColor));
+        var target = scan.target().label().copy().withStyle(ChatFormatting.BOLD);
+        var detailsY = contentY + 3;
+        var targetHeight = font.split(target, detailsWidth).size() * font.lineHeight;
+        categoryPopup.addChild(new LabelWidget(detailsX, detailsY, detailsWidth, targetHeight, target).withBrightColor().withWrap(true));
+        detailsY += targetHeight + 7;
+        var center = surveyText("area_center", scan.x(), scan.z());
+        var centerHeight = font.split(center, detailsWidth).size() * font.lineHeight;
+        categoryPopup.addChild(new LabelWidget(detailsX, detailsY, detailsWidth, centerHeight, center).withColor(0xFFD0D5DA).withWrap(true));
+        detailsY += centerHeight + 2;
+        categoryPopup.addChild(new LabelWidget(detailsX, detailsY, detailsWidth,
+                surveyText("area_radius", scan.radius())).withColor(0xFFD0D5DA));
+        detailsY += font.lineHeight + 6;
+        categoryPopup.addChild(BoxWidget.filled(detailsX, detailsY, detailsWidth, 1, dividerColor));
+        detailsY += 7;
         var hit = report.position().orElse(null);
         var result = surveyText(report.limited() ? "limited" : "no_match");
         if (hit != null) {
@@ -491,28 +511,23 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
             result = scan.target().biome() ? surveyText("found_biome", hit.getX(), hit.getY(), hit.getZ(), distance)
                     : surveyText("found_structure", hit.getX(), hit.getZ(), distance);
         }
-        categoryPopup.addChild(new LabelWidget(detailsX, y + 80, detailsWidth, 34, result).withBrightColor().withWrap(true));
+        categoryPopup.addChild(new LabelWidget(detailsX, detailsY, detailsWidth, 34, result).withBrightColor().withWrap(true));
+        var footer = y + panelHeight - 26;
         if (hit != null) {
-            categoryPopup.addChild(SpaceAgeButtons.panel(detailsX, y + panelHeight - 68, detailsWidth, 18,
+            categoryPopup.addChild(SpaceAgeButtons.panel(detailsX, footer - 25, Math.min(100, detailsWidth), 18,
                     surveyText("export"), ignored -> ClientPacketDistributor.sendToServer(
                             new MissionNetworking.EarthReportRequest(menu.containerId, Optional.of(report.id())))));
-            categoryPopup.addChild(SpaceAgeButtons.panel(detailsX, y + panelHeight - 47, detailsWidth, 18,
-                    surveyText(hit.equals(menu.earthScanCenter) ? "center_set" : "set_center"), ignored -> {
-                        menu.earthScanCenter = hit;
-                        rebuildComponents();
-                    }).withTooltip(surveyText("set_center_help")));
         }
 
-        var footer = y + panelHeight - 26;
-        var previous = SpaceAgeButtons.panel(x + 10, footer, 20, 18, Component.literal("‹"), ignored -> {
+        var previous = SpaceAgeButtons.panel(mapX, footer, 20, 18, Component.literal("‹"), ignored -> {
             earthSurveyIndex--;
             rebuildComponents();
         });
         previous.setActive(earthSurveyIndex > 0);
         categoryPopup.addChild(previous);
-        categoryPopup.addChild(new LabelWidget(x + 35, footer + 5, 47,
-                Component.literal((earthSurveyIndex + 1) + " / " + reports.size())).withBrightColor());
-        var next = SpaceAgeButtons.panel(x + 85, footer, 20, 18, Component.literal("›"), ignored -> {
+        categoryPopup.addChild(new LabelWidget(mapX + 20, footer + 5, mapSize - 40,
+                surveyText("page", earthSurveyIndex + 1, reports.size())).withAlignment(Alignment.CENTER).withBrightColor());
+        var next = SpaceAgeButtons.panel(mapX + mapSize - 20, footer, 20, 18, Component.literal("›"), ignored -> {
             earthSurveyIndex++;
             rebuildComponents();
         });
@@ -969,9 +984,16 @@ public class MissionControlScreen extends OritechWidgetScreen<MissionControlMenu
         map.setCommandCoverage(menu.network.groundAntennas() == 0 ? -2 : menu.network.coverageAltitude());
         map.setTugNames(menu.fleet.stream().collect(Collectors.toMap(MissionNetworking.FleetEntry::id,
                 entry -> entry.telemetry().plan().name().isBlank() ? Component.translatable("screen.oritech_space_age.object.craft") : Component.literal(entry.telemetry().plan().name()))));
+        map.setFleetCraft(fleetCraft());
         map.setFleetTimes(presentation.times());
         map.setCraftLabels(presentation.labels());
         map.setBranchSegmentNames(presentation.segmentNames());
+    }
+
+    private Map<UUID, SpacecraftIcon.Pose> fleetCraft() {
+
+        return menu.fleet.stream().collect(Collectors.toMap(MissionNetworking.FleetEntry::id,
+                entry -> new SpacecraftIcon.Pose(entry.telemetry().rocket().spacecraftModel(), entry.telemetry().position().headingAngle())));
     }
 
     private void advanceTelemetry() {

@@ -2,7 +2,6 @@ package rearth.oritech.spaceage.client.mission_control;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import rearth.oritech.api.screen.UIComponent;
-import rearth.oritech.spaceage.simulation.survey.EarthScan;
 import rearth.oritech.spaceage.simulation.survey.EarthScan.Report;
 
 final class EarthSurveyMapWidget extends UIComponent {
@@ -18,7 +17,7 @@ final class EarthSurveyMapWidget extends UIComponent {
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
 
-        var size = EarthScan.PREVIEW_SIZE;
+        var size = report.previewSize();
         for (var row = 0; row < size; row++) {
             for (var column = 0; column < size; column++) {
                 // Darken the corners so the preview shows the circular search boundary.

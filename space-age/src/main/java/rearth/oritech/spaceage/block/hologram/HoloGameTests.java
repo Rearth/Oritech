@@ -16,7 +16,14 @@ import rearth.oritech.spaceage.network.HoloNetworking;
 import rearth.oritech.spaceage.network.HoloNetworking.Configure;
 import rearth.oritech.spaceage.network.HoloNetworking.Projection;
 import rearth.oritech.spaceage.simulation.SpaceSimulationSavedData;
+import rearth.oritech.spaceage.simulation.SpaceSimulation;
+import rearth.oritech.spaceage.simulation.SpaceObjects;
+import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
+import rearth.oritech.spaceage.simulation.mission.MissionState;
+import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 
+import java.util.Map;
 import java.util.UUID;
 
 public final class HoloGameTests {
@@ -45,7 +52,17 @@ public final class HoloGameTests {
         player.containerMenu = menu;
         var system = SpaceSimulationSavedData.getForPlayer(player);
         var before = system.createObjectData();
+        var rocket = new ActiveRocketData(Map.of(), Map.of());
+        rocket.setModelChoice(SpacecraftModel.ALTERNATE);
+        var position = new MissionState.Position(-3_100_000, 0, 0, 0, SpaceObjects.EARTH_ID, SpaceSimulation.OrbitBand.LOW,
+                -1, 1, SpaceSimulation.FlightPlanAction.NO_TARGET, new SpaceSimulation.SegmentRef(BlockPos.ZERO), 0, 1);
+        var missions = MissionSavedData.get(level.getServer());
+        missions.craft.put(rocket.getRocketId(), new MissionState(player.getUUID(), rocket, SpaceSimulation.FlightPlan.empty(),
+                position, system.earthKnowledge.copy(), stationPos));
         var snapshot = controller.buildSnapshot();
+        test.assertTrue(snapshot.craft().getFirst().model() == SpacecraftModel.ALTERNATE
+                && snapshot.craft().getFirst().headingAngle() == Math.PI / 2,
+                "The projector uses the selected model and the stopped craft's heading");
         test.assertTrue(snapshot.status().equals("ready") && snapshot.surface().width() * snapshot.surface().depth() == 12,
                 "Unpowered controller projects over its connected screen rectangle");
         test.assertTrue(snapshot.objects().equals(before), "Projection uses exactly the owner's discovered map data");
@@ -71,6 +88,7 @@ public final class HoloGameTests {
         level.setBlockAndUpdate(stationPos, Blocks.AIR.defaultBlockState());
         test.assertTrue(controller.buildSnapshot().status().equals("no_station"), "Removing mission control stops the projection");
         test.assertTrue(system.createObjectData().equals(before), "Inspection never changes discovery or simulation state");
+        missions.craft.remove(rocket.getRocketId());
         player.containerMenu = player.inventoryMenu;
         test.succeed();
     }

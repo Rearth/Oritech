@@ -24,11 +24,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.MapItem;
 import net.minecraft.world.item.context.DirectionalPlaceContext;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.ChestBlockEntity;
 import net.minecraft.world.level.block.state.properties.AttachFace;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -73,6 +75,7 @@ import rearth.oritech.spaceage.simulation.power.SolarPower;
 import rearth.oritech.spaceage.simulation.power.SpacePowerService.SurfaceBeam;
 import rearth.oritech.spaceage.simulation.power.SurfaceBeamData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketControllerState;
 import rearth.oritech.spaceage.simulation.rocket.RocketAscent;
@@ -213,6 +216,14 @@ public final class SpaceAgeGameTests {
         test.assertTrue(map.is(Items.FILLED_MAP) && map.has(DataComponents.MAP_DECORATIONS), "The exported map carries the survey marker");
         test.assertTrue(OritechSpaceAge.id("earth_survey_map").equals(map.get(DataComponents.ITEM_MODEL)),
                 "The survey map uses the digital icon and keeps vanilla map behavior");
+        test.assertTrue(report.previewSize() == 32, "New reports include a finer survey preview");
+
+        var oldReport = new Report(UUID.randomUUID(), new EarthScan(0, 0, 64, Target.VILLAGE), Optional.of(BlockPos.ZERO),
+                false, 2, "w".repeat(16 * 16));
+        var oldPreviewMap = MapItem.getSavedData(oldReport.createMap(level), level);
+        test.assertTrue(oldPreviewMap != null && oldPreviewMap.colors[64 * 128 + 64] == MapColor.WATER.getPackedId(MapColor.Brightness.NORMAL)
+                        && oldPreviewMap.colors[0] == 0,
+                "Exports from old reports use natural water colors and leave areas outside the scan blank");
 
         var structure = new EarthScan(center.getX(), center.getZ(), 64, EarthScan.Target.VILLAGE).run(level, 3);
         test.assertTrue(structure.position().filter(p -> Math.hypot(p.getX() - center.getX(), p.getZ() - center.getZ()) > 64).isEmpty(),
@@ -318,6 +329,15 @@ public final class SpaceAgeGameTests {
         smallSolarCraft.rocket = new ActiveRocketData(smallSolarCraft.rocket.getRocketId(), Map.of(original.segmentId(), solarStructure),
                 smallSolarCraft.rocket.getDynamicSegments(), null);
         smallSolarCraft.rocket.getDynamicSegments().values().iterator().next().rfCapacity = 50_000_000;
+        test.assertTrue(smallSolarCraft.rocket.spacecraftModel() == SpacecraftModel.ORIGINAL
+                && smallSolarCraft.summary(0).rocket().spacecraftModel() == SpacecraftModel.ORIGINAL,
+                "Solar hardware selects the original model even when Mission Control only receives a summary");
+        smallSolarCraft.rocket.setModelChoice(SpacecraftModel.ALTERNATE);
+        var appearance = ActiveRocketData.CODEC.encodeStart(JsonOps.INSTANCE, smallSolarCraft.rocket).getOrThrow();
+        var restoredAppearance = ActiveRocketData.CODEC.parse(JsonOps.INSTANCE, appearance).getOrThrow();
+        test.assertTrue(restoredAppearance.spacecraftModel() == SpacecraftModel.ALTERNATE,
+                "A saved manual choice overrides the solar default");
+        smallSolarCraft.rocket.setModelChoice(SpacecraftModel.AUTO);
         var solarAction = SpaceSimulation.FlightPlanAction.create(SpaceSimulation.ActionType.NAVIGATE_TO)
                 .withTarget(SpaceSimulation.SUN_ID).withOrbit(SpaceSimulation.OrbitBand.SOLAR);
         smallSolarCraft.plan = new FlightPlan(List.of(smallSolarCraft.plan.root().withActions(List.of(solarAction))), List.of());

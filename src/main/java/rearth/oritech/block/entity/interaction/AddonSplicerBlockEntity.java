@@ -307,7 +307,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
 
     @Override
     public Direction getFacingForAddon() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override
@@ -364,7 +364,7 @@ public class AddonSplicerBlockEntity extends NetworkedBlockEntity implements Ite
 
     @Override
     public Direction getFacingForMultiblock() {
-        return Objects.requireNonNull(level).getBlockState(getBlockPos()).getValue(BlockStateProperties.HORIZONTAL_FACING);
+        return getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING);
     }
 
     @Override

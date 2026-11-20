@@ -15,6 +15,8 @@ import rearth.oritech.spaceage.block.assembler.RocketAssemblerMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu;
 import rearth.oritech.spaceage.block.beam_aperture.BeamApertureMenu.Snapshot;
 import rearth.oritech.spaceage.block.launch_ramp.LaunchRampMenu;
+import rearth.oritech.spaceage.block.launch_ramp.LaunchRampBlockEntity;
+import rearth.oritech.spaceage.block.assembler.RocketAssemblerBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterBlockEntity;
 import rearth.oritech.spaceage.block.vacuum_crafter.VacuumCrafterMenu;
 import rearth.oritech.spaceage.client.assembler.RocketAssemblerClientController;
@@ -27,6 +29,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SegmentRef;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.service.RocketServiceSettings;
 
 import java.util.List;
@@ -83,6 +86,8 @@ public final class RocketNetworking {
                 RocketNetworking::receiveAssemblerPreview);
         registrar.playToClient(InvalidAssemblerPreviewPayload.TYPE, NetworkManager.getAutoCodec(InvalidAssemblerPreviewPayload.class),
                 RocketNetworking::receiveInvalidAssemblerPreview);
+        registrar.playToServer(SelectSpacecraftModel.TYPE, NetworkManager.getAutoCodec(SelectSpacecraftModel.class),
+                (payload, context) -> context.enqueueWork(() -> selectSpacecraftModel(payload, context)));
         registrar.playToServer(LaunchRocketPayload.TYPE, NetworkManager.getAutoCodec(LaunchRocketPayload.class),
                 RocketNetworking::launchRocket);
         registrar.playToServer(RequestFlightPlannerPayload.TYPE, NetworkManager.getAutoCodec(RequestFlightPlannerPayload.class),
@@ -206,6 +211,31 @@ public final class RocketNetworking {
                 && player.containerMenu instanceof RocketAssemblerMenu menu
                 && menu.blockPos.equals(position)
                 && menu.stillValid(player);
+    }
+
+    private static void selectSpacecraftModel(SelectSpacecraftModel payload, IPayloadContext context) {
+
+        if (!validAssemblerMenu(context, payload.position())) return;
+        var player = (ServerPlayer) context.player();
+        var menu = (RocketAssemblerMenu) player.containerMenu;
+        var rocket = menu.getRocket();
+        if (rocket == null || !rocket.getRocketId().equals(payload.rocketId())) return;
+        var machine = player.level().getBlockEntity(menu.blockPos);
+        if (machine instanceof RocketAssemblerBlockEntity assembler) assembler.setModelChoice(payload.model());
+        else if (machine instanceof LaunchRampBlockEntity ramp) ramp.setModelChoice(payload.model());
+        else return;
+        rocket.setModelChoice(payload.model());
+    }
+
+    public record SelectSpacecraftModel(BlockPos position, UUID rocketId, SpacecraftModel model) implements CustomPacketPayload {
+
+        public static final Type<SelectSpacecraftModel> TYPE = new Type<>(OritechSpaceAge.id("select_spacecraft_model"));
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+
+            return TYPE;
+        }
     }
 
     private static void launchRocket(LaunchRocketPayload payload, IPayloadContext context) {

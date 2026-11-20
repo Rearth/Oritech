@@ -111,6 +111,7 @@ public class SpaceAgeModelProvider extends ModelProvider {
         itemModels.itemModelOutput.accept(SpaceAgeBlocks.SPACE_TROPHY.asItem(),
                 ItemModelUtils.specialModel(OritechSpaceAge.id("item/space_trophy"), new GeckolibItemSpecialRenderer.Unbaked()));
         createCustomModelBlock(SpaceAgeBlocks.SPACECRAFT_ICON.get(), blockModels);
+        createCustomModelBlock(SpaceAgeBlocks.SPACECRAFT_ICON_ALT.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.EARTH.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.SUN.get(), blockModels);
         createCustomModelBlock(SpaceAgeBlocks.MARS.get(), blockModels);

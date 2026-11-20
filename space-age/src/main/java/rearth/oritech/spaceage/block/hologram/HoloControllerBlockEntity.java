@@ -102,7 +102,8 @@ public final class HoloControllerBlockEntity extends BlockEntity implements Menu
                         .ifPresent(p -> journey.addAll(MissionJourney.legs(p)));
             }
             crafts.add(new Craft(id, craft.name(), category, pos.x(), pos.y(), pos.vx(), pos.vy(), destination, craft.connected(), mission.status,
-                    List.copyOf(path), List.copyOf(journey), mission.actionTicks() / 20d));
+                    List.copyOf(path), List.copyOf(journey), mission.actionTicks() / 20d,
+                    mission.rocket.spacecraftModel(), pos.headingAngle()));
         }
         var status = surface.width() == 0 ? "no_screen" : !settings.mode().equals("area")
                 && crafts.stream().noneMatch(c -> HoloView.selected(settings, c)) ? "empty" : "ready";

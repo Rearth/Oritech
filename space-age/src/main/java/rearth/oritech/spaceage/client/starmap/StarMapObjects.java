@@ -12,6 +12,7 @@ import rearth.oritech.spaceage.block.basic.AsteroidBlock.Ore;
 import rearth.oritech.spaceage.client.mission_control.FleetViewPreferences;
 import rearth.oritech.spaceage.client.starmap.StarMapIconGroups.Icon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
+import rearth.oritech.spaceage.simulation.mission.DockingTarget;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 import rearth.oritech.spaceage.simulation.ResourceBodies;
 import rearth.oritech.spaceage.simulation.ResourceBodies.Definition;
@@ -45,6 +46,7 @@ final class StarMapObjects {
     private final List<FogPatch> fogBridges = new ArrayList<>();
     private Set<UUID> fleetMarkers = Set.of();
     private final Map<UUID, TuggedObject> tuggedObjects = new HashMap<>();
+    private final Map<UUID, SpacecraftIcon.Pose> stationCraft = new HashMap<>();
 
     private static void addCircle(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
                                   double centerX, double centerY, double radius, int color, float width) {
@@ -178,6 +180,13 @@ final class StarMapObjects {
                 return PlanetSurfaceProjection.closestEdge(point, body.x(), body.y(), body.radius(), object.outline);
         }
         return point;
+    }
+
+    void setStationCraft(List<DockingTarget> stations) {
+
+        stationCraft.clear();
+        for (var station : stations) stationCraft.put(station.id(),
+                new SpacecraftIcon.Pose(station.rocket().spacecraftModel(), station.position().headingAngle()));
     }
 
     void setSnapshot(SpaceSimulation.FlightPlannerSnapshot snapshot) {
@@ -413,7 +422,10 @@ final class StarMapObjects {
                         var selected = selectedTarget != null && selectedTarget.objectId().equals(object.data.id());
                         graphics.fill(x - 3, y - 3, x + 3, y + 3, selected ? 0xFFFFD45C : 0xFFE2E8F0);
                         graphics.fill(x - 2, y - 2, x + 2, y + 2, 0xFF080D18);
-                    } else SpacecraftIcon.draw(graphics, (int) Math.round(position.x()), (int) Math.round(position.y()), 18);
+                    } else {
+                        var craft = stationCraft.get(object.data.id());
+                        if (craft != null) SpacecraftIcon.draw(graphics, position.x(), position.y(), craft, StarMapCamera.PLANE_TILT);
+                    }
                     if (camera.zoom() >= CRAFT_NAME_ZOOM)
                         graphics.text(Minecraft.getInstance().font, RocketStarMapWidget.objectName(object.data),
                                 (int) Math.round(position.x() + 11), (int) Math.round(position.y() - 4), 0xFF9FB2C4, false);

@@ -33,6 +33,7 @@ import rearth.oritech.spaceage.simulation.SpaceSimulation.FlightPlanAction;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.OrbitBand;
 import rearth.oritech.spaceage.simulation.mission.MissionSavedData;
 import rearth.oritech.spaceage.simulation.rocket.ActiveRocketData;
+import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 import rearth.oritech.spaceage.simulation.rocket.CubeSatData;
 import rearth.oritech.spaceage.simulation.rocket.DynamicRocketSegment;
 import rearth.oritech.spaceage.simulation.rocket.RocketRecovery;
@@ -165,6 +166,9 @@ public final class CubeSatGameTests {
                     "Launcher cores expose no inherited energy storage");
         var pattern = cube(false);
         ramp.pattern.setItem(0, CubeSatBlock.createStack(pattern));
+        test.assertTrue(ramp.createPreview().spacecraftModel() == SpacecraftModel.ALTERNATE,
+                "The automatic model for a cube without solar panels is the alternate");
+        ramp.setModelChoice(SpacecraftModel.ORIGINAL);
         var orbit = FlightPlanAction.create(ActionType.NAVIGATE_TO).withTarget(SpaceObjects.EARTH_ID).withOrbit(OrbitBand.LOW);
         var plan = FlightPlan.empty();
         plan = plan.withBranches(List.of(plan.root().withActions(List.of(orbit))));
@@ -196,12 +200,17 @@ public final class CubeSatGameTests {
                 ramp.saveWithoutMetadata(level.registryAccess())));
         test.assertTrue(savedWithoutItem.pattern.isEmpty() && savedWithoutItem.savedPattern().equals(pattern)
                 && savedWithoutItem.savedPlan().equals(ramp.savedPlan()), "The full program and design survive reload with an empty slot");
+        test.assertTrue(savedWithoutItem.createPreview().modelChoice() == SpacecraftModel.ORIGINAL,
+                "The manual model survives reloading the launcher");
 
         var known = new HashSet<>(missions.craft.keySet());
         ramp.launch(cube(false), 10_000, new Vec3(1, 0, 0));
         var launched = missions.craft.values().stream().filter(state -> !known.contains(state.rocket.getRocketId())).toList();
         test.assertTrue(launched.size() == 1 && launched.getFirst().plan.root().actions().getFirst().id().equals(orbit.id()),
                 "An identical cube follows the ramp's plan");
+        test.assertTrue(launched.getFirst().rocket.spacecraftModel() == SpacecraftModel.ORIGINAL
+                && launched.getFirst().summary(0).rocket().spacecraftModel() == SpacecraftModel.ORIGINAL,
+                "The launch and Mission Control summary both carry the selected model");
         test.assertTrue(ramp.lastOutcome() == LaunchRampBlockEntity.Outcome.PLAN && ramp.pattern.isEmpty(), "The ramp reports the planned launch");
         test.assertTrue(Math.hypot(launched.getFirst().position.vx(), launched.getFirst().position.vy()) > 0, "The particle speed is the starting velocity");
         known.addAll(missions.craft.keySet());

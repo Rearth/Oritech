@@ -42,6 +42,10 @@ public final class SpaceAgeBlocks {
     public static final DeferredBlock<Block> SPACECRAFT_ICON = BLOCKS.registerSimpleBlock("spacecraft_icon",
             () -> machineProperties().noOcclusion());
 
+    @NoBlockItem
+    public static final DeferredBlock<Block> SPACECRAFT_ICON_ALT = BLOCKS.registerSimpleBlock("spacecraft_icon_alt",
+            () -> machineProperties().noOcclusion());
+
     @NoAutoDrop
     public static final DeferredBlock<SpaceTrophyBlock> SPACE_TROPHY = BLOCKS.registerBlock("space_trophy",
             SpaceTrophyBlock::new, () -> machineProperties().noOcclusion());

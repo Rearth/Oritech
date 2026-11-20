@@ -3,7 +3,6 @@ package rearth.oritech.spaceage.client.planner;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
@@ -289,11 +288,6 @@ abstract class FlightPlannerEditors extends OritechWidgetScreen<RocketAssemblerM
     EditBox addPopupField(EditBox field) {
 
         return addRenderableWidget(field);
-    }
-
-    BlockPos earthScanCenter() {
-
-        return menu instanceof MissionControlMenu control ? control.earthScanCenter : null;
     }
 
     void focusPopup(EditBox field) {

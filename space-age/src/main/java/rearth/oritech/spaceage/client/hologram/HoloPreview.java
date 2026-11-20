@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.client.hologram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import rearth.oritech.api.screen.UIComponent;
 import rearth.oritech.api.screen.widgets.BlockWidget;
 import rearth.oritech.spaceage.client.starmap.StarMapLineRenderer;
@@ -130,7 +131,9 @@ final class HoloPreview extends UIComponent {
                     graphics.fill((int) pos.x() + offset, (int) pos.y() + offset, (int) pos.x() + offset + 1, (int) pos.y() + offset + 1, 0xFFDF7973);
                     graphics.fill((int) pos.x() + offset, (int) pos.y() - offset, (int) pos.x() + offset + 1, (int) pos.y() - offset + 1, 0xFFDF7973);
                 }
-            } else graphics.fill((int) pos.x() - 2, (int) pos.y() - 2, (int) pos.x() + 2, (int) pos.y() + 2, 0xFF89F4FF);
+            } else {
+                SpacecraftIcon.draw(graphics, pos.x(), pos.y(), new SpacecraftIcon.Pose(craft.model(), craft.headingAngle()), 1);
+            }
             if (Math.hypot(mouseX - pos.x(), mouseY - pos.y()) < 8) hovered = Component.literal(craft.name());
         }
         graphics.disableScissor();

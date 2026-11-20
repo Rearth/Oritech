@@ -45,7 +45,7 @@ public record EarthScan(int x, int z, int radius, Target target) {
     public static final Identifier MAP_MODEL = OritechSpaceAge.id("earth_survey_map");
     private static final int MIN_RADIUS = 64;
     private static final int MAX_RADIUS = 2048;
-    public static final int PREVIEW_SIZE = 16;
+    private static final int PREVIEW_SIZE = 32;
     private static final int MAX_STRUCTURE_CHECKS = 32;
     private static final int MAX_CHUNK_CHECKS = 8;
     public static final Codec<EarthScan> CODEC = RecordCodecBuilder.create(i -> i.group(
@@ -231,10 +231,17 @@ public record EarthScan(int x, int z, int radius, Target target) {
                 Codec.LONG.fieldOf("tick").forGetter(Report::tick), Codec.STRING.fieldOf("preview").forGetter(Report::preview)
         ).apply(i, Report::new));
 
+        public int previewSize() {
+
+            // Existing reports carry a 16-by-16 preview in the same field.
+            return preview.length() == 16 * 16 ? 16 : PREVIEW_SIZE;
+        }
+
         public char previewAt(int column, int row) {
 
-            if (column < 0 || column >= PREVIEW_SIZE || row < 0 || row >= PREVIEW_SIZE) return ' ';
-            var index = row * PREVIEW_SIZE + column;
+            var size = previewSize();
+            if (column < 0 || column >= size || row < 0 || row >= size) return ' ';
+            var index = row * size + column;
             return index < preview.length() ? preview.charAt(index) : ' ';
         }
 
@@ -248,15 +255,19 @@ public record EarthScan(int x, int z, int radius, Target target) {
             if (map != null) {
                 // Fill the map from the saved preview so exporting never scans the world again.
                 var pixelSize = 1 << scale;
+                var radiusSquared = scan.radius * scan.radius;
                 for (var row = 0; row < 128; row++) {
-                    var z = map.centerZ + (row - 64) * pixelSize;
-                    var previewRow = previewCoordinate(z - scan.z);
+                    var dz = map.centerZ + (row - 64) * pixelSize - scan.z;
+                    var previewRow = previewCoordinate(dz);
                     for (var column = 0; column < 128; column++) {
-                        var x = map.centerX + (column - 64) * pixelSize;
-                        var color = switch (previewAt(previewCoordinate(x - scan.x), previewRow)) {
-                            case 'w' -> MapColor.TERRACOTTA_BLUE;
-                            case 'm' -> MapColor.COLOR_LIGHT_BLUE;
-                            case 'l' -> MapColor.COLOR_CYAN;
+                        var dx = map.centerX + (column - 64) * pixelSize - scan.x;
+                        // Leave unsurveyed pixels blank so the tablet grid shows around the survey.
+                        if (dx * dx + dz * dz > radiusSquared) continue;
+                        // Match the colors Minecraft uses as players explore the map.
+                        var color = switch (previewAt(previewCoordinate(dx), previewRow)) {
+                            case 'w' -> MapColor.WATER;
+                            case 'm' -> MapColor.STONE;
+                            case 'l' -> MapColor.GRASS;
                             default -> MapColor.NONE;
                         };
                         if (color != MapColor.NONE) map.setColor(column, row, color.getPackedId(MapColor.Brightness.NORMAL));
@@ -273,7 +284,7 @@ public record EarthScan(int x, int z, int radius, Target target) {
 
         private int previewCoordinate(int offset) {
 
-            return Math.floorDiv((offset + scan.radius) * PREVIEW_SIZE, scan.radius * 2);
+            return Math.floorDiv((offset + scan.radius) * previewSize(), scan.radius * 2);
         }
     }
 
