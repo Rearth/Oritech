@@ -106,31 +106,27 @@ public class BedrockExtractorEntity extends NetworkedBlockEntity implements Ener
             return;    // inv full
 
         var energyPerStep = getRfPerStep();
-        if (energyStorage.energy < energyPerStep) return;
+        if (energyPerStep <= 0 || energyStorage.energy < energyPerStep) return;
+
+        var availableSteps = energyStorage.energy / energyPerStep;
+        var stepsPerOre = OritechConfig.bedrockExtractorConfig.stepsPerOre.get();
+        var currentProgress = Math.clamp(progress.get(), 0, stepsPerOre);
+        var progressMade = (int) Math.min(availableSteps, stepsPerOre - currentProgress);
 
         try (var transaction = Transaction.openRoot()) {
-
-            var usedEnergy = 0L;
-            while (energyStorage.energy >= energyPerStep) {
-                progress.increment(transaction);
-                usedEnergy += energyStorage.internalExtract(energyPerStep, transaction);
-            }
-
-            while (progress.get() >= OritechConfig.bedrockExtractorConfig.stepsPerOre.get()) {
+            // Preserve the original energy use and limit of one ore per tick.
+            energyStorage.internalExtract(availableSteps * energyPerStep, transaction);
+            progress.set(currentProgress + progressMade, transaction);
+            if (progress.get() >= stepsPerOre) {
                 craftResult(transaction, serverLevel);
                 progress.reset(transaction);
             }
-
-            if (usedEnergy > 0) {
-                transaction.commit();
-                lastWorkTime = serverLevel.getGameTime();
-
-                var particlePos = getCenter(0);
-                ParticleContent.sendParticles(serverLevel, ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
-
-            }
+            transaction.commit();
         }
 
+        lastWorkTime = serverLevel.getGameTime();
+        var particlePos = getCenter(0);
+        ParticleContent.sendParticles(serverLevel, ParticleTypes.LAVA, particlePos.getX() + 0.5, particlePos.getY() + 0.5, particlePos.getZ() + 0.5, 1, 0.6, 0.6, 0.6, 0);
     }
 
     private BlockPos getCenter(int y) {

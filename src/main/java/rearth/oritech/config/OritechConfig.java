@@ -459,7 +459,7 @@ public class OritechConfig {
             b.push("bedrockExtractorConfig");
             energyCapacity = b.defineInRange("energyCapacity", 20_000L, 0L, Long.MAX_VALUE);
             stepsPerOre = b.comment("Work steps required per ore output").defineInRange("stepsPerOre", 20, 1, Integer.MAX_VALUE);
-            energyPerStep = b.comment("RF consumed per work step").defineInRange("energyPerStep", 1024, 0, Integer.MAX_VALUE);
+            energyPerStep = b.comment("RF consumed per work step").defineInRange("energyPerStep", 1024, 1, Integer.MAX_VALUE);
             b.pop();
         }
     }
