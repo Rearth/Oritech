@@ -175,9 +175,12 @@ public class FertilizerBlockEntity extends ItemEnergyFrameInteractionBlockEntity
     protected void doProgress(boolean moving) {
         super.doProgress(moving);
         if (!moving && hasWorkAvailable(getCurrentTarget())) {
-            try (var transaction = Transaction.openRoot()) {
-                fluidStorage.extract(FluidResource.of(fluidStorage.getContent()), (int) getWaterUsagePerTick(), transaction);
-                transaction.commit();
+            var waterUsage = getWaterUsagePerTick();
+            if (waterUsage > 0) {
+                try (var transaction = Transaction.openRoot()) {
+                    fluidStorage.extract(FluidResource.of(fluidStorage.getContent()), (int) waterUsage, transaction);
+                    transaction.commit();
+                }
             }
             if (level instanceof ServerLevel sl) {
                 var bp = getCurrentTarget().below();
