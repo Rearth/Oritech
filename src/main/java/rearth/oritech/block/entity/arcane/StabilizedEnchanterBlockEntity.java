@@ -106,24 +106,28 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
         statistics = StabilizedEnchanterStatistics.EMPTY;
 
         var content = inventory.getStacks().getFirst();
+        var enchantment = getSelectedEnchantment();
+        if (enchantment == null && !selectedEnchantment.equals(NONE_SELECTED)) {
+            selectedEnchantment = NONE_SELECTED;
+            setChanged();
+        }
 
         if (content.isEmpty()
                 || !inventory.getResource(1).isEmpty()
-                || selectedEnchantment.equals(NONE_SELECTED)
-                || !getSelectedEnchantment().isBound()
-                || !content.supportsEnchantment(getSelectedEnchantment())) {
+                || enchantment == null
+                || !content.supportsEnchantment(enchantment)) {
             progress = 0;
             return;
         }
 
-        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
-        var maxLevel = getSelectedEnchantment().value().getMaxLevel();
+        var existingLevel = content.getTagEnchantments().getLevel(enchantment);
+        var maxLevel = enchantment.value().getMaxLevel();
 
         if (existingLevel >= maxLevel) return;
 
-        maxProgress = getEnchantmentCost(getSelectedEnchantment().value(), existingLevel + 1);
+        maxProgress = getEnchantmentCost(enchantment.value(), existingLevel + 1);
 
-        if (canProgress(existingLevel + 1) && serverLevel.getGameTime() % 5 == 0) {
+        if (canProgress(enchantment, existingLevel + 1) && serverLevel.getGameTime() % 5 == 0) {
             this.setChanged();
             energyStorage.energy -= (long) getDisplayedEnergyUsage();
             progress++;
@@ -136,7 +140,7 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
 
             if (progress >= maxProgress) {
                 progress = 0;
-                finishEnchanting();
+                finishEnchanting(enchantment);
                 if (serverLevel instanceof ServerLevel sl) {
                     var target = pos.getCenter();
                     ParticleContent.sendParticles(sl, ParticleTypes.ENCHANTED_HIT, target.x, target.y, target.z, maxProgress + 10, 0.6, 0.6, 0.6, 0);
@@ -153,10 +157,16 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
         triggerAnim("machine", activeAnimation);
     }
 
-    public Holder<Enchantment> getSelectedEnchantment() {
-        if (selectedEnchantment.equals(NONE_SELECTED)) return null;
-        var registry = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
-        return registry.wrapAsHolder(registry.get(selectedEnchantment).orElseThrow().value());
+    public @Nullable Holder<Enchantment> getSelectedEnchantment() {
+        return findEnchantment(selectedEnchantment);
+    }
+
+    private @Nullable Holder<Enchantment> findEnchantment(Identifier id) {
+        if (id.equals(NONE_SELECTED) || level == null) return null;
+        return level.registryAccess().lookup(Registries.ENCHANTMENT)
+                .flatMap(registry -> registry.get(id))
+                .filter(Holder::isBound)
+                .orElse(null);
     }
 
     @Override
@@ -175,21 +185,17 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
         selectedEnchantment = input.read("selected", Identifier.CODEC).orElse(NONE_SELECTED);
     }
 
-    private void finishEnchanting() {
+    private void finishEnchanting(Holder<Enchantment> enchantment) {
         var content = inventory.getStacks().getFirst();
-        var existingLevel = content.getTagEnchantments().getLevel(getSelectedEnchantment());
-        content.enchant(getSelectedEnchantment(), existingLevel + 1);
+        var existingLevel = content.getTagEnchantments().getLevel(enchantment);
+        content.enchant(enchantment, existingLevel + 1);
 
         inventory.getStacks().set(0, ItemStack.EMPTY);
         inventory.getStacks().set(1, content);
         statistics = new StabilizedEnchanterStatistics(0, cachedCatalysts.size());
     }
 
-    private int getRequiredCatalystCount(int targetLevel) {
-        return getSelectedEnchantment().value().getAnvilCost() + targetLevel;
-    }
-
-    private boolean canProgress(int targetLevel) {
+    private boolean canProgress(Holder<Enchantment> enchantment, int targetLevel) {
 
         if (energyStorage.energy <= getDisplayedEnergyUsage()) {
             activeAnimation = "unpowered";
@@ -197,7 +203,7 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
         }
 
         if (level.getGameTime() % 15 == 0) updateNearbyCatalysts();
-        var requiredCatalysts = getRequiredCatalystCount(targetLevel);
+        var requiredCatalysts = enchantment.value().getAnvilCost() + targetLevel;
 
         statistics = new StabilizedEnchanterStatistics(requiredCatalysts, cachedCatalysts.size());
 
@@ -340,11 +346,16 @@ public class StabilizedEnchanterBlockEntity extends NetworkedBlockEntity
     }
 
     public static void receiveEnchantmentSelection(SelectEnchantingPacket packet, IPayloadContext context) {
-        var blockEntity = context.player().level().getBlockEntity(packet.self);
-        if (blockEntity instanceof StabilizedEnchanterBlockEntity stabilized_enchanterBlock) {
-            stabilized_enchanterBlock.selectedEnchantment = packet.enchantmentId;
-            stabilized_enchanterBlock.setChanged();
-        }
+        var player = context.player();
+        if (!(player.containerMenu instanceof StabilizedEnchanterScreenHandler menu)
+                || !menu.blockPos.equals(packet.self) || !menu.stillValid(player)
+                || !(menu.getBlockEntity() instanceof StabilizedEnchanterBlockEntity enchanter)
+                || enchanter.getLevel() != player.level()) return;
+
+        if (!packet.enchantmentId.equals(NONE_SELECTED) && enchanter.findEnchantment(packet.enchantmentId) == null) return;
+
+        enchanter.selectedEnchantment = packet.enchantmentId;
+        enchanter.setChanged();
     }
 
     public record SelectEnchantingPacket(BlockPos self, Identifier enchantmentId) implements CustomPacketPayload {
