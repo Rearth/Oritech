@@ -29,7 +29,7 @@ final class OritechJeiBedrockExtractorRecipe extends AbstractRecipeCategory<Reci
     @Override
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OritechRecipe> recipe,
                                    IFocusGroup focuses) {
-        builder.addAnimatedRecipeArrow(40).setPosition(65, 20);
+        builder.addAnimatedRecipeArrowWidget(40).setPosition(65, 20);
         builder.addText(Component.translatable("emi.title.oritech.bedrock_extractor_placement"), WIDTH - 4, 10)
                 .setPosition(2, 60);
         builder.addText(Component.translatable("emi.title.oritech.bedrock_extractor_infinite"), WIDTH - 4, 10)

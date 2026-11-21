@@ -39,13 +39,13 @@ final class OritechJeiAtomicForgeRecipe extends AbstractRecipeCategory<RecipeHol
     public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OritechRecipe> holder,
                                    IFocusGroup focuses) {
         // Show the forge being charged from both sides. One laser is enough; additional input only makes it faster.
-        builder.addDrawable(endericLaser, 45, 3);
+        builder.addDrawableWidget(endericLaser).setPosition(45, 3);
         builder.addText(Component.literal("→"), 10, 10).setPosition(64, 6);
-        builder.addDrawable(atomicForge, 77, 3);
+        builder.addDrawableWidget(atomicForge).setPosition(77, 3);
         builder.addText(Component.literal("←"), 10, 10).setPosition(97, 6);
-        builder.addDrawable(endericLaser, 109, 3);
+        builder.addDrawableWidget(endericLaser).setPosition(109, 3);
 
-        builder.addAnimatedRecipeArrow(40).setPosition(70, 37);
+        builder.addAnimatedRecipeArrowWidget(40).setPosition(70, 37);
 
         var totalEnergy = (long) OritechConfig.processingMachines.atomicForgeData.energyPerTick.get()
                 * holder.value().time();
