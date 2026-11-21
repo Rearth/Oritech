@@ -312,7 +312,7 @@ public class AcceleratorParticleLogic {
     }
 
     public static float getMaxGateDist(float speed) {
-        return (float) Math.clamp(Math.sqrt(speed) / 2, 2, OritechConfig.maxGateDist.get());
+        return (float) Math.min(Math.max(Math.sqrt(speed) / 2, 2), OritechConfig.maxGateDist.get());
     }
 
     public static float getRequiredBendDist(float speed) {
