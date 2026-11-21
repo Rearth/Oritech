@@ -222,7 +222,7 @@ public class OritechConfig {
 
     public static final ModConfigSpec.IntValue catalystRFPerSoul = COMMON
             .comment("RF/t per catalyst soul capacity level increase")
-            .defineInRange("catalystRFPerSoul", 20, 0, Integer.MAX_VALUE);
+            .defineInRange("catalystRFPerSoul", 20, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue catalystCostMultiplier = COMMON
             .comment("Catalyst soul cost multiplier")
