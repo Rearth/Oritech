@@ -187,7 +187,7 @@ public class OritechConfig {
     public static final ModConfigSpec.IntValue ventRelativeRate = COMMON
             .comment("Vent proportional cooling rate")
             .worldRestart()
-            .defineInRange("ventRelativeRate", 100, 0, Integer.MAX_VALUE);
+            .defineInRange("ventRelativeRate", 100, 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue maxHeat = COMMON
             .comment("Maximum heat before reactor meltdown")
