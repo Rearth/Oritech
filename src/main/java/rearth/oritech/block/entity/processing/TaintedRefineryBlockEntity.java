@@ -58,6 +58,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implements FluidProvider {
+    public static final int OUTPUT_SLOT_COUNT = 3;
 
     @SyncField({SyncType.GUI_TICK, SyncType.SPARSE_TICK, SyncType.INITIAL})
     public final InOutFluidStorage ownStorage = new InOutFluidStorage(16 * FluidType.BUCKET_VOLUME, this::setChanged, new ContainerSlotAssignment(0, 1, 1, 1));
@@ -205,7 +206,7 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     private FluidStack calculateOutputFluid(OritechRecipe recipe) {
 
         var fluidOutputs = recipe.fluidOutputs();
-        if (fluidOutputs.size() > selectedOutput && !fluidOutputs.isEmpty()) {
+        if (isValidOutputSlot(selectedOutput) && selectedOutput < fluidOutputs.size()) {
             var result = fluidOutputs.get(selectedOutput).create();
             return result.copyWithAmount(result.getAmount() * getOutputMultiplier());
         }
@@ -269,7 +270,8 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownStorage.deserialize(input);
-        selectedOutput = input.getIntOr("output", 0);
+        var savedOutput = input.getIntOr("output", 0);
+        selectedOutput = isValidOutputSlot(savedOutput) ? savedOutput : 0;
         arcaneFactor = input.read("arcane_factor", EnvironmentFactor.CODEC).orElse(EnvironmentFactor.DEFAULT);
         sculkFactor = input.read("sculk_factor", EnvironmentFactor.CODEC).orElse(EnvironmentFactor.DEFAULT);
     }
@@ -537,15 +539,18 @@ public class TaintedRefineryBlockEntity extends MultiblockMachineEntity implemen
     }
 
     public static void handleTankPacket(RefineryTankSelectorPacket payload, IPayloadContext context) {
-        var level = context.player().level();
-        if (level == null) return;
-        var refineryCandidate = level.getBlockEntity(payload.position(), BlockEntitiesContent.TAINTED_REFINERY.get());
-        if (refineryCandidate.isEmpty()) return;
-
-        var refinery = refineryCandidate.get();
+        var player = context.player();
+        if (!isValidOutputSlot(payload.slot())
+                || !(player.containerMenu instanceof TaintedRefineryScreenHandler menu)
+                || !menu.blockPos.equals(payload.position()) || !menu.stillValid(player)
+                || !(menu.getBlockEntity() instanceof TaintedRefineryBlockEntity refinery)
+                || refinery.getLevel() != player.level()) return;
         refinery.selectedOutput = payload.slot();
         refinery.setChanged();
+    }
 
+    private static boolean isValidOutputSlot(int slot) {
+        return slot >= 0 && slot < OUTPUT_SLOT_COUNT;
     }
 
     // Client -> Server (e.g. from UI interactions)

@@ -78,7 +78,7 @@ public class TaintedRefineryScreen extends OritechMachineScreen<TaintedRefineryS
         var currentActiveTank = refinery.selectedOutput;
         var cycleSlotButton = ButtonWidget.darkPanel(26, 54, 40, 20, Component.translatable("label.oritech.tainted_refinery.output_slot", currentActiveTank + 1), widget -> {
             var tankIndex = refinery.selectedOutput;
-            var newIndex = (tankIndex + 1) % 3;
+            var newIndex = (tankIndex + 1) % TaintedRefineryBlockEntity.OUTPUT_SLOT_COUNT;
             widget.setLabel(Component.translatable("label.oritech.tainted_refinery.output_slot", newIndex + 1));
             ClientPacketDistributor.sendToServer(new TaintedRefineryBlockEntity.RefineryTankSelectorPacket(menu.blockPos, newIndex));
         }).withTextColor(LabelWidget.BRIGHT_TEXT).withTooltip(Component.translatable("tooltip.oritech.tainted_refinery.output_slot"));
