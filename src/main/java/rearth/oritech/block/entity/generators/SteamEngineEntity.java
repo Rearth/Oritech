@@ -20,6 +20,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.Oritech;
 import rearth.oritech.api.networking.NetworkedBlockEntity;
 import rearth.oritech.api.networking.SyncField;
 import rearth.oritech.api.networking.SyncType;
@@ -28,6 +29,7 @@ import rearth.oritech.block.base.entity.MultiblockGeneratorBlockEntity;
 import rearth.oritech.client.init.ModScreens;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.init.BlockEntitiesContent;
+import rearth.oritech.init.FluidContent;
 import rearth.oritech.init.TagContent;
 import rearth.oritech.init.recipes.OritechRecipe;
 import rearth.oritech.init.recipes.OritechRecipeInput;
@@ -350,7 +352,15 @@ public class SteamEngineEntity extends MultiblockGeneratorBlockEntity implements
 
     public static FluidResource getUsedSteamFluid() {
         if (USED_STEAM_FLUID == null) {
-            USED_STEAM_FLUID = FluidResource.of(BuiltInRegistries.FLUID.get(Identifier.parse(OritechConfig.generators.steamId.get())).get().value());
+            var configuredId = OritechConfig.generators.steamId.get();
+            var id = Identifier.tryParse(configuredId);
+            var fluid = id == null ? null : BuiltInRegistries.FLUID.get(id).orElse(null);
+            if (fluid == null || fluid.value() == Fluids.EMPTY) {
+                Oritech.LOGGER.warn("Invalid boiler steam fluid '{}'. Using oritech:still_steam.", configuredId);
+                USED_STEAM_FLUID = FluidResource.of(FluidContent.STILL_STEAM.get());
+            } else {
+                USED_STEAM_FLUID = FluidResource.of(fluid.value());
+            }
         }
 
         return USED_STEAM_FLUID;
