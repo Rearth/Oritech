@@ -9,8 +9,9 @@ import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
 public final class SpacecraftIcon {
 
     private static final int CANVAS = 24;
+    private static final int MARKER_SIZE = 18;
     private static final BlockWidget ORIGINAL = view(SpacecraftModel.ORIGINAL, -72, 0, .46f);
-    private static final BlockWidget ALTERNATE = view(SpacecraftModel.ALTERNATE, 18, 90, 1.12f);
+    private static final BlockWidget ALTERNATE = view(SpacecraftModel.ALTERNATE, 18, 90, .8f);
     private static final BlockWidget ORIGINAL_PREVIEW = view(SpacecraftModel.ORIGINAL, -48, 26, .55f);
     private static final BlockWidget ALTERNATE_PREVIEW = view(SpacecraftModel.ALTERNATE, 26, 55, 1.02f);
 
@@ -27,7 +28,7 @@ public final class SpacecraftIcon {
 
         // Map icons start facing up. Rotate them to match the heading on the displayed plane.
         var angle = Math.atan2(Math.sin(craft.heading) * verticalScale, Math.cos(craft.heading)) + Math.PI / 2;
-        draw(graphics, x, y, craft.model == SpacecraftModel.ALTERNATE ? ALTERNATE : ORIGINAL, CANVAS, (float) angle);
+        draw(graphics, x, y, craft.model == SpacecraftModel.ALTERNATE ? ALTERNATE : ORIGINAL, MARKER_SIZE, (float) angle);
     }
 
     public static void drawPreview(GuiGraphicsExtractor graphics, double x, double y, SpacecraftModel model, int size) {

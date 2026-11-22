@@ -3,6 +3,7 @@ package rearth.oritech.spaceage.block.hologram;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;
+import rearth.oritech.spaceage.block.hologram.HoloSettings.Trajectories;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Craft;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Point;
 import rearth.oritech.spaceage.block.hologram.HoloView.Frame;
@@ -82,6 +83,51 @@ class HoloViewTest {
         assertTrue(HoloView.frame(snapshot, null).coverage() > 2_000_000);
         assertEquals(snapshot, HoloSnapshot.CODEC.parse(JsonOps.INSTANCE,
                 HoloSnapshot.CODEC.encodeStart(JsonOps.INSTANCE, snapshot).getOrThrow()).getOrThrow());
+    }
+
+    @Test
+    void framingOptionsAndNormalizationMatchTheView() {
+
+        assertEquals(List.of("fixed"), settings("area", "follow").framingOptions());
+        assertEquals("fixed", settings("area", "follow").normalized().framing());
+        assertEquals(List.of("fixed", "fit", "journey"), settings("category", "fit").framingOptions());
+        assertEquals("fixed", settings("category", "follow").normalized().framing());
+        assertEquals(List.of("fixed", "follow", "journey"), settings("craft", "follow").framingOptions());
+        assertEquals("follow", settings("craft", "local").normalized().framing());
+    }
+
+    @Test
+    void trajectoryLoadingAndVisibilityRespectTheSelectedView() {
+
+        var s = settings("craft", "follow");
+        var chosen = new Craft(s.craft(), "Tug", "uncategorized", 0, 0, 0, 0, UUID.randomUUID(), true, "ready", List.of());
+        var other = new Craft(UUID.randomUUID(), "Relay", "other", 0, 0, 0, 0, UUID.randomUUID(), true, "ready", List.of());
+        var json = HoloSettings.CODEC.encodeStart(JsonOps.INSTANCE, s).getOrThrow().getAsJsonObject();
+        assertEquals(List.of(Trajectories.ON, Trajectories.OFF, Trajectories.SELECTED_CRAFT), s.trajectoryOptions());
+        assertTrue(HoloView.showsTrajectory(s, chosen));
+        assertTrue(HoloView.showsTrajectory(s, other));
+
+        json.addProperty("layers", s.layersWithTrajectories(Trajectories.ON) & ~HoloSettings.OTHER_CRAFT);
+        var withoutOtherCraft = HoloSettings.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().normalized();
+        assertFalse(HoloView.showsTrajectory(withoutOtherCraft, other));
+
+        json.addProperty("layers", s.layersWithTrajectories(Trajectories.OFF));
+        var off = HoloSettings.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().normalized();
+        assertFalse(HoloView.showsTrajectory(off, chosen));
+        assertFalse(HoloView.showsTrajectory(off, other));
+
+        json.addProperty("layers", s.layersWithTrajectories(Trajectories.SELECTED_CRAFT));
+        var selected = HoloSettings.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().normalized();
+        assertEquals(Trajectories.SELECTED_CRAFT, selected.trajectories());
+        assertTrue(HoloView.showsTrajectory(selected, chosen));
+        assertFalse(HoloView.showsTrajectory(selected, other));
+
+        json.addProperty("mode", "category");
+        var category = HoloSettings.CODEC.parse(JsonOps.INSTANCE, json).getOrThrow().normalized();
+        assertEquals(List.of(Trajectories.ON, Trajectories.OFF), category.trajectoryOptions());
+        assertEquals(s.layers(), category.layers());
+        assertTrue(HoloView.showsTrajectory(category, chosen));
+        assertFalse(HoloView.showsTrajectory(category, other));
     }
 
     @Test

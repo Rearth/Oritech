@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "": {
+      "model": "oritech_space_age:block/rocket_pad"
+    }
+  },
+  "athena:loader": "athena:ctm",
+  "ctm_textures": {
+    "center": "oritech_space_age:block/rocket_pad/center",
+    "empty": "oritech_space_age:block/rocket_pad/empty",
+    "horizontal": "oritech_space_age:block/rocket_pad/horizontal",
+    "vertical": "oritech_space_age:block/rocket_pad/vertical",
+    "particle": "oritech_space_age:block/rocket_pad/particle"
+  },
+  "connect_to": {
+    "type": "sameBlock"
+  }
+}

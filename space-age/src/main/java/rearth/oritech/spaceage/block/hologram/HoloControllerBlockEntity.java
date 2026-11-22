@@ -96,7 +96,7 @@ public final class HoloControllerBlockEntity extends BlockEntity implements Menu
             var craft = new Craft(id, mission.plan.name().isBlank() ? id.toString().substring(0, 8) : mission.plan.name(),
                     category, pos.x(), pos.y(), pos.vx(), pos.vy(), destination, mission.canUpdateMission(), mission.status, List.copyOf(path));
             var journey = new ArrayList<>(mission.journeyHistory);
-            if (HoloView.selected(settings, craft) && (settings.shows(HoloSettings.PATHS) || settings.framing().equals("journey"))) {
+            if (HoloView.showsTrajectory(settings, craft) || settings.framing().equals("journey") && HoloView.selected(settings, craft)) {
                 var forecast = mission.projectedJourney(system, missions, VacuumRecipe.all(server.getServer()));
                 forecast.paths().stream().filter(p -> p.branchId().equals(mission.plan.root().id())).findFirst()
                         .ifPresent(p -> journey.addAll(MissionJourney.legs(p)));

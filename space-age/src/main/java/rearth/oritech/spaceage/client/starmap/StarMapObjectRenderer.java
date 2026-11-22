@@ -1,6 +1,10 @@
 package rearth.oritech.spaceage.client.starmap;
 
+import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.blaze3d.platform.DestFactor;
+import com.mojang.blaze3d.platform.SourceFactor;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -9,20 +13,49 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.resources.Identifier;
+import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 import org.joml.Matrix3x2f;
 import org.jspecify.annotations.Nullable;
+import rearth.oritech.spaceage.OritechSpaceAge;
 
 import java.util.List;
 
 /**
- * Batches the star map's flat discs and icons into one untextured GUI submission.
+ * Draws the star map's discs, fog and solar glow.
  */
-final class StarMapObjectRenderer {
+public final class StarMapObjectRenderer {
 
     private static final Identifier FOG_TEXTURE = Identifier.fromNamespaceAndPath(
             "oritech_space_age", "textures/gui/map_fog.png");
+    private static final RenderPipeline SUN_GLOW = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
+            .withLocation(OritechSpaceAge.id("pipeline/sun_glow"))
+            .withColorTargetState(new ColorTargetState(new BlendFunction(
+                    SourceFactor.SRC_ALPHA, DestFactor.ONE, SourceFactor.ZERO, DestFactor.ONE)))
+            .build();
 
     private StarMapObjectRenderer() {
+    }
+
+    public static void registerPipelines(RegisterRenderPipelinesEvent event) {
+
+        event.registerPipeline(SUN_GLOW);
+    }
+
+    static void drawSunGlow(GuiGraphicsExtractor graphics, double x, double y, float size) {
+
+        // Reuse the fog's radial falloff and add the glow to the map background.
+        drawGlowLayer(graphics, x, y, Math.max(12f, size * 1.13f), 0xC0FF6518);
+        drawGlowLayer(graphics, x, y, Math.max(7f, size * .75f), 0xF0FFD06B);
+        drawGlowLayer(graphics, x, y, Math.max(4f, size * .57f), 0xF0FFF6DA);
+    }
+
+    private static void drawGlowLayer(GuiGraphicsExtractor graphics, double x, double y, float radius, int color) {
+
+        graphics.pose().pushMatrix();
+        graphics.pose().translate((float) (x - radius), (float) (y - radius));
+        graphics.pose().scale(radius * 2, radius * 2);
+        graphics.blit(SUN_GLOW, FOG_TEXTURE, 0, 0, 0, 0, 1, 1, 1, 1, color);
+        graphics.pose().popMatrix();
     }
 
     static void submit(GuiGraphicsExtractor graphics, List<Disc> discs, StarMapObjects.Viewport viewport) {

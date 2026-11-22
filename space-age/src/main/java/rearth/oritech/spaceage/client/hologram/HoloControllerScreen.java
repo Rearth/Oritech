@@ -18,6 +18,7 @@ import rearth.oritech.api.screen.widgets.SurfaceWidget;
 import rearth.oritech.client.ui.OritechWidgetScreen;
 import rearth.oritech.spaceage.block.hologram.HoloControllerMenu;
 import rearth.oritech.spaceage.block.hologram.HoloSettings;
+import rearth.oritech.spaceage.block.hologram.HoloSettings.Trajectories;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot;
 import rearth.oritech.spaceage.client.SpaceAgeButtons;
 import rearth.oritech.spaceage.network.HoloNetworking.Configure;
@@ -35,8 +36,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
     private HoloSnapshot received;
     private HoloPreview preview;
     private LabelWidget status;
-    private ButtonWidget modeSelector;
-    private ButtonWidget framingSelector;
     private boolean layoutDirty;
     private int page;
     private int ticks;
@@ -104,8 +103,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
         layoutDirty = false;
         craftSearch = null;
         craftPopup = null;
-        modeSelector = null;
-        framingSelector = null;
         var snapshot = HoloRenderer.snapshot(menu.pos);
         if (settings == null) {
             settings = snapshot.settings();
@@ -128,7 +125,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
                     change("centerY", frame.y());
                     change("coverage", frame.coverage());
                     change("mode", "area");
-                    change("framing", "fixed");
                 });
         addComponent(preview);
         var x = panelWidth - 228;
@@ -147,7 +143,7 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             addComponent(tab);
         }
         if (page == 0) {
-            modeSelector = valueButton(x, 55, "mode", text(settings.mode()), () -> {
+            valueButton(x, 55, "mode", text(settings.mode()), "mode." + settings.mode(), () -> {
                 var modes = List.of("area", "category", "craft");
                 var mode = modes.get((modes.indexOf(settings.mode()) + 1) % modes.size());
                 change("mode", mode);
@@ -157,7 +153,7 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             var y = 79;
             if (settings.mode().equals("category")) {
                 var categories = new FleetCategories(snapshot.categories());
-                valueButton(x, y, "category", categories.label(settings.category()), () -> {
+                valueButton(x, y, "category", categories.label(settings.category()), "category", () -> {
                     var all = categories.categories();
                     var current = 0;
                     for (int i = 0; i < all.size(); i++) if (all.get(i).id().equals(settings.category())) current = i;
@@ -167,7 +163,7 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
                 y += 24;
             } else if (settings.mode().equals("craft")) {
                 var craft = snapshot.craft().stream().filter(c -> c.id().equals(settings.craft())).findFirst();
-                valueButton(x, y, "craft", craft.<Component>map(c -> Component.literal(c.name())).orElse(text("none")), () -> {
+                valueButton(x, y, "craft", craft.<Component>map(c -> Component.literal(c.name())).orElse(text("none")), "craft", () -> {
                     choosingCraft = true;
                     craftQuery = "";
                     rebuildComponents();
@@ -175,14 +171,14 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
                 });
                 y += 24;
             }
-            framingSelector = valueButton(x, y, "framing", text(settings.framing()), () -> {
-                var modes = List.of("fixed", "fit", "follow", "journey", "local");
-                change("framing", modes.get((modes.indexOf(settings.framing()) + 1) % modes.size()));
+            var frames = settings.framingOptions();
+            var framing = valueButton(x, y, "framing", text(settings.framing()), "framing." + settings.framing(), () -> {
+                change("framing", frames.get((frames.indexOf(settings.framing()) + 1) % frames.size()));
                 rebuildComponents();
             });
+            framing.setActive(frames.size() > 1);
             button(x, y + 30, 105, "earth", () -> {
                 change("mode", "area");
-                change("framing", "fixed");
                 change("centerX", (double) SpaceObjects.EARTH_X);
                 change("centerY", 0d);
                 change("coverage", 500_000d);
@@ -190,22 +186,28 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
             });
             button(x + 109, y + 30, 109, "system", () -> {
                 change("mode", "area");
-                change("framing", "fixed");
                 change("centerX", 0d);
                 change("centerY", 0d);
                 change("coverage", 20_000_000d);
                 rebuildComponents();
             });
         } else {
-            var names = List.of("bodies", "orbits", "paths", "surveys", "labels", "other_craft");
-            for (int i = 0; i < names.size(); i++) {
-                var mask = 1 << i;
-                valueButton(x, 55 + i * 25, names.get(i), text(settings.shows(mask) ? "on" : "off"), () -> {
-                    change("layers", settings.layers() ^ mask);
-                    rebuildComponents();
-                });
-            }
-            valueButton(x, 207, "lock", text(settings.locked() ? "on" : "off"), () -> {
+            layerButton(x, 55, "bodies", HoloSettings.BODIES);
+            layerButton(x, 80, "orbits", HoloSettings.ORBITS);
+            var trajectories = settings.trajectories();
+            var option = trajectories.name().toLowerCase(Locale.ROOT);
+            var help = trajectories == Trajectories.ON && settings.mode().equals("category") ? "on.category" : option;
+            valueButton(x, 105, "paths", text(option), "paths." + help, () -> {
+                var options = settings.trajectoryOptions();
+                var next = options.get((options.indexOf(trajectories) + 1) % options.size());
+                change("layers", settings.layersWithTrajectories(next));
+                rebuildComponents();
+            });
+            layerButton(x, 130, "surveys", HoloSettings.SURVEYS);
+            layerButton(x, 155, "labels", HoloSettings.LABELS);
+            layerButton(x, 180, "other_craft", HoloSettings.OTHER_CRAFT);
+            var lock = settings.locked() ? "on" : "off";
+            valueButton(x, 207, "lock", text(lock), "lock." + lock, () -> {
                 change("locked", !settings.locked());
                 rebuildComponents();
             });
@@ -221,10 +223,22 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
         addComponent(SpaceAgeButtons.panel(x, y, width, 20, text(key), ignored -> action.run()));
     }
 
-    private ButtonWidget valueButton(int x, int y, String key, Component value, Runnable action) {
+    private void layerButton(int x, int y, String key, int mask) {
 
-        var button = SpaceAgeButtons.darkPanel(x, y, 218, 20, fit(text("setting", text(key), value), 204), ignored -> action.run());
-        button.withTooltip(text(key + ".help"), value);
+        var option = settings.shows(mask) ? "on" : "off";
+        valueButton(x, y, key, text(option), key + "." + option, () -> {
+            change("layers", settings.layers() ^ mask);
+            rebuildComponents();
+        });
+    }
+
+    private ButtonWidget valueButton(int x, int y, String key, Component value, String help, Runnable action) {
+
+        var label = text("setting", text(key), value);
+        var fitted = fit(label, 204);
+        var button = SpaceAgeButtons.darkPanel(x, y, 218, 20, fitted, ignored -> action.run());
+        if (fitted == label) button.withTooltip(text(help + ".help"));
+        else button.withTooltip(value, text(help + ".help"));
         addComponent(button);
         return button;
     }
@@ -309,8 +323,6 @@ public final class HoloControllerScreen extends OritechWidgetScreen<HoloControll
     protected void containerTick() {
 
         super.containerTick();
-        if (modeSelector != null) modeSelector.setLabel(fit(text("setting", text("mode"), text(settings.mode())), 204));
-        if (framingSelector != null) framingSelector.setLabel(fit(text("setting", text("framing"), text(settings.framing())), 204));
         if (dirty && ++ticks % 5 == 0) send(true);
         var snapshot = HoloRenderer.snapshot(menu.pos);
         if (status != null) status.setText(text(snapshot.status(), snapshot.surface().width(), snapshot.surface().depth()));

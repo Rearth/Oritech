@@ -353,6 +353,7 @@ public final class RocketStarMapWidget extends UIComponent {
             mapObjects.moveTug(marker.branchId, motion.x(), motion.y(), position.x(), position.y(), motion.vx(), motion.vy(), camera);
         }
         mapObjects.renderSurfaceDiscs(graphics, camera, viewport);
+        mapObjects.renderSunGlow(graphics, camera, viewport);
 
         hoveredObject = null;
         hoveredSelection = null;

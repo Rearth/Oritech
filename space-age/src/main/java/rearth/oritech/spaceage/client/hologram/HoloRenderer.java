@@ -7,12 +7,12 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeStorage;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.feature.CustomFeatureRenderer;
 import net.minecraft.client.renderer.feature.TextFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -21,42 +21,38 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.context.ContextKey;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.InteractionHand;
-import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
-import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ExtractLevelRenderStateEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent.AfterLevel;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
+import org.joml.Vector3f;
 import rearth.oritech.spaceage.OritechSpaceAge;
 import rearth.oritech.spaceage.block.hologram.HoloSettings;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot;
 import rearth.oritech.spaceage.block.hologram.HoloSnapshot.Point;
 import rearth.oritech.spaceage.block.hologram.HoloView;
 import rearth.oritech.spaceage.block.hologram.HoloView.Frame;
-import rearth.oritech.spaceage.simulation.ResourceBodies;
+import rearth.oritech.spaceage.client.starmap.RocketStarMapWidget;
+import rearth.oritech.spaceage.client.starmap.SpacecraftIcon;
 import rearth.oritech.spaceage.init.SpaceAgeBlocks;
 import rearth.oritech.spaceage.network.HoloNetworking.Projection;
+import rearth.oritech.spaceage.simulation.ResourceBodies;
 import rearth.oritech.spaceage.simulation.SpaceObjects.ObjectType;
 import rearth.oritech.spaceage.simulation.SpaceSimulation.SpaceObjectData;
 import rearth.oritech.spaceage.simulation.flight.RocketFlightPlanRules;
-import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 import rearth.oritech.spaceage.simulation.rocket.SpacecraftModel;
+import rearth.oritech.spaceage.simulation.survey.SurveyRules;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Supplier;
-import net.minecraft.util.FormattedCharSequence;
-import org.joml.Vector3f;
 
 /** Shared local displays render from received snapshots, never from the flight solver. */
 public final class HoloRenderer {
@@ -249,7 +245,7 @@ public final class HoloRenderer {
                 if (!selected && !s.shows(HoloSettings.OTHER_CRAFT)) continue;
                 var color = craft.destroyed() ? (selected ? 0xDDDF7973 : 0x887F5656) : selected ? 0xEE6DE9FF : 0x66698895;
                 var route = new HoloPath(craft, data, cached.frame);
-                if (selected && s.shows(HoloSettings.PATHS)) {
+                if (HoloView.showsTrajectory(s, craft)) {
                     for (var leg : craft.journey()) {
                         var points = route.journey(leg);
                         for (int i = 1; i < points.size(); i++) {
@@ -284,12 +280,13 @@ public final class HoloRenderer {
                     lines.add(new Line(pos.subtract(first), pos.add(first), color, 2.25f));
                     lines.add(new Line(pos.subtract(second), pos.add(second), color, 2.25f));
                 } else if (inside) {
-                    emitters.add(new HoloEmitters.Beam(pos, radius, selected ? 1 : .45, craft.id().hashCode()));
-                    // The original model points along +Z. Lay the alternate model on the same plane first.
                     var alternate = craft.model() == SpacecraftModel.ALTERNATE;
+                    var modelRadius = radius * (alternate ? .5 : .75);
+                    emitters.add(new HoloEmitters.Beam(pos, modelRadius, selected ? 1 : .45, craft.id().hashCode()));
+                    // The original model points along +Z. Lay the alternate model on the same plane first.
                     var yaw = Math.PI / 2 - craft.headingAngle() - Math.toRadians(s.rotation() + data.facing());
                     models.add(new Miniature(model(SpacecraftIcon.block(craft.model())), pos,
-                            (float) (radius * 32 / (alternate ? 20 : 44)), selected ? 1f : .65f,
+                            (float) (modelRadius * 32 / (alternate ? 20 : 44)), selected ? 1f : .65f,
                             (float) yaw, alternate ? (float) (Math.PI / 2) : 0));
                 } else {
                     var direction = new Vec3(point.x() - surface.width() / 2d, 0, point.y() - surface.depth() / 2d).normalize();

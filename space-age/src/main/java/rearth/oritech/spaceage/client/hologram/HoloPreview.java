@@ -69,7 +69,7 @@ final class HoloPreview extends UIComponent {
         var hidden = asteroids.hidden(configured, frame, null);
         var lines = new ArrayList<Line>();
         for (var craft : data.craft()) {
-            if (!s.shows(HoloSettings.PATHS) || !HoloView.selected(s, craft)) continue;
+            if (!HoloView.showsTrajectory(s, craft)) continue;
             var route = new HoloPath(craft, configured, frame);
             for (var leg : craft.journey()) {
                 var points = route.journey(leg);

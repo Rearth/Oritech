@@ -294,6 +294,14 @@ final class StarMapObjects {
         StarMapObjectRenderer.submit(graphics, discs, viewport);
     }
 
+    void renderSunGlow(GuiGraphicsExtractor graphics, StarMapCamera camera, Viewport viewport) {
+
+        var sun = byId(SpaceSimulation.SUN_ID);
+        if (sun == null) return;
+        var center = project(camera, viewport, sun.data.x(), sun.data.y());
+        StarMapObjectRenderer.drawSunGlow(graphics, center.x(), center.y(), iconSize(sun, camera));
+    }
+
     void addReferenceLines(List<StarMapLineRenderer.Line> lines, StarMapCamera camera, Viewport viewport,
                            RocketStarMapWidget.NavigationSelection selectedTarget, Set<UUID> visibleIcons) {
 

@@ -35,6 +35,15 @@ public final class HoloView {
         };
     }
 
+    public static boolean showsTrajectory(HoloSettings settings, Craft craft) {
+
+        return switch (settings.trajectories()) {
+            case OFF -> false;
+            case SELECTED_CRAFT -> selected(settings, craft);
+            case ON -> selected(settings, craft) || settings.mode().equals("craft") && settings.shows(HoloSettings.OTHER_CRAFT);
+        };
+    }
+
     public static Frame frame(HoloSnapshot snapshot, Frame previous) {
 
         var s = snapshot.settings();
@@ -66,7 +75,7 @@ public final class HoloView {
             extent = Math.max(extent, 2 * Math.max(Math.abs(dx * Math.cos(angle) - dy * Math.sin(angle)),
                     Math.abs(dx * Math.sin(angle) + dy * Math.cos(angle))) * s.margin());
         }
-        var coverage = s.framing().equals("follow") || s.framing().equals("local") ? s.coverage()
+        var coverage = s.framing().equals("follow") ? s.coverage()
                 : Math.clamp(extent, s.minimum(), s.maximum());
         return new Frame(centerX, centerY, coverage);
     }

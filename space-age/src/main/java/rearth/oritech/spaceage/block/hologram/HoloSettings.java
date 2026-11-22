@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
 import rearth.oritech.spaceage.simulation.SpaceObjects;
 
+import java.util.List;
 import java.util.UUID;
 
 /** Persistent display configuration only; never modifies a mission. */
@@ -12,10 +13,12 @@ public record HoloSettings(String mode, String framing, String category, UUID cr
 
     public static final int BODIES = 1;
     public static final int ORBITS = 2;
-    public static final int PATHS = 4;
+    private static final int PATHS = 4;
     public static final int SURVEYS = 8;
     public static final int LABELS = 16;
     public static final int OTHER_CRAFT = 32;
+    private static final int SELECTED_PATHS = 64;
+    private static final int LAYER_MASK = BODIES | ORBITS | PATHS | SURVEYS | LABELS | OTHER_CRAFT | SELECTED_PATHS;
     public static final HoloSettings DEFAULT = new HoloSettings("area", "fixed", "uncategorized", new UUID(0, 0), SpaceObjects.EARTH_X, 0, 1_000_000, 20_000, 20_000_000, 1.25, .7, 0, 1, 63, false, 1.2);
     public static final Codec<HoloSettings> CODEC = RecordCodecBuilder.create(i -> i.group(
             Codec.STRING.fieldOf("mode").forGetter(HoloSettings::mode),
@@ -41,21 +44,64 @@ public record HoloSettings(String mode, String framing, String category, UUID cr
         return (layers & layer) != 0;
     }
 
+    public List<String> framingOptions() {
+
+        return switch (mode) {
+            case "category" -> List.of("fixed", "fit", "journey");
+            case "craft" -> List.of("fixed", "follow", "journey");
+            default -> List.of("fixed");
+        };
+    }
+
+    public List<Trajectories> trajectoryOptions() {
+
+        return mode.equals("craft") ? List.of(Trajectories.ON, Trajectories.OFF, Trajectories.SELECTED_CRAFT)
+                : List.of(Trajectories.ON, Trajectories.OFF);
+    }
+
+    public Trajectories trajectories() {
+
+        if (!shows(PATHS)) return Trajectories.OFF;
+        return shows(SELECTED_PATHS) && mode.equals("craft") ? Trajectories.SELECTED_CRAFT : Trajectories.ON;
+    }
+
+    public int layersWithTrajectories(Trajectories option) {
+
+        return (layers & ~(PATHS | SELECTED_PATHS)) | option.layers;
+    }
+
     public HoloSettings normalized() {
 
-        return new HoloSettings(switch (mode) { case "category", "craft" -> mode; default -> "area"; },
-                switch (framing) { case "fit", "follow", "journey", "local" -> framing; default -> "fixed"; },
+        var view = switch (mode) {
+            case "category", "craft" -> mode;
+            default -> "area";
+        };
+        var frame = mode.equals("craft") && framing.equals("local") ? "follow" : framing;
+        return new HoloSettings(view, framingOptions().contains(frame) ? frame : "fixed",
                 category.substring(0, Math.min(64, category.length())), craft,
                 finite(centerX, SpaceObjects.EARTH_X), finite(centerY, 0),
                 Math.clamp(finite(coverage, 1_000_000), 100, 100_000_000),
                 Math.clamp(finite(minimum, 20_000), 100, 100_000_000),
                 Math.clamp(finite(maximum, 20_000_000), Math.clamp(finite(minimum, 20_000), 100, 100_000_000), 100_000_000),
                 Math.clamp(finite(margin, 1.25), 1.05, 3), Math.clamp(finite(height, .7), .16, .7),
-                finite(rotation, 0) % 360, Math.clamp(finite(markerSize, 1), .25, 3), layers & 63, locked, Math.clamp(finite(response, 1.2), .1, 10));
+                finite(rotation, 0) % 360, Math.clamp(finite(markerSize, 1), .25, 3),
+                layersWithTrajectories(trajectories()) & LAYER_MASK, locked, Math.clamp(finite(response, 1.2), .1, 10));
     }
 
     private static double finite(double value, double fallback) {
 
         return Double.isFinite(value) ? value : fallback;
+    }
+
+    public enum Trajectories {
+        ON(PATHS),
+        OFF(0),
+        SELECTED_CRAFT(PATHS | SELECTED_PATHS);
+
+        private final int layers;
+
+        Trajectories(int layers) {
+            this.layers = layers;
+        }
     }
 }
