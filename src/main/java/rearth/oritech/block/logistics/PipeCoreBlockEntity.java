@@ -2,20 +2,26 @@ package rearth.oritech.block.logistics;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
-import rearth.oritech.init.BlockContent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.HashMap;
-import java.util.HashSet;
 
 public class PipeCoreBlockEntity extends BlockEntity {
 
     // stores the different subparts of the block. They each store their connection state
     // position = down means we're talking about the part at the bottom of the current block
-    private final HashMap<PartPosition, PipePart> parts = new HashMap<>();
+    private final HashMap<PipeCore.PartPosition, PipeCore.PipePart> parts = new HashMap<>();
+
+    private VoxelShape pipeShape = PipeCoreShape.CENTER;
 
     public PipeCoreBlockEntity(BlockPos worldPosition, BlockState blockState) {
         super(BlockEntitiesContent.PIPE_CORE.get(), worldPosition, blockState);
@@ -25,195 +31,153 @@ public class PipeCoreBlockEntity extends BlockEntity {
         return parts.isEmpty();
     }
 
-    public void setStartPart(PartPosition position) {
-        parts.put(position, new PipePart());
+    public void setStartPart(PipeCore.PartPosition position) {
+        parts.put(position, new PipeCore.PipePart());
+        onPartsChanged();
+    }
+
+    public VoxelShape getPipeShape() {
+        return pipeShape;
+    }
+
+    // mainly for shape caching
+    private void onPartsChanged() {
+        pipeShape = PipeCoreShape.build(parts);
+        setChanged();
+
+        // the client needs the same parts and connections for block targeting
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        var storedParts = output.child("parts");
+
+        for (var entry : parts.entrySet()) {
+            var storedPart = storedParts.child(entry.getKey().name());
+            for (var direction : Direction.values()) {
+                var connection = entry.getValue().get(direction);
+                if (connection != PipeCore.DirectionState.NONE) {
+                    storedPart.store(direction.getName(), PipeCore.DirectionState.CODEC, connection);
+                }
+            }
+        }
+    }
+
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        var storedParts = input.childOrEmpty("parts");
+        parts.clear();
+
+        for (var position : PipeCore.PartPosition.values()) {
+            storedParts.child(position.name()).ifPresent(storedPart -> {
+                var part = new PipeCore.PipePart();
+                for (var direction : Direction.values()) {
+                    part.set(direction, storedPart.read(direction.getName(), PipeCore.DirectionState.CODEC).orElse(PipeCore.DirectionState.NONE));
+                }
+                parts.put(position, part);
+            });
+        }
+
+        pipeShape = PipeCoreShape.build(parts);
+    }
+
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveWithoutMetadata(registries);
+    }
+
+    @Override
+    public ClientboundBlockEntityDataPacket getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     public void updateConnections() {
 
         System.out.println("Updating Connections at " + getBlockPos().toShortString());
 
+        var changed = false;
         for (var pair : parts.entrySet()) {
-            updateConnection(pair.getKey(), pair.getValue());
+            changed |= updateConnection(pair.getKey(), pair.getValue());
+        }
+
+        if (changed) {
+            onPartsChanged();
         }
 
         PipeConnectionDebugRenderer.draw(level, worldPosition, parts);
     }
 
-    private void updateConnection(PartPosition partPosition, PipePart part) {
-
-        // the surface direction points toward the supporting block, or is null for a center part (e.g. down for a part at the bottom)
-        var surface = PartPosition.ToDirection(partPosition);
-
+    private boolean updateConnection(PipeCore.PartPosition partPosition, PipeCore.PipePart part) {
+        var changed = false;
         for (var direction : Direction.values()) {
-            var state = DirectionState.NONE;
-
-            // a surface part reaches the center in the direction away from its support
-            var internalCandidatePos = surface != null && direction == surface.getOpposite()
-                ? PartPosition.CENTER
-                : PartPosition.FromDirection(direction);
-
-            // each direction stores one route, so prefer an internal connection when available. Technically those should be exclusive of each other.
-            if (parts.containsKey(internalCandidatePos) && canConnectToInternalPart(partPosition, internalCandidatePos)) {
-                state = surface == null || internalCandidatePos == PartPosition.CENTER
-                    ? DirectionState.CONNECTED_INSIDE
-                    : DirectionState.CONNECTED_CORNER;
-            } else if (surface == null || direction.getAxis() != surface.getAxis()) {   // e.g. either be a center (surface null)  or we're checking a local horizontal dir
-                var neighbor = worldPosition.relative(direction);
-                var neighborState = level.getBlockState(neighbor);
-
-                // go straight to a matching part before trying to wrap around the edge
-                if (neighborState.is(BlockContent.PIPE_CORE)
-                    && level.getBlockEntity(neighbor) instanceof PipeCoreBlockEntity neighborPipe
-                    && neighborPipe.parts.containsKey(partPosition)
-                    && canConnectToNeighborPart(worldPosition, neighbor, partPosition, partPosition)) {
-                    state = DirectionState.CONNECTED;
-                } else if (surface != null && !neighborState.isCollisionShapeFullBlock(level, neighbor)) {
-                    // the part around the edge faces back toward the shared support
-                    var edgePos = neighbor.relative(surface);
-                    var edgePart = PartPosition.FromDirection(direction.getOpposite());
-                    if (level.getBlockState(edgePos).is(BlockContent.PIPE_CORE)
-                        && level.getBlockEntity(edgePos) instanceof PipeCoreBlockEntity edgePipe
-                        && edgePipe.parts.containsKey(edgePart)
-                        && canConnectToNeighborPart(worldPosition, edgePos, partPosition, edgePart)) {
-                        state = DirectionState.CONNECTED_EDGE;
-                    }
-                }
+            var connection = resolveConnection(partPosition, direction);
+            if (part.get(direction) != connection) {
+                part.set(direction, connection);
+                changed = true;
             }
-
-            part.set(direction, state);
         }
+        return changed;
     }
 
-    // connection rules (part-> part) (for each part, based on the parts local position):
+    // connection rules (part -> part) based on each part's local position
     // inside the same blockspace:
-    //   routes can go across inside corners in the same blockspace to connect to another part inside the same blockspace (e.g. from down to east)
-    //   routes cannot connect from the floor to ceiling / the opposite surface
-    //   routes can connect from the surface to the center
+    //   routes can go across inside corners to connect two perpendicular surfaces (e.g. from down to east)
+    //   routes cannot connect opposite surfaces (e.g. from the floor to the ceiling)
+    //   routes can connect from a surface to the center
     // to neighboring blocks across back edges for surface parts:
-    //   routes can connect across corners if the surface if the same support block is used by a pipe part there
-    //   routes can only connect across corners if the corner isn't occupied by a solid block (already checked before reaching this method)
+    //   routes can wrap around outside corners if both parts use the same support block
+    //   routes can only wrap around a corner if the block along the straight path has no full-block collision shape
     // to neighboring blocks for surface parts:
-    //   routes can only connect if the neighboring block has a part on the same part position (e.g. if they share a surface)
+    //   straight routes can only connect if the neighboring block has a part in the same part position (e.g. if they share a surface)
     // for center parts:
-    //   routes can only be created to neighboring center parts, or any part within the same block space as the current center
+    //   routes can connect to neighboring center parts or any surface part within the same blockspace
+    private PipeCore.DirectionState resolveConnection(PipeCore.PartPosition partPosition, Direction direction) {
+        // the surface direction points toward the supporting block and is null for a center part
+        var surface = PipeCore.PartPosition.ToDirection(partPosition);
 
-    // this method applied those rules regarding neighboring blocks (e.g. not inside the same blockspace).
-    private boolean canConnectToNeighborPart(BlockPos source, BlockPos target, PartPosition sourcePart, PartPosition targetPart) {
-        // center candidates only come from the direct neighbor check
-        if (sourcePart == PartPosition.CENTER || targetPart == PartPosition.CENTER) {
-            return sourcePart == targetPart;    // center only connects to other centers across blocks. If only one is a center, this returns false
-        }
+        if (surface != null) {  // null surfaces are centers
+            if (direction == surface) {
+                return PipeCore.DirectionState.NONE;
+            }
 
-        var sourceSurface = PartPosition.ToDirection(sourcePart);
-        var targetSurface = PartPosition.ToDirection(targetPart);
-
-        // same-surface candidates only come from the direct check along the surface
-        if (sourceSurface == targetSurface) {
-            return true;
-        }
-
-        // outside corners join perpendicular faces of the same support block
-        return source.relative(sourceSurface).equals(target.relative(targetSurface));
-    }
-
-    // this implements those rules regarding inside connections (e.g. inside the same blockspace)
-    private boolean canConnectToInternalPart(PartPosition sourcePart, PartPosition targetPart) {
-        if (sourcePart == targetPart) return false;
-        if (sourcePart == PartPosition.CENTER || targetPart == PartPosition.CENTER) return true;
-
-        // inside corners join perpendicular surfaces within the same block
-        return PartPosition.ToDirection(sourcePart).getAxis() != PartPosition.ToDirection(targetPart).getAxis();
-    }
-
-    // can be either on a surface (e.g. all 6 cardinal directions) or the center.
-    public static class PipePart {
-
-        // those are all world space cardinal positions and reflect the computed auto-connection states. Overrides are applied afterwards
-        DirectionState NORTH = DirectionState.NONE;
-        DirectionState EAST = DirectionState.NONE;
-        DirectionState SOUTH = DirectionState.NONE;
-        DirectionState WEST = DirectionState.NONE;
-        DirectionState UP = DirectionState.NONE;
-        DirectionState DOWN = DirectionState.NONE;
-
-        // all included directions are disabled. This could be turned into a single int in the future as bit map / flag
-        HashSet<Direction> disabledDirections = new HashSet<>();
-
-        DirectionState get(Direction direction) {
-            return switch (direction) {
-                case NORTH -> NORTH;
-                case EAST -> EAST;
-                case SOUTH -> SOUTH;
-                case WEST -> WEST;
-                case UP -> UP;
-                case DOWN -> DOWN;
-            };
-        }
-
-        void set(Direction direction, DirectionState state) {
-            switch (direction) {
-                case NORTH -> NORTH = state;
-                case EAST -> EAST = state;
-                case SOUTH -> SOUTH = state;
-                case WEST -> WEST = state;
-                case UP -> UP = state;
-                case DOWN -> DOWN = state;
+            // away from the support, a surface part can only reach the local center
+            if (direction == surface.getOpposite()) {
+                return parts.containsKey(PipeCore.PartPosition.CENTER)
+                    ? PipeCore.DirectionState.CONNECTED_INSIDE
+                    : PipeCore.DirectionState.NONE;
             }
         }
 
-        boolean isDisabled(Direction direction) {
-            return disabledDirections.contains(direction);
+        // the local surface in this direction can join the center or form an inside corner
+        var internalPart = PipeCore.PartPosition.FromDirection(direction);
+        if (parts.containsKey(internalPart)) {
+            return surface == null ? PipeCore.DirectionState.CONNECTED_INSIDE : PipeCore.DirectionState.CONNECTED_CORNER;
         }
 
-        void setDisabled(Direction direction, boolean disabled) {
-            if (disabled) {
-                disabledDirections.add(direction);
-            } else {
-                disabledDirections.remove(direction);
-            }
+        // go straight to a matching part before trying to wrap around the edge
+        var neighbor = worldPosition.relative(direction);
+        if (hasPartAt(neighbor, partPosition)) {
+            return PipeCore.DirectionState.CONNECTED;
         }
 
+        if (surface == null || level.getBlockState(neighbor).isCollisionShapeFullBlock(level, neighbor)) {
+            return PipeCore.DirectionState.NONE;
+        }
+
+        // the part around the edge faces back toward the shared support
+        var edgePos = neighbor.relative(surface);
+        var edgePart = PipeCore.PartPosition.FromDirection(direction.getOpposite());
+        return hasPartAt(edgePos, edgePart) ? PipeCore.DirectionState.CONNECTED_EDGE : PipeCore.DirectionState.NONE;
     }
 
-    public enum DirectionState {
-        NONE, // none is just no state / it not being set
-        CONNECTED,  // connected to pipe / machine on neighboring block on same surface or part position (for centers)
-        CONNECTED_EDGE, // connected to a pipe that is "back" by one block relative to the current surface of the part (not possible for center) (outside corner)
-        CONNECTED_INSIDE, // connected from surface to center
-        CONNECTED_CORNER // for inside connections in the same block space between 2 surfaces (e.g. inside 90 degree angle)
-    }
-
-    // basically direction but with center
-    public enum PartPosition {
-        NORTH, EAST, SOUTH, WEST, UP, DOWN, CENTER;
-
-        // center  = null
-        static PartPosition FromDirection(@Nullable Direction direction) {
-            return switch (direction) {
-                case NORTH -> NORTH;
-                case EAST -> EAST;
-                case SOUTH -> SOUTH;
-                case WEST -> WEST;
-                case UP -> UP;
-                case DOWN -> DOWN;
-                case null -> CENTER;
-            };
-        }
-
-        @Nullable
-        static Direction ToDirection(PartPosition position) {
-            return switch (position) {
-                case NORTH -> Direction.NORTH;
-                case EAST -> Direction.EAST;
-                case SOUTH -> Direction.SOUTH;
-                case WEST -> Direction.WEST;
-                case UP -> Direction.UP;
-                case DOWN -> Direction.DOWN;
-                case CENTER -> null;
-            };
-        }
-
+    private boolean hasPartAt(BlockPos pos, PipeCore.PartPosition partPosition) {
+        return level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe
+            && pipe.parts.containsKey(partPosition);
     }
 
 }

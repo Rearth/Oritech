@@ -9,8 +9,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import rearth.oritech.block.logistics.PipeCoreBlockEntity.PartPosition;
-import rearth.oritech.block.logistics.PipeCoreBlockEntity.PipePart;
+import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipePart;
 
 import java.util.Map;
 
@@ -29,7 +29,7 @@ final class PipeConnectionDebugRenderer {
         var center = Vec3.atCenterOf(pos);
         try {
             for (var entry : parts.entrySet()) {
-                drawPart(center, PartPosition.ToDirection(entry.getKey()), entry.getValue());
+                drawPart(center, PipeCore.PartPosition.ToDirection(entry.getKey()), entry.getValue());
             }
         } catch (IllegalStateException ignored) {
             // the integrated server only has a gizmo collector during packet processing and ticks

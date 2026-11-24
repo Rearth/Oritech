@@ -50,7 +50,7 @@ public class PipeCoreBlockItem extends BlockItem {
     }
 
     // if target position is an empty block, its usually that side. If its a non-full block, its usually the neighboring block
-    private PipeCoreBlockEntity.PartPosition getTargetPosition(BlockPlaceContext context) {
+    private PipeCore.PartPosition getTargetPosition(BlockPlaceContext context) {
 
         // direction in which the support / surface is. E.g. the block is on the opposite side of this.
         var supportDirection = context.getClickedFace().getOpposite();
@@ -63,9 +63,9 @@ public class PipeCoreBlockItem extends BlockItem {
 
         System.out.println("Placement data in item: " + pos.toShortString() + " | " + supportDirection + " | side: " + side + " solid: " + hasSolidSupport);
 
-        if (!hasSolidSupport) return PipeCoreBlockEntity.PartPosition.CENTER;
+        if (!hasSolidSupport) return PipeCore.PartPosition.CENTER;
 
-        return PipeCoreBlockEntity.PartPosition.FromDirection(supportDirection);
+        return PipeCore.PartPosition.FromDirection(supportDirection);
 
     }
 }
