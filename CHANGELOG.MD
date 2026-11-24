@@ -1,2 +1,0 @@
-- Update translations
-- Fix crash caused by placement preview of some machines
