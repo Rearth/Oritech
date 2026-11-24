@@ -1,6 +1,7 @@
 package rearth.oritech.block.logistics;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
@@ -60,12 +61,16 @@ public class PipeCoreBlockItem extends BlockItem {
             return InteractionResult.FAIL;
         }
 
-        if (!level.isClientSide()) {
+        if (level instanceof ServerLevel serverLevel) {
             if (!pipe.addPart(part)) {
                 return InteractionResult.FAIL;
             }
 
             var state = pipe.getBlockState();
+            // the core's block state stays the same, so send the usual neighbor update explicitly
+            serverLevel.updateNeighborsAt(pos, state.getBlock());
+            PipeCoreBlock.refreshNearbyPipes(serverLevel, pos);
+
             var sound = state.getSoundType(level, pos, player);
             level.playSound(null, pos, getPlaceSound(state, level, pos, player), SoundSource.BLOCKS,
                 (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
@@ -91,9 +96,21 @@ public class PipeCoreBlockItem extends BlockItem {
             return false;
         }
 
-        var level = context.getLevel();
-        if (!level.isClientSide() && level.getBlockEntity(context.getClickedPos()) instanceof PipeCoreBlockEntity pipe) {
-            pipe.addPart(part);
+        var pos = context.getClickedPos();
+        if (context.getLevel() instanceof ServerLevel level && level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe
+            && pipe.addPart(part)) {
+            // NeoForge defers the placement update while capturing, so it will already see the first part
+            if (!level.captureBlockSnapshots) {
+                level.updateNeighborsAt(pos, placementState.getBlock());
+            }
+
+            // wait until placement can no longer be rolled back by the place event
+            var server = level.getServer();
+            server.schedule(server.wrapRunnable(() -> {
+                if (level.hasChunkAt(pos) && level.getBlockEntity(pos) == pipe) {
+                    PipeCoreBlock.refreshNearbyPipes(level, pos);
+                }
+            }));
         }
 
         return true;

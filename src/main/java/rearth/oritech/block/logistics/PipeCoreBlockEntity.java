@@ -3,8 +3,10 @@ package rearth.oritech.block.logistics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.SectionPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,12 +32,8 @@ public class PipeCoreBlockEntity extends BlockEntity {
         super(BlockEntitiesContent.PIPE_CORE.get(), worldPosition, blockState);
     }
 
-    boolean isEmpty() {
-        return parts.isEmpty();
-    }
-
-    @Nullable PipeCore.PartPosition getOnlyPart() {
-        return parts.size() == 1 ? parts.keySet().iterator().next() : null;
+    boolean hasMultipleParts() {
+        return parts.size() > 1;
     }
 
     @Nullable PipeCore.PartPosition findHitPart(Vec3 start, Vec3 end) {
@@ -63,6 +61,22 @@ public class PipeCoreBlockEntity extends BlockEntity {
         if (parts.remove(position) != null) {
             updateConnections(true);
         }
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        if (!(level instanceof ServerLevel serverLevel)) return;
+
+        // the chunk installs the replacement state before removing the old block entity
+        // during a chunk unload the block state itself is still the pipe core
+        var chunk = serverLevel.getChunkSource().getChunkNow(SectionPos.blockToSectionCoord(worldPosition.getX()),
+            SectionPos.blockToSectionCoord(worldPosition.getZ()));
+        if (chunk == null || chunk.getBlockState(worldPosition).is(getBlockState().getBlock())) return;
+
+        // piston and command changes can replace several states before the final connections are known
+        var server = serverLevel.getServer();
+        server.schedule(server.wrapRunnable(() -> PipeCoreBlock.refreshNearbyPipes(serverLevel, worldPosition)));
     }
 
     public VoxelShape getPipeShape() {
