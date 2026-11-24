@@ -10,10 +10,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.HashMap;
+import java.util.function.BiConsumer;
 
 public class PipeCoreBlockEntity extends BlockEntity {
 
@@ -27,13 +30,39 @@ public class PipeCoreBlockEntity extends BlockEntity {
         super(BlockEntitiesContent.PIPE_CORE.get(), worldPosition, blockState);
     }
 
-    private boolean isEmpty() {
+    boolean isEmpty() {
         return parts.isEmpty();
     }
 
-    public void setStartPart(PipeCore.PartPosition position) {
-        parts.put(position, new PipeCore.PipePart());
-        onPartsChanged();
+    @Nullable PipeCore.PartPosition getOnlyPart() {
+        return parts.size() == 1 ? parts.keySet().iterator().next() : null;
+    }
+
+    @Nullable PipeCore.PartPosition findHitPart(Vec3 start, Vec3 end) {
+        return PipeCoreShape.findHitPart(parts, worldPosition, start, end);
+    }
+
+    boolean hasPart(PipeCore.PartPosition position) {
+        return parts.containsKey(position);
+    }
+
+    void forEachPart(BiConsumer<PipeCore.PartPosition, PipeCore.PipePart> action) {
+        parts.forEach(action);
+    }
+
+    boolean addPart(PipeCore.PartPosition position) {
+        if (parts.putIfAbsent(position, new PipeCore.PipePart()) != null) {
+            return false;
+        }
+
+        updateConnections(true);
+        return true;
+    }
+
+    void removePart(PipeCore.PartPosition position) {
+        if (parts.remove(position) != null) {
+            updateConnections(true);
+        }
     }
 
     public VoxelShape getPipeShape() {
@@ -97,10 +126,12 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     public void updateConnections() {
+        updateConnections(false);
+    }
 
+    private void updateConnections(boolean changed) {
         System.out.println("Updating Connections at " + getBlockPos().toShortString());
 
-        var changed = false;
         for (var pair : parts.entrySet()) {
             changed |= updateConnection(pair.getKey(), pair.getValue());
         }
@@ -108,8 +139,6 @@ public class PipeCoreBlockEntity extends BlockEntity {
         if (changed) {
             onPartsChanged();
         }
-
-        PipeConnectionDebugRenderer.draw(level, worldPosition, parts);
     }
 
     private boolean updateConnection(PipeCore.PartPosition partPosition, PipeCore.PipePart part) {

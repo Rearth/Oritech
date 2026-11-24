@@ -1,71 +1,116 @@
 package rearth.oritech.block.logistics;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
+import rearth.oritech.block.logistics.PipeCore.PartPosition;
 
+// this class is used to place items on either new blocks or update existing ones
 public class PipeCoreBlockItem extends BlockItem {
 
     public PipeCoreBlockItem(Block block, Properties properties) {
         super(block, properties);
     }
 
-    // this is used to create the first part of a pipe on a previously empty block
+    // placement rules:
+    // using this part on an empty block places and initializes a new pipe core with a surface or center part
+    // clicking a support face that borders an existing core adds a surface part to that core
+    // clicking the exposed top face of an installed ribbon adds a center part to that core
+
     @Override
-    protected boolean placeBlock(BlockPlaceContext context, BlockState placementState) {
-
-        if (context.getLevel().isClientSide())
-            return super.placeBlock(context, placementState);
-
-
-        // create actual block + BE
-
-        System.out.println("Before placing pipe at " + context.getClickedPos().toShortString());
-
-        var success = super.placeBlock(context, placementState);
-
-        System.out.println("After placing pipe, before setting start at " + context.getClickedPos().toShortString());
-
-        if (!success) return false;
-
-        // load and configure freshly created new block
-        var level = context.getLevel();
-        var pos = context.getClickedPos();
-
-        if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe) {
-
-            var position = getTargetPosition(context);
-            pipe.setStartPart(position);
-
-            pipe.updateConnections();
-
-
-            System.out.println("After placing pipe, After setting start at " + context.getClickedPos().toShortString());
-
+    public InteractionResult useOn(UseOnContext context) {
+        // use the actual hit before BlockPlaceContext offsets it to the adjacent block
+        var clickedPos = context.getClickedPos();
+        var face = context.getClickedFace();
+        if (context.getLevel().getBlockEntity(clickedPos) instanceof PipeCoreBlockEntity pipe
+            && pipe.hasPart(PartPosition.FromDirection(face.getOpposite()))
+            && PipeCoreShape.isRibbonTop(face, context.getClickLocation().subtract(Vec3.atLowerCornerOf(clickedPos)))) {
+            return addPart(context, clickedPos, pipe, PartPosition.CENTER);
         }
 
+        return super.useOn(context);
+    }
+
+    @Override
+    public InteractionResult place(BlockPlaceContext context) {
+        // a click on a supporting face can aim into a block that already contains a core
+        var pos = context.getClickedPos();
+        if (context.getLevel().getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe) {
+            var part = getTargetPosition(context);
+            return part == PartPosition.CENTER ? InteractionResult.FAIL : addPart(context, pos, pipe, part);
+        }
+
+        return super.place(context);
+    }
+
+    private InteractionResult addPart(UseOnContext context, BlockPos pos, PipeCoreBlockEntity pipe, PartPosition part) {
+        var level = context.getLevel();
+        var player = context.getPlayer();
+
+        // reject occupied slots and check the new part's own hitbox for entity collisions
+        if (pipe.hasPart(part) || !getBlock().isEnabled(level.enabledFeatures())
+            || !level.mayInteract(player, pos) || !canPlacePart(context, pos, part)) {
+            return InteractionResult.FAIL;
+        }
+
+        if (!level.isClientSide()) {
+            if (!pipe.addPart(part)) {
+                return InteractionResult.FAIL;
+            }
+
+            var state = pipe.getBlockState();
+            var sound = state.getSoundType(level, pos, player);
+            level.playSound(null, pos, getPlaceSound(state, level, pos, player), SoundSource.BLOCKS,
+                (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);
+            level.gameEvent(GameEvent.BLOCK_PLACE, pos, GameEvent.Context.of(player, state));
+            context.getItemInHand().consume(1, player);
+        }
+
+        return InteractionResult.SUCCESS_SERVER;
+    }
+
+    @Override
+    protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+        var pos = context.getClickedPos();
+        return (!mustSurvive() || state.canSurvive(context.getLevel(), pos))
+            && canPlacePart(context, pos, getTargetPosition(context));
+    }
+
+    // vanilla handles placing the block and consuming the item for the first part
+    @Override
+    protected boolean placeBlock(BlockPlaceContext context, BlockState placementState) {
+        var part = getTargetPosition(context);
+        if (!super.placeBlock(context, placementState)) {
+            return false;
+        }
+
+        var level = context.getLevel();
+        if (!level.isClientSide() && level.getBlockEntity(context.getClickedPos()) instanceof PipeCoreBlockEntity pipe) {
+            pipe.addPart(part);
+        }
 
         return true;
     }
 
-    // if target position is an empty block, its usually that side. If its a non-full block, its usually the neighboring block
-    private PipeCore.PartPosition getTargetPosition(BlockPlaceContext context) {
+    private boolean canPlacePart(UseOnContext context, BlockPos pos, PartPosition part) {
+        return context.getLevel().isUnobstructed(null, PipeCoreShape.partShape(part).move(pos));
+    }
 
-        // direction in which the support / surface is. E.g. the block is on the opposite side of this.
-        var supportDirection = context.getClickedFace().getOpposite();
-        var side = context.getClickedFace();
+    private PartPosition getTargetPosition(BlockPlaceContext context) {
+        // the backing block lies opposite the clicked face
         var level = context.getLevel();
-        var pos = context.getClickedPos();
-
-        var supportPos = pos.relative(supportDirection);
-        var hasSolidSupport = level.getBlockState(supportPos).isFaceSturdy(level, supportPos, side);
-
-        System.out.println("Placement data in item: " + pos.toShortString() + " | " + supportDirection + " | side: " + side + " solid: " + hasSolidSupport);
-
-        if (!hasSolidSupport) return PipeCore.PartPosition.CENTER;
-
-        return PipeCore.PartPosition.FromDirection(supportDirection);
-
+        var face = context.getClickedFace();
+        var supportDirection = face.getOpposite();
+        var supportPos = context.getClickedPos().relative(supportDirection);
+        return level.getBlockState(supportPos).isFaceSturdy(level, supportPos, face)
+            ? PartPosition.FromDirection(supportDirection)
+            : PartPosition.CENTER;
     }
 }
