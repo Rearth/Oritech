@@ -30,6 +30,7 @@ import rearth.oritech.block.entity.pipes.SmartSplitterBlockEntity;
 import rearth.oritech.block.entity.processing.*;
 import rearth.oritech.block.entity.reactor.*;
 import rearth.oritech.block.entity.storage.*;
+import rearth.oritech.block.logistics.PipeCoreBlockEntity;
 import rearth.oritech.util.RegistryReflectionUtil;
 
 import java.lang.annotation.ElementType;
@@ -226,6 +227,11 @@ public class BlockEntitiesContent {
     public static final Supplier<BlockEntityType<PortableTankEntity>> CREATIVE_TANK = BLOCK_ENTITY_TYPES.register("creative_tank", () -> new BlockEntityType<>((pos, state) -> new PortableTankEntity(pos, state, true), BlockContent.CREATIVE_TANK.get()));
 
     public static final Supplier<BlockEntityType<FluidPipeInterfaceEntity>> FLUID_PIPE = BLOCK_ENTITY_TYPES.register("fluid_pipe", () -> new BlockEntityType<>(FluidPipeInterfaceEntity::new, BlockContent.FLUID_PIPE_CONNECTION.get(), BlockContent.FRAMED_FLUID_PIPE_CONNECTION.get()));
+
+
+    public static final Supplier<BlockEntityType<PipeCoreBlockEntity>> PIPE_CORE = BLOCK_ENTITY_TYPES.register("pipe_core", () -> new BlockEntityType<>(PipeCoreBlockEntity::new, BlockContent.PIPE_CORE.get()));
+
+
     @AssignSidedEnergy
     public static final Supplier<BlockEntityType<EnergyPipeInterfaceEntity>> ENERGY_PIPE = BLOCK_ENTITY_TYPES.register("energy_pipe", () -> new BlockEntityType<>(EnergyPipeInterfaceEntity::new, BlockContent.ENERGY_PIPE_CONNECTION.get(), BlockContent.SUPERCONDUCTOR_CONNECTION.get(), BlockContent.FRAMED_ENERGY_PIPE_CONNECTION.get(), BlockContent.FRAMED_SUPERCONDUCTOR_CONNECTION.get()));
     public static final Supplier<BlockEntityType<ItemPipeInterfaceEntity>> ITEM_PIPE = BLOCK_ENTITY_TYPES.register("item_pipe", () -> new BlockEntityType<>(ItemPipeInterfaceEntity::new, BlockContent.ITEM_PIPE_CONNECTION.get(), BlockContent.FRAMED_ITEM_PIPE_CONNECTION.get(), BlockContent.TRANSPARENT_ITEM_PIPE_CONNECTION.get()));

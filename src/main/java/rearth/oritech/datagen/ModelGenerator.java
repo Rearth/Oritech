@@ -248,6 +248,9 @@ public class ModelGenerator extends ModelProvider {
             createNonTemplateModelBlock(fluid.get(), Blocks.WATER, generator);
         }
 
+        // todo
+        generator.createTrivialCube(BlockContent.PIPE_CORE.get());
+
         generator.createTrivialCube(BlockContent.MACHINE_CORE_1.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_2.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_3.get());

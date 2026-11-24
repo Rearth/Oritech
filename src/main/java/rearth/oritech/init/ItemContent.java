@@ -7,6 +7,7 @@ import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.logistics.PipeCoreBlockItem;
 import rearth.oritech.item.SchrodingersSafeItem;
 import rearth.oritech.item.other.*;
 import rearth.oritech.item.tools.LaserTargetDesignator;
@@ -45,6 +46,10 @@ public class ItemContent {
 
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
+
+    // new pipe
+    public static final DeferredItem<Item> PIPE_PLACER = ITEMS.registerItem("pipe_placer", props -> new PipeCoreBlockItem(BlockContent.PIPE_CORE.get(), props));
+
 
     // region metals
     // nickel

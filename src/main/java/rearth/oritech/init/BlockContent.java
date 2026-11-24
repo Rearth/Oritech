@@ -22,8 +22,8 @@ import rearth.oritech.block.blocks.accelerator.*;
 import rearth.oritech.block.blocks.addons.*;
 import rearth.oritech.block.blocks.addons.MachineAddonBlock.AddonSettings;
 import rearth.oritech.block.blocks.arcane.*;
-import rearth.oritech.block.blocks.augmenter.CyberneticAugmentationCenterBlock;
 import rearth.oritech.block.blocks.augmenter.AugmentResearchStationBlock;
+import rearth.oritech.block.blocks.augmenter.CyberneticAugmentationCenterBlock;
 import rearth.oritech.block.blocks.decorative.*;
 import rearth.oritech.block.blocks.generators.*;
 import rearth.oritech.block.blocks.interaction.*;
@@ -31,17 +31,13 @@ import rearth.oritech.block.blocks.pipes.energy.*;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeConnectionBlock;
 import rearth.oritech.block.blocks.pipes.fluid.FluidPipeDuctBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemFilterBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeConnectionBlock;
-import rearth.oritech.block.blocks.pipes.item.ItemPipeDuctBlock;
-import rearth.oritech.block.blocks.pipes.item.SmartSplitterBlock;
+import rearth.oritech.block.blocks.pipes.item.*;
 import rearth.oritech.block.blocks.processing.*;
 import rearth.oritech.block.blocks.reactor.*;
 import rearth.oritech.block.blocks.storage.*;
+import rearth.oritech.block.logistics.PipeCoreBlock;
 import rearth.oritech.config.OritechConfig;
 import rearth.oritech.config.OritechStartupConfig;
-import rearth.oritech.init.BlockContent.NoAutoDrop;
 import rearth.oritech.init.ItemContent.Compostable;
 import rearth.oritech.item.OritechGeoItem;
 import rearth.oritech.util.ColorableMachine;
@@ -67,6 +63,10 @@ public class BlockContent {
     public static final DeferredBlock<Block> SPAWNER_CAGE = BLOCKS.registerBlock("spawner_cage", SpawnerCageBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BLOCK).noOcclusion()); // sample 1
 
     public static final DeferredBlock<Block> MACHINE_FRAME = BLOCKS.registerBlock("machine_frame", MachineFrameBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS)); // sample 2 new
+
+    @NoBlockItem
+    public static final DeferredBlock<Block> PIPE_CORE = BLOCKS.registerBlock("pipe_core", PipeCoreBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
+
 
     public static final DeferredBlock<Block> FLUID_PIPE = BLOCKS.registerBlock("fluid_pipe", FluidPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));
     public static final DeferredBlock<Block> FRAMED_FLUID_PIPE = BLOCKS.registerBlock("framed_fluid_pipe", FluidPipeBlock.FramedFluidPipeBlock::new, () -> BlockBehaviour.Properties.ofFullCopy(Blocks.IRON_BARS).strength(1.0f, 2.0f));

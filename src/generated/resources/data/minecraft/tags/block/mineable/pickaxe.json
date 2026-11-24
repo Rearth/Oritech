@@ -2,6 +2,7 @@
   "values": [
     "oritech:spawner_cage",
     "oritech:machine_frame",
+    "oritech:pipe_core",
     "oritech:fluid_pipe",
     "oritech:framed_fluid_pipe",
     "oritech:fluid_pipe_duct",

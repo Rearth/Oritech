@@ -56,6 +56,7 @@ public class BlockLootGenerator extends BlockLootSubProvider {
                 BlockContent.BLOCK_PLACER_HEAD.get(),
                 BlockContent.INDUSTRIAL_DOOR_HINGE.get(),
                 BlockContent.HANGAR_DOOR_HELPER.get(),
+                BlockContent.PIPE_CORE.get(), // todo
                 BlockContent.FRAME_GANTRY_ARM.get()
         );
 

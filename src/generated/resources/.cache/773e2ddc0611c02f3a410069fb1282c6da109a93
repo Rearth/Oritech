@@ -1,4 +1,4 @@
-// 26.1.2	2026-11-09T22:37:05.6119839	Model Definitions - oritech
+// 26.1.2	2026-11-24T17:53:33.3603933	Model Definitions - oritech
 b8b37358e4d70ec779b1f47c535f8e6b29ec7bca assets/oritech/blockstates/accelerator_motor.json
 930df7944fce4884e9bf6cc3db2c00f286b1647b assets/oritech/blockstates/accelerator_ring.json
 a0801733923625bd92b1a26db46a868174771600 assets/oritech/blockstates/accelerator_sensor.json
@@ -104,6 +104,7 @@ fe433a9c01d2c9931987907eb2002bdd36d69480 assets/oritech/blockstates/nickel_resou
 f36ed1e011aeba9cd15a9462d440d564da18990d assets/oritech/blockstates/osmium_resource_node.json
 d8148ce3a21d76e81740a5dd001e3bf7d750f9ad assets/oritech/blockstates/particle_accelerator.json
 7eb395cd65df72caf43bedc54067cbf53940fd6c assets/oritech/blockstates/pipe_booster.json
+2929e46442cb71c90b40c3b9e98726f7b9276cd3 assets/oritech/blockstates/pipe_core.json
 3eda43d681f90efdda565c9817805904e36c5022 assets/oritech/blockstates/plastic.json
 e1704b165fee98cc85653ef1fa194de9801877fd assets/oritech/blockstates/platinum.json
 69345584fbabf84a71b55b57b8fef7444a68e46d assets/oritech/blockstates/platinum_resource_node.json
@@ -353,6 +354,7 @@ d7943c15d1038927f092dac4e006f0367547304f assets/oritech/items/overcharged_crysta
 40e87112cb20ba44d4af30f7b9941e26630ded99 assets/oritech/items/packed_wheat.json
 f8249f96e2728690475a7608683ee948e862504d assets/oritech/items/particle_accelerator.json
 d3f44beebea087eff87272c8b2c702e319916b75 assets/oritech/items/pipe_booster.json
+1ba1c29fb0b0959bcfcda9bc4269b1d8eb998b55 assets/oritech/items/pipe_placer.json
 94a54742ed6779e715104a1c548be85785cfce90 assets/oritech/items/placer.json
 e08dc4ee576a75ad434864319db82269eb721c92 assets/oritech/items/plastic.json
 781217690359c1f5d81223b96c87e6dcd3a82ebf assets/oritech/items/plastic_sheet.json
@@ -545,6 +547,7 @@ cfb33bf368023ace98e0e2093a7c07a7098f36da assets/oritech/models/block/nickel_plat
 f3176d028a59a943529c41476e11357d833405e2 assets/oritech/models/block/nickel_plating_stairs_outer.json
 5e9650f792a36e8257a92c3c12c8532070e0874f assets/oritech/models/block/nickel_resource_node.json
 c9edc2226fe3fae6ed040668e5c1636f6ed9d8a6 assets/oritech/models/block/osmium_resource_node.json
+2a92b3b69626b4b78ca1846f4423f1572f50e63a assets/oritech/models/block/pipe_core.json
 dd8cc2da6878dc652197a9b202ab4b6fe04ab345 assets/oritech/models/block/plastic.json
 059f50e0b6629d05a7e6f744c0f9f21268480550 assets/oritech/models/block/platinum.json
 470c2205e48de780e9a5d50dcce0f40ee458177a assets/oritech/models/block/platinum_resource_node.json
@@ -639,6 +642,7 @@ f8fdbb1bb7256e549902ce1076a831d93850eb74 assets/oritech/models/item/oil_resonato
 446d5949c429bed7f1d397ef0b683c520aaf556f assets/oritech/models/item/orange_paint.json
 e8ea32d466df5531df3b6678639b3ffae59d9989 assets/oritech/models/item/overcharged_crystal.json
 05055246d8778d9605a919bccfa66ccd7dc3761f assets/oritech/models/item/packed_wheat.json
+af447e05a65abbc0ff20345a0e91810be1c0de6e assets/oritech/models/item/pipe_placer.json
 dd0d16b614daa98f8373fbe524cbb3ce1791ec75 assets/oritech/models/item/plastic_sheet.json
 b0b2055caa3f84ee6c6d3bf82165b2e70413f5e0 assets/oritech/models/item/platinum_clump.json
 8bf485ac83476add1c6d660f3dc7ca314dbfaf1e assets/oritech/models/item/platinum_dust.json
