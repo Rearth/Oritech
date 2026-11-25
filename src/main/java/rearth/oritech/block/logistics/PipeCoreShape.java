@@ -21,7 +21,7 @@ import java.util.Map;
 final class PipeCoreShape {
 
     // convert model dimensions to block-local coordinates for shapes and gizmos
-    private static final double WIDTH = 4 / 16.0;
+    private static final double WIDTH = 3 / 16.0;
     private static final double THICKNESS = 2 / 16.0;
     private static final double BRIDGE_STEP_LENGTH = 1 / 16.0;
     private static final double HIT_TOLERANCE = 1e-5;
@@ -57,6 +57,35 @@ final class PipeCoreShape {
             combined = Shapes.or(combined, shape);
         }
         return new BlockShapes(combined, Map.copyOf(outlines), List.copyOf(partShapes));
+    }
+
+    static Map<PipeKind, List<AABB>> buildModelLayout(PipeBlockData parts, BlockShapes shapes) {
+        var models = new EnumMap<PipeKind, VoxelShape>(PipeKind.class);
+        models.putAll(shapes.outlines());
+
+        for (var hit : shapes.parts()) {
+            var surface = PartPosition.ToDirection(hit.position());
+            if (surface == null) continue;
+
+            var kind = hit.kind();
+            var part = parts.getByKind(kind).get(hit.position());
+            for (var direction : Direction.values()) {
+                if (part.get(direction) != DirectionState.CONNECTED_EDGE) continue;
+
+                // The two ribbons swap axes at the corner. Give the shared elbow to one of them.
+                if (direction.getAxis().ordinal() >= surface.getAxis().ordinal()) continue;
+
+                var start = pointOnFace(partCenter(kind, surface), direction);
+                var end = start.relative(direction, THICKNESS);
+                var elbow = Shapes.create(pipeBox(start, end, surface, direction.getAxis()));
+                models.merge(kind, elbow, Shapes::or);
+            }
+        }
+
+        // Snapshot the cuboids so matching layouts share a cache key by value.
+        var layout = new EnumMap<PipeKind, List<AABB>>(PipeKind.class);
+        models.forEach((kind, shape) -> layout.put(kind, List.copyOf(shape.toAabbs())));
+        return Map.copyOf(layout);
     }
 
     record BlockShapes(VoxelShape combined, Map<PipeKind, VoxelShape> outlines, List<PartHit> parts) {

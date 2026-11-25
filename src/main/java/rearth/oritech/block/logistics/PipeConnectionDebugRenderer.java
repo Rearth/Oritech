@@ -23,6 +23,7 @@ import rearth.oritech.block.logistics.PipeCore.DirectionState;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
+import rearth.oritech.client.init.OritechClientConfig;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -71,7 +72,7 @@ public final class PipeConnectionDebugRenderer {
     public static void onClientTick(ClientTickEvent.Post event) {
         var minecraft = Minecraft.getInstance();
         var level = minecraft.level;
-        if (level == null || !minecraft.isSingleplayer()) return;
+        if (level == null || !minecraft.isSingleplayer() || !OritechClientConfig.showPipeConnectionDebug.get()) return;
         if (snapshotLevel == level && ++ticksSinceRefresh < REFRESH_INTERVAL_TICKS) return;
 
         ticksSinceRefresh = 0;
@@ -108,7 +109,7 @@ public final class PipeConnectionDebugRenderer {
     @SubscribeEvent
     public static void onSubmitGeometry(SubmitCustomGeometryEvent event) {
         var minecraft = Minecraft.getInstance();
-        if (minecraft.level != snapshotLevel || !minecraft.isSingleplayer()) return;
+        if (minecraft.level != snapshotLevel || !minecraft.isSingleplayer() || !OritechClientConfig.showPipeConnectionDebug.get()) return;
 
         // Minecraft's frame collector is active here. Reuse the snapshot until the next client refresh.
         for (var gizmo : snapshot) {

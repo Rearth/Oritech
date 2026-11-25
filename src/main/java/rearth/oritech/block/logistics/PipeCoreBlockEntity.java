@@ -12,8 +12,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
@@ -22,9 +25,12 @@ import rearth.oritech.block.logistics.PipeCore.PipePart;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class PipeCoreBlockEntity extends BlockEntity {
+
+    public static final ModelProperty<Map<PipeKind, List<AABB>>> MODEL_LAYOUT = new ModelProperty<>();
 
     // position = down means we're talking about the part at the bottom of the current block
     private final PipeBlockData parts = new PipeBlockData();
@@ -165,6 +171,20 @@ public class PipeCoreBlockEntity extends BlockEntity {
         }
 
         pipeShapes = PipeCoreShape.build(parts);
+
+        // A part update can arrive without changing the block state. Refresh after reading its data.
+        if (level != null && level.isClientSide()) {
+            requestModelDataUpdate();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    @Override
+    public ModelData getModelData() {
+        if (!hasPipeParts()) return ModelData.EMPTY;
+
+        // Chunk builders use a snapshot instead of reading the live block entity.
+        return ModelData.of(MODEL_LAYOUT, PipeCoreShape.buildModelLayout(parts, pipeShapes));
     }
 
     @Override

@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "": {
+      "type": "oritech:pipe_core",
+      "texture": "minecraft:block/white_concrete"
+    }
+  }
+}

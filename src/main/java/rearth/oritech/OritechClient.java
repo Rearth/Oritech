@@ -37,6 +37,7 @@ import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
 import rearth.oritech.client.init.*;
+import rearth.oritech.client.model.PipeCoreModel;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.MachineOutlineRenderer;
@@ -102,6 +103,7 @@ public final class OritechClient {
         modEventBus.addListener(this::registerBindings);
         modEventBus.addListener(this::registerClientExtensions);
         modEventBus.addListener(this::registerSpecialModelRenderers);
+        modEventBus.addListener(this::registerBlockStateModels);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(ModScreens::registerScreens);
         modEventBus.addListener(ModRenderers::registerRenderers);
@@ -170,6 +172,10 @@ public final class OritechClient {
     // wires the portable tank item renderer into the 26.1 special-model item pipeline
     private void registerSpecialModelRenderers(RegisterSpecialModelRendererEvent event) {
         event.register(PortableTankItemRenderer.ID, PortableTankItemRenderer.Unbaked.MAP_CODEC);
+    }
+
+    private void registerBlockStateModels(RegisterBlockStateModels event) {
+        PipeCoreModel.register(event);
     }
 
     private void onPreClientTick(ClientTickEvent.Pre event) {

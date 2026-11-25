@@ -40,9 +40,9 @@ import static net.minecraft.client.data.models.BlockModelGenerators.*;
 
 public class ModelGenerator extends ModelProvider {
 
-    // Blocks whose blockstate + model JSONs are hand-authored under src/main/resources
-    // (BlockBench-exported custom geometry) and therefore excluded from datagen validation.
+    // Blocks with hand-authored blockstates under src/main/resources are excluded from datagen validation.
     private static final Set<Block> HAND_AUTHORED_BLOCKS = Set.of(
+            BlockContent.PIPE_CORE.get(),
             BlockContent.MACHINE_EXTENDER.get(),
             BlockContent.POWER_BANK_ADDON_EXTENDER.get(),
             BlockContent.MACHINE_FRAME.get(),
@@ -248,9 +248,6 @@ public class ModelGenerator extends ModelProvider {
         for (var fluid : FluidContent.FLUID_BLOCKS.getEntries()) {
             createNonTemplateModelBlock(fluid.get(), Blocks.WATER, generator);
         }
-
-        // todo
-        generator.createTrivialCube(BlockContent.PIPE_CORE.get());
 
         generator.createTrivialCube(BlockContent.MACHINE_CORE_1.get());
         generator.createTrivialCube(BlockContent.MACHINE_CORE_2.get());

@@ -47,6 +47,10 @@ public class OritechClientConfig {
             .comment("Render multiblock placement preview")
             .define("showMachinePreview", true);
 
+    public static final ModConfigSpec.BooleanValue showPipeConnectionDebug = CLIENT
+            .comment("Show pipe connection gizmos in singleplayer")
+            .define("showPipeConnectionDebug", false);
+
     public static final ModConfigSpec.BooleanValue enableHelpButton = OritechClientConfig.CLIENT
             .comment("Enable help button in machine UIs")
             .define("enableHelpButton", true);
