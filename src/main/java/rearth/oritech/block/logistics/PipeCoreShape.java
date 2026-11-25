@@ -13,7 +13,9 @@ import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 final class PipeCoreShape {
@@ -21,93 +23,147 @@ final class PipeCoreShape {
     // convert model dimensions to block-local coordinates for shapes and gizmos
     private static final double WIDTH = 4 / 16.0;
     private static final double THICKNESS = 2 / 16.0;
+    private static final double BRIDGE_STEP_LENGTH = 1 / 16.0;
     private static final double HIT_TOLERANCE = 1e-5;
+    private static final PipeKind[] KINDS = PipeKind.values();
     static final VoxelShape CENTER = partShape(PipeKind.FLUID, PartPosition.CENTER);
-    static final BlockShapes EMPTY = new BlockShapes(CENTER, Map.of());
+    static final BlockShapes EMPTY = new BlockShapes(CENTER, Map.of(), List.of());
 
     static VoxelShape partShape(PipeKind kind, PartPosition position) {
         var surface = PartPosition.ToDirection(position);
         return Shapes.create(partBox(partCenter(kind, surface), surface));
     }
 
-    static boolean isRibbonTop(PipeKind kind, Direction surface, PipePart part, Vec3 localHit) {
-        // the exposed face is one ribbon thickness away from the supporting block
-        var coordinate = localHit.get(surface.getAxis());
-        var top = faceCoordinate(surface) - surface.getAxisDirection().getStep() * THICKNESS;
-        if (Math.abs(coordinate - top) > HIT_TOLERANCE) return false;
-
-        var shape = buildPart(kind, PartPosition.FromDirection(surface), part);
-        for (var box : shape.toAabbs()) {
-            if (box.inflate(HIT_TOLERANCE).contains(localHit)) return true;
-        }
-        return false;
-    }
-
     static BlockShapes build(PipeBlockData parts) {
         var combined = Shapes.empty();
         var outlines = new EnumMap<PipeKind, VoxelShape>(PipeKind.class);
+        var partShapes = new ArrayList<PartHit>();
 
-        for (var kind : PipeKind.values()) {
-            var shape = Shapes.empty();
-            for (var entry : parts.getByKind(kind).entrySet()) {
-                shape = Shapes.or(shape, buildPart(kind, entry.getKey(), entry.getValue()));
-            }
+        // keep surface parts first at targeting ties, then use kind order
+        for (var position : PartPosition.values()) {
+            for (var kind : KINDS) {
+                var part = parts.getByKind(kind).get(position);
+                if (part == null) continue;
 
-            if (!shape.isEmpty()) {
-                // keep the full outline of each kind for crosshair targeting
-                outlines.put(kind, shape);
-                combined = Shapes.or(combined, shape);
+                var shape = buildPart(parts, kind, position, part);
+                partShapes.add(new PartHit(kind, position, shape));
+                outlines.merge(kind, shape, Shapes::or);
             }
         }
 
         // keep empty cores targetable, including older pipes saved without part data
-        return outlines.isEmpty() ? EMPTY : new BlockShapes(combined, Map.copyOf(outlines));
+        if (outlines.isEmpty()) return EMPTY;
+        for (var shape : outlines.values()) {
+            combined = Shapes.or(combined, shape);
+        }
+        return new BlockShapes(combined, Map.copyOf(outlines), List.copyOf(partShapes));
     }
 
-    record BlockShapes(VoxelShape combined, Map<PipeKind, VoxelShape> outlines) {}
+    record BlockShapes(VoxelShape combined, Map<PipeKind, VoxelShape> outlines, List<PartHit> parts) {
 
-    static @Nullable PartHit findHitPart(PipeBlockData parts, BlockPos pos, Vec3 start, Vec3 end) {
-        PartHit closest = null;
-        var closestDistance = Double.POSITIVE_INFINITY;
+        @Nullable PartHit findHitPart(BlockPos pos, Vec3 start, Vec3 end) {
+            PartHit closest = null;
+            var closestDistance = Double.POSITIVE_INFINITY;
+            for (var part : parts) {
+                var hit = part.shape().clip(start, end, pos);
+                if (hit == null) continue;
 
-        // keep surface parts first at ties, then use kind order where different pipes intersect
-        var kinds = PipeKind.values();
-        for (var position : PartPosition.values()) {
-            for (var kind : kinds) {
-                var part = parts.getByKind(kind).get(position);
-                if (part == null) continue;
-
-                var shape = buildPart(kind, position, part);
-                var hit = shape.clip(start, end, pos);
-                if (hit != null) {
-                    var distance = hit.getLocation().distanceToSqr(start);
-                    if (distance < closestDistance) {
-                        closest = new PartHit(kind, position, shape);
-                        closestDistance = distance;
-                    }
+                var distance = hit.getLocation().distanceToSqr(start);
+                if (distance < closestDistance) {
+                    closest = part;
+                    closestDistance = distance;
                 }
             }
+            return closest;
         }
 
-        return closest;
+        boolean isRibbonTop(PipeKind kind, Direction surface, Vec3 localHit) {
+            var position = PartPosition.FromDirection(surface);
+            var axis = surface.getAxis();
+            for (var part : parts) {
+                if (part.kind() != kind || part.position() != position) continue;
+
+                // use the exposed face of each box, including the raised bridge deck
+                for (var box : part.shape().toAabbs()) {
+                    var top = surface.getAxisDirection() == Direction.AxisDirection.POSITIVE ? box.min(axis) : box.max(axis);
+                    if (Math.abs(localHit.get(axis) - top) <= HIT_TOLERANCE && box.inflate(HIT_TOLERANCE).contains(localHit)) return true;
+                }
+                return false;
+            }
+            return false;
+        }
     }
 
     record PartHit(PipeKind kind, PartPosition position, VoxelShape shape) {}
 
-    private static VoxelShape buildPart(PipeKind kind, PartPosition position, PipePart part) {
+    private static VoxelShape buildPart(PipeBlockData parts, PipeKind kind, PartPosition position, PipePart part) {
         var surface = PartPosition.ToDirection(position);
-        var center = partCenter(kind, surface);
-        var box = partBox(center, surface);
-        var result = Shapes.create(box);
-
+        var result = partShape(kind, position);
         for (var direction : Direction.values()) {
-            var end = connectionEnd(center, surface, direction, part.get(direction));
-            if (end != null) {
-                result = Shapes.or(result, Shapes.create(box.minmax(new AABB(end, end))));
+            var path = connectionPath(parts, kind, position, direction, part.get(direction));
+            for (int i = 1; i < path.size(); i++) {
+                result = Shapes.or(result, Shapes.create(connectionBox(path.get(i - 1), path.get(i), surface, direction)));
+            }
+        }
+        return result;
+    }
+
+    private static AABB connectionBox(Vec3 start, Vec3 end, @Nullable Direction surface, Direction direction) {
+        var axis = direction.getAxis();
+        if (surface != null && start.get(axis) == end.get(axis)) {
+            // extend the vertical step into the flat side so it clears the pipe below
+            var normal = surface.getAxis();
+            var rising = (end.get(normal) - start.get(normal)) * surface.getAxisDirection().getStep() < 0;
+            if (rising) {
+                start = start.relative(direction.getOpposite(), BRIDGE_STEP_LENGTH);
+            } else {
+                end = end.relative(direction, BRIDGE_STEP_LENGTH);
             }
         }
 
-        return result;
+        return pipeBox(start, end, surface, axis);
+    }
+
+    static List<Vec3> connectionPath(PipeBlockData parts, PipeKind kind, PartPosition position, Direction direction, DirectionState state) {
+        if (state == DirectionState.NONE) return List.of();
+
+        var surface = PartPosition.ToDirection(position);
+        var center = partCenter(kind, surface);
+        var end = connectionEnd(center, surface, direction, state);
+        if (end == null) return List.of();
+
+        var axis = direction.getAxis();
+        // only surface arms heading toward lower lanes can rise
+        if (surface == null || axis == surface.getAxis() || direction.getAxisDirection() == Direction.AxisDirection.POSITIVE) {
+            return List.of(center, end);
+        }
+
+        var crossDirection = direction.getClockWise(surface.getAxis()).getAxis().getPositive();
+        var bridgeMin = center.get(axis);
+        var bridgeMax = end.get(axis);
+
+        for (var lowerKind : KINDS) {
+            if (lowerKind.laneCoordinate >= kind.laneCoordinate) continue;
+            var lowerPart = parts.getByKind(lowerKind).get(position);
+            if (lowerPart == null) continue;
+
+            // surface arms reach the block edge or an inside corner, both beyond every lane
+            var lowerState = lowerPart.get(crossDirection);
+            if (lowerState == DirectionState.NONE || lowerState == DirectionState.CONNECTED_INSIDE) continue;
+
+            var lane = lowerKind.laneCoordinate / 16.0;
+            // lanes are one ribbon width apart, so consecutive crossings share a deck
+            bridgeMin = Math.min(bridgeMin, lane - WIDTH / 2);
+            bridgeMax = Math.max(bridgeMax, lane + WIDTH / 2);
+        }
+
+        if (bridgeMin >= bridgeMax) return List.of(center, end);
+
+        var startPoint = center.with(axis, bridgeMax);
+        var endPoint = center.with(axis, bridgeMin);
+        var awayFromSupport = surface.getOpposite();
+        return List.of(center, startPoint, startPoint.relative(awayFromSupport, THICKNESS),
+            endPoint.relative(awayFromSupport, THICKNESS), endPoint, end);
     }
 
     static Vec3 partCenter(PipeKind kind, @Nullable Direction surface) {
@@ -118,9 +174,14 @@ final class PipeCoreShape {
     }
 
     static AABB partBox(Vec3 center, @Nullable Direction surface) {
-        var axis = surface == null ? null : surface.getAxis();
-        return AABB.ofSize(center, axis == Direction.Axis.X ? THICKNESS : WIDTH,
-            axis == Direction.Axis.Y ? THICKNESS : WIDTH, axis == Direction.Axis.Z ? THICKNESS : WIDTH);
+        return pipeBox(center, center, surface, null);
+    }
+
+    private static AABB pipeBox(Vec3 start, Vec3 end, @Nullable Direction surface, @Nullable Direction.Axis travelAxis) {
+        var padding = new Vec3(WIDTH / 2, WIDTH / 2, WIDTH / 2);
+        if (surface != null) padding = padding.with(surface.getAxis(), THICKNESS / 2);
+        if (travelAxis != null) padding = padding.with(travelAxis, 0);
+        return new AABB(start, end).inflate(padding.x, padding.y, padding.z);
     }
 
     static @Nullable Vec3 connectionEnd(Vec3 center, @Nullable Direction surface, Direction direction, DirectionState state) {

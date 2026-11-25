@@ -88,7 +88,7 @@ public final class PipeConnectionDebugRenderer {
         for (var chunk : LOADED_CHUNKS) {
             for (var blockEntity : chunk.getBlockEntities().values()) {
                 if (blockEntity instanceof PipeCoreBlockEntity pipe && !pipe.isRemoved()) {
-                    var origin = Vec3.atLowerCornerOf(pipe.getBlockPos());
+                    var origin = Vec3.atLowerCornerOf(pipe.getBlockPos()).add(GIZMO_OFFSET);
                     for (var kind : kinds) {
                         var color = switch (kind) {
                             case ITEM -> 0xFF55FF55;
@@ -96,7 +96,7 @@ public final class PipeConnectionDebugRenderer {
                             case ENERGY -> 0xFFFFAA00;
                         };
 
-                        pipe.forEachPart(kind, (position, part) -> drawPart(gizmos, origin, kind, PartPosition.ToDirection(position), part, color));
+                        pipe.forEachPart(kind, (position, part) -> drawPart(gizmos, origin, pipe, kind, position, part, color));
                     }
                 }
             }
@@ -116,25 +116,25 @@ public final class PipeConnectionDebugRenderer {
         }
     }
 
-    private static void drawPart(List<Gizmo> gizmos, Vec3 origin, PipeKind kind, @Nullable Direction surface, PipePart part, int color) {
-        var center = PipeCoreShape.partCenter(kind, surface).add(GIZMO_OFFSET);
+    private static void drawPart(List<Gizmo> gizmos, Vec3 origin, PipeCoreBlockEntity pipe, PipeKind kind, PartPosition position, PipePart part, int color) {
+        var surface = PartPosition.ToDirection(position);
+        var center = PipeCoreShape.partCenter(kind, surface);
         var marker = PipeCoreShape.partBox(center, surface).move(origin);
         gizmos.add(new CuboidGizmo(marker, GizmoStyle.stroke(color), false));
 
-        var start = origin.add(center);
         for (var direction : Direction.values()) {
             var state = part.get(direction);
-            var end = PipeCoreShape.connectionEnd(center, surface, direction, state);
-            if (end == null) continue;
-
-            if (state == DirectionState.CONNECTED_EDGE && surface != null) {
-                // extend along the travel axis until the line meets the other ribbon's center line
-                var axis = direction.getAxis();
-                var targetCenter = PipeCoreShape.partCenter(kind, direction.getOpposite()).add(GIZMO_OFFSET);
-                end = end.with(axis, targetCenter.get(axis) + direction.getAxisDirection().getStep());
+            var path = pipe.connectionPath(kind, position, direction, state);
+            for (int i = 1; i < path.size(); i++) {
+                var end = path.get(i);
+                if (i == path.size() - 1 && state == DirectionState.CONNECTED_EDGE) {
+                    // extend the last flat segment until it meets the other ribbon's center line
+                    var axis = direction.getAxis();
+                    var targetCenter = PipeCoreShape.partCenter(kind, direction.getOpposite());
+                    end = end.with(axis, targetCenter.get(axis) + direction.getAxisDirection().getStep());
+                }
+                line(gizmos, origin.add(path.get(i - 1)), origin.add(end), color);
             }
-
-            line(gizmos, start, origin.add(end), color);
         }
     }
 

@@ -21,6 +21,7 @@ import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
 import rearth.oritech.init.BlockEntitiesContent;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 
 public class PipeCoreBlockEntity extends BlockEntity {
@@ -43,7 +44,7 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     @Nullable PipeCoreShape.PartHit findHitPart(Vec3 start, Vec3 end) {
-        return PipeCoreShape.findHitPart(parts, worldPosition, start, end);
+        return pipeShapes.findHitPart(worldPosition, start, end);
     }
 
     boolean hasPart(PipeKind kind, PartPosition position) {
@@ -51,12 +52,15 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     boolean isRibbonTop(PipeKind kind, Direction surface, Vec3 localHit) {
-        var part = parts.getByKind(kind).get(PartPosition.FromDirection(surface));
-        return part != null && PipeCoreShape.isRibbonTop(kind, surface, part, localHit);
+        return pipeShapes.isRibbonTop(kind, surface, localHit);
     }
 
     void forEachPart(PipeKind kind, BiConsumer<PartPosition, PipePart> action) {
         parts.getByKind(kind).forEach(action);
+    }
+
+    List<Vec3> connectionPath(PipeKind kind, PartPosition position, Direction direction, PipeCore.DirectionState state) {
+        return PipeCoreShape.connectionPath(parts, kind, position, direction, state);
     }
 
     boolean addPart(PipeKind kind, PartPosition position) {
