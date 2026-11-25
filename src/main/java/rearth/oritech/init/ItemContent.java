@@ -7,6 +7,7 @@ import net.minecraft.world.item.Rarity;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCoreBlockItem;
 import rearth.oritech.item.SchrodingersSafeItem;
 import rearth.oritech.item.other.*;
@@ -47,8 +48,10 @@ public class ItemContent {
     @ItemGroupTarget(Groups.EQUIPMENT)
     public static final DeferredItem<Item> WRENCH = ITEMS.registerItem("wrench", Wrench::new, props -> props.stacksTo(1).component(DataComponents.TOOL, Wrench.createToolComponent()));
 
-    // new pipe
-    public static final DeferredItem<Item> PIPE_PLACER = ITEMS.registerItem("pipe_placer", props -> new PipeCoreBlockItem(BlockContent.PIPE_CORE.get(), props));
+    // ribbon pipes share a block and each item places its own kind of part
+    public static final DeferredItem<Item> PIPE_PLACER = ITEMS.registerItem("pipe_placer", props -> new PipeCoreBlockItem(BlockContent.PIPE_CORE.get(), PipeKind.ITEM, props));
+    public static final DeferredItem<Item> FLUID_PIPE_PLACER = ITEMS.registerItem("fluid_pipe_placer", props -> new PipeCoreBlockItem(BlockContent.PIPE_CORE.get(), PipeKind.FLUID, props));
+    public static final DeferredItem<Item> ENERGY_PIPE_PLACER = ITEMS.registerItem("energy_pipe_placer", props -> new PipeCoreBlockItem(BlockContent.PIPE_CORE.get(), PipeKind.ENERGY, props));
 
 
     // region metals

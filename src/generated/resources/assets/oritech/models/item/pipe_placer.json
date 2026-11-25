@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "oritech:item/pipe_placer"
+    "layer0": "oritech:block/item_pipe"
   }
 }

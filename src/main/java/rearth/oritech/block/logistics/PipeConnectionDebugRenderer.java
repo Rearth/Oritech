@@ -21,6 +21,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
 
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public final class PipeConnectionDebugRenderer {
 
     private static final int REFRESH_INTERVAL_TICKS = 5;
     private static final double SURFACE_OFFSET = 0.45;
-    private static final GizmoStyle PART_STYLE = GizmoStyle.stroke(0xFFFFFFFF);
+    private static final double KIND_SPACING = 0.04;
     private static final Set<LevelChunk> LOADED_CHUNKS = new HashSet<>();
 
     private static @Nullable ClientLevel snapshotLevel;
@@ -84,11 +85,23 @@ public final class PipeConnectionDebugRenderer {
             return chunk.getLevel() != level || level.getChunkSource().getChunk(pos.x(), pos.z(), false) != chunk;
         });
 
+        var kinds = PipeKind.values();
         for (var chunk : LOADED_CHUNKS) {
             for (var blockEntity : chunk.getBlockEntities().values()) {
                 if (blockEntity instanceof PipeCoreBlockEntity pipe && !pipe.isRemoved()) {
                     var center = Vec3.atCenterOf(pipe.getBlockPos());
-                    pipe.forEachPart((position, part) -> drawPart(gizmos, center, PartPosition.ToDirection(position), part));
+                    for (var kind : kinds) {
+                        var color = switch (kind) {
+                            case ITEM -> 0xFF55FF55;
+                            case FLUID -> 0xFF5599FF;
+                            case ENERGY -> 0xFFFFAA00;
+                        };
+
+                        // shift the whole route so coincident networks remain visible
+                        var offset = (kind.ordinal() - 1) * KIND_SPACING;
+                        var origin = center.add(offset, offset, offset);
+                        pipe.forEachPart(kind, (position, part) -> drawPart(gizmos, origin, PartPosition.ToDirection(position), part, color));
+                    }
                 }
             }
         }
@@ -107,28 +120,28 @@ public final class PipeConnectionDebugRenderer {
         }
     }
 
-    private static void drawPart(List<Gizmo> gizmos, Vec3 center, @Nullable Direction surface, PipePart part) {
+    private static void drawPart(List<Gizmo> gizmos, Vec3 center, @Nullable Direction surface, PipePart part, int color) {
         var start = surface == null ? center : center.relative(surface, SURFACE_OFFSET);
         var axis = surface == null ? null : surface.getAxis();
         var marker = AABB.ofSize(start, axis == Direction.Axis.X ? 0.025 : 0.2,
             axis == Direction.Axis.Y ? 0.025 : 0.2, axis == Direction.Axis.Z ? 0.025 : 0.2);
-        gizmos.add(new CuboidGizmo(marker, PART_STYLE, false));
+        gizmos.add(new CuboidGizmo(marker, GizmoStyle.stroke(color), false));
 
         for (var direction : Direction.values()) {
             switch (part.get(direction)) {
                 case NONE -> { }
-                case CONNECTED -> line(gizmos, start, start.relative(direction, 1), 0xFF55FF55);
-                case CONNECTED_INSIDE -> line(gizmos, start, start.relative(direction, SURFACE_OFFSET), 0xFF55FFFF);
+                case CONNECTED -> line(gizmos, start, start.relative(direction, 1), color);
+                case CONNECTED_INSIDE -> line(gizmos, start, start.relative(direction, SURFACE_OFFSET), color);
                 case CONNECTED_CORNER -> {
                     var corner = start.relative(direction, SURFACE_OFFSET);
-                    line(gizmos, start, corner, 0xFFFFFF55);
-                    line(gizmos, corner, center.relative(direction, SURFACE_OFFSET), 0xFFFFFF55);
+                    line(gizmos, start, corner, color);
+                    line(gizmos, corner, center.relative(direction, SURFACE_OFFSET), color);
                 }
                 case CONNECTED_EDGE -> {
                     if (surface == null) continue;
                     var corner = start.relative(direction, 1 - SURFACE_OFFSET);
-                    line(gizmos, start, corner, 0xFFFF55FF);
-                    line(gizmos, corner, corner.relative(surface, 1 - SURFACE_OFFSET), 0xFFFF55FF);
+                    line(gizmos, start, corner, color);
+                    line(gizmos, corner, corner.relative(surface, 1 - SURFACE_OFFSET), color);
                 }
             }
         }

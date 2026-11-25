@@ -32,6 +32,7 @@ import rearth.oritech.init.ItemContent;
 import rearth.oritech.init.ToolsContent;
 import rearth.oritech.util.RegistryReflectionUtil;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -400,11 +401,22 @@ public class ModelGenerator extends ModelProvider {
                 ItemModelUtils.plainModel(getBlockModelLocation(ItemContent.PORTABLE_ENERGY_STORAGE_ITEM.asItem()))
         );
 
+        var pipeTextures = Map.of(
+                ItemContent.PIPE_PLACER.get(), BlockContent.ITEM_PIPE.get(),
+                ItemContent.FLUID_PIPE_PLACER.get(), BlockContent.FLUID_PIPE.get(),
+                ItemContent.ENERGY_PIPE_PLACER.get(), BlockContent.ENERGY_PIPE.get());
         RegistryReflectionUtil.IterateFields(ItemContent.class, DeferredItem.class, (field, id, item) -> {
-            if (HAND_AUTHORED_ITEM_DEFINITIONS.contains(item.asItem()) || GECKOLIB_ITEM_MODELS.contains(item.asItem()))
+            var value = item.asItem();
+            if (HAND_AUTHORED_ITEM_DEFINITIONS.contains(value) || GECKOLIB_ITEM_MODELS.contains(value))
                 return;
 
-            itemModelGenerator.generateFlatItem(item.asItem(), ModelTemplates.FLAT_ITEM);
+            var pipeTexture = pipeTextures.get(value);
+            if (pipeTexture != null) {
+                var model = ModelTemplates.FLAT_ITEM.create(value, TextureMapping.layer0(pipeTexture), itemModelGenerator.modelOutput);
+                itemModelGenerator.itemModelOutput.accept(value, ItemModelUtils.plainModel(model));
+            } else {
+                itemModelGenerator.generateFlatItem(value, ModelTemplates.FLAT_ITEM);
+            }
         });
 
         for (var bucketItem : FluidContent.BUCKET_ITEMS.getEntries()) {

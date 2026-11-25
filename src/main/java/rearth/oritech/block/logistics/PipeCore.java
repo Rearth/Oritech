@@ -5,11 +5,35 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.Map;
 
 public class PipeCore {
-    
-    
+
+    // each kind has its own set of parts, even when they share a position
+    public static class PipeBlockData {
+        private final Map<PartPosition, PipePart> itemParts = new EnumMap<>(PartPosition.class);
+        private final Map<PartPosition, PipePart> fluidParts = new EnumMap<>(PartPosition.class);
+        private final Map<PartPosition, PipePart> energyParts = new EnumMap<>(PartPosition.class);
+
+        public Map<PartPosition, PipePart> getByKind(PipeKind kind) {
+            return switch (kind) {
+                case ITEM -> itemParts;
+                case FLUID -> fluidParts;
+                case ENERGY -> energyParts;
+            };
+        }
+
+    }
+
+    public enum PipeKind {
+        ITEM, FLUID, ENERGY
+    }
+
+    // a pipe entity has up to 7 parts per type (e.g. 3 types: item, fluid, energy), meaning up to 21 parts in total
+    // each part has 1 direction state per cardinal direction
+    // state of a single direction of a single part
     public enum DirectionState implements StringRepresentable {
         NONE, // none is just no state / it not being set
         CONNECTED,  // connected to pipe / machine on neighboring block on same surface or part position (for centers)

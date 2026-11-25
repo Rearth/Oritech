@@ -73,7 +73,7 @@ public class PipeCoreBlock extends Block implements EntityBlock {
             if (hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(pos)) {
                 var part = pipe.findHitPart(start, end);
                 if (part != null) {
-                    pipe.removePart(part);
+                    pipe.removePart(part.kind(), part.position());
                     serverLevel.updateNeighborsAt(pos, this);
                     refreshNearbyPipes(serverLevel, pos);
                 }

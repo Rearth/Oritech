@@ -9,9 +9,9 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
+import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
-
-import java.util.Map;
 
 final class PipeCoreShape {
 
@@ -34,38 +34,49 @@ final class PipeCoreShape {
         return Math.abs(coordinate - top) < 1e-5;
     }
 
-    static VoxelShape build(Map<PartPosition, PipePart> parts) {
+    static boolean isCenterHit(Vec3 localHit) {
+        return CENTER.bounds().inflate(1e-5).contains(localHit);
+    }
+
+    static VoxelShape build(PipeBlockData parts) {
         var result = Shapes.empty();
 
-        for (var entry : parts.entrySet()) {
-            result = Shapes.or(result, buildPart(entry.getKey(), entry.getValue()));
+        for (var kind : PipeKind.values()) {
+            for (var entry : parts.getByKind(kind).entrySet()) {
+                result = Shapes.or(result, buildPart(entry.getKey(), entry.getValue()));
+            }
         }
 
         // keep empty cores targetable, including older pipes saved without part data
-        return parts.isEmpty() ? CENTER : result;
+        return result.isEmpty() ? CENTER : result;
     }
 
-    static @Nullable PartPosition findHitPart(Map<PartPosition, PipePart> parts, BlockPos pos, Vec3 start, Vec3 end) {
-        PartPosition closest = null;
+    static @Nullable PartHit findHitPart(PipeBlockData parts, BlockPos pos, Vec3 start, Vec3 end) {
+        PartHit closest = null;
         var closestDistance = Double.POSITIVE_INFINITY;
 
-        // use a stable order when two parts meet at the same point, with surface parts before the center
+        // keep surface parts first at ties, then use kind order for overlapping parts on the same surface
+        var kinds = PipeKind.values();
         for (var position : PartPosition.values()) {
-            var part = parts.get(position);
-            if (part == null) continue;
+            for (var kind : kinds) {
+                var part = parts.getByKind(kind).get(position);
+                if (part == null) continue;
 
-            var hit = buildPart(position, part).clip(start, end, pos);
-            if (hit != null) {
-                var distance = hit.getLocation().distanceToSqr(start);
-                if (distance < closestDistance) {
-                    closest = position;
-                    closestDistance = distance;
+                var hit = buildPart(position, part).clip(start, end, pos);
+                if (hit != null) {
+                    var distance = hit.getLocation().distanceToSqr(start);
+                    if (distance < closestDistance) {
+                        closest = new PartHit(kind, position);
+                        closestDistance = distance;
+                    }
                 }
             }
         }
 
         return closest;
     }
+
+    record PartHit(PipeKind kind, PartPosition position) {}
 
     private static VoxelShape buildPart(PartPosition position, PipePart part) {
         var surface = PartPosition.ToDirection(position);

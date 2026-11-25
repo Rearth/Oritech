@@ -15,16 +15,18 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
+import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
+import rearth.oritech.block.logistics.PipeCore.PipeKind;
+import rearth.oritech.block.logistics.PipeCore.PipePart;
 import rearth.oritech.init.BlockEntitiesContent;
 
-import java.util.HashMap;
 import java.util.function.BiConsumer;
 
 public class PipeCoreBlockEntity extends BlockEntity {
 
-    // stores the different subparts of the block. They each store their connection state
     // position = down means we're talking about the part at the bottom of the current block
-    private final HashMap<PipeCore.PartPosition, PipeCore.PipePart> parts = new HashMap<>();
+    private final PipeBlockData parts = new PipeBlockData();
 
     private VoxelShape pipeShape = PipeCoreShape.CENTER;
 
@@ -33,23 +35,27 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     boolean hasMultipleParts() {
-        return parts.size() > 1;
+        var count = 0;
+        for (var kind : PipeKind.values()) {
+            count += parts.getByKind(kind).size();
+        }
+        return count > 1;
     }
 
-    @Nullable PipeCore.PartPosition findHitPart(Vec3 start, Vec3 end) {
+    @Nullable PipeCoreShape.PartHit findHitPart(Vec3 start, Vec3 end) {
         return PipeCoreShape.findHitPart(parts, worldPosition, start, end);
     }
 
-    boolean hasPart(PipeCore.PartPosition position) {
-        return parts.containsKey(position);
+    boolean hasPart(PipeKind kind, PartPosition position) {
+        return parts.getByKind(kind).containsKey(position);
     }
 
-    void forEachPart(BiConsumer<PipeCore.PartPosition, PipeCore.PipePart> action) {
-        parts.forEach(action);
+    void forEachPart(PipeKind kind, BiConsumer<PartPosition, PipePart> action) {
+        parts.getByKind(kind).forEach(action);
     }
 
-    boolean addPart(PipeCore.PartPosition position) {
-        if (parts.putIfAbsent(position, new PipeCore.PipePart()) != null) {
+    boolean addPart(PipeKind kind, PartPosition position) {
+        if (parts.getByKind(kind).putIfAbsent(position, new PipePart()) != null) {
             return false;
         }
 
@@ -57,8 +63,8 @@ public class PipeCoreBlockEntity extends BlockEntity {
         return true;
     }
 
-    void removePart(PipeCore.PartPosition position) {
-        if (parts.remove(position) != null) {
+    void removePart(PipeKind kind, PartPosition position) {
+        if (parts.getByKind(kind).remove(position) != null) {
             updateConnections(true);
         }
     }
@@ -99,12 +105,18 @@ public class PipeCoreBlockEntity extends BlockEntity {
         super.saveAdditional(output);
         var storedParts = output.child("parts");
 
-        for (var entry : parts.entrySet()) {
-            var storedPart = storedParts.child(entry.getKey().name());
-            for (var direction : Direction.values()) {
-                var connection = entry.getValue().get(direction);
-                if (connection != PipeCore.DirectionState.NONE) {
-                    storedPart.store(direction.getName(), PipeCore.DirectionState.CODEC, connection);
+        for (var kind : PipeKind.values()) {
+            var kindParts = parts.getByKind(kind);
+            if (kindParts.isEmpty()) continue;
+
+            var storedKind = storedParts.child(kind.name());
+            for (var entry : kindParts.entrySet()) {
+                var storedPart = storedKind.child(entry.getKey().name());
+                for (var direction : Direction.values()) {
+                    var connection = entry.getValue().get(direction);
+                    if (connection != PipeCore.DirectionState.NONE) {
+                        storedPart.store(direction.getName(), PipeCore.DirectionState.CODEC, connection);
+                    }
                 }
             }
         }
@@ -114,16 +126,22 @@ public class PipeCoreBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         var storedParts = input.childOrEmpty("parts");
-        parts.clear();
 
-        for (var position : PipeCore.PartPosition.values()) {
-            storedParts.child(position.name()).ifPresent(storedPart -> {
-                var part = new PipeCore.PipePart();
-                for (var direction : Direction.values()) {
-                    part.set(direction, storedPart.read(direction.getName(), PipeCore.DirectionState.CODEC).orElse(PipeCore.DirectionState.NONE));
-                }
-                parts.put(position, part);
-            });
+        for (var kind : PipeKind.values()) {
+            var kindParts = parts.getByKind(kind);
+            kindParts.clear();
+
+            // older saves stored positions directly under parts. Those parts become item pipes.
+            var storedKind = kind == PipeKind.ITEM ? storedParts.child(kind.name()).orElse(storedParts) : storedParts.childOrEmpty(kind.name());
+            for (var position : PartPosition.values()) {
+                storedKind.child(position.name()).ifPresent(storedPart -> {
+                    var part = new PipePart();
+                    for (var direction : Direction.values()) {
+                        part.set(direction, storedPart.read(direction.getName(), PipeCore.DirectionState.CODEC).orElse(PipeCore.DirectionState.NONE));
+                    }
+                    kindParts.put(position, part);
+                });
+            }
         }
 
         pipeShape = PipeCoreShape.build(parts);
@@ -146,8 +164,10 @@ public class PipeCoreBlockEntity extends BlockEntity {
     private void updateConnections(boolean changed) {
         System.out.println("Updating Connections at " + getBlockPos().toShortString());
 
-        for (var pair : parts.entrySet()) {
-            changed |= updateConnection(pair.getKey(), pair.getValue());
+        for (var kind : PipeKind.values()) {
+            for (var partEntry : parts.getByKind(kind).entrySet()) {
+                changed |= updateConnection(kind, partEntry.getKey(), partEntry.getValue());
+            }
         }
 
         if (changed) {
@@ -155,10 +175,10 @@ public class PipeCoreBlockEntity extends BlockEntity {
         }
     }
 
-    private boolean updateConnection(PipeCore.PartPosition partPosition, PipeCore.PipePart part) {
+    private boolean updateConnection(PipeKind kind, PartPosition partPosition, PipePart part) {
         var changed = false;
         for (var direction : Direction.values()) {
-            var connection = resolveConnection(partPosition, direction);
+            var connection = resolveConnection(kind, partPosition, direction);
             if (part.get(direction) != connection) {
                 part.set(direction, connection);
                 changed = true;
@@ -168,6 +188,7 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     // connection rules (part -> part) based on each part's local position
+    // all routes can only connect parts of the same kind
     // inside the same blockspace:
     //   routes can go across inside corners to connect two perpendicular surfaces (e.g. from down to east)
     //   routes cannot connect opposite surfaces (e.g. from the floor to the ceiling)
@@ -179,9 +200,9 @@ public class PipeCoreBlockEntity extends BlockEntity {
     //   straight routes can only connect if the neighboring block has a part in the same part position (e.g. if they share a surface)
     // for center parts:
     //   routes can connect to neighboring center parts or any surface part within the same blockspace
-    private PipeCore.DirectionState resolveConnection(PipeCore.PartPosition partPosition, Direction direction) {
+    private PipeCore.DirectionState resolveConnection(PipeKind kind, PartPosition partPosition, Direction direction) {
         // the surface direction points toward the supporting block and is null for a center part
-        var surface = PipeCore.PartPosition.ToDirection(partPosition);
+        var surface = PartPosition.ToDirection(partPosition);
 
         if (surface != null) {  // null surfaces are centers
             if (direction == surface) {
@@ -190,21 +211,21 @@ public class PipeCoreBlockEntity extends BlockEntity {
 
             // away from the support, a surface part can only reach the local center
             if (direction == surface.getOpposite()) {
-                return parts.containsKey(PipeCore.PartPosition.CENTER)
+                return hasPart(kind, PartPosition.CENTER)
                     ? PipeCore.DirectionState.CONNECTED_INSIDE
                     : PipeCore.DirectionState.NONE;
             }
         }
 
         // the local surface in this direction can join the center or form an inside corner
-        var internalPart = PipeCore.PartPosition.FromDirection(direction);
-        if (parts.containsKey(internalPart)) {
+        var internalPart = PartPosition.FromDirection(direction);
+        if (hasPart(kind, internalPart)) {
             return surface == null ? PipeCore.DirectionState.CONNECTED_INSIDE : PipeCore.DirectionState.CONNECTED_CORNER;
         }
 
         // go straight to a matching part before trying to wrap around the edge
         var neighbor = worldPosition.relative(direction);
-        if (hasPartAt(neighbor, partPosition)) {
+        if (hasPartAt(neighbor, kind, partPosition)) {
             return PipeCore.DirectionState.CONNECTED;
         }
 
@@ -214,13 +235,12 @@ public class PipeCoreBlockEntity extends BlockEntity {
 
         // the part around the edge faces back toward the shared support
         var edgePos = neighbor.relative(surface);
-        var edgePart = PipeCore.PartPosition.FromDirection(direction.getOpposite());
-        return hasPartAt(edgePos, edgePart) ? PipeCore.DirectionState.CONNECTED_EDGE : PipeCore.DirectionState.NONE;
+        var edgePart = PartPosition.FromDirection(direction.getOpposite());
+        return hasPartAt(edgePos, kind, edgePart) ? PipeCore.DirectionState.CONNECTED_EDGE : PipeCore.DirectionState.NONE;
     }
 
-    private boolean hasPartAt(BlockPos pos, PipeCore.PartPosition partPosition) {
-        return level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe
-            && pipe.parts.containsKey(partPosition);
+    private boolean hasPartAt(BlockPos pos, PipeKind kind, PartPosition partPosition) {
+        return level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe && pipe.hasPart(kind, partPosition);
     }
 
 }

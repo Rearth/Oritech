@@ -5,6 +5,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
@@ -12,18 +13,32 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipeKind;
+
+import java.util.Map;
 
 // this class is used to place items on either new blocks or update existing ones
 public class PipeCoreBlockItem extends BlockItem {
 
-    public PipeCoreBlockItem(Block block, Properties properties) {
+    private final PipeKind kind;
+
+    public PipeCoreBlockItem(Block block, PipeKind kind, Properties properties) {
         super(block, properties);
+        this.kind = kind;
+    }
+
+    @Override
+    public void registerBlocks(Map<Block, Item> map, Item item) {
+        // keep the item pipe as the default for the shared block
+        if (kind == PipeKind.ITEM) {
+            super.registerBlocks(map, item);
+        }
     }
 
     // placement rules:
     // using this part on an empty block places and initializes a new pipe core with a surface or center part
     // clicking a support face that borders an existing core adds a surface part to that core
-    // clicking the exposed top face of an installed ribbon adds a center part to that core
+    // clicking the exposed top face of a matching ribbon adds a center part to that core
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -31,9 +46,14 @@ public class PipeCoreBlockItem extends BlockItem {
         var clickedPos = context.getClickedPos();
         var face = context.getClickedFace();
         if (context.getLevel().getBlockEntity(clickedPos) instanceof PipeCoreBlockEntity pipe
-            && pipe.hasPart(PartPosition.FromDirection(face.getOpposite()))
-            && PipeCoreShape.isRibbonTop(face, context.getClickLocation().subtract(Vec3.atLowerCornerOf(clickedPos)))) {
-            return addPart(context, clickedPos, pipe, PartPosition.CENTER);
+            && pipe.hasPart(kind, PartPosition.FromDirection(face.getOpposite()))) {
+            var localHit = context.getClickLocation().subtract(Vec3.atLowerCornerOf(clickedPos));
+
+            // another kind's center can cover the ribbon, so allow clicking the center above it too
+            if (PipeCoreShape.isRibbonTop(face, localHit)
+                || (!pipe.hasPart(kind, PartPosition.CENTER) && PipeCoreShape.isCenterHit(localHit))) {
+                return addPart(context, clickedPos, pipe, PartPosition.CENTER);
+            }
         }
 
         return super.useOn(context);
@@ -56,13 +76,13 @@ public class PipeCoreBlockItem extends BlockItem {
         var player = context.getPlayer();
 
         // reject occupied slots and check the new part's own hitbox for entity collisions
-        if (pipe.hasPart(part) || !getBlock().isEnabled(level.enabledFeatures())
+        if (pipe.hasPart(kind, part) || !getBlock().isEnabled(level.enabledFeatures())
             || !level.mayInteract(player, pos) || !canPlacePart(context, pos, part)) {
             return InteractionResult.FAIL;
         }
 
         if (level instanceof ServerLevel serverLevel) {
-            if (!pipe.addPart(part)) {
+            if (!pipe.addPart(kind, part)) {
                 return InteractionResult.FAIL;
             }
 
@@ -98,7 +118,7 @@ public class PipeCoreBlockItem extends BlockItem {
 
         var pos = context.getClickedPos();
         if (context.getLevel() instanceof ServerLevel level && level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe
-            && pipe.addPart(part)) {
+            && pipe.addPart(kind, part)) {
             // NeoForge defers the placement update while capturing, so it will already see the first part
             if (!level.captureBlockSnapshots) {
                 level.updateNeighborsAt(pos, placementState.getBlock());
