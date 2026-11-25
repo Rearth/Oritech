@@ -9,7 +9,6 @@ import net.minecraft.gizmos.GizmoStyle;
 import net.minecraft.gizmos.Gizmos;
 import net.minecraft.gizmos.LineGizmo;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,6 +19,7 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.logistics.PipeCore.DirectionState;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
@@ -33,8 +33,7 @@ import java.util.Set;
 public final class PipeConnectionDebugRenderer {
 
     private static final int REFRESH_INTERVAL_TICKS = 5;
-    private static final double SURFACE_OFFSET = 0.45;
-    private static final double KIND_SPACING = 0.04;
+    private static final float GIZMO_OFFSET = 0.01f;
     private static final Set<LevelChunk> LOADED_CHUNKS = new HashSet<>();
 
     private static @Nullable ClientLevel snapshotLevel;
@@ -89,7 +88,7 @@ public final class PipeConnectionDebugRenderer {
         for (var chunk : LOADED_CHUNKS) {
             for (var blockEntity : chunk.getBlockEntities().values()) {
                 if (blockEntity instanceof PipeCoreBlockEntity pipe && !pipe.isRemoved()) {
-                    var center = Vec3.atCenterOf(pipe.getBlockPos());
+                    var origin = Vec3.atLowerCornerOf(pipe.getBlockPos());
                     for (var kind : kinds) {
                         var color = switch (kind) {
                             case ITEM -> 0xFF55FF55;
@@ -97,10 +96,7 @@ public final class PipeConnectionDebugRenderer {
                             case ENERGY -> 0xFFFFAA00;
                         };
 
-                        // shift the whole route so coincident networks remain visible
-                        var offset = (kind.ordinal() - 1) * KIND_SPACING;
-                        var origin = center.add(offset, offset, offset);
-                        pipe.forEachPart(kind, (position, part) -> drawPart(gizmos, origin, PartPosition.ToDirection(position), part, color));
+                        pipe.forEachPart(kind, (position, part) -> drawPart(gizmos, origin, kind, PartPosition.ToDirection(position), part, color));
                     }
                 }
             }
@@ -116,34 +112,29 @@ public final class PipeConnectionDebugRenderer {
 
         // Minecraft's frame collector is active here. Reuse the snapshot until the next client refresh.
         for (var gizmo : snapshot) {
-            Gizmos.addGizmo(gizmo).setAlwaysOnTop();
+            Gizmos.addGizmo(gizmo);
         }
     }
 
-    private static void drawPart(List<Gizmo> gizmos, Vec3 center, @Nullable Direction surface, PipePart part, int color) {
-        var start = surface == null ? center : center.relative(surface, SURFACE_OFFSET);
-        var axis = surface == null ? null : surface.getAxis();
-        var marker = AABB.ofSize(start, axis == Direction.Axis.X ? 0.025 : 0.2,
-            axis == Direction.Axis.Y ? 0.025 : 0.2, axis == Direction.Axis.Z ? 0.025 : 0.2);
+    private static void drawPart(List<Gizmo> gizmos, Vec3 origin, PipeKind kind, @Nullable Direction surface, PipePart part, int color) {
+        var center = PipeCoreShape.partCenter(kind, surface).add(GIZMO_OFFSET);
+        var marker = PipeCoreShape.partBox(center, surface).move(origin);
         gizmos.add(new CuboidGizmo(marker, GizmoStyle.stroke(color), false));
 
+        var start = origin.add(center);
         for (var direction : Direction.values()) {
-            switch (part.get(direction)) {
-                case NONE -> { }
-                case CONNECTED -> line(gizmos, start, start.relative(direction, 1), color);
-                case CONNECTED_INSIDE -> line(gizmos, start, start.relative(direction, SURFACE_OFFSET), color);
-                case CONNECTED_CORNER -> {
-                    var corner = start.relative(direction, SURFACE_OFFSET);
-                    line(gizmos, start, corner, color);
-                    line(gizmos, corner, center.relative(direction, SURFACE_OFFSET), color);
-                }
-                case CONNECTED_EDGE -> {
-                    if (surface == null) continue;
-                    var corner = start.relative(direction, 1 - SURFACE_OFFSET);
-                    line(gizmos, start, corner, color);
-                    line(gizmos, corner, corner.relative(surface, 1 - SURFACE_OFFSET), color);
-                }
+            var state = part.get(direction);
+            var end = PipeCoreShape.connectionEnd(center, surface, direction, state);
+            if (end == null) continue;
+
+            if (state == DirectionState.CONNECTED_EDGE && surface != null) {
+                // extend along the travel axis until the line meets the other ribbon's center line
+                var axis = direction.getAxis();
+                var targetCenter = PipeCoreShape.partCenter(kind, direction.getOpposite()).add(GIZMO_OFFSET);
+                end = end.with(axis, targetCenter.get(axis) + direction.getAxisDirection().getStep());
             }
+
+            line(gizmos, start, origin.add(end), color);
         }
     }
 

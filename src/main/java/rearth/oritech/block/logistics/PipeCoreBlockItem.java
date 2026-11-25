@@ -44,14 +44,9 @@ public class PipeCoreBlockItem extends BlockItem {
     public InteractionResult useOn(UseOnContext context) {
         // use the actual hit before BlockPlaceContext offsets it to the adjacent block
         var clickedPos = context.getClickedPos();
-        var face = context.getClickedFace();
-        if (context.getLevel().getBlockEntity(clickedPos) instanceof PipeCoreBlockEntity pipe
-            && pipe.hasPart(kind, PartPosition.FromDirection(face.getOpposite()))) {
+        if (context.getLevel().getBlockEntity(clickedPos) instanceof PipeCoreBlockEntity pipe) {
             var localHit = context.getClickLocation().subtract(Vec3.atLowerCornerOf(clickedPos));
-
-            // another kind's center can cover the ribbon, so allow clicking the center above it too
-            if (PipeCoreShape.isRibbonTop(face, localHit)
-                || (!pipe.hasPart(kind, PartPosition.CENTER) && PipeCoreShape.isCenterHit(localHit))) {
+            if (pipe.isRibbonTop(kind, context.getClickedFace().getOpposite(), localHit)) {
                 return addPart(context, clickedPos, pipe, PartPosition.CENTER);
             }
         }
@@ -137,7 +132,7 @@ public class PipeCoreBlockItem extends BlockItem {
     }
 
     private boolean canPlacePart(UseOnContext context, BlockPos pos, PartPosition part) {
-        return context.getLevel().isUnobstructed(null, PipeCoreShape.partShape(part).move(pos));
+        return context.getLevel().isUnobstructed(null, PipeCoreShape.partShape(kind, part).move(pos));
     }
 
     private PartPosition getTargetPosition(BlockPlaceContext context) {

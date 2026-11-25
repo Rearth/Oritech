@@ -28,7 +28,14 @@ public class PipeCore {
     }
 
     public enum PipeKind {
-        ITEM, FLUID, ENERGY
+        ITEM(4), FLUID(8), ENERGY(12);
+
+        // lane coordinate in model units (0 to 16)
+        final int laneCoordinate;
+
+        PipeKind(int laneCoordinate) {
+            this.laneCoordinate = laneCoordinate;
+        }
     }
 
     // a pipe entity has up to 7 parts per type (e.g. 3 types: item, fluid, energy), meaning up to 21 parts in total

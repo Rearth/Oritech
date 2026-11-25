@@ -40,6 +40,7 @@ import rearth.oritech.client.init.*;
 import rearth.oritech.client.renderers.BlockOutlineRenderer;
 import rearth.oritech.client.renderers.OreFinderRenderer;
 import rearth.oritech.client.renderers.MachineOutlineRenderer;
+import rearth.oritech.client.renderers.PipeOutlineRenderer;
 import rearth.oritech.client.renderers.PortableTankItemRenderer;
 import rearth.oritech.client.renderers.ResonatorRenderer;
 import rearth.oritech.client.ui.AugmentSelectionScreen;
@@ -249,6 +250,7 @@ public final class OritechClient {
 
     private void onBlockOutlinesRendered(ExtractBlockOutlineRenderStateEvent event) {
         MachineOutlineRenderer.onExtractBlockOutline(event);
+        PipeOutlineRenderer.onExtractBlockOutline(event);
         BlockOutlineRenderer.onOutlineExtract(event);
     }
 }

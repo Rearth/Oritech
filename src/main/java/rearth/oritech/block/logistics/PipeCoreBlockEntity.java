@@ -28,7 +28,7 @@ public class PipeCoreBlockEntity extends BlockEntity {
     // position = down means we're talking about the part at the bottom of the current block
     private final PipeBlockData parts = new PipeBlockData();
 
-    private VoxelShape pipeShape = PipeCoreShape.CENTER;
+    private PipeCoreShape.BlockShapes pipeShapes = PipeCoreShape.EMPTY;
 
     public PipeCoreBlockEntity(BlockPos worldPosition, BlockState blockState) {
         super(BlockEntitiesContent.PIPE_CORE.get(), worldPosition, blockState);
@@ -48,6 +48,11 @@ public class PipeCoreBlockEntity extends BlockEntity {
 
     boolean hasPart(PipeKind kind, PartPosition position) {
         return parts.getByKind(kind).containsKey(position);
+    }
+
+    boolean isRibbonTop(PipeKind kind, Direction surface, Vec3 localHit) {
+        var part = parts.getByKind(kind).get(PartPosition.FromDirection(surface));
+        return part != null && PipeCoreShape.isRibbonTop(kind, surface, part, localHit);
     }
 
     void forEachPart(PipeKind kind, BiConsumer<PartPosition, PipePart> action) {
@@ -86,12 +91,23 @@ public class PipeCoreBlockEntity extends BlockEntity {
     }
 
     public VoxelShape getPipeShape() {
-        return pipeShape;
+        return pipeShapes.combined();
     }
+
+    public boolean hasPipeParts() {
+        return !pipeShapes.outlines().isEmpty();
+    }
+
+    public @Nullable HitOutline findHitOutline(Vec3 start, Vec3 end) {
+        var part = findHitPart(start, end);
+        return part == null ? null : new HitOutline(pipeShapes.outlines().get(part.kind()), part.shape());
+    }
+
+    public record HitOutline(VoxelShape kindShape, VoxelShape partShape) {}
 
     // mainly for shape caching
     private void onPartsChanged() {
-        pipeShape = PipeCoreShape.build(parts);
+        pipeShapes = PipeCoreShape.build(parts);
         setChanged();
 
         // the client needs the same parts and connections for block targeting
@@ -144,7 +160,7 @@ public class PipeCoreBlockEntity extends BlockEntity {
             }
         }
 
-        pipeShape = PipeCoreShape.build(parts);
+        pipeShapes = PipeCoreShape.build(parts);
     }
 
     @Override
