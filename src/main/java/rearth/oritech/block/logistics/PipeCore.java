@@ -27,14 +27,21 @@ public class PipeCore {
 
     }
 
-    public enum PipeKind {
+    public enum PipeKind implements StringRepresentable {
         ITEM(4), FLUID(8), ENERGY(12);
+
+        static final Codec<PipeKind> CODEC = StringRepresentable.fromEnum(PipeKind::values);
 
         // lane coordinate in model units (0 to 16)
         final int laneCoordinate;
 
         PipeKind(int laneCoordinate) {
             this.laneCoordinate = laneCoordinate;
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name();
         }
     }
 
@@ -57,8 +64,15 @@ public class PipeCore {
     }
 
     // basically direction but with center
-    public enum PartPosition {
+    public enum PartPosition implements StringRepresentable {
         NORTH, EAST, SOUTH, WEST, UP, DOWN, CENTER;
+
+        static final Codec<PartPosition> CODEC = StringRepresentable.fromEnum(PartPosition::values);
+
+        @Override
+        public String getSerializedName() {
+            return name();
+        }
 
         // center  = null
         static PartPosition FromDirection(@Nullable Direction direction) {

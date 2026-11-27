@@ -1,6 +1,7 @@
 package rearth.oritech.block.logistics;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +14,7 @@ import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.redstone.Orientation;
@@ -20,6 +22,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class PipeCoreBlock extends Block implements EntityBlock {
 
@@ -84,16 +88,26 @@ public class PipeCoreBlock extends Block implements EntityBlock {
     }
 
     static void refreshNearbyPipes(ServerLevel level, BlockPos pos) {
+        PipeNetworks.get(level).refreshNearby(level, pos);
+    }
+
+    static @Nullable PipeCoreBlockEntity getLoadedPipe(ServerLevel level, BlockPos pos) {
+        var chunk = getLoadedChunk(level, pos);
+        return chunk != null && chunk.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe ? pipe : null;
+    }
+
+    static @Nullable LevelChunk getLoadedChunk(ServerLevel level, BlockPos pos) {
+        return level.getChunkSource().getChunkNow(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()));
+    }
+
+    static void forEachNearbyPipePosition(BlockPos pos, Consumer<BlockPos> action) {
         // straight connections reach face neighbors and outside wraps reach edge neighbors
         for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
                 for (int z = -1; z <= 1; z++) {
                     if (Math.abs(x) + Math.abs(y) + Math.abs(z) > 2) continue;
 
-                    var target = pos.offset(x, y, z);
-                    if (level.hasChunkAt(target) && level.getBlockEntity(target) instanceof PipeCoreBlockEntity pipe) {
-                        pipe.updateConnections();
-                    }
+                    action.accept(pos.offset(x, y, z));
                 }
             }
         }

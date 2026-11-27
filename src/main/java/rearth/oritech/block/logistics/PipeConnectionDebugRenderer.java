@@ -19,11 +19,9 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
-import rearth.oritech.block.logistics.PipeCore.DirectionState;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
-import rearth.oritech.client.init.OritechClientConfig;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,6 +31,7 @@ import java.util.Set;
 @EventBusSubscriber(modid = Oritech.MOD_ID, value = Dist.CLIENT)
 public final class PipeConnectionDebugRenderer {
 
+    private static final boolean ENABLED = false;
     private static final int REFRESH_INTERVAL_TICKS = 5;
     private static final float GIZMO_OFFSET = 0.01f;
     private static final Set<LevelChunk> LOADED_CHUNKS = new HashSet<>();
@@ -45,6 +44,7 @@ public final class PipeConnectionDebugRenderer {
 
     @SubscribeEvent
     public static void onChunkLoad(ChunkEvent.Load event) {
+        if (!ENABLED) return;
         if (event.getLevel() instanceof ClientLevel && Minecraft.getInstance().isSingleplayer()) {
             LOADED_CHUNKS.add(event.getChunk());
         }
@@ -52,6 +52,7 @@ public final class PipeConnectionDebugRenderer {
 
     @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
+        if (!ENABLED) return;
         if (event.getLevel() instanceof ClientLevel) {
             LOADED_CHUNKS.remove(event.getChunk());
         }
@@ -59,6 +60,7 @@ public final class PipeConnectionDebugRenderer {
 
     @SubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
+        if (!ENABLED) return;
         if (event.getLevel() instanceof ClientLevel level) {
             LOADED_CHUNKS.removeIf(chunk -> chunk.getLevel() == level);
             if (snapshotLevel == level) {
@@ -70,9 +72,10 @@ public final class PipeConnectionDebugRenderer {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        if (!ENABLED) return;
         var minecraft = Minecraft.getInstance();
         var level = minecraft.level;
-        if (level == null || !minecraft.isSingleplayer() || !OritechClientConfig.showPipeConnectionDebug.get()) return;
+        if (level == null || !minecraft.isSingleplayer()) return;
         if (snapshotLevel == level && ++ticksSinceRefresh < REFRESH_INTERVAL_TICKS) return;
 
         ticksSinceRefresh = 0;
@@ -108,8 +111,9 @@ public final class PipeConnectionDebugRenderer {
 
     @SubscribeEvent
     public static void onSubmitGeometry(SubmitCustomGeometryEvent event) {
+        if (!ENABLED) return;
         var minecraft = Minecraft.getInstance();
-        if (minecraft.level != snapshotLevel || !minecraft.isSingleplayer() || !OritechClientConfig.showPipeConnectionDebug.get()) return;
+        if (minecraft.level != snapshotLevel || !minecraft.isSingleplayer()) return;
 
         // Minecraft's frame collector is active here. Reuse the snapshot until the next client refresh.
         for (var gizmo : snapshot) {
@@ -125,16 +129,9 @@ public final class PipeConnectionDebugRenderer {
 
         for (var direction : Direction.values()) {
             var state = part.get(direction);
-            var path = pipe.connectionPath(kind, position, direction, state);
+            var path = pipe.debugConnectionPath(kind, position, direction, state);
             for (int i = 1; i < path.size(); i++) {
-                var end = path.get(i);
-                if (i == path.size() - 1 && state == DirectionState.CONNECTED_EDGE) {
-                    // extend the last flat segment until it meets the other ribbon's center line
-                    var axis = direction.getAxis();
-                    var targetCenter = PipeCoreShape.partCenter(kind, direction.getOpposite());
-                    end = end.with(axis, targetCenter.get(axis) + direction.getAxisDirection().getStep());
-                }
-                line(gizmos, origin.add(path.get(i - 1)), origin.add(end), color);
+                line(gizmos, origin.add(path.get(i - 1)), origin.add(path.get(i)), color);
             }
         }
     }

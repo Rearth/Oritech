@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
+import rearth.oritech.block.logistics.PipeNetworks;
 import rearth.oritech.block.behavior.AcceleratorBlockImpactBehavior;
 import rearth.oritech.block.behavior.EndericLaserBlockBehavior;
 import rearth.oritech.block.behavior.EndericLaserEntityBehavior;
@@ -148,6 +149,7 @@ public final class Oritech {
 
     private void onLevelTickPos(LevelTickEvent.Post event) {
         if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
+        PipeNetworks.tick(serverLevel);
         ElectricMaceItem.processLightningEvents(serverLevel);
         PromethiumAxeItem.onTick(serverLevel);
     }
