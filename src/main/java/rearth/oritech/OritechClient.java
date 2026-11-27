@@ -28,11 +28,13 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.client.network.event.RegisterClientPayloadHandlersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import org.jspecify.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 import rearth.oritech.block.entity.augmenter.PlayerAugments;
+import rearth.oritech.block.logistics.PipeToolPreview;
 import rearth.oritech.client.cablesurfer.ActiveCableRenderer;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.client.cablesurfer.ZiplineFxHandler;
@@ -101,6 +103,7 @@ public final class OritechClient {
         neoEventBus.addListener(OreFinderRenderer::onSubmitGeometry);
 
         modEventBus.addListener(this::registerBindings);
+        modEventBus.addListener(this::registerClientPayloadHandlers);
         modEventBus.addListener(this::registerClientExtensions);
         modEventBus.addListener(this::registerSpecialModelRenderers);
         modEventBus.addListener(this::registerBlockStateModels);
@@ -241,6 +244,11 @@ public final class OritechClient {
     private void onPostClientTick(ClientTickEvent.Post event) {
         ClientZiplineHandler.onClientTick();
         ZiplineFxHandler.tick();
+        PipeOutlineRenderer.tick();
+    }
+
+    private void registerClientPayloadHandlers(RegisterClientPayloadHandlersEvent event) {
+        event.register(PipeToolPreview.Outline.TYPE, PipeOutlineRenderer::receivePreview);
     }
 
     private void onMouseClicked(InputEvent.MouseButton.Pre event) {

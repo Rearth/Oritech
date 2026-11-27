@@ -6,7 +6,7 @@ import net.minecraft.util.StringRepresentable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumMap;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Map;
 
 public class PipeCore {
@@ -28,7 +28,7 @@ public class PipeCore {
     }
 
     public enum PipeKind implements StringRepresentable {
-        ITEM(4), FLUID(8), ENERGY(12);
+        ITEM(4), FLUID(12), ENERGY(8);
 
         static final Codec<PipeKind> CODEC = StringRepresentable.fromEnum(PipeKind::values);
 
@@ -37,6 +37,10 @@ public class PipeCore {
 
         PipeKind(int laneCoordinate) {
             this.laneCoordinate = laneCoordinate;
+        }
+
+        boolean supportsExtraction() {
+            return this == ITEM || this == FLUID;
         }
 
         @Override
@@ -106,7 +110,7 @@ public class PipeCore {
     // can be either on a surface (e.g. all 6 cardinal directions) or the center.
     public static class PipePart {
 
-        // those are all world space cardinal positions and reflect the computed auto-connection states. Overrides are applied afterwards
+        // These world-space directions contain the connection states after applying wrench settings.
         DirectionState NORTH = DirectionState.NONE;
         DirectionState EAST = DirectionState.NONE;
         DirectionState SOUTH = DirectionState.NONE;
@@ -114,8 +118,13 @@ public class PipeCore {
         DirectionState UP = DirectionState.NONE;
         DirectionState DOWN = DirectionState.NONE;
 
-        // all included directions are disabled. This could be turned into a single int in the future as bit map / flag
-        HashSet<Direction> disabledDirections = new HashSet<>();
+        static final Codec<Map<Direction, DirectionState>> CLOSED_PORTS_CODEC = Codec.unboundedMap(Direction.CODEC, DirectionState.CODEC);
+
+        // Remember which route a closed port had so it can be reopened from either endpoint.
+        Map<Direction, DirectionState> closedPorts = Map.of();
+
+        // Keep the setting when a wrench closes the port so reopening restores its mode.
+        final EnumSet<Direction> extractionPorts = EnumSet.noneOf(Direction.class);
 
         DirectionState get(Direction direction) {
             return switch (direction) {
@@ -140,16 +149,20 @@ public class PipeCore {
         }
 
         boolean isDisabled(Direction direction) {
-            return disabledDirections.contains(direction);
+            return closedPorts.containsKey(direction);
         }
 
-        void setDisabled(Direction direction, boolean disabled) {
-            if (disabled) {
-                disabledDirections.add(direction);
-            } else {
-                disabledDirections.remove(direction);
+        boolean isExtracting(Direction direction) {
+            return get(direction) == DirectionState.CONNECTED_MACHINE && extractionPorts.contains(direction);
+        }
+
+        static Map<Direction, DirectionState> readLegacyClosedPorts(int mask) {
+            if (mask == 0) return Map.of();
+            var ports = new EnumMap<Direction, DirectionState>(Direction.class);
+            for (var direction : Direction.values()) {
+                if ((mask & (1 << direction.get3DDataValue())) != 0) ports.put(direction, DirectionState.NONE);
             }
+            return Map.copyOf(ports);
         }
-
     }
 }

@@ -10,10 +10,13 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
+import rearth.oritech.block.logistics.PipeNetworks.Node;
 
 import java.util.Map;
 
@@ -38,46 +41,75 @@ public class PipeCoreBlockItem extends BlockItem {
     // placement rules:
     // using this part on an empty block places and initializes a new pipe core with a surface or center part
     // clicking a support face that borders an existing core adds a surface part to that core
-    // clicking the exposed top face of a matching ribbon adds a center part to that core
+    // clicking the exposed top face of a ribbon adds a center part to that core
+    // extending a floating pipe into an existing core works if that kind's center slot is free
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        // use the actual hit before BlockPlaceContext offsets it to the adjacent block
-        var clickedPos = context.getClickedPos();
-        if (context.getLevel().getBlockEntity(clickedPos) instanceof PipeCoreBlockEntity pipe) {
-            var localHit = context.getClickLocation().subtract(Vec3.atLowerCornerOf(clickedPos));
-            if (pipe.isRibbonTop(kind, context.getClickedFace().getOpposite(), localHit)) {
-                return addPart(context, clickedPos, pipe, PartPosition.CENTER);
-            }
-        }
-
-        return super.useOn(context);
+        var placementContext = new BlockPlaceContext(context);
+        return place(placementContext, findPlacement(placementContext, context.getClickedPos()));
     }
 
     @Override
     public InteractionResult place(BlockPlaceContext context) {
-        // a click on a supporting face can aim into a block that already contains a core
-        var pos = context.getClickedPos();
-        if (context.getLevel().getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe) {
-            var part = getTargetPosition(context);
-            return part == PartPosition.CENTER ? InteractionResult.FAIL : addPart(context, pos, pipe, part);
-        }
-
-        return super.place(context);
+        return place(context, findPlacement(context, null));
     }
 
-    private InteractionResult addPart(UseOnContext context, BlockPos pos, PipeCoreBlockEntity pipe, PartPosition part) {
+    private record Placement(BlockPos pos, PartPosition part, @Nullable PipeCoreBlockEntity pipe) {}
+
+    public @Nullable Node getPlacementTarget(UseOnContext context) {
+        var placement = findPlacement(new BlockPlaceContext(context), context.getClickedPos());
+        return placement == null ? null : new Node(placement.pos(), kind, placement.part());
+    }
+
+    private @Nullable Placement findPlacement(BlockPlaceContext context, @Nullable BlockPos hitPos) {
         var level = context.getLevel();
         var player = context.getPlayer();
-
-        // reject occupied slots and check the new part's own hitbox for entity collisions
-        if (pipe.hasPart(kind, part) || !getBlock().isEnabled(level.enabledFeatures())
-            || !level.mayInteract(player, pos) || !canPlacePart(context, pos, part)) {
-            return InteractionResult.FAIL;
+        if (context.getItemInHand().isEmpty() || !getBlock().isEnabled(level.enabledFeatures())) return null;
+        if (hitPos != null && player != null && (player.isSpectator() || player.getCooldowns().isOnCooldown(context.getItemInHand())
+            || !player.getAbilities().mayBuild && !context.getItemInHand().canPlaceOnBlockInAdventureMode(new BlockInWorld(level, hitPos, false)))) {
+            return null;
         }
 
+        // Use the original hit for a ribbon top, before the normal placement context offsets it.
+        if (hitPos != null && level.getBlockEntity(hitPos) instanceof PipeCoreBlockEntity pipe) {
+            var localHit = context.getClickLocation().subtract(Vec3.atLowerCornerOf(hitPos));
+            if (pipe.isRibbonTop(context.getClickedFace().getOpposite(), localHit)) {
+                return existingPartPlacement(context, hitPos, pipe, PartPosition.CENTER);
+            }
+        }
+
+        var pos = context.getClickedPos();
+        var part = getTargetPosition(context);
+        if (level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe) {
+            return existingPartPlacement(context, pos, pipe, part);
+        }
+
+        return canInteract(context, pos) && context.canPlace() && getPlacementState(context) != null
+            ? new Placement(pos, part, null) : null;
+    }
+
+    private @Nullable Placement existingPartPlacement(BlockPlaceContext context, BlockPos pos, PipeCoreBlockEntity pipe, PartPosition part) {
+        return !pipe.hasPart(kind, part) && canInteract(context, pos) && canPlacePart(context, pos, part)
+            ? new Placement(pos, part, pipe) : null;
+    }
+
+    private boolean canInteract(BlockPlaceContext context, BlockPos pos) {
+        var level = context.getLevel();
+        return !level.isOutsideBuildHeight(pos) && level.getWorldBorder().isWithinBounds(pos)
+            && (context.getPlayer() == null || level.mayInteract(context.getPlayer(), pos));
+    }
+
+    private InteractionResult place(BlockPlaceContext context, @Nullable Placement placement) {
+        if (placement == null) return InteractionResult.FAIL;
+        var pipe = placement.pipe();
+        if (pipe == null) return super.place(context);
+
+        var pos = placement.pos();
+        var level = context.getLevel();
+        var player = context.getPlayer();
         if (level instanceof ServerLevel serverLevel) {
-            if (!pipe.addPart(kind, part)) {
+            if (!pipe.addPart(kind, placement.part())) {
                 return InteractionResult.FAIL;
             }
 

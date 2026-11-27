@@ -9,6 +9,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -19,10 +22,13 @@ import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.logistics.PipeCore.DirectionState;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
+import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
+import rearth.oritech.block.logistics.PipeCore.PipePart;
 import rearth.oritech.init.BlockContent;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -61,7 +67,7 @@ public final class PipeNetworks extends SavedData {
 
     private PipeNetworks(List<StoredPart> savedParts) {
         for (var part : savedParts) {
-            parts.put(part.node(), Connections.of(part.node(), part.directions()));
+            parts.put(part.node(), Connections.of(part.node(), part.directions(), part.closedPorts()));
             indexPosition(part.node().pos());
         }
     }
@@ -86,29 +92,38 @@ public final class PipeNetworks extends SavedData {
         }
     }
 
-    private record StoredPart(Node node, Map<Direction, DirectionState> directions) {
+    public record Port(Node node, Direction direction) {}
+
+    private record StoredPart(Node node, Map<Direction, DirectionState> directions, Map<Direction, DirectionState> closedPorts) {
         private static final Codec<StoredPart> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Node.CODEC.fieldOf("part").forGetter(StoredPart::node),
-            Codec.unboundedMap(Direction.CODEC, DirectionState.CODEC).fieldOf("directions").forGetter(StoredPart::directions)
-        ).apply(instance, StoredPart::new));
+            Codec.unboundedMap(Direction.CODEC, DirectionState.CODEC).fieldOf("directions").forGetter(StoredPart::directions),
+            PipePart.CLOSED_PORTS_CODEC.optionalFieldOf("closed_ports", Map.of()).forGetter(StoredPart::closedPorts),
+            Codec.INT.optionalFieldOf("disabled_directions", 0).forGetter(part -> 0)
+        ).apply(instance, (node, directions, closedPorts, legacyMask) -> new StoredPart(node, directions,
+            closedPorts.isEmpty() ? PipePart.readLegacyClosedPorts(legacyMask) : closedPorts)));
     }
 
-    private record Connections(Map<Direction, DirectionState> directions, Set<Node> targets) {
-        private static final Connections EMPTY = new Connections(Map.of(), Set.of());
+    private record Connections(Map<Direction, DirectionState> directions, Set<Node> targets, Map<Direction, DirectionState> closedPorts) {
+        private static final Connections EMPTY = new Connections(Map.of(), Set.of(), Map.of());
 
-        private static Connections of(Node node, Map<Direction, DirectionState> directions) {
-            if (directions.isEmpty()) return EMPTY;
+        private static Connections of(Node node, Map<Direction, DirectionState> directions, Map<Direction, DirectionState> closedPorts) {
+            if (directions.isEmpty()) return EMPTY.withClosedPorts(closedPorts);
             var targets = new HashSet<Node>();
             directions.forEach((direction, state) -> {
                 var target = connectionTarget(node, direction, state);
                 if (target != null) targets.add(target);
             });
-            return new Connections(Map.copyOf(directions), Set.copyOf(targets));
+            return new Connections(Map.copyOf(directions), Set.copyOf(targets), Map.copyOf(closedPorts));
+        }
+
+        private Connections withClosedPorts(Map<Direction, DirectionState> ports) {
+            return closedPorts.equals(ports) ? this : new Connections(directions, targets, Map.copyOf(ports));
         }
     }
 
     private List<StoredPart> storedParts() {
-        return parts.entrySet().stream().map(entry -> new StoredPart(entry.getKey(), entry.getValue().directions())).toList();
+        return parts.entrySet().stream().map(entry -> new StoredPart(entry.getKey(), entry.getValue().directions(), entry.getValue().closedPorts())).toList();
     }
 
     public Set<Node> getConnections(Node node) {
@@ -145,6 +160,10 @@ public final class PipeNetworks extends SavedData {
         return parts.getOrDefault(node, Connections.EMPTY).directions().getOrDefault(direction, DirectionState.NONE);
     }
 
+    Map<Direction, DirectionState> getClosedPorts(Node node) {
+        return parts.getOrDefault(node, Connections.EMPTY).closedPorts();
+    }
+
     Set<Node> getLoadedNodes(ServerLevel level) {
         var nodes = new HashSet<Node>();
         positionsByChunk.forEach((chunk, positions) -> {
@@ -174,9 +193,11 @@ public final class PipeNetworks extends SavedData {
         for (var kind : KINDS) {
             for (var slot : POSITIONS) {
                 var node = new Node(pos, kind, slot);
-                if (pipe != null && pipe.hasPart(kind, slot)) {
+                var part = pipe == null ? null : pipe.getPart(kind, slot);
+                if (part != null) {
                     hasParts = true;
-                    changed |= parts.putIfAbsent(node, Connections.EMPTY) == null;
+                    // Once indexed, the dimension owns the port settings so an unloaded endpoint can be edited.
+                    changed |= parts.putIfAbsent(node, Connections.EMPTY.withClosedPorts(part.closedPorts)) == null;
                 } else {
                     changed |= parts.remove(node) != null;
                 }
@@ -223,14 +244,112 @@ public final class PipeNetworks extends SavedData {
 
                 var directions = new EnumMap<Direction, DirectionState>(Direction.class);
                 for (var direction : DIRECTIONS) {
-                    var state = resolveConnection(level, node, direction, previous.directions().get(direction));
-                    if (state != DirectionState.NONE) directions.put(direction, state);
+                    var port = new Port(node, direction);
+                    var state = autoDirection(level, port, TopologyChange.NONE);
+                    mirrorClosedPort(level, port, state);
+                    if (state != DirectionState.NONE && isOpen(port, state, TopologyChange.NONE)) directions.put(direction, state);
                 }
                 if (!previous.directions().equals(directions)) {
-                    parts.put(node, Connections.of(node, directions));
+                    parts.put(node, Connections.of(node, directions, getClosedPorts(node)));
                     setDirty();
                 }
             }
+        }
+    }
+
+    private static @Nullable Port linkedPort(Port source, DirectionState state) {
+        var target = connectionTarget(source.node(), source.direction(), state);
+        if (target == null) return null;
+
+        // At corners, the far arm points along the source ribbon's normal instead of back along the same axis.
+        var targetDirection = switch (state) {
+            case CONNECTED_CORNER -> PartPosition.ToDirection(source.node().position());
+            case CONNECTED_EDGE -> PartPosition.ToDirection(source.node().position()).getOpposite();
+            default -> source.direction().getOpposite();
+        };
+        return targetDirection == null ? null : new Port(target, targetDirection);
+    }
+
+    private @Nullable DirectionState closedState(Port port) {
+        return getClosedPorts(port.node()).get(port.direction());
+    }
+
+    private DirectionState autoDirection(ServerLevel level, Port port, TopologyChange change) {
+        var node = port.node();
+        var direction = port.direction();
+        var previous = getDirection(node, direction);
+        var closed = change.closedState(port, closedState(port));
+        if (previous == DirectionState.NONE && closed != null) previous = closed;
+        return resolveConnection(level, node, direction, previous, change);
+    }
+
+    private boolean isOpen(Port port, DirectionState state, TopologyChange change) {
+        if (change.closedState(port, closedState(port)) != null) return false;
+        var target = linkedPort(port, state);
+        return target == null || change.closedState(target, closedState(target)) == null;
+    }
+
+    private void mirrorClosedPort(ServerLevel level, Port source, DirectionState state) {
+        var closed = closedState(source);
+        if (closed == null || state == DirectionState.NONE) return;
+        // Older saves record only a closed direction. The first valid route supplies the matching endpoint.
+        if (closed == DirectionState.NONE) setClosedPort(source, state);
+        else if (closed != state) return;
+
+        var target = linkedPort(source, state);
+        if (target != null && parts.containsKey(target.node()) && closedState(target) == null
+            && source.equals(linkedPort(target, autoDirection(level, target, TopologyChange.NONE)))) {
+            setClosedPort(target, state);
+        }
+    }
+
+    private void setClosedPort(Port port, @Nullable DirectionState state) {
+        var previous = parts.get(port.node());
+        if (previous == null || previous.closedPorts().get(port.direction()) == state) return;
+
+        var ports = new EnumMap<Direction, DirectionState>(Direction.class);
+        ports.putAll(previous.closedPorts());
+        if (state == null) ports.remove(port.direction());
+        else ports.put(port.direction(), state);
+        parts.put(port.node(), previous.withClosedPorts(ports));
+        queueRefresh(port.node().pos());
+        setDirty();
+    }
+
+    private record PortChange(Port source, @Nullable Port target, DirectionState route, boolean reopen) {}
+
+    private @Nullable PortChange getPortChange(Port source) {
+        var closed = closedState(source);
+        var state = closed != null ? closed : getDirection(source.node(), source.direction());
+        if (state == DirectionState.NONE && closed == null) return null;
+
+        var target = linkedPort(source, state);
+        if (target != null) {
+            var returnState = closed != null ? closedState(target) : getDirection(target.node(), target.direction());
+            if (returnState == null || !source.equals(linkedPort(target, returnState))) target = null;
+        }
+        return new PortChange(source, target, state, closed != null);
+    }
+
+    boolean toggleConnection(ServerLevel level, Port source) {
+        var change = getPortChange(source);
+        if (change == null) return false;
+
+        var state = change.reopen() ? null : change.route();
+        setClosedPort(source, state);
+        if (change.target() != null) setClosedPort(change.target(), state);
+        refreshNearby(level, source.node().pos());
+        return true;
+    }
+
+    private record TopologyChange(@Nullable Node added, @Nullable PortChange ports) {
+        private static final TopologyChange NONE = new TopologyChange(null, null);
+
+        private @Nullable DirectionState closedState(Port port, @Nullable DirectionState previous) {
+            if (ports != null && (port.equals(ports.source()) || port.equals(ports.target()))) {
+                return ports.reopen() ? null : ports.route();
+            }
+            return previous;
         }
     }
 
@@ -254,35 +373,37 @@ public final class PipeNetworks extends SavedData {
     // a surface part can connect to machines under it (with a special indicator on the model indicating that "down" direction
     // a surface part cannot connect directly to machines above it
     // a surface part can connect to machines next to it (e.g. in the neighboring blockspace) if there's no other pipe part on that side
-    private DirectionState resolveConnection(ServerLevel level, Node node, Direction direction, @Nullable DirectionState previous) {
+    private DirectionState resolveConnection(ServerLevel level, Node node, Direction direction, DirectionState previous, TopologyChange change) {
         var surface = PartPosition.ToDirection(node.position());
         var neighbor = node.pos().relative(direction);
-        if (direction == surface) return resolveMachine(level, node.kind(), neighbor, direction, previous);
+        if (direction == surface) return resolveMachine(level, node.kind(), neighbor, direction, previous, change);
 
         if (surface != null && direction == surface.getOpposite()) {
-            return hasPartAt(level, node.pos(), node.kind(), PartPosition.CENTER) ? DirectionState.CONNECTED_INSIDE : DirectionState.NONE;
+            return hasPartAt(level, node.pos(), node.kind(), PartPosition.CENTER, change) ? DirectionState.CONNECTED_INSIDE : DirectionState.NONE;
         }
 
-        if (hasPartAt(level, node.pos(), node.kind(), PartPosition.FromDirection(direction))) {
+        if (hasPartAt(level, node.pos(), node.kind(), PartPosition.FromDirection(direction), change)) {
             return surface == null ? DirectionState.CONNECTED_INSIDE : DirectionState.CONNECTED_CORNER;
         }
 
-        if (hasPartAt(level, neighbor, node.kind(), node.position())) return DirectionState.CONNECTED;
+        if (hasPartAt(level, neighbor, node.kind(), node.position(), change)) return DirectionState.CONNECTED;
 
-        if (surface != null && hasPartAt(level, neighbor.relative(surface), node.kind(), PartPosition.FromDirection(direction.getOpposite()))) {
+        if (surface != null && hasPartAt(level, neighbor.relative(surface), node.kind(), PartPosition.FromDirection(direction.getOpposite()), change)) {
             // A wrap can cross a third chunk. Keep its last verified choice until the obstruction can be checked.
             var chunk = PipeCoreBlock.getLoadedChunk(level, neighbor);
             if (chunk == null && previous == DirectionState.CONNECTED_EDGE) return previous;
-            if (chunk != null && !chunk.getBlockState(neighbor).isCollisionShapeFullBlock(level, neighbor)) {
+            if (chunk != null && (change.added() != null && change.added().pos().equals(neighbor)
+                || !chunk.getBlockState(neighbor).isCollisionShapeFullBlock(level, neighbor))) {
                 return DirectionState.CONNECTED_EDGE;
             }
         }
 
-        return resolveMachine(level, node.kind(), neighbor, direction, previous);
+        return resolveMachine(level, node.kind(), neighbor, direction, previous, change);
     }
 
-    private DirectionState resolveMachine(ServerLevel level, PipeKind kind, BlockPos target, Direction direction, @Nullable DirectionState previous) {
+    private DirectionState resolveMachine(ServerLevel level, PipeKind kind, BlockPos target, Direction direction, DirectionState previous, TopologyChange change) {
         if (level.isOutsideBuildHeight(target)) return DirectionState.NONE;
+        if (change.added() != null && change.added().pos().equals(target)) return DirectionState.NONE;
         var chunk = PipeCoreBlock.getLoadedChunk(level, target);
         // Keep the last known port for rendering across chunk borders. Check it again when the target loads.
         if (chunk == null) return previous == DirectionState.CONNECTED_MACHINE ? previous : DirectionState.NONE;
@@ -291,7 +412,7 @@ public final class PipeNetworks extends SavedData {
         if (state.is(BlockContent.PIPE_CORE.get())) return DirectionState.NONE;
 
         // Also watch empty faces so a machine can expose a new port without replacing its block.
-        machineListeners.computeIfAbsent(target, pos -> {
+        if (change == TopologyChange.NONE) machineListeners.computeIfAbsent(target, pos -> {
             var listener = new ICapabilityInvalidationListener() {
                 @Override
                 public boolean onInvalidate() {
@@ -314,10 +435,74 @@ public final class PipeNetworks extends SavedData {
             ? DirectionState.CONNECTED_MACHINE : DirectionState.NONE;
     }
 
-    private boolean hasPartAt(ServerLevel level, BlockPos pos, PipeKind kind, PartPosition slot) {
+    private boolean hasPartAt(ServerLevel level, BlockPos pos, PipeKind kind, PartPosition slot, TopologyChange change) {
+        var added = change.added();
+        if (added != null && added.kind() == kind && added.position() == slot && added.pos().equals(pos)) return true;
         var chunk = PipeCoreBlock.getLoadedChunk(level, pos);
         if (chunk == null) return parts.containsKey(new Node(pos, kind, slot));
         return chunk.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe && pipe.hasPart(kind, slot);
+    }
+
+    static VoxelShape previewPlacement(ServerLevel level, Node added) {
+        var networks = getExisting(level);
+        if (networks == null) networks = new PipeNetworks();
+        var geometry = networks.previewGeometry(level, added, new TopologyChange(added, null), true);
+        return Shapes.or(geometry, PipeCoreShape.partShape(added.kind(), added.position()));
+    }
+
+    @Nullable WrenchPreview previewWrench(ServerLevel level, Port port) {
+        var change = getPortChange(port);
+        if (change == null) return null;
+
+        var node = port.node();
+        var shape = previewGeometry(level, node, new TopologyChange(null, change), change.reopen());
+        if (shape.isEmpty()) shape = PipeCoreShape.portMarker(node.kind(), node.position(), port.direction());
+        return new WrenchPreview(change.reopen(), shape);
+    }
+
+    record WrenchPreview(boolean reopen, VoxelShape shape) {}
+
+    private VoxelShape previewGeometry(ServerLevel level, Node origin, TopologyChange change, boolean adding) {
+        var positions = new ArrayList<BlockPos>();
+        PipeCoreBlock.forEachNearbyPipePosition(origin.pos(), positions::add);
+        var before = Shapes.empty();
+        var after = Shapes.empty();
+        for (var pos : positions) {
+            var pipe = PipeCoreBlock.getLoadedPipe(level, pos);
+            if (pipe == null && !(change.added() != null && change.added().pos().equals(pos))) continue;
+
+            // Leave nearby block entities untouched. Resolve the hypothetical ports into a temporary layout.
+            var preview = new PipeBlockData();
+            var changed = false;
+            for (var kind : KINDS) {
+                for (var slot : POSITIONS) {
+                    var existing = pipe == null ? null : pipe.getPart(kind, slot);
+                    var node = new Node(pos, kind, slot);
+                    if (existing == null && !node.equals(change.added())) continue;
+                    var part = existing;
+                    if (kind == origin.kind()) {
+                        part = new PipePart();
+                        if (existing == null) changed = true;
+                        else part.extractionPorts.addAll(existing.extractionPorts);
+                        for (var direction : DIRECTIONS) {
+                            var port = new Port(node, direction);
+                            var state = autoDirection(level, port, change);
+                            if (state != DirectionState.NONE && !isOpen(port, state, change)) state = DirectionState.NONE;
+                            part.set(direction, state);
+                            if (existing != null && existing.get(direction) != state) changed = true;
+                        }
+                    }
+                    preview.getByKind(kind).put(slot, part);
+                }
+            }
+
+            var offset = pos.subtract(origin.pos());
+            var oldShape = pipe == null ? Shapes.empty() : pipe.modelShape(origin.kind());
+            var newShape = changed ? PipeCoreShape.modelShape(preview, PipeCoreShape.build(preview), origin.kind()) : oldShape;
+            before = Shapes.or(before, oldShape.move(offset));
+            after = Shapes.or(after, newShape.move(offset));
+        }
+        return adding ? Shapes.join(after, before, BooleanOp.ONLY_FIRST) : Shapes.join(before, after, BooleanOp.ONLY_FIRST);
     }
 
     static @Nullable Node connectionTarget(Node node, Direction direction, DirectionState state) {

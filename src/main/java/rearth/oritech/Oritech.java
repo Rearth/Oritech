@@ -23,6 +23,7 @@ import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.slf4j.Logger;
 import rearth.oritech.api.networking.NetworkManager;
 import rearth.oritech.block.logistics.PipeNetworks;
+import rearth.oritech.block.logistics.PipeToolPreview;
 import rearth.oritech.block.behavior.AcceleratorBlockImpactBehavior;
 import rearth.oritech.block.behavior.EndericLaserBlockBehavior;
 import rearth.oritech.block.behavior.EndericLaserEntityBehavior;
@@ -190,6 +191,7 @@ public final class Oritech {
         final PayloadRegistrar registrar = event.registrar("1");
         NetworkManager.initClientBound(registrar);
         NetworkManager.initServerBound(registrar);
+        PipeToolPreview.register(registrar);
     }
 
     private void loadLevelPipeData(ServerLevel level) {

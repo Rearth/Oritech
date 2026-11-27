@@ -20,7 +20,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
 import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
 import net.neoforged.neoforge.client.model.ExtraFaceData;
@@ -30,9 +29,9 @@ import org.joml.Vector3fc;
 import rearth.oritech.Oritech;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCoreBlockEntity;
+import rearth.oritech.block.logistics.PipeCoreBlockEntity.ModelPart;
 
 import java.util.List;
-import java.util.Map;
 
 public final class PipeCoreModel implements DynamicBlockStateModel {
 
@@ -55,7 +54,7 @@ public final class PipeCoreModel implements DynamicBlockStateModel {
 
     private final Material.Baked texture;
     private final BakedQuad.MaterialInfo material;
-    private final LoadingCache<Map<PipeKind, List<AABB>>, SimpleModelWrapper> bakedLayouts;
+    private final LoadingCache<List<ModelPart>, SimpleModelWrapper> bakedLayouts;
 
     private PipeCoreModel(Material.Baked texture) {
         this.texture = texture;
@@ -64,7 +63,7 @@ public final class PipeCoreModel implements DynamicBlockStateModel {
         // Each resource reload creates a new model and cache for the current atlas.
         bakedLayouts = CacheBuilder.newBuilder()
             .maximumWeight(CACHED_QUAD_LIMIT)
-            .weigher((Map<PipeKind, List<AABB>> layout, SimpleModelWrapper model) -> model.quads().getAll().size())
+            .weigher((List<ModelPart> layout, SimpleModelWrapper model) -> model.quads().getAll().size())
             .build(CacheLoader.from(this::bakeLayout));
     }
 
@@ -78,11 +77,11 @@ public final class PipeCoreModel implements DynamicBlockStateModel {
         if (layout != null) output.add(bakedLayouts.getUnchecked(layout));
     }
 
-    private SimpleModelWrapper bakeLayout(Map<PipeKind, List<AABB>> layout) {
+    private SimpleModelWrapper bakeLayout(List<ModelPart> layout) {
         var quads = new QuadCollection.Builder();
-        layout.forEach((kind, boxes) -> {
-            var faceData = new ExtraFaceData(color(kind), 0, false);
-            for (var box : boxes) {
+        for (var part : layout) {
+            var faceData = new ExtraFaceData(color(part.kind(), part.extractionCollar()), 0, false);
+            for (var box : part.boxes()) {
                 var from = new Vector3f((float) (box.minX * 16), (float) (box.minY * 16), (float) (box.minZ * 16));
                 var to = new Vector3f((float) (box.maxX * 16), (float) (box.maxY * 16), (float) (box.maxZ * 16));
                 for (var face : DIRECTIONS) {
@@ -93,14 +92,14 @@ public final class PipeCoreModel implements DynamicBlockStateModel {
                     quads.addUnculledFace(FaceBakery.bakeQuad(NO_INTERNING, from, to, uv, Quadrant.R0, material, face, IDENTITY, null, faceData));
                 }
             }
-        });
+        }
         return new SimpleModelWrapper(quads.build(), false, texture);
     }
 
-    private static int color(PipeKind kind) {
+    private static int color(PipeKind kind, boolean extractionCollar) {
         return switch (kind) {
-            case ITEM -> 0xFF64BA66;
-            case FLUID -> 0xFF589AD9;
+            case ITEM -> extractionCollar ? 0xFFC2FF91 : 0xFF64BA66;
+            case FLUID -> extractionCollar ? 0xFF9FE6FC : 0xFF589AD9;
             case ENERGY -> 0xFFE79844;
         };
     }

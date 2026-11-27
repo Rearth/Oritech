@@ -3,6 +3,9 @@ package rearth.oritech.block.logistics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -18,10 +21,12 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.redstone.Orientation;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
+import rearth.oritech.init.ItemContent;
 
 import java.util.function.Consumer;
 
@@ -34,6 +39,28 @@ public class PipeCoreBlock extends Block implements EntityBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe ? pipe.getPipeShape() : PipeCoreShape.CENTER;
+    }
+
+    public static boolean canToggleExtraction(Player player, BlockPos pos) {
+        if (player.isSpectator() || player.isHolding(stack -> stack.is(ItemContent.WRENCH) || stack.getItem() instanceof PipeCoreBlockItem)) return false;
+
+        var main = player.getMainHandItem();
+        var off = player.getOffhandItem();
+        return !player.isSecondaryUseActive() || (main.isEmpty() && off.isEmpty())
+            || (main.doesSneakBypassUse(player.level(), pos, player) && off.doesSneakBypassUse(player.level(), pos, player));
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (!canToggleExtraction(player, pos) || !(level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe)) return InteractionResult.PASS;
+
+        var target = pipe.findExtractionTarget(hit);
+        if (target == null) return InteractionResult.PASS;
+        if (level.isClientSide()) return InteractionResult.SUCCESS_SERVER;
+        if (!pipe.toggleExtraction(target.port())) return InteractionResult.PASS;
+
+        level.playSound(null, pos, SoundEvents.BAMBOO_WOOD_BUTTON_CLICK_ON, SoundSource.BLOCKS, 0.9f, 1.2f);
+        return InteractionResult.SUCCESS_SERVER;
     }
 
     // this is called on normal blockstate changed from the neighboring block(?), e.g. redstone update, block placement, destruction, etc.

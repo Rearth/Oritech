@@ -20,6 +20,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.BlockHitResult;
+import rearth.oritech.block.logistics.PipeCoreBlockEntity;
 import rearth.oritech.client.cablesurfer.ClientCableFinder;
 import rearth.oritech.client.cablesurfer.ClientZiplineHandler;
 import rearth.oritech.init.BlockContent;
@@ -102,11 +103,13 @@ public class Wrench extends Item {
         if (player == null) return InteractionResult.PASS;
         var level = context.getLevel();
         var pos = context.getClickedPos();
-        if (!(level.getBlockState(pos).getBlock() instanceof Wrenchable)
+        var hit = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), pos, context.isInside());
+        if (level.getBlockEntity(pos) instanceof PipeCoreBlockEntity pipe) {
+            if (level.isClientSide()) return pipe.findWrenchTarget(hit) == null ? InteractionResult.FAIL : InteractionResult.SUCCESS_SERVER;
+        } else if (!(level.getBlockState(pos).getBlock() instanceof Wrenchable)
                 && !(level.getBlockState(pos.relative(context.getClickedFace())).getBlock() instanceof Wrenchable))
             return InteractionResult.PASS;
         if (level.isClientSide()) return InteractionResult.SUCCESS;
-        var hit = new BlockHitResult(context.getClickLocation(), context.getClickedFace(), pos, context.isInside());
         return useWrench(context.getItemInHand(), player, context.getHand(), hit)
                 ? InteractionResult.SUCCESS : InteractionResult.FAIL;
     }
@@ -120,6 +123,12 @@ public class Wrench extends Item {
 
         var level = player.level();
         var blockPos = result.getBlockPos();
+        if (level.getBlockEntity(blockPos) instanceof PipeCoreBlockEntity pipe) {
+            if (!pipe.toggleConnection(result)) return false;
+            onUsed(item, player, hand);
+            return true;
+        }
+
         var blockState = level.getBlockState(blockPos);
         if (blockState.getBlock() instanceof Wrenchable wrenchable) {
             // Wrench used on a wrenchable block

@@ -1,5 +1,6 @@
 package rearth.oritech.block.logistics;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -12,6 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.model.data.ModelData;
@@ -23,6 +25,7 @@ import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
 import rearth.oritech.block.logistics.PipeNetworks.Node;
+import rearth.oritech.block.logistics.PipeNetworks.Port;
 import rearth.oritech.init.BlockEntitiesContent;
 
 import java.util.ArrayList;
@@ -32,7 +35,10 @@ import java.util.function.BiConsumer;
 
 public class PipeCoreBlockEntity extends BlockEntity {
 
-    public static final ModelProperty<Map<PipeKind, List<AABB>>> MODEL_LAYOUT = new ModelProperty<>();
+    public static final ModelProperty<List<ModelPart>> MODEL_LAYOUT = new ModelProperty<>();
+    private static final Codec<List<Direction>> EXTRACTION_PORTS_CODEC = Direction.CODEC.listOf();
+
+    public record ModelPart(PipeKind kind, boolean extractionCollar, List<AABB> boxes) {}
 
     // position = down means we're talking about the part at the bottom of the current block
     private final PipeBlockData parts = new PipeBlockData();
@@ -63,8 +69,8 @@ public class PipeCoreBlockEntity extends BlockEntity {
         return parts.getByKind(kind).get(position);
     }
 
-    boolean isRibbonTop(PipeKind kind, Direction surface, Vec3 localHit) {
-        return pipeShapes.isRibbonTop(kind, surface, localHit);
+    boolean isRibbonTop(Direction surface, Vec3 localHit) {
+        return pipeShapes.isRibbonTop(surface, localHit);
     }
 
     void forEachPart(PipeKind kind, BiConsumer<PartPosition, PipePart> action) {
@@ -139,6 +145,68 @@ public class PipeCoreBlockEntity extends BlockEntity {
 
     public record HitOutline(VoxelShape kindShape, VoxelShape partShape) {}
 
+    public record WrenchTarget(Port port, boolean reenable) {}
+
+    public @Nullable WrenchTarget findWrenchTarget(BlockHitResult hit) {
+        if (!worldPosition.equals(hit.getBlockPos())) return null;
+
+        var localHit = hit.getLocation().subtract(Vec3.atLowerCornerOf(worldPosition));
+        var partHit = pipeShapes.findHitPart(hit, localHit);
+        if (partHit == null) return null;
+
+        var direction = PipeCoreShape.findWrenchDirection(parts, partHit, hit.getDirection(), localHit);
+        if (direction == null) return null;
+
+        var kind = partHit.kind();
+        var position = partHit.position();
+        return new WrenchTarget(new Port(new Node(worldPosition, kind, position), direction), getPart(kind, position).isDisabled(direction));
+    }
+
+    public boolean toggleConnection(BlockHitResult hit) {
+        if (!(level instanceof ServerLevel serverLevel)) return false;
+
+        var target = findWrenchTarget(hit);
+        if (target == null) return false;
+
+        return PipeNetworks.get(serverLevel).toggleConnection(serverLevel, target.port());
+    }
+
+    public record ExtractionTarget(Port port, boolean extracting, VoxelShape shape) {}
+
+    public @Nullable ExtractionTarget findExtractionTarget(BlockHitResult hit) {
+        if (!worldPosition.equals(hit.getBlockPos())) return null;
+
+        var localHit = hit.getLocation().subtract(Vec3.atLowerCornerOf(worldPosition));
+        var partHit = pipeShapes.findHitPart(hit, localHit);
+        if (partHit == null) return null;
+
+        var direction = PipeCoreShape.findExtractionDirection(parts, partHit, hit, localHit);
+        if (direction == null) return null;
+
+        var kind = partHit.kind();
+        var position = partHit.position();
+        var port = new Port(new Node(worldPosition, kind, position), direction);
+        return new ExtractionTarget(port, getPart(kind, position).isExtracting(direction),
+            PipeCoreShape.extractionMarker(parts, kind, position, direction));
+    }
+
+    boolean toggleExtraction(Port port) {
+        var node = port.node();
+        if (!(level instanceof ServerLevel) || !worldPosition.equals(node.pos()) || !node.kind().supportsExtraction()) return false;
+
+        var part = getPart(node.kind(), node.position());
+        var direction = port.direction();
+        if (part == null || part.get(direction) != DirectionState.CONNECTED_MACHINE) return false;
+
+        if (!part.extractionPorts.add(direction)) part.extractionPorts.remove(direction);
+        onPartsChanged();
+        return true;
+    }
+
+    VoxelShape modelShape(PipeKind kind) {
+        return PipeCoreShape.modelShape(parts, pipeShapes, kind);
+    }
+
     // mainly for shape caching
     private void onPartsChanged() {
         pipeShapes = PipeCoreShape.build(parts);
@@ -162,6 +230,12 @@ public class PipeCoreBlockEntity extends BlockEntity {
             var storedKind = storedParts.child(kind.name());
             for (var entry : kindParts.entrySet()) {
                 var storedPart = storedKind.child(entry.getKey().name());
+                if (!entry.getValue().closedPorts.isEmpty()) {
+                    storedPart.store("closed_ports", PipePart.CLOSED_PORTS_CODEC, entry.getValue().closedPorts);
+                }
+                if (!entry.getValue().extractionPorts.isEmpty()) {
+                    storedPart.store("extraction_ports", EXTRACTION_PORTS_CODEC, List.copyOf(entry.getValue().extractionPorts));
+                }
                 for (var direction : Direction.values()) {
                     var connection = entry.getValue().get(direction);
                     if (connection != PipeCore.DirectionState.NONE) {
@@ -186,6 +260,9 @@ public class PipeCoreBlockEntity extends BlockEntity {
             for (var position : PartPosition.values()) {
                 storedKind.child(position.name()).ifPresent(storedPart -> {
                     var part = new PipePart();
+                    part.closedPorts = storedPart.read("closed_ports", PipePart.CLOSED_PORTS_CODEC)
+                        .map(Map::copyOf).orElseGet(() -> PipePart.readLegacyClosedPorts(storedPart.getIntOr("disabled_directions", 0)));
+                    if (kind.supportsExtraction()) storedPart.read("extraction_ports", EXTRACTION_PORTS_CODEC).ifPresent(part.extractionPorts::addAll);
                     for (var direction : Direction.values()) {
                         part.set(direction, storedPart.read(direction.getName(), PipeCore.DirectionState.CODEC).orElse(PipeCore.DirectionState.NONE));
                     }
@@ -244,6 +321,11 @@ public class PipeCoreBlockEntity extends BlockEntity {
             for (var partEntry : parts.getByKind(kind).entrySet()) {
                 var node = new Node(worldPosition, kind, partEntry.getKey());
                 var part = partEntry.getValue();
+                var closedPorts = networks.getClosedPorts(node);
+                if (!part.closedPorts.equals(closedPorts)) {
+                    part.closedPorts = closedPorts;
+                    changed = true;
+                }
                 for (var direction : Direction.values()) {
                     var state = networks.getDirection(node, direction);
                     if (part.get(direction) != state) {

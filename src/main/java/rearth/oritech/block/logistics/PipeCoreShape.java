@@ -3,7 +3,9 @@ package rearth.oritech.block.logistics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
@@ -12,6 +14,7 @@ import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeCore.PipeBlockData;
 import rearth.oritech.block.logistics.PipeCore.PipeKind;
 import rearth.oritech.block.logistics.PipeCore.PipePart;
+import rearth.oritech.block.logistics.PipeCoreBlockEntity.ModelPart;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -24,10 +27,11 @@ final class PipeCoreShape {
     private static final double WIDTH = 3 / 16.0;
     private static final double THICKNESS = 2 / 16.0;
     private static final double MACHINE_COLLAR_MARGIN = 1 / 32.0;
+    private static final double EXTRACTION_SLEEVE_LENGTH = 3 / 16.0;
     private static final double BRIDGE_STEP_LENGTH = 1 / 16.0;
     private static final double HIT_TOLERANCE = 1e-5;
     private static final PipeKind[] KINDS = PipeKind.values();
-    static final VoxelShape CENTER = partShape(PipeKind.FLUID, PartPosition.CENTER);
+    static final VoxelShape CENTER = Shapes.create(partBox(new Vec3(0.5, 0.5, 0.5), null));
     static final BlockShapes EMPTY = new BlockShapes(CENTER, Map.of(), List.of());
 
     static VoxelShape partShape(PipeKind kind, PartPosition position) {
@@ -60,15 +64,36 @@ final class PipeCoreShape {
         return new BlockShapes(combined, Map.copyOf(outlines), List.copyOf(partShapes));
     }
 
-    static Map<PipeKind, List<AABB>> buildModelLayout(PipeBlockData parts, BlockShapes shapes) {
-        var models = new EnumMap<PipeKind, VoxelShape>(PipeKind.class);
-        models.putAll(shapes.outlines());
+    static List<ModelPart> buildModelLayout(PipeBlockData parts, BlockShapes shapes) {
+        // Snapshot the cuboids so matching layouts share a cache key by value.
+        var layout = new ArrayList<ModelPart>();
+        for (var kind : KINDS) {
+            if (!shapes.outlines().containsKey(kind)) continue;
+            var model = modelShape(parts, shapes, kind);
+            var extractingCollars = Shapes.empty();
+            for (var entry : parts.getByKind(kind).entrySet()) {
+                var surface = PartPosition.ToDirection(entry.getKey());
+                if (surface != null && entry.getValue().isExtracting(surface)) {
+                    extractingCollars = Shapes.or(extractingCollars, machineCollar(kind, surface));
+                }
+            }
+            if (!extractingCollars.isEmpty()) {
+                // Give backing collars their own tint without drawing the same faces twice.
+                layout.add(new ModelPart(kind, true, List.copyOf(extractingCollars.toAabbs())));
+                model = Shapes.join(model, extractingCollars, BooleanOp.ONLY_FIRST);
+            }
+            if (!model.isEmpty()) layout.add(new ModelPart(kind, false, List.copyOf(model.toAabbs())));
+        }
+        return List.copyOf(layout);
+    }
 
+    static VoxelShape modelShape(PipeBlockData parts, BlockShapes shapes, PipeKind kind) {
+        var model = shapes.outlines().getOrDefault(kind, Shapes.empty());
         for (var hit : shapes.parts()) {
+            if (hit.kind() != kind) continue;
             var surface = PartPosition.ToDirection(hit.position());
             if (surface == null) continue;
 
-            var kind = hit.kind();
             var part = parts.getByKind(kind).get(hit.position());
             for (var direction : Direction.values()) {
                 if (part.get(direction) != DirectionState.CONNECTED_EDGE) continue;
@@ -78,15 +103,11 @@ final class PipeCoreShape {
 
                 var start = pointOnFace(partCenter(kind, surface), direction);
                 var end = start.relative(direction, THICKNESS);
-                var elbow = Shapes.create(pipeBox(start, end, surface, direction.getAxis()));
-                models.merge(kind, elbow, Shapes::or);
+                model = Shapes.or(model, Shapes.create(pipeBox(start, end, surface, direction.getAxis())));
             }
         }
 
-        // Snapshot the cuboids so matching layouts share a cache key by value.
-        var layout = new EnumMap<PipeKind, List<AABB>>(PipeKind.class);
-        models.forEach((kind, shape) -> layout.put(kind, List.copyOf(shape.toAabbs())));
-        return Map.copyOf(layout);
+        return model;
     }
 
     record BlockShapes(VoxelShape combined, Map<PipeKind, VoxelShape> outlines, List<PartHit> parts) {
@@ -107,18 +128,17 @@ final class PipeCoreShape {
             return closest;
         }
 
-        boolean isRibbonTop(PipeKind kind, Direction surface, Vec3 localHit) {
-            var position = PartPosition.FromDirection(surface);
-            var axis = surface.getAxis();
+        @Nullable PartHit findHitPart(BlockHitResult hit, Vec3 localHit) {
             for (var part : parts) {
-                if (part.kind() != kind || part.position() != position) continue;
+                if (hit.isInside() ? contains(part.shape(), localHit) : isOnFace(part.shape(), hit.getDirection(), localHit)) return part;
+            }
+            return null;
+        }
 
-                // use the exposed face of each box, including the raised bridge deck
-                for (var box : part.shape().toAabbs()) {
-                    var top = surface.getAxisDirection() == Direction.AxisDirection.POSITIVE ? box.min(axis) : box.max(axis);
-                    if (Math.abs(localHit.get(axis) - top) <= HIT_TOLERANCE && box.inflate(HIT_TOLERANCE).contains(localHit)) return true;
-                }
-                return false;
+        boolean isRibbonTop(Direction surface, Vec3 localHit) {
+            var position = PartPosition.FromDirection(surface);
+            for (var part : parts) {
+                if (part.position() == position && isOnFace(part.shape(), surface.getOpposite(), localHit)) return true;
             }
             return false;
         }
@@ -126,22 +146,126 @@ final class PipeCoreShape {
 
     record PartHit(PipeKind kind, PartPosition position, VoxelShape shape) {}
 
-    private static VoxelShape buildPart(PipeBlockData parts, PipeKind kind, PartPosition position, PipePart part) {
-        var surface = PartPosition.ToDirection(position);
-        var result = partShape(kind, position);
-        if (surface != null && part.get(surface) == DirectionState.CONNECTED_MACHINE) {
-            // The ribbon already touches the machine. A raised collar marks the hidden port.
-            var collar = partBox(partCenter(kind, surface), surface).inflate(MACHINE_COLLAR_MARGIN)
-                .move(Vec3.ZERO.relative(surface.getOpposite(), MACHINE_COLLAR_MARGIN));
-            result = Shapes.or(result, Shapes.create(collar));
+    private static boolean contains(VoxelShape shape, Vec3 point) {
+        return shape.toAabbs().stream().anyMatch(box -> box.inflate(HIT_TOLERANCE).contains(point));
+    }
+
+    private static boolean isOnFace(VoxelShape shape, Direction face, Vec3 point) {
+        var axis = face.getAxis();
+        for (var box : shape.toAabbs()) {
+            var side = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? box.max(axis) : box.min(axis);
+            if (Math.abs(point.get(axis) - side) <= HIT_TOLERANCE && box.inflate(HIT_TOLERANCE).contains(point)) return true;
         }
+        return false;
+    }
+
+    private static VoxelShape buildPart(PipeBlockData parts, PipeKind kind, PartPosition position, PipePart part) {
+        var result = partShape(kind, position);
         for (var direction : Direction.values()) {
-            var path = connectionPath(parts, kind, position, direction, part.get(direction));
-            for (int i = 1; i < path.size(); i++) {
-                result = Shapes.or(result, Shapes.create(connectionBox(path.get(i - 1), path.get(i), surface, direction)));
-            }
+            result = Shapes.or(result, connectionShape(parts, kind, position, direction, part.get(direction)));
         }
         return result;
+    }
+
+    static VoxelShape connectionShape(PipeBlockData parts, PipeKind kind, PartPosition position, Direction direction, DirectionState state) {
+        var surface = PartPosition.ToDirection(position);
+        if (direction == surface && state == DirectionState.CONNECTED_MACHINE) return machineCollar(kind, surface);
+
+        var result = Shapes.empty();
+        var path = connectionPath(parts, kind, position, direction, state);
+        for (int i = 1; i < path.size(); i++) {
+            result = Shapes.or(result, Shapes.create(connectionBox(path.get(i - 1), path.get(i), surface, direction)));
+        }
+        if (state == DirectionState.CONNECTED_MACHINE && parts.getByKind(kind).get(position).isExtracting(direction)) {
+            result = Shapes.or(result, extractionSleeve(path, surface, direction));
+        }
+        return result;
+    }
+
+    static VoxelShape extractionMarker(PipeBlockData parts, PipeKind kind, PartPosition position, Direction direction) {
+        var surface = PartPosition.ToDirection(position);
+        if (direction == surface) return machineCollar(kind, surface);
+
+        var path = connectionPath(parts, kind, position, direction, DirectionState.CONNECTED_MACHINE);
+        return extractionSleeve(path, surface, direction);
+    }
+
+    private static VoxelShape extractionSleeve(List<Vec3> path, @Nullable Direction surface, Direction direction) {
+        var axis = direction.getAxis();
+        var end = path.getLast();
+        var legStart = path.get(path.size() - 2);
+        // Fit the sleeve on the last leg so it stays clear of any bridge that leads into it.
+        var length = Math.min(EXTRACTION_SLEEVE_LENGTH, Math.abs(end.get(axis) - legStart.get(axis)));
+        var start = end.relative(direction.getOpposite(), length);
+        var margin = MACHINE_COLLAR_MARGIN;
+        var padding = new Vec3(margin, margin, margin).with(axis, 0);
+        var box = pipeBox(start, end, surface, axis).inflate(padding.x, padding.y, padding.z);
+        if (surface != null) box = box.move(Vec3.ZERO.relative(surface.getOpposite(), margin));
+        return Shapes.create(box);
+    }
+
+    private static VoxelShape machineCollar(PipeKind kind, Direction surface) {
+        // The ribbon already touches the machine. A raised collar marks the hidden port.
+        var collar = partBox(partCenter(kind, surface), surface).inflate(MACHINE_COLLAR_MARGIN)
+            .move(Vec3.ZERO.relative(surface.getOpposite(), MACHINE_COLLAR_MARGIN));
+        return Shapes.create(collar);
+    }
+
+    static VoxelShape portMarker(PipeKind kind, PartPosition position, Direction direction) {
+        var surface = PartPosition.ToDirection(position);
+        if (direction == surface) return machineCollar(kind, surface);
+
+        var center = partCenter(kind, surface);
+        var radius = surface != null && direction.getAxis() == surface.getAxis() ? THICKNESS / 2 : WIDTH / 2;
+        var start = center.relative(direction, radius);
+        return Shapes.create(pipeBox(start, start.relative(direction, BRIDGE_STEP_LENGTH), surface, direction.getAxis()));
+    }
+
+    static @Nullable Direction findWrenchDirection(PipeBlockData parts, PartHit hit, Direction face, Vec3 localHit) {
+        var kind = hit.kind();
+        var position = hit.position();
+        var part = parts.getByKind(kind).get(position);
+        var surface = PartPosition.ToDirection(position);
+        var onBody = contains(partShape(kind, position), localHit);
+        var onCollar = surface != null && part.get(surface) == DirectionState.CONNECTED_MACHINE
+            && isOnFace(machineCollar(kind, surface), face, localHit);
+
+        if (!onBody && !onCollar) {
+            for (var direction : Direction.values()) {
+                if (isOnFace(connectionShape(parts, kind, position, direction, part.get(direction)), face, localHit)) return direction;
+            }
+        }
+
+        if (surface != null && face == surface.getOpposite()) {
+            // From the ribbon's exposed side, aim at an edge to reopen a lateral port.
+            // The middle selects the hidden backing port, while the surrounding area can reopen the center link.
+            var offset = localHit.subtract(partCenter(kind, surface)).with(surface.getAxis(), 0);
+            var edge = Direction.getApproximateNearest(offset);
+            var nearEdge = offset.lengthSqr() >= WIDTH * WIDTH / 16;
+            if (nearEdge && edge.getAxis() != surface.getAxis() && part.isDisabled(edge)) return edge;
+            if ((!nearEdge || !part.isDisabled(face)) && isWrenchable(part, surface)) return surface;
+        }
+
+        if (onCollar && !part.isDisabled(face)) return surface;
+        return isWrenchable(part, face) ? face : null;
+    }
+
+    static @Nullable Direction findExtractionDirection(PipeBlockData parts, PartHit hit, BlockHitResult blockHit, Vec3 localHit) {
+        var kind = hit.kind();
+        if (!kind.supportsExtraction()) return null;
+
+        var position = hit.position();
+        var part = parts.getByKind(kind).get(position);
+        for (var direction : Direction.values()) {
+            if (part.get(direction) != DirectionState.CONNECTED_MACHINE) continue;
+            var shape = connectionShape(parts, kind, position, direction, DirectionState.CONNECTED_MACHINE);
+            if (blockHit.isInside() ? contains(shape, localHit) : isOnFace(shape, blockHit.getDirection(), localHit)) return direction;
+        }
+        return null;
+    }
+
+    private static boolean isWrenchable(PipePart part, Direction direction) {
+        return part.isDisabled(direction) || part.get(direction) != DirectionState.NONE;
     }
 
     private static AABB connectionBox(Vec3 start, Vec3 end, @Nullable Direction surface, Direction direction) {
