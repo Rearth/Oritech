@@ -23,6 +23,7 @@ final class PipeCoreShape {
     // convert model dimensions to block-local coordinates for shapes and gizmos
     private static final double WIDTH = 3 / 16.0;
     private static final double THICKNESS = 2 / 16.0;
+    private static final double MACHINE_COLLAR_MARGIN = 1 / 32.0;
     private static final double BRIDGE_STEP_LENGTH = 1 / 16.0;
     private static final double HIT_TOLERANCE = 1e-5;
     private static final PipeKind[] KINDS = PipeKind.values();
@@ -128,6 +129,12 @@ final class PipeCoreShape {
     private static VoxelShape buildPart(PipeBlockData parts, PipeKind kind, PartPosition position, PipePart part) {
         var surface = PartPosition.ToDirection(position);
         var result = partShape(kind, position);
+        if (surface != null && part.get(surface) == DirectionState.CONNECTED_MACHINE) {
+            // The ribbon already touches the machine. A raised collar marks the hidden port.
+            var collar = partBox(partCenter(kind, surface), surface).inflate(MACHINE_COLLAR_MARGIN)
+                .move(Vec3.ZERO.relative(surface.getOpposite(), MACHINE_COLLAR_MARGIN));
+            result = Shapes.or(result, Shapes.create(collar));
+        }
         for (var direction : Direction.values()) {
             var path = connectionPath(parts, kind, position, direction, part.get(direction));
             for (int i = 1; i < path.size(); i++) {
@@ -216,7 +223,7 @@ final class PipeCoreShape {
     static @Nullable Vec3 connectionEnd(Vec3 center, @Nullable Direction surface, Direction direction, DirectionState state) {
         return switch (state) {
             case NONE -> null;
-            case CONNECTED, CONNECTED_EDGE -> pointOnFace(center, direction);
+            case CONNECTED, CONNECTED_EDGE, CONNECTED_MACHINE -> pointOnFace(center, direction);
             // the two surface arms meet where their center lines cross
             case CONNECTED_CORNER -> center.with(direction.getAxis(), surfaceCoordinate(direction));
             // the center owns the arm between itself and a surface part

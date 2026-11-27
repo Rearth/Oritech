@@ -17,6 +17,7 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent;
 import org.jetbrains.annotations.Nullable;
 import rearth.oritech.Oritech;
+import rearth.oritech.block.logistics.PipeCore.DirectionState;
 import rearth.oritech.block.logistics.PipeCore.PartPosition;
 import rearth.oritech.block.logistics.PipeNetworks.Node;
 
@@ -124,24 +125,24 @@ public final class PipeNetworkDebugRenderer {
         if (part == null) return;
 
         var origin = Vec3.atLowerCornerOf(node.pos());
-        if (neighbors.isEmpty()) {
-            // A single disconnected part is still its own network.
-            var surface = PartPosition.ToDirection(node.position());
-            var center = origin.add(PipeCoreShape.partCenter(node.kind(), surface));
-            var direction = surface != null && surface.getAxis() == Direction.Axis.X ? Direction.SOUTH : Direction.EAST;
-            lines.add(new LineGizmo(center.relative(direction, -1 / 16.0), center.relative(direction, 1 / 16.0), color, LineGizmo.DEFAULT_WIDTH));
-            return;
-        }
-
+        int firstLine = lines.size();
         for (var direction : Direction.values()) {
             var state = part.get(direction);
             var target = PipeNetworks.connectionTarget(node, direction, state);
-            if (target == null || !neighbors.contains(target)) continue;
+            if (state != DirectionState.CONNECTED_MACHINE && (target == null || !neighbors.contains(target))) continue;
 
             var path = pipe.debugConnectionPath(node.kind(), node.position(), direction, state);
             for (int i = 1; i < path.size(); i++) {
                 lines.add(new LineGizmo(origin.add(path.get(i - 1)), origin.add(path.get(i)), color, LineGizmo.DEFAULT_WIDTH));
             }
+        }
+
+        if (neighbors.isEmpty() && lines.size() == firstLine) {
+            // A single disconnected part is still its own network.
+            var surface = PartPosition.ToDirection(node.position());
+            var center = origin.add(PipeCoreShape.partCenter(node.kind(), surface));
+            var direction = surface != null && surface.getAxis() == Direction.Axis.X ? Direction.SOUTH : Direction.EAST;
+            lines.add(new LineGizmo(center.relative(direction, -1 / 16.0), center.relative(direction, 1 / 16.0), color, LineGizmo.DEFAULT_WIDTH));
         }
     }
 }

@@ -11,6 +11,8 @@ import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 import net.neoforged.neoforge.event.level.BlockEvent.NeighborNotifyEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import org.jetbrains.annotations.Nullable;
@@ -52,6 +54,8 @@ public final class PipeNetworks extends SavedData {
     private final Set<BlockPos> pendingRefresh = new HashSet<>();
     // Remember newly loaded chunks until their block entities are ready to compare with the saved pipes.
     private final Set<ChunkPos> pendingChunks = new HashSet<>();
+    // NeoForge holds weak references to these listeners. Share one across all pipes probing a block.
+    private final Map<BlockPos, ICapabilityInvalidationListener> machineListeners = new HashMap<>();
 
     private PipeNetworks() {}
 
@@ -186,6 +190,10 @@ public final class PipeNetworks extends SavedData {
                 var chunk = ChunkPos.containing(pos);
                 var positions = positionsByChunk.get(chunk);
                 if (positions != null && positions.remove(pos) && positions.isEmpty()) positionsByChunk.remove(chunk);
+                for (var direction : DIRECTIONS) {
+                    var target = pos.relative(direction);
+                    if (!hasAdjacentPipe(target)) machineListeners.remove(target);
+                }
             }
             setDirty();
         }
@@ -240,9 +248,16 @@ public final class PipeNetworks extends SavedData {
     //   straight routes take priority over outside wraps
     // for center parts:
     //   routes can connect to neighboring center parts or any surface part within the same blockspace
+
+    // connection rules to machines (part -> machine):
+    // a central part can connect to machines in all 6 directions, if there's no a part of that side
+    // a surface part can connect to machines under it (with a special indicator on the model indicating that "down" direction
+    // a surface part cannot connect directly to machines above it
+    // a surface part can connect to machines next to it (e.g. in the neighboring blockspace) if there's no other pipe part on that side
     private DirectionState resolveConnection(ServerLevel level, Node node, Direction direction, @Nullable DirectionState previous) {
         var surface = PartPosition.ToDirection(node.position());
-        if (direction == surface) return DirectionState.NONE;
+        var neighbor = node.pos().relative(direction);
+        if (direction == surface) return resolveMachine(level, node.kind(), neighbor, direction, previous);
 
         if (surface != null && direction == surface.getOpposite()) {
             return hasPartAt(level, node.pos(), node.kind(), PartPosition.CENTER) ? DirectionState.CONNECTED_INSIDE : DirectionState.NONE;
@@ -252,18 +267,51 @@ public final class PipeNetworks extends SavedData {
             return surface == null ? DirectionState.CONNECTED_INSIDE : DirectionState.CONNECTED_CORNER;
         }
 
-        var neighbor = node.pos().relative(direction);
         if (hasPartAt(level, neighbor, node.kind(), node.position())) return DirectionState.CONNECTED;
 
-        if (surface == null || !hasPartAt(level, neighbor.relative(surface), node.kind(), PartPosition.FromDirection(direction.getOpposite()))) {
-            return DirectionState.NONE;
+        if (surface != null && hasPartAt(level, neighbor.relative(surface), node.kind(), PartPosition.FromDirection(direction.getOpposite()))) {
+            // A wrap can cross a third chunk. Keep its last verified choice until the obstruction can be checked.
+            var chunk = PipeCoreBlock.getLoadedChunk(level, neighbor);
+            if (chunk == null && previous == DirectionState.CONNECTED_EDGE) return previous;
+            if (chunk != null && !chunk.getBlockState(neighbor).isCollisionShapeFullBlock(level, neighbor)) {
+                return DirectionState.CONNECTED_EDGE;
+            }
         }
 
-        // A wrap can cross a third chunk. Keep its last verified choice until the obstruction can be checked.
-        var chunk = PipeCoreBlock.getLoadedChunk(level, neighbor);
-        if (chunk == null) return previous == DirectionState.CONNECTED_EDGE ? previous : DirectionState.NONE;
+        return resolveMachine(level, node.kind(), neighbor, direction, previous);
+    }
 
-        return chunk.getBlockState(neighbor).isCollisionShapeFullBlock(level, neighbor) ? DirectionState.NONE : DirectionState.CONNECTED_EDGE;
+    private DirectionState resolveMachine(ServerLevel level, PipeKind kind, BlockPos target, Direction direction, @Nullable DirectionState previous) {
+        if (level.isOutsideBuildHeight(target)) return DirectionState.NONE;
+        var chunk = PipeCoreBlock.getLoadedChunk(level, target);
+        // Keep the last known port for rendering across chunk borders. Check it again when the target loads.
+        if (chunk == null) return previous == DirectionState.CONNECTED_MACHINE ? previous : DirectionState.NONE;
+
+        var state = chunk.getBlockState(target);
+        if (state.is(BlockContent.PIPE_CORE.get())) return DirectionState.NONE;
+
+        // Also watch empty faces so a machine can expose a new port without replacing its block.
+        machineListeners.computeIfAbsent(target, pos -> {
+            var listener = new ICapabilityInvalidationListener() {
+                @Override
+                public boolean onInvalidate() {
+                    if (machineListeners.get(pos) != this) return false;
+                    queueRefresh(pos);
+                    return true;
+                }
+            };
+            level.registerCapabilityListener(pos, listener);
+            return listener;
+        });
+
+        var face = direction.getOpposite();
+        var capability = switch (kind) {
+            case ITEM -> Capabilities.Item.BLOCK;
+            case FLUID -> Capabilities.Fluid.BLOCK;
+            case ENERGY -> Capabilities.Energy.BLOCK;
+        };
+        return level.getCapability(capability, target, state, null, face) != null
+            ? DirectionState.CONNECTED_MACHINE : DirectionState.NONE;
     }
 
     private boolean hasPartAt(ServerLevel level, BlockPos pos, PipeKind kind, PartPosition slot) {
@@ -286,7 +334,7 @@ public final class PipeNetworks extends SavedData {
                 yield surface == null ? null : new Node(pos.relative(direction).relative(surface),
                     kind, PartPosition.FromDirection(direction.getOpposite()));
             }
-            case NONE -> null;
+            case NONE, CONNECTED_MACHINE -> null;
         };
     }
 
@@ -318,16 +366,16 @@ public final class PipeNetworks extends SavedData {
         if (networks == null || networks.positionsByChunk.isEmpty()) return;
 
         var pos = event.getPos();
-        if (networks.hasIndexedPipe(pos)) {
+        if (networks.hasIndexedPipe(pos) || networks.hasAdjacentPipe(pos)) {
             networks.queueRefresh(pos);
-            return;
         }
+    }
+
+    private boolean hasAdjacentPipe(BlockPos pos) {
         for (var direction : DIRECTIONS) {
-            if (networks.hasIndexedPipe(pos.relative(direction))) {
-                networks.queueRefresh(pos);
-                return;
-            }
+            if (hasIndexedPipe(pos.relative(direction))) return true;
         }
+        return false;
     }
 
     @SubscribeEvent
@@ -392,8 +440,8 @@ public final class PipeNetworks extends SavedData {
     }
 
     private void collectChunkConnections(ChunkPos chunk, Set<BlockPos> affected) {
-        // Recheck both sides of the border, even when the arriving chunk contains only the obstruction for a wrap.
-        // Unchanged interior parts only need a new check if a block can obstruct an outside wrap.
+        // Check interior machine ports and both sides of the border when their blocks become available.
+        // The arriving chunk can also contain only the obstruction for a wrap.
         ChunkPos.rangeClosed(chunk, 1).forEach(neighbor -> {
             for (var pos : positionsByChunk.getOrDefault(neighbor, Set.of())) {
                 int x = pos.getX();
@@ -401,25 +449,9 @@ public final class PipeNetworks extends SavedData {
                 if (x < chunk.getMinBlockX() - 1 || x > chunk.getMaxBlockX() + 1
                     || z < chunk.getMinBlockZ() - 1 || z > chunk.getMaxBlockZ() + 1) continue;
 
-                if (x <= chunk.getMinBlockX() || x >= chunk.getMaxBlockX() || z <= chunk.getMinBlockZ() || z >= chunk.getMaxBlockZ()
-                    || hasOutsideWrapCandidate(pos)) affected.add(pos);
+                affected.add(pos);
             }
         });
     }
 
-    private boolean hasOutsideWrapCandidate(BlockPos pos) {
-        for (var kind : KINDS) {
-            for (var slot : POSITIONS) {
-                var surface = PartPosition.ToDirection(slot);
-                if (surface == null || !parts.containsKey(new Node(pos, kind, slot))) continue;
-                for (var direction : DIRECTIONS) {
-                    if (direction.getAxis() == surface.getAxis()) continue;
-                    var target = pos.relative(direction).relative(surface);
-                    var targetSlot = PartPosition.FromDirection(direction.getOpposite());
-                    if (parts.containsKey(new Node(target, kind, targetSlot))) return true;
-                }
-            }
-        }
-        return false;
-    }
 }

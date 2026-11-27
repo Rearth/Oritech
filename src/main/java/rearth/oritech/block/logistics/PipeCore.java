@@ -50,10 +50,11 @@ public class PipeCore {
     // state of a single direction of a single part
     public enum DirectionState implements StringRepresentable {
         NONE, // none is just no state / it not being set
-        CONNECTED,  // connected to pipe / machine on neighboring block on same surface or part position (for centers)
+        CONNECTED,  // connected to a matching pipe part in the neighboring block
         CONNECTED_EDGE, // connected to a pipe that is "back" by one block relative to the current surface of the part (not possible for center) (outside corner)
         CONNECTED_INSIDE, // connected from surface to center
-        CONNECTED_CORNER; // for inside connections in the same block space between 2 surfaces (e.g. inside 90 degree angle)
+        CONNECTED_CORNER, // for inside connections in the same block space between 2 surfaces (e.g. inside 90 degree angle)
+        CONNECTED_MACHINE; // ends at the neighboring block's capability on the face toward the pipe
 
         public static final Codec<DirectionState> CODEC = StringRepresentable.fromEnum(DirectionState::values);
 
